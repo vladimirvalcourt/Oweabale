@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UploadCloud, FileText, CheckCircle, AlertCircle, X, Lock } from 'lucide-react';
 import { toast } from 'sonner';
+import Tesseract from 'tesseract.js';
 import { useStore } from '../store/useStore';
 
 export default function Upload() {
@@ -10,6 +11,7 @@ export default function Upload() {
   
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractionComplete, setExtractionComplete] = useState(false);
   
@@ -22,6 +24,14 @@ export default function Upload() {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
+  useEffect(() => {
+    if (file && file.type.startsWith('image/')) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    }
+  }, [file]);
+
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -32,23 +42,61 @@ export default function Upload() {
     }
   };
 
-  const simulateExtraction = (uploadedFile: File) => {
+  const processDocument = async (uploadedFile: File) => {
     setFile(uploadedFile);
     setIsExtracting(true);
     
-    // Simulate API call for OCR/Data extraction
-    setTimeout(() => {
+    try {
+      if (uploadedFile.type.startsWith('image/')) {
+        const result = await Tesseract.recognize(uploadedFile, 'eng');
+        const text = result.data.text;
+        
+        const lines = text.split('\n').filter(line => line.trim().length > 0);
+        const biller = lines.length > 0 ? lines[0].trim() : 'Unknown Biller';
+        
+        const amountMatches = text.match(/\$?\s*\d+\.\d{2}/g);
+        let maxAmount = 0;
+        if (amountMatches) {
+          const amounts = amountMatches.map(m => parseFloat(m.replace(/[^0-9.]/g, '')));
+          maxAmount = Math.max(...amounts);
+        }
+
+        const dateMatch = text.match(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/);
+        let dueDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+        if (dateMatch) {
+            try {
+                const parsed = new Date(dateMatch[0]);
+                if (!isNaN(parsed.getTime())) {
+                    dueDate = parsed.toISOString().split('T')[0];
+                }
+            } catch (e) {}
+        }
+
+        setFormData({
+          biller: biller.substring(0, 50),
+          amount: maxAmount > 0 ? maxAmount.toFixed(2) : '',
+          dueDate: dueDate,
+          category: 'Utilities',
+        });
+        toast.success('Document processed successfully');
+      } else {
+        setTimeout(() => {
+          setFormData({
+            biller: 'Unknown Document',
+            amount: '',
+            dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            category: 'Other',
+          });
+          toast.success('File loaded. Manual entry required for PDFs.');
+        }, 1000);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to process document');
+    } finally {
       setIsExtracting(false);
       setExtractionComplete(true);
-      // Mock extracted data
-      setFormData({
-        biller: 'Comcast Internet',
-        amount: '89.99',
-        dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        category: 'Utilities',
-      });
-      toast.success('Document processed successfully');
-    }, 2500);
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -57,14 +105,14 @@ export default function Upload() {
     setDragActive(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      simulateExtraction(e.dataTransfer.files[0]);
+      processDocument(e.dataTransfer.files[0]);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
-      simulateExtraction(e.target.files[0]);
+      processDocument(e.target.files[0]);
     }
   };
 
@@ -189,8 +237,12 @@ export default function Upload() {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="flex-1 bg-[#0A0A0A] border border-[#262626] rounded flex items-center justify-center min-h-[300px]">
-              <p className="text-sm text-zinc-500">Document Preview</p>
+            <div className="flex-1 bg-[#0A0A0A] border border-[#262626] rounded flex items-center justify-center min-h-[300px] overflow-hidden">
+              {previewUrl ? (
+                <img src={previewUrl} alt="Document preview" className="max-w-full max-h-[400px] object-contain" referrerPolicy="no-referrer" />
+              ) : (
+                <p className="text-sm text-zinc-500">Document Preview</p>
+              )}
             </div>
           </div>
 

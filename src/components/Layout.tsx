@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { 
   Bell, Search, Home, Receipt, CreditCard, Target, 
   Settings, Repeat, BarChart3, Plus, Menu, X, 
-  Upload as UploadIcon, Sparkles 
+  Upload as UploadIcon
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition } from '@headlessui/react';
 import { toast } from 'sonner';
@@ -16,7 +16,6 @@ export default function Layout() {
 
   const navItems = [
     { name: 'Dashboard', path: '/', icon: Home },
-    { name: 'AI Advisor', path: '/advisor', icon: Sparkles },
     { name: 'Bills', path: '/bills', icon: Receipt },
     { name: 'Debts', path: '/debts', icon: CreditCard },
     { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },

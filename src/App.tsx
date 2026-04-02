@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
-import Advisor from './pages/Advisor';
 import Bills from './pages/Bills';
 import AddBill from './pages/AddBill';
 import Debts from './pages/Debts';
@@ -35,7 +34,6 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
-          <Route path="advisor" element={<Advisor />} />
           <Route path="bills" element={<Bills />} />
           <Route path="bills/add" element={<AddBill />} />
           <Route path="bills/edit/:id" element={<AddBill />} />
