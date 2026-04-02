@@ -1,21 +1,88 @@
-import React, { useState } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Bell, Search, Home, Receipt, CreditCard, Target, 
   Settings, Repeat, BarChart3, Plus, Menu, X, 
-  Upload as UploadIcon
+  Upload as UploadIcon, Wallet
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition } from '@headlessui/react';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
+import { useStore } from '../store/useStore';
 
 export default function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+
+  const { bills, debts, transactions, subscriptions, goals } = useStore();
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const searchResults = React.useMemo(() => {
+    if (!searchQuery.trim()) return [];
+
+    const query = searchQuery.toLowerCase();
+    const results = [];
+
+    bills.forEach(bill => {
+      if (bill.biller.toLowerCase().includes(query) || bill.category.toLowerCase().includes(query)) {
+        results.push({ type: 'Bill', name: bill.biller, detail: `$${bill.amount} - ${bill.status}`, path: '/bills' });
+      }
+    });
+
+    debts.forEach(debt => {
+      if (debt.name.toLowerCase().includes(query) || debt.type.toLowerCase().includes(query)) {
+        results.push({ type: 'Debt', name: debt.name, detail: `$${debt.remaining} remaining`, path: '/debts' });
+      }
+    });
+
+    transactions.forEach(tx => {
+      if (tx.name.toLowerCase().includes(query) || tx.category.toLowerCase().includes(query)) {
+        results.push({ type: 'Transaction', name: tx.name, detail: `$${tx.amount} - ${tx.date}`, path: '/' });
+      }
+    });
+
+    subscriptions.forEach(sub => {
+      if (sub.name.toLowerCase().includes(query)) {
+        results.push({ type: 'Subscription', name: sub.name, detail: `$${sub.amount} / ${sub.frequency}`, path: '/subscriptions' });
+      }
+    });
+
+    goals.forEach(goal => {
+      if (goal.name.toLowerCase().includes(query)) {
+        results.push({ type: 'Goal', name: goal.name, detail: `$${goal.currentAmount} / $${goal.targetAmount}`, path: '/goals' });
+      }
+    });
+
+    return results.slice(0, 8); // Limit to 8 results
+  }, [searchQuery, bills, debts, transactions, subscriptions, goals]);
+
+  const handleSearchSelect = (path: string) => {
+    navigate(path);
+    setIsSearchOpen(false);
+    setSearchQuery('');
+  };
+
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: Home },
+    { name: 'Dashboard', path: '/dashboard', icon: Home },
+    { name: 'Income', path: '/income', icon: Wallet },
     { name: 'Bills', path: '/bills', icon: Receipt },
     { name: 'Debts', path: '/debts', icon: CreditCard },
     { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },
@@ -63,7 +130,7 @@ export default function Layout() {
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path || (item.path !== '/' && location.pathname.startsWith(item.path));
+            const isActive = location.pathname === item.path || (item.path !== '/' && item.path !== '/dashboard' && location.pathname.startsWith(item.path));
             const Icon = item.icon;
             return (
               <Link
@@ -115,20 +182,54 @@ export default function Layout() {
             </button>
             
             {/* Global Search (Desktop) */}
-            <div className="hidden md:flex items-center max-w-xs w-full relative">
+            <div className="hidden md:flex items-center max-w-md w-full relative" ref={searchRef}>
               <Search className="w-4 h-4 text-zinc-500 absolute left-3" />
               <input 
                 type="text" 
-                placeholder="Search..." 
+                placeholder="Search bills, transactions, debts..." 
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setIsSearchOpen(true);
+                }}
+                onFocus={() => setIsSearchOpen(true)}
                 className="w-full pl-9 pr-4 py-1.5 bg-[#141414] border border-[#262626] rounded-md text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
               />
+              
+              {/* Search Dropdown */}
+              {isSearchOpen && searchQuery.trim() !== '' && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-[#141414] border border-[#262626] rounded-md shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto">
+                  {searchResults.length > 0 ? (
+                    <ul className="py-1">
+                      {searchResults.map((result, index) => (
+                        <li key={index}>
+                          <button
+                            onClick={() => handleSearchSelect(result.path)}
+                            className="w-full text-left px-4 py-2 hover:bg-[#1C1C1C] transition-colors flex flex-col"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-[#FAFAFA]">{result.name}</span>
+                              <span className="text-xs text-zinc-500 bg-[#1C1C1C] px-1.5 py-0.5 rounded">{result.type}</span>
+                            </div>
+                            <span className="text-xs text-zinc-400 mt-0.5">{result.detail}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="px-4 py-3 text-sm text-zinc-500 text-center">
+                      No results found for "{searchQuery}"
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
             {/* Search Icon (Mobile) */}
             <button 
-              onClick={() => toast.success('Search opened')} 
+              onClick={() => setIsMobileSearchOpen(true)} 
               className="md:hidden text-zinc-500 hover:text-zinc-300 transition-colors p-1"
             >
               <Search className="w-4 h-4" />
@@ -275,6 +376,66 @@ export default function Layout() {
           </div>
         </footer>
       </div>
+
+      {/* Mobile Search Modal */}
+      {isMobileSearchOpen && (
+        <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm md:hidden flex flex-col">
+          <div className="p-4 bg-[#141414] border-b border-[#262626] flex items-center gap-3">
+            <Search className="w-5 h-5 text-zinc-500 shrink-0" />
+            <input 
+              autoFocus
+              type="text" 
+              placeholder="Search bills, transactions, debts..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="flex-1 bg-transparent border-none text-base text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-0"
+            />
+            <button 
+              onClick={() => {
+                setIsMobileSearchOpen(false);
+                setSearchQuery('');
+              }}
+              className="p-1 text-zinc-500 hover:text-zinc-300"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto bg-[#0A0A0A]">
+            {searchQuery.trim() !== '' ? (
+              searchResults.length > 0 ? (
+                <ul className="py-2">
+                  {searchResults.map((result, index) => (
+                    <li key={index}>
+                      <button
+                        onClick={() => {
+                          handleSearchSelect(result.path);
+                          setIsMobileSearchOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-3 hover:bg-[#1C1C1C] transition-colors flex flex-col border-b border-[#262626]/50"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-base font-medium text-[#FAFAFA]">{result.name}</span>
+                          <span className="text-xs text-zinc-500 bg-[#1C1C1C] px-1.5 py-0.5 rounded">{result.type}</span>
+                        </div>
+                        <span className="text-sm text-zinc-400 mt-1">{result.detail}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <div className="px-4 py-8 text-center text-zinc-500">
+                  No results found for "{searchQuery}"
+                </div>
+              )
+            ) : (
+              <div className="px-4 py-8 text-center text-zinc-600 text-sm">
+                Type to start searching...
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

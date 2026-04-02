@@ -14,9 +14,11 @@ import Settings from './pages/Settings';
 import Upload from './pages/Upload';
 import Transactions from './pages/Transactions';
 import Goals from './pages/Goals';
+import Income from './pages/Income';
 import Categories from './pages/Categories';
 import Subscriptions from './pages/Subscriptions';
 import Reports from './pages/Reports';
+import Landing from './pages/Landing';
 
 export default function App() {
   return (
@@ -32,12 +34,14 @@ export default function App() {
         }} 
       />
       <Routes>
+        <Route path="/" element={<Landing />} />
         <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} />
           <Route path="bills" element={<Bills />} />
           <Route path="bills/add" element={<AddBill />} />
           <Route path="bills/edit/:id" element={<AddBill />} />
           <Route path="debts" element={<Debts />} />
+          <Route path="income" element={<Income />} />
           <Route path="upload" element={<Upload />} />
           <Route path="transactions" element={<Transactions />} />
           <Route path="goals" element={<Goals />} />

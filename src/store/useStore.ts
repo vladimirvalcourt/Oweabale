@@ -56,6 +56,16 @@ export interface Goal {
   color: string;
 }
 
+export interface IncomeSource {
+  id: string;
+  name: string;
+  amount: number;
+  frequency: 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Yearly';
+  category: string;
+  nextDate: string;
+  status: 'active' | 'paused';
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -70,6 +80,7 @@ interface AppState {
   assets: Asset[];
   subscriptions: Subscription[];
   goals: Goal[];
+  incomes: IncomeSource[];
   categories: Category[];
   user: {
     firstName: string;
@@ -94,6 +105,10 @@ interface AppState {
   editGoal: (id: string, goal: Partial<Goal>) => void;
   deleteGoal: (id: string) => void;
   addGoalProgress: (id: string, amount: number) => void;
+  addIncome: (income: Omit<IncomeSource, 'id'>) => void;
+  editIncome: (id: string, income: Partial<IncomeSource>) => void;
+  deleteIncome: (id: string) => void;
+  recordIncomeDeposit: (id: string, amount?: number) => void;
   addCategory: (category: Omit<Category, 'id'>) => void;
   editCategory: (id: string, category: Partial<Category>) => void;
   deleteCategory: (id: string) => void;
@@ -133,6 +148,11 @@ const initialData = {
     { id: '1', name: 'Emergency Fund', targetAmount: 15000, currentAmount: 8500, deadline: '2026-12-31', type: 'emergency' as const, color: '#28a745' },
     { id: '2', name: 'Pay off Chase Card', targetAmount: 4250, currentAmount: 1200, deadline: '2026-08-01', type: 'debt' as const, color: '#dc3545' },
     { id: '3', name: 'Europe Trip', targetAmount: 5000, currentAmount: 1500, deadline: '2027-05-01', type: 'savings' as const, color: '#007bff' },
+  ],
+  incomes: [
+    { id: '1', name: 'Tech Corp Salary', amount: 4200.00, frequency: 'Bi-weekly' as const, category: 'Salary', nextDate: '2026-04-15', status: 'active' as const },
+    { id: '2', name: 'Freelance Design', amount: 850.00, frequency: 'Monthly' as const, category: 'Freelance', nextDate: '2026-04-20', status: 'active' as const },
+    { id: '3', name: 'Dividend Yield', amount: 125.00, frequency: 'Quarterly' as const, category: 'Investments', nextDate: '2026-06-01', status: 'active' as const },
   ],
   categories: [
     { id: '1', name: 'Housing', color: '#6f42c1', type: 'expense' as const },
@@ -218,12 +238,36 @@ export const useStore = create<AppState>((set) => ({
   addGoalProgress: (id, amount) => set((state) => ({
     goals: state.goals.map((g) => g.id === id ? { ...g, currentAmount: Math.max(0, Math.min(g.targetAmount, g.currentAmount + amount)) } : g)
   })),
+  addIncome: (income) => set((state) => ({ incomes: [...state.incomes, { ...income, id: Math.random().toString(36).substr(2, 9) }] })),
+  editIncome: (id, updatedIncome) => set((state) => ({
+    incomes: state.incomes.map((i) => i.id === id ? { ...i, ...updatedIncome } : i)
+  })),
+  deleteIncome: (id) => set((state) => ({ incomes: state.incomes.filter((i) => i.id !== id) })),
+  recordIncomeDeposit: (id, amount) => set((state) => {
+    const income = state.incomes.find(i => i.id === id);
+    if (!income) return state;
+    
+    const depositAmount = amount || income.amount;
+    
+    const newTransaction: Transaction = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: `Deposit: ${income.name}`,
+      category: income.category,
+      date: new Date().toISOString().split('T')[0],
+      amount: depositAmount,
+      type: 'income'
+    };
+    
+    return {
+      transactions: [newTransaction, ...state.transactions].slice(0, 50)
+    };
+  }),
   addCategory: (category) => set((state) => ({ categories: [...state.categories, { ...category, id: Math.random().toString(36).substr(2, 9) }] })),
   editCategory: (id, updatedCategory) => set((state) => ({
     categories: state.categories.map((c) => c.id === id ? { ...c, ...updatedCategory } : c)
   })),
   deleteCategory: (id) => set((state) => ({ categories: state.categories.filter((c) => c.id !== id) })),
   updateUser: (user) => set((state) => ({ user: { ...state.user, ...user } })),
-  deleteAccount: () => set({ bills: [], debts: [], transactions: [], assets: [], subscriptions: [], goals: [], categories: [], user: { firstName: '', lastName: '', email: '' } }),
+  deleteAccount: () => set({ bills: [], debts: [], transactions: [], assets: [], subscriptions: [], goals: [], incomes: [], categories: [], user: { firstName: '', lastName: '', email: '' } }),
   seedData: () => set(initialData),
 }));
