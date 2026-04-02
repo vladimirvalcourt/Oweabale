@@ -83,42 +83,42 @@ export default function AddBill() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
-        <Link to="/bills" className="p-2 -ml-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors">
+        <Link to="/bills" className="p-2 -ml-2 text-zinc-500 hover:text-zinc-300 rounded-full hover:bg-[#1C1C1C] transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">{isEditing ? 'Edit Bill' : 'Add New Bill'}</h1>
-          <p className="text-sm text-gray-500 mt-1">Enter the details of your recurring or one-time payment.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">{isEditing ? 'Edit Bill' : 'Add New Bill'}</h1>
+          <p className="text-sm text-zinc-400 mt-1">Enter the details of your recurring or one-time payment.</p>
         </div>
       </div>
 
-      <div className="bg-white shadow-sm rounded-lg border border-gray-200">
+      <div className="bg-[#141414] rounded-lg border border-[#262626]">
         <form onSubmit={handleSubmit} className="p-6 space-y-8">
           {/* Basic Details */}
           <div>
-            <h3 className="text-base font-medium text-gray-900 mb-4">Basic Details</h3>
+            <h3 className="text-base font-semibold tracking-tight text-[#FAFAFA] mb-4">Basic Details</h3>
             <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
               <div className="sm:col-span-4">
-                <label htmlFor="biller" className="block text-sm font-medium text-gray-700">Biller Name *</label>
+                <label htmlFor="biller" className="block text-sm font-semibold text-zinc-300">Biller Name *</label>
                 <div className="mt-1">
-                  <input type="text" id="biller" value={formData.biller} onChange={handleChange} required className="shadow-sm focus:ring-[#28a745] focus:border-[#28a745] block w-full sm:text-sm border-gray-300 rounded-md px-3 py-2 border transition-colors" placeholder="e.g., City Electric" />
+                  <input type="text" id="biller" value={formData.biller} onChange={handleChange} required className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors" placeholder="e.g., City Electric" />
                 </div>
               </div>
 
               <div className="sm:col-span-2">
-                <label htmlFor="amount" className="block text-sm font-medium text-gray-700">Amount *</label>
-                <div className="mt-1 relative rounded-md shadow-sm">
+                <label htmlFor="amount" className="block text-sm font-semibold text-zinc-300">Amount *</label>
+                <div className="mt-1 relative rounded-md">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500 sm:text-sm">$</span>
+                    <span className="text-zinc-500 sm:text-sm">$</span>
                   </div>
-                  <input type="number" step="0.01" min="0" id="amount" value={formData.amount} onChange={handleChange} required className="focus:ring-[#28a745] focus:border-[#28a745] block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md py-2 border transition-colors" placeholder="0.00" />
+                  <input type="number" step="0.01" min="0" id="amount" value={formData.amount} onChange={handleChange} required className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md py-2 border transition-colors" placeholder="0.00" />
                 </div>
               </div>
 
               <div className="sm:col-span-3">
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700">Category *</label>
+                <label htmlFor="category" className="block text-sm font-semibold text-zinc-300">Category *</label>
                 <div className="mt-1">
-                  <select id="category" value={formData.category} onChange={handleChange} required className="shadow-sm focus:ring-[#28a745] focus:border-[#28a745] block w-full sm:text-sm border-gray-300 rounded-md px-3 py-2 border bg-white transition-colors">
+                  <select id="category" value={formData.category} onChange={handleChange} required className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors">
                     <option value="">Select a category</option>
                     <option value="Utilities">Utilities</option>
                     <option value="Housing">Housing</option>
@@ -131,23 +131,23 @@ export default function AddBill() {
             </div>
           </div>
 
-          <hr className="border-gray-200" />
+          <hr className="border-[#262626]" />
 
           {/* Timing */}
           <div>
-            <h3 className="text-base font-medium text-gray-900 mb-4">Timing & Frequency</h3>
+            <h3 className="text-base font-semibold tracking-tight text-[#FAFAFA] mb-4">Timing & Frequency</h3>
             <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
               <div className="sm:col-span-3">
-                <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700">Next Due Date *</label>
+                <label htmlFor="dueDate" className="block text-sm font-semibold text-zinc-300">Next Due Date *</label>
                 <div className="mt-1">
-                  <input type="date" id="dueDate" value={formData.dueDate} onChange={handleChange} required className="shadow-sm focus:ring-[#28a745] focus:border-[#28a745] block w-full sm:text-sm border-gray-300 rounded-md px-3 py-2 border transition-colors" />
+                  <input type="date" id="dueDate" value={formData.dueDate} onChange={handleChange} required className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors" />
                 </div>
               </div>
 
               <div className="sm:col-span-3">
-                <label htmlFor="frequency" className="block text-sm font-medium text-gray-700">Repeat Frequency</label>
+                <label htmlFor="frequency" className="block text-sm font-semibold text-zinc-300">Repeat Frequency</label>
                 <div className="mt-1">
-                  <select id="frequency" value={formData.frequency} onChange={handleChange} className="shadow-sm focus:ring-[#28a745] focus:border-[#28a745] block w-full sm:text-sm border-gray-300 rounded-md px-3 py-2 border bg-white transition-colors">
+                  <select id="frequency" value={formData.frequency} onChange={handleChange} className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors">
                     <option value="none">Does not repeat</option>
                     <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
@@ -158,38 +158,38 @@ export default function AddBill() {
             </div>
           </div>
 
-          <hr className="border-gray-200" />
+          <hr className="border-[#262626]" />
 
           {/* Preferences */}
           <div>
-            <h3 className="text-base font-medium text-gray-900 mb-4">Preferences</h3>
+            <h3 className="text-base font-semibold tracking-tight text-[#FAFAFA] mb-4">Preferences</h3>
             <div className="space-y-4">
               <div className="flex items-start">
                 <div className="flex items-center h-5">
-                  <input id="autoPay" type="checkbox" checked={formData.autoPay} onChange={handleChange} className="focus:ring-[#28a745] h-4 w-4 text-[#28a745] border-gray-300 rounded transition-colors" />
+                  <input id="autoPay" type="checkbox" checked={formData.autoPay} onChange={handleChange} className="focus:ring-indigo-500 h-4 w-4 text-indigo-500 bg-[#0A0A0A] border-[#262626] rounded transition-colors" />
                 </div>
                 <div className="ml-3 text-sm">
-                  <label htmlFor="autoPay" className="font-medium text-gray-700">Auto-Pay Enabled</label>
-                  <p className="text-gray-500">Automatically mark this bill as paid on its due date.</p>
+                  <label htmlFor="autoPay" className="font-medium text-zinc-200">Auto-Pay Enabled</label>
+                  <p className="text-zinc-500">Automatically mark this bill as paid on its due date.</p>
                 </div>
               </div>
               <div className="flex items-start">
                 <div className="flex items-center h-5">
-                  <input id="reminders" type="checkbox" defaultChecked className="focus:ring-[#28a745] h-4 w-4 text-[#28a745] border-gray-300 rounded transition-colors" />
+                  <input id="reminders" type="checkbox" defaultChecked className="focus:ring-indigo-500 h-4 w-4 text-indigo-500 bg-[#0A0A0A] border-[#262626] rounded transition-colors" />
                 </div>
                 <div className="ml-3 text-sm">
-                  <label htmlFor="reminders" className="font-medium text-gray-700">Send Reminders</label>
-                  <p className="text-gray-500">Receive an email notification 3 days before the due date.</p>
+                  <label htmlFor="reminders" className="font-medium text-zinc-200">Send Reminders</label>
+                  <p className="text-zinc-500">Receive an email notification 3 days before the due date.</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="pt-5 border-t border-gray-200 flex justify-end gap-3">
-            <Link to="/bills" className="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#28a745]">
+          <div className="pt-5 border-t border-[#262626] flex justify-end gap-3">
+            <Link to="/bills" className="px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500">
               Cancel
             </Link>
-            <button type="submit" className="px-4 py-2 bg-[#28a745] hover:bg-[#218838] text-white rounded-md text-sm font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#28a745]">
+            <button type="submit" className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500">
               {isEditing ? 'Save Changes' : 'Save Bill'}
             </button>
           </div>

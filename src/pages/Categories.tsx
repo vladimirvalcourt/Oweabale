@@ -10,7 +10,7 @@ export default function Categories() {
   const [formData, setFormData] = useState({
     name: '',
     type: 'expense' as 'income' | 'expense',
-    color: '#28a745',
+    color: '#6366F1',
   });
 
   const handleAdd = (e: React.FormEvent) => {
@@ -28,7 +28,7 @@ export default function Categories() {
 
     toast.success('Category added successfully');
     setIsAdding(false);
-    setFormData({ name: '', type: 'expense', color: '#28a745' });
+    setFormData({ name: '', type: 'expense', color: '#6366F1' });
   };
 
   const handleUpdate = (e: React.FormEvent) => {
@@ -43,7 +43,7 @@ export default function Categories() {
 
     toast.success('Category updated');
     setEditingId(null);
-    setFormData({ name: '', type: 'expense', color: '#28a745' });
+    setFormData({ name: '', type: 'expense', color: '#6366F1' });
   };
 
   const startEdit = (category: any) => {
@@ -51,14 +51,14 @@ export default function Categories() {
     setFormData({
       name: category.name,
       type: category.type,
-      color: category.color || '#28a745',
+      color: category.color || '#6366F1',
     });
     setIsAdding(false);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setFormData({ name: '', type: 'expense', color: '#28a745' });
+    setFormData({ name: '', type: 'expense', color: '#6366F1' });
   };
 
   const handleDelete = (id: string) => {
@@ -72,16 +72,16 @@ export default function Categories() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Categories</h1>
-          <p className="text-sm text-gray-500 mt-1">Manage your transaction categories for better insights.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">Categories</h1>
+          <p className="text-sm text-zinc-400 mt-1">Manage your transaction categories for better insights.</p>
         </div>
         <button
           onClick={() => {
             setIsAdding(true);
             setEditingId(null);
-            setFormData({ name: '', type: 'expense', color: '#28a745' });
+            setFormData({ name: '', type: 'expense', color: '#6366F1' });
           }}
-          className="inline-flex items-center justify-center px-4 py-2 bg-[#28a745] hover:bg-[#218838] text-white rounded-md text-sm font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#28a745]"
+          className="inline-flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Category
@@ -89,12 +89,12 @@ export default function Categories() {
       </div>
 
       {(isAdding || editingId) && (
-        <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-6 mb-6">
+        <div className="bg-[#141414] rounded-lg border border-[#262626] p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium text-gray-900">
+            <h3 className="text-lg font-semibold tracking-tight text-[#FAFAFA]">
               {editingId ? 'Edit Category' : 'Create New Category'}
             </h3>
-            <button onClick={() => { setIsAdding(false); cancelEdit(); }} className="text-gray-400 hover:text-gray-500">
+            <button onClick={() => { setIsAdding(false); cancelEdit(); }} className="text-zinc-500 hover:text-zinc-300 transition-colors">
               <span className="sr-only">Close</span>
               &times;
             </button>
@@ -102,37 +102,37 @@ export default function Categories() {
           <form onSubmit={editingId ? handleUpdate : handleAdd} className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Category Name</label>
+                <label className="block text-sm font-semibold text-zinc-300">Category Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="mt-1 shadow-sm focus:ring-[#28a745] focus:border-[#28a745] block w-full sm:text-sm border-gray-300 rounded-md px-3 py-2 border transition-colors"
+                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors"
                   placeholder="e.g., Groceries"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Type</label>
+                <label className="block text-sm font-semibold text-zinc-300">Type</label>
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                  className="mt-1 shadow-sm focus:ring-[#28a745] focus:border-[#28a745] block w-full sm:text-sm border-gray-300 rounded-md px-3 py-2 border transition-colors"
+                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors"
                 >
                   <option value="expense">Expense</option>
                   <option value="income">Income</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Color</label>
+                <label className="block text-sm font-semibold text-zinc-300">Color</label>
                 <div className="mt-1 flex items-center gap-3">
                   <input
                     type="color"
                     value={formData.color}
                     onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                    className="h-9 w-14 p-1 border border-gray-300 rounded-md cursor-pointer"
+                    className="h-9 w-14 p-1 border border-[#262626] bg-[#0A0A0A] rounded-md cursor-pointer"
                   />
-                  <span className="text-sm text-gray-500">{formData.color}</span>
+                  <span className="text-sm text-zinc-500">{formData.color}</span>
                 </div>
               </div>
             </div>
@@ -140,13 +140,13 @@ export default function Categories() {
               <button
                 type="button"
                 onClick={() => { setIsAdding(false); cancelEdit(); }}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#28a745]"
+                className="px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-[#28a745] hover:bg-[#218838] text-white rounded-md text-sm font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#28a745]"
+                className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
               >
                 {editingId ? 'Save Changes' : 'Add Category'}
               </button>
@@ -156,50 +156,50 @@ export default function Categories() {
       )}
 
       {categories.length === 0 && !isAdding ? (
-        <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-12 text-center">
-          <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Tags className="w-8 h-8 text-gray-400" />
+        <div className="bg-[#141414] rounded-lg border border-[#262626] p-12 text-center">
+          <div className="w-16 h-16 border border-[#262626] rounded-full flex items-center justify-center mx-auto mb-4">
+            <Tags className="w-8 h-8 text-zinc-500" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No categories found</h3>
-          <p className="text-sm text-gray-500 max-w-sm mx-auto mb-6">
+          <h3 className="text-lg font-semibold tracking-tight text-[#FAFAFA] mb-2">No categories found</h3>
+          <p className="text-sm text-zinc-400 max-w-sm mx-auto mb-6">
             Categories help you organize your transactions and understand your spending habits.
           </p>
           <button
             onClick={() => setIsAdding(true)}
-            className="inline-flex items-center justify-center px-4 py-2 bg-[#28a745] hover:bg-[#218838] text-white rounded-md text-sm font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#28a745]"
+            className="inline-flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create Category
           </button>
         </div>
       ) : (
-        <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
-          <ul className="divide-y divide-gray-200">
+        <div className="bg-[#141414] rounded-lg border border-[#262626] overflow-hidden">
+          <ul className="divide-y divide-[#1F1F1F]">
             {categories.map((category) => (
-              <li key={category.id} className="p-4 sm:px-6 hover:bg-gray-50 transition-colors flex items-center justify-between">
+              <li key={category.id} className="p-4 sm:px-6 hover:bg-[#1C1C1C] transition-colors flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white"
-                    style={{ backgroundColor: category.color || '#28a745' }}
+                    style={{ backgroundColor: category.color || '#6366F1' }}
                   >
                     <Tag className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-gray-900">{category.name}</h4>
-                    <p className="text-xs text-gray-500 capitalize">{category.type}</p>
+                    <h4 className="text-sm font-medium text-[#FAFAFA]">{category.name}</h4>
+                    <p className="text-xs text-zinc-500 capitalize">{category.type}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => startEdit(category)}
-                    className="p-2 text-gray-400 hover:text-blue-600 rounded-full hover:bg-blue-50 transition-colors"
+                    className="p-2 text-zinc-500 hover:text-indigo-400 rounded-md hover:bg-[#262626] transition-colors"
                     title="Edit"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(category.id)}
-                    className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors"
+                    className="p-2 text-zinc-500 hover:text-red-400 rounded-md hover:bg-[#262626] transition-colors"
                     title="Delete"
                   >
                     <Trash2 className="w-4 h-4" />

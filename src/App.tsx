@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
+import Advisor from './pages/Advisor';
 import Bills from './pages/Bills';
 import AddBill from './pages/AddBill';
 import Debts from './pages/Debts';
@@ -16,14 +17,25 @@ import Transactions from './pages/Transactions';
 import Goals from './pages/Goals';
 import Categories from './pages/Categories';
 import Subscriptions from './pages/Subscriptions';
+import Reports from './pages/Reports';
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Toaster position="top-right" richColors />
+      <Toaster 
+        position="top-right" 
+        toastOptions={{
+          style: {
+            background: '#141414',
+            color: '#FAFAFA',
+            border: '1px solid #262626',
+          },
+        }} 
+      />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Dashboard />} />
+          <Route path="advisor" element={<Advisor />} />
           <Route path="bills" element={<Bills />} />
           <Route path="bills/add" element={<AddBill />} />
           <Route path="bills/edit/:id" element={<AddBill />} />
@@ -33,6 +45,7 @@ export default function App() {
           <Route path="goals" element={<Goals />} />
           <Route path="categories" element={<Categories />} />
           <Route path="subscriptions" element={<Subscriptions />} />
+          <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>

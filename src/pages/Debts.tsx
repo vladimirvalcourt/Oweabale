@@ -126,13 +126,13 @@ export default function Debts() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Debt Tracker</h1>
-          <p className="text-sm text-gray-500 mt-1">Monitor your liabilities and payoff progress.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">Debt Tracker</h1>
+          <p className="text-sm text-zinc-400 mt-1">Monitor your liabilities and payoff progress.</p>
         </div>
         {debts.length > 0 && (
           <button 
             onClick={openAddModal}
-            className="px-4 py-2 bg-[#28a745] hover:bg-[#218838] text-white rounded-md text-sm font-medium transition-colors shadow-sm flex items-center gap-2 self-start sm:self-auto focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#28a745]"
+            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors flex items-center gap-2 self-start sm:self-auto focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
           >
             <Plus className="w-4 h-4" />
             Add Debt
@@ -141,17 +141,17 @@ export default function Debts() {
       </div>
 
       {debts.length === 0 ? (
-        <div className="bg-white shadow-sm rounded-lg border border-gray-200 border-dashed py-20 px-6 flex flex-col items-center justify-center text-center">
-          <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-4">
-            <CreditCard className="w-8 h-8 text-[#28a745]" />
+        <div className="bg-[#141414] rounded-lg border border-[#262626] border-dashed py-20 px-6 flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 border border-[#262626] rounded-full flex items-center justify-center mb-4">
+            <CreditCard className="w-8 h-8 text-zinc-500" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">No debts tracked yet</h2>
-          <p className="text-gray-500 max-w-md mb-8">
+          <h2 className="text-xl font-semibold tracking-tight text-[#FAFAFA] mb-2">No debts tracked yet</h2>
+          <p className="text-zinc-400 max-w-md mb-8">
             Monitor your liabilities, track your payoff progress, and stay on top of your financial goals. Add your first debt account to get started.
           </p>
           <button 
             onClick={openAddModal}
-            className="px-6 py-3 bg-[#28a745] hover:bg-[#218838] text-white rounded-md text-sm font-medium transition-colors shadow-sm flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#28a745]"
+            className="px-6 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
           >
             <Plus className="w-5 h-5" />
             Add Your First Debt
@@ -161,34 +161,34 @@ export default function Debts() {
         <>
           {/* Overview Stats */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-            <div className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 p-5">
-              <p className="text-sm font-medium text-gray-500 truncate">Total Outstanding</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">
+            <div className="bg-[#141414] overflow-hidden rounded-lg border border-[#262626] p-5">
+              <p className="text-sm font-medium text-zinc-500 truncate">Total Outstanding</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums text-[#FAFAFA]">
                 ${totalOutstanding.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </p>
-              <p className="mt-1 text-sm text-gray-500">Across {debts.length} active accounts</p>
+              <p className="mt-1 text-sm text-zinc-500">Across {debts.length} active accounts</p>
             </div>
-            <div className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 p-5">
-              <p className="text-sm font-medium text-gray-500 truncate">Overall Progress</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">
+            <div className="bg-[#141414] overflow-hidden rounded-lg border border-[#262626] p-5">
+              <p className="text-sm font-medium text-zinc-500 truncate">Overall Progress</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums text-[#FAFAFA]">
                 {overallProgress.toFixed(1)}%
               </p>
-              <div className="mt-2 w-full bg-gray-100 rounded-full h-1.5">
-                <div className="bg-[#28a745] h-1.5 rounded-full" style={{ width: `${overallProgress}%` }}></div>
+              <div className="mt-2 w-full bg-[#1F1F1F] rounded-full h-1.5">
+                <div className="bg-indigo-500 h-1.5 rounded-full" style={{ width: `${overallProgress}%` }}></div>
               </div>
             </div>
-            <div className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 p-5">
-              <p className="text-sm font-medium text-gray-500 truncate">Total Paid Off</p>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">
+            <div className="bg-[#141414] overflow-hidden rounded-lg border border-[#262626] p-5">
+              <p className="text-sm font-medium text-zinc-500 truncate">Total Paid Off</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums text-[#FAFAFA]">
                 ${totalPaid.toLocaleString('en-US', { minimumFractionDigits: 2 })}
               </p>
-              <p className="mt-1 text-sm text-gray-500">Lifetime progress</p>
+              <p className="mt-1 text-sm text-zinc-500">Lifetime progress</p>
             </div>
           </div>
 
           {/* Debt Accounts */}
           <div className="space-y-4">
-            <h2 className="text-lg font-medium text-gray-900">Active Accounts</h2>
+            <h2 className="text-lg font-semibold tracking-tight text-[#FAFAFA]">Active Accounts</h2>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               {debts.map((debt) => {
@@ -196,15 +196,15 @@ export default function Debts() {
                 const progress = total > 0 ? ((debt.paid / total) * 100).toFixed(0) : '0';
                 
                 return (
-                  <div key={debt.id} className="bg-white shadow-sm rounded-lg border border-gray-200 p-6 flex flex-col">
+                  <div key={debt.id} className="bg-[#141414] rounded-lg border border-[#262626] p-6 flex flex-col">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="text-base font-semibold text-gray-900">{debt.name}</h3>
-                      <p className="text-sm text-gray-500">{debt.type} • {debt.apr}% APR</p>
+                      <h3 className="text-base font-semibold text-[#FAFAFA]">{debt.name}</h3>
+                      <p className="text-sm text-zinc-500">{debt.type} • {debt.apr}% APR</p>
                     </div>
                     
                     <Menu as="div" className="relative inline-block text-left">
-                      <Menu.Button className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#28a745]">
+                      <Menu.Button className="text-zinc-500 hover:text-zinc-300 transition-colors p-1 rounded-md focus:outline-none">
                         <MoreHorizontal className="w-5 h-5" />
                       </Menu.Button>
                       <Transition
@@ -216,17 +216,17 @@ export default function Debts() {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                       >
-                        <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
+                        <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-[#141414] border border-[#262626] shadow-xl focus:outline-none z-10 py-1">
                           <div className="py-1">
                             <Menu.Item>
                               {({ active }) => (
                                 <button
                                   onClick={() => openPaymentModal(debt)}
                                   className={`${
-                                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
+                                    active ? 'bg-[#1C1C1C] text-zinc-200' : 'text-zinc-400'
                                   } group flex w-full items-center px-4 py-2 text-sm`}
                                 >
-                                  <DollarSign className="mr-3 h-4 w-4 text-gray-400 group-hover:text-gray-500" />
+                                  <DollarSign className="mr-3 h-4 w-4 text-zinc-500" />
                                   Record Payment
                                 </button>
                               )}
@@ -236,10 +236,10 @@ export default function Debts() {
                                 <button
                                   onClick={() => openEditModal(debt)}
                                   className={`${
-                                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-700'
+                                    active ? 'bg-[#1C1C1C] text-zinc-200' : 'text-zinc-400'
                                   } group flex w-full items-center px-4 py-2 text-sm`}
                                 >
-                                  <Edit2 className="mr-3 h-4 w-4 text-gray-400 group-hover:text-gray-500" />
+                                  <Edit2 className="mr-3 h-4 w-4 text-zinc-500" />
                                   Edit Details
                                 </button>
                               )}
@@ -249,10 +249,10 @@ export default function Debts() {
                                 <button
                                   onClick={() => handleDelete(debt.id)}
                                   className={`${
-                                    active ? 'bg-red-50 text-red-700' : 'text-red-600'
+                                    active ? 'bg-[#1C1C1C] text-[#EF4444]' : 'text-[#7F1D1D]'
                                   } group flex w-full items-center px-4 py-2 text-sm`}
                                 >
-                                  <Trash2 className="mr-3 h-4 w-4 text-red-400 group-hover:text-red-500" />
+                                  <Trash2 className="mr-3 h-4 w-4 text-current" />
                                   Delete Account
                                 </button>
                               )}
@@ -265,14 +265,14 @@ export default function Debts() {
                   
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Remaining</p>
-                      <p className="text-xl font-semibold text-gray-900">
+                      <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Remaining</p>
+                      <p className="text-xl font-bold tabular-nums text-[#FAFAFA]">
                         ${debt.remaining.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Min. Payment</p>
-                      <p className="text-xl font-semibold text-gray-900">
+                      <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Min. Payment</p>
+                      <p className="text-xl font-bold tabular-nums text-[#FAFAFA]">
                         ${debt.minPayment.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                       </p>
                     </div>
@@ -280,11 +280,11 @@ export default function Debts() {
 
                   <div className="mt-auto">
                     <div className="flex justify-between text-sm font-medium mb-1">
-                      <span className="text-gray-700">Progress</span>
-                      <span className="text-gray-900">{progress}%</span>
+                      <span className="text-zinc-400">Progress</span>
+                      <span className="text-[#FAFAFA]">{progress}%</span>
                     </div>
-                    <div className="w-full bg-gray-100 rounded-full h-2">
-                      <div className="bg-[#28a745] h-2 rounded-full" style={{ width: `${progress}%` }}></div>
+                    <div className="w-full bg-[#1F1F1F] rounded-full h-2">
+                      <div className="bg-indigo-500 h-2 rounded-full" style={{ width: `${progress}%` }}></div>
                     </div>
                   </div>
                 </div>
@@ -297,27 +297,27 @@ export default function Debts() {
 
       {/* Add/Edit Debt Modal */}
       <Dialog open={isAddModalOpen || isEditModalOpen} onClose={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="relative z-50">
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-md w-full rounded-lg bg-white shadow-xl overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <Dialog.Title className="text-lg font-medium text-gray-900">
+          <Dialog.Panel className="mx-auto max-w-md w-full rounded-lg bg-[#141414] border border-[#262626] shadow-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-[#262626] flex items-center justify-between">
+              <Dialog.Title className="text-lg font-semibold tracking-tight text-[#FAFAFA]">
                 {isEditModalOpen ? 'Edit Debt' : 'Add New Debt'}
               </Dialog.Title>
-              <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-gray-400 hover:text-gray-500 transition-colors">
+              <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-zinc-500 hover:text-zinc-300 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
             
             <form onSubmit={isEditModalOpen ? handleEditSubmit : handleAddSubmit} className="p-6 space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Account Name *</label>
-                <input type="text" id="name" value={formData.name} onChange={handleChange} required className="mt-1 shadow-sm focus:ring-[#28a745] focus:border-[#28a745] block w-full sm:text-sm border-gray-300 rounded-md px-3 py-2 border transition-colors" placeholder="e.g., Chase Sapphire" />
+                <label htmlFor="name" className="block text-sm font-semibold text-zinc-300">Account Name *</label>
+                <input type="text" id="name" value={formData.name} onChange={handleChange} required className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors" placeholder="e.g., Chase Sapphire" />
               </div>
               
               <div>
-                <label htmlFor="type" className="block text-sm font-medium text-gray-700">Account Type</label>
-                <select id="type" value={formData.type} onChange={handleChange} className="mt-1 shadow-sm focus:ring-[#28a745] focus:border-[#28a745] block w-full sm:text-sm border-gray-300 rounded-md px-3 py-2 border bg-white transition-colors">
+                <label htmlFor="type" className="block text-sm font-semibold text-zinc-300">Account Type</label>
+                <select id="type" value={formData.type} onChange={handleChange} className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors">
                   <option value="Credit Card">Credit Card</option>
                   <option value="Auto Loan">Auto Loan</option>
                   <option value="Student Loan">Student Loan</option>
@@ -328,31 +328,31 @@ export default function Debts() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="remaining" className="block text-sm font-medium text-gray-700">Remaining Balance *</label>
-                  <div className="mt-1 relative rounded-md shadow-sm">
+                  <label htmlFor="remaining" className="block text-sm font-semibold text-zinc-300">Remaining Balance *</label>
+                  <div className="mt-1 relative rounded-md">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-gray-500 sm:text-sm">$</span>
+                      <span className="text-zinc-500 sm:text-sm">$</span>
                     </div>
-                    <input type="number" step="0.01" min="0" id="remaining" value={formData.remaining} onChange={handleChange} required className="focus:ring-[#28a745] focus:border-[#28a745] block w-full pl-7 sm:text-sm border-gray-300 rounded-md py-2 border transition-colors" placeholder="0.00" />
+                    <input type="number" step="0.01" min="0" id="remaining" value={formData.remaining} onChange={handleChange} required className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md py-2 border transition-colors" placeholder="0.00" />
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="minPayment" className="block text-sm font-medium text-gray-700">Min. Payment *</label>
-                  <div className="mt-1 relative rounded-md shadow-sm">
+                  <label htmlFor="minPayment" className="block text-sm font-semibold text-zinc-300">Min. Payment *</label>
+                  <div className="mt-1 relative rounded-md">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-gray-500 sm:text-sm">$</span>
+                      <span className="text-zinc-500 sm:text-sm">$</span>
                     </div>
-                    <input type="number" step="0.01" min="0" id="minPayment" value={formData.minPayment} onChange={handleChange} required className="focus:ring-[#28a745] focus:border-[#28a745] block w-full pl-7 sm:text-sm border-gray-300 rounded-md py-2 border transition-colors" placeholder="0.00" />
+                    <input type="number" step="0.01" min="0" id="minPayment" value={formData.minPayment} onChange={handleChange} required className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md py-2 border transition-colors" placeholder="0.00" />
                   </div>
                 </div>
               </div>
 
               <div>
-                <label htmlFor="apr" className="block text-sm font-medium text-gray-700">Interest Rate (APR) *</label>
-                <div className="mt-1 relative rounded-md shadow-sm">
-                  <input type="number" step="0.01" min="0" id="apr" value={formData.apr} onChange={handleChange} required className="focus:ring-[#28a745] focus:border-[#28a745] block w-full pr-7 sm:text-sm border-gray-300 rounded-md px-3 py-2 border transition-colors" placeholder="0.00" />
+                <label htmlFor="apr" className="block text-sm font-semibold text-zinc-300">Interest Rate (APR) *</label>
+                <div className="mt-1 relative rounded-md">
+                  <input type="number" step="0.01" min="0" id="apr" value={formData.apr} onChange={handleChange} required className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full pr-7 sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors" placeholder="0.00" />
                   <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500 sm:text-sm">%</span>
+                    <span className="text-zinc-500 sm:text-sm">%</span>
                   </div>
                 </div>
               </div>
@@ -361,13 +361,13 @@ export default function Debts() {
                 <button
                   type="button"
                   onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#28a745]"
+                  className="px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#28a745] hover:bg-[#218838] text-white rounded-md text-sm font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#28a745]"
+                  className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
                 >
                   {isEditModalOpen ? 'Save Changes' : 'Add Debt'}
                 </button>
@@ -379,26 +379,26 @@ export default function Debts() {
 
       {/* Add Payment Modal */}
       <Dialog open={isPaymentModalOpen} onClose={() => setIsPaymentModalOpen(false)} className="relative z-50">
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-sm w-full rounded-lg bg-white shadow-xl overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <Dialog.Title className="text-lg font-medium text-gray-900">Record Payment</Dialog.Title>
-              <button onClick={() => setIsPaymentModalOpen(false)} className="text-gray-400 hover:text-gray-500 transition-colors">
+          <Dialog.Panel className="mx-auto max-w-sm w-full rounded-lg bg-[#141414] border border-[#262626] shadow-2xl overflow-hidden">
+            <div className="px-6 py-4 border-b border-[#262626] flex items-center justify-between">
+              <Dialog.Title className="text-lg font-semibold tracking-tight text-[#FAFAFA]">Record Payment</Dialog.Title>
+              <button onClick={() => setIsPaymentModalOpen(false)} className="text-zinc-500 hover:text-zinc-300 transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
             
             <form onSubmit={handlePaymentSubmit} className="p-6 space-y-4">
-              <p className="text-sm text-gray-500">
-                Recording a payment for <span className="font-medium text-gray-900">{selectedDebt?.name}</span>.
+              <p className="text-sm text-zinc-400">
+                Recording a payment for <span className="font-semibold text-[#FAFAFA]">{selectedDebt?.name}</span>.
               </p>
               
               <div>
-                <label htmlFor="paymentAmount" className="block text-sm font-medium text-gray-700">Payment Amount *</label>
-                <div className="mt-1 relative rounded-md shadow-sm">
+                <label htmlFor="paymentAmount" className="block text-sm font-semibold text-zinc-300">Payment Amount *</label>
+                <div className="mt-1 relative rounded-md">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500 sm:text-sm">$</span>
+                    <span className="text-zinc-500 sm:text-sm">$</span>
                   </div>
                   <input 
                     type="number" 
@@ -408,7 +408,7 @@ export default function Debts() {
                     value={paymentAmount} 
                     onChange={(e) => setPaymentAmount(e.target.value)} 
                     required 
-                    className="focus:ring-[#28a745] focus:border-[#28a745] block w-full pl-7 sm:text-sm border-gray-300 rounded-md py-2 border transition-colors" 
+                    className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md py-2 border transition-colors" 
                     placeholder="0.00" 
                   />
                 </div>
@@ -418,13 +418,13 @@ export default function Debts() {
                 <button
                   type="button"
                   onClick={() => setIsPaymentModalOpen(false)}
-                  className="px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#28a745]"
+                  className="px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#28a745] hover:bg-[#218838] text-white rounded-md text-sm font-medium transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#28a745]"
+                  className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
                 >
                   Record Payment
                 </button>
