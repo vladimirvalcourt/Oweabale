@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Dialog } from '@headlessui/react';
 import { AlertTriangle, Lock, Shield, Smartphone, CreditCard as CreditCardIcon, CheckCircle2, Plus, X, Building2, Loader2, Search, Download, Fingerprint, EyeOff, FileSpreadsheet, Sparkles, FileText } from 'lucide-react';
 import { cn } from '../lib/utils';
+import BankConnection from '../components/BankConnection';
 
 type Tab = 'profile' | 'notifications' | 'security' | 'billing' | 'financial' | 'privacy' | 'integrations';
 
@@ -20,26 +21,6 @@ export default function Settings() {
   });
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isPlaidModalOpen, setIsPlaidModalOpen] = useState(false);
-  const [plaidStep, setPlaidStep] = useState<'intro' | 'select' | 'login' | 'success'>('intro');
-  const [plaidLoading, setPlaidLoading] = useState(false);
-  const [selectedBank, setSelectedBank] = useState('');
-  const [connectedBanks, setConnectedBanks] = useState([
-    { id: 1, name: 'Chase Bank', type: 'Checking', mask: '1234', initial: 'C' }
-  ]);
-
-  const handlePlaidConnect = () => {
-    setPlaidLoading(true);
-    setTimeout(() => {
-      setPlaidLoading(false);
-      setPlaidStep('success');
-      setTimeout(() => {
-        setConnectedBanks([...connectedBanks, { id: Date.now(), name: selectedBank, type: 'Checking', mask: Math.floor(1000 + Math.random() * 9000).toString(), initial: selectedBank.charAt(0) }]);
-        setIsPlaidModalOpen(false);
-        toast.success(`${selectedBank} connected successfully`);
-      }, 1500);
-    }, 2000);
-  };
 
   const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -591,31 +572,7 @@ export default function Settings() {
 
           {activeTab === 'integrations' && (
             <div className="space-y-6">
-              <div className="bg-[#141414] rounded-lg border border-[#262626]">
-                <div className="px-6 py-5 border-b border-[#262626]">
-                  <h3 className="text-base font-semibold text-[#FAFAFA]">Bank Connections</h3>
-                  <p className="mt-1 text-sm text-zinc-400">Link your bank accounts to automatically sync transactions and balances.</p>
-                </div>
-                <div className="p-6">
-                  {connectedBanks.map((bank) => (
-                    <div key={bank.id} className="border border-[#262626] rounded-md p-4 flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-[#1C1C1C] rounded flex items-center justify-center border border-[#262626]">
-                          <span className="text-zinc-300 font-bold text-lg">{bank.initial}</span>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-[#FAFAFA]">{bank.name}</p>
-                          <p className="text-xs text-zinc-500">{bank.type} •••• {bank.mask}</p>
-                        </div>
-                      </div>
-                      <span className="text-xs font-medium text-[#22C55E] border border-[#262626] px-2 py-1 rounded-full">Connected</span>
-                    </div>
-                  ))}
-                  <button onClick={() => { setPlaidStep('intro'); setIsPlaidModalOpen(true); }} className="text-sm font-medium text-indigo-500 hover:text-indigo-400 transition-colors flex items-center gap-2">
-                    <Plus className="w-4 h-4" /> Link another account
-                  </button>
-                </div>
-              </div>
+              <BankConnection />
 
               <div className="bg-[#141414] rounded-lg border border-[#262626]">
                 <div className="px-6 py-5 border-b border-[#262626]">
@@ -790,124 +747,6 @@ export default function Settings() {
                 Delete
               </button>
             </div>
-          </Dialog.Panel>
-        </div>
-      </Dialog>
-
-      {/* Plaid Link Mock Modal */}
-      <Dialog open={isPlaidModalOpen} onClose={() => !plaidLoading && setIsPlaidModalOpen(false)} className="relative z-50">
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" aria-hidden="true" />
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-sm w-full rounded-xl bg-white shadow-2xl overflow-hidden">
-            {plaidStep === 'intro' && (
-              <div className="p-8 flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center mb-6">
-                  <Building2 className="w-8 h-8 text-white" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Oweable uses Plaid</h2>
-                <p className="text-gray-600 mb-8 text-sm">
-                  Plaid lets you securely connect your financial accounts to Oweable in seconds.
-                </p>
-                <ul className="text-left space-y-4 mb-8 w-full">
-                  <li className="flex gap-3 text-sm text-gray-700">
-                    <Shield className="w-5 h-5 text-gray-400 shrink-0" />
-                    <span>Your data is encrypted end-to-end and never sold.</span>
-                  </li>
-                  <li className="flex gap-3 text-sm text-gray-700">
-                    <Lock className="w-5 h-5 text-gray-400 shrink-0" />
-                    <span>Oweable never sees your login credentials.</span>
-                  </li>
-                </ul>
-                <button 
-                  onClick={() => setPlaidStep('select')}
-                  className="w-full bg-black hover:bg-gray-800 text-white font-medium py-3 rounded-lg transition-colors"
-                >
-                  Continue
-                </button>
-              </div>
-            )}
-
-            {plaidStep === 'select' && (
-              <div className="flex flex-col h-[500px]">
-                <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-                  <h2 className="text-lg font-bold text-gray-900">Select your bank</h2>
-                  <button onClick={() => setIsPlaidModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-                <div className="p-4 border-b border-gray-100">
-                  <div className="relative">
-                    <Search className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
-                    <input 
-                      type="text" 
-                      placeholder="Search for your bank" 
-                      className="w-full bg-gray-50 border-none rounded-lg pl-10 pr-4 py-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-black"
-                    />
-                  </div>
-                </div>
-                <div className="flex-1 overflow-y-auto p-2">
-                  {['Bank of America', 'Wells Fargo', 'Citi', 'Capital One', 'USAA', 'PNC Bank', 'U.S. Bank'].map((bank) => (
-                    <button 
-                      key={bank}
-                      onClick={() => { setSelectedBank(bank); setPlaidStep('login'); }}
-                      className="w-full flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition-colors text-left"
-                    >
-                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 font-bold">
-                        {bank.charAt(0)}
-                      </div>
-                      <span className="font-medium text-gray-900">{bank}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {plaidStep === 'login' && (
-              <div className="p-8 flex flex-col">
-                <div className="flex justify-between items-center mb-6">
-                  <button onClick={() => setPlaidStep('select')} className="text-sm text-gray-500 hover:text-gray-900">Back</button>
-                  <button onClick={() => setIsPlaidModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-                <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                  <span className="text-2xl font-bold text-gray-900">{selectedBank.charAt(0)}</span>
-                </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1 text-center">Enter your credentials</h2>
-                <p className="text-gray-500 mb-6 text-sm text-center">To connect your {selectedBank} account</p>
-                
-                <div className="space-y-4 mb-8">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">User ID</label>
-                    <input type="text" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:ring-2 focus:ring-black focus:border-black" defaultValue="user123" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Password</label>
-                    <input type="password" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-gray-900 focus:ring-2 focus:ring-black focus:border-black" defaultValue="password" />
-                  </div>
-                </div>
-                
-                <button 
-                  onClick={handlePlaidConnect}
-                  disabled={plaidLoading}
-                  className="w-full bg-black hover:bg-gray-800 text-white font-medium py-3 rounded-lg transition-colors flex justify-center items-center"
-                >
-                  {plaidLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Submit'}
-                </button>
-              </div>
-            )}
-
-            {plaidStep === 'success' && (
-              <div className="p-8 flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                  <CheckCircle2 className="w-8 h-8 text-green-600" />
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Success!</h2>
-                <p className="text-gray-600 text-sm">
-                  Your {selectedBank} account has been successfully connected to Oweable.
-                </p>
-              </div>
-            )}
           </Dialog.Panel>
         </div>
       </Dialog>

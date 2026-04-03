@@ -95,6 +95,8 @@ interface AppState {
     lastName: string;
     email: string;
   };
+  bankConnected: boolean;
+  connectBank: () => void;
   addBill: (bill: Omit<Bill, 'id'>) => void;
   editBill: (id: string, bill: Partial<Bill>) => void;
   deleteBill: (id: string) => void;
@@ -182,10 +184,31 @@ const initialData = {
     lastName: 'Morgan',
     email: 'alex.morgan@example.com',
   },
+  bankConnected: false,
 };
 
 export const useStore = create<AppState>((set) => ({
   ...initialData,
+  connectBank: () => set((state) => {
+    const newTransactions: Transaction[] = [
+      { id: 'p1', name: 'Whole Foods Market', category: 'Food & Dining', date: new Date().toISOString().split('T')[0], amount: 142.50, type: 'expense' },
+      { id: 'p2', name: 'Uber Ride', category: 'Transportation', date: new Date(Date.now() - 86400000).toISOString().split('T')[0], amount: 24.90, type: 'expense' },
+      { id: 'p3', name: 'Direct Deposit - Tech Corp', category: 'Income', date: new Date(Date.now() - 172800000).toISOString().split('T')[0], amount: 4200.00, type: 'income' },
+      { id: 'p4', name: 'Equinox Fitness', category: 'Health', date: new Date(Date.now() - 259200000).toISOString().split('T')[0], amount: 250.00, type: 'expense' },
+      { id: 'p5', name: 'Starbucks', category: 'Food & Dining', date: new Date(Date.now() - 345600000).toISOString().split('T')[0], amount: 6.45, type: 'expense' },
+    ];
+    
+    const newBills: Bill[] = [
+      { id: 'pb1', biller: 'Verizon Wireless', amount: 85.00, category: 'Utilities', dueDate: new Date(Date.now() + 5 * 86400000).toISOString().split('T')[0], frequency: 'Monthly', status: 'upcoming', autoPay: true },
+      { id: 'pb2', biller: 'Planet Fitness', amount: 15.00, category: 'Health', dueDate: new Date(Date.now() + 12 * 86400000).toISOString().split('T')[0], frequency: 'Monthly', status: 'upcoming', autoPay: true },
+    ];
+
+    return {
+      bankConnected: true,
+      transactions: [...newTransactions, ...state.transactions],
+      bills: [...state.bills, ...newBills],
+    };
+  }),
   addBill: (bill) => set((state) => ({ bills: [...state.bills, { ...bill, id: Math.random().toString(36).substr(2, 9) }] })),
   editBill: (id, updatedBill) => set((state) => ({
     bills: state.bills.map((b) => b.id === id ? { ...b, ...updatedBill } : b)
