@@ -1,0 +1,335 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { Check, Twitter, Github, Linkedin, Plus, Minus } from 'lucide-react';
+
+function useInView(threshold = 0.15) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold }
+    );
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return [ref, isVisible] as const;
+}
+
+function FaqItem({ question, answer }: { question: string, answer: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="border-b border-[#262626] py-6">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between w-full text-left focus:outline-none group"
+      >
+        <span className="text-lg font-medium text-[#FAFAFA] group-hover:text-indigo-400 transition-colors">{question}</span>
+        {isOpen ? (
+          <Minus className="w-5 h-5 text-zinc-500 group-hover:text-indigo-400 transition-colors" />
+        ) : (
+          <Plus className="w-5 h-5 text-zinc-500 group-hover:text-indigo-400 transition-colors" />
+        )}
+      </button>
+      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-40 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+        <p className="text-zinc-400 leading-relaxed">{answer}</p>
+      </div>
+    </div>
+  );
+}
+
+export default function Pricing() {
+  const [scrolled, setScrolled] = useState(false);
+  const [isYearly, setIsYearly] = useState(false);
+  
+  const [headerRef, headerVisible] = useInView();
+  const [cardsRef, cardsVisible] = useInView();
+  const [faqRef, faqVisible] = useInView();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-[#0A0A0A] text-[#FAFAFA] font-sans selection:bg-indigo-500/30">
+      {/* Navigation */}
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0A0A0A]/90 backdrop-blur-md border-b border-[#262626] py-4' : 'bg-transparent py-6'}`}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
+          <Link to="/" className="font-black text-xl tracking-[0.2em] text-[#FAFAFA] transition-colors duration-200">
+            OWEABLE
+          </Link>
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
+            <Link to="/#features" className="hover:text-white transition-colors duration-200">Features</Link>
+            <Link to="/pricing" className="text-white transition-colors duration-200">Pricing</Link>
+            <Link to="/dashboard" className="hover:text-white transition-colors duration-200">Sign In</Link>
+          </div>
+          <Link 
+            to="/dashboard" 
+            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-sm font-bold transition-colors duration-200"
+          >
+            Get Started
+          </Link>
+        </div>
+      </nav>
+
+      {/* Header Section */}
+      <section className="relative pt-40 pb-20 overflow-hidden">
+        {/* Subtle Background Glow */}
+        <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/10 via-[#0A0A0A]/0 to-transparent pointer-events-none"></div>
+
+        <div 
+          ref={headerRef}
+          className={`relative z-10 max-w-4xl mx-auto px-6 lg:px-8 w-full flex flex-col items-center text-center transition-all duration-1000 ease-out ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
+        >
+          <div className="flex items-center gap-4 mb-8">
+            <div className="h-[1px] w-8 bg-[#F59E0B]"></div>
+            <span className="text-[#F59E0B] text-xs tracking-widest uppercase">RUTHLESS ROI</span>
+            <div className="h-[1px] w-8 bg-[#F59E0B]"></div>
+          </div>
+          
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-8">
+            Priced for maximum leverage.
+          </h1>
+          
+          <p className="text-base md:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed font-light">
+            Stop paying for apps that just track your debt. Invest in the arsenal that eliminates it.
+          </p>
+        </div>
+      </section>
+
+      {/* Pricing Cards Section */}
+      <section className="relative pb-32">
+        <div 
+          ref={cardsRef}
+          className="max-w-5xl mx-auto px-6 lg:px-8 relative z-10"
+        >
+          {/* Billing Toggle */}
+          <div className={`flex justify-center mb-12 transition-all duration-700 ease-out ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className="flex items-center gap-4">
+              <div className="bg-[#1C1C1C] border border-[#262626] rounded-full p-1 flex items-center relative">
+                <div 
+                  className={`absolute top-1 bottom-1 w-[100px] bg-[#262626] shadow-sm rounded-full transition-all duration-300 ease-in-out ${isYearly ? 'left-[104px]' : 'left-1'}`}
+                ></div>
+                <button 
+                  onClick={() => setIsYearly(false)}
+                  className={`relative z-10 w-[100px] py-2 text-sm font-medium transition-colors duration-300 ${!isYearly ? 'text-white' : 'text-zinc-400 hover:text-zinc-300'}`}
+                >
+                  Monthly
+                </button>
+                <button 
+                  onClick={() => setIsYearly(true)}
+                  className={`relative z-10 w-[100px] py-2 text-sm font-medium transition-colors duration-300 ${isYearly ? 'text-white' : 'text-zinc-400 hover:text-zinc-300'}`}
+                >
+                  Yearly
+                </button>
+              </div>
+              <div className="flex items-center">
+                <span className="text-[10px] text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">
+                  Save 25%
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            {/* Card 1: The Tracker */}
+            <div className={`bg-[#1C1C1C] border border-[#262626] rounded-xl p-10 flex flex-col transition-all duration-700 ease-out delay-[100ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+              <h3 className="text-2xl font-bold text-[#FAFAFA] mb-2">The Tracker</h3>
+              <p className="text-zinc-400 text-sm mb-8 h-10">For those who just need to see the bleeding.</p>
+              
+              <div className="mb-8">
+                <span className="text-4xl font-mono font-bold text-[#FAFAFA]">$0</span>
+                <span className="text-zinc-500 font-mono text-sm ml-2">/ forever</span>
+              </div>
+              
+              <Link 
+                to="/dashboard" 
+                className="w-full py-4 px-6 bg-transparent border border-[#262626] hover:border-zinc-500 text-[#FAFAFA] rounded-sm text-sm font-bold text-center transition-colors duration-200 mb-10"
+              >
+                Deploy Free Tracker
+              </Link>
+              
+              <div className="flex flex-col gap-4 mt-auto">
+                <div className="flex items-start gap-3">
+                  <Check className="w-5 h-5 text-zinc-500 shrink-0 mt-0.5" />
+                  <span className="text-zinc-300 text-sm">3 Basic accounts</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Check className="w-5 h-5 text-zinc-500 shrink-0 mt-0.5" />
+                  <span className="text-zinc-300 text-sm">Manual bill entry</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Check className="w-5 h-5 text-zinc-500 shrink-0 mt-0.5" />
+                  <span className="text-zinc-300 text-sm">Standard net worth chart</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: The Arsenal */}
+            <div className={`relative transition-all duration-700 ease-out delay-[200ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+              {/* Indigo Glow Behind Card */}
+              <div className="absolute -inset-1 bg-indigo-500/20 blur-2xl rounded-xl z-0"></div>
+              
+              <div className="bg-[#1C1C1C] border border-indigo-500/50 rounded-xl p-10 flex flex-col relative z-10 h-full shadow-[0_0_40px_rgba(99,102,241,0.1)]">
+                <div className="absolute top-0 right-8 transform -translate-y-1/2">
+                  <span className="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Recommended</span>
+                </div>
+                
+                <h3 className="text-2xl font-bold text-[#FAFAFA] mb-2">The Arsenal</h3>
+                <p className="text-zinc-400 text-sm mb-8 h-10">For those ready to go to war with their debt.</p>
+                
+                <div className="mb-8 relative h-12">
+                  <div className={`absolute inset-0 transition-all duration-300 ease-in-out ${!isYearly ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
+                    <span className="text-4xl font-mono font-bold text-[#FAFAFA]">$12</span>
+                    <span className="text-zinc-500 font-mono text-sm ml-2">/ month</span>
+                  </div>
+                  <div className={`absolute inset-0 transition-all duration-300 ease-in-out ${isYearly ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
+                    <span className="text-4xl font-mono font-bold text-[#FAFAFA]">$9</span>
+                    <span className="text-zinc-500 font-mono text-sm ml-2">/ month</span>
+                    <div className="text-xs text-zinc-500 mt-1">Billed annually at $108</div>
+                  </div>
+                </div>
+                
+                <Link 
+                  to="/dashboard" 
+                  className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-sm font-bold text-center transition-colors duration-200 mb-10 shadow-[0_0_20px_rgba(99,102,241,0.3)]"
+                >
+                  Claim Financial Freedom
+                </Link>
+                
+                <div className="flex flex-col gap-4 mt-auto">
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+                    <span className="text-zinc-300 text-sm">Unlimited account sync</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+                    <span className="text-zinc-300 text-sm">The "Debt Detonator" algorithm</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+                    <span className="text-zinc-300 text-sm">"Subscription Sniper" active alerts</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+                    <span className="text-zinc-300 text-sm">Automated Tax Fortress tracking</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+                    <span className="text-zinc-300 text-sm">24/7 AI Financial Advisor</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="relative pb-32 bg-[#0A0A0A]">
+        <div 
+          ref={faqRef}
+          className="max-w-3xl mx-auto px-6 lg:px-8"
+        >
+          <div className={`transition-all duration-1000 ease-out ${faqVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-12 text-[#FAFAFA]">Frequently Asked Questions</h2>
+            
+            <div className="flex flex-col">
+              <FaqItem 
+                question="Can I cancel my subscription at any time?" 
+                answer="Yes. We believe in ruthless efficiency, not holding you hostage. Cancel anytime from your dashboard settings with a single click. No questions asked." 
+              />
+              <FaqItem 
+                question="Is my financial data secure?" 
+                answer="We use bank-level 256-bit encryption. We don't sell your data, and we don't store your bank credentials. We use Plaid to securely connect to your institutions." 
+              />
+              <FaqItem 
+                question="How does the Debt Detonator work?" 
+                answer="It uses a proprietary algorithm to analyze your interest rates, balances, and cash flow to recommend the mathematically optimal payoff strategy (avalanche or snowball) to save you the most money." 
+              />
+              <FaqItem 
+                question="Do I need to link my bank accounts?" 
+                answer="No. The Free Tracker allows for 100% manual entry if you prefer complete privacy. However, The Arsenal tier requires linking accounts to automate the Subscription Sniper and Tax Fortress features." 
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-[#0A0A0A] border-t border-[#262626] pt-20 pb-10">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+            <div className="col-span-1">
+              <Link to="/" className="font-black text-xl tracking-[0.2em] text-[#FAFAFA] block mb-4">
+                OWEABLE
+              </Link>
+              <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">
+                The command center for your financial future.
+              </p>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Product</h4>
+              <ul className="space-y-3 text-sm text-zinc-400">
+                <li><Link to="/#features" className="hover:text-white transition-colors">Features</Link></li>
+                <li><Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
+                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Resources</h4>
+              <ul className="space-y-3 text-sm text-zinc-400">
+                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <ul className="space-y-3 text-sm text-zinc-400">
+                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div className="pt-8 border-t border-[#262626] flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-zinc-500">
+              &copy; {new Date().getFullYear()} Oweable Inc. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4 text-zinc-500">
+              <a href="#" className="hover:text-white transition-colors">
+                <Twitter className="w-5 h-5" />
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                <Github className="w-5 h-5" />
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                <Linkedin className="w-5 h-5" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

@@ -66,6 +66,13 @@ export interface IncomeSource {
   status: 'active' | 'paused';
 }
 
+export interface Budget {
+  id: string;
+  category: string;
+  amount: number;
+  period: 'Monthly' | 'Yearly';
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -81,6 +88,7 @@ interface AppState {
   subscriptions: Subscription[];
   goals: Goal[];
   incomes: IncomeSource[];
+  budgets: Budget[];
   categories: Category[];
   user: {
     firstName: string;
@@ -109,6 +117,9 @@ interface AppState {
   editIncome: (id: string, income: Partial<IncomeSource>) => void;
   deleteIncome: (id: string) => void;
   recordIncomeDeposit: (id: string, amount?: number) => void;
+  addBudget: (budget: Omit<Budget, 'id'>) => void;
+  editBudget: (id: string, budget: Partial<Budget>) => void;
+  deleteBudget: (id: string) => void;
   addCategory: (category: Omit<Category, 'id'>) => void;
   editCategory: (id: string, category: Partial<Category>) => void;
   deleteCategory: (id: string) => void;
@@ -153,6 +164,12 @@ const initialData = {
     { id: '1', name: 'Tech Corp Salary', amount: 4200.00, frequency: 'Bi-weekly' as const, category: 'Salary', nextDate: '2026-04-15', status: 'active' as const },
     { id: '2', name: 'Freelance Design', amount: 850.00, frequency: 'Monthly' as const, category: 'Freelance', nextDate: '2026-04-20', status: 'active' as const },
     { id: '3', name: 'Dividend Yield', amount: 125.00, frequency: 'Quarterly' as const, category: 'Investments', nextDate: '2026-06-01', status: 'active' as const },
+  ],
+  budgets: [
+    { id: '1', category: 'Housing', amount: 2000, period: 'Monthly' as const },
+    { id: '2', category: 'Food & Dining', amount: 600, period: 'Monthly' as const },
+    { id: '3', category: 'Utilities', amount: 300, period: 'Monthly' as const },
+    { id: '4', category: 'Entertainment', amount: 150, period: 'Monthly' as const },
   ],
   categories: [
     { id: '1', name: 'Housing', color: '#6f42c1', type: 'expense' as const },
@@ -262,12 +279,17 @@ export const useStore = create<AppState>((set) => ({
       transactions: [newTransaction, ...state.transactions].slice(0, 50)
     };
   }),
+  addBudget: (budget) => set((state) => ({ budgets: [...state.budgets, { ...budget, id: Math.random().toString(36).substr(2, 9) }] })),
+  editBudget: (id, updatedBudget) => set((state) => ({
+    budgets: state.budgets.map((b) => b.id === id ? { ...b, ...updatedBudget } : b)
+  })),
+  deleteBudget: (id) => set((state) => ({ budgets: state.budgets.filter((b) => b.id !== id) })),
   addCategory: (category) => set((state) => ({ categories: [...state.categories, { ...category, id: Math.random().toString(36).substr(2, 9) }] })),
   editCategory: (id, updatedCategory) => set((state) => ({
     categories: state.categories.map((c) => c.id === id ? { ...c, ...updatedCategory } : c)
   })),
   deleteCategory: (id) => set((state) => ({ categories: state.categories.filter((c) => c.id !== id) })),
   updateUser: (user) => set((state) => ({ user: { ...state.user, ...user } })),
-  deleteAccount: () => set({ bills: [], debts: [], transactions: [], assets: [], subscriptions: [], goals: [], incomes: [], categories: [], user: { firstName: '', lastName: '', email: '' } }),
+  deleteAccount: () => set({ bills: [], debts: [], transactions: [], assets: [], subscriptions: [], goals: [], incomes: [], budgets: [], categories: [], user: { firstName: '', lastName: '', email: '' } }),
   seedData: () => set(initialData),
 }));

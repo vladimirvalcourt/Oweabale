@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
 import { Dialog } from '@headlessui/react';
-import { AlertTriangle, Lock, Shield, Smartphone, CreditCard as CreditCardIcon, CheckCircle2, Plus, X, Building2, Loader2, Search } from 'lucide-react';
+import { AlertTriangle, Lock, Shield, Smartphone, CreditCard as CreditCardIcon, CheckCircle2, Plus, X, Building2, Loader2, Search, Download, Fingerprint, EyeOff, FileSpreadsheet, Sparkles, FileText } from 'lucide-react';
 import { cn } from '../lib/utils';
 
 type Tab = 'profile' | 'notifications' | 'security' | 'billing' | 'financial' | 'privacy' | 'integrations';
@@ -243,9 +243,39 @@ export default function Settings() {
                       <p className="text-sm text-zinc-500">Authenticator App</p>
                     </div>
                   </div>
-                  <button onClick={() => toast.success('2FA settings opened')} className="px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500">
-                    Manage
-                  </button>
+                  <div className="flex gap-3">
+                    <button onClick={() => toast.success('Recovery codes generated')} className="px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500">
+                      Recovery Codes
+                    </button>
+                    <button onClick={() => toast.success('2FA settings opened')} className="px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500">
+                      Manage
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#141414] rounded-lg border border-[#262626]">
+                <div className="px-6 py-5 border-b border-[#262626]">
+                  <h3 className="text-base font-semibold text-[#FAFAFA]">Biometric Authentication</h3>
+                  <p className="mt-1 text-sm text-zinc-400">Require FaceID or TouchID when opening the application.</p>
+                </div>
+                <div className="p-6 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-[#1C1C1C] border border-[#262626] rounded-lg flex items-center justify-center">
+                      <Fingerprint className="w-5 h-5 text-indigo-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[#FAFAFA]">App Lock</p>
+                      <p className="text-xs text-zinc-500">Currently disabled</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center h-5">
+                    <input
+                      type="checkbox"
+                      onChange={(e) => toast.success(e.target.checked ? 'Biometrics enabled' : 'Biometrics disabled')}
+                      className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-[#0A0A0A] border-[#262626] rounded transition-colors cursor-pointer"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -282,27 +312,68 @@ export default function Settings() {
 
           {activeTab === 'billing' && (
             <div className="space-y-6">
-              <div className="bg-[#141414] rounded-lg border border-[#262626]">
-                <div className="px-6 py-5 border-b border-[#262626]">
-                  <h3 className="text-base font-semibold text-[#FAFAFA]">Subscription Plan</h3>
-                  <p className="mt-1 text-sm text-zinc-400">You are currently on the Pro plan.</p>
+              <div className="bg-[#141414] rounded-lg border border-[#262626] overflow-hidden">
+                <div className="px-6 py-5 border-b border-[#262626] bg-[#1C1C1C]/50 flex justify-between items-center">
+                  <div>
+                    <h3 className="text-base font-semibold text-[#FAFAFA]">Subscription Plan</h3>
+                    <p className="mt-1 text-sm text-zinc-400">You are currently on the Free tier.</p>
+                  </div>
+                  <span className="inline-flex items-center text-xs font-medium text-zinc-400 bg-[#262626] px-2.5 py-1 rounded-full">
+                    The Tracker
+                  </span>
                 </div>
                 <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-5 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div>
-                      <p className="text-lg font-semibold text-[#FAFAFA]">Oweable Pro</p>
-                      <p className="text-sm text-zinc-500">$4.99 / month</p>
+                      <h4 className="text-[#FAFAFA] font-bold flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-indigo-400" />
+                        Upgrade to The Arsenal
+                      </h4>
+                      <p className="text-sm text-indigo-200/70 mt-1 max-w-md">
+                        Unlock the Debt Detonator, Subscription Sniper, and 24/7 AI Financial Advisor.
+                      </p>
                     </div>
-                    <span className="inline-flex items-center text-xs font-medium text-[#22C55E]">
-                      Active
-                    </span>
-                  </div>
-                  <p className="text-sm text-zinc-400 mb-6">Your next billing date is April 15, 2026.</p>
-                  <div className="flex gap-3">
-                    <button onClick={() => toast.success('Plan management opened')} className="px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500">
-                      Manage Plan
+                    <button onClick={() => toast.success('Redirecting to upgrade...')} className="shrink-0 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-md text-sm font-bold transition-colors shadow-[0_0_15px_rgba(99,102,241,0.3)]">
+                      Upgrade Now
                     </button>
                   </div>
+                </div>
+              </div>
+
+              <div className="bg-[#141414] rounded-lg border border-[#262626]">
+                <div className="px-6 py-5 border-b border-[#262626]">
+                  <h3 className="text-base font-semibold text-[#FAFAFA]">Billing History</h3>
+                  <p className="mt-1 text-sm text-zinc-400">View and download your previous invoices.</p>
+                </div>
+                <div className="p-0">
+                  <table className="w-full text-left text-sm text-zinc-400">
+                    <thead className="bg-[#1C1C1C] border-b border-[#262626] text-xs uppercase">
+                      <tr>
+                        <th className="px-6 py-3 font-medium">Date</th>
+                        <th className="px-6 py-3 font-medium">Amount</th>
+                        <th className="px-6 py-3 font-medium">Status</th>
+                        <th className="px-6 py-3 font-medium text-right">Invoice</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#262626]">
+                      <tr className="hover:bg-[#1C1C1C]/50 transition-colors">
+                        <td className="px-6 py-4">Mar 15, 2026</td>
+                        <td className="px-6 py-4">$0.00</td>
+                        <td className="px-6 py-4"><span className="text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded text-xs">Paid</span></td>
+                        <td className="px-6 py-4 text-right">
+                          <button className="text-indigo-400 hover:text-indigo-300 transition-colors"><Download className="w-4 h-4 inline" /></button>
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-[#1C1C1C]/50 transition-colors">
+                        <td className="px-6 py-4">Feb 15, 2026</td>
+                        <td className="px-6 py-4">$0.00</td>
+                        <td className="px-6 py-4"><span className="text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded text-xs">Paid</span></td>
+                        <td className="px-6 py-4 text-right">
+                          <button className="text-indigo-400 hover:text-indigo-300 transition-colors"><Download className="w-4 h-4 inline" /></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
@@ -392,6 +463,37 @@ export default function Settings() {
                   ))}
                 </div>
               </div>
+
+              <div className="bg-[#141414] rounded-lg border border-[#262626]">
+                <div className="px-6 py-5 border-b border-[#262626]">
+                  <h3 className="text-base font-semibold text-[#FAFAFA]">Smart Alerts (The Arsenal)</h3>
+                  <p className="mt-1 text-sm text-zinc-400">Advanced notifications powered by our algorithms.</p>
+                </div>
+                <div className="p-6 space-y-6">
+                  {[
+                    { id: 'sniper-increase', label: 'Subscription Sniper: Price Hikes', desc: 'Alert me instantly if a subscription price increases.', defaultChecked: true },
+                    { id: 'sniper-renewal', label: 'Subscription Sniper: Auto-Renewals', desc: 'Alert me 7 days before an annual subscription renews.', defaultChecked: true },
+                    { id: 'detonator-milestone', label: 'Debt Detonator: Milestones', desc: 'Celebrate when I pay off 25%, 50%, 75%, and 100% of a debt.', defaultChecked: true },
+                    { id: 'detonator-rate', label: 'Debt Detonator: Rate Changes', desc: 'Alert me if a variable interest rate changes.', defaultChecked: true },
+                  ].map((item) => (
+                    <div key={item.id} className="flex items-start justify-between">
+                      <div className="pr-4">
+                        <label htmlFor={item.id} className="text-sm font-medium text-[#FAFAFA] cursor-pointer">{item.label}</label>
+                        <p className="text-sm text-zinc-500">{item.desc}</p>
+                      </div>
+                      <div className="flex items-center h-5 mt-1">
+                        <input
+                          id={item.id}
+                          type="checkbox"
+                          defaultChecked={item.defaultChecked}
+                          onChange={() => toast.success('Smart alert updated')}
+                          className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-[#0A0A0A] border-[#262626] rounded transition-colors cursor-pointer"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
@@ -435,6 +537,23 @@ export default function Settings() {
                       <option>MM/DD/YYYY</option>
                       <option>DD/MM/YYYY</option>
                       <option>YYYY-MM-DD</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-zinc-300">Fiscal Year Start</label>
+                    <select className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors">
+                      <option>January</option>
+                      <option>April</option>
+                      <option>July</option>
+                      <option>October</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-zinc-300">Default Dashboard View</label>
+                    <select className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors">
+                      <option>Net Worth Overview</option>
+                      <option>Upcoming Bills</option>
+                      <option>Debt Detonator Timeline</option>
                     </select>
                   </div>
                   <div className="pt-2">
@@ -497,6 +616,43 @@ export default function Settings() {
                   </button>
                 </div>
               </div>
+
+              <div className="bg-[#141414] rounded-lg border border-[#262626]">
+                <div className="px-6 py-5 border-b border-[#262626]">
+                  <h3 className="text-base font-semibold text-[#FAFAFA]">Tax & Export</h3>
+                  <p className="mt-1 text-sm text-zinc-400">Connect external services for seamless tax preparation and reporting.</p>
+                </div>
+                <div className="p-6 space-y-4">
+                  <div className="border border-[#262626] rounded-md p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-[#1C1C1C] border border-[#262626] rounded-lg flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-indigo-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-[#FAFAFA]">TurboTax Integration</p>
+                        <p className="text-xs text-zinc-500">Export Tax Fortress data directly</p>
+                      </div>
+                    </div>
+                    <button onClick={() => toast.success('TurboTax integration initiated')} className="text-sm font-medium text-zinc-300 hover:text-white bg-[#262626] hover:bg-[#333] px-3 py-1.5 rounded transition-colors">
+                      Connect
+                    </button>
+                  </div>
+                  <div className="border border-[#262626] rounded-md p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-[#1C1C1C] border border-[#262626] rounded-lg flex items-center justify-center">
+                        <FileSpreadsheet className="w-5 h-5 text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-[#FAFAFA]">Google Sheets Sync</p>
+                        <p className="text-xs text-zinc-500">Live sync transactions and balances</p>
+                      </div>
+                    </div>
+                    <button onClick={() => toast.success('Google Sheets sync initiated')} className="text-sm font-medium text-zinc-300 hover:text-white bg-[#262626] hover:bg-[#333] px-3 py-1.5 rounded transition-colors">
+                      Connect
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -504,7 +660,69 @@ export default function Settings() {
             <div className="space-y-6">
               <div className="bg-[#141414] rounded-lg border border-[#262626]">
                 <div className="px-6 py-5 border-b border-[#262626]">
-                  <h3 className="text-base font-semibold text-[#FAFAFA]">Data & Privacy</h3>
+                  <h3 className="text-base font-semibold text-[#FAFAFA]">Privacy Mode</h3>
+                  <p className="mt-1 text-sm text-zinc-400">Control visibility of sensitive information.</p>
+                </div>
+                <div className="p-6 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-[#1C1C1C] border border-[#262626] rounded-lg flex items-center justify-center">
+                      <EyeOff className="w-5 h-5 text-zinc-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[#FAFAFA]">Hide Balances</p>
+                      <p className="text-xs text-zinc-500">Blur all monetary values until hovered</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center h-5">
+                    <input
+                      type="checkbox"
+                      onChange={(e) => toast.success(e.target.checked ? 'Privacy mode enabled' : 'Privacy mode disabled')}
+                      className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-[#0A0A0A] border-[#262626] rounded transition-colors cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#141414] rounded-lg border border-[#262626]">
+                <div className="px-6 py-5 border-b border-[#262626]">
+                  <h3 className="text-base font-semibold text-[#FAFAFA]">AI & Data Usage</h3>
+                  <p className="mt-1 text-sm text-zinc-400">Control how Oweable AI interacts with your financial data.</p>
+                </div>
+                <div className="p-6 space-y-6">
+                  <div className="flex items-start justify-between">
+                    <div className="pr-4">
+                      <label className="text-sm font-medium text-[#FAFAFA]">Allow AI Analysis</label>
+                      <p className="text-sm text-zinc-500">Allow Oweable AI to analyze your transaction history to provide personalized insights.</p>
+                    </div>
+                    <div className="flex items-center h-5 mt-1">
+                      <input
+                        type="checkbox"
+                        defaultChecked={true}
+                        onChange={() => toast.success('AI preference updated')}
+                        className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-[#0A0A0A] border-[#262626] rounded transition-colors cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-start justify-between">
+                    <div className="pr-4">
+                      <label className="text-sm font-medium text-[#FAFAFA]">Data Donation</label>
+                      <p className="text-sm text-zinc-500">Anonymize and use my data to improve Oweable AI models. (Default off for privacy)</p>
+                    </div>
+                    <div className="flex items-center h-5 mt-1">
+                      <input
+                        type="checkbox"
+                        defaultChecked={false}
+                        onChange={() => toast.success('Data donation preference updated')}
+                        className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-[#0A0A0A] border-[#262626] rounded transition-colors cursor-pointer"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#141414] rounded-lg border border-[#262626]">
+                <div className="px-6 py-5 border-b border-[#262626]">
+                  <h3 className="text-base font-semibold text-[#FAFAFA]">Data Export</h3>
                   <p className="mt-1 text-sm text-zinc-400">Manage your personal data and privacy settings.</p>
                 </div>
                 <div className="p-6 space-y-6">

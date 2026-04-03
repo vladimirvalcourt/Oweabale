@@ -15,10 +15,15 @@ import Upload from './pages/Upload';
 import Transactions from './pages/Transactions';
 import Goals from './pages/Goals';
 import Income from './pages/Income';
+import Budgets from './pages/Budgets';
+import NetWorth from './pages/NetWorth';
+import Calendar from './pages/Calendar';
+import Taxes from './pages/Taxes';
 import Categories from './pages/Categories';
 import Subscriptions from './pages/Subscriptions';
 import Reports from './pages/Reports';
 import Landing from './pages/Landing';
+import Pricing from './pages/Pricing';
 
 export default function App() {
   return (
@@ -35,6 +40,7 @@ export default function App() {
       />
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/pricing" element={<Pricing />} />
         <Route path="/" element={<Layout />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="bills" element={<Bills />} />
@@ -44,6 +50,10 @@ export default function App() {
           <Route path="income" element={<Income />} />
           <Route path="upload" element={<Upload />} />
           <Route path="transactions" element={<Transactions />} />
+          <Route path="budgets" element={<Budgets />} />
+          <Route path="net-worth" element={<NetWorth />} />
+          <Route path="calendar" element={<Calendar />} />
+          <Route path="taxes" element={<Taxes />} />
           <Route path="goals" element={<Goals />} />
           <Route path="categories" element={<Categories />} />
           <Route path="subscriptions" element={<Subscriptions />} />

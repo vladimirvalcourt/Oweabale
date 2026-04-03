@@ -1,232 +1,422 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Receipt, TrendingDown, Scan, ShieldCheck, Wallet, PieChart, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Star, Shield, Lock, Zap, TrendingUp, FileText, Calculator, BarChart3, Target, Twitter, Github, Linkedin, Sparkles } from 'lucide-react';
+
+function useInView(threshold = 0.15) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold }
+    );
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return [ref, isVisible] as const;
+}
 
 export default function Landing() {
+  const [scrolled, setScrolled] = useState(false);
+  
+  const [socialRef, socialVisible] = useInView();
+  const [featuresRef, featuresVisible] = useInView();
+  const [statsRef, statsVisible] = useInView();
+  const [ctaRef, ctaVisible] = useInView();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#0A0A0A] text-[#FAFAFA] font-sans selection:bg-indigo-500/30">
       {/* Navigation */}
-      <nav className="border-b border-[#262626] bg-[#0A0A0A]/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-indigo-500 rounded-md flex items-center justify-center shrink-0">
-              <span className="text-white font-bold text-lg leading-none">O</span>
-            </div>
-            <span className="font-semibold text-xl tracking-tight text-[#FAFAFA]">
-              Oweable
-            </span>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-[#0A0A0A]/90 backdrop-blur-md border-b border-[#262626] py-4' : 'bg-transparent py-6'}`}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
+          <Link to="/" className="font-black text-xl tracking-[0.2em] text-[#FAFAFA] transition-colors duration-200">
+            OWEABLE
+          </Link>
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
+            <a href="#features" className="hover:text-white transition-colors duration-200">Features</a>
+            <Link to="/pricing" className="hover:text-white transition-colors duration-200">Pricing</Link>
+            <Link to="/dashboard" className="hover:text-white transition-colors duration-200">Sign In</Link>
           </div>
-          <div className="flex items-center gap-4">
-            <Link 
-              to="/dashboard" 
-              className="text-sm font-medium text-zinc-400 hover:text-zinc-200 transition-colors hidden sm:block"
-            >
-              Sign In
-            </Link>
-            <Link 
-              to="/dashboard" 
-              className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
-            >
-              Get Started
-            </Link>
-          </div>
+          <Link 
+            to="/dashboard" 
+            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-sm font-bold transition-colors duration-200"
+          >
+            Get Started
+          </Link>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-24 pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0A0A0A] to-[#0A0A0A] -z-10"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-8">
-            <span className="flex h-2 w-2 rounded-full bg-indigo-500"></span>
-            The ultimate bill management platform
+      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: 'url("https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1920&q=80")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        >
+          <div className="absolute inset-0 bg-black/70"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-[#0A0A0A]"></div>
+        </div>
+
+        {/* Hero Glow */}
+        <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#0A0A0A]/0 to-transparent pointer-events-none"></div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full flex flex-col items-center text-center mt-12">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="h-[1px] w-8 bg-[#F59E0B]"></div>
+            <span className="text-[#F59E0B] text-xs tracking-widest uppercase">FINANCIAL CLARITY, FINALLY</span>
+            <div className="h-[1px] w-8 bg-[#F59E0B]"></div>
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 max-w-4xl mx-auto leading-tight">
-            Take absolute control of your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">monthly bills</span>
+          
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.85] mb-8" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <span className="block text-white">Stop Bleeding</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60">Money.</span>
           </h1>
-          <p className="text-lg md:text-xl text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Stop stressing about due dates. Oweable helps you track expenses, crush debt, and manage your entire financial life in one beautiful, secure dashboard.
+          
+          <p className="text-base md:text-lg text-zinc-400 max-w-3xl mx-auto leading-relaxed mb-12 font-light">
+            Oweable gives you a ruthless command center for your bills, debts, and financial future. See everything. Owe nothing.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          
+          <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
             <Link 
               to="/dashboard" 
-              className="px-8 py-4 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-base font-medium transition-all flex items-center gap-2 w-full sm:w-auto justify-center shadow-[0_0_40px_-10px_rgba(99,102,241,0.5)]"
+              className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-zinc-200 text-black rounded-sm text-base font-bold transition-colors duration-200 flex items-center justify-center gap-2"
             >
-              Open Dashboard <ArrowRight className="w-5 h-5" />
+              Deploy Your Dashboard <ArrowRight className="w-5 h-5" />
             </Link>
+            <a 
+              href="#features" 
+              className="w-full sm:w-auto px-6 py-3 bg-transparent border border-white/20 hover:border-white/50 text-white rounded-sm text-base font-medium transition-colors duration-200 flex items-center justify-center"
+            >
+              View The Arsenal
+            </a>
           </div>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="py-24 bg-[#111111] border-y border-[#262626]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight mb-4">Everything you need to manage your money</h2>
-            <p className="text-zinc-400 max-w-2xl mx-auto">Powerful tools designed to give you clarity and confidence in your financial decisions.</p>
+      {/* Social Proof Bar */}
+      <div className="border-y border-[#262626] bg-[#0A0A0A] py-6 overflow-hidden">
+        <div 
+          ref={socialRef}
+          className={`max-w-7xl mx-auto px-6 lg:px-8 flex flex-wrap justify-center md:justify-between items-center gap-8 text-sm font-medium text-zinc-400 transition-all duration-700 ease-out ${socialVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+        >
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-indigo-400" />
+            <span>Trusted by 12,000+ households</span>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Feature 1 */}
-            <div className="bg-[#141414] border border-[#262626] rounded-2xl p-8 hover:border-indigo-500/50 transition-colors group">
-              <div className="w-12 h-12 bg-[#1C1C1C] border border-[#262626] rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Receipt className="w-6 h-6 text-indigo-400" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Smart Bill Tracking</h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Never miss a payment again. Track upcoming bills, set auto-pay reminders, and view your monthly obligations at a glance.
-              </p>
+          <div className="flex items-center gap-2">
+            <div className="flex text-[#F59E0B]">
+              <Star className="w-4 h-4 fill-current" />
+              <Star className="w-4 h-4 fill-current" />
+              <Star className="w-4 h-4 fill-current" />
+              <Star className="w-4 h-4 fill-current" />
+              <Star className="w-4 h-4 fill-current" />
             </div>
-
-            {/* Feature 2 */}
-            <div className="bg-[#141414] border border-[#262626] rounded-2xl p-8 hover:border-emerald-500/50 transition-colors group">
-              <div className="w-12 h-12 bg-[#1C1C1C] border border-[#262626] rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <TrendingDown className="w-6 h-6 text-emerald-400" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Debt Payoff Strategies</h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Visualize your path to becoming debt-free. Compare Snowball vs. Avalanche methods to see how much interest you can save.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="bg-[#141414] border border-[#262626] rounded-2xl p-8 hover:border-cyan-500/50 transition-colors group">
-              <div className="w-12 h-12 bg-[#1C1C1C] border border-[#262626] rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Scan className="w-6 h-6 text-cyan-400" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Receipt Scanning</h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Upload photos of receipts or PDF invoices. Our built-in OCR automatically extracts the merchant, amount, and due date.
-              </p>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="bg-[#141414] border border-[#262626] rounded-2xl p-8 hover:border-purple-500/50 transition-colors group">
-              <div className="w-12 h-12 bg-[#1C1C1C] border border-[#262626] rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Wallet className="w-6 h-6 text-purple-400" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Income & Assets</h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Track your salary, freelance income, and investments. Get a complete picture of your net worth in real-time.
-              </p>
-            </div>
-
-            {/* Feature 5 */}
-            <div className="bg-[#141414] border border-[#262626] rounded-2xl p-8 hover:border-pink-500/50 transition-colors group">
-              <div className="w-12 h-12 bg-[#1C1C1C] border border-[#262626] rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <PieChart className="w-6 h-6 text-pink-400" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Visual Reports</h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Understand your spending habits with beautiful, interactive charts. See exactly where your money goes every month.
-              </p>
-            </div>
-
-            {/* Feature 6 */}
-            <div className="bg-[#141414] border border-[#262626] rounded-2xl p-8 hover:border-amber-500/50 transition-colors group">
-              <div className="w-12 h-12 bg-[#1C1C1C] border border-[#262626] rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <ShieldCheck className="w-6 h-6 text-amber-400" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3">Bank-Grade Security</h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Your financial data is encrypted end-to-end. We use industry-standard security practices to keep your information safe.
-              </p>
-            </div>
+            <span>4.9 / 5.0 rating</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Lock className="w-4 h-4 text-indigo-400" />
+            <span>Bank-grade 256-bit encryption</span>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* How it helps section */}
-      <section className="py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row items-center gap-16">
-            <div className="flex-1 space-y-8">
-              <h2 className="text-3xl md:text-4xl font-bold tracking-tight">Stop wondering where your money went.</h2>
-              <p className="text-lg text-zinc-400 leading-relaxed">
-                Managing bills shouldn't be a part-time job. Oweable centralizes your financial obligations so you can focus on living your life, not updating spreadsheets.
-              </p>
-              <ul className="space-y-4">
-                {[
-                  'Avoid late fees with proactive due date tracking',
-                  'Identify forgotten subscriptions draining your account',
-                  'Create realistic budgets based on actual spending',
-                  'Set and achieve meaningful savings goals'
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-6 h-6 text-indigo-500 shrink-0" />
-                    <span className="text-zinc-300">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link 
-                to="/dashboard" 
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#1C1C1C] hover:bg-[#262626] border border-[#333333] text-white rounded-lg text-sm font-medium transition-colors"
-              >
-                Try Oweable for free <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <div className="flex-1 w-full">
-              <div className="relative rounded-2xl overflow-hidden border border-[#262626] shadow-2xl bg-[#141414] aspect-[4/3] flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-transparent"></div>
-                {/* Abstract Dashboard Representation */}
-                <div className="w-3/4 h-3/4 flex flex-col gap-4 p-6">
-                  <div className="flex gap-4 h-1/3">
-                    <div className="flex-1 bg-[#1C1C1C] rounded-lg border border-[#262626] p-4 flex flex-col justify-between">
-                      <div className="w-8 h-2 bg-zinc-700 rounded"></div>
-                      <div className="w-24 h-6 bg-indigo-500/50 rounded"></div>
+      {/* Features Section (Bento Grid) */}
+      <section id="features" className="py-32 bg-[#141414] overflow-hidden">
+        <div ref={featuresRef} className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className={`mb-20 max-w-3xl transition-all duration-700 ease-out ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-6 text-[#FAFAFA]">Every dollar,<br/>accounted for.</h2>
+            <p className="text-base text-zinc-400 leading-relaxed">
+              From rent to streaming services, Oweable maps your complete financial picture.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[280px]">
+            {/* Bento Cell 1 - Large */}
+            <div className={`md:col-span-2 transition-all duration-700 ease-out delay-[0ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+              <div className="bg-[#1C1C1C] border border-[#262626] rounded-xl p-8 flex flex-col justify-between group hover:border-indigo-500/50 transition-colors duration-200 relative overflow-hidden h-full">
+                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-200">
+                  <TrendingUp className="w-48 h-48 text-indigo-400" />
+                </div>
+                <div className="relative z-10">
+                  <div className="mb-8 w-full max-w-[240px] bg-[#0A0A0A] border border-[#262626] rounded-lg p-4 shadow-lg">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-xs font-medium text-zinc-400">Total Debt</span>
+                      <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">Payoff date: Oct 2026</span>
                     </div>
-                    <div className="flex-1 bg-[#1C1C1C] rounded-lg border border-[#262626] p-4 flex flex-col justify-between">
-                      <div className="w-8 h-2 bg-zinc-700 rounded"></div>
-                      <div className="w-24 h-6 bg-emerald-500/50 rounded"></div>
+                    <div className="w-full h-1.5 bg-[#262626] rounded-full overflow-hidden">
+                      <div className="h-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)] rounded-full animate-[progress-active_4s_ease-in-out_infinite]"></div>
                     </div>
                   </div>
-                  <div className="flex-1 bg-[#1C1C1C] rounded-lg border border-[#262626] p-4 flex items-end gap-2">
-                    {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (
-                      <div key={i} className="flex-1 bg-indigo-500/40 rounded-t-sm" style={{ height: `${h}%` }}></div>
-                    ))}
-                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-3 text-[#FAFAFA]">Debt Detonator</h3>
+                  <p className="text-zinc-400 text-sm md:text-base max-w-md">
+                    Crush interest rates and see the exact day you become debt-free.
+                  </p>
                 </div>
               </div>
+            </div>
+
+            {/* Bento Cell 2 */}
+            <div className={`transition-all duration-700 ease-out delay-[100ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+              <div className="bg-[#1C1C1C] border border-[#262626] rounded-xl p-8 flex flex-col justify-between group hover:border-indigo-500/50 transition-colors duration-200 relative overflow-hidden h-full">
+                <div className="relative z-10">
+                  <div className="mb-6 h-28 w-full max-w-[240px] overflow-hidden relative [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)]">
+                    <div className="flex flex-col gap-2 animate-[marquee-vertical_15s_linear_infinite]">
+                      {[
+                        { name: "Netflix", price: "$15.99" },
+                        { name: "Equinox", price: "$250.00" },
+                        { name: "Spotify", price: "$10.99" },
+                        { name: "Adobe CC", price: "$54.99" },
+                        { name: "ChatGPT", price: "$20.00" },
+                        { name: "Netflix", price: "$15.99" },
+                        { name: "Equinox", price: "$250.00" },
+                        { name: "Spotify", price: "$10.99" },
+                        { name: "Adobe CC", price: "$54.99" },
+                        { name: "ChatGPT", price: "$20.00" }
+                      ].map((sub, i) => (
+                        <div key={i} className="flex items-center justify-between bg-[#0A0A0A] border border-[#262626] rounded-md px-3 py-2 shadow-sm shrink-0">
+                          <div className="flex items-center gap-2">
+                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)] animate-pulse"></div>
+                            <span className="text-xs font-medium text-zinc-300">{sub.name}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs text-zinc-500">{sub.price}</span>
+                            <span className="text-[10px] font-bold text-red-400 hover:text-red-300 cursor-pointer transition-colors uppercase tracking-wider">Cancel</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-3 text-[#FAFAFA]">Subscription Sniper</h3>
+                  <p className="text-zinc-400 text-sm md:text-base">
+                    Stop paying for things you don't use. We find them, you kill them.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bento Cell 3 */}
+            <div className={`transition-all duration-700 ease-out delay-[200ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+              <div className="bg-[#1C1C1C] border border-[#262626] rounded-xl p-8 flex flex-col justify-between group hover:border-indigo-500/50 transition-colors duration-200 relative overflow-hidden h-full">
+                <div className="relative z-10">
+                  <div className="mb-8 h-16 flex items-end gap-2 max-w-[240px]">
+                    <div className="w-8 bg-[#0A0A0A] border border-[#262626] border-t-indigo-500/30 rounded-t-sm animate-[chart-1_4s_ease-in-out_infinite]"></div>
+                    <div className="w-8 bg-[#0A0A0A] border border-[#262626] border-t-indigo-500/50 rounded-t-sm animate-[chart-2_5s_ease-in-out_infinite]"></div>
+                    <div className="w-8 bg-[#0A0A0A] border border-[#262626] border-t-indigo-500/70 rounded-t-sm animate-[chart-3_6s_ease-in-out_infinite]"></div>
+                    <div className="w-8 bg-indigo-500/20 border border-indigo-500/50 border-t-indigo-400 rounded-t-sm shadow-[0_-5px_15px_rgba(99,102,241,0.2)] relative animate-[chart-4_7s_ease-in-out_infinite]">
+                      <div className="absolute -top-[1px] left-0 right-0 h-[2px] bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,1)]"></div>
+                    </div>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-3 text-[#FAFAFA]">Wealth Velocity</h3>
+                  <p className="text-zinc-400 text-sm md:text-base">
+                    Track net worth with institutional-grade precision.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bento Cell 4 - Large */}
+            <div className={`md:col-span-2 transition-all duration-700 ease-out delay-[300ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+              <div className="bg-[#1C1C1C] border border-[#262626] rounded-xl p-8 flex flex-col justify-between group hover:border-indigo-500/50 transition-colors duration-200 relative overflow-hidden h-full">
+                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-200">
+                  <Calculator className="w-48 h-48 text-indigo-400" />
+                </div>
+                <div className="relative z-10">
+                  <div className="w-10 h-10 bg-[#0A0A0A] border border-[#262626] rounded-lg flex items-center justify-center mb-6">
+                    <Calculator className="w-5 h-5 text-indigo-400" />
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-3 text-[#FAFAFA]">Tax Fortress</h3>
+                  <p className="text-zinc-400 text-sm md:text-base max-w-md">
+                    Never be surprised by April again. Real-time liability tracking.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bento Cell 5 */}
+            <div className={`transition-all duration-700 ease-out delay-[400ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+              <div className="bg-[#1C1C1C] border border-[#262626] rounded-xl p-8 flex flex-col justify-between group hover:border-indigo-500/50 transition-colors duration-200 relative overflow-hidden h-full">
+                <div className="relative z-10">
+                  <div className="w-10 h-10 bg-[#0A0A0A] border border-[#262626] rounded-lg flex items-center justify-center mb-6">
+                    <FileText className="w-5 h-5 text-indigo-400" />
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-3 text-[#FAFAFA]">Receipt to Reality</h3>
+                  <p className="text-zinc-400 text-sm md:text-base">
+                    Snap a photo. We extract the merchant, amount, and date instantly.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bento Cell 5.5 - AI Advisor */}
+            <div className={`md:col-span-2 transition-all duration-700 ease-out delay-[450ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+              <div className="bg-[#1C1C1C] border border-[#262626] rounded-xl p-8 flex flex-col justify-between group hover:border-indigo-500/50 transition-colors duration-200 relative overflow-hidden h-full">
+                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-200">
+                  <Sparkles className="w-48 h-48 text-indigo-400" />
+                </div>
+                <div className="relative z-10">
+                  <div className="mb-6 w-full max-w-[300px] flex flex-col gap-3">
+                    <div className="self-end bg-[#262626] text-zinc-300 text-[10px] px-3 py-2 rounded-lg rounded-tr-none max-w-[85%] shadow-sm">
+                      Can I afford a new car this year?
+                    </div>
+                    <div className="self-start bg-indigo-500/10 border border-indigo-500/20 text-indigo-200 text-[10px] px-3 py-2 rounded-lg rounded-tl-none max-w-[95%] shadow-[0_0_15px_rgba(99,102,241,0.1)]">
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></div>
+                        <span className="font-bold text-indigo-400 tracking-wide uppercase text-[8px]">Oweable AI</span>
+                      </div>
+                      <span className="leading-relaxed">Based on your Debt Detonator timeline, financing a car now adds 14 months to your payoff date. Let's look at your cash flow...</span>
+                    </div>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold mb-3 text-[#FAFAFA]">AI Financial Advisor</h3>
+                  <p className="text-zinc-400 text-sm md:text-base max-w-md">
+                    Stop guessing. Ask our AI anything about your finances and get ruthless, data-driven answers instantly.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bento Cell 6 */}
+            <div className={`md:col-span-3 transition-all duration-700 ease-out delay-[500ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+              <div className="bg-[#1C1C1C] border border-[#262626] rounded-xl p-8 flex flex-col md:flex-row items-center justify-between group hover:border-indigo-500/50 transition-colors duration-200 h-full">
+                <div className="flex items-center gap-6 mb-6 md:mb-0">
+                  <div className="w-14 h-14 bg-[#0A0A0A] border border-[#262626] rounded-xl flex items-center justify-center shrink-0">
+                    <Lock className="w-7 h-7 text-indigo-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl md:text-2xl font-bold mb-2 text-[#FAFAFA]">Fort Knox Security</h3>
+                    <p className="text-zinc-400 text-sm md:text-base">
+                      Your data is encrypted end-to-end. We never sell your information.
+                    </p>
+                  </div>
+                </div>
+                <Link 
+                  to="/dashboard" 
+                  className="px-6 py-3 bg-[#0A0A0A] hover:bg-[#262626] border border-[#262626] rounded-sm text-white text-sm font-medium transition-colors duration-200 whitespace-nowrap"
+                >
+                  Read Security Policy
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-32 bg-[#0A0A0A] border-y border-[#262626] overflow-hidden relative">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900/10 via-[#0A0A0A]/0 to-transparent pointer-events-none"></div>
+        <div ref={statsRef} className={`relative z-10 max-w-7xl mx-auto px-6 lg:px-8 transition-all duration-700 ease-out ${statsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 divide-y md:divide-y-0 md:divide-x divide-[#262626] text-center md:text-left">
+            <div className="md:pr-12 pt-12 md:pt-0">
+              <p className="text-4xl md:text-5xl font-black text-[#F59E0B] mb-3 tracking-tighter">$2.4B+</p>
+              <p className="text-sm md:text-base text-zinc-400 font-medium tracking-wide">In bills tracked</p>
+            </div>
+            <div className="md:px-12 pt-12 md:pt-0">
+              <p className="text-4xl md:text-5xl font-black text-[#F59E0B] mb-3 tracking-tighter">98%</p>
+              <p className="text-sm md:text-base text-zinc-400 font-medium tracking-wide">Of users cut expenses in month 1</p>
+            </div>
+            <div className="md:pl-12 pt-12 md:pt-0">
+              <p className="text-4xl md:text-5xl font-black text-[#F59E0B] mb-3 tracking-tighter">4 min</p>
+              <p className="text-sm md:text-base text-zinc-400 font-medium tracking-wide">Average setup time</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-indigo-900/20 border-t border-indigo-500/20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-indigo-500/10 via-transparent to-transparent"></div>
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h2 className="text-4xl font-bold tracking-tight mb-6">Ready to master your finances?</h2>
-          <p className="text-xl text-indigo-200/70 mb-10">
-            Join thousands of users who have taken control of their bills and crushed their debt with Oweable.
+      <section className="py-40 relative overflow-hidden bg-[#141414]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#141414] to-[#141414]"></div>
+        <div ref={ctaRef} className={`relative z-10 max-w-4xl mx-auto px-6 lg:px-8 text-center transition-all duration-700 ease-out ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-6 text-[#FAFAFA]">
+            Your money deserves a strategist.
+          </h2>
+          <p className="text-base md:text-lg text-zinc-400 mb-10 font-light">
+            Join thousands who stopped guessing and started knowing.
           </p>
           <Link 
             to="/dashboard" 
-            className="px-8 py-4 bg-indigo-500 hover:bg-indigo-400 text-white rounded-lg text-lg font-medium transition-all inline-flex items-center gap-2 shadow-lg shadow-indigo-500/25"
+            className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-base font-bold transition-all duration-200 hover:scale-105"
           >
-            Get Started Now <ArrowRight className="w-5 h-5" />
+            Claim Your Financial Freedom <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#0A0A0A] border-t border-[#262626] py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-indigo-500 rounded flex items-center justify-center shrink-0">
-              <span className="text-white font-bold text-xs leading-none">O</span>
+      <footer className="bg-[#0A0A0A] border-t border-[#262626] pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+            <div className="col-span-1 md:col-span-1">
+              <Link to="/" className="font-black text-xl tracking-[0.2em] text-[#FAFAFA] block mb-4">
+                OWEABLE
+              </Link>
+              <p className="text-sm text-zinc-400 leading-relaxed max-w-xs">
+                The command center for your financial future.
+              </p>
             </div>
-            <span className="font-semibold text-lg tracking-tight text-[#FAFAFA]">
-              Oweable
-            </span>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Product</h4>
+              <ul className="space-y-3 text-sm text-zinc-400">
+                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+                <li><Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
+                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Resources</h4>
+              <ul className="space-y-3 text-sm text-zinc-400">
+                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="text-white font-semibold mb-4">Company</h4>
+              <ul className="space-y-3 text-sm text-zinc-400">
+                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+              </ul>
+            </div>
           </div>
-          <p className="text-sm text-zinc-500">
-            &copy; {new Date().getFullYear()} Oweable Inc. All rights reserved.
-          </p>
-          <div className="flex items-center gap-6 text-sm text-zinc-500">
-            <a href="#" className="hover:text-zinc-300 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-zinc-300 transition-colors">Terms</a>
-            <a href="#" className="hover:text-zinc-300 transition-colors">Contact</a>
+          
+          <div className="pt-8 border-t border-[#262626] flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-zinc-500">
+              &copy; {new Date().getFullYear()} Oweable Inc. All rights reserved.
+            </p>
+            <div className="flex items-center gap-4 text-zinc-500">
+              <a href="#" className="hover:text-white transition-colors">
+                <Twitter className="w-5 h-5" />
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                <Github className="w-5 h-5" />
+              </a>
+              <a href="#" className="hover:text-white transition-colors">
+                <Linkedin className="w-5 h-5" />
+              </a>
+            </div>
           </div>
         </div>
       </footer>

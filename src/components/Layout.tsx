@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Bell, Search, Home, Receipt, CreditCard, Target, 
   Settings, Repeat, BarChart3, Plus, Menu, X, 
-  Upload as UploadIcon, Wallet
+  Upload as UploadIcon, Wallet, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition } from '@headlessui/react';
 import { toast } from 'sonner';
@@ -86,7 +86,12 @@ export default function Layout() {
     { name: 'Bills', path: '/bills', icon: Receipt },
     { name: 'Debts', path: '/debts', icon: CreditCard },
     { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },
+    { name: 'Transactions', path: '/transactions', icon: Receipt },
+    { name: 'Budgets', path: '/budgets', icon: PieChart },
+    { name: 'Net Worth', path: '/net-worth', icon: TrendingUp },
+    { name: 'Calendar', path: '/calendar', icon: CalendarIcon },
     { name: 'Goals', path: '/goals', icon: Target },
+    { name: 'Taxes', path: '/taxes', icon: Calculator },
     { name: 'Reports', path: '/reports', icon: BarChart3 },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
@@ -111,9 +116,6 @@ export default function Layout() {
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-[#262626]">
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className="w-8 h-8 bg-indigo-500 rounded-md flex items-center justify-center shrink-0">
-              <span className="text-white font-bold text-lg leading-none">O</span>
-            </div>
             {!sidebarCollapsed && (
               <span className="font-semibold text-xl tracking-tight text-[#FAFAFA] whitespace-nowrap">
                 Oweable
