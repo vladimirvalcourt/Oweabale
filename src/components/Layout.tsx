@@ -85,8 +85,7 @@ export default function Layout() {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: Home },
     { name: 'Income', path: '/income', icon: Wallet },
-    { name: 'Bills', path: '/bills', icon: Receipt },
-    { name: 'Debts', path: '/debts', icon: CreditCard },
+    { name: 'Obligations', path: '/obligations', icon: Receipt },
     { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },
     { name: 'Transactions', path: '/transactions', icon: Receipt },
     { name: 'Budgets', path: '/budgets', icon: PieChart },
