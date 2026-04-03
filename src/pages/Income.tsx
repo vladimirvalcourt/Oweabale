@@ -129,17 +129,19 @@ export default function Income() {
       </div>
 
       {incomes.length === 0 ? (
-        <div className="bg-[#141414] border border-[#262626] rounded-lg p-12 text-center">
-          <div className="w-16 h-16 bg-[#1C1C1C] rounded-full flex items-center justify-center mx-auto mb-4 border border-[#262626]">
+        <div className="bg-[#141414] rounded-lg border border-[#262626] border-dashed py-20 px-6 flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 border border-[#262626] rounded-full flex items-center justify-center mb-4">
             <Wallet className="w-8 h-8 text-zinc-500" />
           </div>
-          <h3 className="text-lg font-medium text-[#FAFAFA] mb-2">No income sources yet</h3>
-          <p className="text-zinc-400 mb-6 max-w-md mx-auto">Add your salary, freelance work, or other income streams to track your expected earnings.</p>
+          <h2 className="text-xl font-semibold tracking-tight text-[#FAFAFA] mb-2">No income sources yet</h2>
+          <p className="text-zinc-400 max-w-md mb-8">
+            Add your salary, freelance work, or other income streams to track your expected earnings.
+          </p>
           <button 
             onClick={openAddModal}
-            className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors inline-flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
+            className="px-6 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-5 h-5" />
             Add First Income
           </button>
         </div>

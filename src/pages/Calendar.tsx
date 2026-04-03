@@ -26,23 +26,31 @@ export default function Calendar() {
     
     // Add bills
     bills.forEach(bill => {
-      const billDate = new Date(bill.dueDate);
-      // If it's a monthly bill, we might want to show it in the current month even if the year/month doesn't match exactly, 
-      // but for simplicity, let's just check if the day matches for monthly, or exact date.
-      // A better approach is to check if the bill is due this month based on frequency.
-      // For this simple calendar, we'll just map the day of the month if it's active.
-      
-      // Let's just use the day of the month for all bills/subs for the current view
-      const day = billDate.getDate();
-      if (!events[day]) events[day] = [];
-      events[day].push({ ...bill, type: 'bill' });
+      if (!bill.dueDate) return;
+      const [year, month, dayStr] = bill.dueDate.split('-');
+      const day = parseInt(dayStr, 10);
+      const billMonth = parseInt(month, 10) - 1;
+      const billYear = parseInt(year, 10);
+
+      // Simple recurring logic: if it's monthly, show it every month. 
+      // If it's a specific date, only show if month/year match.
+      // For this mock, we'll assume they recur monthly if frequency is 'Monthly', 
+      // otherwise only show in the exact month.
+      const isCurrentMonth = (billMonth === currentDate.getMonth() && billYear === currentDate.getFullYear());
+      const isRecurringMonthly = bill.frequency === 'Monthly';
+
+      if (isCurrentMonth || isRecurringMonthly) {
+        if (!events[day]) events[day] = [];
+        events[day].push({ ...bill, type: 'bill' });
+      }
     });
 
     // Add subscriptions
     subscriptions.forEach(sub => {
-      if (sub.status !== 'active') return;
-      const subDate = new Date(sub.nextBillingDate);
-      const day = subDate.getDate();
+      if (sub.status !== 'active' || !sub.nextBillingDate) return;
+      const [year, month, dayStr] = sub.nextBillingDate.split('-');
+      const day = parseInt(dayStr, 10);
+      
       if (!events[day]) events[day] = [];
       events[day].push({ ...sub, type: 'subscription' });
     });
@@ -80,14 +88,15 @@ export default function Calendar() {
             {dayEvents.map((event, idx) => (
               <div 
                 key={idx} 
-                className={`text-[10px] px-1.5 py-1 rounded truncate ${
+                className={`text-[10px] px-1.5 py-1 rounded flex justify-between items-center gap-1 ${
                   event.type === 'bill' 
                     ? event.status === 'paid' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
                     : 'bg-purple-500/20 text-purple-400'
                 }`}
                 title={`${event.biller || event.name} - $${event.amount}`}
               >
-                {event.biller || event.name}
+                <span className="truncate">{event.biller || event.name}</span>
+                <span className="font-mono shrink-0">${Math.round(event.amount).toLocaleString()}</span>
               </div>
             ))}
           </div>

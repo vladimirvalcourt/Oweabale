@@ -9,12 +9,14 @@ import { Menu as HeadlessMenu, Transition } from '@headlessui/react';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
+import QuickAddModal from './QuickAddModal';
 
 export default function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -237,67 +239,20 @@ export default function Layout() {
               <Search className="w-4 h-4" />
             </button>
 
-            {/* + Add Dropdown */}
-            <HeadlessMenu as="div" className="relative">
-              <HeadlessMenu.Button className="flex items-center justify-center w-8 h-8 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]">
-                <Plus className="w-4 h-4" />
-              </HeadlessMenu.Button>
-              <Transition
-                as={React.Fragment}
-                enter="transition ease-out duration-100"
-                enterFrom="transform opacity-0 scale-95"
-                enterTo="transform opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="transform opacity-100 scale-100"
-                leaveTo="transform opacity-0 scale-95"
-              >
-                <HeadlessMenu.Items className="absolute right-0 mt-2 w-48 origin-top-right bg-[#141414] border border-[#262626] rounded-md shadow-xl outline-none py-1 z-50">
-                  <HeadlessMenu.Item>
-                    {({ active }) => (
-                      <button
-                        onClick={() => toast.success('Add Bill modal opened')}
-                        className={cn(
-                          active ? 'bg-[#1C1C1C] text-zinc-200' : 'text-zinc-400',
-                          'flex items-center gap-2 w-full px-4 py-2 text-sm'
-                        )}
-                      >
-                        <Receipt className="w-4 h-4 text-zinc-500" />
-                        Add Bill
-                      </button>
-                    )}
-                  </HeadlessMenu.Item>
-                  <HeadlessMenu.Item>
-                    {({ active }) => (
-                      <button
-                        onClick={() => toast.success('Add Debt modal opened')}
-                        className={cn(
-                          active ? 'bg-[#1C1C1C] text-zinc-200' : 'text-zinc-400',
-                          'flex items-center gap-2 w-full px-4 py-2 text-sm'
-                        )}
-                      >
-                        <CreditCard className="w-4 h-4 text-zinc-500" />
-                        Add Debt
-                      </button>
-                    )}
-                  </HeadlessMenu.Item>
-                  <div className="h-px bg-[#262626] my-1" />
-                  <HeadlessMenu.Item>
-                    {({ active }) => (
-                      <Link
-                        to="/upload"
-                        className={cn(
-                          active ? 'bg-[#1C1C1C] text-zinc-200' : 'text-zinc-400',
-                          'flex items-center gap-2 w-full px-4 py-2 text-sm'
-                        )}
-                      >
-                        <UploadIcon className="w-4 h-4 text-zinc-500" />
-                        Upload Document
-                      </Link>
-                    )}
-                  </HeadlessMenu.Item>
-                </HeadlessMenu.Items>
-              </Transition>
-            </HeadlessMenu>
+            {/* Quick Add Button */}
+            <button
+              onClick={() => setIsQuickAddOpen(true)}
+              className="hidden sm:flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm px-4 py-2 font-medium text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
+            >
+              <Plus className="w-4 h-4" />
+              Quick Add
+            </button>
+            <button
+              onClick={() => setIsQuickAddOpen(true)}
+              className="sm:hidden flex items-center justify-center w-8 h-8 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
 
             {/* Notifications */}
             <button 
@@ -438,6 +393,9 @@ export default function Layout() {
           </div>
         </div>
       )}
+
+      {/* Quick Add Modal */}
+      <QuickAddModal isOpen={isQuickAddOpen} onClose={() => setIsQuickAddOpen(false)} />
     </div>
   );
 }
