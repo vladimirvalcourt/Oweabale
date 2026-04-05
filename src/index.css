@@ -1,9 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap');
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-surface-base: #0A0A0A;
+  --color-surface-raised: #141414;
+  --color-surface-elevated: #1C1C1C;
+  --color-surface-highlight: #1F1F1F;
+  --color-surface-border: #262626;
+  --color-content-primary: #FAFAFA;
+
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  
+  --radius-lg: 0.125rem;
+  --radius-md: 0.125rem;
+  --radius-xl: 0.125rem;
 }
 
 @layer utilities {
@@ -42,5 +54,132 @@
 }
 
 body {
-  @apply bg-[#0A0A0A] text-[#FAFAFA] antialiased selection:bg-indigo-500/30;
+  @apply bg-surface-base text-content-primary antialiased selection:bg-indigo-500/30;
+}
+
+/* Hide scrollbars while keeping scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Remove numeric spin buttons globally for tactile terminal styling */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.noise-bg {
+  position: relative;
+}
+
+.noise-bg::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  filter: contrast(150%) brightness(150%);
+}
+
+/* 
+  Soft Tactile Theme: 
+  Overrides standard pure black/white arbitrary values injected across Oweable
+  to create a muted, warm stone-gray interface. 
+*/
+html.theme-light {
+  --bg-stone-0: #E8E6E3; /* Deepest Canvas (Top-level wrapper) */
+  --bg-stone-1: #F2F0ED; /* Default surface (Cards/Modals) */
+  --bg-stone-2: #FAFAFA; /* Interactive element/input inside cards */
+  --border-stone: #D1CDD2; /* Soft separation */
+  
+  --text-dark: #2D2A26; /* Primary Readability */
+  --text-mid: #625D56;
+  --text-light: #88847E;
+}
+
+html.theme-light body {
+  background-color: var(--bg-stone-0) !important;
+  color: var(--text-dark) !important;
+}
+
+/* Map specific hardcoded arbitrary HEX backgrounds -> Soft Tactile */
+html.theme-light .bg-\[\#0A0A0A\], html.theme-light .bg-\[\#0F0F0F\] { background-color: var(--bg-stone-0) !important; }
+html.theme-light .bg-\[\#111111\], html.theme-light .bg-\[\#141414\] { background-color: var(--bg-stone-1) !important; }
+html.theme-light .bg-\[\#1C1C1C\] { background-color: var(--bg-stone-2) !important; }
+
+/* Invert the active state backgrounds for buttons */
+html.theme-light .bg-\[\#262626\] { background-color: #DCD9D5 !important; }
+html.theme-light .hover\:bg-\[\#141414\]:hover { background-color: #E2DFDB !important; }
+html.theme-light .hover\:bg-\[\#1C1C1C\]:hover { background-color: #ECE9E6 !important; }
+
+/* Harmonize hardcoded Borders */
+html.theme-light .border-\[\#262626\] { border-color: var(--border-stone) !important; }
+html.theme-light .border-\[\#333\] { border-color: #BEB9BF !important; }
+
+/* Re-map hardcoded Typography */
+html.theme-light .text-\[\#FAFAFA\] { color: var(--text-dark) !important; }
+html.theme-light .text-zinc-200, html.theme-light .text-white { color: var(--text-dark) !important; }
+html.theme-light .text-zinc-300 { color: #4B463E !important; }
+html.theme-light .text-zinc-400 { color: var(--text-light) !important; }
+html.theme-light .text-zinc-500 { color: var(--text-mid) !important; }
+html.theme-light .text-zinc-600 { color: #A49F98 !important; }
+html.theme-light .text-zinc-700 { color: #C2BEB9 !important; }
+
+/* Adjust Shadows for Organic Physicality */
+/* Target all common shadow utilities to be soft off-black instead of absolute black */
+html.theme-light [class*="shadow"] {
+  box-shadow: 0 4px 20px rgba(45, 42, 38, 0.08), 0 2px 8px rgba(45, 42, 38, 0.04) !important;
+}
+html.theme-light .shadow-none { box-shadow: none !important; }
+
+/* Convert harsh noise grain into subtle premium paper texture */
+/* Convert harsh noise grain into subtle premium paper texture */
+html.theme-light .noise-bg::after {
+  opacity: 0.25;
+  filter: invert(1) contrast(110%) brightness(130%);
+}
+
+/* Tactile Physical Geometry Classes */
+.sidebar-recessed {
+  box-shadow: inset -15px 0 30px rgba(0, 0, 0, 0.25);
+}
+.topbar-groove {
+  box-shadow: inset 0 -6px 12px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid #050505 !important;
+}
+.search-carved {
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6) !important;
+  border: 1px solid #050505 !important;
+}
+.nav-pressed {
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.7) !important;
+  background-color: #050505 !important;
+  transform: translateY(1px);
+}
+
+/* Light Theme Physical Geometry Translations */
+html.theme-light .sidebar-recessed {
+  box-shadow: inset -15px 0 30px rgba(45, 42, 38, 0.08) !important;
+}
+html.theme-light .topbar-groove {
+  box-shadow: inset 0 -6px 12px rgba(45, 42, 38, 0.05) !important;
+  border-bottom: 1px solid #CAC6CD !important;
+}
+html.theme-light .search-carved {
+  box-shadow: inset 0 2px 6px rgba(45, 42, 38, 0.12) !important;
+  border: 1px solid #C4C0C7 !important;
+}
+html.theme-light .nav-pressed {
+  box-shadow: inset 0 2px 4px rgba(45, 42, 38, 0.15) !important;
+  background-color: #DDD9D4 !important;
 }

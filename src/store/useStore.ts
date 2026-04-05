@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { supabase } from '../lib/supabase';
+import { toast } from 'sonner';
 
 export interface Bill {
   id: string;
@@ -44,6 +46,7 @@ export interface Subscription {
   frequency: string;
   nextBillingDate: string;
   status: 'active' | 'paused' | 'cancelled';
+  priceHistory?: { date: string; amount: number }[];
 }
 
 export interface Goal {
@@ -80,6 +83,27 @@ export interface Category {
   type: 'income' | 'expense';
 }
 
+export interface Citation {
+  id: string;
+  type: string;
+  jurisdiction: string;
+  daysLeft: number;
+  amount: number;
+  penaltyFee: number;
+  date: string;
+  citationNumber: string;
+  paymentUrl: string;
+  status: 'open' | 'resolved';
+}
+
+export interface Deduction {
+  id: string;
+  name: string;
+  category: string;
+  amount: number;
+  date: string;
+}
+
 interface AppState {
   bills: Bill[];
   debts: Debt[];
@@ -90,13 +114,19 @@ interface AppState {
   incomes: IncomeSource[];
   budgets: Budget[];
   categories: Category[];
+  citations: Citation[];
+  deductions: Deduction[];
   user: {
+    id: string;
     firstName: string;
     lastName: string;
     email: string;
+    avatar?: string;
+    theme?: string;
   };
   bankConnected: boolean;
   connectBank: () => void;
+  addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   addBill: (bill: Omit<Bill, 'id'>) => void;
   editBill: (id: string, bill: Partial<Bill>) => void;
   deleteBill: (id: string) => void;
@@ -125,10 +155,26 @@ interface AppState {
   addCategory: (category: Omit<Category, 'id'>) => void;
   editCategory: (id: string, category: Partial<Category>) => void;
   deleteCategory: (id: string) => void;
+  addCitation: (citation: Omit<Citation, 'id'>) => void;
+  resolveCitation: (id: string) => void;
+  addDeduction: (deduction: Omit<Deduction, 'id'>) => void;
+  deleteDeduction: (id: string) => void;
   updateUser: (user: Partial<AppState['user']>) => void;
   deleteAccount: () => void;
   seedData: () => void;
+  
+  // Supabase Syncing
+  fetchData: () => Promise<void>;
+  isLoading: boolean;
+  
+  // Modal State
+  isQuickAddOpen: boolean;
+  quickAddTab: TabType;
+  openQuickAdd: (tab?: TabType) => void;
+  closeQuickAdd: () => void;
 }
+
+type TabType = 'transaction' | 'obligation' | 'income';
 
 const initialData = {
   bills: [
@@ -153,9 +199,11 @@ const initialData = {
     { id: '3', name: 'Primary Residence', value: 450000.00, type: 'Real Estate' },
   ],
   subscriptions: [
-    { id: '1', name: 'Netflix Premium', amount: 22.99, frequency: 'Monthly', nextBillingDate: '2026-04-15', status: 'active' as const },
-    { id: '2', name: 'Spotify Duo', amount: 14.99, frequency: 'Monthly', nextBillingDate: '2026-04-18', status: 'active' as const },
-    { id: '3', name: 'Amazon Prime', amount: 139.00, frequency: 'Yearly', nextBillingDate: '2026-08-10', status: 'active' as const },
+    { id: '1', name: 'Netflix Premium', amount: 22.99, frequency: 'Monthly', nextBillingDate: '2026-04-15', status: 'active' as const, priceHistory: [{ date: '2026-01-01', amount: 20.99 }, { date: '2026-03-01', amount: 22.99 }] },
+    { id: '2', name: 'Spotify Duo', amount: 14.99, frequency: 'Monthly', nextBillingDate: '2026-04-18', status: 'active' as const, priceHistory: [{ date: '2026-01-01', amount: 14.99 }] },
+    { id: '3', name: 'Amazon Prime', amount: 139.00, frequency: 'Yearly', nextBillingDate: '2026-08-10', status: 'active' as const, priceHistory: [{ date: '2025-08-01', amount: 119.00 }, { date: '2026-08-01', amount: 139.00 }] },
+    { id: '4', name: 'Adobe Creative Cloud', amount: 59.99, frequency: 'Monthly', nextBillingDate: '2026-04-22', status: 'active' as const, priceHistory: [{ date: '2026-01-01', amount: 54.99 }, { date: '2026-03-15', amount: 59.99 }] },
+    { id: '5', name: 'YouTube Premium', amount: 13.99, frequency: 'Monthly', nextBillingDate: '2026-04-30', status: 'active' as const, priceHistory: [{ date: '2026-01-01', amount: 13.99 }] },
   ],
   goals: [
     { id: '1', name: 'Emergency Fund', targetAmount: 15000, currentAmount: 8500, deadline: '2026-12-31', type: 'emergency' as const, color: '#28a745' },
@@ -165,7 +213,7 @@ const initialData = {
   incomes: [
     { id: '1', name: 'Tech Corp Salary', amount: 4200.00, frequency: 'Bi-weekly' as const, category: 'Salary', nextDate: '2026-04-15', status: 'active' as const },
     { id: '2', name: 'Freelance Design', amount: 850.00, frequency: 'Monthly' as const, category: 'Freelance', nextDate: '2026-04-20', status: 'active' as const },
-    { id: '3', name: 'Dividend Yield', amount: 125.00, frequency: 'Quarterly' as const, category: 'Investments', nextDate: '2026-06-01', status: 'active' as const },
+    { id: '3', name: 'Dividend Yield', amount: 125.00, frequency: 'Yearly' as const, category: 'Investments', nextDate: '2026-06-01', status: 'active' as const },
   ],
   budgets: [
     { id: '1', category: 'Housing', amount: 2000, period: 'Monthly' as const },
@@ -179,10 +227,22 @@ const initialData = {
     { id: '3', name: 'Food & Dining', color: '#fd7e14', type: 'expense' as const },
     { id: '4', name: 'Income', color: '#28a745', type: 'income' as const },
   ],
+  citations: [
+    { id: 'c1', type: 'SPEEDING', jurisdiction: 'NY CITY', daysLeft: 3, amount: 150, penaltyFee: 75, date: '12 OCT', citationNumber: 'NY-99281-A', paymentUrl: 'https://nyc.gov/payticket', status: 'open' as const },
+    { id: 'c2', type: 'TOLL VIOLATION', jurisdiction: 'EZ-PASS NJ', daysLeft: 25, amount: 15, penaltyFee: 10, date: '03 NOV', citationNumber: 'EZ-449102', paymentUrl: 'https://ezpassnj.com/pay', status: 'open' as const },
+  ],
+  deductions: [
+    { id: 'd1', name: 'Home Office', category: 'Business', amount: 1200, date: '2026-01-01' },
+    { id: 'd2', name: 'Equipment - MacBook Pro', category: 'Business', amount: 2499, date: '2026-02-15' },
+    { id: 'd3', name: 'Mileage (4,200 miles)', category: 'Transportation', amount: 2772, date: '2026-03-31' },
+  ],
   user: {
+    id: 'USR-88291-ALPHA',
     firstName: 'Alex',
     lastName: 'Morgan',
     email: 'alex.morgan@example.com',
+    avatar: '',
+    theme: 'Dark'
   },
   bankConnected: false,
 };
@@ -209,16 +269,46 @@ export const useStore = create<AppState>((set) => ({
       bills: [...state.bills, ...newBills],
     };
   }),
-  addBill: (bill) => set((state) => ({ bills: [...state.bills, { ...bill, id: Math.random().toString(36).substr(2, 9) }] })),
-  editBill: (id, updatedBill) => set((state) => ({
-    bills: state.bills.map((b) => b.id === id ? { ...b, ...updatedBill } : b)
-  })),
-  deleteBill: (id) => set((state) => ({ bills: state.bills.filter((b) => b.id !== id) })),
+  addTransaction: async (transaction) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const { error } = await supabase.from('transactions').insert({ ...transaction, user_id: userId });
+      if (error) { toast.error('Failed to sync transaction'); return; }
+    }
+    set((state) => ({ 
+      transactions: [{ ...transaction, id: Math.random().toString(36).substr(2, 9) }, ...state.transactions].slice(0, 100) 
+    }));
+  },
+  addBill: async (bill) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const { error } = await supabase.from('bills').insert({ ...bill, user_id: userId });
+      if (error) { toast.error('Failed to sync bill'); return; }
+    }
+    set((state) => ({ bills: [...state.bills, { ...bill, id: Math.random().toString(36).substr(2, 9) }] }));
+  },
+  editBill: async (id, updatedBill) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const { error } = await supabase.from('bills').update(updatedBill).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to update bill'); return; }
+    }
+    set((state) => ({
+      bills: state.bills.map((b) => b.id === id ? { ...b, ...updatedBill } : b)
+    }));
+  },
+  deleteBill: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const { error } = await supabase.from('bills').delete().eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to delete bill'); return; }
+    }
+    set((state) => ({ bills: state.bills.filter((b) => b.id !== id) }));
+  },
   markBillPaid: (id) => set((state) => {
     const bill = state.bills.find(b => b.id === id);
     if (!bill) return state;
     
-    // Also add a transaction when a bill is paid
     const newTransaction: Transaction = {
       id: Math.random().toString(36).substr(2, 9),
       name: bill.biller,
@@ -230,10 +320,17 @@ export const useStore = create<AppState>((set) => ({
     
     return {
       bills: state.bills.map((b) => b.id === id ? { ...b, status: 'paid' } : b),
-      transactions: [newTransaction, ...state.transactions].slice(0, 50) // Keep last 50
+      transactions: [newTransaction, ...state.transactions].slice(0, 50)
     };
   }),
-  addDebt: (debt) => set((state) => ({ debts: [...state.debts, { ...debt, id: Math.random().toString(36).substr(2, 9) }] })),
+  addDebt: async (debt) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const { error } = await supabase.from('debts').insert({ ...debt, user_id: userId });
+      if (error) { toast.error('Failed to sync debt'); return; }
+    }
+    set((state) => ({ debts: [...state.debts, { ...debt, id: Math.random().toString(36).substr(2, 9) }] }));
+  },
   editDebt: (id, updatedDebt) => set((state) => ({
     debts: state.debts.map((d) => d.id === id ? { ...d, ...updatedDebt } : d)
   })),
@@ -312,7 +409,81 @@ export const useStore = create<AppState>((set) => ({
     categories: state.categories.map((c) => c.id === id ? { ...c, ...updatedCategory } : c)
   })),
   deleteCategory: (id) => set((state) => ({ categories: state.categories.filter((c) => c.id !== id) })),
+  addCitation: (citation) => set((state) => ({ citations: [...state.citations, { ...citation, id: Math.random().toString(36).substr(2, 9) }] })),
+  resolveCitation: (id) => set((state) => ({ citations: state.citations.map((c) => c.id === id ? { ...c, status: 'resolved' as const } : c) })),
+  addDeduction: (deduction) => set((state) => ({ deductions: [...state.deductions, { ...deduction, id: Math.random().toString(36).substr(2, 9) }] })),
+  deleteDeduction: (id) => set((state) => ({ deductions: state.deductions.filter((d) => d.id !== id) })),
   updateUser: (user) => set((state) => ({ user: { ...state.user, ...user } })),
-  deleteAccount: () => set({ bills: [], debts: [], transactions: [], assets: [], subscriptions: [], goals: [], incomes: [], budgets: [], categories: [], user: { firstName: '', lastName: '', email: '' } }),
+  deleteAccount: () => set({ bills: [], debts: [], transactions: [], assets: [], subscriptions: [], goals: [], incomes: [], budgets: [], categories: [], citations: [], deductions: [], user: { id: '', firstName: '', lastName: '', email: '' } }),
   seedData: () => set(initialData),
+
+  // Supabase Implementation
+  isLoading: false,
+  fetchData: async () => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return;
+
+    set({ isLoading: true });
+    try {
+      const [
+        { data: bills },
+        { data: debts },
+        { data: transactions },
+        { data: assets },
+        { data: subscriptions },
+        { data: goals },
+        { data: incomes },
+        { data: budgets },
+        { data: categories },
+        { data: citations },
+        { data: deductions },
+        { data: profile }
+      ] = await Promise.all([
+        supabase.from('bills').select('*').eq('user_id', userId),
+        supabase.from('debts').select('*').eq('user_id', userId),
+        supabase.from('transactions').select('*').eq('user_id', userId),
+        supabase.from('assets').select('*').eq('user_id', userId),
+        supabase.from('subscriptions').select('*').eq('user_id', userId),
+        supabase.from('goals').select('*').eq('user_id', userId),
+        supabase.from('incomes').select('*').eq('user_id', userId),
+        supabase.from('budgets').select('*').eq('user_id', userId),
+        supabase.from('categories').select('*').eq('user_id', userId),
+        supabase.from('citations').select('*').eq('user_id', userId),
+        supabase.from('deductions').select('*').eq('user_id', userId),
+        supabase.from('profiles').select('*').eq('id', userId).single(),
+      ]);
+
+      set({
+        bills: bills || [],
+        debts: debts || [],
+        transactions: transactions || [],
+        assets: assets || [],
+        subscriptions: subscriptions || [],
+        goals: goals || [],
+        incomes: incomes || [],
+        budgets: budgets || [],
+        categories: categories || [],
+        citations: citations || [],
+        deductions: deductions || [],
+        user: profile ? { 
+          id: profile.id, 
+          firstName: profile.first_name, 
+          lastName: profile.last_name, 
+          email: profile.email, 
+          avatar: profile.avatar, 
+          theme: profile.theme 
+        } : initialData.user,
+        isLoading: false
+      });
+    } catch (err) {
+      console.error('Error fetching from Supabase:', err);
+      set({ isLoading: false });
+    }
+  },
+
+  // Modal Implementation
+  isQuickAddOpen: false,
+  quickAddTab: 'transaction',
+  openQuickAdd: (tab = 'transaction') => set({ isQuickAddOpen: true, quickAddTab: tab }),
+  closeQuickAdd: () => set({ isQuickAddOpen: false }),
 }));

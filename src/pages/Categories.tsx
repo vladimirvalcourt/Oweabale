@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { Tags, Plus, Edit2, Trash2, Tag } from 'lucide-react';
+import { CollapsibleModule } from '../components/CollapsibleModule';
 import { toast } from 'sonner';
+import { motion } from 'motion/react';
 
 export default function Categories() {
   const { categories, addCategory, editCategory, deleteCategory } = useStore();
@@ -72,8 +74,8 @@ export default function Categories() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">Categories</h1>
-          <p className="text-sm text-zinc-400 mt-1">Manage your transaction categories for better insights.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-content-primary">Categories</h1>
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500 mt-1">Saved categories for transaction analysis</p>
         </div>
         <button
           onClick={() => {
@@ -81,17 +83,17 @@ export default function Categories() {
             setEditingId(null);
             setFormData({ name: '', type: 'expense', color: '#6366F1' });
           }}
-          className="inline-flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
+          className="px-4 py-2 bg-content-primary hover:bg-zinc-200 text-surface-base rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 focus:outline-none"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-3.5 h-3.5" />
           Add Category
         </button>
       </div>
 
       {(isAdding || editingId) && (
-        <div className="bg-[#141414] rounded-lg border border-[#262626] p-6 mb-6">
+        <div className="bg-surface-raised rounded-sm border border-surface-border p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold tracking-tight text-[#FAFAFA]">
+            <h3 className="text-lg font-semibold tracking-tight text-content-primary">
               {editingId ? 'Edit Category' : 'Create New Category'}
             </h3>
             <button onClick={() => { setIsAdding(false); cancelEdit(); }} className="text-zinc-500 hover:text-zinc-300 transition-colors">
@@ -108,7 +110,7 @@ export default function Categories() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors"
+                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors"
                   placeholder="e.g., Groceries"
                 />
               </div>
@@ -117,7 +119,7 @@ export default function Categories() {
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors"
+                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors"
                 >
                   <option value="expense">Expense</option>
                   <option value="income">Income</option>
@@ -130,7 +132,7 @@ export default function Categories() {
                     type="color"
                     value={formData.color}
                     onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                    className="h-9 w-14 p-1 border border-[#262626] bg-[#0A0A0A] rounded-md cursor-pointer"
+                    className="h-9 w-14 p-1 border border-surface-border bg-surface-base rounded-sm cursor-pointer"
                   />
                   <span className="text-sm text-zinc-500">{formData.color}</span>
                 </div>
@@ -140,13 +142,13 @@ export default function Categories() {
               <button
                 type="button"
                 onClick={() => { setIsAdding(false); cancelEdit(); }}
-                className="px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
+                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-zinc-300 hover:bg-surface-elevated transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
+                className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500"
               >
                 {editingId ? 'Save Changes' : 'Add Category'}
               </button>
@@ -156,59 +158,80 @@ export default function Categories() {
       )}
 
       {categories.length === 0 && !isAdding ? (
-        <div className="bg-[#141414] rounded-lg border border-[#262626] p-12 text-center">
-          <div className="w-16 h-16 border border-[#262626] rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="bg-surface-raised rounded-sm border border-surface-border p-12 text-center">
+          <div className="w-16 h-16 border border-surface-border rounded-full flex items-center justify-center mx-auto mb-4">
             <Tags className="w-8 h-8 text-zinc-500" />
           </div>
-          <h3 className="text-lg font-semibold tracking-tight text-[#FAFAFA] mb-2">No categories found</h3>
+          <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No categories found</h3>
           <p className="text-sm text-zinc-400 max-w-sm mx-auto mb-6">
             Categories help you organize your transactions and understand your spending habits.
           </p>
-          <button
+          <motion.button
+            whileTap={{ scale: 0.95 }}
             onClick={() => setIsAdding(true)}
-            className="inline-flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
+            className="inline-flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create Category
-          </button>
+          </motion.button>
         </div>
       ) : (
-        <div className="bg-[#141414] rounded-lg border border-[#262626] overflow-hidden">
-          <ul className="divide-y divide-[#1F1F1F]">
-            {categories.map((category) => (
-              <li key={category.id} className="p-4 sm:px-6 hover:bg-[#1C1C1C] transition-colors flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white"
-                    style={{ backgroundColor: category.color || '#6366F1' }}
-                  >
-                    <Tag className="w-5 h-5" />
+        <CollapsibleModule 
+          title="Manage Categories" 
+          icon={Tags}
+          extraHeader={<span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{categories.length} Categories Saved</span>}
+        >
+          <div className="bg-surface-raised rounded-sm border border-surface-border overflow-hidden -mx-6 -my-6">
+            <motion.ul 
+              className="divide-y divide-surface-highlight"
+              initial="hidden"
+              animate="visible"
+              variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
+            >
+              {categories.map((category) => (
+                <motion.li 
+                  key={category.id} 
+                  className="p-4 sm:px-6 hover:bg-surface-elevated transition-colors flex items-center justify-between group"
+                  variants={{
+                    hidden: { opacity: 0, x: -10 },
+                    visible: { opacity: 1, x: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } }
+                  }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div
+                      className="w-10 h-10 rounded-sm flex items-center justify-center text-white border border-surface-border bg-surface-base group-hover:border-zinc-700 transition-colors"
+                      style={{ borderLeftColor: category.color || '#6366F1', borderLeftWidth: '3px' }}
+                    >
+                      <Tag className="w-5 h-5" style={{ color: category.color || '#6366F1' }} />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-mono font-bold uppercase tracking-widest text-content-primary">{category.name}</h4>
+                      <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest mt-1">{category.type} stream</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-medium text-[#FAFAFA]">{category.name}</h4>
-                    <p className="text-xs text-zinc-500 capitalize">{category.type}</p>
+                  <div className="flex items-center gap-2">
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => startEdit(category)}
+                      className="p-2 text-zinc-500 hover:text-indigo-400 rounded-sm hover:bg-surface-border transition-colors"
+                      title="Edit"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </motion.button>
+                    <motion.button
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => handleDelete(category.id)}
+                      className="p-2 text-zinc-500 hover:text-red-400 rounded-sm hover:bg-surface-border transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </motion.button>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => startEdit(category)}
-                    className="p-2 text-zinc-500 hover:text-indigo-400 rounded-md hover:bg-[#262626] transition-colors"
-                    title="Edit"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(category.id)}
-                    className="p-2 text-zinc-500 hover:text-red-400 rounded-md hover:bg-[#262626] transition-colors"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+                </motion.li>
+              ))}
+            </motion.ul>
+          </div>
+        </CollapsibleModule>
       )}
     </div>
   );

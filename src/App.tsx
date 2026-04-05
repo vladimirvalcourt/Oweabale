@@ -6,6 +6,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import Layout from './components/Layout';
+import DeviceGuard from './components/DeviceGuard';
 import Dashboard from './pages/Dashboard';
 import Obligations from './pages/Obligations';
 import Settings from './pages/Settings';
@@ -33,29 +34,32 @@ export default function App() {
             background: '#141414',
             color: '#FAFAFA',
             border: '1px solid #262626',
+            borderRadius: '2px', // Brutalist radius
           },
         }} 
       />
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/pricing" element={<Pricing />} />
-        <Route path="/" element={<Layout />}>
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="obligations" element={<Obligations />} />
-          <Route path="income" element={<Income />} />
-          <Route path="upload" element={<Upload />} />
-          <Route path="transactions" element={<Transactions />} />
-          <Route path="budgets" element={<Budgets />} />
-          <Route path="net-worth" element={<NetWorth />} />
-          <Route path="calendar" element={<Calendar />} />
-          <Route path="taxes" element={<Taxes />} />
-          <Route path="goals" element={<Goals />} />
-          <Route path="categories" element={<Categories />} />
-          <Route path="subscriptions" element={<Subscriptions />} />
-          <Route path="reports" element={<Reports />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
-      </Routes>
+      <DeviceGuard>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/" element={<Layout />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="obligations" element={<Obligations />} />
+            <Route path="income" element={<Income />} />
+            <Route path="upload" element={<Upload />} />
+            <Route path="transactions" element={<Transactions />} />
+            <Route path="budgets" element={<Budgets />} />
+            <Route path="net-worth" element={<NetWorth />} />
+            <Route path="calendar" element={<Calendar />} />
+            <Route path="taxes" element={<Taxes />} />
+            <Route path="goals" element={<Goals />} />
+            <Route path="categories" element={<Categories />} />
+            <Route path="subscriptions" element={<Subscriptions />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
+        </Routes>
+      </DeviceGuard>
     </BrowserRouter>
   );
 }

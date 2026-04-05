@@ -1,6 +1,9 @@
 import { useState, useMemo } from 'react';
 import { useStore } from '../store/useStore';
-import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, DollarSign, Tag } from 'lucide-react';
+import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, DollarSign, Tag, Download } from 'lucide-react';
+import { CollapsibleModule } from '../components/CollapsibleModule';
+import { BrandLogo } from '../components/BrandLogo';
+import { motion } from 'motion/react';
 
 export default function Transactions() {
   const { transactions, categories } = useStore();
@@ -38,13 +41,32 @@ export default function Transactions() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">Transaction History</h1>
-          <p className="text-sm text-zinc-400 mt-1">View all your past payments and income.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-content-primary">Transaction History</h1>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mt-1">{filteredTransactions.length} of {transactions.length} records detected</p>
         </div>
+        <button
+          onClick={() => {
+            const headers = ['Date', 'Name', 'Category', 'Type', 'Amount'];
+            const rows = filteredTransactions.map(t => [t.date, `"${t.name}"`, t.category, t.type, t.amount.toFixed(2)]);
+            const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'oweable-transactions.csv'; a.click();
+            URL.revokeObjectURL(url);
+          }}
+          className="flex items-center gap-2 px-4 py-2 border border-surface-border text-zinc-300 text-sm font-medium hover:bg-surface-elevated rounded-sm transition-colors"
+        >
+          <Download className="w-4 h-4" /> Export CSV
+        </button>
       </div>
 
-      <div className="bg-[#141414] rounded-lg border border-[#262626]">
-        <div className="p-4 border-b border-[#262626] flex flex-col gap-4">
+      <CollapsibleModule 
+        title="Record Probe" 
+        icon={Filter}
+        extraHeader={<span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{filteredTransactions.length} Records Detected</span>}
+      >
+        <div className="-mx-6 -my-6 p-6 space-y-4">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
             <div className="relative w-full sm:max-w-xs">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -52,113 +74,114 @@ export default function Transactions() {
               </div>
               <input
                 type="text"
-                placeholder="Search transactions..."
+                placeholder="PROBE RECORDS..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-[#262626] rounded-md leading-5 bg-[#0A0A0A] text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
+                className="block w-full pl-10 pr-3 py-2 border border-surface-border rounded-sm leading-5 bg-surface-base text-xs font-mono uppercase tracking-widest text-zinc-200 placeholder-zinc-700 focus:outline-none focus:border-indigo-600 transition-all"
               />
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className={`px-3 py-2 border rounded-md text-sm font-medium flex items-center gap-2 transition-colors ${
+                className={`px-4 py-2 border rounded-sm text-[10px] font-mono uppercase tracking-widest flex items-center gap-2 transition-all ${
                   showAdvancedFilters 
-                    ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-400' 
-                    : 'bg-[#0A0A0A] border-[#262626] text-zinc-300 hover:bg-[#1C1C1C]'
+                    ? 'bg-indigo-600 border-indigo-600 text-white' 
+                    : 'bg-transparent border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated'
                 }`}
               >
-                <Filter className="w-4 h-4" />
-                Filters
+                <Filter className="w-3.5 h-3.5" />
+                Parameters
               </button>
             </div>
           </div>
 
           {showAdvancedFilters && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-[#262626]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-surface-border">
               <div>
-                <label className="block text-xs font-medium text-zinc-500 mb-1 flex items-center gap-1">
+                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2 flex items-center gap-1.5">
                   <Activity className="w-3 h-3" /> Type
                 </label>
                 <select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value as any)}
-                  className="block w-full pl-3 pr-10 py-2 text-base border border-[#262626] bg-[#0A0A0A] text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-colors"
+                  className="block w-full px-3 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus:outline-none focus:border-indigo-600 transition-colors"
                 >
-                  <option value="all">All Types</option>
-                  <option value="income">Income</option>
-                  <option value="expense">Expense</option>
+                  <option value="all">ALL STREAMS</option>
+                  <option value="income">INCOMING</option>
+                  <option value="expense">OUTGOING</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-500 mb-1 flex items-center gap-1">
+                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2 flex items-center gap-1.5">
                   <Tag className="w-3 h-3" /> Category
                 </label>
                 <select
                   value={filterCategory}
                   onChange={(e) => setFilterCategory(e.target.value)}
-                  className="block w-full pl-3 pr-10 py-2 text-base border border-[#262626] bg-[#0A0A0A] text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-colors"
+                  className="block w-full px-3 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus:outline-none focus:border-indigo-600 transition-colors"
                 >
-                  <option value="all">All Categories</option>
+                  <option value="all">ALL CLASSES</option>
                   {uniqueCategories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
+                    <option key={cat} value={cat}>{cat.toUpperCase()}</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-500 mb-1 flex items-center gap-1">
-                  <Calendar className="w-3 h-3" /> Date Range
+                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2 flex items-center gap-1.5">
+                  <Calendar className="w-3 h-3" /> Window
                 </label>
                 <div className="flex items-center gap-2">
                   <input
                     type="date"
                     value={dateRange.start}
                     onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
-                    className="block w-full px-2 py-2 border border-[#262626] bg-[#0A0A0A] text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-xs rounded-md transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary focus:outline-none focus:border-indigo-600 transition-colors"
                   />
-                  <span className="text-zinc-500">-</span>
+                  <span className="text-surface-border">::</span>
                   <input
                     type="date"
                     value={dateRange.end}
                     onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
-                    className="block w-full px-2 py-2 border border-[#262626] bg-[#0A0A0A] text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-xs rounded-md transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary focus:outline-none focus:border-indigo-600 transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-500 mb-1 flex items-center gap-1">
-                  <DollarSign className="w-3 h-3" /> Amount Range
+                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2 flex items-center gap-1.5">
+                  <DollarSign className="w-3 h-3" /> Magnitude
                 </label>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
-                    placeholder="Min"
+                    placeholder="MIN"
                     value={amountRange.min}
                     onChange={(e) => setAmountRange({...amountRange, min: e.target.value})}
-                    className="block w-full px-2 py-2 border border-[#262626] bg-[#0A0A0A] text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary placeholder-zinc-700 focus:outline-none focus:border-indigo-600 transition-colors"
                   />
-                  <span className="text-zinc-500">-</span>
+                  <span className="text-surface-border">::</span>
                   <input
                     type="number"
-                    placeholder="Max"
+                    placeholder="MAX"
                     value={amountRange.max}
                     onChange={(e) => setAmountRange({...amountRange, max: e.target.value})}
-                    className="block w-full px-2 py-2 border border-[#262626] bg-[#0A0A0A] text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary placeholder-zinc-700 focus:outline-none focus:border-indigo-600 transition-colors"
                   />
                 </div>
               </div>
             </div>
           )}
         </div>
+      </CollapsibleModule>
 
         {filteredTransactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 text-center">
-            <div className="w-16 h-16 border border-[#262626] rounded-full flex items-center justify-center mb-4">
+            <div className="w-16 h-16 border border-surface-border rounded-full flex items-center justify-center mb-4">
               <Activity className="w-8 h-8 text-zinc-500" />
             </div>
-            <h3 className="text-lg font-semibold tracking-tight text-[#FAFAFA] mb-1">No transactions found</h3>
+            <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-1">No transactions found</h3>
             <p className="text-sm text-zinc-400 max-w-sm">
               {searchTerm || filterType !== 'all' 
                 ? "We couldn't find any transactions matching your current filters."
@@ -173,68 +196,88 @@ export default function Transactions() {
                   setDateRange({start: '', end: ''});
                   setAmountRange({min: '', max: ''});
                 }}
-                className="mt-4 px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
+                className="mt-4 px-4 py-2 bg-transparent border border-surface-border rounded-md text-sm font-medium text-zinc-300 hover:bg-surface-elevated transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500"
               >
                 Clear Filters
               </button>
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-[#1F1F1F]">
-              <thead className="bg-[#0A0A0A]">
+        <CollapsibleModule title="Transaction Intelligence" icon={Activity}>
+          <div className="overflow-x-auto -mx-6 -my-6">
+            <table className="min-w-full divide-y divide-surface-highlight">
+              <thead className="bg-surface-base">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                    Transaction
+                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-[0.2em]">
+                    Transaction Record
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                    Date
+                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-[0.2em]">
+                    Timestamp
                   </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                    Category
+                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-[0.2em]">
+                    Classification
                   </th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                    Amount
+                  <th scope="col" className="px-6 py-4 text-right text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-[0.2em]">
+                    Magnitude
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-[#141414] divide-y divide-[#1F1F1F]">
+              <motion.tbody 
+                className="bg-surface-raised divide-y divide-surface-highlight"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  visible: {
+                    transition: { staggerChildren: 0.05 }
+                  }
+                }}
+              >
                 {filteredTransactions.map((transaction) => (
-                  <tr key={transaction.id} className="hover:bg-[#1C1C1C] transition-colors">
+                  <motion.tr 
+                    key={transaction.id} 
+                    className="group hover:bg-surface-elevated transition-colors border-l-2 border-transparent hover:border-indigo-600"
+                    variants={{
+                      hidden: { opacity: 0, y: 15 },
+                      visible: { opacity: 1, y: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } }
+                    }}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className={`flex-shrink-0 h-10 w-10 rounded-full border border-[#262626] flex items-center justify-center`}>
-                          {transaction.type === 'income' ? (
-                            <ArrowUpRight className="h-5 w-5 text-[#22C55E]" />
-                          ) : (
-                            <ArrowDownRight className="h-5 w-5 text-zinc-500" />
-                          )}
-                        </div>
+                        <BrandLogo
+                          name={transaction.name}
+                          fallbackIcon={
+                            transaction.type === 'income' ? (
+                              <ArrowUpRight className="h-5 w-5 text-emerald-500" />
+                            ) : (
+                              <ArrowDownRight className="h-5 w-5 text-zinc-600" />
+                            )
+                          }
+                        />
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-[#FAFAFA]">{transaction.name}</div>
+                          <div className="text-sm font-bold text-content-primary">{transaction.name}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-400">
+                    <td className="px-6 py-4 whitespace-nowrap text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
                       {transaction.date}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-400">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#1C1C1C] border border-[#262626] text-zinc-300">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold uppercase tracking-widest bg-surface-base border border-surface-border text-zinc-500 group-hover:text-zinc-300 transition-colors">
                         {transaction.category}
                       </span>
                     </td>
-                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold tabular-nums text-right ${
-                      transaction.type === 'income' ? 'text-[#22C55E]' : 'text-[#FAFAFA]'
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold font-mono tabular-nums text-right ${
+                      transaction.type === 'income' ? 'text-emerald-500' : 'text-content-primary'
                     }`}>
                       {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
-                  </tr>
+                  </motion.tr>
                 ))}
-              </tbody>
+              </motion.tbody>
             </table>
           </div>
+        </CollapsibleModule>
         )}
-      </div>
     </div>
   );
 }

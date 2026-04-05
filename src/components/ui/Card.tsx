@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils';
  */
 export function Card({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("bg-[#141414] rounded-lg border border-[#262626] overflow-hidden", className)}>
+    <div className={cn("bg-surface-raised rounded-lg border border-surface-border overflow-hidden", className)}>
       {children}
     </div>
   );
@@ -22,8 +22,8 @@ export function Card({ children, className }: { children: React.ReactNode; class
  */
 export function CardHeader({ title, action, className }: { title: string; action?: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("px-6 py-4 border-b border-[#262626] flex items-center justify-between", className)}>
-      <h2 className="text-base font-semibold tracking-tight text-[#FAFAFA]">{title}</h2>
+    <div className={cn("px-6 py-4 border-b border-surface-border flex items-center justify-between", className)}>
+      <h2 className="text-base font-semibold tracking-tight text-content-primary">{title}</h2>
       {action && <div>{action}</div>}
     </div>
   );

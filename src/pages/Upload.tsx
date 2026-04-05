@@ -4,6 +4,7 @@ import { UploadCloud, FileText, CheckCircle, AlertCircle, X, Lock } from 'lucide
 import { toast } from 'sonner';
 import Tesseract from 'tesseract.js';
 import { useStore } from '../store/useStore';
+import { CollapsibleModule } from '../components/CollapsibleModule';
 
 export default function Upload() {
   const navigate = useNavigate();
@@ -154,155 +155,158 @@ export default function Upload() {
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">Upload Document</h1>
-          <p className="text-sm text-zinc-400 mt-1">Upload a bill or receipt to automatically extract details.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-content-primary">Document Upload</h1>
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500 mt-1">Data extraction & ingestion</p>
         </div>
-        <div className="flex items-center text-sm text-zinc-400 bg-[#141414] px-3 py-1.5 rounded-full border border-[#262626]">
-          <Lock className="w-4 h-4 mr-1.5 text-zinc-500" />
-          End-to-end encrypted
+        <div className="flex items-center text-[10px] font-mono text-zinc-400 bg-surface-raised px-3 py-1.5 rounded-sm border border-surface-border uppercase tracking-widest leading-none">
+          <Lock className="w-3.5 h-3.5 mr-1.5 text-indigo-500" />
+          Channel secured
         </div>
       </div>
 
       {!file && !isExtracting && (
-        <div 
-          className={`mt-6 border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
-            dragActive ? 'border-indigo-500 bg-[#1C1C1C]' : 'border-[#262626] hover:border-[#3f3f46] bg-[#141414]'
-          }`}
-          onDragEnter={handleDrag}
-          onDragLeave={handleDrag}
-          onDragOver={handleDrag}
-          onDrop={handleDrop}
-        >
-          <div className="w-16 h-16 bg-[#1C1C1C] border border-[#262626] rounded-full flex items-center justify-center mx-auto mb-4">
-            <UploadCloud className={`w-8 h-8 ${dragActive ? 'text-indigo-500' : 'text-zinc-500'}`} />
-          </div>
-          <h3 className="text-lg font-semibold tracking-tight text-[#FAFAFA] mb-1">Click to upload or drag and drop</h3>
-          <p className="text-sm text-zinc-400 mb-6">PDF, PNG, JPG or HEIC (max. 10MB)</p>
-          
-          <input
-            ref={inputRef}
-            type="file"
-            className="hidden"
-            accept=".pdf,image/*"
-            onChange={handleChange}
-          />
-          <button 
+        <CollapsibleModule title="Asset Ingestion" icon={UploadCloud}>
+          <div 
+            className={`-mx-6 -my-6 p-12 text-center transition-all cursor-pointer ${
+              dragActive ? 'bg-indigo-500/5' : 'bg-surface-raised hover:bg-surface-elevated'
+            }`}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
             onClick={() => inputRef.current?.click()}
-            className="px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
           >
-            Select File
-          </button>
-        </div>
+            <div className={`w-16 h-16 bg-surface-base border rounded-sm flex items-center justify-center mx-auto mb-6 transition-colors ${dragActive ? 'border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.2)]' : 'border-surface-border'}`}>
+              <UploadCloud className={`w-8 h-8 ${dragActive ? 'text-indigo-500' : 'text-zinc-600'}`} />
+            </div>
+            <h3 className="text-lg font-mono font-bold tracking-tight text-content-primary mb-2 uppercase">Interface for ingestion</h3>
+            <p className="text-[10px] font-mono text-zinc-500 mb-8 uppercase tracking-widest">DRAG ASSETS HERE OR CLICK TO BROWSE</p>
+            
+            <input
+              ref={inputRef}
+              type="file"
+              className="hidden"
+              accept=".pdf,image/*"
+              onChange={handleChange}
+            />
+            <div className="inline-block px-6 py-2 bg-transparent border border-surface-border rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-zinc-300 hover:bg-surface-elevated transition-colors">
+              Connect Local Source
+            </div>
+          </div>
+        </CollapsibleModule>
       )}
 
       {isExtracting && (
-        <div className="bg-[#141414] rounded-lg border border-[#262626] p-12 text-center">
-          <div className="inline-block relative w-16 h-16 mb-4">
-            <div className="absolute inset-0 border-4 border-[#1C1C1C] rounded-full"></div>
-            <div className="absolute inset-0 border-4 border-indigo-500 rounded-full border-t-transparent animate-spin"></div>
+        <div className="bg-surface-raised rounded-sm border border-surface-border p-12 text-center">
+          <div className="inline-block relative w-16 h-16 mb-6">
+            <div className="absolute inset-0 border-[3px] border-surface-elevated rounded-sm"></div>
+            <div className="absolute inset-0 border-[3px] border-indigo-600 rounded-sm border-t-transparent animate-spin"></div>
             <FileText className="absolute inset-0 m-auto w-6 h-6 text-indigo-500" />
           </div>
-          <h3 className="text-lg font-semibold tracking-tight text-[#FAFAFA] mb-1">Extracting data...</h3>
-          <p className="text-sm text-zinc-400">Our AI is reading your document to save you time.</p>
+          <h3 className="text-lg font-bold tracking-tight text-content-primary mb-2 uppercase">Scanning content...</h3>
+          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Applying OCR algorithms to assets</p>
           
-          <div className="max-w-md mx-auto mt-8 space-y-3">
-            <div className="h-2 bg-[#1C1C1C] rounded overflow-hidden">
-              <div className="h-full bg-indigo-500 w-2/3 animate-pulse rounded"></div>
+          <div className="max-w-xs mx-auto mt-10 space-y-3">
+            <div className="h-1 bg-surface-base border border-surface-border rounded-sm overflow-hidden">
+              <div className="h-full bg-indigo-500 w-2/3 animate-[progress-active_4s_ease-in-out_infinite]"></div>
             </div>
-            <div className="h-2 bg-[#1C1C1C] rounded overflow-hidden">
-              <div className="h-full bg-indigo-500 w-1/2 animate-pulse rounded delay-75"></div>
-            </div>
-            <div className="h-2 bg-[#1C1C1C] rounded overflow-hidden">
-              <div className="h-full bg-indigo-500 w-5/6 animate-pulse rounded delay-150"></div>
+            <div className="h-1 bg-surface-base border border-surface-border rounded-sm overflow-hidden opacity-50">
+              <div className="h-full bg-indigo-500 w-1/2 animate-[progress-active_5s_ease-in-out_infinite]"></div>
             </div>
           </div>
         </div>
       )}
 
       {extractionComplete && file && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* File Preview */}
-          <div className="bg-[#141414] rounded-lg border border-[#262626] p-4 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#1C1C1C] rounded flex items-center justify-center border border-[#262626]">
-                  <FileText className="w-5 h-5 text-zinc-500" />
+        <CollapsibleModule 
+          title="Extraction Analytics" 
+          icon={CheckCircle}
+          extraHeader={<span className="text-[10px] font-mono text-emerald-500 font-bold uppercase tracking-widest leading-none flex items-center gap-1.5"><CheckCircle className="w-3 h-3" /> Integrity Verified</span>}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 -mx-6 -my-6 p-6">
+            {/* File Preview */}
+            <div className="bg-surface-base rounded-sm border border-surface-border p-4 flex flex-col">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-surface-raised rounded-sm flex items-center justify-center border border-surface-border">
+                    <FileText className="w-5 h-5 text-zinc-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-mono font-bold text-content-primary truncate uppercase tracking-widest">{file.name}</p>
+                    <p className="text-[9px] font-mono text-zinc-600 uppercase">{(file.size / 1024 / 1024).toFixed(2)} MB • HASH_SHA256</p>
+                  </div>
                 </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-[#FAFAFA] truncate">{file.name}</p>
-                  <p className="text-xs text-zinc-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
-                </div>
+                <button onClick={resetUpload} className="p-1.5 text-zinc-500 hover:text-red-400 hover:bg-surface-elevated rounded-sm transition-colors">
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <button onClick={resetUpload} className="p-1.5 text-zinc-500 hover:text-zinc-300 hover:bg-[#1C1C1C] rounded-md transition-colors">
-                <X className="w-4 h-4" />
-              </button>
+              <div className="flex-1 bg-surface-raised border border-surface-border rounded-sm flex items-center justify-center min-h-[300px] overflow-hidden group">
+                {previewUrl ? (
+                  <img src={previewUrl} alt="Document preview" className="max-w-full max-h-[400px] object-contain opacity-60 group-hover:opacity-100 transition-opacity" referrerPolicy="no-referrer" />
+                ) : (
+                  <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Visual Feedback Missing</p>
+                )}
+              </div>
             </div>
-            <div className="flex-1 bg-[#0A0A0A] border border-[#262626] rounded flex items-center justify-center min-h-[300px] overflow-hidden">
-              {previewUrl ? (
-                <img src={previewUrl} alt="Document preview" className="max-w-full max-h-[400px] object-contain" referrerPolicy="no-referrer" />
-              ) : (
-                <p className="text-sm text-zinc-500">Document Preview</p>
-              )}
-            </div>
-          </div>
 
-          {/* Extracted Data Form */}
-          <div className="bg-[#141414] rounded-lg border border-[#262626]">
-            <div className="px-6 py-5 border-b border-[#262626] flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-[#22C55E]" />
-              <h3 className="text-base font-semibold tracking-tight text-[#FAFAFA]">Review Extracted Details</h3>
-            </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="biller" className="block text-sm font-semibold text-zinc-300">Biller Name</label>
-                  <input type="text" id="biller" value={formData.biller} onChange={handleFormChange} required className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors" />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
+            {/* Extracted Data Form */}
+            <div className="bg-surface-base rounded-sm border border-surface-border flex flex-col">
+              <div className="px-6 py-4 border-b border-surface-border flex items-center gap-3 bg-surface-elevated/50 leading-none">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <h3 className="text-[10px] font-mono uppercase tracking-widest text-content-primary">Payload Details</h3>
+              </div>
+              <form onSubmit={handleSubmit} className="p-6 space-y-6 flex-1 flex flex-col justify-between">
+                <div className="space-y-6">
                   <div>
-                    <label htmlFor="amount" className="block text-sm font-semibold text-zinc-300">Amount</label>
-                    <div className="mt-1 relative rounded-md">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span className="text-zinc-500 sm:text-sm">$</span>
+                    <label htmlFor="biller" className="block text-[10px] font-mono uppercase tracking-widest text-zinc-600 mb-2 font-bold">Authenticated Merchant</label>
+                    <input type="text" id="biller" value={formData.biller} onChange={handleFormChange} required className="w-full bg-surface-raised border border-surface-border rounded-sm px-3 py-2 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors uppercase tracking-widest" />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label htmlFor="amount" className="block text-[10px] font-mono uppercase tracking-widest text-zinc-600 mb-2 font-bold">Total Value</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-2.5 text-[10px] font-mono text-zinc-600">$</span>
+                        <input type="number" step="0.01" id="amount" value={formData.amount} onChange={handleFormChange} required className="w-full bg-surface-raised border border-surface-border rounded-sm pl-7 pr-3 py-2 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors" />
                       </div>
-                      <input type="number" step="0.01" id="amount" value={formData.amount} onChange={handleFormChange} required className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md py-2 border transition-colors" />
+                    </div>
+                    <div>
+                      <label htmlFor="dueDate" className="block text-[10px] font-mono uppercase tracking-widest text-zinc-600 mb-2 font-bold">Maturity Date</label>
+                      <input type="date" id="dueDate" value={formData.dueDate} onChange={handleFormChange} required className="w-full bg-surface-raised border border-surface-border rounded-sm px-3 py-2 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors" />
                     </div>
                   </div>
+
                   <div>
-                    <label htmlFor="dueDate" className="block text-sm font-semibold text-zinc-300">Due Date</label>
-                    <input type="date" id="dueDate" value={formData.dueDate} onChange={handleFormChange} required className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors" />
+                    <label htmlFor="category" className="block text-[10px] font-mono uppercase tracking-widest text-zinc-600 mb-2 font-bold">Resource Type</label>
+                    <select id="category" value={formData.category} onChange={handleFormChange} required className="w-full bg-surface-raised border border-surface-border rounded-sm px-3 py-2 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors uppercase tracking-widest">
+                      <option value="Utilities">Utilities</option>
+                      <option value="Housing">Housing</option>
+                      <option value="Insurance">Insurance</option>
+                      <option value="Subscriptions">Subscriptions</option>
+                      <option value="Other">Other</option>
+                    </select>
                   </div>
                 </div>
 
-                <div>
-                  <label htmlFor="category" className="block text-sm font-semibold text-zinc-300">Category</label>
-                  <select id="category" value={formData.category} onChange={handleFormChange} required className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors">
-                    <option value="Utilities">Utilities</option>
-                    <option value="Housing">Housing</option>
-                    <option value="Insurance">Insurance</option>
-                    <option value="Subscriptions">Subscriptions</option>
-                    <option value="Other">Other</option>
-                  </select>
+                <div className="mt-8">
+                  <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-sm p-4 flex gap-3 mb-6">
+                    <AlertCircle className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                    <p className="text-[10px] font-mono text-indigo-200/70 uppercase leading-relaxed tracking-wider">Please verify extracted payload against physical asset before committing the record.</p>
+                  </div>
+
+                  <div className="flex justify-end gap-3">
+                    <button type="button" onClick={resetUpload} className="px-5 py-2 bg-transparent border border-surface-border rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-zinc-500 hover:text-zinc-300 hover:bg-surface-elevated transition-colors">
+                      Discard Asset
+                    </button>
+                    <button type="submit" className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors shadow-lg shadow-indigo-500/10">
+                      Commit Record
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-md p-4 flex gap-3">
-                <AlertCircle className="w-5 h-5 text-indigo-400 shrink-0" />
-                <p className="text-sm text-indigo-200">Please verify the extracted information against your document before saving.</p>
-              </div>
-
-              <div className="pt-2 flex justify-end gap-3">
-                <button type="button" onClick={resetUpload} className="px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500">
-                  Discard
-                </button>
-                <button type="submit" className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500">
-                  Save Bill
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
-        </div>
+        </CollapsibleModule>
       )}
     </div>
   );

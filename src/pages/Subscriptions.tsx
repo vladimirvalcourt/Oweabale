@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
-import { Repeat, Plus, Edit2, Trash2, Calendar, DollarSign } from 'lucide-react';
+import { Repeat, Plus, Edit2, Trash2, Calendar, DollarSign, TrendingUp, AlertTriangle, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { CollapsibleModule } from '../components/CollapsibleModule';
+import { BrandLogo } from '../components/BrandLogo';
+import { motion } from 'motion/react';
 
 export default function Subscriptions() {
   const { subscriptions, addSubscription, editSubscription, deleteSubscription } = useStore();
@@ -81,12 +84,30 @@ export default function Subscriptions() {
     return acc + (sub.frequency === 'Monthly' ? sub.amount : sub.frequency === 'Yearly' ? sub.amount / 12 : sub.amount * 4.33);
   }, 0);
 
+  // Price hike detector
+  const hikedSubs = subscriptions.filter(sub => {
+    const hist = sub.priceHistory;
+    if (!hist || hist.length < 2) return false;
+    const sorted = [...hist].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return sorted[sorted.length - 1].amount > sorted[sorted.length - 2].amount;
+  });
+
+  const getPriceHike = (sub: typeof subscriptions[0]) => {
+    const hist = sub.priceHistory;
+    if (!hist || hist.length < 2) return null;
+    const sorted = [...hist].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const prev = sorted[sorted.length - 2].amount;
+    const curr = sorted[sorted.length - 1].amount;
+    if (curr <= prev) return null;
+    return { prev, curr, pct: (((curr - prev) / prev) * 100).toFixed(0) };
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">Subscriptions</h1>
-          <p className="text-sm text-zinc-400 mt-1">Manage your recurring payments and track monthly costs.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-content-primary">Subscriptions</h1>
+          <p className="text-xs font-mono uppercase tracking-widest text-zinc-500 mt-1">Recurring liabilities management</p>
         </div>
         <button
           onClick={() => {
@@ -94,54 +115,73 @@ export default function Subscriptions() {
             setEditingId(null);
             setFormData({ name: '', amount: '', frequency: 'Monthly', nextBillingDate: '', status: 'active' });
           }}
-          className="inline-flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-sm font-bold transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-600"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4" />
           Add Subscription
         </button>
       </div>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <div className="bg-[#141414] overflow-hidden rounded-lg border border-[#262626] p-5">
-          <p className="text-sm font-medium text-zinc-500 truncate">Total Monthly Cost</p>
-          <p className="mt-1 text-2xl font-bold tabular-nums text-[#FAFAFA]">
-            ${monthlyCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-          </p>
-          <p className="mt-1 text-sm text-zinc-500">Across {activeSubscriptions.length} active subscriptions</p>
+      <CollapsibleModule 
+        title="Subscription Health" 
+        icon={TrendingUp}
+        extraHeader={<span className="text-xs font-mono text-content-primary font-bold">${monthlyCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}/mo</span>}
+      >
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 -mx-6 -my-6 p-6">
+          <div className="bg-surface-elevated overflow-hidden rounded-sm border border-surface-border p-5">
+            <p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Monthly Cost</p>
+            <p className="text-2xl font-bold font-mono tabular-nums text-content-primary">
+              ${monthlyCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+            </p>
+            <p className="mt-1 text-xs font-mono text-zinc-500">Across {activeSubscriptions.length} active subscriptions</p>
+          </div>
+          <div className="bg-surface-elevated rounded-sm border border-surface-border p-5">
+            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
+              <TrendingUp className="w-3 h-3" /> Price Hikes
+            </p>
+            <p className={`text-2xl font-bold font-mono tabular-nums ${hikedSubs.length > 0 ? 'text-amber-400' : 'text-zinc-600'}`}>
+              {hikedSubs.length}
+            </p>
+            <p className="mt-1 text-xs font-mono text-zinc-500 truncate">
+              {hikedSubs.length > 0 ? hikedSubs.map(s => s.name).join(', ') : 'No price increases found'}
+            </p>
+          </div>
+          <div className="bg-surface-elevated overflow-hidden rounded-sm border border-surface-border p-5">
+            <p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Annual Cost</p>
+            <p className="text-2xl font-bold font-mono tabular-nums text-content-primary">${(monthlyCost * 12).toLocaleString('en-US', { minimumFractionDigits: 0 })}</p>
+            <p className="mt-1 text-xs font-mono text-zinc-500">Projected yearly spend</p>
+          </div>
         </div>
-      </div>
+      </CollapsibleModule>
 
       {(isAdding || editingId) && (
-        <div className="bg-[#141414] rounded-lg border border-[#262626] p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold tracking-tight text-[#FAFAFA]">
-              {editingId ? 'Edit Subscription' : 'Add New Subscription'}
+        <div className="bg-surface-raised rounded-sm border border-surface-border p-6 mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-content-primary">
+              {editingId ? 'Edit Entry' : 'Manual Entry'}
             </h3>
             <button onClick={() => { setIsAdding(false); cancelEdit(); }} className="text-zinc-500 hover:text-zinc-300 transition-colors">
-              <span className="sr-only">Close</span>
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
-          <form onSubmit={editingId ? handleUpdate : handleAdd} className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <form onSubmit={editingId ? handleUpdate : handleAdd} className="space-y-6">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               <div>
-                <label className="block text-sm font-semibold text-zinc-300">Service Name</label>
+                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Service Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
                   placeholder="e.g., Netflix"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-zinc-300">Amount</label>
-                <div className="mt-1 relative rounded-md">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-zinc-500 sm:text-sm">$</span>
-                  </div>
+                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Amount</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-xs font-mono text-zinc-600">$</span>
                   <input
                     type="number"
                     required
@@ -149,17 +189,17 @@ export default function Subscriptions() {
                     step="0.01"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md py-2 border transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-sm pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
                     placeholder="0.00"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-zinc-300">Frequency</label>
+                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Frequency</label>
                 <select
                   value={formData.frequency}
                   onChange={(e) => setFormData({ ...formData, frequency: e.target.value as any })}
-                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
                 >
                   <option value="Weekly">Weekly</option>
                   <option value="Monthly">Monthly</option>
@@ -167,41 +207,29 @@ export default function Subscriptions() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-zinc-300">Next Billing Date</label>
+                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Next Billing</label>
                 <input
                   type="date"
                   required
                   value={formData.nextBillingDate}
                   onChange={(e) => setFormData({ ...formData, nextBillingDate: e.target.value })}
-                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-semibold text-zinc-300">Status</label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-[#262626] bg-[#0A0A0A] text-zinc-200 rounded-md px-3 py-2 border transition-colors"
-                >
-                  <option value="active">Active</option>
-                  <option value="paused">Paused</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </div>
             </div>
-            <div className="flex justify-end gap-3 pt-4">
+            <div className="flex justify-end gap-3 pt-2">
               <button
                 type="button"
                 onClick={() => { setIsAdding(false); cancelEdit(); }}
-                className="px-4 py-2 bg-transparent border border-[#262626] rounded-md text-sm font-medium text-zinc-300 hover:bg-[#1C1C1C] transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
+                className="px-4 py-2 text-xs font-mono uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
+                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors shadow-lg shadow-indigo-500/10"
               >
-                {editingId ? 'Save Changes' : 'Add Subscription'}
+                {editingId ? 'Commit Changes' : 'Add to Ledger'}
               </button>
             </div>
           </form>
@@ -209,71 +237,98 @@ export default function Subscriptions() {
       )}
 
       {subscriptions.length === 0 && !isAdding ? (
-        <div className="bg-[#141414] rounded-lg border border-[#262626] border-dashed p-12 text-center">
-          <div className="w-16 h-16 border border-[#262626] rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="bg-surface-raised rounded-sm border border-surface-border border-dashed p-12 text-center">
+          <div className="w-16 h-16 border border-surface-border rounded-sm flex items-center justify-center mx-auto mb-4">
             <Repeat className="w-8 h-8 text-zinc-500" />
           </div>
-          <h3 className="text-lg font-semibold tracking-tight text-[#FAFAFA] mb-2">No subscriptions found</h3>
-          <p className="text-sm text-zinc-400 max-w-sm mx-auto mb-6">
-            Track your recurring payments like Netflix, Spotify, or gym memberships.
+          <h3 className="text-lg font-bold tracking-tight text-content-primary mb-2">No active subscriptions</h3>
+          <p className="text-xs font-mono text-zinc-500 max-w-sm mx-auto mb-8 uppercase tracking-widest">
+            Ready to track Netflix, Spotify, and more.
           </p>
           <button
             onClick={() => setIsAdding(true)}
-            className="inline-flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm font-medium transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:ring-indigo-500"
+            className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-sm font-bold transition-colors flex items-center gap-2 mx-auto"
           >
-            <Plus className="w-4 h-4 mr-2" />
-            Add Subscription
+            <Plus className="w-4 h-4" />
+            Begin Tracking
           </button>
         </div>
       ) : (
-        <div className="bg-[#141414] rounded-lg border border-[#262626] overflow-hidden">
-          <ul className="divide-y divide-[#1F1F1F]">
+        <CollapsibleModule title="Recurring Liabilities" icon={Repeat}>
+          <motion.ul 
+            className="divide-y divide-surface-highlight -mx-6 -my-6"
+            initial="hidden"
+            animate="visible"
+            variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
+          >
             {subscriptions.map((sub) => (
-              <li key={sub.id} className="p-4 sm:px-6 hover:bg-[#1C1C1C] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <motion.li 
+                key={sub.id} 
+                className="p-4 sm:px-6 hover:bg-surface-elevated transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                variants={{
+                  hidden: { opacity: 0, y: 15 },
+                  visible: { opacity: 1, y: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } }
+                }}
+              >
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg border border-[#262626] flex items-center justify-center">
-                    <Repeat className="w-5 h-5 text-zinc-500" />
-                  </div>
+                  <BrandLogo size="lg" name={sub.name} fallbackIcon={<Repeat className="w-5 h-5 text-zinc-600" />} />
                   <div>
-                    <h4 className="text-sm font-semibold text-[#FAFAFA]">{sub.name}</h4>
+                    <h4 className="text-sm font-bold text-content-primary flex items-center gap-2">
+                      {sub.name}
+                      {(() => {
+                        const hike = getPriceHike(sub);
+                        if (!hike) return null;
+                        return (
+                          <span className="flex items-center gap-1 text-[9px] font-mono font-bold text-amber-400 border border-amber-500/30 bg-amber-500/5 px-1.5 py-0.5 rounded-sm">
+                            <TrendingUp className="w-2.5 h-2.5" />
+                            +{hike.pct}%
+                          </span>
+                        );
+                      })()}
+                    </h4>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`inline-flex items-center text-xs font-medium ${
-                        sub.status === 'active' ? 'text-[#22C55E]' :
-                        sub.status === 'paused' ? 'text-[#EAB308]' :
+                      <span className={`inline-flex items-center text-xs font-mono font-medium ${
+                        sub.status === 'active' ? 'text-emerald-400' :
+                        sub.status === 'paused' ? 'text-amber-400' :
                         'text-zinc-400'
                       }`}>
                         {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
                       </span>
-                      <span className="text-xs text-zinc-500">Renews {sub.nextBillingDate}</span>
+                      <span className="text-xs font-mono text-zinc-500">Renews {sub.nextBillingDate}</span>
+                      {(() => {
+                        const hike = getPriceHike(sub);
+                        if (!hike) return null;
+                        return <span className="text-[10px] font-mono text-zinc-600">(was ${hike.prev.toFixed(2)})</span>;
+                      })()}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
+                <div className="flex items-center justify-between sm:justify-end gap-12 w-full sm:w-auto">
                   <div className="text-right">
-                    <p className="text-sm font-bold tabular-nums text-[#FAFAFA]">${sub.amount.toFixed(2)}</p>
-                    <p className="text-xs text-zinc-500">{sub.frequency}</p>
+                    <p className="text-base font-bold font-mono tabular-nums text-content-primary">${sub.amount.toFixed(2)}</p>
+                    <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{sub.frequency}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => startEdit(sub)}
-                      className="p-2 text-zinc-500 hover:text-zinc-300 rounded-md hover:bg-[#1C1C1C] transition-colors"
+                      className="p-2 text-zinc-500 hover:text-zinc-300 rounded-md hover:bg-surface-elevated transition-colors"
                       title="Edit"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(sub.id)}
-                      className="p-2 text-zinc-500 hover:text-[#EF4444] rounded-md hover:bg-[#1C1C1C] transition-colors"
+                      className="p-2 text-zinc-500 hover:text-[#EF4444] rounded-md hover:bg-surface-elevated transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
-              </li>
+              </motion.li>
             ))}
-          </ul>
-        </div>
+          </motion.ul>
+        </CollapsibleModule>
       )}
     </div>
   );

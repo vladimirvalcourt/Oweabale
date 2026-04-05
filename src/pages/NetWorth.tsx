@@ -1,185 +1,218 @@
 import React, { useMemo } from 'react';
 import { useStore } from '../store/useStore';
-import { TrendingUp, TrendingDown, DollarSign, Building2, CreditCard, Wallet } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { TrendingUp, TrendingDown, DollarSign, Building2, CreditCard, Wallet, PieChart, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPie, Pie, Cell } from 'recharts';
+import { toast } from 'sonner';
+import { motion, animate } from 'motion/react';
+import { useState, useEffect } from 'react';
+import { CollapsibleModule } from '../components/CollapsibleModule';
+
+function AnimatedValue({ value, prefix = "", suffix = "", decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    const controls = animate(displayValue, value, {
+      duration: 1.5,
+      ease: [0.16, 1, 0.3, 1], // HUD-style ease out
+      onUpdate(value) {
+        setDisplayValue(value);
+      },
+    });
+    return () => controls.stop();
+  }, [value]);
+
+  return (
+    <span>
+      {prefix}{displayValue.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}{suffix}
+    </span>
+  );
+}
 
 export default function NetWorth() {
-  const { assets, debts } = useStore();
+  const { assets, debts, addAsset, deleteAsset } = useStore();
 
   const totalAssets = useMemo(() => assets.reduce((sum, asset) => sum + asset.value, 0), [assets]);
   const totalLiabilities = useMemo(() => debts.reduce((sum, debt) => sum + debt.remaining, 0), [debts]);
   const netWorth = totalAssets - totalLiabilities;
 
-  // Generate some mock historical data based on current net worth
+  // 12-month historical mock
   const historicalData = useMemo(() => {
     const data = [];
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const currentMonth = new Date().getMonth();
-    
-    let currentNW = netWorth * 0.8; // Start 20% lower 6 months ago
-    const step = (netWorth - currentNW) / 5;
-
-    for (let i = 5; i >= 0; i--) {
-      const monthIndex = (currentMonth - i + 12) % 12;
-      data.push({
-        name: months[monthIndex],
-        value: i === 0 ? netWorth : currentNW + (step * (5 - i)) + (Math.random() * 5000 - 2500) // Add some noise
-      });
+    const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+    for (let i = 0; i < months.length; i++) {
+      const factor = 0.78 + (i / (months.length - 1)) * 0.22;
+      const noise = (Math.random() - 0.5) * netWorth * 0.04;
+      data.push({ name: months[i], value: Math.round(netWorth * factor + noise) });
     }
+    data[data.length - 1].value = netWorth;
     return data;
   }, [netWorth]);
+
+  // Asset allocation by type
+  const ASSET_COLORS = ['#6366F1', '#34D399', '#F59E0B', '#8B5CF6', '#06B6D4', '#EC4899'];
+  const assetAllocation = useMemo(() => {
+    const map = new Map<string, number>();
+    assets.forEach(a => map.set(a.type, (map.get(a.type) || 0) + a.value));
+    return Array.from(map.entries()).map(([name, value]) => ({ name, value }));
+  }, [assets]);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#FAFAFA]">Net Worth</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Net Worth</h1>
           <p className="text-sm text-zinc-400 mt-1">Track your total assets minus total liabilities over time.</p>
         </div>
       </div>
 
       {/* Top Level Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-[#141414] rounded-lg border border-[#262626] p-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <DollarSign className="w-16 h-16" />
-          </div>
-          <p className="text-sm font-medium text-zinc-400 mb-2">Total Net Worth</p>
-          <p className={`text-3xl font-bold tabular-nums ${netWorth >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-            ${netWorth.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+        <div className="bg-surface-raised rounded-sm border border-surface-border p-6 relative overflow-hidden">
+          <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-2 font-bold">Total Net Worth</p>
+          <p className={`text-4xl font-bold font-mono tabular-nums ${netWorth >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+            $<AnimatedValue value={netWorth} decimals={2} />
           </p>
-          <div className="mt-4 flex items-center text-sm text-emerald-400">
+          <div className="mt-3 flex items-center text-sm text-emerald-400 font-mono">
             <TrendingUp className="w-4 h-4 mr-1" />
             <span>+2.4% from last month</span>
           </div>
         </div>
 
-        <div className="bg-[#141414] rounded-lg border border-[#262626] p-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <Building2 className="w-16 h-16" />
-          </div>
-          <p className="text-sm font-medium text-zinc-400 mb-2">Total Assets</p>
-          <p className="text-3xl font-bold tabular-nums text-[#FAFAFA]">
-            ${totalAssets.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+        <div className="bg-surface-raised rounded-sm border border-surface-border p-6 relative overflow-hidden">
+          <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-2 font-bold">Total Assets</p>
+          <p className="text-4xl font-bold font-mono tabular-nums text-content-primary">
+            $<AnimatedValue value={totalAssets} decimals={2} />
           </p>
-          <div className="mt-4 flex items-center text-sm text-zinc-500">
+          <div className="mt-3 flex items-center text-sm text-zinc-500 font-mono">
             <span>Across {assets.length} accounts</span>
           </div>
         </div>
 
-        <div className="bg-[#141414] rounded-lg border border-[#262626] p-6 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <CreditCard className="w-16 h-16" />
-          </div>
-          <p className="text-sm font-medium text-zinc-400 mb-2">Total Liabilities</p>
-          <p className="text-3xl font-bold tabular-nums text-[#FAFAFA]">
-            ${totalLiabilities.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+        <div className="bg-surface-raised rounded-sm border border-surface-border p-6 relative overflow-hidden">
+          <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-2 font-bold">Total Liabilities</p>
+          <p className="text-4xl font-bold font-mono tabular-nums text-content-primary">
+            $<AnimatedValue value={totalLiabilities} decimals={2} />
           </p>
-          <div className="mt-4 flex items-center text-sm text-zinc-500">
+          <div className="mt-3 flex items-center text-sm text-zinc-500 font-mono">
             <span>Across {debts.length} accounts</span>
           </div>
         </div>
       </div>
 
-      {/* Historical Chart */}
-      <div className="bg-[#141414] rounded-lg border border-[#262626] p-6">
-        <h3 className="text-lg font-semibold text-[#FAFAFA] mb-6">Net Worth History (6 Months)</h3>
-        <div className="h-[300px] w-full">
+      {/* Historical Chart — 12 months */}
+      <CollapsibleModule title="Net Worth History — 12 Months" icon={TrendingUp}>
+        <div className="h-[260px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={historicalData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/>
                   <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#262626" vertical={false} />
-              <XAxis 
-                dataKey="name" 
-                stroke="#52525b" 
-                fontSize={12} 
-                tickLine={false}
-                axisLine={false}
-                dy={10}
+              <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" vertical={false} />
+              <XAxis dataKey="name" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} dy={10} fontFamily="monospace" />
+              <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} dx={-10} fontFamily="monospace" />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', color: '#FAFAFA', fontFamily: 'monospace', fontSize: '12px' }}
+                formatter={(value: number) => [`$${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}`, 'Net Worth']}
               />
-              <YAxis 
-                stroke="#52525b" 
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) => `$${(value / 1000)}k`}
-                dx={-10}
-              />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#1C1C1C', borderColor: '#262626', borderRadius: '0.5rem', color: '#FAFAFA' }}
-                itemStyle={{ color: '#818cf8' }}
-                formatter={(value: number) => [`$${value.toLocaleString('en-US', {maximumFractionDigits: 0})}`, 'Net Worth']}
-              />
-              <Area 
-                type="monotone" 
-                dataKey="value" 
-                stroke="#6366f1" 
-                strokeWidth={3}
-                fillOpacity={1} 
-                fill="url(#colorValue)" 
-              />
+              <Area type="monotone" dataKey="value" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" dot={{ fill: '#6366f1', strokeWidth: 0, r: 3 }} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </CollapsibleModule>
 
-      {/* Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="flex flex-col gap-6">
+          {/* Asset Allocation Donut */}
+          <CollapsibleModule 
+            title="Asset Allocation" 
+            icon={PieChart}
+          >
+            <div className="flex flex-col items-center gap-4">
+              <ResponsiveContainer width="100%" height={140}>
+                <RechartsPie>
+                  <Pie data={assetAllocation} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value" paddingAngle={3}>
+                    {assetAllocation.map((_, i) => (
+                      <Cell key={i} fill={ASSET_COLORS[i % ASSET_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', fontFamily: 'monospace', fontSize: '11px' }}
+                    formatter={(v: number) => [`$${v.toLocaleString()}`, 'Value']}
+                  />
+                </RechartsPie>
+              </ResponsiveContainer>
+              <div className="w-full space-y-2">
+                {assetAllocation.map((item, i) => (
+                  <div key={item.name} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-none" style={{ backgroundColor: ASSET_COLORS[i % ASSET_COLORS.length] }} />
+                      <span className="text-xs font-mono text-zinc-400">{item.name}</span>
+                    </div>
+                    <span className="text-xs font-mono text-zinc-300">{((item.value / totalAssets) * 100).toFixed(1)}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CollapsibleModule>
+
+          {/* Subscriptions Sniper / Additional Data? */}
+        </div>
+
         {/* Assets List */}
-        <div className="bg-[#141414] rounded-lg border border-[#262626] overflow-hidden">
-          <div className="p-4 border-b border-[#262626] bg-[#1C1C1C]/50 flex justify-between items-center">
-            <h3 className="font-medium text-[#FAFAFA] flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-emerald-400" /> Assets
-            </h3>
-            <span className="text-sm text-zinc-400">${totalAssets.toLocaleString()}</span>
-          </div>
-          <div className="divide-y divide-[#262626]">
+        <CollapsibleModule 
+          title="Assets" 
+          icon={Building2} 
+          extraHeader={<span className="text-xs font-mono text-emerald-400 font-bold">${totalAssets.toLocaleString()}</span>}
+        >
+          <div className="divide-y divide-surface-border -mx-6 -my-6">
             {assets.length === 0 ? (
-              <div className="p-8 text-center text-zinc-500 text-sm">No assets added yet.</div>
+              <div className="p-6 text-center text-zinc-500 text-sm font-mono">No assets added yet.</div>
             ) : (
               assets.map(asset => (
-                <div key={asset.id} className="p-4 flex justify-between items-center hover:bg-[#1C1C1C] transition-colors">
+                <div key={asset.id} className="px-6 py-3 flex justify-between items-center hover:bg-surface-elevated transition-colors group">
                   <div>
-                    <p className="font-medium text-[#FAFAFA]">{asset.name}</p>
-                    <p className="text-xs text-zinc-500">{asset.type}</p>
+                    <p className="text-sm font-medium text-content-primary">{asset.name}</p>
+                    <p className="text-xs font-mono text-zinc-500">{asset.type}</p>
                   </div>
-                  <p className="font-medium text-emerald-400">+${asset.value.toLocaleString()}</p>
+                  <div className="flex items-center gap-3">
+                    <p className="text-sm font-mono font-medium text-emerald-400">+${asset.value.toLocaleString()}</p>
+                    <button onClick={() => { deleteAsset(asset.id); toast.success('Asset removed'); }} className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition-all">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))
             )}
           </div>
-        </div>
+        </CollapsibleModule>
 
         {/* Liabilities List */}
-        <div className="bg-[#141414] rounded-lg border border-[#262626] overflow-hidden">
-          <div className="p-4 border-b border-[#262626] bg-[#1C1C1C]/50 flex justify-between items-center">
-            <h3 className="font-medium text-[#FAFAFA] flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-red-400" /> Liabilities
-            </h3>
-            <span className="text-sm text-zinc-400">${totalLiabilities.toLocaleString()}</span>
-          </div>
-          <div className="divide-y divide-[#262626]">
+        <CollapsibleModule 
+          title="Liabilities" 
+          icon={CreditCard} 
+          extraHeader={<span className="text-xs font-mono text-red-400 font-bold">${totalLiabilities.toLocaleString()}</span>}
+        >
+          <div className="divide-y divide-surface-border -mx-6 -my-6">
             {debts.length === 0 ? (
-              <div className="p-8 text-center text-zinc-500 text-sm">No liabilities added yet.</div>
+              <div className="p-6 text-center text-zinc-500 text-sm font-mono">No liabilities added yet.</div>
             ) : (
               debts.map(debt => (
-                <div key={debt.id} className="p-4 flex justify-between items-center hover:bg-[#1C1C1C] transition-colors">
+                <div key={debt.id} className="px-6 py-3 flex justify-between items-center hover:bg-surface-elevated transition-colors">
                   <div>
-                    <p className="font-medium text-[#FAFAFA]">{debt.name}</p>
-                    <p className="text-xs text-zinc-500">{debt.type}</p>
+                    <p className="text-sm font-medium text-content-primary">{debt.name}</p>
+                    <p className="text-xs font-mono text-zinc-500">{debt.type} · {debt.apr}% APR</p>
                   </div>
-                  <p className="font-medium text-red-400">-${debt.remaining.toLocaleString()}</p>
+                  <p className="text-sm font-mono font-medium text-red-400">-${debt.remaining.toLocaleString()}</p>
                 </div>
               ))
             )}
           </div>
-        </div>
+        </CollapsibleModule>
       </div>
     </div>
   );
 }
+

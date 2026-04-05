@@ -41,9 +41,9 @@ export default function BankConnection() {
   };
 
   return (
-    <div className="bg-[#1C1C1C] rounded-sm border border-[#262626] p-6">
+    <div className="bg-surface-elevated rounded-sm border border-surface-border p-6">
       <div className="mb-6">
-        <h3 className="text-xs font-mono uppercase tracking-widest text-[#FAFAFA]">Data Sources</h3>
+        <h3 className="text-xs font-mono uppercase tracking-widest text-content-primary">Data Sources</h3>
         <p className="mt-1 text-sm text-zinc-400">Connect your financial institutions for live data sync.</p>
       </div>
 
@@ -52,7 +52,7 @@ export default function BankConnection() {
           <button
             onClick={handleConnectClick}
             disabled={isConnecting}
-            className="bg-[#FAFAFA] text-black hover:bg-zinc-200 font-bold px-6 py-3 rounded-sm flex items-center gap-2 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            className="bg-content-primary text-black hover:bg-zinc-200 font-bold px-6 py-3 rounded-sm flex items-center gap-2 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {isConnecting ? (
               <>
@@ -68,9 +68,9 @@ export default function BankConnection() {
           </button>
         </div>
       ) : (
-        <div className="bg-[#0A0A0A] border border-[#262626] rounded-sm p-4">
+        <div className="bg-surface-base border border-surface-border rounded-sm p-4">
           <div className="flex items-center justify-between">
-            <div className="font-mono text-sm text-[#FAFAFA]">
+            <div className="font-mono text-sm text-content-primary">
               [STATUS: <span className="text-emerald-400 animate-pulse">ACTIVE</span>] CHASE CHECKING (...4429)
             </div>
           </div>
