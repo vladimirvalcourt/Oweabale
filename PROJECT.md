@@ -8,9 +8,9 @@ Oweable is an ultra-premium, dark-themed personal finance "command center" engin
 ### Tech Stack
 *   **Framework**: React 18 (Vite) - Client-Side Rendered (CSR) for maximum dashboard speed and responsiveness.
 *   **Routing**: React Router DOM
-*   **Styling**: Tailwind CSS
-*   **State Management**: Zustand
-*   **Icons**: Lucide React
+*   **Styling**: Vanilla CSS (with Tailwind CSS for utility-first layout)
+*   **State Management**: Zustand (Integrated with Supabase for persistence)
+*   **Icons**: Streamline Icons (Premium integration)
 *   **Charts**: Recharts
 *   **Notifications**: Sonner
 
@@ -20,7 +20,7 @@ Oweable is an ultra-premium, dark-themed personal finance "command center" engin
 *   **Borders**: `#262626` (Subtle dividers)
 *   **Typography**: Inter (sans-serif) for primary text, JetBrains Mono for ledgers and financial data.
 *   **Accent Colors**:
-    *   **Indigo** (`#6366F1`): Primary actions, AI features, Debt Detonator.
+    *   **Indigo** (`#6366F1`): Primary actions, Debt Detonator.
     *   **Emerald** (`#34D399`): Positive cash flow, savings, wealth velocity.
     *   **Red** (`#EF4444`): Destructive actions, Subscription Sniper alerts, burn rate.
     *   **Amber** (`#F59E0B`): Premium highlights, "Ruthless ROI" branding.
@@ -31,34 +31,29 @@ Oweable is an ultra-premium, dark-themed personal finance "command center" engin
 3.  **Wealth Velocity**: Tracking daily burn rate versus income rate to ensure positive cash flow momentum.
 4.  **Tax Fortress**: Real-time liability tracking and fiscal year planning.
 5.  **Citation Sniper**: High-urgency tracking for one-off penalties (tickets, fines) to prevent compounding fees.
-6.  **Oweable AI**: A 24/7 Financial Advisor embedded directly into the dashboard.
+6.  **Net Worth Tracker**: Comprehensive overview of assets vs liabilities with real-time delta tracking.
 
 ---
 
 ## Phase 2: Backend Architecture & Data Flow
 
-### 1. Core Infrastructure (Decoupled)
-The Oweable frontend is built as a highly optimized Client-Side Rendered (CSR) application utilizing React 18 and Vite. Due to the inherent security constraints of CSR architectures, **no secret API keys, service credentials, or direct database queries shall reside within the React codebase.** 
+### 1. Core Infrastructure (Secure & Decoupled)
+The Oweable frontend is a highly optimized Client-Side Rendered (CSR) application. To maintain bank-grade security, **no secret API keys or direct database queries reside within the client-side codebase.** All data operations are managed through the Supabase client with strict security protocols.
 
-To enforce strict separation of concerns and maintain bank-grade security, we will implement a decoupled backend architecture utilizing **Supabase (PostgreSQL)** as our primary relational database and authentication provider.
+### 2. Database & Persistence (Supabase)
+We utilize **Supabase (PostgreSQL)** as our primary relational database and authentication provider.
+*   **Data Synchronization**: The Zustand store is synchronized with Supabase tables to ensure a seamless "offline-first" feel with real-time persistence.
+*   **Row Level Security (RLS)**: Strictly enforced at the database level. Users can only access, mutate, or query their own isolated financial records.
+*   **Schema**: Optimized for performance with specialized tables for `accounts`, `transactions`, `obligations`, and `user_profiles`.
 
-### 2. Authentication Flow & Data Isolation
-We will implement **Supabase Auth** to manage user identity and session states. 
-* The React frontend will handle the presentation of the login/registration UI.
-* Upon successful authentication, the client receives a secure JSON Web Token (JWT).
-* This JWT must be passed in the `Authorization` header of every subsequent data request.
-* Supabase Row Level Security (RLS) policies will be strictly enforced at the database level, ensuring users can only query, mutate, or access their own isolated financial data.
-
-### 3. The API Layer (Secure Executions)
-Sensitive operations—specifically the Plaid Token Exchange and AI Financial Advisor prompts (OpenAI/Gemini)—require a secure execution environment isolated from the client. 
-* We will deploy a lightweight, serverless API layer utilizing **Supabase Edge Functions** (or a dedicated Node.js/Express microservice).
-* The React frontend will execute secure `fetch` calls to this API layer.
-* The API layer will securely broker communications with third-party services (Plaid, LLMs) utilizing hidden, server-side environment variables, ensuring zero credential leakage to the client.
+### 3. Security & Authentication
+*   **Supabase Auth**: Manages user identity and session states via secure JWTs.
+*   **Server-Side Logic**: Sensitive operations like Plaid token exchanges or complex financial calculations are handled via **Supabase Edge Functions**, ensuring zero credential leakage to the client.
 
 ### 4. Data Model Blueprint
-The PostgreSQL database will be structured to support high-performance financial querying. The foundational schema requires the following core tables:
-
-*   **`users`**: `(id [uuid, pk], email [varchar], settings [jsonb], created_at [timestamp])`
-*   **`accounts`**: `(id [uuid, pk], user_id [uuid, fk], plaid_item_id [varchar], institution_name [varchar], mask [varchar], balances [jsonb], updated_at [timestamp])`
-*   **`transactions`**: `(id [uuid, pk], account_id [uuid, fk], amount [numeric], date [date], category [varchar], pending [boolean], created_at [timestamp])`
-*   **`obligations`**: `(id [uuid, pk], user_id [uuid, fk], type [enum: bill, debt, citation], amount [numeric], due_date [date], status [varchar], metadata [jsonb])`
+The PostgreSQL database is structured for high-performance financial querying:
+*   **`profiles`**: User-specific settings, encryption keys, and preferences.
+*   **`accounts`**: Linked financial accounts (via Plaid or manual entry).
+*   **`transactions`**: Granular ledger of all debits and credits.
+*   **`obligations`**: Tracking for bills, debts, and citations with status monitoring.
+*   **`goals`**: Financial milestones and target tracking coordinates.
