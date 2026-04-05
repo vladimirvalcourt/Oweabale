@@ -3,6 +3,11 @@
 ## Project Overview
 Oweable is an ultra-premium, dark-themed personal finance "command center" engineered for high-net-worth individuals and users demanding a ruthless, data-driven approach to debt elimination and wealth accumulation. Eschewing the gamified, bubbly aesthetics of traditional budgeting applications, Oweable delivers a sleek, professional, and aggressive UI designed for maximum financial visibility and velocity.
 
+## Deployment & Infrastructure
+*   **Domain**: [oweable.com](https://oweable.com)
+*   **Platform**: Vercel (Recommended for Vite/React SSR-like responsiveness)
+*   **Database**: Supabase (PostgreSQL)
+
 ## Phase 1: Frontend Architecture & Design System
 
 ### Tech Stack
