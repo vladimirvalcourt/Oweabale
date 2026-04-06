@@ -42,6 +42,13 @@
   .tnum {
     font-variant-numeric: tabular-nums;
   }
+  /* Currency symbol alignment — keeps $ flush at top when paired with large numbers */
+  .currency-symbol {
+    line-height: 1;
+    align-self: flex-start;
+    padding-top: 0.1em;
+  }
+
   .btn-tactile {
     @apply relative transition-all duration-200 active:translate-y-[1px];
     box-shadow: var(--shadow-tactile);

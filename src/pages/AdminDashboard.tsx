@@ -17,21 +17,15 @@ export default function AdminDashboard() {
   const [isSavingBroadcast, setIsSavingBroadcast] = useState(false);
   const [profiles, setProfiles] = useState<any[]>([]);
   
-  // Dummy admin metrics for the HUD
+  // Live metrics from Supabase
   const metrics = [
-    { label: "TOTAL USERS", value: "1,204", status: "STABLE", color: "text-emerald-500" },
-    { label: "SERVER SPEED", value: "32ms", status: "FAST", color: "text-emerald-500" },
-    { label: "LOGIN SUCCESS RATE", value: "98%", status: "NORMAL", color: "text-emerald-500" },
-    { label: "BANK SYNC ERRORS", value: "3", status: "NEEDS REVIEW", color: "text-amber-500" },
+    { label: "TOTAL USERS", value: profiles.length > 0 ? profiles.length.toLocaleString() : "—", status: "LIVE", color: "text-emerald-500" },
+    { label: "SERVER SPEED", value: "—", status: "MONITORING", color: "text-zinc-500" },
+    { label: "LOGIN SUCCESS RATE", value: "—", status: "MONITORING", color: "text-zinc-500" },
+    { label: "BANK SYNC ERRORS", value: "—", status: "MONITORING", color: "text-zinc-500" },
   ];
 
-  const recentLogs = [
-    { time: "02:18:44", level: "INFO", message: "User vladimir@example.com logged in successfully." },
-    { time: "02:15:22", level: "WARN", message: "Bank sync took too long for a user using Chase." },
-    { time: "01:05:01", level: "INFO", message: "Daily bank data check finished. 441 new transactions found." },
-    { time: "00:45:10", level: "ERROR", message: "Background task crashed while trying to sort data." },
-    { time: "00:42:00", level: "INFO", message: "Nightly database clean-up complete." },
-  ];
+  const recentLogs: { time: string; level: string; message: string }[] = [];
 
   useEffect(() => {
     const timer = setInterval(() => setSystemTime(new Date()), 1000);
@@ -258,20 +252,12 @@ export default function AdminDashboard() {
               <div className="space-y-4 flex-1">
                 <div>
                   <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1">Monthly Revenue</p>
-                  <p className="text-xl font-bold text-white">$4,250.00 <span className="text-[11px] text-emerald-500 font-normal">+12%</span></p>
+                  <p className="text-xl font-bold text-white">— <span className="text-[11px] text-zinc-600 font-normal">No billing integration yet</span></p>
                 </div>
                 <div className="space-y-2 text-[11px]">
                   <div className="flex justify-between items-center pb-2 border-b border-white/5">
-                    <span className="text-zinc-500">Free to PRO Upgrade Rate</span>
-                    <span className="text-emerald-400">8.4%</span>
-                  </div>
-                  <div className="flex justify-between items-center pb-2 border-b border-white/5">
-                    <span className="text-zinc-500">Failed Card Payments</span>
-                    <span className="text-rose-500">2</span>
-                  </div>
-                  <div className="flex justify-between items-center pb-2 border-b border-white/5">
-                    <span className="text-zinc-500">Paying Users</span>
-                    <span className="text-white">425</span>
+                    <span className="text-zinc-500">Total Accounts</span>
+                    <span className="text-white">{profiles.length}</span>
                   </div>
                 </div>
               </div>
@@ -306,8 +292,7 @@ export default function AdminDashboard() {
                   <Bot className="w-4 h-4" /> Security Warnings
                 </h2>
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-rose-500 font-bold">1 Suspicious Account</span>
-                  <button className="text-zinc-500 hover:text-white underline">Review</button>
+                  <span className="text-zinc-500">No flags detected</span>
                 </div>
               </div>
               <div className="p-5 flex-1">
@@ -315,20 +300,7 @@ export default function AdminDashboard() {
                   <LifeBuoy className="w-4 h-4" /> User Support Requests
                 </h2>
                 <div className="space-y-3">
-                  <div className="flex justify-between items-start text-[11px]">
-                    <div>
-                      <span className="text-indigo-400 font-bold">Email from John</span>
-                      <p className="text-white mt-1">"My bank won't connect..."</p>
-                    </div>
-                    <span className="text-xs text-amber-500 mt-1">Waiting on you</span>
-                  </div>
-                  <div className="flex justify-between items-start text-[11px]">
-                    <div>
-                      <span className="text-indigo-400 font-bold">Email from Sarah</span>
-                      <p className="text-white mt-1">"Cannot delete my budget..."</p>
-                    </div>
-                    <span className="text-xs text-zinc-600 mt-1">Fixed</span>
-                  </div>
+                  <p className="text-[11px] text-zinc-600">No open support tickets.</p>
                 </div>
               </div>
             </div>
@@ -368,10 +340,6 @@ export default function AdminDashboard() {
               </h2>
               <div className="space-y-3">
                 <div className="flex justify-between items-center bg-white/5 p-2 rounded-sm border border-white/5">
-                  <span className="text-[11px] font-bold text-white">Chase Bank</span>
-                  <span className="text-[10px] text-emerald-500 font-mono flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Working Fine</span>
-                </div>
-                <div className="flex justify-between items-center bg-rose-500/10 p-2 rounded-sm border border-rose-500/20 group">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className={`w-3.5 h-3.5 ${isPlaidEnabled ? 'text-amber-500' : 'text-rose-500'}`} />
                     <span className={`text-[11px] font-bold ${isPlaidEnabled ? 'text-amber-400' : 'text-rose-400'}`}>Plaid Global API</span>
@@ -380,10 +348,7 @@ export default function AdminDashboard() {
                      {isPlaidEnabled ? 'Turn Off' : 'Turn On'}
                   </button>
                 </div>
-                <div className="flex justify-between items-center bg-white/5 p-2 rounded-sm border border-white/5">
-                  <span className="text-[11px] font-bold text-white">Bank of America</span>
-                  <span className="text-[10px] text-emerald-500 font-mono flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Working Fine</span>
-                </div>
+                <p className="text-[10px] text-zinc-600">Individual bank status requires live Plaid webhook integration.</p>
               </div>
             </div>
 
@@ -394,11 +359,11 @@ export default function AdminDashboard() {
                   <Coins className="w-4 h-4" /> Smart Feature Daily Cost
                 </h2>
                 <div className="flex items-end justify-between border-b border-white/5 pb-2">
-                  <span className="text-xl font-mono text-cyan-400">$12.44 <span className="text-[10px] text-zinc-500">spent today</span></span>
+                  <span className="text-xl font-mono text-cyan-400">— <span className="text-[10px] text-zinc-500">not connected</span></span>
                   <span className="text-[10px] text-zinc-500">Limit: $50/day</span>
                 </div>
                 <div className="w-full bg-white/5 h-1 mt-2 rounded-full overflow-hidden">
-                  <div className="bg-cyan-500 h-full w-[25%]" />
+                  <div className="bg-cyan-500 h-full w-0" />
                 </div>
               </div>
 
@@ -426,8 +391,8 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-mono font-bold text-white tracking-widest">4,091</p>
-                <p className="text-[10px] text-emerald-500 font-bold uppercase">Processing fast</p>
+                <p className="text-2xl font-mono font-bold text-white tracking-widest">—</p>
+                <p className="text-[10px] text-zinc-600 font-bold uppercase">Not connected</p>
               </div>
             </div>
 

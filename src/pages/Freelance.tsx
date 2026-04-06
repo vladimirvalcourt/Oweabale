@@ -84,7 +84,7 @@ export default function Freelance() {
       }
 
       if (capturedWriteOffs > 0) {
-        toast.success(`Deduction Scoured: Found $${capturedWriteOffs.toFixed(2)} in write-offs`);
+        toast.success(`We found $${capturedWriteOffs.toFixed(2)} in tax deductions`);
       }
 
       setFormData({
@@ -148,7 +148,7 @@ export default function Freelance() {
     });
     setFormData({ client: '', amount: '', date: new Date().toISOString().split('T')[0], scouredWriteOffs: 0 });
     setIsAddModalOpen(false);
-    toast.success('Inflow logged and shielded');
+    toast.success('Payment saved successfully');
   };
 
   return (
@@ -215,7 +215,7 @@ export default function Freelance() {
                     <div className="px-6 py-20 text-center flex flex-col items-center">
                        <Zap className="w-12 h-12 text-zinc-700 mb-4" />
                        <p className="text-zinc-500 font-mono text-xs uppercase tracking-widest leading-relaxed max-w-xs">
-                         NO RECENT GIG INFLOWS DETECTED. START LOGGING YOUR WEEKLY EARNINGS TO CALCULATE SHIELD REQUIREMENTS.
+                         NO PAYMENTS LOGGED YET. START ADDING YOUR EARNINGS TO SEE HOW MUCH TO SET ASIDE FOR TAXES.
                        </p>
                     </div>
                   ) : (
@@ -232,10 +232,10 @@ export default function Freelance() {
                               </p>
                               <div className="pt-2 flex flex-wrap gap-2">
                                  <span className="text-[9px] font-mono text-rose-500 border border-rose-500/20 px-1.5 py-0.5 rounded-sm">TAX: -${entry.totalLiability.toFixed(0)}</span>
-                                 <span className="text-[9px] font-mono text-emerald-400 border border-emerald-400/20 px-1.5 py-0.5 rounded-sm">REAL: +${entry.profit.toFixed(0)}</span>
+                                 <span className="text-[9px] font-mono text-emerald-400 border border-emerald-400/20 px-1.5 py-0.5 rounded-sm">YOU KEEP: +${entry.profit.toFixed(0)}</span>
                                  {entry.scouredWriteOffs && entry.scouredWriteOffs > 0 && (
                                    <span className="text-[9px] font-mono bg-brand-indigo/20 text-brand-indigo border border-brand-indigo/30 px-1.5 py-0.5 rounded-sm flex items-center gap-1">
-                                     <ShieldCheck className="w-3 h-3" /> TAX SHIELD: ${entry.scouredWriteOffs.toFixed(0)} SAVED
+                                     <ShieldCheck className="w-3 h-3" /> DEDUCTIONS: ${entry.scouredWriteOffs.toFixed(0)} SAVED
                                    </span>
                                  )}
                               </div>
@@ -244,9 +244,9 @@ export default function Freelance() {
 
                         <div className="flex items-center gap-4">
                            <div className="text-right">
-                              <p className="text-[9px] font-mono text-zinc-600 uppercase mb-1">State Efficiency</p>
+                              <p className="text-[9px] font-mono text-zinc-600 uppercase mb-1">% You Keep</p>
                               <div className="w-24 bg-surface-base h-1 rounded-none overflow-hidden">
-                                 <div className="bg-brand-indigo h-full" style={{ width: `${(entry.profit / entry.amount) * 100}%` }} />
+                                 <div className="bg-brand-violet h-full" style={{ width: `${(entry.profit / entry.amount) * 100}%` }} />
                               </div>
                            </div>
                            <button 
@@ -267,15 +267,15 @@ export default function Freelance() {
 
         <div className="space-y-6">
            <div className="bg-surface-raised border border-surface-border p-6 rounded-none">
-              <div className="flex items-center gap-2 text-brand-indigo mb-4">
-                 <Zap className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-content-tertiary mb-4">
+                 <Zap className="w-4 h-4 text-brand-violet" />
                  <h3 className="text-xs font-mono font-black uppercase tracking-[0.2em]">Freelance Tips</h3>
               </div>
               <div className="space-y-6">
                  <div className="border-l-2 border-brand-violet pl-4">
-                    <p className="text-[10px] font-mono font-bold text-white uppercase mb-1">Self-Employment Tax</p>
+                    <p className="text-[10px] font-mono font-bold text-white uppercase mb-1">Self-Employment Tax (15.3%)</p>
                     <p className="text-[10px] font-mono text-zinc-500 uppercase leading-relaxed tracking-tighter">
-                      Oweable has set aside 15.3% for Self-Employment tax. This is your largest mandatory cost.
+                      Oweable sets aside 15.3% from each payment for your self-employment tax bill — so you're never caught off guard.
                     </p>
                  </div>
                  <div className="border-l-2 border-brand-violet pl-4">
@@ -287,19 +287,26 @@ export default function Freelance() {
               </div>
            </div>
 
-           <div className="bg-brand-indigo p-6 rounded-none shadow-[0_35px_60px_-15px_rgba(99,102,241,0.3)]">
-              <h3 className="text-xs font-mono font-black text-white uppercase tracking-[0.2em] mb-4">Weekly Summary</h3>
-              <div className="space-y-3">
-                 <div className="flex justify-between items-center bg-black/10 p-2 border border-white/10">
-                    <span className="text-[9px] font-mono text-white opacity-60 uppercase">Real Money Kept</span>
-                    <span className="text-sm font-mono text-white font-bold">${entriesWithMath.reduce((s, e) => s + e.profit, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+           <div className="bg-surface-raised border border-surface-border p-6 rounded-none">
+              <div className="flex items-center gap-2 mb-5">
+                 <div className="w-1.5 h-1.5 bg-emerald-500" />
+                 <h3 className="text-xs font-mono font-black text-content-primary uppercase tracking-[0.2em]">Weekly Summary</h3>
+              </div>
+              <div className="space-y-2">
+                 <div className="flex justify-between items-center bg-surface-elevated border border-surface-border p-3">
+                    <span className="text-[9px] font-mono text-content-tertiary uppercase tracking-widest">Take-Home Pay</span>
+                    <span className="text-sm font-mono text-emerald-400 font-bold">${entriesWithMath.reduce((s, e) => s + e.profit, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                  </div>
-                 <div className="flex justify-between items-center bg-black/10 p-2 border border-white/10">
-                    <span className="text-[9px] font-mono text-white opacity-60 uppercase">Taxes Owed</span>
-                    <span className="text-sm font-mono text-white font-bold">${entriesWithMath.reduce((s, e) => s + e.totalLiability, 0) .toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                 <div className="flex justify-between items-center bg-surface-elevated border border-surface-border p-3">
+                    <span className="text-[9px] font-mono text-content-tertiary uppercase tracking-widest">Taxes Owed</span>
+                    <span className="text-sm font-mono text-rose-400 font-bold">${entriesWithMath.reduce((s, e) => s + e.totalLiability, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                 </div>
+                 <div className="flex justify-between items-center bg-surface-elevated border border-surface-border p-3">
+                    <span className="text-[9px] font-mono text-content-tertiary uppercase tracking-widest">Total Earned</span>
+                    <span className="text-sm font-mono text-content-primary font-bold">${entriesWithMath.reduce((s, e) => s + e.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                  </div>
               </div>
-              <p className="text-[9px] font-mono text-white/50 mt-4 uppercase leading-relaxed">
+              <p className="text-[9px] font-mono text-content-muted mt-4 uppercase leading-relaxed border-t border-surface-border pt-4">
                 'Saved' confirms you have physically moved these funds to a separate bank account.
               </p>
            </div>

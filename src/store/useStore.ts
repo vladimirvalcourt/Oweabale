@@ -224,8 +224,7 @@ interface AppState {
   deleteFreelanceEntry: (id: string) => Promise<void>;
   updateUser: (user: Partial<AppState['user']>) => Promise<void>;
   deleteAccount: () => Promise<void>;
-  seedData: () => void;
-  
+
   // Ingestion Actions
   addPendingIngestion: (ingestion: Omit<PendingIngestion, 'id'>) => string;
   updatePendingIngestion: (id: string, updates: Partial<PendingIngestion>) => void;
@@ -803,8 +802,7 @@ export const useStore = create<AppState>((set, get) => ({
     }
     set({ bills: [], debts: [], transactions: [], assets: [], subscriptions: [], goals: [], incomes: [], budgets: [], categories: [], citations: [], deductions: [], freelanceEntries: [], user: { id: '', firstName: '', lastName: '', email: '' } });
   },
-  seedData: () => set(initialData),
-  
+
   // Ingestion Implementation
   addPendingIngestion: (ingestion) => {
     const id = Math.random().toString(36).substr(2, 9);

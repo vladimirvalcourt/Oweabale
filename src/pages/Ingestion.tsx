@@ -260,9 +260,9 @@ export default function Ingestion() {
                       {item.originalFile?.type?.includes('image') ? <FileText className="w-5 h-5 text-indigo-400" /> : <FileText className="w-5 h-5 text-zinc-500" />}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-mono font-bold text-content-primary truncate">{item.extractedData.biller || item.extractedData.name || item.originalFile?.name || 'Inbound Asset'}</p>
+                      <p className="text-xs font-mono font-bold text-content-primary truncate">{item.extractedData.biller || item.extractedData.name || item.originalFile?.name || 'Uploaded File'}</p>
                       <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest mt-1">
-                        {item.originalFile?.size ? (item.originalFile.size / 1024).toFixed(1) + ' KB' : 'SCAN_RESULT'}
+                        {item.originalFile?.size ? (item.originalFile.size / 1024).toFixed(1) + ' KB' : 'SCANNED'}
                       </p>
                     </div>
                   </div>
@@ -279,24 +279,24 @@ export default function Ingestion() {
                           <>
                             <Loader2 className="w-3 h-3 text-indigo-500 animate-spin" />
                             <span className="text-[9px] font-mono font-black text-indigo-500 uppercase tracking-widest leading-none">
-                              {item.status.replace('scanning', '').trim() || 'Scrubbing...'}
+                              {item.status.replace('scanning', '').trim() || 'Reading...'}
                             </span>
                           </>
                         ) : item.status === 'ready' ? (
                           <>
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-glow-emerald" />
-                            <span className="text-[9px] font-mono font-black text-emerald-500 uppercase tracking-widest">Validated</span>
+                            <span className="text-[9px] font-mono font-black text-emerald-500 uppercase tracking-widest">Ready to Save</span>
                           </>
                         ) : (
                           <>
                             <AlertCircle className="w-3 h-3 text-rose-500" />
-                            <span className="text-[9px] font-mono font-black text-rose-500 uppercase tracking-widest">Correction Req.</span>
+                            <span className="text-[9px] font-mono font-black text-rose-500 uppercase tracking-widest">Needs Review</span>
                           </>
                         )}
                       </div>
                       {item.storagePath && (
                         <span className="text-[8px] font-mono text-sky-600 uppercase tracking-widest flex items-center gap-1">
-                          <CloudUpload className="w-2.5 h-2.5" /> Vaulted
+                          <CloudUpload className="w-2.5 h-2.5" /> Backed Up
                         </span>
                       )}
                     </div>
@@ -357,11 +357,11 @@ export default function Ingestion() {
                         <div className="bg-surface-raised border border-surface-border flex flex-col min-h-[400px]">
                           <div className="px-4 py-2 border-b border-surface-border flex justify-between items-center bg-surface-elevated/50">
                             <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest font-bold flex items-center gap-2">
-                              <FileText className="w-3 h-3" /> Digital Copy
+                              <FileText className="w-3 h-3" /> Document Preview
                               {item.storagePath && (
                                 <span className="text-[8px] text-sky-500 flex items-center gap-1">
-                                  <CloudUpload className="w-2.5 h-2.5" /> Secure Vault
-                                </span>
+                                <CloudUpload className="w-2.5 h-2.5" /> Saved
+                              </span>
                               )}
                             </span>
                             {item.storageUrl && (

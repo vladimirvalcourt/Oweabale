@@ -152,7 +152,7 @@ export default function Income() {
           <div className="w-12 h-12 border border-surface-border bg-surface-elevated rounded-none flex items-center justify-center mb-4">
             <Vault className="w-5 h-5 text-zinc-500" />
           </div>
-          <h2 className="text-sm font-mono font-bold tracking-widest uppercase text-content-primary mb-2">No Income Sources Detected</h2>
+          <h2 className="text-sm font-mono font-bold tracking-widest uppercase text-content-primary mb-2">No income added yet</h2>
           <motion.button 
             whileTap={{ scale: 0.95 }}
             onClick={openAddModal}
@@ -166,7 +166,7 @@ export default function Income() {
         <>
           {/* Overview Stats */}
           <CollapsibleModule 
-            title="Revenue Overview" 
+            title="Income Overview" 
             icon={TrendingUp}
             extraHeader={<span className="text-xs font-mono text-content-primary font-bold">${totalMonthlyIncome.toLocaleString()} /mo</span>}
           >
@@ -193,7 +193,7 @@ export default function Income() {
           </CollapsibleModule>
 
           {/* Income Sources List */}
-          <CollapsibleModule title="Inflow Strategy" icon={Vault}>
+          <CollapsibleModule title="Your Income Sources" icon={Vault}>
             <motion.div 
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 -mx-6 -my-6 p-6"
               initial="hidden"
@@ -220,7 +220,7 @@ export default function Income() {
                       <div>
                         <h3 className="text-sm font-medium text-content-primary">{income.name}</h3>
                         <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-1 flex items-center gap-1.5">
-                          {income.category} {income.isTaxWithheld ? '· W-2/WITHHELD' : '· GROSS/GIG'}
+                          {income.category} {income.isTaxWithheld ? '· W-2 (Taxes Withheld)' : '· Self-Employed'}
                         </p>
                       </div>
                     </div>
@@ -400,7 +400,7 @@ export default function Income() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Tax Provisioning</label>
+                <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Tax Handling</label>
                 <div className="flex items-center gap-4 bg-surface-base border border-surface-border p-3 rounded-sm">
                   <input 
                     type="checkbox"
@@ -410,7 +410,7 @@ export default function Income() {
                   />
                   <div className="flex-1">
                     <p className="text-[10px] font-mono font-bold text-content-primary uppercase tracking-widest">Taxes Already Withheld</p>
-                    <p className="text-[10px] font-mono text-zinc-500 mt-1 uppercase tracking-tight">IF UNCHECKED, OWEABLE WILL AUTOMATICALLY RESERVE 25% FOR TAX SEASON.</p>
+                    <p className="text-[10px] font-mono text-zinc-500 mt-1 uppercase tracking-tight">IF UNCHECKED, OWEABLE WILL AUTOMATICALLY SET ASIDE 25% FOR TAXES.</p>
                   </div>
                 </div>
               </div>
@@ -420,7 +420,7 @@ export default function Income() {
                   type="submit"
                   className="w-full bg-content-primary hover:bg-zinc-200 text-surface-base rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-colors py-3 focus:outline-none"
                 >
-                  {isEditModalOpen ? 'SAVE' : 'EXECUTE'}
+                  {isEditModalOpen ? 'SAVE CHANGES' : 'ADD INCOME'}
                 </button>
               </div>
             </form>
@@ -442,12 +442,12 @@ export default function Income() {
             
             <form onSubmit={handleDepositSubmit} className="p-6 space-y-4">
               <div className="bg-surface-elevated rounded-sm p-4 border border-surface-border">
-                <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Target Source</p>
+                <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Income Source</p>
                 <p className="text-sm font-mono font-bold text-content-primary">{selectedIncome?.name}</p>
               </div>
 
               <div>
-                <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Amount Captured</label>
+                <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Amount Received ($)</label>
                 <div className="relative">
                   <span className="absolute left-3 top-2 text-zinc-500 font-mono">$</span>
                   <input 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, Twitter, Github, Linkedin, Plus, Minus } from 'lucide-react';
+import Footer from '../components/Footer';
+import { Check, Plus, Minus } from 'lucide-react';
 
 function useInView(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
@@ -271,65 +272,8 @@ export default function Pricing() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-surface-base border-t border-surface-border pt-20 pb-10">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-            <div className="col-span-1">
-              <Link to="/" className="font-black text-xl tracking-[0.2em] text-content-primary block mb-4">
-                OWEABLE
-              </Link>
-              <p className="text-zinc-400 text-sm leading-relaxed max-w-xs">
-                The command center for your financial future.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-semibold mb-4">Product</h4>
-              <ul className="space-y-3 text-sm text-zinc-400">
-                <li><Link to="/#features" className="hover:text-white transition-colors">Features</Link></li>
-                <li><Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
-                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-semibold mb-4">Resources</h4>
-              <ul className="space-y-3 text-sm text-zinc-400">
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-semibold mb-4">Company</h4>
-              <ul className="space-y-3 text-sm text-zinc-400">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="pt-8 border-t border-surface-border flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-zinc-500">
-              &copy; {new Date().getFullYear()} Oweable Inc. All rights reserved.
-            </p>
-            <div className="flex items-center gap-4 text-zinc-500">
-              <a href="#" className="hover:text-white transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                <Github className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                <Linkedin className="w-5 h-5" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
+

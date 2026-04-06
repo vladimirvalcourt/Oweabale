@@ -1,9 +1,11 @@
 import React from 'react';
 import { Shield, Lock, Eye, FileText, ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Footer from '../components/Footer';
 
 export default function Privacy() {
   return (
+    <>
     <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-brand-violet/30">
       <div className="max-w-3xl mx-auto">
         <Link to="/" className="inline-flex items-center gap-2 text-content-tertiary hover:text-brand-violet transition-colors mb-12 font-mono text-[10px] uppercase tracking-widest">
@@ -52,10 +54,9 @@ export default function Privacy() {
           </section>
         </div>
 
-        <footer className="mt-24 pt-12 border-t border-surface-border font-mono text-[10px] text-content-muted uppercase tracking-[0.2em]">
-          End of Privacy Protocol // Oweable Inc.
-        </footer>
       </div>
     </div>
+    <Footer />
+    </>
   );
 }

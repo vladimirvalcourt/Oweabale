@@ -605,7 +605,7 @@ export default function Settings() {
                   </div>
                   <div className="pt-6 border-t border-surface-border">
                     <h4 className="text-sm font-medium text-content-primary">Privacy Policy</h4>
-                    <p className="text-xs text-zinc-500 mt-1">We use bank-grade encryption to protect your data. We never sell your personal financial information to third parties. Read our full <a href="#" className="text-indigo-500 hover:underline">Privacy Policy</a>.</p>
+                    <p className="text-xs text-zinc-500 mt-1">We use bank-grade encryption to protect your data. We never sell your personal financial information to third parties. Read our full <a href="/privacy" className="text-indigo-500 hover:underline">Privacy Policy</a>.</p>
                   </div>
                 </div>
               </CollapsibleModule>

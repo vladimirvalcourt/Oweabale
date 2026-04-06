@@ -229,13 +229,13 @@ export default function Obligations() {
                       strategy === s ? 'bg-indigo-600 text-white' : 'text-zinc-500 hover:text-zinc-300'
                     }`}
                   >
-                    {s === 'avalanche' ? '⚡ Avalanche' : '❄️ Snowball'}
+                    {s === 'avalanche' ? '⚡ Highest Interest First' : '❄️ Smallest Debt First'}
                   </button>
                 ))}
               </div>
               <div className="flex items-center gap-3 bg-surface-base border border-surface-border rounded-sm px-3 py-1.5">
                 <Calculator className="w-3.5 h-3.5 text-zinc-500" />
-                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Extra/mo:</span>
+                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Extra per month:</span>
                 <button onClick={() => setExtraPayment(e => Math.max(0, e - 100))} className="text-zinc-500 hover:text-white"><Minus className="w-3 h-3" /></button>
                 <span className="text-sm font-mono text-content-primary w-16 text-center">${extraPayment}</span>
                 <button onClick={() => setExtraPayment(e => e + 100)} className="text-zinc-500 hover:text-white"><Plus className="w-3 h-3" /></button>
@@ -256,13 +256,13 @@ export default function Obligations() {
               <div className="bg-surface-elevated border border-emerald-500/20 rounded-sm p-4">
                 <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mb-1">Interest Saved</p>
                 <p className="text-lg font-mono font-bold text-emerald-400">${interestSaved.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
-                <p className="text-[10px] font-mono text-zinc-600">vs. min-only</p>
+                <p className="text-[10px] font-mono text-zinc-600">vs. minimum payments only</p>
               </div>
             </div>
 
             {/* Per-debt timeline bars */}
             <div className="space-y-4">
-              <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Payoff Order — {strategy === 'avalanche' ? 'Highest APR First' : 'Lowest Balance First'}</p>
+              <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Payoff Order — {strategy === 'avalanche' ? 'Highest Interest First' : 'Smallest Balance First'}</p>
               {[...debts]
                 .sort((a, b) => strategy === 'avalanche' ? b.apr - a.apr : a.remaining - b.remaining)
                 .map((d, i) => {
@@ -274,7 +274,7 @@ export default function Obligations() {
                         <div className="flex items-center gap-2">
                           <span className="w-5 h-5 bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 text-[10px] font-mono font-bold flex items-center justify-center rounded-sm">{i + 1}</span>
                           <span className="text-sm text-content-primary">{d.name}</span>
-                          <span className="text-[10px] font-mono text-zinc-600 border border-surface-border px-1.5 py-0.5 rounded-sm">{d.apr}% APR</span>
+                          <span className="text-[10px] font-mono text-zinc-600 border border-surface-border px-1.5 py-0.5 rounded-sm">{d.apr}% interest rate</span>
                         </div>
                         <span className="text-xs font-mono text-zinc-400">${d.remaining.toLocaleString()} left</span>
                       </div>

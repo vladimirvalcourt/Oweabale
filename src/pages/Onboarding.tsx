@@ -182,15 +182,16 @@ export default function Onboarding() {
                 
                 {currentStep.id === 'assets' && (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-surface-border group-focus-within:border-brand-violet transition-all">
-                      <span className="text-zinc-600 font-mono text-2xl mb-1">$</span>
+                    <div className="flex items-end border-b border-surface-border group-focus-within:border-brand-violet transition-all">
+                      <span className="text-zinc-500 font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
                       <input 
                         autoFocus
-                        type="number" 
+                        type="text"
+                        inputMode="decimal"
                         placeholder="0.00"
                         value={formData.cash}
                         onChange={e => setFormData({...formData, cash: e.target.value})}
-                        className="w-full bg-transparent py-4 text-5xl font-mono text-white placeholder-zinc-900 outline-none tnum leading-none"
+                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder-zinc-900 outline-none tnum leading-none"
                       />
                     </div>
                     <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest pt-1">Current Balances // Liquid Assets Only</p>
@@ -199,15 +200,16 @@ export default function Onboarding() {
 
                 {currentStep.id === 'obligations' && (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 border-b border-surface-border group-focus-within:border-brand-violet transition-all">
-                      <span className="text-zinc-600 font-mono text-2xl mb-1">$</span>
+                    <div className="flex items-end border-b border-surface-border group-focus-within:border-brand-violet transition-all">
+                      <span className="text-zinc-500 font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
                       <input 
                         autoFocus
-                        type="number" 
+                        type="text"
+                        inputMode="decimal"
                         placeholder="0.00"
                         value={formData.bills}
                         onChange={e => setFormData({...formData, bills: e.target.value})}
-                        className="w-full bg-transparent py-4 text-5xl font-mono text-white placeholder-zinc-900 outline-none tnum leading-none"
+                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder-zinc-900 outline-none tnum leading-none"
                       />
                     </div>
                     <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest pt-1">Monthly Fixed Outflow // Rent, Subscriptions, Debt Mins</p>
@@ -216,20 +218,21 @@ export default function Onboarding() {
 
                 {currentStep.id === 'velocity' && (
                   <div className="space-y-6">
-                    <div className="flex items-center gap-2 border-b border-surface-border group-focus-within:border-brand-violet transition-all">
-                      <span className="text-zinc-600 font-mono text-2xl mb-1">$</span>
+                    <div className="flex items-end border-b border-surface-border group-focus-within:border-brand-violet transition-all">
+                      <span className="text-zinc-500 font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
                       <input 
                         autoFocus
-                        type="number" 
+                        type="text"
+                        inputMode="decimal"
                         placeholder="0.00"
                         value={formData.dailyLimit}
                         onChange={e => setFormData({...formData, dailyLimit: e.target.value})}
-                        className="w-full bg-transparent py-4 text-5xl font-mono text-white placeholder-zinc-900 outline-none tnum leading-none"
+                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder-zinc-900 outline-none tnum leading-none"
                       />
                     </div>
                     <div className="border border-surface-border p-3 bg-black/40">
-                       <span className="text-[9px] font-mono text-amber-500 uppercase tracking-widest block mb-1 font-bold">Velocity Alert Threshold:</span>
-                       <p className="text-[9px] font-mono text-zinc-500 uppercase leading-relaxed">The system will monitor rolling 72H spending against this benchmark.</p>
+                       <span className="text-[9px] font-mono text-amber-500 uppercase tracking-widest block mb-1 font-bold">Daily Spending Limit:</span>
+                       <p className="text-[9px] font-mono text-zinc-500 uppercase leading-relaxed">Oweable will track your 3-day spending and alert you if you're going over this amount.</p>
                     </div>
                   </div>
                 )}
@@ -238,17 +241,17 @@ export default function Onboarding() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button 
                       onClick={() => setFormData({...formData, focus: 'stacking'})}
-                      className={`p-5 border transition-all text-left group ${formData.focus === 'stacking' ? 'bg-brand-indigo text-white border-brand-violet shadow-glow-indigo' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
+                      className={`p-5 border transition-all text-left group ${formData.focus === 'stacking' ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
                     >
-                      <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Wealth Stacking</h3>
+                      <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Save & Grow</h3>
                       <p className="text-[9px] font-mono uppercase leading-relaxed opacity-60">Focus on growth trajectory and asset accumulation.</p>
                     </button>
 
                     <button 
                       onClick={() => setFormData({...formData, focus: 'detonation'})}
-                      className={`p-5 border transition-all text-left group ${formData.focus === 'detonation' ? 'bg-rose-600 text-white border-rose-500 shadow-[0_0_20px_rgba(225,29,72,0.2)]' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
+                      className={`p-5 border transition-all text-left group ${formData.focus === 'detonation' ? 'bg-surface-elevated text-white border-rose-500' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
                     >
-                      <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Debt Detonation</h3>
+                      <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Pay Off Debt Fast</h3>
                       <p className="text-[9px] font-mono uppercase leading-relaxed opacity-60">Focus on highest APR targets and accelerated repayment.</p>
                     </button>
                   </div>
@@ -258,13 +261,13 @@ export default function Onboarding() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button 
                       onClick={() => setFormData({...formData, freelance: true})}
-                      className={`p-5 border transition-all text-left group ${formData.freelance ? 'bg-brand-indigo text-white border-brand-violet shadow-glow-indigo' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
+                      className={`p-5 border transition-all text-left group ${formData.freelance ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest">Independent Contractor</h3>
                         <Shield className="w-3 h-3 opacity-50" />
                       </div>
-                      <p className="text-[9px] font-mono uppercase leading-relaxed opacity-60 text-current">Enables Tax Shield, SE Tax automation, and Statement Scanning.</p>
+                      <p className="text-[9px] font-mono uppercase leading-relaxed opacity-60 text-current">Activates tax tracking for freelancers, automatically sets aside your tax amount, and lets you scan income statements.</p>
                     </button>
 
                     <button 

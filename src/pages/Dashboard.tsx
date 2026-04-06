@@ -295,7 +295,7 @@ export default function Dashboard() {
         <div className="bg-surface-raised border border-surface-border p-6 rounded-sm shadow-sm md:flex md:flex-col md:justify-between">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <p className="text-xs font-mono text-zinc-400 uppercase tracking-widest mb-1">Estimated Runway</p>
+              <p className="text-xs font-mono text-zinc-400 uppercase tracking-widest mb-1">How long your money lasts</p>
               <h2 className="text-6xl sm:text-7xl font-mono font-bold text-white tracking-tighter tabular-nums leading-none">
                 <AnimatedValue value={survivalMonths} decimals={1} />
                 <span className="text-xl font-sans text-zinc-500 font-medium ml-2 uppercase tracking-wide">Months</span>
@@ -309,7 +309,7 @@ export default function Dashboard() {
               <p className="text-xl font-mono text-emerald-400 font-medium">${liquidCash.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1">Monthly Burn</p>
+              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1">Monthly Expenses</p>
               <p className="text-xl font-mono text-white font-medium">${Math.round(monthlyBurn).toLocaleString()}</p>
             </div>
           </div>
@@ -327,7 +327,7 @@ export default function Dashboard() {
             </div>
             <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
               <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                Tax Reserve <ShieldCheck className="w-3 h-3 text-indigo-400" />
+                Tax Savings <ShieldCheck className="w-3 h-3 text-indigo-400" />
               </p>
               <p className="text-3xl font-mono text-indigo-400 font-semibold tabular-nums">-$<AnimatedValue value={cashFlow.taxReserve} /></p>
             </div>
@@ -339,7 +339,7 @@ export default function Dashboard() {
       </div>
 
       {/* 4. Active Intelligence Grid */}
-      <h2 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400 pl-1 mt-8 mb-3">Intelligence Subsystems</h2>
+      <h2 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400 pl-1 mt-8 mb-3">Smart Alerts</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Tax Shield */}
@@ -351,7 +351,7 @@ export default function Dashboard() {
               </div>
               <span className="text-[10px] font-mono bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded uppercase tracking-widest font-semibold border border-indigo-500/20">Active</span>
             </div>
-            <h3 className="text-sm font-sans font-semibold text-white mb-1">Deduction Finder</h3>
+            <h3 className="text-sm font-sans font-semibold text-white mb-1">Tax Deduction Finder</h3>
             <p className="text-xs font-sans text-zinc-400 mb-5 leading-relaxed">
               Automatic extraction of valid deductions from freelancer platforms and records.
             </p>
@@ -370,18 +370,18 @@ export default function Dashboard() {
                 <Activity className="w-5 h-5" />
               </div>
               <span className={`text-[10px] font-mono px-2 py-1 rounded uppercase tracking-widest font-semibold border ${burnVelocity.isHighVelocity ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-surface-base text-zinc-400 border-surface-border'}`}>
-                {burnVelocity.status}
+                {burnVelocity.isHighVelocity ? 'HIGH' : burnVelocity.isModerateVelocity ? 'ELEVATED' : 'ON TRACK'}
               </span>
             </div>
-            <h3 className="text-sm font-sans font-semibold text-white mb-1">Spending Pulse (72H)</h3>
+            <h3 className="text-sm font-sans font-semibold text-white mb-1">Recent Spending (Last 3 Days)</h3>
             <p className="text-xs font-sans text-zinc-400 mb-5 leading-relaxed">
-              Monitoring recent transaction velocity to prevent budget drift.
+              Tracks recent spending to help you stay on budget.
             </p>
           </div>
           <div>
             <div className="flex items-baseline gap-2 mb-3">
               <p className="text-3xl font-mono text-white tabular-nums">${burnVelocity.totalSpent.toFixed(0)}</p>
-              <p className="text-xs font-sans text-zinc-500 font-medium">/ {burnVelocity.frequency} logs</p>
+              <p className="text-xs font-sans text-zinc-500 font-medium">/ {burnVelocity.frequency} transactions</p>
             </div>
             {burnVelocity.isHighVelocity && (
               <p className="text-[11px] font-mono text-amber-500 bg-amber-500/5 p-2 rounded border border-amber-500/20">
@@ -399,9 +399,9 @@ export default function Dashboard() {
                 <Flame className="w-5 h-5" />
               </div>
             </div>
-            <h3 className="text-sm font-sans font-semibold text-white mb-1">Debt Eradication Plan</h3>
+            <h3 className="text-sm font-sans font-semibold text-white mb-1">Debt Payoff Plan</h3>
             <p className="text-xs font-sans text-zinc-400 mb-5 leading-relaxed">
-              Avalanche method targets the highest interest rate automatically.
+              Pays off the highest interest debt first to save you the most money.
             </p>
           </div>
           

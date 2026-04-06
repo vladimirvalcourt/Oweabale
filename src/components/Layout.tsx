@@ -552,9 +552,9 @@ export default function Layout() {
               &copy; {new Date().getFullYear()} Oweable Inc. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-sm text-zinc-500">
-              <a href="#" className="hover:text-zinc-300 transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-zinc-300 transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-zinc-300 transition-colors">Security</a>
+              <Link to="/privacy" className="hover:text-zinc-300 transition-colors">Privacy Policy</Link>
+              <Link to="/terms" className="hover:text-zinc-300 transition-colors">Terms of Service</Link>
+              <Link to="/security" className="hover:text-zinc-300 transition-colors">Security</Link>
             </div>
           </div>
         </footer>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Terminal, Activity, FileText, Database, UploadCloud, ShieldCheck, Zap } from 'lucide-react';
+import Footer from '../components/Footer';
+import { ArrowRight, UploadCloud, ShieldCheck, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 function useInView(threshold = 0.15) {
@@ -272,55 +273,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* CTA Footer */}
-      <footer className="border-t border-surface-border bg-surface-raised pt-24 pb-12">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-24">
-            <div className="col-span-1 md:col-span-2">
-              <Link to="/" className="brand-header-text flex items-center gap-2 mb-6">
-                <div className="w-2 h-2 bg-brand-violet shadow-glow-indigo"></div>
-                Oweable
-              </Link>
-              <p className="text-sm text-content-tertiary max-w-sm leading-relaxed mb-8">
-                Autonomous financial infrastructure for the modern worker. Track, save, and protect your profit with bank-grade precision.
-              </p>
-              <div className="flex items-center gap-4">
-                <Link to="/onboarding" className="bg-content-primary text-surface-base px-6 py-3 text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-zinc-200 transition-all">
-                  Get Started
-                </Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-primary mb-6">Platform</h4>
-              <ul className="flex flex-col gap-3 text-xs font-mono text-content-tertiary uppercase tracking-widest">
-                <li><a href="#features" className="hover:text-brand-violet transition-colors">Features</a></li>
-                <li><Link to="/pricing" className="hover:text-brand-violet transition-colors">Pricing</Link></li>
-                <li><Link to="/dashboard" className="hover:text-brand-violet transition-colors">SignIn</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-primary mb-6">Legal</h4>
-              <ul className="flex flex-col gap-3 text-xs font-mono text-content-tertiary uppercase tracking-widest">
-                <li><Link to="/privacy" className="hover:text-brand-violet transition-colors text-left block">Privacy</Link></li>
-                <li><Link to="/terms" className="hover:text-brand-violet transition-colors text-left block">Terms</Link></li>
-                <li><Link to="/security" className="hover:text-brand-violet transition-colors text-left block">Security</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="pt-8 border-t border-surface-border flex flex-col md:flex-row justify-between items-center gap-6">
-            <div className="flex items-center gap-6 text-[10px] font-mono text-content-muted uppercase tracking-widest">
-              <span>OWEABLE INC. NYC</span>
-              <span className="opacity-30">/</span>
-              <span>© {new Date().getFullYear()} ALL RIGHTS RESERVED</span>
-            </div>
-            <div className="flex items-center gap-4 text-content-muted">
-              <Terminal className="w-4 h-4" />
-              <Activity className="w-4 h-4" />
-              <Database className="w-4 h-4" />
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
