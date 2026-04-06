@@ -7,3 +7,9 @@ coverage/
 .env*
 !.env.example
 npm-cache/
+
+# AI tool configs — not part of the project
+.claude/
+.1code/
+.mcp.json
+.gemini/
