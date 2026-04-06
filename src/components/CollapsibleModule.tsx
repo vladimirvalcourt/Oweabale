@@ -18,11 +18,11 @@ export function CollapsibleModule({ title, icon: Icon, children, defaultOpen = t
     <div className={`bg-surface-raised border border-surface-border rounded-sm overflow-hidden flex flex-col ${className}`}>
       <div 
         onClick={() => setIsOpen(!isOpen)}
-        className="px-6 py-3 bg-surface-elevated border-b border-surface-border flex items-center justify-between cursor-pointer group hover:bg-surface-highlight transition-colors"
+        className="px-6 py-3 bg-surface-elevated/80 border-b border-surface-border flex items-center justify-between cursor-pointer group active:translate-y-[1px] hover:bg-surface-highlight transition-all border-t border-t-white/5"
       >
         <div className="flex items-center gap-3">
           {Icon && <Icon className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 transition-colors" />}
-          <h3 className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-zinc-400 group-hover:text-content-primary transition-colors">{title}</h3>
+          <h3 className="brand-header-text group-hover:text-content-primary transition-colors text-[10px]">{title}</h3>
         </div>
         <div className="flex items-center gap-4">
           {!isOpen && extraHeader}
@@ -31,6 +31,7 @@ export function CollapsibleModule({ title, icon: Icon, children, defaultOpen = t
           </div>
         </div>
       </div>
+
       <motion.div
         initial={false}
         animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}

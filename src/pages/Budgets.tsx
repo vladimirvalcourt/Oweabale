@@ -21,24 +21,23 @@ export default function Budgets() {
 
   const expenseCategories = categories.filter(c => c.type === 'expense').map(c => c.name);
 
-  // Calculate spending per category for the current month
-  const currentMonthSpending = useMemo(() => {
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
+  // Calculate spending per category — scoped to the correct period
+  const currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+  const currentYearKey = `${new Date().getFullYear()}`;
 
-    const spending: Record<string, number> = {};
-    
+  const currentMonthSpending = useMemo(() => {
+    const spending: Record<string, { monthly: number; yearly: number }> = {};
+
     transactions.forEach(t => {
       if (t.type === 'expense') {
-        const tDate = new Date(t.date);
-        if (tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear) {
-          spending[t.category] = (spending[t.category] || 0) + t.amount;
-        }
+        if (!spending[t.category]) spending[t.category] = { monthly: 0, yearly: 0 };
+        if (t.date.startsWith(currentMonthKey)) spending[t.category].monthly += t.amount;
+        if (t.date.startsWith(currentYearKey))  spending[t.category].yearly  += t.amount;
       }
     });
     return spending;
-  }, [transactions]);
+  }, [transactions, currentMonthKey, currentYearKey]);
+
 
   const openAddModal = () => {
     setFormData({
@@ -133,11 +132,14 @@ export default function Budgets() {
             variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
           >
             {budgets.map((budget) => {
-              const spent = currentMonthSpending[budget.category] || 0;
+              const spendRecord = currentMonthSpending[budget.category];
+              const spent = budget.period === 'Yearly'
+                ? (spendRecord?.yearly ?? 0)
+                : (spendRecord?.monthly ?? 0);
               const percentage = Math.min(100, (spent / budget.amount) * 100);
               const isOverBudget = spent > budget.amount;
               const isNearLimit = percentage >= 80 && !isOverBudget;
-              
+
               let progressColor = 'bg-indigo-500';
               if (isOverBudget) progressColor = 'bg-red-500';
               else if (isNearLimit) progressColor = 'bg-amber-500';

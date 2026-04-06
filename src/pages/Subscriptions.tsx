@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
-import { Repeat, Plus, Edit2, Trash2, Calendar, DollarSign, TrendingUp, AlertTriangle, X } from 'lucide-react';
+import { Repeat, Plus, Edit2, Trash2, Calendar, Hash, TrendingUp, AlertTriangle, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
@@ -198,7 +198,7 @@ export default function Subscriptions() {
                 <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Frequency</label>
                 <select
                   value={formData.frequency}
-                  onChange={(e) => setFormData({ ...formData, frequency: e.target.value as any })}
+                  onChange={(e) => setFormData({ ...formData, frequency: e.target.value as 'Weekly' | 'Monthly' | 'Yearly' })}
                   className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
                 >
                   <option value="Weekly">Weekly</option>

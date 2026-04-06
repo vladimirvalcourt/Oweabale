@@ -21,6 +21,10 @@ export interface Debt {
   remaining: number;
   minPayment: number;
   paid: number;
+  // Optional amortization fields
+  originalAmount?: number;
+  originationDate?: string;
+  termMonths?: number;
 }
 
 export interface Transaction {
@@ -37,6 +41,10 @@ export interface Asset {
   name: string;
   value: number;
   type: string;
+  // Optional appreciation fields
+  appreciationRate?: number;
+  purchasePrice?: number;
+  purchaseDate?: string;
 }
 
 export interface Subscription {
@@ -67,6 +75,7 @@ export interface IncomeSource {
   category: string;
   nextDate: string;
   status: 'active' | 'paused';
+  isTaxWithheld: boolean; // True for W-2/Salaried, False for Freelance/Gig
 }
 
 export interface Budget {
@@ -104,6 +113,47 @@ export interface Deduction {
   date: string;
 }
 
+export interface FreelanceEntry {
+  id: string;
+  client: string;
+  amount: number;
+  date: string;
+  isVaulted: boolean;
+  scouredWriteOffs?: number;
+}
+
+export interface PendingIngestion {
+  id: string;
+  type: 'bill' | 'debt' | 'transaction' | 'income';
+  status: 'scanning' | 'uploading' | 'ready' | 'error' | string;
+  extractedData: {
+    name?: string;
+    biller?: string;
+    amount?: number;
+    date?: string;
+    dueDate?: string;
+    category?: string;
+    source?: string;
+  };
+  originalFile?: {
+    name: string;
+    size: number;
+    type: string;
+    url?: string;
+  };
+  storagePath?: string;   // Supabase Storage path after upload
+  storageUrl?: string;    // Signed URL for preview (short-lived)
+}
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  timestamp: string;
+  read: boolean;
+}
+
 interface AppState {
   bills: Bill[];
   debts: Debt[];
@@ -116,6 +166,9 @@ interface AppState {
   categories: Category[];
   citations: Citation[];
   deductions: Deduction[];
+  freelanceEntries: FreelanceEntry[];
+  notifications: Notification[];
+  pendingIngestions: PendingIngestion[];
   user: {
     id: string;
     firstName: string;
@@ -123,51 +176,70 @@ interface AppState {
     email: string;
     avatar?: string;
     theme?: string;
+    taxState?: string;
+    taxRate?: number;
+    phone?: string;
+    timezone?: string;
+    language?: string;
   };
+  setTaxSettings: (state: string, rate: number) => void;
   bankConnected: boolean;
-  connectBank: () => void;
+  connectBank: () => Promise<void>;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
   addBill: (bill: Omit<Bill, 'id'>) => void;
   editBill: (id: string, bill: Partial<Bill>) => void;
   deleteBill: (id: string) => void;
   markBillPaid: (id: string) => void;
   addDebt: (debt: Omit<Debt, 'id'>) => void;
-  editDebt: (id: string, debt: Partial<Debt>) => void;
-  deleteDebt: (id: string) => void;
-  addDebtPayment: (id: string, amount: number) => void;
-  addAsset: (asset: Omit<Asset, 'id'>) => void;
-  editAsset: (id: string, asset: Partial<Asset>) => void;
-  deleteAsset: (id: string) => void;
-  addSubscription: (subscription: Omit<Subscription, 'id'>) => void;
-  editSubscription: (id: string, subscription: Partial<Subscription>) => void;
-  deleteSubscription: (id: string) => void;
-  addGoal: (goal: Omit<Goal, 'id'>) => void;
-  editGoal: (id: string, goal: Partial<Goal>) => void;
-  deleteGoal: (id: string) => void;
-  addGoalProgress: (id: string, amount: number) => void;
-  addIncome: (income: Omit<IncomeSource, 'id'>) => void;
-  editIncome: (id: string, income: Partial<IncomeSource>) => void;
-  deleteIncome: (id: string) => void;
-  recordIncomeDeposit: (id: string, amount?: number) => void;
-  addBudget: (budget: Omit<Budget, 'id'>) => void;
-  editBudget: (id: string, budget: Partial<Budget>) => void;
-  deleteBudget: (id: string) => void;
-  addCategory: (category: Omit<Category, 'id'>) => void;
-  editCategory: (id: string, category: Partial<Category>) => void;
-  deleteCategory: (id: string) => void;
-  addCitation: (citation: Omit<Citation, 'id'>) => void;
-  resolveCitation: (id: string) => void;
-  addDeduction: (deduction: Omit<Deduction, 'id'>) => void;
-  deleteDeduction: (id: string) => void;
-  updateUser: (user: Partial<AppState['user']>) => void;
-  deleteAccount: () => void;
+  editDebt: (id: string, debt: Partial<Debt>) => Promise<void>;
+  deleteDebt: (id: string) => Promise<void>;
+  addDebtPayment: (id: string, amount: number) => Promise<void>;
+  addAsset: (asset: Omit<Asset, 'id'>) => Promise<void>;
+  editAsset: (id: string, asset: Partial<Asset>) => Promise<void>;
+  deleteAsset: (id: string) => Promise<void>;
+  addSubscription: (subscription: Omit<Subscription, 'id'>) => Promise<void>;
+  editSubscription: (id: string, subscription: Partial<Subscription>) => Promise<void>;
+  deleteSubscription: (id: string) => Promise<void>;
+  addGoal: (goal: Omit<Goal, 'id'>) => Promise<void>;
+  editGoal: (id: string, goal: Partial<Goal>) => Promise<void>;
+  deleteGoal: (id: string) => Promise<void>;
+  addGoalProgress: (id: string, amount: number) => Promise<void>;
+  addIncome: (income: Omit<IncomeSource, 'id'>) => Promise<void>;
+  editIncome: (id: string, income: Partial<IncomeSource>) => Promise<void>;
+  deleteIncome: (id: string) => Promise<void>;
+  recordIncomeDeposit: (id: string, amount?: number) => Promise<void>;
+  addBudget: (budget: Omit<Budget, 'id'>) => Promise<void>;
+  editBudget: (id: string, budget: Partial<Budget>) => Promise<void>;
+  deleteBudget: (id: string) => Promise<void>;
+  addCategory: (category: Omit<Category, 'id'>) => Promise<void>;
+  editCategory: (id: string, category: Partial<Category>) => Promise<void>;
+  deleteCategory: (id: string) => Promise<void>;
+  addCitation: (citation: Omit<Citation, 'id'>) => Promise<void>;
+  resolveCitation: (id: string) => Promise<void>;
+  addDeduction: (deduction: Omit<Deduction, 'id'>) => Promise<void>;
+  deleteDeduction: (id: string) => Promise<void>;
+  // Freelance Actions
+  addFreelanceEntry: (entry: Omit<FreelanceEntry, 'id'>) => Promise<void>;
+  toggleFreelanceVault: (id: string) => Promise<void>;
+  deleteFreelanceEntry: (id: string) => Promise<void>;
+  updateUser: (user: Partial<AppState['user']>) => Promise<void>;
+  deleteAccount: () => Promise<void>;
   seedData: () => void;
+  
+  // Ingestion Actions
+  addPendingIngestion: (ingestion: Omit<PendingIngestion, 'id'>) => string;
+  updatePendingIngestion: (id: string, updates: Partial<PendingIngestion>) => void;
+  removePendingIngestion: (id: string) => void;
+  commitIngestion: (id: string) => Promise<void>;
   
   // Supabase Syncing
   fetchData: () => Promise<void>;
   isLoading: boolean;
   
   // Modal State
+  addNotification: (note: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void;
+  markNotificationsRead: () => void;
+  clearNotifications: () => void;
   isQuickAddOpen: boolean;
   quickAddTab: TabType;
   openQuickAdd: (tab?: TabType) => void;
@@ -177,115 +249,84 @@ interface AppState {
 type TabType = 'transaction' | 'obligation' | 'income';
 
 const initialData = {
-  bills: [
-    { id: '1', biller: 'City Electric & Grid', amount: 142.50, category: 'Utilities', dueDate: '2026-04-12', frequency: 'Monthly', status: 'overdue' as const, autoPay: false },
-    { id: '2', biller: 'Monthly Mortgage', amount: 1850.00, category: 'Housing', dueDate: '2026-04-28', frequency: 'Monthly', status: 'paid' as const, autoPay: true },
-    { id: '3', biller: 'Fiber Internet Pro', amount: 89.99, category: 'Subscriptions', dueDate: '2026-05-04', frequency: 'Monthly', status: 'upcoming' as const, autoPay: false },
-    { id: '4', biller: 'Auto Insurance', amount: 412.00, category: 'Insurance', dueDate: '2026-05-15', frequency: 'Quarterly', status: 'upcoming' as const, autoPay: true },
-  ],
-  debts: [
-    { id: '1', name: 'Chase Sapphire Reserve', type: 'Credit Card', apr: 24.99, remaining: 4250.00, minPayment: 125.00, paid: 3500.00 },
-    { id: '2', name: 'Honda Civic Loan', type: 'Auto Loan', apr: 4.5, remaining: 12400.00, minPayment: 350.00, paid: 8600.00 },
-    { id: '3', name: 'Federal Student Loan', type: 'Education', apr: 5.8, remaining: 26200.00, minPayment: 280.00, paid: 4500.00 },
-  ],
-  transactions: [
-    { id: '1', name: 'Rent Payment', category: 'Housing', date: '2026-03-28', amount: 1800.00, type: 'expense' as const },
-    { id: '2', name: 'City Electric', category: 'Utilities', date: '2026-03-24', amount: 142.50, type: 'expense' as const },
-    { id: '3', name: 'Salary Deposit', category: 'Income', date: '2026-03-15', amount: 4200.00, type: 'income' as const },
-  ],
-  assets: [
-    { id: '1', name: 'Chase Checking', value: 5400.00, type: 'Cash' },
-    { id: '2', name: 'Vanguard 401k', value: 85000.00, type: 'Investment' },
-    { id: '3', name: 'Primary Residence', value: 450000.00, type: 'Real Estate' },
-  ],
-  subscriptions: [
-    { id: '1', name: 'Netflix Premium', amount: 22.99, frequency: 'Monthly', nextBillingDate: '2026-04-15', status: 'active' as const, priceHistory: [{ date: '2026-01-01', amount: 20.99 }, { date: '2026-03-01', amount: 22.99 }] },
-    { id: '2', name: 'Spotify Duo', amount: 14.99, frequency: 'Monthly', nextBillingDate: '2026-04-18', status: 'active' as const, priceHistory: [{ date: '2026-01-01', amount: 14.99 }] },
-    { id: '3', name: 'Amazon Prime', amount: 139.00, frequency: 'Yearly', nextBillingDate: '2026-08-10', status: 'active' as const, priceHistory: [{ date: '2025-08-01', amount: 119.00 }, { date: '2026-08-01', amount: 139.00 }] },
-    { id: '4', name: 'Adobe Creative Cloud', amount: 59.99, frequency: 'Monthly', nextBillingDate: '2026-04-22', status: 'active' as const, priceHistory: [{ date: '2026-01-01', amount: 54.99 }, { date: '2026-03-15', amount: 59.99 }] },
-    { id: '5', name: 'YouTube Premium', amount: 13.99, frequency: 'Monthly', nextBillingDate: '2026-04-30', status: 'active' as const, priceHistory: [{ date: '2026-01-01', amount: 13.99 }] },
-  ],
-  goals: [
-    { id: '1', name: 'Emergency Fund', targetAmount: 15000, currentAmount: 8500, deadline: '2026-12-31', type: 'emergency' as const, color: '#28a745' },
-    { id: '2', name: 'Pay off Chase Card', targetAmount: 4250, currentAmount: 1200, deadline: '2026-08-01', type: 'debt' as const, color: '#dc3545' },
-    { id: '3', name: 'Europe Trip', targetAmount: 5000, currentAmount: 1500, deadline: '2027-05-01', type: 'savings' as const, color: '#007bff' },
-  ],
-  incomes: [
-    { id: '1', name: 'Tech Corp Salary', amount: 4200.00, frequency: 'Bi-weekly' as const, category: 'Salary', nextDate: '2026-04-15', status: 'active' as const },
-    { id: '2', name: 'Freelance Design', amount: 850.00, frequency: 'Monthly' as const, category: 'Freelance', nextDate: '2026-04-20', status: 'active' as const },
-    { id: '3', name: 'Dividend Yield', amount: 125.00, frequency: 'Yearly' as const, category: 'Investments', nextDate: '2026-06-01', status: 'active' as const },
-  ],
-  budgets: [
-    { id: '1', category: 'Housing', amount: 2000, period: 'Monthly' as const },
-    { id: '2', category: 'Food & Dining', amount: 600, period: 'Monthly' as const },
-    { id: '3', category: 'Utilities', amount: 300, period: 'Monthly' as const },
-    { id: '4', category: 'Entertainment', amount: 150, period: 'Monthly' as const },
-  ],
-  categories: [
-    { id: '1', name: 'Housing', color: '#6f42c1', type: 'expense' as const },
-    { id: '2', name: 'Utilities', color: '#17a2b8', type: 'expense' as const },
-    { id: '3', name: 'Food & Dining', color: '#fd7e14', type: 'expense' as const },
-    { id: '4', name: 'Income', color: '#28a745', type: 'income' as const },
-  ],
-  citations: [
-    { id: 'c1', type: 'SPEEDING', jurisdiction: 'NY CITY', daysLeft: 3, amount: 150, penaltyFee: 75, date: '12 OCT', citationNumber: 'NY-99281-A', paymentUrl: 'https://nyc.gov/payticket', status: 'open' as const },
-    { id: 'c2', type: 'TOLL VIOLATION', jurisdiction: 'EZ-PASS NJ', daysLeft: 25, amount: 15, penaltyFee: 10, date: '03 NOV', citationNumber: 'EZ-449102', paymentUrl: 'https://ezpassnj.com/pay', status: 'open' as const },
-  ],
-  deductions: [
-    { id: 'd1', name: 'Home Office', category: 'Business', amount: 1200, date: '2026-01-01' },
-    { id: 'd2', name: 'Equipment - MacBook Pro', category: 'Business', amount: 2499, date: '2026-02-15' },
-    { id: 'd3', name: 'Mileage (4,200 miles)', category: 'Transportation', amount: 2772, date: '2026-03-31' },
-  ],
+  bills: [],
+  debts: [],
+  transactions: [],
+  assets: [],
+  subscriptions: [],
+  goals: [],
+  incomes: [],
+  budgets: [],
+  categories: [],
+  citations: [],
+  deductions: [],
+  freelanceEntries: [],
   user: {
-    id: 'USR-88291-ALPHA',
-    firstName: 'Alex',
-    lastName: 'Morgan',
-    email: 'alex.morgan@example.com',
+    id: '',
+    firstName: '',
+    lastName: '',
+    email: '',
     avatar: '',
-    theme: 'Dark'
+    theme: 'Dark',
+    taxState: 'CA',
+    taxRate: 35.0,
+    phone: '',
+    timezone: 'Eastern Time (ET)',
+    language: 'English (US)'
   },
   bankConnected: false,
+  pendingIngestions: [],
+  notifications: [],
 };
 
-export const useStore = create<AppState>((set) => ({
+export const useStore = create<AppState>((set, get) => ({
   ...initialData,
-  connectBank: () => set((state) => {
-    const newTransactions: Transaction[] = [
-      { id: 'p1', name: 'Whole Foods Market', category: 'Food & Dining', date: new Date().toISOString().split('T')[0], amount: 142.50, type: 'expense' },
-      { id: 'p2', name: 'Uber Ride', category: 'Transportation', date: new Date(Date.now() - 86400000).toISOString().split('T')[0], amount: 24.90, type: 'expense' },
-      { id: 'p3', name: 'Direct Deposit - Tech Corp', category: 'Income', date: new Date(Date.now() - 172800000).toISOString().split('T')[0], amount: 4200.00, type: 'income' },
-      { id: 'p4', name: 'Equinox Fitness', category: 'Health', date: new Date(Date.now() - 259200000).toISOString().split('T')[0], amount: 250.00, type: 'expense' },
-      { id: 'p5', name: 'Starbucks', category: 'Food & Dining', date: new Date(Date.now() - 345600000).toISOString().split('T')[0], amount: 6.45, type: 'expense' },
-    ];
-    
-    const newBills: Bill[] = [
-      { id: 'pb1', biller: 'Verizon Wireless', amount: 85.00, category: 'Utilities', dueDate: new Date(Date.now() + 5 * 86400000).toISOString().split('T')[0], frequency: 'Monthly', status: 'upcoming', autoPay: true },
-      { id: 'pb2', biller: 'Planet Fitness', amount: 15.00, category: 'Health', dueDate: new Date(Date.now() + 12 * 86400000).toISOString().split('T')[0], frequency: 'Monthly', status: 'upcoming', autoPay: true },
-    ];
-
-    return {
-      bankConnected: true,
-      transactions: [...newTransactions, ...state.transactions],
-      bills: [...state.bills, ...newBills],
-    };
-  }),
-  addTransaction: async (transaction) => {
+  addNotification: (note) => set((state) => ({
+    notifications: [
+      { ...note, id: Math.random().toString(36).substr(2, 9), timestamp: new Date().toISOString(), read: false },
+      ...state.notifications,
+    ].slice(0, 50),
+  })),
+  markNotificationsRead: () => set((state) => ({
+    notifications: state.notifications.map(n => ({ ...n, read: true })),
+  })),
+  clearNotifications: () => set({ notifications: [] }),
+  setTaxSettings: async (state, rate) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
     if (userId) {
-      const { error } = await supabase.from('transactions').insert({ ...transaction, user_id: userId });
-      if (error) { toast.error('Failed to sync transaction'); return; }
+      await supabase.from('profiles').update({ tax_state: state, tax_rate: rate }).eq('id', userId);
     }
-    set((state) => ({ 
-      transactions: [{ ...transaction, id: Math.random().toString(36).substr(2, 9) }, ...state.transactions].slice(0, 100) 
+    set((s) => ({ user: { ...s.user, taxState: state, taxRate: rate } }));
+  },
+  connectBank: async () => {
+    set({ bankConnected: true });
+    await get().fetchData();
+  },
+  addTransaction: async (transaction) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = Math.random().toString(36).substr(2, 9);
+    if (userId) {
+      const { data, error } = await supabase.from('transactions').insert({ ...transaction, user_id: userId }).select('id').single();
+      if (error) { toast.error('Failed to sync transaction'); return; }
+      if (data?.id) newId = data.id;
+    }
+    set((state) => ({
+      transactions: [{ ...transaction, id: newId }, ...state.transactions].slice(0, 100)
     }));
   },
   addBill: async (bill) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = Math.random().toString(36).substr(2, 9);
     if (userId) {
-      const { error } = await supabase.from('bills').insert({ ...bill, user_id: userId });
+      const { data, error } = await supabase.from('bills').insert({
+        biller: bill.biller, amount: bill.amount, category: bill.category,
+        due_date: bill.dueDate, frequency: bill.frequency, status: bill.status,
+        auto_pay: bill.autoPay, user_id: userId,
+      }).select('id').single();
       if (error) { toast.error('Failed to sync bill'); return; }
+      if (data?.id) newId = data.id;
     }
-    set((state) => ({ bills: [...state.bills, { ...bill, id: Math.random().toString(36).substr(2, 9) }] }));
+    set((state) => ({ bills: [...state.bills, { ...bill, id: newId }] }));
   },
   editBill: async (id, updatedBill) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
@@ -305,117 +346,570 @@ export const useStore = create<AppState>((set) => ({
     }
     set((state) => ({ bills: state.bills.filter((b) => b.id !== id) }));
   },
-  markBillPaid: (id) => set((state) => {
-    const bill = state.bills.find(b => b.id === id);
-    if (!bill) return state;
-    
+  markBillPaid: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    const bill = get().bills.find(b => b.id === id);
+    if (!bill) return;
+
+    // Compute next due date based on frequency
+    const nextDue = new Date(bill.dueDate);
+    switch (bill.frequency) {
+      case 'Weekly':    nextDue.setDate(nextDue.getDate() + 7); break;
+      case 'Bi-weekly': nextDue.setDate(nextDue.getDate() + 14); break;
+      case 'Yearly':    nextDue.setFullYear(nextDue.getFullYear() + 1); break;
+      default:          nextDue.setMonth(nextDue.getMonth() + 1); // Monthly
+    }
+    const nextDueStr = nextDue.toISOString().split('T')[0];
+
+    if (userId) {
+      const { error } = await supabase.from('bills').update({ status: 'upcoming', due_date: nextDueStr }).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to update bill status'); return; }
+    }
+
+    get().addNotification({
+      title: `${bill.biller} Marked Paid`,
+      message: `$${bill.amount.toFixed(2)} recorded. Next due: ${nextDueStr}.`,
+      type: 'success',
+    });
+
     const newTransaction: Transaction = {
       id: Math.random().toString(36).substr(2, 9),
       name: bill.biller,
       category: bill.category,
       date: new Date().toISOString().split('T')[0],
       amount: bill.amount,
-      type: 'expense'
+      type: 'expense',
     };
-    
-    return {
-      bills: state.bills.map((b) => b.id === id ? { ...b, status: 'paid' } : b),
-      transactions: [newTransaction, ...state.transactions].slice(0, 50)
-    };
-  }),
+
+    if (userId) {
+      await supabase.from('transactions').insert({
+        name: newTransaction.name,
+        category: newTransaction.category,
+        date: newTransaction.date,
+        amount: newTransaction.amount,
+        type: newTransaction.type,
+        user_id: userId,
+      });
+    }
+
+    set((state) => ({
+      bills: state.bills.map((b) =>
+        b.id === id ? { ...b, status: 'upcoming', dueDate: nextDueStr } : b
+      ),
+      transactions: [newTransaction, ...state.transactions].slice(0, 50),
+    }));
+  },
   addDebt: async (debt) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = Math.random().toString(36).substr(2, 9);
     if (userId) {
-      const { error } = await supabase.from('debts').insert({ ...debt, user_id: userId });
+      const { data, error } = await supabase.from('debts').insert({
+        name: debt.name, type: debt.type, apr: debt.apr, remaining: debt.remaining,
+        min_payment: debt.minPayment, paid: debt.paid,
+        original_amount: debt.originalAmount ?? null,
+        origination_date: debt.originationDate ?? null,
+        term_months: debt.termMonths ?? null,
+        user_id: userId,
+      }).select('id').single();
       if (error) { toast.error('Failed to sync debt'); return; }
+      if (data?.id) newId = data.id;
     }
-    set((state) => ({ debts: [...state.debts, { ...debt, id: Math.random().toString(36).substr(2, 9) }] }));
+    set((state) => ({ debts: [...state.debts, { ...debt, id: newId }] }));
   },
-  editDebt: (id, updatedDebt) => set((state) => ({
-    debts: state.debts.map((d) => d.id === id ? { ...d, ...updatedDebt } : d)
-  })),
-  deleteDebt: (id) => set((state) => ({ debts: state.debts.filter((d) => d.id !== id) })),
-  addDebtPayment: (id, amount) => set((state) => {
-    const debt = state.debts.find(d => d.id === id);
-    if (!debt) return state;
-    
-    const newTransaction: Transaction = {
+  editDebt: async (id, updatedDebt) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const snakeCased: Record<string, unknown> = {};
+      if (updatedDebt.name !== undefined) snakeCased.name = updatedDebt.name;
+      if (updatedDebt.type !== undefined) snakeCased.type = updatedDebt.type;
+      if (updatedDebt.apr !== undefined) snakeCased.apr = updatedDebt.apr;
+      if (updatedDebt.remaining !== undefined) snakeCased.remaining = updatedDebt.remaining;
+      if (updatedDebt.minPayment !== undefined) snakeCased.min_payment = updatedDebt.minPayment;
+      if (updatedDebt.paid !== undefined) snakeCased.paid = updatedDebt.paid;
+      if (updatedDebt.originalAmount !== undefined) snakeCased.original_amount = updatedDebt.originalAmount;
+      if (updatedDebt.originationDate !== undefined) snakeCased.origination_date = updatedDebt.originationDate;
+      if (updatedDebt.termMonths !== undefined) snakeCased.term_months = updatedDebt.termMonths;
+      const { error } = await supabase.from('debts').update(snakeCased).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to update debt'); return; }
+    }
+    set((state) => ({
+      debts: state.debts.map((d) => d.id === id ? { ...d, ...updatedDebt } : d)
+    }));
+  },
+  deleteDebt: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const { error } = await supabase.from('debts').delete().eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to delete debt'); return; }
+    }
+    set((state) => ({ debts: state.debts.filter((d) => d.id !== id) }));
+  },
+  addDebtPayment: async (id, amount) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    const debt = get().debts.find(d => d.id === id);
+    if (!debt) return;
+    const newRemaining = Math.max(0, debt.remaining - amount);
+    const newPaid = debt.paid + amount;
+    if (userId) {
+      const { error } = await supabase.from('debts').update({ remaining: newRemaining, paid: newPaid }).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to sync debt payment'); return; }
+    }
+    const newTx: Transaction = {
       id: Math.random().toString(36).substr(2, 9),
       name: `Payment: ${debt.name}`,
       category: 'Debt Repayment',
       date: new Date().toISOString().split('T')[0],
-      amount: amount,
-      type: 'expense'
+      amount,
+      type: 'expense',
     };
-    
-    return {
-      debts: state.debts.map((d) => d.id === id ? { 
-        ...d, 
-        remaining: Math.max(0, d.remaining - amount),
-        paid: d.paid + amount
-      } : d),
-      transactions: [newTransaction, ...state.transactions].slice(0, 50)
-    };
-  }),
-  addAsset: (asset) => set((state) => ({ assets: [...state.assets, { ...asset, id: Math.random().toString(36).substr(2, 9) }] })),
-  editAsset: (id, updatedAsset) => set((state) => ({
-    assets: state.assets.map((a) => a.id === id ? { ...a, ...updatedAsset } : a)
-  })),
-  deleteAsset: (id) => set((state) => ({ assets: state.assets.filter((a) => a.id !== id) })),
-  addSubscription: (subscription) => set((state) => ({ subscriptions: [...state.subscriptions, { ...subscription, id: Math.random().toString(36).substr(2, 9) }] })),
-  editSubscription: (id, updatedSubscription) => set((state) => ({
-    subscriptions: state.subscriptions.map((s) => s.id === id ? { ...s, ...updatedSubscription } : s)
-  })),
-  deleteSubscription: (id) => set((state) => ({ subscriptions: state.subscriptions.filter((s) => s.id !== id) })),
-  addGoal: (goal) => set((state) => ({ goals: [...state.goals, { ...goal, id: Math.random().toString(36).substr(2, 9) }] })),
-  editGoal: (id, updatedGoal) => set((state) => ({
-    goals: state.goals.map((g) => g.id === id ? { ...g, ...updatedGoal } : g)
-  })),
-  deleteGoal: (id) => set((state) => ({ goals: state.goals.filter((g) => g.id !== id) })),
-  addGoalProgress: (id, amount) => set((state) => ({
-    goals: state.goals.map((g) => g.id === id ? { ...g, currentAmount: Math.max(0, Math.min(g.targetAmount, g.currentAmount + amount)) } : g)
-  })),
-  addIncome: (income) => set((state) => ({ incomes: [...state.incomes, { ...income, id: Math.random().toString(36).substr(2, 9) }] })),
-  editIncome: (id, updatedIncome) => set((state) => ({
-    incomes: state.incomes.map((i) => i.id === id ? { ...i, ...updatedIncome } : i)
-  })),
-  deleteIncome: (id) => set((state) => ({ incomes: state.incomes.filter((i) => i.id !== id) })),
-  recordIncomeDeposit: (id, amount) => set((state) => {
-    const income = state.incomes.find(i => i.id === id);
-    if (!income) return state;
-    
+    if (userId) {
+      await supabase.from('transactions').insert({ name: newTx.name, category: newTx.category, date: newTx.date, amount: newTx.amount, type: newTx.type, user_id: userId });
+    }
+    set((state) => ({
+      debts: state.debts.map((d) => d.id === id ? { ...d, remaining: newRemaining, paid: newPaid } : d),
+      transactions: [newTx, ...state.transactions].slice(0, 50),
+    }));
+  },
+  addAsset: async (asset) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = Math.random().toString(36).substr(2, 9);
+    if (userId) {
+      const { data, error } = await supabase.from('assets').insert({
+        name: asset.name, value: asset.value, type: asset.type,
+        appreciation_rate: asset.appreciationRate ?? null,
+        purchase_price: asset.purchasePrice ?? null,
+        purchase_date: asset.purchaseDate ?? null,
+        user_id: userId,
+      }).select('id').single();
+      if (error) { toast.error('Failed to sync asset'); return; }
+      if (data?.id) newId = data.id;
+    }
+    set((state) => ({ assets: [...state.assets, { ...asset, id: newId }] }));
+  },
+  editAsset: async (id, updatedAsset) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const snakeCased: Record<string, unknown> = {};
+      if (updatedAsset.name !== undefined) snakeCased.name = updatedAsset.name;
+      if (updatedAsset.value !== undefined) snakeCased.value = updatedAsset.value;
+      if (updatedAsset.type !== undefined) snakeCased.type = updatedAsset.type;
+      if (updatedAsset.appreciationRate !== undefined) snakeCased.appreciation_rate = updatedAsset.appreciationRate;
+      if (updatedAsset.purchasePrice !== undefined) snakeCased.purchase_price = updatedAsset.purchasePrice;
+      if (updatedAsset.purchaseDate !== undefined) snakeCased.purchase_date = updatedAsset.purchaseDate;
+      const { error } = await supabase.from('assets').update(snakeCased).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to update asset'); return; }
+    }
+    set((state) => ({
+      assets: state.assets.map((a) => a.id === id ? { ...a, ...updatedAsset } : a)
+    }));
+  },
+  deleteAsset: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      await supabase.from('assets').delete().eq('id', id).eq('user_id', userId);
+    }
+    set((state) => ({ assets: state.assets.filter((a) => a.id !== id) }));
+  },
+
+  // ── Subscriptions ─────────────────────────────────────────────
+  addSubscription: async (subscription) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = Math.random().toString(36).substr(2, 9);
+    if (userId) {
+      const { data, error } = await supabase.from('subscriptions').insert({
+        name: subscription.name, amount: subscription.amount,
+        frequency: subscription.frequency, next_billing_date: subscription.nextBillingDate,
+        status: subscription.status, price_history: subscription.priceHistory ?? [],
+        user_id: userId,
+      }).select('id').single();
+      if (error) { toast.error('Failed to sync subscription'); return; }
+      if (data?.id) newId = data.id;
+    }
+    set((state) => ({ subscriptions: [...state.subscriptions, { ...subscription, id: newId }] }));
+  },
+  editSubscription: async (id, updatedSubscription) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const patch: Record<string, unknown> = {};
+      if (updatedSubscription.name !== undefined)            patch.name = updatedSubscription.name;
+      if (updatedSubscription.amount !== undefined)          patch.amount = updatedSubscription.amount;
+      if (updatedSubscription.frequency !== undefined)       patch.frequency = updatedSubscription.frequency;
+      if (updatedSubscription.nextBillingDate !== undefined) patch.next_billing_date = updatedSubscription.nextBillingDate;
+      if (updatedSubscription.status !== undefined)          patch.status = updatedSubscription.status;
+      if (updatedSubscription.priceHistory !== undefined)    patch.price_history = updatedSubscription.priceHistory;
+      await supabase.from('subscriptions').update(patch).eq('id', id).eq('user_id', userId);
+    }
+    set((state) => ({ subscriptions: state.subscriptions.map((s) => s.id === id ? { ...s, ...updatedSubscription } : s) }));
+  },
+  deleteSubscription: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) await supabase.from('subscriptions').delete().eq('id', id).eq('user_id', userId);
+    set((state) => ({ subscriptions: state.subscriptions.filter((s) => s.id !== id) }));
+  },
+
+  // ── Goals ─────────────────────────────────────────────────────
+  addGoal: async (goal) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = Math.random().toString(36).substr(2, 9);
+    if (userId) {
+      const { data, error } = await supabase.from('goals').insert({
+        name: goal.name, target_amount: goal.targetAmount, current_amount: goal.currentAmount,
+        deadline: goal.deadline, type: goal.type, color: goal.color, user_id: userId,
+      }).select('id').single();
+      if (error) { toast.error('Failed to sync goal'); return; }
+      if (data?.id) newId = data.id;
+    }
+    set((state) => ({ goals: [...state.goals, { ...goal, id: newId }] }));
+  },
+  editGoal: async (id, updatedGoal) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const patch: Record<string, unknown> = {};
+      if (updatedGoal.name !== undefined)          patch.name = updatedGoal.name;
+      if (updatedGoal.targetAmount !== undefined)  patch.target_amount = updatedGoal.targetAmount;
+      if (updatedGoal.currentAmount !== undefined) patch.current_amount = updatedGoal.currentAmount;
+      if (updatedGoal.deadline !== undefined)      patch.deadline = updatedGoal.deadline;
+      if (updatedGoal.type !== undefined)          patch.type = updatedGoal.type;
+      if (updatedGoal.color !== undefined)         patch.color = updatedGoal.color;
+      await supabase.from('goals').update(patch).eq('id', id).eq('user_id', userId);
+    }
+    set((state) => ({ goals: state.goals.map((g) => g.id === id ? { ...g, ...updatedGoal } : g) }));
+  },
+  deleteGoal: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) await supabase.from('goals').delete().eq('id', id).eq('user_id', userId);
+    set((state) => ({ goals: state.goals.filter((g) => g.id !== id) }));
+  },
+  addGoalProgress: async (id, amount) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    const goal = get().goals.find(g => g.id === id);
+    if (!goal) return;
+    const newAmount = Math.max(0, Math.min(goal.targetAmount, goal.currentAmount + amount));
+    if (userId) {
+      await supabase.from('goals').update({ current_amount: newAmount }).eq('id', id).eq('user_id', userId);
+    }
+    if (newAmount >= goal.targetAmount) {
+      get().addNotification({ title: `🎯 Goal Complete!`, message: `"${goal.name}" has been fully funded.`, type: 'success' });
+    }
+    set((state) => ({ goals: state.goals.map((g) => g.id === id ? { ...g, currentAmount: newAmount } : g) }));
+  },
+
+  // ── Income ────────────────────────────────────────────────────
+  addIncome: async (income) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = Math.random().toString(36).substr(2, 9);
+    if (userId) {
+      const { data, error } = await supabase.from('incomes').insert({
+        name: income.name, amount: income.amount, frequency: income.frequency,
+        category: income.category, next_date: income.nextDate,
+        status: income.status, is_tax_withheld: income.isTaxWithheld, user_id: userId,
+      }).select('id').single();
+      if (error) { toast.error('Failed to sync income'); return; }
+      if (data?.id) newId = data.id;
+    }
+    set((state) => ({ incomes: [...state.incomes, { ...income, id: newId }] }));
+  },
+  editIncome: async (id, updatedIncome) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const patch: Record<string, unknown> = {};
+      if (updatedIncome.name !== undefined)         patch.name = updatedIncome.name;
+      if (updatedIncome.amount !== undefined)       patch.amount = updatedIncome.amount;
+      if (updatedIncome.frequency !== undefined)    patch.frequency = updatedIncome.frequency;
+      if (updatedIncome.category !== undefined)     patch.category = updatedIncome.category;
+      if (updatedIncome.nextDate !== undefined)     patch.next_date = updatedIncome.nextDate;
+      if (updatedIncome.status !== undefined)       patch.status = updatedIncome.status;
+      if (updatedIncome.isTaxWithheld !== undefined) patch.is_tax_withheld = updatedIncome.isTaxWithheld;
+      await supabase.from('incomes').update(patch).eq('id', id).eq('user_id', userId);
+    }
+    set((state) => ({ incomes: state.incomes.map((i) => i.id === id ? { ...i, ...updatedIncome } : i) }));
+  },
+  deleteIncome: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) await supabase.from('incomes').delete().eq('id', id).eq('user_id', userId);
+    set((state) => ({ incomes: state.incomes.filter((i) => i.id !== id) }));
+  },
+  recordIncomeDeposit: async (id, amount) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    const income = get().incomes.find(i => i.id === id);
+    if (!income) return;
     const depositAmount = amount || income.amount;
-    
-    const newTransaction: Transaction = {
+    const newTx: Transaction = {
       id: Math.random().toString(36).substr(2, 9),
       name: `Deposit: ${income.name}`,
       category: income.category,
       date: new Date().toISOString().split('T')[0],
       amount: depositAmount,
-      type: 'income'
+      type: 'income',
     };
-    
-    return {
-      transactions: [newTransaction, ...state.transactions].slice(0, 50)
-    };
-  }),
-  addBudget: (budget) => set((state) => ({ budgets: [...state.budgets, { ...budget, id: Math.random().toString(36).substr(2, 9) }] })),
-  editBudget: (id, updatedBudget) => set((state) => ({
-    budgets: state.budgets.map((b) => b.id === id ? { ...b, ...updatedBudget } : b)
-  })),
-  deleteBudget: (id) => set((state) => ({ budgets: state.budgets.filter((b) => b.id !== id) })),
-  addCategory: (category) => set((state) => ({ categories: [...state.categories, { ...category, id: Math.random().toString(36).substr(2, 9) }] })),
-  editCategory: (id, updatedCategory) => set((state) => ({
-    categories: state.categories.map((c) => c.id === id ? { ...c, ...updatedCategory } : c)
-  })),
-  deleteCategory: (id) => set((state) => ({ categories: state.categories.filter((c) => c.id !== id) })),
-  addCitation: (citation) => set((state) => ({ citations: [...state.citations, { ...citation, id: Math.random().toString(36).substr(2, 9) }] })),
-  resolveCitation: (id) => set((state) => ({ citations: state.citations.map((c) => c.id === id ? { ...c, status: 'resolved' as const } : c) })),
-  addDeduction: (deduction) => set((state) => ({ deductions: [...state.deductions, { ...deduction, id: Math.random().toString(36).substr(2, 9) }] })),
-  deleteDeduction: (id) => set((state) => ({ deductions: state.deductions.filter((d) => d.id !== id) })),
-  updateUser: (user) => set((state) => ({ user: { ...state.user, ...user } })),
-  deleteAccount: () => set({ bills: [], debts: [], transactions: [], assets: [], subscriptions: [], goals: [], incomes: [], budgets: [], categories: [], citations: [], deductions: [], user: { id: '', firstName: '', lastName: '', email: '' } }),
+    if (userId) {
+      await supabase.from('transactions').insert({ name: newTx.name, category: newTx.category, date: newTx.date, amount: newTx.amount, type: newTx.type, user_id: userId });
+    }
+    set((state) => ({ transactions: [newTx, ...state.transactions].slice(0, 50) }));
+  },
+
+  // ── Budgets ───────────────────────────────────────────────────
+  addBudget: async (budget) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = Math.random().toString(36).substr(2, 9);
+    if (userId) {
+      const { data, error } = await supabase.from('budgets').insert({ category: budget.category, amount: budget.amount, period: budget.period, user_id: userId }).select('id').single();
+      if (error) { toast.error('Failed to sync budget'); return; }
+      if (data?.id) newId = data.id;
+    }
+    set((state) => ({ budgets: [...state.budgets, { ...budget, id: newId }] }));
+  },
+  editBudget: async (id, updatedBudget) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) await supabase.from('budgets').update(updatedBudget).eq('id', id).eq('user_id', userId);
+    set((state) => ({ budgets: state.budgets.map((b) => b.id === id ? { ...b, ...updatedBudget } : b) }));
+  },
+  deleteBudget: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) await supabase.from('budgets').delete().eq('id', id).eq('user_id', userId);
+    set((state) => ({ budgets: state.budgets.filter((b) => b.id !== id) }));
+  },
+
+  // ── Categories ────────────────────────────────────────────────
+  addCategory: async (category) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = Math.random().toString(36).substr(2, 9);
+    if (userId) {
+      const { data, error } = await supabase.from('categories').insert({ name: category.name, color: category.color, type: category.type, user_id: userId }).select('id').single();
+      if (error) { toast.error('Failed to sync category'); return; }
+      if (data?.id) newId = data.id;
+    }
+    set((state) => ({ categories: [...state.categories, { ...category, id: newId }] }));
+  },
+  editCategory: async (id, updatedCategory) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) await supabase.from('categories').update(updatedCategory).eq('id', id).eq('user_id', userId);
+    set((state) => ({ categories: state.categories.map((c) => c.id === id ? { ...c, ...updatedCategory } : c) }));
+  },
+  deleteCategory: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) await supabase.from('categories').delete().eq('id', id).eq('user_id', userId);
+    set((state) => ({ categories: state.categories.filter((c) => c.id !== id) }));
+  },
+
+  // ── Citations ─────────────────────────────────────────────────
+  addCitation: async (citation) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = Math.random().toString(36).substr(2, 9);
+    if (userId) {
+      const { data, error } = await supabase.from('citations').insert({
+        type: citation.type, jurisdiction: citation.jurisdiction,
+        days_left: citation.daysLeft, amount: citation.amount,
+        penalty_fee: citation.penaltyFee, date: citation.date,
+        citation_number: citation.citationNumber, payment_url: citation.paymentUrl,
+        status: citation.status, user_id: userId,
+      }).select('id').single();
+      if (error) { toast.error('Failed to sync citation'); return; }
+      if (data?.id) newId = data.id;
+    }
+    set((state) => ({ citations: [...state.citations, { ...citation, id: newId }] }));
+  },
+  resolveCitation: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) await supabase.from('citations').update({ status: 'resolved' }).eq('id', id).eq('user_id', userId);
+    set((state) => ({ citations: state.citations.map((c) => c.id === id ? { ...c, status: 'resolved' as const } : c) }));
+  },
+
+  // ── Deductions ────────────────────────────────────────────────
+  addDeduction: async (deduction) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = Math.random().toString(36).substr(2, 9);
+    if (userId) {
+      const { data, error } = await supabase.from('deductions').insert({ name: deduction.name, category: deduction.category, amount: deduction.amount, date: deduction.date, user_id: userId }).select('id').single();
+      if (error) { toast.error('Failed to sync deduction'); return; }
+      if (data?.id) newId = data.id;
+    }
+    set((state) => ({ deductions: [...state.deductions, { ...deduction, id: newId }] }));
+  },
+  deleteDeduction: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) await supabase.from('deductions').delete().eq('id', id).eq('user_id', userId);
+    set((state) => ({ deductions: state.deductions.filter((d) => d.id !== id) }));
+  },
+
+  // ── User / Profile ────────────────────────────────────────────
+  updateUser: async (user) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const patch: Record<string, unknown> = {};
+      if (user.firstName !== undefined) patch.first_name = user.firstName;
+      if (user.lastName !== undefined)  patch.last_name = user.lastName;
+      if (user.email !== undefined)     patch.email = user.email;
+      if (user.avatar !== undefined)    patch.avatar = user.avatar;
+      if (user.theme !== undefined)     patch.theme = user.theme;
+      if (user.phone !== undefined)    patch.phone = user.phone;
+      if (user.timezone !== undefined) patch.timezone = user.timezone;
+      if (user.language !== undefined) patch.language = user.language;
+      if (user.taxState !== undefined) patch.tax_state = user.taxState;
+      if (user.taxRate !== undefined)  patch.tax_rate = user.taxRate;
+      if (Object.keys(patch).length > 0) {
+        await supabase.from('profiles').update(patch).eq('id', userId);
+      }
+    }
+    set((state) => ({ user: { ...state.user, ...user } }));
+  },
+  addFreelanceEntry: async (entry) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = Math.random().toString(36).substr(2, 9);
+    if (userId) {
+      const { data, error } = await supabase.from('freelance_entries').insert({
+        client: entry.client, amount: entry.amount, date: entry.date,
+        is_vaulted: entry.isVaulted, scoured_write_offs: entry.scouredWriteOffs ?? 0,
+        user_id: userId,
+      }).select('id').single();
+      if (error) { toast.error('Failed to sync freelance entry'); return; }
+      if (data?.id) newId = data.id;
+    }
+    set((state) => ({ freelanceEntries: [...state.freelanceEntries, { ...entry, id: newId }] }));
+  },
+  toggleFreelanceVault: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    const current = useStore.getState().freelanceEntries.find(e => e.id === id);
+    if (userId && current) {
+      await supabase.from('freelance_entries').update({ is_vaulted: !current.isVaulted }).eq('id', id).eq('user_id', userId);
+    }
+    set((state) => ({ freelanceEntries: state.freelanceEntries.map((e) => e.id === id ? { ...e, isVaulted: !e.isVaulted } : e) }));
+  },
+  deleteFreelanceEntry: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      await supabase.from('freelance_entries').delete().eq('id', id).eq('user_id', userId);
+    }
+    set((state) => ({ freelanceEntries: state.freelanceEntries.filter((e) => e.id !== id) }));
+  },
+  deleteAccount: async () => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      await Promise.all([
+        supabase.from('bills').delete().eq('user_id', userId),
+        supabase.from('debts').delete().eq('user_id', userId),
+        supabase.from('transactions').delete().eq('user_id', userId),
+        supabase.from('assets').delete().eq('user_id', userId),
+        supabase.from('subscriptions').delete().eq('user_id', userId),
+        supabase.from('goals').delete().eq('user_id', userId),
+        supabase.from('incomes').delete().eq('user_id', userId),
+        supabase.from('budgets').delete().eq('user_id', userId),
+        supabase.from('categories').delete().eq('user_id', userId),
+        supabase.from('citations').delete().eq('user_id', userId),
+        supabase.from('deductions').delete().eq('user_id', userId),
+        supabase.from('freelance_entries').delete().eq('user_id', userId),
+      ]);
+      await supabase.auth.signOut();
+    }
+    set({ bills: [], debts: [], transactions: [], assets: [], subscriptions: [], goals: [], incomes: [], budgets: [], categories: [], citations: [], deductions: [], freelanceEntries: [], user: { id: '', firstName: '', lastName: '', email: '' } });
+  },
   seedData: () => set(initialData),
+  
+  // Ingestion Implementation
+  addPendingIngestion: (ingestion) => {
+    const id = Math.random().toString(36).substr(2, 9);
+    set((state) => ({
+      pendingIngestions: [...state.pendingIngestions, { ...ingestion, id }]
+    }));
+    return id;
+  },
+  updatePendingIngestion: (id, updates) => set((state) => ({
+    pendingIngestions: state.pendingIngestions.map(pi => pi.id === id ? { ...pi, ...updates } : pi)
+  })),
+  removePendingIngestion: (id) => set((state) => ({
+    pendingIngestions: state.pendingIngestions.filter(pi => pi.id !== id)
+  })),
+  commitIngestion: async (id) => {
+    const state = useStore.getState();
+    const item = state.pendingIngestions.find(pi => pi.id === id);
+    if (!item || (item.status !== 'ready' && !item.status.includes('scanning'))) return;
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+
+    const data = item.extractedData;
+    const commonId = Math.random().toString(36).substr(2, 9);
+    
+    // Deterministic Mapping (No AI Slop)
+    const getCategoryFromMerchant = (name: string): string => {
+      const lowerName = name.toLowerCase();
+      if (lowerName.includes('food') || lowerName.includes('grocery') || lowerName.includes('market') || lowerName.includes('wholefoods') || lowerName.includes('trader joes') || lowerName.includes('walmart')) return 'food';
+      if (lowerName.includes('uber') || lowerName.includes('lyft') || lowerName.includes('gas') || lowerName.includes('shell') || lowerName.includes('exxon') || lowerName.includes('parking') || lowerName.includes('mta') || lowerName.includes('subway')) return 'transport';
+      if (lowerName.includes('amazon') || lowerName.includes('target') || lowerName.includes('apple') || lowerName.includes('best buy') || lowerName.includes('shopping')) return 'shopping';
+      if (lowerName.includes('netflix') || lowerName.includes('spotify') || lowerName.includes('hulu') || lowerName.includes('hbo') || lowerName.includes('movie') || lowerName.includes('cinema')) return 'entertainment';
+      if (lowerName.includes('cvs') || lowerName.includes('walgreens') || lowerName.includes('clinic') || lowerName.includes('doctor') || lowerName.includes('hospital')) return 'medical';
+      return 'other';
+    };
+
+    const merchantName = data.name || data.biller || 'New Entry';
+    const autoCategory = getCategoryFromMerchant(merchantName);
+
+    if (item.type === 'transaction') {
+      const newTransaction: Transaction = {
+        id: commonId,
+        name: merchantName,
+        amount: data.amount || 0,
+        category: data.category || autoCategory,
+        date: data.date || new Date().toISOString().split('T')[0],
+        type: 'expense'
+      };
+      if (userId) {
+        await supabase.from('transactions').insert({
+          name: newTransaction.name, category: newTransaction.category,
+          date: newTransaction.date, amount: newTransaction.amount,
+          type: newTransaction.type, user_id: userId,
+        });
+      }
+      set((s) => ({
+        transactions: [newTransaction, ...s.transactions].slice(0, 50),
+        pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
+      }));
+    } else if (item.type === 'bill') {
+      const newBill: Bill = {
+        id: commonId,
+        biller: merchantName,
+        amount: data.amount || 0,
+        category: data.category || autoCategory,
+        dueDate: data.dueDate || data.date || new Date().toISOString().split('T')[0],
+        frequency: 'Monthly',
+        status: 'upcoming',
+        autoPay: false,
+      };
+      if (userId) {
+        await supabase.from('bills').insert({
+          biller: newBill.biller, amount: newBill.amount, category: newBill.category,
+          due_date: newBill.dueDate, frequency: newBill.frequency,
+          status: newBill.status, auto_pay: newBill.autoPay, user_id: userId,
+        });
+      }
+      set((s) => ({
+        bills: [...s.bills, newBill],
+        pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
+      }));
+    } else if (item.type === 'income') {
+      const newIncome: IncomeSource = {
+        id: commonId,
+        name: data.source || 'New Income',
+        amount: data.amount || 0,
+        frequency: 'Monthly',
+        category: 'Salary',
+        nextDate: data.date || new Date().toISOString().split('T')[0],
+        status: 'active',
+        isTaxWithheld: false,
+      };
+      if (userId) {
+        await supabase.from('incomes').insert({
+          name: newIncome.name, amount: newIncome.amount, frequency: newIncome.frequency,
+          category: newIncome.category, next_date: newIncome.nextDate,
+          status: newIncome.status, is_tax_withheld: newIncome.isTaxWithheld, user_id: userId,
+        });
+      }
+      set((s) => ({
+        incomes: [...s.incomes, newIncome],
+        pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
+      }));
+    }
+
+    toast.success(`Saved ${item.type} to history`);
+  },
 
   // Supabase Implementation
   isLoading: false,
@@ -437,6 +931,7 @@ export const useStore = create<AppState>((set) => ({
         { data: categories },
         { data: citations },
         { data: deductions },
+        { data: freelanceEntries },
         { data: profile }
       ] = await Promise.all([
         supabase.from('bills').select('*').eq('user_id', userId),
@@ -450,28 +945,135 @@ export const useStore = create<AppState>((set) => ({
         supabase.from('categories').select('*').eq('user_id', userId),
         supabase.from('citations').select('*').eq('user_id', userId),
         supabase.from('deductions').select('*').eq('user_id', userId),
+        supabase.from('freelance_entries').select('*').eq('user_id', userId),
         supabase.from('profiles').select('*').eq('id', userId).single(),
       ]);
 
       set({
-        bills: bills || [],
-        debts: debts || [],
-        transactions: transactions || [],
-        assets: assets || [],
-        subscriptions: subscriptions || [],
-        goals: goals || [],
-        incomes: incomes || [],
-        budgets: budgets || [],
-        categories: categories || [],
-        citations: citations || [],
-        deductions: deductions || [],
-        user: profile ? { 
-          id: profile.id, 
-          firstName: profile.first_name, 
-          lastName: profile.last_name, 
-          email: profile.email, 
-          avatar: profile.avatar, 
-          theme: profile.theme 
+        bills: (bills || []).map((b: Record<string, unknown>) => ({
+          id: b.id as string,
+          biller: b.biller as string,
+          amount: b.amount as number,
+          category: b.category as string,
+          dueDate: (b.due_date ?? b.dueDate) as string,
+          frequency: b.frequency as string,
+          status: b.status as Bill['status'],
+          autoPay: (b.auto_pay ?? b.autoPay) as boolean,
+        })),
+        debts: (debts || []).map((d: Record<string, unknown>) => ({
+          id: d.id as string,
+          name: d.name as string,
+          type: d.type as string,
+          apr: d.apr as number,
+          remaining: d.remaining as number,
+          minPayment: (d.min_payment ?? d.minPayment) as number,
+          paid: d.paid as number,
+          originalAmount: (d.original_amount ?? undefined) as number | undefined,
+          originationDate: (d.origination_date ?? undefined) as string | undefined,
+          termMonths: (d.term_months ?? undefined) as number | undefined,
+        })),
+        transactions: (transactions || []).map((t: Record<string, unknown>) => ({
+          id: t.id as string,
+          name: t.name as string,
+          category: t.category as string,
+          date: t.date as string,
+          amount: t.amount as number,
+          type: t.type as Transaction['type'],
+        })),
+        assets: (assets || []).map((a: Record<string, unknown>) => ({
+          id: a.id as string,
+          name: a.name as string,
+          value: a.value as number,
+          type: a.type as string,
+          appreciationRate: (a.appreciation_rate ?? undefined) as number | undefined,
+          purchasePrice: (a.purchase_price ?? undefined) as number | undefined,
+          purchaseDate: (a.purchase_date ?? undefined) as string | undefined,
+        })),
+        subscriptions: (subscriptions || []).map((s: Record<string, unknown>) => ({
+          id: s.id as string,
+          name: s.name as string,
+          amount: s.amount as number,
+          frequency: s.frequency as string,
+          nextBillingDate: (s.next_billing_date ?? s.nextBillingDate) as string,
+          status: s.status as Subscription['status'],
+          priceHistory: (s.price_history ?? s.priceHistory ?? []) as { date: string; amount: number }[],
+        })),
+        goals: (goals || []).map((g: Record<string, unknown>) => ({
+          id: g.id as string,
+          name: g.name as string,
+          targetAmount: (g.target_amount ?? g.targetAmount) as number,
+          currentAmount: (g.current_amount ?? g.currentAmount) as number,
+          deadline: g.deadline as string,
+          type: g.type as Goal['type'],
+          color: g.color as string,
+        })),
+        incomes: (incomes || []).map((i: Record<string, unknown>) => ({
+          id: i.id as string,
+          name: i.name as string,
+          amount: i.amount as number,
+          frequency: i.frequency as IncomeSource['frequency'],
+          category: i.category as string,
+          nextDate: (i.next_date ?? i.nextDate) as string,
+          status: i.status as IncomeSource['status'],
+          isTaxWithheld: (i.is_tax_withheld ?? i.isTaxWithheld ?? false) as boolean,
+        })),
+        budgets: (budgets || []).map((b: Record<string, unknown>) => ({
+          id: b.id as string,
+          category: b.category as string,
+          amount: b.amount as number,
+          period: b.period as Budget['period'],
+        })),
+        categories: (categories || []).map((c: Record<string, unknown>) => ({
+          id: c.id as string,
+          name: c.name as string,
+          color: c.color as string,
+          type: c.type as Category['type'],
+        })),
+        citations: (citations || []).map((c: Record<string, unknown>) => {
+          const storedDate = c.date as string;
+          const computedDaysLeft = storedDate
+            ? Math.ceil((new Date(storedDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+            : (c.days_left ?? c.daysLeft) as number;
+          return {
+            id: c.id as string,
+            type: c.type as string,
+            jurisdiction: c.jurisdiction as string,
+            daysLeft: computedDaysLeft,
+            amount: c.amount as number,
+            penaltyFee: (c.penalty_fee ?? c.penaltyFee) as number,
+            date: storedDate,
+            citationNumber: (c.citation_number ?? c.citationNumber) as string,
+            paymentUrl: (c.payment_url ?? c.paymentUrl) as string,
+            status: c.status as Citation['status'],
+          };
+        }),
+        deductions: (deductions || []).map((d: Record<string, unknown>) => ({
+          id: d.id as string,
+          name: d.name as string,
+          category: d.category as string,
+          amount: d.amount as number,
+          date: d.date as string,
+        })),
+        freelanceEntries: (freelanceEntries || []).map((f: Record<string, unknown>) => ({
+          id: f.id as string,
+          client: f.client as string,
+          amount: f.amount as number,
+          date: f.date as string,
+          isVaulted: (f.is_vaulted ?? f.isVaulted ?? false) as boolean,
+          scouredWriteOffs: (f.scoured_write_offs ?? f.scouredWriteOffs ?? 0) as number,
+        })),
+        user: profile ? {
+          id: profile.id,
+          firstName: profile.first_name,
+          lastName: profile.last_name,
+          email: profile.email,
+          avatar: profile.avatar,
+          theme: profile.theme,
+          phone: profile.phone ?? '',
+          timezone: profile.timezone ?? 'Eastern Time (ET)',
+          language: profile.language ?? 'English (US)',
+          taxState: profile.tax_state ?? 'CA',
+          taxRate: profile.tax_rate ?? 35.0,
         } : initialData.user,
         isLoading: false
       });

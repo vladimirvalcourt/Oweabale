@@ -1,57 +1,121 @@
-# Oweable - Financial Dashboard
+# Oweable — Financial Command Center
 
-Oweable is a top-tier, production-ready financial dashboard designed to help users track their net worth, manage bills, pay off debts, and monitor subscriptions.
+Ultra-premium personal finance dashboard for debt elimination, tax defense, and wealth tracking. Dark, brutalist, deterministic — no AI slop, just hard math.
 
-## 🚀 Tech Stack
+---
 
-- **Framework:** React 18 (via Vite)
-  - *Note: While the architecture follows Next.js App Router principles (feature-based routing, strict boundaries), Vite is used as the bundler for optimal performance in this specific sandbox environment.*
-- **Routing:** React Router DOM
-- **State Management:** Zustand
-- **Styling:** Tailwind CSS
-- **Icons:** Lucide React
-- **Notifications:** Sonner
-- **Charts:** Recharts
+## Quick Start
 
-## 📁 Folder Structure
-
-The codebase follows a scalable, feature-based architecture typical of Enterprise SaaS applications:
-
-```text
-/src
-  /components       # Shared, reusable UI components
-    /ui             # Generic components (Buttons, Cards, Inputs)
-    /layout         # App layout, Sidebar, Header
-  /features         # Feature-based modules (Domain logic)
-    /dashboard      # Dashboard views and widgets
-    /bills          # Bill tracking and management
-    /debts          # Debt payoff tracking
-    /goals          # Financial goals
-    /subscriptions  # Recurring payment tracking
-    /settings       # User preferences and integrations
-  /hooks            # Custom React hooks & global store
-  /lib              # Utility functions and constants
-  /types            # Global TypeScript interfaces
-  App.tsx           # Main application routing
-  main.tsx          # Application entry point
+```bash
+npm install
+npm run dev       # http://localhost:3000
+npm run build     # production build
+npm run lint      # TypeScript type check (tsc --noEmit)
 ```
 
-## 🏗️ Architecture Decisions
+---
 
-1. **Feature-Based Organization:** Instead of grouping by file type (e.g., all components together, all hooks together), files are grouped by feature (`/features/bills`, `/features/debts`). This makes the codebase highly scalable and easier to maintain.
-2. **Separation of Concerns:** UI components (`/components/ui`) are strictly presentational. Business logic and state management are handled in `/hooks` and feature-level components.
-3. **Strict Typing:** TypeScript interfaces are centralized in `/types` to ensure consistent data structures across the app.
-4. **Tailwind for Styling:** Utility-first CSS ensures consistent design without the overhead of maintaining separate stylesheets.
+## Tech Stack
 
-## 💻 Running Locally
+| Layer | Tool |
+|---|---|
+| Framework | React 19 + Vite 6 |
+| Routing | React Router DOM v7 |
+| State | Zustand v5 |
+| Database | Supabase (PostgreSQL + Auth) |
+| Styling | Tailwind CSS v4 |
+| Charts | Recharts |
+| Animations | Motion (Framer Motion v12) |
+| Notifications | Sonner |
+| Icons | Lucide React |
+| PDF Parsing | pdfjs-dist v5 (npm, NOT CDN) |
+| OCR | Tesseract.js v7 |
+| UI Primitives | Headless UI v2 |
 
-1. Install dependencies: `npm install`
-2. Start the development server: `npm run dev`
-3. Build for production: `npm run build`
+---
 
-## 📝 Component Standards
+## Actual Folder Structure
 
-Every component in this project follows these rules:
-- **Typed Props:** All components use TypeScript interfaces for props.
-- **Documentation:** Components include a brief comment explaining their purpose.
-- **Clean Imports:** Imports are organized (React, third-party, local).
+```
+/src
+  App.tsx                     # Route definitions
+  main.tsx                    # Entry point
+  index.css                   # Global styles + Tailwind theme tokens
+
+  /pages                      # One file per route
+    Dashboard.tsx             # /dashboard — main command center
+    Income.tsx                # /income
+    Freelance.tsx             # /freelance — gig income + tax shield
+    Taxes.tsx                 # /taxes — quarterly estimates + deductions
+    Obligations.tsx           # /bills — bills, debts, citations
+    NetWorth.tsx              # /net-worth
+    Transactions.tsx          # /transactions
+    Ingestion.tsx             # /inbox — document scan + review queue
+    Settings.tsx              # /settings
+    Goals.tsx                 # /goals
+    Subscriptions.tsx         # /subscriptions
+    Budgets.tsx               # /budgets
+    Calendar.tsx              # /calendar
+    Categories.tsx            # /categories
+    Reports.tsx               # /reports
+    Landing.tsx               # / (public)
+    Pricing.tsx               # /pricing (public)
+    Onboarding.tsx            # /onboarding
+    Privacy.tsx               # /privacy
+    Terms.tsx                 # /terms
+    Security.tsx              # /security
+
+  /components
+    Layout.tsx                # App shell: sidebar, header, search, QuickAdd
+    QuickAddModal.tsx         # Global quick-entry modal (transaction/bill/income)
+    DeviceGuard.tsx           # Blocks <768px viewports
+    CollapsibleModule.tsx     # Shared collapsible card wrapper
+    BrandLogo.tsx             # Auto-generates brand initials/logo
+    BankConnection.tsx        # Plaid link integration
+    /ui
+      TactileIcon.tsx         # Animated icon components
+      Card.tsx                # Base card primitive
+
+  /features
+    /dashboard
+      /components
+        NetWorthCard.tsx      # Extracted dashboard widget
+
+  /store
+    useStore.ts               # Single Zustand store — all state + actions
+
+  /lib
+    finance.ts                # Pure financial math (amortization, projections, routing)
+    supabase.ts               # Supabase client init + getProfile helper
+    utils.ts                  # cn() className utility
+    supabase_schema.sql       # Full DB schema reference
+    /migrations
+      001_add_financial_depth.sql
+
+  /env
+    .env                      # VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY
+```
+
+---
+
+## Environment Variables
+
+Create `.env` in the project root:
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+---
+
+## Key Conventions
+
+See `ARCHITECTURE.md` for full engineering rules. Quick summary:
+
+- **All state lives in `useStore.ts`** — no local state for server data
+- **Always destructure from `useStore()`** — never call `useStore.getState()` inside render or dependency arrays
+- **Always show a toast** on user actions — no silent returns
+- **PDF parsing uses `pdfjs-dist` npm package** — never `window.pdfjsLib` from CDN
+- **Validate before storing** — check `isNaN`, `isFinite`, and non-empty strings before calling any store action
+- **Mobile blocked by design** — `DeviceGuard` enforces ≥768px. Do not remove.

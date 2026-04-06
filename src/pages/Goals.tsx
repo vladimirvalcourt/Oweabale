@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
+import type { Goal } from '../store/useStore';
 import { Target, Plus, TrendingUp, TrendingDown, CheckCircle2, AlertCircle, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
@@ -13,7 +14,7 @@ export default function Goals() {
     targetAmount: '',
     currentAmount: '',
     deadline: '',
-    type: 'savings' as 'savings' | 'payoff',
+    type: 'savings' as Goal['type'],
   });
 
   const handleAddGoal = (e: React.FormEvent) => {
@@ -28,8 +29,8 @@ export default function Goals() {
       targetAmount: Number(newGoal.targetAmount),
       currentAmount: Number(newGoal.currentAmount) || 0,
       deadline: newGoal.deadline,
-      type: newGoal.type as any,
-      color: newGoal.type === 'payoff' ? '#dc3545' : '#007bff',
+      type: newGoal.type,
+      color: newGoal.type === 'debt' ? '#dc3545' : newGoal.type === 'emergency' ? '#f59e0b' : '#6366f1',
     });
 
     toast.success('Goal created successfully');
@@ -92,11 +93,12 @@ export default function Goals() {
                 <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Operation Type</label>
                 <select
                   value={newGoal.type}
-                  onChange={(e) => setNewGoal({ ...newGoal, type: e.target.value as any })}
+                  onChange={(e) => setNewGoal({ ...newGoal, type: e.target.value as Goal['type'] })}
                   className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm font-mono uppercase text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
                 >
                   <option value="savings">SAVINGS</option>
-                  <option value="payoff">PAYOFF</option>
+                  <option value="debt">DEBT PAYOFF</option>
+                  <option value="emergency">EMERGENCY FUND</option>
                 </select>
               </div>
               <div>

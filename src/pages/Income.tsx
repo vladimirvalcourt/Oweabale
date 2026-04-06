@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Plus, MoreHorizontal, X, Wallet, Edit2, Trash2, ArrowDownCircle, TrendingUp } from 'lucide-react';
+import { Plus, MoreHorizontal, X, Vault, Edit2, Trash2, ArrowDownCircle, TrendingUp } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 import { motion } from 'motion/react';
 import { useStore, IncomeSource } from '../store/useStore';
 import { Dialog, Menu, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { toast } from 'sonner';
+import { guessCategory } from '../lib/categorizer';
 
 export default function Income() {
   const { incomes, addIncome, editIncome, deleteIncome, recordIncomeDeposit } = useStore();
@@ -21,10 +22,22 @@ export default function Income() {
     frequency: 'Monthly',
     category: 'Salary',
     nextDate: new Date().toISOString().split('T')[0],
-    status: 'active' as 'active' | 'paused'
+    status: 'active' as 'active' | 'paused',
+    isTaxWithheld: true
   });
 
   const [depositAmount, setDepositAmount] = useState('');
+
+  useEffect(() => {
+    if (formData.name.length > 2 && !isEditModalOpen) {
+      const guessed = guessCategory(formData.name);
+      if (guessed) {
+        // Just capitalize the first letter to match "Salary" default style
+        const capitalized = guessed.charAt(0).toUpperCase() + guessed.slice(1);
+        setFormData(prev => ({ ...prev, category: capitalized }));
+      }
+    }
+  }, [formData.name, isEditModalOpen]);
 
   const calculateMonthlyExpected = () => {
     return incomes.reduce((sum, income) => {
@@ -47,7 +60,8 @@ export default function Income() {
       frequency: 'Monthly',
       category: 'Salary',
       nextDate: new Date().toISOString().split('T')[0],
-      status: 'active'
+      status: 'active',
+      isTaxWithheld: true
     });
     setIsAddModalOpen(true);
   };
@@ -60,7 +74,8 @@ export default function Income() {
       frequency: income.frequency,
       category: income.category,
       nextDate: income.nextDate,
-      status: income.status
+      status: income.status,
+      isTaxWithheld: income.isTaxWithheld
     });
     setIsEditModalOpen(true);
   };
@@ -79,7 +94,8 @@ export default function Income() {
       frequency: formData.frequency as any,
       category: formData.category,
       nextDate: formData.nextDate,
-      status: formData.status
+      status: formData.status,
+      isTaxWithheld: formData.isTaxWithheld
     });
     setIsAddModalOpen(false);
     toast.success('Income source added');
@@ -94,7 +110,8 @@ export default function Income() {
         frequency: formData.frequency as any,
         category: formData.category,
         nextDate: formData.nextDate,
-        status: formData.status
+        status: formData.status,
+        isTaxWithheld: formData.isTaxWithheld
       });
       setIsEditModalOpen(false);
       toast.success('Income source updated');
@@ -133,7 +150,7 @@ export default function Income() {
       {incomes.length === 0 ? (
         <div className="bg-surface-raised rounded-sm border border-surface-border py-20 px-6 flex flex-col items-center justify-center text-center">
           <div className="w-12 h-12 border border-surface-border bg-surface-elevated rounded-none flex items-center justify-center mb-4">
-            <Wallet className="w-5 h-5 text-zinc-500" />
+            <Vault className="w-5 h-5 text-zinc-500" />
           </div>
           <h2 className="text-sm font-mono font-bold tracking-widest uppercase text-content-primary mb-2">No Income Sources Detected</h2>
           <motion.button 
@@ -165,7 +182,7 @@ export default function Income() {
               </div>
               <div className="bg-surface-elevated rounded-sm border border-surface-border p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <Wallet className="w-3.5 h-3.5 text-zinc-500" />
+                  <Vault className="w-3.5 h-3.5 text-zinc-500" />
                   <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">Active Sources</p>
                 </div>
                 <p className="mt-2 text-2xl font-bold font-mono tabular-nums text-content-primary">
@@ -176,7 +193,7 @@ export default function Income() {
           </CollapsibleModule>
 
           {/* Income Sources List */}
-          <CollapsibleModule title="Inflow Strategy" icon={Wallet}>
+          <CollapsibleModule title="Inflow Strategy" icon={Vault}>
             <motion.div 
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 -mx-6 -my-6 p-6"
               initial="hidden"
@@ -202,7 +219,9 @@ export default function Income() {
                       <BrandLogo name={income.name} />
                       <div>
                         <h3 className="text-sm font-medium text-content-primary">{income.name}</h3>
-                        <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-1">{income.category}</p>
+                        <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-1 flex items-center gap-1.5">
+                          {income.category} {income.isTaxWithheld ? '· W-2/WITHHELD' : '· GROSS/GIG'}
+                        </p>
                       </div>
                     </div>
                     
@@ -378,6 +397,22 @@ export default function Income() {
                   <option value="active">ACTIVE</option>
                   <option value="paused">PAUSED</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Tax Provisioning</label>
+                <div className="flex items-center gap-4 bg-surface-base border border-surface-border p-3 rounded-sm">
+                  <input 
+                    type="checkbox"
+                    checked={formData.isTaxWithheld}
+                    onChange={(e) => setFormData({...formData, isTaxWithheld: e.target.checked})}
+                    className="w-4 h-4 rounded-sm border-surface-border text-brand-indigo focus:ring-brand-indigo bg-surface-raised cursor-pointer"
+                  />
+                  <div className="flex-1">
+                    <p className="text-[10px] font-mono font-bold text-content-primary uppercase tracking-widest">Taxes Already Withheld</p>
+                    <p className="text-[10px] font-mono text-zinc-500 mt-1 uppercase tracking-tight">IF UNCHECKED, OWEABLE WILL AUTOMATICALLY RESERVE 25% FOR TAX SEASON.</p>
+                  </div>
+                </div>
               </div>
 
               <div className="pt-6">

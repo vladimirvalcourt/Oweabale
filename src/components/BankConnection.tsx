@@ -9,34 +9,27 @@ export default function BankConnection() {
   const [isConnecting, setIsConnecting] = useState(false);
   const [syncTime, setSyncTime] = useState<string | null>(null);
 
-  // Mock onSuccess handler
-  const onSuccess = (public_token: string, metadata: any) => {
+  const onSuccess = async (public_token: string, metadata: any) => {
     setIsConnecting(true);
     
-    // Simulate 1.5s secure handshake
-    setTimeout(() => {
-      setIsConnecting(false);
-      connectBank(); // Hydrates global state with mock transactions and bills
-      setSyncTime('JUST NOW');
-      toast.success('Bank connected successfully. Data hydrated.');
-    }, 1500);
+    await connectBank(); // Hydrates global state and persists to Supabase
+    setSyncTime('JUST NOW');
+    toast.success('Bank connected successfully. Data hydrated.');
+    setIsConnecting(false);
   };
 
-  // We mock the usePlaidLink hook behavior since we don't have a real link token
-  // In a real app, we would pass a valid token from the backend
+  // In a production environment, you would retrieve a real link token from the backend
   const { open, ready } = usePlaidLink({
-    token: 'mock-token-123',
+    token: 'link-token-placeholder', // Replace with real token
     onSuccess,
-    // We bypass the actual Plaid UI opening for this mock flow
-    // by manually triggering onSuccess when the button is clicked.
   });
 
   const handleConnectClick = () => {
-    // Simulate the Plaid flow by directly calling onSuccess with mock data
-    // In a real scenario, we would call open() here.
+    // Normally, this calls pure `open()` from usePlaidLink. 
+    // We will simulate success for the demo flow until the token service is online.
     setIsConnecting(true);
     setTimeout(() => {
-      onSuccess('mock-public-token', { institution: { name: 'Chase' } });
+      onSuccess('public-token', { institution: { name: 'Bank' } });
     }, 500);
   };
 

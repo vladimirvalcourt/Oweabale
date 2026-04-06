@@ -1,18 +1,20 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useStore } from '../store/useStore';
-import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, DollarSign, Tag, Download } from 'lucide-react';
+import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, Hash, Tag, Download, TrendingUp } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 import { motion } from 'motion/react';
 
 export default function Transactions() {
-  const { transactions, categories } = useStore();
+  const { transactions, subscriptions } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [dateRange, setDateRange] = useState<{start: string, end: string}>({start: '', end: ''});
   const [amountRange, setAmountRange] = useState<{min: string, max: string}>({min: '', max: ''});
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 25;
 
   const filteredTransactions = useMemo(() => {
     return transactions.filter((transaction) => {
@@ -31,6 +33,11 @@ export default function Transactions() {
       return matchesSearch && matchesType && matchesCategory && matchesDate && matchesAmount;
     });
   }, [transactions, searchTerm, filterType, filterCategory, dateRange, amountRange]);
+
+  useEffect(() => { setPage(1); }, [transactions, searchTerm, filterType, filterCategory, dateRange, amountRange]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / PAGE_SIZE));
+  const pagedTransactions = filteredTransactions.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const uniqueCategories = useMemo(() => {
     const cats = new Set(transactions.map(t => t.category));
@@ -151,7 +158,7 @@ export default function Transactions() {
 
               <div>
                 <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2 flex items-center gap-1.5">
-                  <DollarSign className="w-3 h-3" /> Magnitude
+                  <Hash className="w-3 h-3" /> Magnitude
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -203,6 +210,7 @@ export default function Transactions() {
             )}
           </div>
         ) : (
+        <>
         <CollapsibleModule title="Transaction Intelligence" icon={Activity}>
           <div className="overflow-x-auto -mx-6 -my-6">
             <table className="min-w-full divide-y divide-surface-highlight">
@@ -232,51 +240,91 @@ export default function Transactions() {
                   }
                 }}
               >
-                {filteredTransactions.map((transaction) => (
-                  <motion.tr 
-                    key={transaction.id} 
-                    className="group hover:bg-surface-elevated transition-colors border-l-2 border-transparent hover:border-indigo-600"
-                    variants={{
-                      hidden: { opacity: 0, y: 15 },
-                      visible: { opacity: 1, y: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } }
-                    }}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <BrandLogo
-                          name={transaction.name}
-                          fallbackIcon={
-                            transaction.type === 'income' ? (
-                              <ArrowUpRight className="h-5 w-5 text-emerald-500" />
-                            ) : (
-                              <ArrowDownRight className="h-5 w-5 text-zinc-600" />
-                            )
-                          }
-                        />
-                        <div className="ml-4">
-                          <div className="text-sm font-bold text-content-primary">{transaction.name}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
-                      {transaction.date}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold uppercase tracking-widest bg-surface-base border border-surface-border text-zinc-500 group-hover:text-zinc-300 transition-colors">
-                        {transaction.category}
-                      </span>
-                    </td>
-                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold font-mono tabular-nums text-right ${
-                      transaction.type === 'income' ? 'text-emerald-500' : 'text-content-primary'
-                    }`}>
-                      {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </td>
-                  </motion.tr>
-                ))}
+                  {pagedTransactions.map((transaction) => {
+                    const subData = subscriptions.find(s => s.name.toLowerCase() === transaction.name.toLowerCase());
+                    const isPriceHike = subData && transaction.type === 'expense' && transaction.amount > subData.amount;
+                    
+                    return (
+                      <motion.tr 
+                        key={transaction.id} 
+                        className="group hover:bg-surface-elevated transition-colors border-l-2 border-transparent hover:border-indigo-600"
+                        variants={{
+                          hidden: { opacity: 0, y: 15 },
+                          visible: { opacity: 1, y: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } }
+                        }}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <BrandLogo
+                              name={transaction.name}
+                              fallbackIcon={
+                                transaction.type === 'income' ? (
+                                  <ArrowUpRight className="h-5 w-5 text-emerald-500" />
+                                ) : (
+                                  <ArrowDownRight className="h-5 w-5 text-zinc-600" />
+                                )
+                              }
+                            />
+                            <div className="ml-4">
+                              <div className="flex items-center gap-2">
+                                <div className="text-sm font-bold text-content-primary uppercase tracking-tight">{transaction.name}</div>
+                                {isPriceHike && (
+                                  <span className="flex items-center gap-1 text-[8px] bg-rose-500 text-black px-1.5 font-black uppercase tracking-tighter animate-pulse">
+                                    <TrendingUp className="w-2 h-2" /> Price Hike
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                          {transaction.date}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex flex-col gap-1">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold uppercase tracking-widest bg-surface-base border border-surface-border text-zinc-500 group-hover:text-zinc-300 transition-colors">
+                              {transaction.category}
+                            </span>
+                          </div>
+                        </td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold font-mono tabular-nums text-right ${
+                          transaction.type === 'income' ? 'text-emerald-500' : 'text-content-primary'
+                        }`}>
+                          {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+                      </motion.tr>
+                    );
+                  })}
               </motion.tbody>
             </table>
           </div>
         </CollapsibleModule>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between pt-2 px-1">
+            <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
+              Page {page} of {totalPages} — {filteredTransactions.length} records
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                Prev
+              </button>
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+        </>
         )}
     </div>
   );

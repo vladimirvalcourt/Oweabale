@@ -1,19 +1,20 @@
 /**
- * Obligations — Universal Liability Ledger + Debt Detonator
+ * Bills & Debts — Total Bills & Debt record
  * Avalanche/Snowball payoff algorithm with projected payoff dates and interest savings.
  */
 import React, { useState, useMemo } from 'react';
 import {
   Receipt, CreditCard, AlertTriangle, ShieldAlert,
-  Zap, Home, Car, Smartphone, Wifi,
-  Activity, FileText, CheckCircle2, Flame, SlidersHorizontal,
-  TrendingDown, Calculator, ChevronDown, ChevronUp, Plus, Minus
+  FileText, CheckCircle2, Flame,
+  Calculator, ChevronDown, ChevronUp, Plus, Minus
 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 import { motion } from 'motion/react';
+import { generateAmortizationSchedule } from '../lib/finance';
 
 type ObligationType = 'recurring' | 'debt' | 'ambush';
 type Strategy = 'avalanche' | 'snowball';
@@ -29,12 +30,7 @@ interface Obligation {
   status?: 'active' | 'resolved';
 }
 
-const MOCK_OBLIGATIONS: Obligation[] = [
-  { id: '1', name: 'Rent - Downtown Apt', type: 'recurring', subType: 'Fixed Bill', dueDate: '2026-04-01', amount: 2400.00, icon: Home },
-  { id: '4', name: 'Verizon Wireless', type: 'recurring', subType: 'Fixed Bill', dueDate: '2026-04-12', amount: 120.00, icon: Smartphone },
-  { id: '6', name: 'Comcast Internet', type: 'recurring', subType: 'Fixed Bill', dueDate: '2026-04-18', amount: 89.99, icon: Wifi },
-  { id: '9', name: 'Electric Utility', type: 'recurring', subType: 'Variable Bill', dueDate: '2026-04-22', amount: 145.50, icon: Zap },
-];
+
 
 type FilterTab = 'all' | 'recurring' | 'debt' | 'ambush';
 
@@ -105,9 +101,18 @@ export default function Obligations() {
   const [strategy, setStrategy] = useState<Strategy>('avalanche');
   const [extraPayment, setExtraPayment] = useState(0);
   const [showDetonator, setShowDetonator] = useState(true);
+  const [expandedDebtId, setExpandedDebtId] = useState<string | null>(null);
 
-  // Merge store bills with mock recurring
-  const recurringObligations = MOCK_OBLIGATIONS.filter(o => o.type === 'recurring');
+  // Map live bills from store into Obligation shape
+  const recurringObligations: Obligation[] = bills.map(b => ({
+    id: b.id,
+    name: b.biller,
+    type: 'recurring' as ObligationType,
+    subType: b.frequency === 'Monthly' ? 'Fixed Bill' : `${b.frequency} Bill`,
+    dueDate: b.dueDate,
+    amount: b.amount,
+    icon: Receipt,
+  }));
   const allObligations: Obligation[] = [
     ...recurringObligations,
     ...debts.map(d => ({
@@ -152,24 +157,24 @@ export default function Obligations() {
 
   const tabs: { key: FilterTab; label: string; count: number }[] = [
     { key: 'all', label: 'All', count: allObligations.length },
-    { key: 'recurring', label: 'Recurring', count: allObligations.filter(o => o.type === 'recurring').length },
-    { key: 'debt', label: 'Debt', count: allObligations.filter(o => o.type === 'debt').length },
-    { key: 'ambush', label: 'Ambushes', count: allObligations.filter(o => o.type === 'ambush').length },
+    { key: 'recurring', label: 'Regular Bills', count: allObligations.filter(o => o.type === 'recurring').length },
+    { key: 'debt', label: 'Loans & Credit', count: allObligations.filter(o => o.type === 'debt').length },
+    { key: 'ambush', label: 'Tickets & Fines', count: allObligations.filter(o => o.type === 'ambush').length },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-content-primary mb-1">Bills & Debts</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-content-primary mb-1 uppercase">BILLS & DEBTS</h1>
           <p className="text-zinc-400 text-sm">A complete record of everything you owe.</p>
         </div>
         <button 
           onClick={() => openQuickAdd('obligation')}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-sm font-bold transition-colors flex items-center gap-2 self-start"
+          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-all flex items-center gap-2 self-start btn-tactile"
         >
           <Plus className="w-4 h-4" />
-          Add Bill
+          ADD BILL
         </button>
       </div>
       {/* Stats */}
@@ -177,14 +182,14 @@ export default function Obligations() {
         <div className="bg-surface-elevated border border-surface-border p-5 rounded-sm">
           <div className="flex items-center gap-2 text-zinc-500 mb-3">
             <Receipt className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-mono uppercase tracking-wider">Monthly Outflow</span>
+            <span className="text-[10px] font-mono uppercase tracking-wider">Monthly Payments</span>
           </div>
           <p className="text-2xl font-mono text-red-400 font-bold">${totalMonthlyBurn.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
         <div className="bg-surface-elevated border border-surface-border p-5 rounded-sm">
           <div className="flex items-center gap-2 text-zinc-500 mb-3">
             <CreditCard className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-mono uppercase tracking-wider">Active Principal</span>
+            <span className="text-[10px] font-mono uppercase tracking-wider">Total Debt</span>
           </div>
           <p className="text-2xl font-mono text-amber-400 font-bold">${activePrincipal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
@@ -192,7 +197,7 @@ export default function Obligations() {
           {urgentTotal > 0 && <div className="absolute inset-0 bg-rose-500/3" />}
           <div className="flex items-center gap-2 text-zinc-500 mb-3 relative z-10">
             <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
-            <span className="text-[10px] font-mono uppercase tracking-wider">Urgent Ambushes</span>
+            <span className="text-[10px] font-mono uppercase tracking-wider">Urgent Tickets</span>
             {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold text-rose-400 border border-rose-500/50 px-1 rounded-sm ml-auto">{urgentCitations.length} DUE</span>}
           </div>
           <p className={`text-2xl font-mono font-bold relative z-10 ${urgentTotal > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
@@ -204,7 +209,7 @@ export default function Obligations() {
       {/* Debt Detonator Panel */}
       {debts.length > 0 && (
         <CollapsibleModule 
-          title="Debt Detonator" 
+          title="Debt Payoff Plan" 
           icon={Flame}
           extraHeader={
             <span className="text-[10px] font-mono text-zinc-600 bg-surface-base border border-surface-border px-2 py-0.5 rounded-sm">
@@ -262,6 +267,7 @@ export default function Obligations() {
                 .sort((a, b) => strategy === 'avalanche' ? b.apr - a.apr : a.remaining - b.remaining)
                 .map((d, i) => {
                   const pct = Math.round((d.paid / (d.paid + d.remaining)) * 100);
+                  const isExpanded = expandedDebtId === d.id;
                   return (
                     <div key={d.id}>
                       <div className="flex items-center justify-between mb-1">
@@ -279,6 +285,52 @@ export default function Obligations() {
                         <span>{pct}% paid</span>
                         <span>Min: ${d.minPayment}/mo</span>
                       </div>
+                      <div className="mt-1">
+                        <button
+                          onClick={() => setExpandedDebtId(isExpanded ? null : d.id)}
+                          className="text-[10px] font-mono text-zinc-600 hover:text-indigo-400 transition-colors uppercase tracking-widest flex items-center gap-1"
+                        >
+                          {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                          {isExpanded ? 'Hide Schedule' : 'Show 12-Month Schedule'}
+                        </button>
+                      </div>
+                      {isExpanded && (() => {
+                        const schedule = generateAmortizationSchedule(d).slice(0, 12);
+                        const chartData = schedule.map(row => ({
+                          name: `M${row.month}`,
+                          principal: row.principal,
+                          interest: row.interest,
+                        }));
+                        const totalInterest12 = schedule.reduce((s, r) => s + r.interest, 0);
+                        return (
+                          <div className="mt-3 border-t border-surface-border pt-3">
+                            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">
+                              Principal vs. Interest — First 12 Months
+                            </p>
+                            <div className="h-[120px] w-full">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={chartData} margin={{ top: 0, right: 0, left: -30, bottom: 0 }} barSize={8}>
+                                  <XAxis dataKey="name" tick={{ fill: '#52525B', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} />
+                                  <YAxis tick={{ fill: '#52525B', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}`} />
+                                  <Tooltip
+                                    contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', fontFamily: 'monospace', fontSize: '11px' }}
+                                    formatter={(value, name) => [`$${Number(value ?? 0).toFixed(2)}`, name === 'principal' ? 'Principal' : 'Interest']}
+                                  />
+                                  <Bar dataKey="principal" fill="#6366f1" stackId="a" />
+                                  <Bar dataKey="interest" fill="#EF4444" stackId="a" />
+                                </BarChart>
+                              </ResponsiveContainer>
+                            </div>
+                            <div className="flex gap-4 mt-2">
+                              <span className="text-[10px] font-mono text-indigo-400">■ Principal</span>
+                              <span className="text-[10px] font-mono text-red-400">■ Interest</span>
+                              <span className="text-[10px] font-mono text-zinc-600 ml-auto">
+                                12-mo interest: ${totalInterest12.toFixed(2)}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   );
                 })}
@@ -313,8 +365,8 @@ export default function Obligations() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-surface-border bg-surface-raised">
-                <th className="px-6 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Type</th>
+                <th className="px-6 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Description</th>
+                <th className="px-6 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Category</th>
                 <th className="px-6 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Due Date</th>
                 <th className="px-6 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-wider text-right">Amount</th>
                 <th className="px-6 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-wider text-right">Action</th>
@@ -374,11 +426,11 @@ export default function Obligations() {
                           whileTap={{ scale: 0.95 }}
                           onClick={() => {
                             const cit = citations.find(c => c.id === ob.id);
-                            if (cit) resolveCitation(cit.id);
-                            toast.success(`${ob.name} resolved`);
+                            if (cit) { resolveCitation(cit.id); toast.success(`${ob.name} resolved`); }
+                            else toast.error('Citation not found');
                           }}
                           className="px-3 py-1 border border-rose-500/50 hover:bg-rose-500/10 text-rose-400 text-xs font-mono font-bold rounded-sm transition-colors"
-                        >RESOLVE</motion.button>
+                        >PAY</motion.button>
                       )}
                     </td>
                   </motion.tr>

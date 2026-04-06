@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useStore } from '../store/useStore';
-import { TrendingUp, TrendingDown, DollarSign, Building2, CreditCard, Wallet, PieChart, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import { projectNetWorth } from '../lib/finance';
+import { TrendingUp, TrendingDown, Hash, Building2, CreditCard, Vault, PieChart, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPie, Pie, Cell } from 'recharts';
 import { toast } from 'sonner';
 import { motion, animate } from 'motion/react';
@@ -29,24 +30,19 @@ function AnimatedValue({ value, prefix = "", suffix = "", decimals = 0 }: { valu
 }
 
 export default function NetWorth() {
-  const { assets, debts, addAsset, deleteAsset } = useStore();
+  const { assets, debts, incomes, bills, subscriptions, deleteAsset } = useStore();
 
   const totalAssets = useMemo(() => assets.reduce((sum, asset) => sum + asset.value, 0), [assets]);
   const totalLiabilities = useMemo(() => debts.reduce((sum, debt) => sum + debt.remaining, 0), [debts]);
   const netWorth = totalAssets - totalLiabilities;
 
-  // 12-month historical mock
-  const historicalData = useMemo(() => {
-    const data = [];
-    const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
-    for (let i = 0; i < months.length; i++) {
-      const factor = 0.78 + (i / (months.length - 1)) * 0.22;
-      const noise = (Math.random() - 0.5) * netWorth * 0.04;
-      data.push({ name: months[i], value: Math.round(netWorth * factor + noise) });
-    }
-    data[data.length - 1].value = netWorth;
-    return data;
-  }, [netWorth]);
+  const [extraMonthly, setExtraMonthly] = useState(0);
+
+  // 12-month forward projection
+  const projectionData = useMemo(() => {
+    const rows = projectNetWorth(assets, debts, incomes, bills, subscriptions, 12, extraMonthly);
+    return rows.map(r => ({ name: r.label, value: r.netWorth }));
+  }, [assets, debts, incomes, bills, subscriptions, extraMonthly]);
 
   // Asset allocation by type
   const ASSET_COLORS = ['#6366F1', '#34D399', '#F59E0B', '#8B5CF6', '#06B6D4', '#EC4899'];
@@ -99,11 +95,26 @@ export default function NetWorth() {
         </div>
       </div>
 
-      {/* Historical Chart — 12 months */}
-      <CollapsibleModule title="Net Worth History — 12 Months" icon={TrendingUp}>
+      {/* Forward Projection — 12 months */}
+      <CollapsibleModule title="Net Worth Projection — 12 Months Forward" icon={TrendingUp}>
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Extra/mo:</span>
+          <button
+            onClick={() => setExtraMonthly(e => Math.max(0, e - 100))}
+            className="text-zinc-500 hover:text-white text-sm font-mono transition-colors"
+          >−</button>
+          <span className="text-sm font-mono text-content-primary w-20 text-center">${extraMonthly.toLocaleString()}</span>
+          <button
+            onClick={() => setExtraMonthly(e => e + 100)}
+            className="text-zinc-500 hover:text-white text-sm font-mono transition-colors"
+          >+</button>
+          {extraMonthly > 0 && (
+            <span className="text-[10px] font-mono text-indigo-400 ml-2">accelerated payoff active</span>
+          )}
+        </div>
         <div className="h-[260px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={historicalData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <AreaChart data={projectionData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/>
@@ -115,7 +126,7 @@ export default function NetWorth() {
               <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} dx={-10} fontFamily="monospace" />
               <Tooltip
                 contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', color: '#FAFAFA', fontFamily: 'monospace', fontSize: '12px' }}
-                formatter={(value: number) => [`$${value.toLocaleString('en-US', { maximumFractionDigits: 0 })}`, 'Net Worth']}
+                formatter={(value) => [`$${Number(value ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`, 'Net Worth']}
               />
               <Area type="monotone" dataKey="value" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" dot={{ fill: '#6366f1', strokeWidth: 0, r: 3 }} />
             </AreaChart>
@@ -140,7 +151,7 @@ export default function NetWorth() {
                   </Pie>
                   <Tooltip
                     contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', fontFamily: 'monospace', fontSize: '11px' }}
-                    formatter={(v: number) => [`$${v.toLocaleString()}`, 'Value']}
+                    formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Value']}
                   />
                 </RechartsPie>
               </ResponsiveContainer>

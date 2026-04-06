@@ -1,25 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, UploadCloud, FileText, Terminal } from 'lucide-react';
+import { X, Terminal, AlertCircle } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
+import { guessCategory } from '../lib/categorizer';
 
 interface QuickAddModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-type TabType = 'transaction' | 'obligation' | 'income';
-
 export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const { quickAddTab, addTransaction, addBill, addDebt, addIncome } = useStore();
   const [activeTab, setActiveTab] = useState<'transaction' | 'obligation' | 'income'>('transaction');
-  const [isDragging, setIsDragging] = useState(false);
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanPhase, setScanPhase] = useState<1 | 2>(1);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form states
   const [amount, setAmount] = useState('');
@@ -30,8 +25,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [dueDate, setDueDate] = useState('');
   const [vendor, setVendor] = useState('');
   const [source, setSource] = useState('salary');
-  const [customCategory, setCustomCategory] = useState('');
-  const [customSource, setCustomSource] = useState('');
+  // Validation state
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (isOpen) {
@@ -39,135 +34,129 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       setAmount('');
       setDescription('');
       setVendor('');
+      setErrors({});
     }
   }, [isOpen, quickAddTab]);
+
+  useEffect(() => {
+    if (activeTab === 'obligation' && vendor.length > 2) {
+      const guessed = guessCategory(vendor);
+      if (guessed) setCategory(guessed);
+    } else if (activeTab === 'transaction' && description.length > 2) {
+      const guessed = guessCategory(description);
+      if (guessed) setCategory(guessed);
+    }
+  }, [vendor, description, activeTab]);
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+    if (!amount || isNaN(parseFloat(amount))) newErrors.amount = "Please enter a valid amount.";
+    
+    if (activeTab === 'transaction') {
+      if (!description.trim()) newErrors.description = "Please describe the transaction.";
+    } else if (activeTab === 'obligation') {
+      if (!vendor.trim()) newErrors.vendor = "Please specify who is being paid.";
+      if (!dueDate) newErrors.dueDate = "Please select a due date.";
+    } else if (activeTab === 'income') {
+      // Incomes mostly rely on select, but we can check amount and date
+      if (!date) newErrors.date = "Please select a date.";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleNLPInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
     
-    const amtMatch = val.match(/\$([\d,]+(?:\.\d{2})?)/);
-    if (amtMatch) setAmount(amtMatch[1].replace(',', ''));
-    
-    const lowerVal = val.toLowerCase();
-    if (lowerVal.includes('spent') || lowerVal.includes('bought') || lowerVal.includes('paid for')) {
-      setActiveTab('transaction');
-      setDescription(val.replace(/\$([\d,]+(?:\.\d{2})?)/g, '').replace(/spent|bought|paid for/i, '').trim() || 'Parsed Transaction');
-    } else if (lowerVal.includes('bill') || lowerVal.includes('owe') || lowerVal.includes('due') || lowerVal.includes('ticket')) {
-      setActiveTab('obligation');
-      setVendor(val.replace(/\$([\d,]+(?:\.\d{2})?)/g, '').replace(/bill|owe|due|ticket/i, '').trim() || 'Unknown Payee');
-      setType(lowerVal.includes('ticket') ? 'debt' : 'bill');
-    } else if (lowerVal.includes('earned') || lowerVal.includes('paid me') || lowerVal.includes('income')) {
-      setActiveTab('income');
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      simulateScan();
-    }
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      simulateScan();
-    }
-  };
-
-  const simulateScan = () => {
-    setIsScanning(true);
-    setScanPhase(1);
-
-    // Phase 1: Extracting
-    setTimeout(() => {
-      setScanPhase(2);
+    // Simple NLP parsing
+    const parts = val.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      const lastPart = parts[parts.length - 1].toLowerCase();
       
-      // Phase 2: Categorizing
-      setTimeout(() => {
-        setIsScanning(false);
-        setActiveTab('obligation');
-        setType('bill');
-        setAmount('340.00');
-        setVendor('Quest Diagnostics');
+      // Date parsing check
+      if (lastPart === 'today') setDate(new Date().toISOString().split('T')[0]);
+      if (lastPart === 'yesterday') {
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        setDate(d.toISOString().split('T')[0]);
+      }
+      if (lastPart === 'tomorrow') {
+        const d = new Date();
+        d.setDate(d.getDate() + 1);
+        setDate(d.toISOString().split('T')[0]);
+      }
+
+      // Find amount (e.g. 50 or $50)
+      const amountPart = parts.find(p => p.match(/^\$?\d+(\.\d{2})?$/));
+      if (amountPart) {
+        setAmount(amountPart.replace('$', ''));
+        const namePart = parts.filter(p => p !== amountPart && !['today', 'yesterday', 'tomorrow'].includes(p.toLowerCase())).join(' ');
         
-        const futureDate = new Date();
-        futureDate.setDate(futureDate.getDate() + 14);
-        setDueDate(futureDate.toISOString().split('T')[0]);
-        
-        setCategory('medical'); // We'll add this to the dropdown
-        toast.success('Document successfully parsed');
-      }, 1500);
-    }, 1500);
+        if (val.toLowerCase().includes('bill') || val.toLowerCase().includes('due')) {
+          setActiveTab('obligation');
+          setVendor(namePart);
+        } else if (val.toLowerCase().includes('earned') || val.toLowerCase().includes('paid me')) {
+          setActiveTab('income');
+        } else {
+          setActiveTab('transaction');
+          setDescription(namePart);
+        }
+      }
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validateForm()) return;
     
     const numAmount = parseFloat(amount);
-    if (isNaN(numAmount)) {
-      toast.error('Please enter a valid amount');
-      return;
-    }
-
-    const finalCategory = category === 'other' ? customCategory : category;
 
     try {
       if (activeTab === 'transaction') {
         addTransaction({
           name: description,
           amount: numAmount,
-          category: finalCategory,
+          category: category,
           date: date,
           type: 'expense'
         });
-        toast.success(`Transaction "${description}" saved`);
+        toast.success(`Transaction saved`);
       } else if (activeTab === 'obligation') {
         if (type === 'bill') {
           addBill({
             biller: vendor,
             amount: numAmount,
-            category: finalCategory,
+            category: category,
             dueDate: dueDate || date,
             frequency: 'Monthly',
             status: 'upcoming',
             autoPay: false
           });
-          toast.success(`Bill for "${vendor}" added`);
-        } else if (type === 'debt') {
+          toast.success(`Bill added`);
+        } else {
           addDebt({
             name: vendor,
-            type: 'Card', // Default
-            apr: 19.99, // Default
+            type: 'Card', 
+            apr: 19.99, 
             remaining: numAmount,
             minPayment: Math.max(25, numAmount * 0.02),
             paid: 0
           });
-          toast.success(`Debt "${vendor}" recorded`);
+          toast.success(`Debt recorded`);
         }
       } else if (activeTab === 'income') {
-        const finalSource = source === 'other' ? customSource : source;
         addIncome({
-          name: finalSource,
+          name: source,
           amount: numAmount,
           frequency: 'Monthly',
           category: 'Income',
           nextDate: date,
-          status: 'active'
+          status: 'active',
+          isTaxWithheld: false
         });
-        toast.success(`Income from "${finalSource}" recorded`);
+        toast.success(`Income recorded`);
       }
-
       onClose();
     } catch (error) {
       toast.error('Failed to save to ledger');
@@ -179,7 +168,6 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     <AnimatePresence>
       {isOpen && (
         <Dialog 
-          static
           open={isOpen} 
           onClose={onClose} 
           className="relative z-50"
@@ -189,339 +177,295 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md" 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm" 
             aria-hidden="true" 
           />
 
-          <div className="fixed inset-0 flex items-center justify-center p-4">
+          <div className="fixed inset-0 flex items-center justify-center p-4 sm:p-0">
             <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              initial={{ opacity: 0, y: 15, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 15, scale: 0.98 }}
+              exit={{ opacity: 0, y: 10, scale: 0.98 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="mx-auto max-w-lg w-full"
+              className="w-full sm:max-w-md"
             >
-              <Dialog.Panel className="rounded-sm bg-gradient-to-b from-surface-elevated to-surface-raised border border-surface-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+              <Dialog.Panel className="rounded shadow-xl bg-surface-elevated border border-surface-border overflow-hidden flex flex-col max-h-[90vh]">
+                
+                {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border bg-surface-raised shrink-0">
-                  <Dialog.Title className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-content-primary">
+                  <Dialog.Title className="text-sm font-sans font-semibold text-white">
                     Quick Entry
                   </Dialog.Title>
-                  <button onClick={onClose} className="text-zinc-500 hover:text-zinc-300 transition-colors">
-                    <X className="w-4 h-4" />
+                  <button 
+                    onClick={onClose} 
+                    className="text-zinc-400 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-sm"
+                  >
+                    <span className="sr-only">Close</span>
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
 
-                <div className="overflow-y-auto scrollbar-hide flex-1">
-                  {/* Natural Language Terminal Node */}
-                  <div className="bg-surface-base p-4 border-b border-surface-border">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Terminal className="w-3.5 h-3.5 text-indigo-400" />
-                      <span className="text-[10px] font-mono text-indigo-400 uppercase tracking-widest font-bold">Smart Text Input</span>
+                <div className="overflow-y-auto w-full">
+                  {/* Smart Input Bar */}
+                  <div className="bg-surface-base p-6 border-b border-surface-border">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Terminal className="w-4 h-4 text-indigo-400" />
+                      <span className="text-xs font-sans font-medium text-zinc-300">Natural Language Speed Input</span>
                     </div>
+                    
                     <textarea 
-                      placeholder="e.g. 'Spent $45 on hardware...' or 'Got a $150 Speeding ticket...'"
+                      placeholder="e.g. 'Coffee 5.50 today' or 'Comcast bill 120 next tuesday'"
                       onChange={handleNLPInput}
-                      className="w-full bg-surface-raised border border-surface-border rounded-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-[11px] font-mono text-content-primary placeholder-surface-border p-3 outline-none resize-none transition-colors shadow-inner"
+                      className="w-full bg-surface-raised border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm font-sans text-white placeholder-zinc-500 p-3 outline-none resize-none transition-colors"
                       rows={2}
                     />
                   </div>
 
-                  {/* Smart Dropzone */}
-                  <div className="p-6 border-b border-surface-border bg-surface-raised">
-                    <div 
-                      className={`border-2 border-dashed rounded-sm p-6 text-center transition-colors cursor-pointer ${
-                        isDragging ? 'border-indigo-500 bg-indigo-500/10' : 'border-surface-border hover:border-zinc-500 hover:bg-surface-elevated'
-                      }`}
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={handleDrop}
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <input 
-                        type="file" 
-                        ref={fileInputRef} 
-                        className="hidden" 
-                        accept="image/*,.pdf" 
-                        onChange={handleFileSelect}
-                      />
-                      
-                      {isScanning ? (
-                        <div className="flex flex-col items-center justify-center h-20">
-                          <FileText className="w-8 h-8 text-indigo-500 mb-3 animate-pulse" />
-                          {scanPhase === 1 ? (
-                            <p className="text-sm font-mono text-zinc-400">&gt; EXTRACTING TEXT...</p>
-                          ) : (
-                            <p className="text-sm font-mono text-indigo-400 animate-pulse">&gt; CATEGORIZING EXPENSE...</p>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center justify-center">
-                          <UploadCloud className="w-8 h-8 text-zinc-500 mb-3" />
-                          <p className="text-zinc-400 text-sm">Drop any bill, receipt, or citation. Oweable will extract and categorize it.</p>
-                          <p className="text-xs text-zinc-600 mt-2">Supports PDF, JPG, PNG</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex border-b border-surface-border sticky top-0 bg-surface-elevated z-10 p-1">
+                  {/* Tabs */}
+                  <div className="flex border-b border-surface-border bg-surface-raised p-1 gap-1">
                     <button
-                      onClick={() => setActiveTab('transaction')}
-                      className={`flex-1 py-1.5 text-[9px] font-mono uppercase tracking-widest transition-all rounded-sm ${
-                        activeTab === 'transaction' ? 'bg-surface-border text-white border border-surface-border' : 'text-zinc-500 hover:text-zinc-300'
-                      }`}
+                      onClick={() => { setActiveTab('transaction'); setErrors({}); }}
+                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded ${
+                        activeTab === 'transaction' ? 'bg-surface-border text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200 hover:bg-surface-elevated'
+                      } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}
                     >
-                      Transaction
+                      Expense
                     </button>
                     <button
-                      onClick={() => setActiveTab('obligation')}
-                      className={`flex-1 py-1.5 text-[9px] font-mono uppercase tracking-widest transition-all rounded-sm ${
-                        activeTab === 'obligation' ? 'bg-surface-border text-white border border-surface-border' : 'text-zinc-500 hover:text-zinc-300'
-                      }`}
+                      onClick={() => { setActiveTab('obligation'); setErrors({}); }}
+                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded ${
+                        activeTab === 'obligation' ? 'bg-surface-border text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200 hover:bg-surface-elevated'
+                      } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}
                     >
                       Bill/Debt
                     </button>
                     <button
-                      onClick={() => setActiveTab('income')}
-                      className={`flex-1 py-1.5 text-[9px] font-mono uppercase tracking-widest transition-all rounded-sm ${
-                        activeTab === 'income' ? 'bg-surface-border text-white border border-surface-border' : 'text-zinc-500 hover:text-zinc-300'
-                      }`}
+                      onClick={() => { setActiveTab('income'); setErrors({}); }}
+                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded ${
+                        activeTab === 'income' ? 'bg-surface-border text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200 hover:bg-surface-elevated'
+                      } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}
                     >
                       Income
                     </button>
                   </div>
 
-                  <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                  {/* Form Body */}
+                  <form id="quick-add-form" onSubmit={handleSubmit} className="p-6 space-y-5">
+                    
+                    {/* AMOUNT FIELD (ALWAYS PRESENT) */}
+                    <div>
+                      <label htmlFor="amount" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Amount</label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                        <input
+                          id="amount"
+                          type="number"
+                          step="0.01"
+                          value={amount}
+                          onChange={(e) => { setAmount(e.target.value); if(errors.amount) setErrors({...errors, amount: ''}); }}
+                          placeholder="0.00"
+                          className={`w-full bg-surface-base border ${errors.amount ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 pl-7 py-2.5 text-base font-sans font-semibold text-white placeholder-zinc-600 outline-none transition-colors`}
+                        />
+                      </div>
+                      {errors.amount && (
+                        <p className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5"><AlertCircle className="w-3 h-3" /> {errors.amount}</p>
+                      )}
+                    </div>
+
+                    {/* EXPENSE FIELDS */}
                     {activeTab === 'transaction' && (
                       <>
                         <div>
-                          <label className="block text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Amount</label>
-                          <div className="relative flex items-center">
-                            <span className="absolute left-0 text-[#4ade80] font-mono text-2xl pointer-events-none">$</span>
-                            <input
-                              type="number"
-                              step="0.01"
-                              required
-                              value={amount}
-                              onChange={(e) => setAmount(e.target.value)}
-                              placeholder="0.00"
-                              className="w-full bg-transparent border-b border-surface-border focus:border-[#4ade80] rounded-none focus:outline-none focus:ring-0 pl-7 py-2 text-2xl font-mono text-[#4ade80] placeholder-[#4ade80]/20 focus:shadow-[inset_0_-4px_12px_rgba(74,222,128,0.06)] transition-all"
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Who are we paying?</label>
-                          <div className="relative flex items-center gap-3">
-                            {description.length > 1 && <BrandLogo name={description} size="sm" />}
-                            <input
-                              type="text"
-                              required
-                              value={description}
-                              onChange={(e) => setDescription(e.target.value)}
-                              placeholder="e.g., Whole Foods"
-                              className="w-full bg-transparent border-b border-surface-border focus:border-indigo-500 rounded-none focus:outline-none focus:ring-0 focus:shadow-[inset_0_-2px_15px_rgba(255,255,255,0.03)] py-2 text-content-primary placeholder-zinc-600 transition-all"
-                            />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-6">
-                          <div>
-                            <div className="flex items-center justify-between mb-2">
-                              <label className="block text-xs font-mono text-zinc-500 uppercase tracking-wider">Category</label>
-                            </div>
-                            <select 
-                              value={category}
-                              onChange={(e) => setCategory(e.target.value)}
-                              className="w-full bg-transparent border-b border-surface-border focus:border-indigo-500 rounded-none focus:ring-0 py-2 text-content-primary"
-                            >
-                              <option value="food" className="bg-surface-elevated">Food & Dining</option>
-                              <option value="transport" className="bg-surface-elevated">Transportation</option>
-                              <option value="shopping" className="bg-surface-elevated">Shopping</option>
-                              <option value="entertainment" className="bg-surface-elevated">Entertainment</option>
-                              <option value="medical" className="bg-surface-elevated">Medical / Health</option>
-                              <option value="other" className="bg-surface-elevated">Other (Custom)</option>
-                            </select>
-                            {category === 'other' && (
+                          <label htmlFor="description" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Description</label>
+                          <div className="flex gap-3">
+                            <div className="flex-1">
                               <input
+                                id="description"
                                 type="text"
-                                required
-                                value={customCategory}
-                                onChange={(e) => setCustomCategory(e.target.value)}
-                                placeholder="Enter custom category name..."
-                                className="w-full mt-3 bg-transparent border-b border-surface-border focus:border-indigo-500 rounded-none focus:ring-0 text-sm text-content-primary placeholder:text-zinc-600 px-0 py-2 animate-in fade-in slide-in-from-top-2 duration-200"
+                                value={description}
+                                onChange={(e) => { setDescription(e.target.value); if(errors.description) setErrors({...errors, description: ''}); }}
+                                placeholder="E.g., Whole Foods"
+                                className={`w-full bg-surface-base border ${errors.description ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none transition-colors`}
                               />
+                            </div>
+                            {description.length > 2 && (
+                              <div className="shrink-0 flex items-center justify-center bg-surface-base border border-surface-border rounded w-10">
+                                <BrandLogo name={description} size="sm" />
+                              </div>
                             )}
                           </div>
+                          {errors.description && (
+                            <p className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5"><AlertCircle className="w-3 h-3" /> {errors.description}</p>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Date</label>
+                            <label htmlFor="category" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Category</label>
+                            <select 
+                              id="category"
+                              value={category}
+                              onChange={(e) => setCategory(e.target.value)}
+                              className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none cursor-pointer"
+                            >
+                              <option value="housing">Housing & Rent</option>
+                              <option value="utilities">Utilities & Telecom</option>
+                              <option value="subscriptions">Subscriptions</option>
+                              <option value="insurance">Insurance</option>
+                              <option value="auto">Auto & Car Payment</option>
+                              <option value="health">Health & Medical</option>
+                              <option value="education">Education & Loans</option>
+                              <option value="childcare">Childcare</option>
+                              <option value="personal">Personal Care & Gym</option>
+                              <option value="taxes">Taxes</option>
+                              <option value="business">Business & Software</option>
+                              <option value="food">Food & Dining</option>
+                              <option value="transport">Transportation</option>
+                              <option value="shopping">Shopping</option>
+                              <option value="entertainment">Entertainment</option>
+                              <option value="debt">Debt Services</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label htmlFor="date" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Date</label>
                             <input
+                              id="date"
                               type="date"
-                              required
                               value={date}
                               onChange={(e) => setDate(e.target.value)}
-                              className="w-full bg-transparent border-b border-surface-border focus:border-indigo-500 rounded-none focus:ring-0 py-2 text-content-primary"
+                              className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none"
                             />
                           </div>
                         </div>
                       </>
                     )}
 
+                    {/* OBLIGATION FIELDS */}
                     {activeTab === 'obligation' && (
                       <>
-                        <div>
-                          <label className="block text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Amount</label>
-                          <div className="relative flex items-center">
-                            <span className="absolute left-0 text-[#4ade80] font-mono text-2xl pointer-events-none">$</span>
-                            <input
-                              type="number"
-                              step="0.01"
-                              required
-                              value={amount}
-                              onChange={(e) => setAmount(e.target.value)}
-                              placeholder="0.00"
-                              className="w-full bg-transparent border-b border-surface-border focus:border-[#4ade80] rounded-none focus:outline-none focus:ring-0 pl-7 py-2 text-2xl font-mono text-[#4ade80] placeholder-[#4ade80]/20 focus:shadow-[inset_0_-4px_12px_rgba(74,222,128,0.06)] transition-all"
-                            />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-6">
+                        <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Type</label>
+                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Type</label>
                             <select 
                               value={type}
                               onChange={(e) => setType(e.target.value)}
-                              className="w-full bg-transparent border-b border-surface-border focus:border-indigo-500 rounded-none focus:ring-0 py-2 text-content-primary"
+                              className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none cursor-pointer"
                             >
-                              <option value="bill" className="bg-surface-elevated">Bill</option>
-                              <option value="debt" className="bg-surface-elevated">Debt</option>
-                              <option value="citation" className="bg-surface-elevated">Citation</option>
+                              <option value="bill">Monthly Bill</option>
+                              <option value="debt">Debt / Loan</option>
                             </select>
                           </div>
                           <div>
-                            <label className="block text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Due Date</label>
+                            <label htmlFor="dueDate" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Due Date</label>
                             <input
+                              id="dueDate"
                               type="date"
-                              required
                               value={dueDate}
-                              onChange={(e) => setDueDate(e.target.value)}
-                              className="w-full bg-transparent border-b border-surface-border focus:border-indigo-500 rounded-none focus:ring-0 py-2 text-content-primary"
+                              onChange={(e) => { setDueDate(e.target.value); if(errors.dueDate) setErrors({...errors, dueDate: ''}); }}
+                              className={`w-full bg-surface-base border ${errors.dueDate ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none`}
                             />
+                            {errors.dueDate && <p className="text-xs text-red-400 mt-1.5">{errors.dueDate}</p>}
                           </div>
                         </div>
-                        <div>
-                          <label className="block text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Who are we paying?</label>
-                          <div className="relative flex items-center gap-3">
-                            {vendor.length > 1 && <BrandLogo name={vendor} size="sm" />}
-                            <input
-                              type="text"
-                              required
-                              value={vendor}
-                              onChange={(e) => setVendor(e.target.value)}
-                              placeholder="e.g., Verizon Wireless"
-                              className="w-full bg-transparent border-b border-surface-border focus:border-indigo-500 rounded-none focus:outline-none focus:ring-0 focus:shadow-[inset_0_-2px_15px_rgba(255,255,255,0.03)] py-2 text-content-primary placeholder-zinc-600 transition-all"
-                            />
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label htmlFor="vendor" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Biller Name</label>
+                            <div className="flex gap-3">
+                              <div className="flex-1">
+                                <input
+                                  id="vendor"
+                                  type="text"
+                                  value={vendor}
+                                  onChange={(e) => { setVendor(e.target.value); if(errors.vendor) setErrors({...errors, vendor: ''}); }}
+                                  placeholder={type === 'bill' ? "E.g., AT&T" : "E.g., Chase Sapphire"}
+                                  className={`w-full bg-surface-base border ${errors.vendor ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none transition-colors`}
+                                />
+                              </div>
+                            </div>
+                            {errors.vendor && (
+                              <p className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5"><AlertCircle className="w-3 h-3" /> {errors.vendor}</p>
+                            )}
                           </div>
-                        </div>
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <label className="block text-xs font-mono text-zinc-500 uppercase tracking-wider">Category</label>
+                          <div>
+                            <label htmlFor="billCategory" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Category</label>
+                            <select 
+                              id="billCategory"
+                              value={category}
+                              onChange={(e) => setCategory(e.target.value)}
+                              className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2.5 text-sm font-sans text-white outline-none cursor-pointer"
+                            >
+                              <option value="housing">Housing & Rent</option>
+                              <option value="utilities">Utilities & Telecom</option>
+                              <option value="subscriptions">Subscriptions</option>
+                              <option value="insurance">Insurance</option>
+                              <option value="auto">Auto & Car Payment</option>
+                              <option value="health">Health & Medical</option>
+                              <option value="education">Education & Loans</option>
+                              <option value="childcare">Childcare</option>
+                              <option value="personal">Personal Care & Gym</option>
+                              <option value="taxes">Taxes</option>
+                              <option value="business">Business & Software</option>
+                              <option value="food">Food & Dining</option>
+                              <option value="transport">Transportation</option>
+                              <option value="shopping">Shopping</option>
+                              <option value="debt">Debt Services</option>
+                            </select>
                           </div>
-                          <select 
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className="w-full bg-transparent border-b border-surface-border focus:border-indigo-500 rounded-none focus:ring-0 py-2 text-content-primary"
-                          >
-                            <option value="food" className="bg-surface-elevated">Food & Dining</option>
-                            <option value="transport" className="bg-surface-elevated">Transportation</option>
-                            <option value="shopping" className="bg-surface-elevated">Shopping</option>
-                            <option value="entertainment" className="bg-surface-elevated">Entertainment</option>
-                            <option value="medical" className="bg-surface-elevated">Medical / Health</option>
-                            <option value="other" className="bg-surface-elevated">Other (Custom)</option>
-                          </select>
-                          {category === 'other' && (
-                            <input
-                              type="text"
-                              required
-                              value={customCategory}
-                              onChange={(e) => setCustomCategory(e.target.value)}
-                              placeholder="Enter custom category name..."
-                              className="w-full mt-3 bg-transparent border-b border-surface-border focus:border-indigo-500 rounded-none focus:ring-0 text-sm text-content-primary placeholder:text-zinc-600 px-0 py-2 animate-in fade-in slide-in-from-top-2 duration-200"
-                            />
-                          )}
                         </div>
                       </>
                     )}
 
+                    {/* INCOME FIELDS */}
                     {activeTab === 'income' && (
                       <>
-                        <div>
-                          <label className="block text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Amount</label>
-                          <div className="relative flex items-center">
-                            <span className="absolute left-0 text-[#4ade80] font-mono text-2xl pointer-events-none">$</span>
-                            <input
-                              type="number"
-                              step="0.01"
-                              required
-                              value={amount}
-                              onChange={(e) => setAmount(e.target.value)}
-                              placeholder="0.00"
-                              className="w-full bg-transparent border-b border-surface-border focus:border-[#4ade80] rounded-none focus:outline-none focus:ring-0 pl-7 py-2 text-2xl font-mono text-[#4ade80] placeholder-[#4ade80]/20 focus:shadow-[inset_0_-4px_12px_rgba(74,222,128,0.06)] transition-all"
-                            />
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Source</label>
+                            <select 
+                              value={source}
+                              onChange={(e) => setSource(e.target.value)}
+                              className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none cursor-pointer"
+                            >
+                              <option value="salary">Salary / Wages</option>
+                              <option value="freelance">Freelance</option>
+                              <option value="bonus">Bonus</option>
+                              <option value="other">Other</option>
+                            </select>
                           </div>
-                        </div>
-                        <div>
-                          <label className="block text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Source</label>
-                          <select 
-                            value={source}
-                            onChange={(e) => setSource(e.target.value)}
-                            className="w-full bg-transparent border-b border-surface-border focus:border-indigo-500 rounded-none focus:ring-0 py-2 text-content-primary"
-                          >
-                            <option value="salary" className="bg-surface-elevated">Salary / Wages</option>
-                            <option value="freelance" className="bg-surface-elevated">Freelance / Contract</option>
-                            <option value="bonus" className="bg-surface-elevated">Bonus</option>
-                            <option value="investment" className="bg-surface-elevated">Investment</option>
-                            <option value="other" className="bg-surface-elevated">Other (Custom)</option>
-                          </select>
-                          {source === 'other' && (
+                          <div>
+                            <label htmlFor="incDate" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Date</label>
                             <input
-                              type="text"
-                              required
-                              value={customSource}
-                              onChange={(e) => setCustomSource(e.target.value)}
-                              placeholder="Enter custom income source..."
-                              className="w-full mt-3 bg-transparent border-b border-surface-border focus:border-indigo-500 rounded-none focus:ring-0 text-sm text-content-primary placeholder:text-zinc-600 px-0 py-2 animate-in fade-in slide-in-from-top-2 duration-200"
+                              id="incDate"
+                              type="date"
+                              value={date}
+                              onChange={(e) => { setDate(e.target.value); if(errors.date) setErrors({...errors, date: ''}); }}
+                              className={`w-full bg-surface-base border ${errors.date ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none`}
                             />
-                          )}
-                        </div>
-                        <div>
-                          <label className="block text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Date</label>
-                          <input
-                            type="date"
-                            required
-                            value={date}
-                            onChange={(e) => setDate(e.target.value)}
-                            className="w-full bg-transparent border-b border-surface-border focus:border-indigo-500 rounded-none focus:ring-0 py-2 text-content-primary"
-                          />
+                            {errors.date && <p className="text-xs text-red-400 mt-1.5">{errors.date}</p>}
+                          </div>
                         </div>
                       </>
                     )}
+
                   </form>
                 </div>
-                <div className="p-6 border-t border-surface-border bg-surface-raised shrink-0">
-                  <div className="flex justify-end gap-6 items-center">
-                    <button
-                      type="button"
-                      onClick={onClose}
-                      className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 hover:text-zinc-300 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      onClick={handleSubmit}
-                      className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-colors shadow-lg shadow-indigo-500/10"
-                    >
-                      Add to Ledger
-                    </button>
-                  </div>
+
+                {/* Footer Controls */}
+                <div className="px-6 py-4 border-t border-surface-border bg-surface-raised shrink-0 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="px-4 py-2 text-sm font-sans font-medium text-zinc-400 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 rounded"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    form="quick-add-form"
+                    className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-sm font-sans font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-raised focus-visible:ring-indigo-500 shadow"
+                  >
+                    Save Entry
+                  </button>
                 </div>
               </Dialog.Panel>
             </motion.div>

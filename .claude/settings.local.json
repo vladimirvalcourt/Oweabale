@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_start",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
+      "Bash(curl -s http://localhost:3000/)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" SUPABASE_ACCESS_TOKEN=\"sbp_d6a7051c1d6e6ab4f5f42441f6eed2a2bf6e48f1\" supabase db pull)"
+    ]
+  }
+}

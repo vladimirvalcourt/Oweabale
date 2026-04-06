@@ -1,22 +1,25 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, ArrowUpRight, ArrowDownRight, Plus, Activity, AlertCircle, TrendingUp, ShieldCheck, CreditCard, Wallet, Calendar, ArrowRight, Flame, Crosshair, Terminal, SlidersHorizontal, ShieldAlert, Siren, X, Copy, ExternalLink, ChevronUp, ChevronRight, Zap } from 'lucide-react';
+import { ArrowRight, Activity, ShieldCheck, Calendar, Flame, Inbox, ShieldAlert } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
 import { Dialog } from '@headlessui/react';
-import { motion, useSpring, useTransform, animate } from 'motion/react';
+import { motion } from 'motion/react';
+import { X, Copy, ExternalLink } from 'lucide-react';
+import { animate } from 'motion/react';
 import { useStore } from '../store/useStore';
-import { CollapsibleModule } from '../components/CollapsibleModule';
+import { calcMonthlyCashFlow, calcSurplusRouting } from '../lib/finance';
 
+// Helper for animated numbers
 function AnimatedValue({ value, prefix = "", suffix = "" , decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
     const controls = animate(displayValue, value, {
       duration: 1.5,
-      ease: [0.16, 1, 0.3, 1], // HUD-style ease out
-      onUpdate(value) {
-        setDisplayValue(value);
+      ease: [0.16, 1, 0.3, 1], // Standard Ease-out
+      onUpdate(val) {
+        setDisplayValue(val);
       },
     });
     return () => controls.stop();
@@ -29,35 +32,26 @@ function AnimatedValue({ value, prefix = "", suffix = "" , decimals = 0 }: { val
   );
 }
 
-const chartData = [
-  { name: '1 Apr', balance: 18000 },
-  { name: '8 Apr', balance: 19500 },
-  { name: '15 Apr', balance: 18200 },
-  { name: '22 Apr', balance: 21000 },
-  { name: '29 Apr', balance: 20500 },
-  { name: '6 May', balance: 23000 },
-  { name: '13 May', balance: 24562 },
-];
+import { projectNetWorth } from '../lib/finance';
 
-const mockCitations = [
-  { id: 1, type: 'SPEEDING', jurisdiction: 'NY CITY', daysLeft: 3, amount: 150, penalty: 75, date: '12 OCT', citationNumber: 'NY-99281-A', paymentUrl: 'https://nyc.gov/payticket' },
-  { id: 2, type: 'TOLL VIOLATION', jurisdiction: 'EZ-PASS NJ', daysLeft: 25, amount: 15, penalty: 10, date: '03 NOV', citationNumber: 'EZ-449102', paymentUrl: 'https://ezpassnj.com/pay' }
-];
+import type { Citation } from '../store/useStore';
 
 export default function Dashboard() {
-  const { bills, debts, transactions, assets, subscriptions, incomes, user, openQuickAdd } = useStore();
-  const [isLoading, setIsLoading] = useState(true);
+  const { bills, debts, transactions, assets, subscriptions, incomes, goals, user, pendingIngestions, freelanceEntries, citations, resolveCitation } = useStore();
+  const [isLoading, setIsLoading] = useState(false);
   const [isCitationModalOpen, setIsCitationModalOpen] = useState(false);
-  const [selectedCitation, setSelectedCitation] = useState<typeof mockCitations[0] | null>(null);
+  const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
 
-  useEffect(() => {
-    // Simulate data fetching
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, []);
 
+
+  const projectedData = useMemo(() => {
+    return projectNetWorth(assets, debts, incomes, bills, subscriptions, 6, 0).map(r => ({
+      name: r.label,
+      balance: r.netWorth
+    }));
+  }, [assets, debts, incomes, bills, subscriptions]);
+
+  // --- Financial Calcs ---
   const totalAssets = useMemo(() => assets.reduce((acc, asset) => acc + asset.value, 0), [assets]);
   const totalDebts = useMemo(() => debts.reduce((acc, debt) => acc + debt.remaining, 0), [debts]);
   const netWorth = totalAssets - totalDebts;
@@ -81,20 +75,28 @@ export default function Dashboard() {
     return billsTotal + debtMins + subTotal;
   }, [bills, debts, subscriptions]);
 
-  const survivalMonths = liquidCash / (monthlyBurn || 1);
-  const survivalDays = Math.round(survivalMonths * 30.44);
+  const cashFlow = useMemo(
+    () => calcMonthlyCashFlow(incomes, bills, debts, subscriptions),
+    [incomes, bills, debts, subscriptions]
+  );
+
+  const surplusRouting = useMemo(
+    () => calcSurplusRouting(cashFlow.surplus, goals, debts),
+    [cashFlow.surplus, goals, debts]
+  );
+
+  const survivalMonths = Math.max(0, liquidCash / (monthlyBurn || 1));
   
   const upcomingBills = useMemo(() => bills.filter(b => b.status === 'upcoming').sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()), [bills]);
-  const nextBill = upcomingBills.length > 0 ? upcomingBills[0] : null;
-
+  
   const activeSubscriptions = useMemo(() => subscriptions.filter(s => s.status === 'active'), [subscriptions]);
   const monthlySubscriptionCost = useMemo(() => activeSubscriptions.reduce((acc, sub) => {
     return acc + (sub.frequency === 'Monthly' ? sub.amount : sub.amount / 12);
   }, 0), [activeSubscriptions]);
 
-  // --- Autonomous Intelligence Engine (No AI) --- //
-  
-  // 1. Debt Detonator (Avalanche Math)
+  // --- Intelligent Modules ---
+
+  // 1. Debt
   const avalancheTarget = useMemo(() => {
     const activeDebts = [...debts].filter(d => d.remaining > 0);
     return activeDebts.sort((a, b) => b.apr - a.apr)[0] || null;
@@ -105,14 +107,12 @@ export default function Dashboard() {
     return (avalancheTarget.paid / (avalancheTarget.remaining + avalancheTarget.paid)) * 100;
   }, [avalancheTarget]);
 
-  // 2. Liquidity Gap Engine (Timeline Vector Intersection)
+  // 2. Cash Gap
   const { isOverdraftRisk, liquidBuffer, imminentTotal, nextPaydayStr } = useMemo(() => {
     const today = new Date();
-    // Find absolute closest active income date as Next Payday
     const activeIncomes = incomes.filter(i => i.status === 'active' && new Date(i.nextDate) >= today);
     const nextPayday = activeIncomes.sort((a, b) => new Date(a.nextDate).getTime() - new Date(b.nextDate).getTime())[0];
     
-    // Default sniper window to 14 days if no payday exists
     let sniperWindowMs = 14 * 24 * 60 * 60 * 1000;
     if (nextPayday) {
       sniperWindowMs = new Date(nextPayday.nextDate).getTime() - today.getTime();
@@ -134,7 +134,13 @@ export default function Dashboard() {
     };
   }, [upcomingBills, liquidCash, incomes]);
 
-  // 3. Burn Velocity Tracker (72-Hour Pulse Detection)
+  // 3. Tax Check
+  const taxInsolvencyRisk = useMemo(() => {
+    const estimatedQuarterlyLiability = cashFlow.taxReserve * 3;
+    return liquidCash < estimatedQuarterlyLiability && cashFlow.taxReserve > 0;
+  }, [liquidCash, cashFlow.taxReserve]);
+
+  // 4. Spending
   const burnVelocity = useMemo(() => {
     const today = new Date();
     const seventyTwoHoursAgo = new Date(today.getTime() - (72 * 60 * 60 * 1000));
@@ -147,7 +153,6 @@ export default function Dashboard() {
     const totalSpent = recentExpenses.reduce((sum, t) => sum + t.amount, 0);
     const frequency = recentExpenses.length;
     
-    // Thresholds for "High Velocity"
     const isHighVelocity = totalSpent > 500 || frequency > 8;
     const isModerateVelocity = totalSpent > 200 || frequency > 4;
     
@@ -160,488 +165,448 @@ export default function Dashboard() {
     };
   }, [transactions]);
 
+  // 5. Total Tax Shield
+  const lifetimeTaxShield = useMemo(() => {
+    return freelanceEntries.reduce((sum, e) => sum + (e.scouredWriteOffs || 0), 0);
+  }, [freelanceEntries]);
+
   if (isLoading) {
     return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-8 bg-surface-elevated rounded-sm w-1/4"></div>
-        <div className="bg-surface-raised rounded-sm border border-surface-border p-8 h-40"></div>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+      <div className="space-y-6 animate-pulse p-6">
+        <div className="h-8 bg-zinc-800 rounded w-1/4"></div>
+        <div className="bg-zinc-900 rounded border border-zinc-800 p-8 h-40"></div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-surface-raised rounded-sm border border-surface-border p-5 h-24"></div>
+            <div key={i} className="bg-zinc-900 rounded border border-zinc-800 p-6 h-32"></div>
           ))}
         </div>
-        <div className="bg-surface-raised rounded-sm border border-surface-border h-64"></div>
       </div>
     );
   }
 
+  // Active actionable alerts
+  const hasActionableAlerts = pendingIngestions.length > 0 || isOverdraftRisk || taxInsolvencyRisk;
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
-      {/* Welcome Banner */}
-      <div className="flex justify-between items-end mb-2">
-        <div>
-          <h1 className="text-2xl font-bold font-mono tracking-tight text-content-primary uppercase group">
-            Welcome back, <span className="text-indigo-400 group-hover:text-indigo-300 transition-colors">{user.firstName}</span>.
-          </h1>
-          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-1">Here is your financial overview for the day.</p>
+    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+      
+      {/* 1. Dashboard Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
+        <div className="flex items-center gap-5">
+          <div className="h-14 w-14 rounded-full bg-surface-raised border border-surface-border flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+            {user.avatar ? (
+              <img src={user.avatar} alt="Profile" className="h-full w-full object-cover" />
+            ) : (
+              <div className="h-full w-full flex items-center justify-center bg-indigo-500/10 text-brand-violet font-mono text-xl font-bold">
+                {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+              </div>
+            )}
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-sans font-semibold tracking-tight text-white">
+              Welcome back, <span className="text-brand-indigo">{user.firstName}</span>
+            </h1>
+            <p className="text-sm font-sans text-zinc-400 mt-1">Here is your financial overview for today.</p>
+          </div>
         </div>
       </div>
 
-      {/* Strategic Survival Meter */}
-      <CollapsibleModule title="Financial Runway Overview" icon={Activity}>
-        <div className="relative group">
-          <div className="absolute inset-0 bg-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`w-2 h-2 rounded-none animate-pulse ${survivalMonths < 3 ? 'bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]' : 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`} />
-                <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest font-bold">Status: Tracking Active</p>
-              </div>
-              <div className="flex items-baseline gap-4">
-                <h2 className="text-4xl font-mono font-bold text-content-primary tabular-nums">
-                  <AnimatedValue value={survivalMonths} decimals={1} />
-                  <span className="text-sm font-normal text-zinc-500 ml-1">Months</span>
-                </h2>
-                <div className="h-8 w-[1px] bg-surface-border" />
-                <p className="text-sm font-mono text-zinc-300 uppercase tracking-widest">
-                  <AnimatedValue value={survivalDays} /> <span className="text-zinc-600">Days of coverage</span>
-                </p>
-              </div>
-            </div>
-
-            <div className="lg:w-1/3 space-y-3">
-              <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest">
-                <span className="text-zinc-500">Available Cash</span>
-                <span className="text-emerald-400">$<AnimatedValue value={liquidCash} /></span>
-              </div>
-              <div className="w-full h-1 bg-surface-border rounded-none overflow-hidden">
+      {/* 2. Action Center (Grouped Urgent Alerts) */}
+      {hasActionableAlerts && (
+        <div className="space-y-3">
+          <h2 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400 pl-1">Action Center</h2>
+          
+          <div className="grid grid-cols-1 gap-3">
+            {/* Ingestion Action */}
+            {pendingIngestions.length > 0 && (
+              <Link to="/ingestion" className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-sm">
                 <motion.div 
-                  initial={{ width: 0 }}
-                  animate={{ width: `${Math.min(100, (survivalMonths / 12) * 100)}%` }}
-                  transition={{ type: 'spring', damping: 20, stiffness: 50, delay: 0.2 }}
-                  className={`h-full ${survivalMonths < 3 ? 'bg-rose-500' : 'bg-indigo-500'}`} 
-                />
-              </div>
-              <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest">
-                <span className="text-zinc-500">Monthly Expenses</span>
-                <span className="text-rose-400">$<AnimatedValue value={monthlyBurn} />/mo</span>
-              </div>
-            </div>
+                  initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                  className="bg-indigo-500/10 border border-indigo-500/20 p-5 rounded-sm flex items-center justify-between hover:bg-indigo-500/15 transition-all shadow-sm group"
+                >
+                  <div className="flex items-center gap-5">
+                    <div className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center shrink-0">
+                      <Inbox className="w-5 h-5 text-indigo-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-sans font-medium text-indigo-300">Requires Review</p>
+                      <p className="text-xs font-sans text-indigo-200/70 mt-0.5">{pendingIngestions.length} document{pendingIngestions.length === 1 ? '' : 's'} waiting for approval.</p>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-indigo-400 group-hover:translate-x-1 transition-transform" />
+                </motion.div>
+              </Link>
+            )}
+
+            {/* Overdraft Risk Action */}
+            {isOverdraftRisk && (
+              <Link to="/obligations" className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 rounded-sm">
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                  className="bg-rose-500/10 border border-rose-500/30 p-5 rounded-sm flex items-center justify-between hover:bg-rose-500/15 transition-all shadow-sm group"
+                >
+                  <div className="flex items-center gap-5">
+                    <div className="w-10 h-10 bg-rose-500/20 rounded-full flex items-center justify-center shrink-0">
+                      <ShieldAlert className="w-5 h-5 text-rose-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-sans font-medium text-rose-400">Cash Flow Warning</p>
+                      <p className="text-xs font-sans text-rose-300/80 mt-0.5">
+                        Upcoming bills exceed current cash by <span className="font-semibold">${Math.abs(liquidBuffer).toFixed(2)}</span> before next payday.
+                      </p>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-rose-400 group-hover:translate-x-1 transition-transform" />
+                </motion.div>
+              </Link>
+            )}
+
+            {/* Tax Insolvency Action */}
+            {taxInsolvencyRisk && (
+              <Link to="/taxes" className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm">
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
+                  className="bg-amber-500/10 border border-amber-500/30 p-5 rounded-sm flex items-center justify-between hover:bg-amber-500/15 transition-all shadow-sm group"
+                >
+                  <div className="flex items-center gap-5">
+                    <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center shrink-0">
+                      <ShieldAlert className="w-5 h-5 text-amber-400" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-sans font-medium text-amber-400">Low Tax Reserve</p>
+                      <p className="text-xs font-sans text-amber-300/80 mt-0.5">
+                        Cash is below the estimated quarterly liability of ${Math.round(cashFlow.taxReserve * 3).toLocaleString()}.
+                      </p>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                </motion.div>
+              </Link>
+            )}
           </div>
         </div>
-      </CollapsibleModule>
+      )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex gap-3">
-          <motion.button 
-            whileTap={{ scale: 0.95 }}
-            onClick={() => openQuickAdd('obligation')}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-sm font-bold transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-600 shadow-[0_2px_10px_rgba(79,70,229,0.3)]"
-          >
-            <Plus className="w-4 h-4" />
-            Add Bill
-          </motion.button>
-        </div>
-      </div>
-
-      {/* Net Worth Hero Section */}
-      <CollapsibleModule title="Net Worth Overview" icon={ShieldCheck}>
-        <div className="relative z-10">
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Total Valuation</p>
-            <div className="flex items-center gap-2 bg-surface-base border border-surface-border px-3 py-1 rounded-sm shadow-inner">
-              <ShieldAlert className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-[10px] font-mono text-zinc-300 uppercase">Buffer Status: <span className="text-emerald-400 font-bold">$2,450.00 SAFE</span></span>
+      {/* 3. Primary Metrics Panel */}
+      <h2 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400 pl-1 mt-8 mb-3">Core Financials</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        {/* Runway Metric Card */}
+        <div className="bg-surface-raised border border-surface-border p-6 rounded-sm shadow-sm md:flex md:flex-col md:justify-between">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <p className="text-xs font-mono text-zinc-400 uppercase tracking-widest mb-1">Estimated Runway</p>
+              <h2 className="text-6xl sm:text-7xl font-mono font-bold text-white tracking-tighter tabular-nums leading-none">
+                <AnimatedValue value={survivalMonths} decimals={1} />
+                <span className="text-xl font-sans text-zinc-500 font-medium ml-2 uppercase tracking-wide">Months</span>
+              </h2>
             </div>
-          </div>
-          <div className="mt-4 flex items-baseline gap-4">
-            <h2 className="text-5xl font-mono font-bold tracking-tight text-content-primary tabular-nums">
-              $<AnimatedValue value={netWorth} decimals={2} />
-            </h2>
-            <span className="flex items-center text-sm font-mono text-[#22C55E]">
-              <ArrowUpRight className="w-4 h-4 mr-1" />
-              +5.2%
-            </span>
           </div>
           
-          <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-6 border-t border-surface-border pt-6">
-            <div className="bg-surface-base p-3 rounded-sm border border-surface-border shadow-inner">
-              <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                <Wallet className="w-3 h-3 text-zinc-600" /> Assets
-              </p>
-              <p className="text-xl font-bold font-mono text-content-primary tabular-nums">
-                $<AnimatedValue value={totalAssets} decimals={2} />
-              </p>
+          <div className="grid grid-cols-2 gap-4 border-t border-surface-border pt-5">
+            <div>
+              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1">Liquid Cash</p>
+              <p className="text-xl font-mono text-emerald-400 font-medium">${liquidCash.toLocaleString()}</p>
             </div>
-            <div className="bg-surface-base p-3 rounded-sm border border-surface-border shadow-inner">
-              <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                <CreditCard className="w-3 h-3 text-zinc-600" /> Debts
-              </p>
-              <p className="text-xl font-bold font-mono text-content-primary tabular-nums">
-                $<AnimatedValue value={totalDebts} decimals={2} />
-              </p>
-            </div>
-            <div className="bg-surface-base p-3 rounded-sm border border-surface-border shadow-inner">
-              <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                <Activity className="w-3 h-3 text-zinc-600" /> 30D Velocity
-              </p>
-              <p className="text-xl font-bold font-mono text-emerald-500 tabular-nums">+$60/day</p>
-            </div>
-            <div className="bg-surface-base p-3 rounded-sm border border-surface-border shadow-inner">
-              <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest flex items-center gap-2 mb-1">
-                <TrendingUp className="w-3 h-3 text-zinc-600" /> Burn Rate
-              </p>
-              <p className="text-xl font-bold font-mono text-rose-500 tabular-nums">-$150/day</p>
+            <div>
+              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1">Monthly Burn</p>
+              <p className="text-xl font-mono text-white font-medium">${Math.round(monthlyBurn).toLocaleString()}</p>
             </div>
           </div>
         </div>
-      </CollapsibleModule>
 
-      {/* Tactical Grid: Core Algorithms */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Cash Safety Card */}
-        <div className={`col-span-1 lg:col-span-1 border rounded-sm p-6 bg-surface-raised transition-all duration-500 relative overflow-hidden group shadow-md ${isOverdraftRisk ? 'border-rose-500/50 bg-rose-500/5 shadow-[inset_0_0_20px_rgba(244,63,94,0.1)]' : 'border-surface-border'}`}>
-          <div className="relative z-10">
-            <div className="flex justify-between items-start mb-4">
-              <div className={`w-8 h-8 border flex items-center justify-center shrink-0 ${isOverdraftRisk ? 'border-rose-500/50 bg-rose-500/10 text-rose-400' : 'border-surface-border bg-surface-base text-zinc-500'}`}>
-                <ShieldAlert className="w-4 h-4" />
-              </div>
-              <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-sm uppercase tracking-widest border ${isOverdraftRisk ? 'bg-rose-500/20 text-rose-400 border-rose-500/30 font-black' : 'bg-surface-base text-emerald-400 border-emerald-500/20'}`}>
-                {isOverdraftRisk ? 'CRITICAL RISK' : 'SECURE'}
-              </span>
+        {/* Distributed 4-grid for standard numbers */}
+        <div className="grid grid-cols-2 gap-4">
+            <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
+              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-2">Net Worth</p>
+              <p className="text-3xl font-mono text-white font-semibold tabular-nums">$<AnimatedValue value={netWorth} /></p>
             </div>
-            <h3 className="text-[11px] font-mono uppercase tracking-[0.2em] text-content-primary mb-4 font-bold">Cash Safety Check</h3>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center bg-surface-base p-2 border border-surface-border shadow-inner">
-                <span className="text-[10px] font-mono text-zinc-500 uppercase">Bills Due</span>
-                <span className="text-sm font-mono font-bold text-content-primary">${imminentTotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between items-center bg-surface-base p-2 border border-surface-border shadow-inner">
-                <span className="text-[10px] font-mono text-zinc-500 uppercase">Current Cash</span>
-                <span className={`text-sm font-mono font-bold ${isOverdraftRisk ? 'text-rose-500' : 'text-emerald-400'}`}>${liquidCash.toFixed(2)}</span>
-              </div>
+            <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
+              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-2">Total Assets</p>
+              <p className="text-3xl font-mono text-white font-semibold tabular-nums">$<AnimatedValue value={totalAssets} /></p>
             </div>
-            <p className={`text-[10px] font-mono mt-4 leading-relaxed border-l-2 pl-3 py-1 ${isOverdraftRisk ? 'text-rose-400 border-rose-500/50' : 'text-zinc-500 border-surface-border'}`}>
-              {isOverdraftRisk 
-                ? `INSUFFICIENT FUNDS: You need $${Math.abs(liquidBuffer).toLocaleString()} more to cover payments before ${nextPaydayStr}.`
-                : `SAFE: All obligations covered until ${nextPaydayStr}.`}
+            <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
+              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                Tax Reserve <ShieldCheck className="w-3 h-3 text-indigo-400" />
+              </p>
+              <p className="text-3xl font-mono text-indigo-400 font-semibold tabular-nums">-$<AnimatedValue value={cashFlow.taxReserve} /></p>
+            </div>
+            <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
+              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-2">Monthly Surplus</p>
+              <p className="text-3xl font-mono text-emerald-400 font-semibold tabular-nums">+$<AnimatedValue value={cashFlow.surplus} /></p>
+            </div>
+        </div>
+      </div>
+
+      {/* 4. Active Intelligence Grid */}
+      <h2 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400 pl-1 mt-8 mb-3">Intelligence Subsystems</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Tax Shield */}
+        <div className="bg-surface-raised rounded-sm p-6 border border-surface-border flex flex-col justify-between shadow-sm hover:border-zinc-700 transition-colors">
+          <div>
+            <div className="flex justify-between items-start mb-5">
+              <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-full flex items-center justify-center shrink-0 text-indigo-400">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <span className="text-[10px] font-mono bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded uppercase tracking-widest font-semibold border border-indigo-500/20">Active</span>
+            </div>
+            <h3 className="text-sm font-sans font-semibold text-white mb-1">Deduction Finder</h3>
+            <p className="text-xs font-sans text-zinc-400 mb-5 leading-relaxed">
+              Automatic extraction of valid deductions from freelancer platforms and records.
             </p>
           </div>
-          {isOverdraftRisk && <div className="absolute top-0 right-0 w-32 h-32 bg-rose-500/5 blur-3xl -mr-16 -mt-16 pointer-events-none" />}
+          <div className="bg-surface-base border border-surface-border p-4 rounded-sm">
+              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Lifetime Recovered</p>
+              <p className="text-3xl font-mono text-white font-bold tabular-nums">${lifetimeTaxShield.toLocaleString()}</p>
+          </div>
         </div>
         
-        {/* Spending Pulse Card */}
-        <div className={`col-span-1 border rounded-sm p-6 bg-surface-raised border-surface-border transition-all duration-300 relative overflow-hidden group shadow-md ${burnVelocity.isHighVelocity ? 'border-amber-500/50 bg-amber-500/5 shadow-[inset_0_0_20px_rgba(245,158,11,0.1)]' : ''}`}>
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-8 h-8 border flex items-center justify-center shrink-0 ${burnVelocity.isHighVelocity ? 'border-amber-500/50 bg-amber-500/10 text-amber-500' : 'border-surface-border bg-surface-base text-zinc-500'}`}>
-                <Zap className={`w-4 h-4 ${burnVelocity.isHighVelocity ? 'animate-pulse' : ''}`} />
+        {/* Spending Pulse */}
+        <div className={`bg-surface-raised rounded-sm p-6 border flex flex-col justify-between shadow-sm transition-colors ${burnVelocity.isHighVelocity ? 'border-amber-500/30' : 'border-surface-border hover:border-zinc-700'}`}>
+          <div>
+            <div className="flex justify-between items-start mb-5">
+              <div className={`w-10 h-10 border rounded-full flex items-center justify-center shrink-0 ${burnVelocity.isHighVelocity ? 'border-amber-500/30 bg-amber-500/10 text-amber-500' : 'border-surface-border bg-surface-base text-zinc-400'}`}>
+                <Activity className="w-5 h-5" />
               </div>
-              <span className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-sm border uppercase tracking-widest ${
-                burnVelocity.isHighVelocity ? 'bg-amber-500/20 text-amber-500 border-amber-500/30' : 
-                burnVelocity.isModerateVelocity ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 
-                'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-              }`}>
+              <span className={`text-[10px] font-mono px-2 py-1 rounded uppercase tracking-widest font-semibold border ${burnVelocity.isHighVelocity ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-surface-base text-zinc-400 border-surface-border'}`}>
                 {burnVelocity.status}
               </span>
             </div>
-            <h3 className="text-[11px] font-mono uppercase tracking-[0.2em] text-content-primary mb-1 font-bold">Spending Pulse</h3>
-            <p className="text-[10px] font-mono text-zinc-600 mb-4 uppercase tracking-widest">Rolling 72H Window</p>
-            
-            <div className="flex items-baseline gap-2 mb-4">
-              <p className="text-3xl font-mono font-bold text-content-primary tabular-nums">${burnVelocity.totalSpent.toFixed(0)}</p>
-              <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest font-bold">Log: {burnVelocity.frequency}</p>
-            </div>
-            
-            <p className={`text-[10px] font-mono border-l-2 pl-3 py-1 ${burnVelocity.isHighVelocity ? 'text-amber-500 border-amber-500/50' : 'text-zinc-500 border-surface-border'}`}>
-              {burnVelocity.isHighVelocity 
-                ? "WARNING: High frequency impulse burn detected. Cooling protocol suggested."
-                : "STABLE: Recent spending habits remain within target baseline."}
+            <h3 className="text-sm font-sans font-semibold text-white mb-1">Spending Pulse (72H)</h3>
+            <p className="text-xs font-sans text-zinc-400 mb-5 leading-relaxed">
+              Monitoring recent transaction velocity to prevent budget drift.
             </p>
           </div>
-        </div>
-
-        {/* Debt Detonator Card */}
-        <div className="col-span-1 border border-surface-border rounded-sm p-6 bg-surface-raised border-surface-border relative overflow-hidden group shadow-md hover:border-zinc-700 transition-colors">
-          <div className="relative z-10 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-8 h-8 border border-surface-border bg-surface-base flex items-center justify-center shrink-0 text-zinc-500">
-                <Flame className="w-4 h-4" />
-              </div>
-              {avalancheTarget && (
-                <div className="flex items-center gap-1.5 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 rounded-sm">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
-                  <span className="text-[9px] font-mono font-black text-rose-500 uppercase tracking-widest">Target Locked</span>
-                </div>
-              )}
+          <div>
+            <div className="flex items-baseline gap-2 mb-3">
+              <p className="text-3xl font-mono text-white tabular-nums">${burnVelocity.totalSpent.toFixed(0)}</p>
+              <p className="text-xs font-sans text-zinc-500 font-medium">/ {burnVelocity.frequency} logs</p>
             </div>
-            
-            <h3 className="text-[11px] font-mono uppercase tracking-[0.2em] text-content-primary mb-1 font-bold">Debt Detonator</h3>
-            <p className="text-[10px] font-mono text-zinc-600 mb-4 uppercase tracking-widest">Avalanche Strategy</p>
-            
-            {avalancheTarget ? (
-              <div className="flex-1 flex flex-col">
-                <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-indigo-400 mb-1 truncate">{avalancheTarget.name}</p>
-                <div className="flex items-baseline justify-between mb-2">
-                  <span className="text-xl font-mono font-bold text-content-primary tabular-nums">${avalancheTarget.remaining.toLocaleString()}</span>
-                  <span className="text-[10px] font-mono text-zinc-500">{debtProgress.toFixed(1)}%</span>
-                </div>
-                <div className="w-full h-1 bg-surface-base border border-surface-border p-0.5 rounded-none overflow-hidden mb-4 shadow-inner">
-                  <div className="h-full bg-indigo-500 transition-all duration-1000 shadow-[0_0_10px_rgba(79,70,229,0.5)]" style={{ width: `${debtProgress}%` }}></div>
-                </div>
-                <p className="text-[10px] font-mono text-zinc-500 border-l-2 border-surface-border pl-3 mt-auto leading-relaxed">
-                  Focus all excess cash on this <span className="text-indigo-400 font-bold">{avalancheTarget.apr}% APR</span> principal.
-                </p>
-              </div>
-            ) : (
-              <p className="text-[10px] font-mono text-zinc-500 border-l-2 border-surface-border pl-3 mt-4 leading-relaxed">
-                STATUS: DEBT FREE. All toxic liabilities neutralized. You are cleared for pure asset accumulation.
+            {burnVelocity.isHighVelocity && (
+              <p className="text-[11px] font-mono text-amber-500 bg-amber-500/5 p-2 rounded border border-amber-500/20">
+                Elevated spending detected. Please review recent transactions.
               </p>
             )}
           </div>
         </div>
+
+        {/* Debt Target */}
+        <div className="bg-surface-raised rounded-sm p-6 border border-surface-border flex flex-col justify-between shadow-sm hover:border-zinc-700 transition-colors">
+          <div>
+            <div className="flex justify-between items-start mb-5">
+              <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-full flex items-center justify-center shrink-0 text-zinc-400">
+                <Flame className="w-5 h-5" />
+              </div>
+            </div>
+            <h3 className="text-sm font-sans font-semibold text-white mb-1">Debt Eradication Plan</h3>
+            <p className="text-xs font-sans text-zinc-400 mb-5 leading-relaxed">
+              Avalanche method targets the highest interest rate automatically.
+            </p>
+          </div>
+          
+          {avalancheTarget ? (
+            <div>
+              <div className="mb-2">
+                <p className="text-xs font-sans text-zinc-300 font-medium mb-1 truncate">Prioritizing: {avalancheTarget.name}</p>
+                <div className="flex justify-between items-baseline">
+                  <span className="text-2xl font-mono text-white tabular-nums">${avalancheTarget.remaining.toLocaleString()}</span>
+                  <span className="text-xs font-mono text-zinc-400">{debtProgress.toFixed(1)}% Paid</span>
+                </div>
+              </div>
+              <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden mt-3">
+                <div className="h-full bg-indigo-500 transition-all duration-1000" style={{ width: `${debtProgress}%` }}></div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-surface-base border border-surface-border p-4 rounded-sm">
+              <p className="text-sm font-sans text-emerald-400 font-medium">Debt-Free Status Achieved.</p>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Cash Flow Timeline Chart */}
+      {/* 5. Lower Content Panels */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+        
+        {/* Timeline Chart */}
         <div className="lg:col-span-2">
-          <CollapsibleModule title="Cash Flow Projection" icon={Terminal}>
+          <div className="bg-surface-raised rounded-sm border border-surface-border p-6 shadow-sm">
             <div className="flex justify-between items-center mb-6">
-              <p className="text-xs font-mono text-zinc-500">Estimated balance trajectory</p>
-              <select className="text-[10px] font-mono bg-surface-base border border-surface-border text-zinc-200 rounded-sm focus:ring-1 focus:ring-zinc-500 px-3 py-1 outline-none">
-                <option>NEXT 30 DAYS</option>
-                <option>NEXT 90 DAYS</option>
+              <div>
+                <h3 className="text-sm font-sans font-semibold text-white">Cash Flow Trajectory</h3>
+                <p className="text-xs font-sans text-zinc-400 mt-1">Projected balances across all accounts</p>
+              </div>
+              <select className="text-xs font-sans bg-surface-base border border-surface-border text-zinc-300 rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+                <option>Next 30 Days</option>
+                <option>Next 90 Days</option>
               </select>
             </div>
-            <div className="h-[260px] w-full">
+            
+            <div className="h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={projectedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#FAFAFA" stopOpacity={0.1}/>
-                      <stop offset="95%" stopColor="#FAFAFA" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#818CF8" stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor="#818CF8" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={(value) => `$${value / 1000}k`} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#27272A" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#A1A1AA', fontSize: 11, fontFamily: 'sans-serif' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A1A1AA', fontSize: 11, fontFamily: 'sans-serif' }} tickFormatter={(val) => `$${val / 1000}k`} />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: '#141414', borderRadius: '4px', border: '1px solid #262626', color: '#FAFAFA', fontFamily: 'monospace', fontSize: '12px' }}
-                    itemStyle={{ color: '#FAFAFA' }}
-                    formatter={(value: number) => [`$${value.toLocaleString()}`, 'Projected Balance']}
+                    contentStyle={{ backgroundColor: '#18181B', borderRadius: '6px', border: '1px solid #3F3F46', color: '#FAFAFA', fontFamily: 'sans-serif', fontSize: '13px' }}
+                    itemStyle={{ color: '#818CF8' }}
+                    formatter={(val) => [`$${Number(val ?? 0).toLocaleString()}`, 'Projected Balance']}
                   />
-                  <Area type="monotone" dataKey="balance" stroke="#FAFAFA" strokeWidth={1.5} fillOpacity={1} fill="url(#colorBalance)" />
+                  <Area type="monotone" dataKey="balance" stroke="#818CF8" strokeWidth={2} fillOpacity={1} fill="url(#colorBalance)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-          </CollapsibleModule>
+          </div>
         </div>
 
-        {/* Upcoming Bills & Subscriptions */}
-        <div className="flex flex-col gap-6">
-          <div className="bg-surface-raised rounded-sm border border-surface-border flex flex-col">
-            <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center">
-              <h3 className="text-xs font-mono uppercase tracking-widest text-content-primary">Upcoming Obligations</h3>
-              <Link to="/bills" className="text-xs font-mono text-zinc-500 hover:text-white transition-colors">VIEW ALL</Link>
+        {/* Sidebar Lists */}
+        <div className="space-y-6">
+          
+          {/* Upcoming Obligations */}
+          <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit max-h-[350px]">
+            <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
+              <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-300">Upcoming Bills</h3>
+              <Link to="/obligations" className="text-xs font-sans text-indigo-400 hover:text-indigo-300 transition-colors font-medium">See all</Link>
             </div>
-            <div className="p-0">
-              {/* Liquidity Gap Indicator */}
-              <div className="bg-surface-elevated border-b border-surface-border px-6 py-3 flex items-center justify-between">
-                <span className="text-xs font-mono text-zinc-500">Next Payday: <span className="text-emerald-400">In 4 Days</span></span>
-                <span className="text-xs font-mono text-zinc-500">Bills Before Payday: <span className="text-content-primary">$145.00</span></span>
-              </div>
+            
+            <div className="overflow-y-auto outline-none">
               {upcomingBills.length === 0 ? (
-                <div className="p-6 text-center text-sm font-mono text-zinc-500">No upcoming obligations.</div>
+                <div className="p-8 text-center flex flex-col items-center">
+                  <Calendar className="w-8 h-8 text-zinc-600 mb-3" />
+                  <p className="text-sm font-sans font-medium text-zinc-300">No Upcoming Bills</p>
+                  <p className="text-xs text-zinc-500 mt-1">You are all caught up.</p>
+                </div>
               ) : (
-                <motion.ul 
-                  className="divide-y divide-surface-highlight"
-                  initial="hidden"
-                  animate="visible"
-                  variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-                >
-                  {upcomingBills.slice(0, 3).map((bill) => (
-                    <motion.li 
-                      key={bill.id} 
-                      className="px-6 py-3 hover:bg-surface-elevated transition-colors flex justify-between items-center"
-                      variants={{
-                        hidden: { opacity: 0, scale: 0.98 },
-                        visible: { opacity: 1, scale: 1, transition: { type: 'spring', damping: 25, stiffness: 300 } }
-                      }}
-                    >
+                <ul className="divide-y divide-surface-border">
+                  {upcomingBills.slice(0, 4).map((bill) => (
+                    <li key={bill.id} className="px-6 py-4 hover:bg-surface-base transition-colors flex justify-between items-center group cursor-default">
                       <div className="flex items-center gap-4">
-                        <div className="text-xs font-mono text-zinc-500 w-12 text-center leading-tight">
+                        <div className="text-xs font-mono text-zinc-500 w-10 text-center uppercase">
                           {bill.dueDate.split('-')[2]}<br/>{['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][parseInt(bill.dueDate.split('-')[1], 10) - 1]}
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-content-primary">{bill.biller}</p>
-                        </div>
+                        <p className="text-sm font-sans font-medium text-zinc-200">{bill.biller}</p>
                       </div>
-                      <p className="text-sm font-mono text-content-primary tabular-nums">${bill.amount.toFixed(2)}</p>
-                    </motion.li>
+                      <p className="text-sm font-mono text-zinc-300 font-medium tabular-nums">${bill.amount.toFixed(2)}</p>
+                    </li>
                   ))}
-                </motion.ul>
+                </ul>
               )}
             </div>
           </div>
 
-          <div className="bg-surface-raised rounded-sm border border-surface-border flex flex-col">
-            <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center">
-              <h3 className="text-xs font-mono uppercase tracking-widest text-content-primary flex items-center gap-2">
-                <Crosshair className="w-3.5 h-3.5 text-zinc-400" /> Subscription Sniper
-              </h3>
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-mono text-zinc-500 tabular-nums">${monthlySubscriptionCost.toFixed(2)}/MO</span>
-              </div>
+              {/* Citations / Tickets */}
+          <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit">
+            <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
+              <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-300">Citations & Tickets</h3>
             </div>
-            <div className="p-0">
-              <div className="bg-surface-elevated border-b border-surface-border p-4 flex items-start gap-3">
-                <div className="w-1.5 h-1.5 rounded-none bg-red-500 mt-1.5 shrink-0"></div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-content-primary">Netflix increased by $2.00</p>
-                  <p className="text-xs font-mono text-zinc-500 mt-1">0 hours watched in 21 days.</p>
-                  <button onClick={() => toast.success('Cancellation process started')} className="text-xs font-mono font-bold text-red-400 hover:text-red-300 mt-3 uppercase tracking-widest transition-colors">Execute Cancel</button>
-                </div>
-              </div>
-              {activeSubscriptions.length === 0 ? (
-                <div className="p-6 text-center text-sm font-mono text-zinc-500">No active subscriptions.</div>
-              ) : (
-                <motion.ul 
-                  className="divide-y divide-surface-highlight"
-                  initial="hidden"
-                  animate="visible"
-                  variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-                >
-                  {activeSubscriptions.slice(0, 3).map((sub) => (
-                    <motion.li 
-                      key={sub.id} 
-                      className="px-6 py-3 hover:bg-surface-elevated transition-colors flex justify-between items-center"
-                      variants={{
-                        hidden: { opacity: 0, scale: 0.98 },
-                        visible: { opacity: 1, scale: 1, transition: { type: 'spring', damping: 25, stiffness: 300 } }
-                      }}
-                    >
-                      <div>
-                        <p className="text-sm font-medium text-content-primary">{sub.name}</p>
-                        <p className="text-xs font-mono text-zinc-500 mt-0.5">RENEWS {sub.nextBillingDate.toUpperCase()}</p>
-                      </div>
-                      <p className="text-sm font-mono text-content-primary tabular-nums">${sub.amount.toFixed(2)}</p>
-                    </motion.li>
-                  ))}
-                </motion.ul>
-              )}
-            </div>
-          </div>
-
-          {/* Ambush Terminal */}
-          <div className={`bg-surface-raised rounded-sm border flex flex-col transition-all duration-500 ${mockCitations.some(c => c.daysLeft <= 7) ? 'border-rose-500/50 shadow-[0_0_15px_rgba(244,63,94,0.05)] animate-[pulse_3s_ease-in-out_infinite]' : 'border-surface-border'}`}>
-            <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-surface-elevated/50">
-              <h3 className="text-xs font-mono uppercase tracking-widest text-content-primary flex items-center gap-2 font-bold">
-                <Siren className={`w-3.5 h-3.5 ${mockCitations.some(c => c.daysLeft <= 7) ? 'text-rose-500' : 'text-zinc-500'}`} /> Citations & Fines
-              </h3>
-              {mockCitations.some(c => c.daysLeft <= 7) && (
-                <span className="text-[9px] font-mono bg-rose-500/20 border border-rose-500/30 text-rose-400 px-2 py-0.5 rounded-sm font-bold animate-pulse">DUE SOON</span>
-              )}
-            </div>
-            <div className="p-0">
-              <motion.ul 
-                className="divide-y divide-surface-highlight"
-                initial="hidden"
-                animate="visible"
-                variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-              >
-                {mockCitations.map((citation) => (
-                  <motion.li 
-                    key={citation.id} 
-                    className="px-6 py-4 hover:bg-surface-elevated transition-colors"
-                    variants={{
-                      hidden: { opacity: 0, scale: 0.98 },
-                      visible: { opacity: 1, scale: 1, transition: { type: 'spring', damping: 25, stiffness: 300 } }
-                    }}
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex items-start gap-4">
-                        <div className={`w-10 h-10 border ${citation.daysLeft <= 7 ? 'border-rose-500/30 bg-rose-500/10 text-rose-500' : 'border-surface-border bg-surface-base text-zinc-500'} flex flex-col justify-center items-center rounded-sm shrink-0 leading-none`}>
-                          <span className="text-xs font-black font-mono">{citation.daysLeft}</span>
-                          <span className="text-[8px] font-mono tracking-widest">DAYS</span>
+            <div className="p-0 outline-none">
+               {citations.filter(c => c.status === 'open').length === 0 ? (
+                  <div className="p-8 text-center flex flex-col items-center">
+                    <ShieldCheck className="w-8 h-8 text-emerald-500/50 mb-3" />
+                    <p className="text-sm font-sans font-medium text-zinc-300">Clean Record</p>
+                    <p className="text-xs text-zinc-500 mt-1">No outstanding tickets found.</p>
+                  </div>
+               ) : (
+                 <ul className="divide-y divide-surface-border">
+                  {citations.filter(c => c.status === 'open').map((citation) => (
+                    <li key={citation.id} className="px-6 py-4 hover:bg-surface-base transition-colors">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-start gap-3">
+                          <div className={`w-9 h-9 rounded bg-surface-base border flex flex-col justify-center items-center shrink-0 ${citation.daysLeft <= 7 ? 'text-rose-400 border-rose-500/30' : 'text-zinc-400 border-surface-border'}`}>
+                            <span className="text-xs font-bold font-mono leading-none">{citation.daysLeft}</span>
+                            <span className="text-[9px] font-sans">Days</span>
+                          </div>
+                          <div>
+                            <p className="text-sm font-sans font-medium text-zinc-200">{citation.type}</p>
+                            <p className="text-xs font-sans text-zinc-500">{citation.jurisdiction}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-xs font-mono font-bold text-content-primary uppercase">{citation.type}</p>
-                          <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{citation.jurisdiction}</p>
-                          <p className={`text-[10px] font-mono mt-1 ${citation.daysLeft <= 7 ? 'text-rose-400 shadow-rose-500/50' : 'text-zinc-500'}`}>
-                            +${citation.penalty} PENALTY TRIGGER
-                          </p>
-                        </div>
+                        <p className="text-sm font-mono font-bold text-zinc-300 tabular-nums">${citation.amount.toFixed(2)}</p>
                       </div>
-                      <div className="text-right">
-                        <p className="text-sm font-mono font-bold text-content-primary tabular-nums">${citation.amount.toFixed(2)}</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
                       <button 
                         onClick={() => { setSelectedCitation(citation); setIsCitationModalOpen(true); }}
-                        className={`w-full text-[10px] font-mono font-bold px-3 py-2 uppercase tracking-widest transition-colors rounded-sm ${citation.daysLeft <= 7 ? 'bg-rose-500 hover:bg-rose-600 text-white shadow-[0_0_10px_rgba(244,63,94,0.3)]' : 'bg-content-primary hover:bg-zinc-200 text-surface-base'}`}
+                        className={`w-full text-xs font-sans font-medium py-2 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-raised ${citation.daysLeft <= 7 ? 'bg-rose-500 hover:bg-rose-600 text-white focus-visible:ring-rose-500' : 'bg-surface-border hover:bg-zinc-700 text-zinc-200 focus-visible:ring-zinc-400'}`}
                       >
-                        Execute Resolution
+                        Resolve Ticket
                       </button>
-                    </div>
-                  </motion.li>
-                ))}
-              </motion.ul>
+                    </li>
+                  ))}
+                 </ul>
+               )}
             </div>
           </div>
+
         </div>
       </div>
 
-      {/* Citation Resolution Modal */}
-      <Dialog open={isCitationModalOpen} onClose={() => setIsCitationModalOpen(false)} className="relative z-50">
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" aria-hidden="true" />
+       {/* Citation Resolution Modal */}
+       <Dialog open={isCitationModalOpen} onClose={() => setIsCitationModalOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-md w-full rounded-sm bg-surface-raised border border-surface-border shadow-2xl overflow-hidden">
-            <div className="p-4 border-b border-surface-border flex justify-between items-center bg-surface-elevated">
-              <h2 className="text-sm font-mono font-bold text-content-primary uppercase tracking-widest flex items-center gap-2">
-                <Siren className="w-4 h-4 text-rose-400" /> Resolve Citation
-              </h2>
-              <button onClick={() => setIsCitationModalOpen(false)} className="text-zinc-500 hover:text-white transition-colors">
-                <X className="w-4 h-4" />
+          <Dialog.Panel className="mx-auto max-w-sm w-full rounded shadow-xl bg-surface-elevated border border-surface-border overflow-hidden">
+            <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-surface-raised">
+              <Dialog.Title className="text-sm font-sans font-semibold text-zinc-200">
+                Ticket Details
+              </Dialog.Title>
+              <button 
+                onClick={() => setIsCitationModalOpen(false)} 
+                className="text-zinc-500 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded-sm"
+              >
+                <X className="w-5 h-5" />
               </button>
             </div>
+
             {selectedCitation && (
-              <div className="p-6">
-                <div className="mb-6 bg-surface-elevated border border-surface-border p-4 rounded-sm">
-                  <p className="text-[10px] font-mono text-zinc-500 mb-1 uppercase tracking-widest">Citation Details</p>
-                  <p className="text-base font-mono font-bold text-content-primary">{selectedCitation.type} | {selectedCitation.jurisdiction}</p>
-                  <p className={`text-xs font-mono mt-2 ${selectedCitation.daysLeft <= 7 ? 'text-rose-400 font-bold' : 'text-zinc-400'}`}>
-                    {selectedCitation.daysLeft} DAYS LEFT → +${selectedCitation.penalty} FEE
-                  </p>
+              <div className="p-6 space-y-6">
+                <div>
+                  <h4 className="text-lg font-sans font-medium text-white mb-1">{selectedCitation.type}</h4>
+                  <p className="text-sm text-zinc-400">{selectedCitation.jurisdiction}</p>
+                  {selectedCitation.daysLeft <= 7 && (
+                     <p className="text-xs font-medium text-rose-400 mt-2 bg-rose-500/10 px-2 py-1 rounded inline-block">
+                       Due in {selectedCitation.daysLeft} days. ${selectedCitation.penaltyFee} penalty fee approaching.
+                     </p>
+                  )}
                 </div>
                 
-                <div className="space-y-4 mb-8">
+                <div className="space-y-4">
                   <div>
-                    <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Citation Number</label>
-                    <div className="flex items-center gap-2">
-                      <input type="text" readOnly value={selectedCitation.citationNumber} className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm font-mono text-content-primary focus:outline-none" />
-                      <button onClick={() => toast.success('Copied to clipboard')} className="bg-surface-border hover:bg-surface-border text-white p-2 rounded-sm transition-colors">
+                    <label className="block text-xs font-sans font-medium text-zinc-500 mb-1.5">Citation Number</label>
+                    <div className="flex">
+                      <input 
+                        type="text" 
+                        readOnly 
+                        value={selectedCitation.citationNumber} 
+                        className="bg-surface-base border border-surface-border rounded-l px-3 py-2 text-sm font-mono text-zinc-300 w-full focus:outline-none" 
+                      />
+                      <button 
+                        onClick={() => toast.success('Copied to clipboard')} 
+                        className="bg-surface-border hover:bg-zinc-700 text-zinc-300 px-3 border border-l-0 border-surface-border rounded-r transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 z-10"
+                        title="Copy"
+                      >
                         <Copy className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Payment Portal</label>
-                    <div className="flex items-center gap-2">
-                      <input type="text" readOnly value={selectedCitation.paymentUrl} className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm font-mono text-content-primary focus:outline-none" />
-                      <a href={selectedCitation.paymentUrl} target="_blank" rel="noreferrer" className="bg-content-primary hover:bg-zinc-300 text-surface-base p-2 rounded-sm transition-colors flex items-center justify-center">
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
-                    </div>
+                    <label className="block text-xs font-sans font-medium text-zinc-500 mb-1.5">Online Payment Portal</label>
+                    <a 
+                      href={selectedCitation.paymentUrl} 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className="flex items-center justify-center gap-2 w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated focus-visible:ring-indigo-500"
+                    >
+                      Open Payment Portal <ExternalLink className="w-4 h-4" />
+                    </a>
                   </div>
                 </div>
-                
-                <button 
-                  onClick={() => { toast.success('Marked as resolved'); setIsCitationModalOpen(false); }}
-                  className="w-full bg-emerald-500/10 border border-emerald-500/50 hover:bg-emerald-500/20 text-emerald-400 font-mono font-bold py-3 rounded-sm transition-colors uppercase tracking-widest text-xs"
-                >
-                  Mark as Paid
-                </button>
               </div>
             )}
           </Dialog.Panel>

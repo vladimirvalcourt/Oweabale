@@ -31,19 +31,7 @@ function exportCSV(data: { date: string; name: string; category: string; amount:
   URL.revokeObjectURL(url);
 }
 
-// Generate mock 12-month net worth history from current totals
-function generateNetWorthHistory(totalAssets: number, totalDebts: number) {
-  const netWorthNow = totalAssets - totalDebts;
-  const months = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
-  return months.map((month, i) => {
-    const factor = 0.82 + (i / months.length) * 0.18;
-    const variance = (Math.random() - 0.5) * 0.03;
-    return {
-      month,
-      netWorth: Math.round(netWorthNow * (factor + variance)),
-    };
-  });
-}
+
 
 export default function Reports() {
   const { transactions, debts, assets } = useStore();
@@ -91,10 +79,39 @@ export default function Reports() {
     return months;
   }, [transactions]);
 
-  // Net worth trend (mock historical)
-  const totalAssets = assets.reduce((s, a) => s + a.value, 0);
-  const totalDebts = debts.reduce((s, d) => s + d.remaining, 0);
-  const netWorthHistory = useMemo(() => generateNetWorthHistory(totalAssets, totalDebts), [totalAssets, totalDebts]);
+  // Net worth forward projection (12 months, deterministic)
+  const netWorthHistory = useMemo(() => {
+    const MONTHS = 12;
+    const result: { month: string; netWorth: number }[] = [];
+
+    // Clone mutable state for simulation
+    let simAssets = assets.map(a => ({ value: a.value, rate: a.appreciationRate ?? 0 }));
+    let simDebts = debts.map(d => ({ remaining: d.remaining, minPayment: d.minPayment, apr: d.apr }));
+
+    for (let i = 0; i < MONTHS; i++) {
+      const d = new Date();
+      d.setMonth(d.getMonth() + i + 1);
+      const label = d.toLocaleString('default', { month: 'short', year: '2-digit' });
+
+      // Apply monthly appreciation to each asset
+      simAssets = simAssets.map(a => ({
+        ...a,
+        value: a.value * (1 + a.rate / 12),
+      }));
+
+      // Apply interest then min payments to each debt
+      simDebts = simDebts.map(d => {
+        const interest = d.remaining * (d.apr / 100 / 12);
+        const newRemaining = Math.max(0, d.remaining + interest - d.minPayment);
+        return { ...d, remaining: newRemaining };
+      });
+
+      const totalA = simAssets.reduce((s, a) => s + a.value, 0);
+      const totalD = simDebts.reduce((s, d) => s + d.remaining, 0);
+      result.push({ month: label, netWorth: Math.round(totalA - totalD) });
+    }
+    return result;
+  }, [assets, debts]);
 
   // Debt payoff progress
   const debtProgress = debts.map(d => ({
@@ -182,7 +199,7 @@ export default function Reports() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v: number, name: string) => [`$${v.toLocaleString()}`, name === 'income' ? 'Income' : 'Expenses']} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(v, name) => [`$${Number(v ?? 0).toLocaleString()}`, name === 'income' ? 'Income' : 'Expenses']} />
                 <Bar dataKey="income" fill="#34D399" radius={0} />
                 <Bar dataKey="expenses" fill="#EF4444" radius={0} />
               </BarChart>
@@ -210,7 +227,7 @@ export default function Reports() {
                       <Cell key={i} fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`$${v.toLocaleString()}`, 'Spent']} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Spent']} />
                 </RechartsPie>
               </ResponsiveContainer>
               <div className="flex-1 space-y-2 min-w-0">
@@ -245,7 +262,7 @@ export default function Reports() {
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
             <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} />
             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
-            <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`$${v.toLocaleString()}`, 'Net Worth']} />
+            <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Net Worth']} />
             <Area type="monotone" dataKey="netWorth" stroke="#6366F1" strokeWidth={2} fillOpacity={1} fill="url(#nwGradient)" dot={{ fill: '#6366F1', strokeWidth: 0, r: 3 }} />
           </AreaChart>
         </ResponsiveContainer>

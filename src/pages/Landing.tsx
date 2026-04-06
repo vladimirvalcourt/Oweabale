@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Star, Shield, Lock, Zap, TrendingUp, FileText, Calculator, BarChart3, Target, Twitter, Github, Linkedin } from 'lucide-react';
+import { ArrowRight, Terminal, Activity, FileText, Database, UploadCloud, ShieldCheck, Zap } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 function useInView(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
@@ -25,372 +26,297 @@ function useInView(threshold = 0.15) {
   return [ref, isVisible] as const;
 }
 
+const CYCLE_WORDS = [
+  'Freelancers',
+  'Uber Drivers',
+  'Tax Savings',
+  'Paying Tolls',
+  'Managing Bills',
+  'Protecting Profit',
+  'DoorDashers'
+];
+
+function WordCycler() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % CYCLE_WORDS.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const longestWord = CYCLE_WORDS.reduce((a, b) => a.length > b.length ? a : b);
+
+  return (
+    <span className="inline-grid grid-cols-1 grid-rows-1 relative text-left align-baseline">
+      {/* Invisible spacer to maintain width based on longest word */}
+      <span className="col-start-1 row-start-1 opacity-0 pointer-events-none select-none h-0 sm:h-auto overflow-hidden pr-1">
+        {longestWord}.
+      </span>
+      
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={CYCLE_WORDS[index]}
+          initial={{ y: '10%', opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: '-10%', opacity: 0 }}
+          transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+          className="text-brand-violet col-start-1 row-start-1 inline-block"
+        >
+          {CYCLE_WORDS[index]}.
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+}
+
 export default function Landing() {
   const [scrolled, setScrolled] = useState(false);
   
-  const [socialRef, socialVisible] = useInView();
-  const [featuresRef, featuresVisible] = useInView();
-  const [statsRef, statsVisible] = useInView();
-  const [ctaRef, ctaVisible] = useInView();
+  const [heroRef, heroVisible] = useInView(0.1);
+  const [archRef, archVisible] = useInView(0.1);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
+      setScrolled(window.scrollY > 20);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-brand-violet/30 flex flex-col">
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-surface-base/90 backdrop-blur-md border-b border-surface-border py-4' : 'bg-transparent py-6'}`}>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-surface-base/90 backdrop-blur-sm border-b border-surface-border py-4' : 'bg-transparent py-6 border-b border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <Link to="/" className="font-black text-xl tracking-[0.2em] text-content-primary transition-colors duration-200">
-            OWEABLE
+          <Link to="/" className="brand-header-text flex items-center gap-2">
+            <div className="w-2 h-2 bg-brand-violet shadow-glow-indigo"></div>
+            Oweable
           </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-            <a href="#features" className="hover:text-white transition-colors duration-200">Features</a>
-            <Link to="/pricing" className="hover:text-white transition-colors duration-200">Pricing</Link>
-            <Link to="/dashboard" className="hover:text-white transition-colors duration-200">Sign In</Link>
+          <div className="hidden md:flex items-center gap-8 text-xs font-mono uppercase tracking-widest text-content-tertiary">
+            <a href="#features" className="hover:text-content-primary transition-colors">Features</a>
+            <Link to="/pricing" className="hover:text-content-primary transition-colors">Pricing</Link>
           </div>
           <Link 
             to="/dashboard" 
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-sm font-bold transition-colors duration-200"
+            className="px-6 py-2 bg-content-primary text-surface-base hover:bg-zinc-200 text-[11px] font-mono font-bold uppercase tracking-widest transition-all btn-tactile"
           >
-            Get Started
+            Sign In
           </Link>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
-        {/* Background Image */}
-        <div 
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundImage: 'url("https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1920&q=80")',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
-          <div className="absolute inset-0 bg-black/70"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-surface-base"></div>
-        </div>
-
-        {/* Hero Glow */}
-        <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-surface-base/0 to-transparent pointer-events-none"></div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full flex flex-col items-center text-center mt-12">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="h-[1px] w-8 bg-[#F59E0B]"></div>
-            <span className="text-[#F59E0B] text-xs tracking-widest uppercase">FINANCIAL CLARITY, FINALLY</span>
-            <div className="h-[1px] w-8 bg-[#F59E0B]"></div>
-          </div>
+      <section className="pt-40 pb-20 px-6 lg:px-8 max-w-7xl mx-auto w-full flex-1 flex flex-col justify-center">
+        <div ref={heroRef} className={`grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-32 items-center transition-all duration-1000 ease-out ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
           
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.85] mb-8" style={{ fontFamily: 'Inter, sans-serif' }}>
-            <span className="block text-white">Stop Bleeding</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-b from-white to-white/60">Money.</span>
-          </h1>
-          
-          <p className="text-base md:text-lg text-zinc-400 max-w-3xl mx-auto leading-relaxed mb-12 font-light">
-            Oweable gives you a ruthless command center for your bills, debts, and financial future. See everything. Owe nothing.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
+          <div className="lg:col-span-7 flex flex-col items-start pr-0 lg:pr-12">
+            <div className="inline-flex items-center gap-3 border border-brand-violet/30 bg-brand-violet/5 px-3 py-1.5 mb-8 text-xs font-mono text-brand-violet uppercase tracking-widest">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full bg-brand-violet opacity-75"></span>
+                <span className="relative inline-flex bg-brand-violet h-2 w-2"></span>
+              </span>
+              Bank-grade Security
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl xl:text-7xl font-sans font-medium tracking-[-0.03em] text-content-primary mb-8 leading-[1.05]">
+              The Operating System<br/>
+              <span className="whitespace-nowrap inline-flex items-baseline gap-[0.2em]">
+                for <WordCycler />
+              </span>
+            </h1>
+            
+            <p className="text-base text-content-secondary max-w-lg leading-relaxed mb-10 border-l border-surface-border pl-6">
+              A high-precision command center to track your gig earnings, automate your tax reserves, and defend your profit with clinical accuracy.
+            </p>
+            
             <Link 
-              to="/dashboard" 
-              className="w-full sm:w-auto px-6 py-3 bg-white hover:bg-zinc-200 text-black rounded-sm text-base font-bold transition-colors duration-200 flex items-center justify-center gap-2"
+              to="/onboarding" 
+              className="group flex items-center gap-4 bg-brand-indigo hover:bg-brand-violet text-white px-8 py-4 text-[13px] font-mono font-bold uppercase tracking-wider transition-all btn-tactile"
             >
-              Deploy Your Dashboard <ArrowRight className="w-5 h-5" />
+              Get started for free
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
-            <a 
-              href="#features" 
-              className="w-full sm:w-auto px-6 py-3 bg-transparent border border-white/20 hover:border-white/50 text-white rounded-sm text-base font-medium transition-colors duration-200 flex items-center justify-center"
-            >
-              View The Arsenal
-            </a>
+          </div>
+
+          <div className="lg:col-span-5 relative">
+            <div className="bg-surface-raised border border-surface-border shadow-stripe-dark p-1">
+              <div className="bg-surface-elevated border border-surface-border p-6 flex flex-col gap-6">
+                <div className="flex justify-between items-center border-b border-surface-border pb-4">
+                  <span className="font-mono text-xs uppercase tracking-widest text-content-tertiary">Account Balances</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-brand-violet shadow-glow-indigo">
+                    <path d="M17 3a2 2 0 0 1 1.492 0.668l0.108 0.132 3.704 4.939a2 2 0 0 1 -0.012 2.416l-0.108 0.13 -9.259 10.184a1.25 1.25 0 0 1 -1.753 0.096l-0.097 -0.096 -9.259 -10.185a2 2 0 0 1 -0.215 -2.407l0.095 -0.138L5.4 3.8a2 2 0 0 1 1.43 -0.793L7 3zm-2.477 8H9.477L12 17.307zm5.217 0h-3.063l-2.406 6.015zM7.323 11H4.261l5.468 6.015zm5.059 -6h-0.764l-2 4h4.764zM17 5h-2.382l2 4H20zM9.382 5H7L4 9h3.382z"></path>
+                  </svg>
+                </div>
+                
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead>
+                      <tr className="text-xs font-mono uppercase tracking-widest text-content-tertiary border-b border-surface-border child:pb-3">
+                        <th className="font-normal w-1/3">Account</th>
+                        <th className="font-normal text-right">Trend / Status</th>
+                        <th className="font-normal text-right">Tax Est.</th>
+                        <th className="font-normal text-right">Balance</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-content-primary child:border-b child:border-surface-border child:last:border-0 child:child:py-3 font-mono">
+                      <tr className="hover:bg-surface-highlight transition-colors">
+                        <td>Uber / Lyft Inflow</td>
+                        <td className="text-right text-emerald-400">+12%</td>
+                        <td className="text-right text-rose-400">22.5%</td>
+                        <td className="text-right">$2,450</td>
+                      </tr>
+                      <tr className="hover:bg-surface-highlight transition-colors">
+                        <td>Savings Account</td>
+                        <td className="text-right text-emerald-400">+2.1%</td>
+                        <td className="text-right text-content-tertiary">—</td>
+                        <td className="text-right">$45,230</td>
+                      </tr>
+                      <tr className="hover:bg-surface-highlight transition-colors">
+                        <td>Stock Portfolio</td>
+                        <td className="text-right text-emerald-400">+5.0%</td>
+                        <td className="text-right text-content-tertiary">—</td>
+                        <td className="text-right">$124,550</td>
+                      </tr>
+                      <tr className="hover:bg-surface-highlight transition-colors">
+                        <td>Tax Reserve (Shield)</td>
+                        <td className="text-right text-brand-violet">ACTIVE</td>
+                        <td className="text-right text-content-tertiary">—</td>
+                        <td className="text-right text-emerald-400">$8,400</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="flex justify-between items-end pt-4 border-t border-surface-border mt-2">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] uppercase font-mono tracking-widest text-content-tertiary mb-1">Total Net Worth</span>
+                    <span className="text-2xl font-bold font-sans tracking-tight tnum">$181,838</span>
+                  </div>
+                  <div className="flex gap-1 h-8 items-end w-32">
+                    {[40, 70, 45, 90, 65, 80, 100].map((h, i) => (
+                      <div key={i} className="flex-1 bg-brand-violet/30 hover:bg-brand-violet transition-colors shadow-glow-indigo/10" style={{ height: `${h}%` }}></div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Decorative alignment lines */}
+            <div className="absolute -left-10 top-0 bottom-0 w-[1px] bg-surface-border hidden xl:block opacity-50"></div>
+            <div className="absolute -right-10 top-0 bottom-0 w-[1px] bg-surface-border hidden xl:block opacity-50"></div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Architecture Section */}
+      <section id="features" className="py-24 border-t border-surface-border bg-surface-base relative">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8" ref={archRef}>
+          <div className={`mb-16 transition-all duration-1000 ease-out ${archVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <h2 className="text-3xl font-sans font-medium tracking-tight text-content-primary mb-4">
+              Built for clarity
+            </h2>
+            <div className="w-full h-[1px] bg-surface-border relative overflow-hidden">
+              <motion.div 
+                initial={{ x: '-100%' }}
+                whileInView={{ x: '0%' }}
+                viewport={{ once: true }}
+                transition={{ duration: 1.5, ease: "circOut" }}
+                className="absolute left-0 top-0 h-full w-full bg-gradient-to-r from-brand-violet to-transparent opacity-50"
+              />
+              <motion.div 
+                initial={{ x: '-100%' }}
+                whileInView={{ x: '0%' }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, ease: "circOut" }}
+                className="absolute left-0 top-0 h-full w-1/4 bg-brand-violet"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-l border-t border-surface-border">
+            {[
+              {
+                icon: UploadCloud,
+                title: "Statement Scanning",
+                desc: "Drop your Uber, Lyft, or DoorDash pay statements. We'll automatically capture your gross earnings and platform fees."
+              },
+              {
+                icon: ShieldCheck,
+                title: "Tax Defense Shield",
+                desc: "Every dollar you earn is instantly shielded. We calculate your 15.3% SE tax and state-specific liability exactly."
+              },
+              {
+                icon: Zap,
+                title: "Deduction Scouring",
+                desc: "Automatic mileage detection at the 2024 IRS rate ($0.67/mi). We find the hidden write-offs in your work statements."
+              }
+            ].map((feat, i) => (
+              <div 
+                key={i} 
+                className="border-r border-b border-surface-border p-10 bg-surface-base hover:bg-surface-raised transition-colors group relative overflow-hidden"
+              >
+                <feat.icon />
+                <h3 className="text-lg font-medium text-content-primary mb-3">
+                  {feat.title}
+                </h3>
+                <p className="text-sm text-content-secondary leading-relaxed">
+                  {feat.desc}
+                </p>
+                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-brand-violet scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500"></div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Social Proof Bar */}
-      <div className="border-y border-surface-border bg-surface-base py-6 overflow-hidden">
-        <div 
-          ref={socialRef}
-          className={`max-w-7xl mx-auto px-6 lg:px-8 flex flex-wrap justify-center md:justify-between items-center gap-8 text-sm font-medium text-zinc-400 transition-all duration-700 ease-out ${socialVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
-        >
-          <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-indigo-400" />
-            <span>Trusted by 12,000+ households</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex text-[#F59E0B]">
-              <Star className="w-4 h-4 fill-current" />
-              <Star className="w-4 h-4 fill-current" />
-              <Star className="w-4 h-4 fill-current" />
-              <Star className="w-4 h-4 fill-current" />
-              <Star className="w-4 h-4 fill-current" />
-            </div>
-            <span>4.9 / 5.0 rating</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Lock className="w-4 h-4 text-indigo-400" />
-            <span>Bank-grade 256-bit encryption</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Features Section (Bento Grid) */}
-      <section id="features" className="py-32 bg-surface-raised overflow-hidden">
-        <div ref={featuresRef} className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className={`mb-20 max-w-3xl transition-all duration-700 ease-out ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <h2 className="text-3xl md:text-4xl font-black tracking-tight mb-6 text-content-primary">Every dollar,<br/>accounted for.</h2>
-            <p className="text-base text-zinc-400 leading-relaxed">
-              From rent to streaming services, Oweable maps your complete financial picture.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-[280px]">
-            {/* Bento Cell 1 - Large */}
-            <div className={`md:col-span-2 transition-all duration-700 ease-out delay-[0ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              <div className="bg-surface-elevated border border-surface-border rounded-xl p-8 flex flex-col justify-between group hover:border-indigo-500/50 transition-colors duration-200 relative overflow-hidden h-full">
-                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-200">
-                  <TrendingUp className="w-48 h-48 text-indigo-400" />
-                </div>
-                <div className="relative z-10">
-                  <div className="mb-8 w-full max-w-[240px] bg-surface-base border border-surface-border rounded-lg p-4 shadow-lg">
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-xs font-medium text-zinc-400">Total Debt</span>
-                      <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">Payoff date: Oct 2026</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-surface-border rounded-full overflow-hidden">
-                      <div className="h-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)] rounded-full animate-[progress-active_4s_ease-in-out_infinite]"></div>
-                    </div>
-                  </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-3 text-content-primary">Debt Detonator</h3>
-                  <p className="text-zinc-400 text-sm md:text-base max-w-md">
-                    Crush interest rates and see the exact day you become debt-free.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Bento Cell 2 */}
-            <div className={`transition-all duration-700 ease-out delay-[100ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              <div className="bg-surface-elevated border border-surface-border rounded-xl p-8 flex flex-col justify-between group hover:border-indigo-500/50 transition-colors duration-200 relative overflow-hidden h-full">
-                <div className="relative z-10">
-                  <div className="mb-6 h-28 w-full max-w-[240px] overflow-hidden relative [mask-image:linear-gradient(to_bottom,transparent,black_20%,black_80%,transparent)]">
-                    <div className="flex flex-col gap-2 animate-[marquee-vertical_15s_linear_infinite]">
-                      {[
-                        { name: "Netflix", price: "$15.99" },
-                        { name: "Equinox", price: "$250.00" },
-                        { name: "Spotify", price: "$10.99" },
-                        { name: "Adobe CC", price: "$54.99" },
-                        { name: "ChatGPT", price: "$20.00" },
-                        { name: "Netflix", price: "$15.99" },
-                        { name: "Equinox", price: "$250.00" },
-                        { name: "Spotify", price: "$10.99" },
-                        { name: "Adobe CC", price: "$54.99" },
-                        { name: "ChatGPT", price: "$20.00" }
-                      ].map((sub, i) => (
-                        <div key={i} className="flex items-center justify-between bg-surface-base border border-surface-border rounded-md px-3 py-2 shadow-sm shrink-0">
-                          <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-red-500 shadow-[0_0_5px_rgba(239,68,68,0.8)] animate-pulse"></div>
-                            <span className="text-xs font-medium text-zinc-300">{sub.name}</span>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className="text-xs text-zinc-500">{sub.price}</span>
-                            <span className="text-[10px] font-bold text-red-400 hover:text-red-300 cursor-pointer transition-colors uppercase tracking-wider">Cancel</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-3 text-content-primary">Subscription Sniper</h3>
-                  <p className="text-zinc-400 text-sm md:text-base">
-                    Stop paying for things you don't use. We find them, you kill them.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Bento Cell 3 */}
-            <div className={`transition-all duration-700 ease-out delay-[200ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              <div className="bg-surface-elevated border border-surface-border rounded-xl p-8 flex flex-col justify-between group hover:border-indigo-500/50 transition-colors duration-200 relative overflow-hidden h-full">
-                <div className="relative z-10">
-                  <div className="mb-8 h-16 flex items-end gap-2 max-w-[240px]">
-                    <div className="w-8 bg-surface-base border border-surface-border border-t-indigo-500/30 rounded-t-sm animate-[chart-1_4s_ease-in-out_infinite]"></div>
-                    <div className="w-8 bg-surface-base border border-surface-border border-t-indigo-500/50 rounded-t-sm animate-[chart-2_5s_ease-in-out_infinite]"></div>
-                    <div className="w-8 bg-surface-base border border-surface-border border-t-indigo-500/70 rounded-t-sm animate-[chart-3_6s_ease-in-out_infinite]"></div>
-                    <div className="w-8 bg-indigo-500/20 border border-indigo-500/50 border-t-indigo-400 rounded-t-sm shadow-[0_-5px_15px_rgba(99,102,241,0.2)] relative animate-[chart-4_7s_ease-in-out_infinite]">
-                      <div className="absolute -top-[1px] left-0 right-0 h-[2px] bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,1)]"></div>
-                    </div>
-                  </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-3 text-content-primary">Wealth Velocity</h3>
-                  <p className="text-zinc-400 text-sm md:text-base">
-                    Track net worth with institutional-grade precision.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Bento Cell 4 - Large */}
-            <div className={`md:col-span-2 transition-all duration-700 ease-out delay-[300ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              <div className="bg-surface-elevated border border-surface-border rounded-xl p-8 flex flex-col justify-between group hover:border-indigo-500/50 transition-colors duration-200 relative overflow-hidden h-full">
-                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-200">
-                  <Calculator className="w-48 h-48 text-indigo-400" />
-                </div>
-                <div className="relative z-10">
-                  <div className="w-10 h-10 bg-surface-base border border-surface-border rounded-lg flex items-center justify-center mb-6">
-                    <Calculator className="w-5 h-5 text-indigo-400" />
-                  </div>
-                  <h3 className="text-xl md:text-2xl font-bold mb-3 text-content-primary">Tax Fortress</h3>
-                  <p className="text-zinc-400 text-sm md:text-base max-w-md">
-                    Never be surprised by April again. Real-time liability tracking.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Bento Cell 5 */}
-            <div className={`md:col-span-3 transition-all duration-700 ease-out delay-[400ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              <div className="bg-surface-elevated border border-surface-border rounded-xl p-8 flex flex-col md:flex-row items-center justify-between group hover:border-indigo-500/50 transition-colors duration-200 relative overflow-hidden h-full">
-                <div className="flex items-center gap-6">
-                  <div className="w-14 h-14 bg-surface-base border border-surface-border rounded-xl flex items-center justify-center shrink-0">
-                    <FileText className="w-7 h-7 text-indigo-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl md:text-2xl font-bold mb-2 text-content-primary">Receipt to Reality</h3>
-                    <p className="text-zinc-400 text-sm md:text-base">
-                      Snap a photo. We extract the merchant, amount, and date instantly.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Bento Cell 6 */}
-            <div className={`md:col-span-3 transition-all duration-700 ease-out delay-[500ms] ${featuresVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              <div className="bg-surface-elevated border border-surface-border rounded-xl p-8 flex flex-col md:flex-row items-center justify-between group hover:border-indigo-500/50 transition-colors duration-200 h-full">
-                <div className="flex items-center gap-6 mb-6 md:mb-0">
-                  <div className="w-14 h-14 bg-surface-base border border-surface-border rounded-xl flex items-center justify-center shrink-0">
-                    <Lock className="w-7 h-7 text-indigo-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl md:text-2xl font-bold mb-2 text-content-primary">Fort Knox Security</h3>
-                    <p className="text-zinc-400 text-sm md:text-base">
-                      Your data is encrypted end-to-end. We never sell your information.
-                    </p>
-                  </div>
-                </div>
-                <Link 
-                  to="/dashboard" 
-                  className="px-6 py-3 bg-surface-base hover:bg-surface-border border border-surface-border rounded-sm text-white text-sm font-medium transition-colors duration-200 whitespace-nowrap"
-                >
-                  Read Security Policy
+      {/* CTA Footer */}
+      <footer className="border-t border-surface-border bg-surface-raised pt-24 pb-12">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-24">
+            <div className="col-span-1 md:col-span-2">
+              <Link to="/" className="brand-header-text flex items-center gap-2 mb-6">
+                <div className="w-2 h-2 bg-brand-violet shadow-glow-indigo"></div>
+                Oweable
+              </Link>
+              <p className="text-sm text-content-tertiary max-w-sm leading-relaxed mb-8">
+                Autonomous financial infrastructure for the modern worker. Track, save, and protect your profit with bank-grade precision.
+              </p>
+              <div className="flex items-center gap-4">
+                <Link to="/onboarding" className="bg-content-primary text-surface-base px-6 py-3 text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-zinc-200 transition-all">
+                  Get Started
                 </Link>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-32 bg-surface-base border-y border-surface-border overflow-hidden relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900/10 via-surface-base/0 to-transparent pointer-events-none"></div>
-        <div ref={statsRef} className={`relative z-10 max-w-7xl mx-auto px-6 lg:px-8 transition-all duration-700 ease-out ${statsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 divide-y md:divide-y-0 md:divide-x divide-surface-border text-center md:text-left">
-            <div className="md:pr-12 pt-12 md:pt-0">
-              <p className="text-4xl md:text-5xl font-black text-[#F59E0B] mb-3 tracking-tighter">$2.4B+</p>
-              <p className="text-sm md:text-base text-zinc-400 font-medium tracking-wide">In bills tracked</p>
-            </div>
-            <div className="md:px-12 pt-12 md:pt-0">
-              <p className="text-4xl md:text-5xl font-black text-[#F59E0B] mb-3 tracking-tighter">98%</p>
-              <p className="text-sm md:text-base text-zinc-400 font-medium tracking-wide">Of users cut expenses in month 1</p>
-            </div>
-            <div className="md:pl-12 pt-12 md:pt-0">
-              <p className="text-4xl md:text-5xl font-black text-[#F59E0B] mb-3 tracking-tighter">4 min</p>
-              <p className="text-sm md:text-base text-zinc-400 font-medium tracking-wide">Average setup time</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-40 relative overflow-hidden bg-surface-raised">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-indigo-900/20 via-surface-raised to-surface-raised"></div>
-        <div ref={ctaRef} className={`relative z-10 max-w-4xl mx-auto px-6 lg:px-8 text-center transition-all duration-700 ease-out ${ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <h2 className="text-3xl md:text-4xl font-black tracking-tighter mb-6 text-content-primary">
-            Your money deserves a strategist.
-          </h2>
-          <p className="text-base md:text-lg text-zinc-400 mb-10 font-light">
-            Join thousands who stopped guessing and started knowing.
-          </p>
-          <Link 
-            to="/dashboard" 
-            className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-base font-bold transition-all duration-200 hover:scale-105"
-          >
-            Claim Your Financial Freedom <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-surface-base border-t border-surface-border pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-            <div className="col-span-1 md:col-span-1">
-              <Link to="/" className="font-black text-xl tracking-[0.2em] text-content-primary block mb-4">
-                OWEABLE
-              </Link>
-              <p className="text-sm text-zinc-400 leading-relaxed max-w-xs">
-                The command center for your financial future.
-              </p>
-            </div>
-            
             <div>
-              <h4 className="text-white font-semibold mb-4">Product</h4>
-              <ul className="space-y-3 text-sm text-zinc-400">
-                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
-                <li><Link to="/dashboard" className="hover:text-white transition-colors">Dashboard</Link></li>
-                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
+              <h4 className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-primary mb-6">Platform</h4>
+              <ul className="flex flex-col gap-3 text-xs font-mono text-content-tertiary uppercase tracking-widest">
+                <li><a href="#features" className="hover:text-brand-violet transition-colors">Features</a></li>
+                <li><Link to="/pricing" className="hover:text-brand-violet transition-colors">Pricing</Link></li>
+                <li><Link to="/dashboard" className="hover:text-brand-violet transition-colors">SignIn</Link></li>
               </ul>
             </div>
-            
             <div>
-              <h4 className="text-white font-semibold mb-4">Resources</h4>
-              <ul className="space-y-3 text-sm text-zinc-400">
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-semibold mb-4">Company</h4>
-              <ul className="space-y-3 text-sm text-zinc-400">
-                <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+              <h4 className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-primary mb-6">Legal</h4>
+              <ul className="flex flex-col gap-3 text-xs font-mono text-content-tertiary uppercase tracking-widest">
+                <li><Link to="/privacy" className="hover:text-brand-violet transition-colors text-left block">Privacy</Link></li>
+                <li><Link to="/terms" className="hover:text-brand-violet transition-colors text-left block">Terms</Link></li>
+                <li><Link to="/security" className="hover:text-brand-violet transition-colors text-left block">Security</Link></li>
               </ul>
             </div>
           </div>
-          
-          <div className="pt-8 border-t border-surface-border flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-zinc-500">
-              &copy; {new Date().getFullYear()} Oweable Inc. All rights reserved.
-            </p>
-            <div className="flex items-center gap-4 text-zinc-500">
-              <a href="#" className="hover:text-white transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                <Github className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-white transition-colors">
-                <Linkedin className="w-5 h-5" />
-              </a>
+          <div className="pt-8 border-t border-surface-border flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-6 text-[10px] font-mono text-content-muted uppercase tracking-widest">
+              <span>OWEABLE INC. NYC</span>
+              <span className="opacity-30">/</span>
+              <span>© {new Date().getFullYear()} ALL RIGHTS RESERVED</span>
+            </div>
+            <div className="flex items-center gap-4 text-content-muted">
+              <Terminal className="w-4 h-4" />
+              <Activity className="w-4 h-4" />
+              <Database className="w-4 h-4" />
             </div>
           </div>
         </div>

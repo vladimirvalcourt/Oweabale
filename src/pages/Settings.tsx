@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
+import { supabase } from '../lib/supabase';
 import { Dialog } from '@headlessui/react';
 import { AlertTriangle, Lock, Shield, Smartphone, CreditCard as CreditCardIcon, CheckCircle2, Plus, X, Building2, Loader2, Search, Download, Fingerprint, EyeOff, FileSpreadsheet, FileText, User, Mail, BellRing, BrainCircuit, Palette, Globe, PieChart } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -19,6 +20,9 @@ export default function Settings() {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
+    phone: user.phone || '',
+    timezone: user.timezone || 'Eastern Time (ET)',
+    language: user.language || 'English (US)',
   });
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -33,7 +37,7 @@ export default function Settings() {
     toast.success('Profile updated successfully');
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
@@ -148,26 +152,26 @@ export default function Settings() {
 
                       <div className="sm:col-span-4">
                         <label htmlFor="phone" className="block text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-widest mb-2">Phone Number</label>
-                        <input type="tel" id="phone" placeholder="+1 (555) 000-0000" className="focus:border-indigo-500 block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-zinc-200 rounded-sm px-3 py-2 border transition-colors outline-none" />
+                        <input type="tel" id="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" className="focus:border-indigo-500 block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-zinc-200 rounded-sm px-3 py-2 border transition-colors outline-none" />
                       </div>
 
                       <div className="sm:col-span-3">
                         <label htmlFor="timezone" className="block text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-widest mb-2">Timezone</label>
-                        <select id="timezone" className="focus:border-indigo-500 block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-zinc-200 rounded-sm px-3 py-2 border transition-colors outline-none appearance-none">
-                          <option>Pacific Time (PT)</option>
-                          <option>Eastern Time (ET)</option>
-                          <option>Central Time (CT)</option>
-                          <option>Greenwich Mean Time (GMT)</option>
+                        <select id="timezone" value={formData.timezone} onChange={handleChange} className="focus:border-indigo-500 block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-zinc-200 rounded-sm px-3 py-2 border transition-colors outline-none appearance-none">
+                          <option value="Pacific Time (PT)">Pacific Time (PT)</option>
+                          <option value="Eastern Time (ET)">Eastern Time (ET)</option>
+                          <option value="Central Time (CT)">Central Time (CT)</option>
+                          <option value="Greenwich Mean Time (GMT)">Greenwich Mean Time (GMT)</option>
                         </select>
                       </div>
 
                       <div className="sm:col-span-3">
                         <label htmlFor="language" className="block text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-widest mb-2">Language</label>
-                        <select id="language" className="focus:border-indigo-500 block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-zinc-200 rounded-sm px-3 py-2 border transition-colors outline-none appearance-none">
-                          <option>English (US)</option>
-                          <option>Spanish</option>
-                          <option>French</option>
-                          <option>German</option>
+                        <select id="language" value={formData.language} onChange={handleChange} className="focus:border-indigo-500 block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-zinc-200 rounded-sm px-3 py-2 border transition-colors outline-none appearance-none">
+                          <option value="English (US)">English (US)</option>
+                          <option value="Spanish">Spanish</option>
+                          <option value="French">French</option>
+                          <option value="German">German</option>
                         </select>
                       </div>
                     </div>
@@ -189,18 +193,25 @@ export default function Settings() {
             <div className="space-y-6">
               <CollapsibleModule title="Password" icon={Lock} defaultOpen={true}>
                 <p className="text-sm text-zinc-400 mb-6">Ensure your account is using a long, random password to stay secure.</p>
-                <form className="space-y-4 max-w-md" onSubmit={(e) => { e.preventDefault(); toast.success('Password updated successfully'); e.currentTarget.reset(); }}>
-                  <div>
-                    <label className="block text-sm font-semibold text-zinc-300">Current Password</label>
-                    <input type="password" required className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors" />
-                  </div>
+                <form className="space-y-4 max-w-md" onSubmit={async (e) => {
+                  e.preventDefault();
+                  const form = e.currentTarget;
+                  const newPw = (form.elements.namedItem('newPassword') as HTMLInputElement).value;
+                  const confirmPw = (form.elements.namedItem('confirmPassword') as HTMLInputElement).value;
+                  if (newPw !== confirmPw) { toast.error('Passwords do not match'); return; }
+                  if (newPw.length < 8) { toast.error('Password must be at least 8 characters'); return; }
+                  const { error } = await supabase.auth.updateUser({ password: newPw });
+                  if (error) { toast.error(error.message); return; }
+                  toast.success('Password updated successfully');
+                  form.reset();
+                }}>
                   <div>
                     <label className="block text-sm font-semibold text-zinc-300">New Password</label>
-                    <input type="password" required className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors" />
+                    <input name="newPassword" type="password" required minLength={8} className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors" />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-zinc-300">Confirm Password</label>
-                    <input type="password" required className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors" />
+                    <input name="confirmPassword" type="password" required className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors" />
                   </div>
                   <div className="pt-2">
                     <button type="submit" className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500">
@@ -449,22 +460,7 @@ export default function Settings() {
 
           {activeTab === 'financial' && (
             <div className="space-y-6">
-              <CollapsibleModule title="Appearance" icon={Palette} defaultOpen={false}>
-                <p className="text-sm text-zinc-400 mb-6">Customize how Oweable looks on your device.</p>
-                <div className="space-y-4 max-w-md">
-                  <div>
-                    <label className="block text-sm font-semibold text-zinc-300">Theme</label>
-                    <select 
-                      value={user.theme || 'Dark'}
-                      onChange={(e) => updateUser({ theme: e.target.value })}
-                      className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors outline-none cursor-pointer"
-                    >
-                      <option value="Dark">Dark (Default)</option>
-                      <option value="Light">Light Mode</option>
-                    </select>
-                  </div>
-                </div>
-              </CollapsibleModule>
+
 
               <CollapsibleModule title="Currency & Formatting" icon={Globe} defaultOpen={false}>
                 <p className="text-sm text-zinc-400 mb-6">Set your preferred currency and date format.</p>
