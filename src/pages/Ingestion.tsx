@@ -11,11 +11,13 @@ import {
   X,
   UploadCloud,
   CloudUpload,
-  ExternalLink
+  ExternalLink,
+  Smartphone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useStore } from '../store/useStore';
 import { supabase } from '../lib/supabase';
+import MobileSyncModal from '../components/MobileSyncModal';
 import { toast } from 'sonner';
 import Tesseract from 'tesseract.js';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -27,6 +29,7 @@ export default function Ingestion() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [isSyncOpen, setIsSyncOpen] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const processFile = async (uploadedFile: File) => {
@@ -203,11 +206,18 @@ export default function Ingestion() {
             onChange={handleFileSelect} 
           />
           <button 
+            onClick={() => setIsSyncOpen(true)}
+            className="px-6 py-2.5 bg-brand-violet/10 border border-brand-violet/30 hover:bg-brand-violet/20 text-brand-violet rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 btn-tactile"
+          >
+            <Smartphone className="w-4 h-4" /> SCAN VIA PHONE
+          </button>
+          <button 
             onClick={() => fileInputRef.current?.click()}
             className="px-6 py-2.5 bg-surface-raised border border-surface-border hover:bg-surface-elevated text-zinc-300 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 btn-tactile"
           >
             <UploadCloud className="w-4 h-4" /> UPLOAD DOCUMENTS
           </button>
+
           {pendingIngestions.some(pi => pi.status === 'ready') && (
             <button 
               onClick={handleBulkCommit}
@@ -477,6 +487,16 @@ export default function Ingestion() {
           </div>
         )}
       </div>
+      <MobileSyncModal 
+        isOpen={isSyncOpen} 
+        onClose={() => setIsSyncOpen(false)} 
+        onSuccess={() => {
+           // Mobile upload already inserted the record, 
+           // but we might need to refresh local state if store doesn't auto-poll
+           // In Oweable, fetchData() usually handles this.
+           useStore.getState().fetchData();
+        }}
+      />
     </div>
   );
 }

@@ -39,6 +39,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import Education from './pages/Education';
 import HelpDesk from './pages/HelpDesk';
 import AuthCallback from './pages/AuthCallback';
+import MobileCapture from './pages/MobileCapture';
 
 function AppRoutes() {
   const { user: authUser, loading: authLoading } = useAuth();
@@ -80,6 +81,7 @@ function AppRoutes() {
         element={authUser ? <Navigate to="/dashboard" replace /> : <AuthPage />}
       />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/capture" element={<MobileCapture />} />
 
       {/* ── Protected routes — require authentication ── */}
       <Route element={<AuthGuard />}>
