@@ -38,6 +38,7 @@ import Security from './pages/Security';
 import AdminDashboard from './pages/AdminDashboard';
 import Education from './pages/Education';
 import HelpDesk from './pages/HelpDesk';
+import AuthCallback from './pages/AuthCallback';
 
 function AppRoutes() {
   const { user: authUser, loading: authLoading } = useAuth();
@@ -56,7 +57,7 @@ function AppRoutes() {
   
   // If user is logged in but hasn't completed onboarding, redirect to onboarding 
   // (unless already on that page)
-  const isNewUser = authUser && (!user.id || !user.hasCompletedOnboarding);
+  const isNewUser = authUser && user.id && !user.hasCompletedOnboarding;
   const isNotOnOnboarding = window.location.pathname !== '/onboarding';
   
   if (isNewUser && isNotOnOnboarding) {
@@ -78,6 +79,7 @@ function AppRoutes() {
         path="/auth"
         element={authUser ? <Navigate to="/dashboard" replace /> : <AuthPage />}
       />
+      <Route path="/auth/callback" element={<AuthCallback />} />
 
       {/* ── Protected routes — require authentication ── */}
       <Route element={<AuthGuard />}>

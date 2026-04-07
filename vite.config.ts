@@ -44,6 +44,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      historyApiFallback: true,
       hmr: process.env.DISABLE_HMR !== 'true',
       headers: {
         'X-Content-Type-Options': 'nosniff',
