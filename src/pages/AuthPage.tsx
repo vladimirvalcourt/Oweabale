@@ -45,7 +45,7 @@ export default function AuthPage() {
           <h1 className="font-mono text-2xl text-white font-bold tracking-tight">
             Sign in to Oweable
           </h1>
-          <p className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mt-1">
+          <p className="font-mono text-xs text-zinc-400 uppercase tracking-[0.2em] mt-2">
             Your financial OS — Secure access only.
           </p>
         </div>
@@ -85,16 +85,17 @@ export default function AuthPage() {
         </button>
 
         {/* Support Note */}
-        <p className="font-mono text-[9px] text-zinc-600 text-center mb-8 uppercase tracking-[0.15em]">
-          Enterprise encryption and biometric auth handled by Google Identity Services.
+        <p className="font-mono text-[11px] text-zinc-500 text-center mb-10 uppercase tracking-[0.1em] leading-relaxed">
+          Enterprise encryption and biometric auth <br />
+          handled by Google Identity Services.
         </p>
 
         {/* Legal */}
-        <p className="font-mono text-[8px] text-zinc-700 text-center mt-4 leading-relaxed">
+        <p className="font-mono text-[10px] text-zinc-600 text-center mt-6 leading-relaxed uppercase tracking-wider">
           By continuing, you agree to our{' '}
-          <a href="/terms" className="text-zinc-500 hover:text-white">Terms</a>
+          <a href="/terms" className="text-zinc-400 hover:text-white underline underline-offset-2">Terms</a>
           {' '}and{' '}
-          <a href="/privacy" className="text-zinc-500 hover:text-white">Privacy Policy</a>.
+          <a href="/privacy" className="text-zinc-400 hover:text-white underline underline-offset-2">Privacy Policy</a>.
         </p>
       </div>
     </div>
