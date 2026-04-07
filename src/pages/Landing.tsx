@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import { ArrowRight, UploadCloud, ShieldCheck, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 
 function useInView(threshold = 0.15) {
@@ -101,12 +102,25 @@ export default function Landing() {
             <a href="#features" className="hover:text-content-primary transition-colors">Features</a>
             <Link to="/pricing" className="hover:text-content-primary transition-colors">Pricing</Link>
           </div>
-          <Link 
-            to={user?.id ? "/dashboard" : "/auth"} 
-            className="px-6 py-2 bg-content-primary text-surface-base hover:bg-zinc-200 text-[11px] font-mono font-bold uppercase tracking-widest transition-all btn-tactile"
-          >
-            {user?.id ? "Enter Dashboard" : "Sign In"}
-          </Link>
+          <div className="flex items-center gap-3">
+            {user?.id && (
+              <button 
+                onClick={() => {
+                  useStore.getState().signOut();
+                  toast.success('Session Terminated');
+                }}
+                className="hidden sm:block px-6 py-2 bg-transparent border border-surface-border hover:border-zinc-500 text-zinc-400 hover:text-zinc-200 text-[11px] font-mono font-bold uppercase tracking-widest transition-all btn-tactile"
+              >
+                Sign Out
+              </button>
+            )}
+            <Link 
+              to={user?.id ? "/dashboard" : "/auth"} 
+              className="px-6 py-2 bg-content-primary text-surface-base hover:bg-zinc-200 text-[11px] font-mono font-bold uppercase tracking-widest transition-all btn-tactile"
+            >
+              {user?.id ? "Enter Dashboard" : "Sign In"}
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -130,7 +144,7 @@ export default function Landing() {
               </span>
             </h1>
             
-            <p className="text-base text-content-secondary max-w-lg leading-relaxed mb-10 border-l border-surface-border pl-6">
+            <p className="text-lg font-medium text-zinc-300 max-w-lg leading-[1.6] mb-10 border-l-2 border-brand-violet/30 pl-6">
               A high-precision command center to track your gig earnings, automate your tax reserves, and defend your profit with clinical accuracy.
             </p>
             
