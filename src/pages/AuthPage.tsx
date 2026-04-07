@@ -7,14 +7,23 @@ export default function AuthPage() {
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`,
-      },
-    });
-    if (error) {
-      toast.error(error.message);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      });
+      
+      if (error) {
+        throw error;
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to sign in with Google');
       setGoogleLoading(false);
     }
   };

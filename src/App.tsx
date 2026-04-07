@@ -56,7 +56,7 @@ function AppRoutes() {
   
   // If user is logged in but hasn't completed onboarding, redirect to onboarding 
   // (unless already on that page)
-  const isNewUser = authUser && !user.hasCompletedOnboarding;
+  const isNewUser = authUser && (!user.id || !user.hasCompletedOnboarding);
   const isNotOnOnboarding = window.location.pathname !== '/onboarding';
   
   if (isNewUser && isNotOnOnboarding) {
@@ -76,7 +76,7 @@ function AppRoutes() {
       {/* ── Auth route — redirect to dashboard if already signed in ── */}
       <Route
         path="/auth"
-        element={user ? <Navigate to="/dashboard" replace /> : <AuthPage />}
+        element={authUser ? <Navigate to="/dashboard" replace /> : <AuthPage />}
       />
 
       {/* ── Protected routes — require authentication ── */}
