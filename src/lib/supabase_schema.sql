@@ -16,21 +16,24 @@ CREATE TABLE profiles (
   phone       TEXT,
   timezone    TEXT,
   language    TEXT,
+  is_admin    BOOLEAN NOT NULL DEFAULT FALSE,
   created_at  TIMESTAMPTZ DEFAULT NOW(),
   updated_at  TIMESTAMPTZ DEFAULT NOW()
 );
 
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view their own profile"   ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Admins can view all profiles"       ON profiles FOR SELECT USING (EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.is_admin = TRUE));
 CREATE POLICY "Users can insert their own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 CREATE POLICY "Users can update their own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can delete their own profile" ON profiles FOR DELETE USING (auth.uid() = id);
 
 -- 2. BILLS
 CREATE TABLE bills (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   biller     TEXT NOT NULL,
-  amount     DECIMAL(12,2) NOT NULL,
+  amount     DECIMAL(12,2) NOT NULL CHECK (amount > 0),
   category   TEXT,
   due_date   DATE NOT NULL,
   frequency  TEXT,
@@ -50,8 +53,8 @@ CREATE TABLE debts (
   name              TEXT NOT NULL,
   type              TEXT,
   apr               DECIMAL(5,2),
-  remaining         DECIMAL(12,2) NOT NULL,
-  min_payment       DECIMAL(12,2),
+  remaining         DECIMAL(12,2) NOT NULL CHECK (remaining >= 0),
+  min_payment       DECIMAL(12,2) CHECK (min_payment >= 0),
   paid              DECIMAL(12,2) DEFAULT 0,
   original_amount   DECIMAL(12,2),
   origination_date  DATE,
@@ -83,7 +86,7 @@ CREATE TABLE assets (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id           UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   name              TEXT NOT NULL,
-  value             DECIMAL(12,2) NOT NULL,
+  value             DECIMAL(12,2) NOT NULL CHECK (value > 0),
   type              TEXT,
   appreciation_rate DECIMAL(8,4),
   purchase_price    DECIMAL(12,2),
@@ -100,7 +103,7 @@ CREATE TABLE subscriptions (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id           UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   name              TEXT NOT NULL,
-  amount            DECIMAL(12,2) NOT NULL,
+  amount            DECIMAL(12,2) NOT NULL CHECK (amount > 0),
   frequency         TEXT,
   next_billing_date DATE,
   status            TEXT CHECK (status IN ('active', 'paused', 'cancelled')),
@@ -117,8 +120,8 @@ CREATE TABLE goals (
   id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id        UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   name           TEXT NOT NULL,
-  target_amount  DECIMAL(12,2) NOT NULL,
-  current_amount DECIMAL(12,2) DEFAULT 0,
+  target_amount  DECIMAL(12,2) NOT NULL CHECK (target_amount > 0),
+  current_amount DECIMAL(12,2) DEFAULT 0 CHECK (current_amount >= 0),
   deadline       DATE,
   type           TEXT CHECK (type IN ('debt', 'savings', 'emergency')),
   color          TEXT,
@@ -134,7 +137,7 @@ CREATE TABLE incomes (
   id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id         UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   name            TEXT NOT NULL,
-  amount          DECIMAL(12,2) NOT NULL,
+  amount          DECIMAL(12,2) NOT NULL CHECK (amount > 0),
   frequency       TEXT,
   category        TEXT,
   next_date       DATE,
@@ -152,7 +155,7 @@ CREATE TABLE budgets (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id    UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   category   TEXT NOT NULL,
-  amount     DECIMAL(12,2) NOT NULL,
+  amount     DECIMAL(12,2) NOT NULL CHECK (amount > 0),
   period     TEXT CHECK (period IN ('Monthly', 'Yearly')),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -181,8 +184,8 @@ CREATE TABLE citations (
   type            TEXT NOT NULL,
   jurisdiction    TEXT,
   days_left       INT,
-  amount          DECIMAL(12,2) NOT NULL,
-  penalty_fee     DECIMAL(12,2),
+  amount          DECIMAL(12,2) NOT NULL CHECK (amount > 0),
+  penalty_fee     DECIMAL(12,2) CHECK (penalty_fee >= 0),
   date            DATE,
   citation_number TEXT,
   payment_url     TEXT,
@@ -200,7 +203,7 @@ CREATE TABLE deductions (
   user_id    UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   name       TEXT NOT NULL,
   category   TEXT,
-  amount     DECIMAL(12,2) NOT NULL,
+  amount     DECIMAL(12,2) NOT NULL CHECK (amount > 0),
   date       DATE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );

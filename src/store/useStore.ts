@@ -184,6 +184,7 @@ interface AppState {
     timezone?: string;
     language?: string;
     hasCompletedOnboarding: boolean;
+    isAdmin: boolean;
   };
   setTaxSettings: (state: string, rate: number) => void;
   bankConnected: boolean;
@@ -278,6 +279,7 @@ const initialData = {
     timezone: 'Eastern Time (ET)',
     language: 'English (US)',
     hasCompletedOnboarding: false,
+    isAdmin: false,
   },
   bankConnected: false,
   pendingIngestions: [],
@@ -1207,6 +1209,7 @@ export const useStore = create<AppState>()(
           hasCompletedOnboarding: profile.has_completed_onboarding || false,
           taxState: profile.tax_state ?? 'CA',
           taxRate: profile.tax_rate ?? 35.0,
+          isAdmin: profile.is_admin === true,
         } : initialData.user,
         isLoading: false
       });

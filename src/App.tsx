@@ -10,6 +10,7 @@ import Layout from './components/Layout';
 import DeviceGuard from './components/DeviceGuard';
 import ErrorBoundary from './components/ErrorBoundary';
 import AuthGuard from './components/AuthGuard';
+import AdminGuard from './components/AdminGuard';
 import { AppLoader } from './components/PageSkeleton';
 import { useStore } from './store/useStore';
 import { useAuth } from './hooks/useAuth';
@@ -88,8 +89,10 @@ function AppRoutes() {
 
       {/* ── Protected routes — require authentication ── */}
       <Route element={<AuthGuard />}>
-        {/* Admin — authenticated users only (no public access) */}
-        <Route path="/admin" element={<ErrorBoundary><AdminDashboard /></ErrorBoundary>} />
+        {/* Admin — requires both authentication AND is_admin = true on profile */}
+        <Route element={<AdminGuard />}>
+          <Route path="/admin" element={<ErrorBoundary><AdminDashboard /></ErrorBoundary>} />
+        </Route>
 
         {/* Onboarding doesn't need Layout sidebar/topbar */}
         <Route path="/onboarding" element={<Onboarding />} />
