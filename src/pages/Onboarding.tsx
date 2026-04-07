@@ -306,12 +306,12 @@ export default function Onboarding() {
             disabled={currentStepIndex === 0}
             className={`font-mono text-[11px] uppercase tracking-[0.3em] transition-colors ${currentStepIndex === 0 ? 'opacity-0' : 'text-zinc-500 hover:text-white'}`}
           >
-            [BACK_STEP]
+            Back
           </button>
           
           <div className="flex items-center gap-4">
              <div className="hidden sm:block text-[10px] font-mono text-zinc-600 uppercase tracking-widest font-medium opacity-50">
-               Encrypted Session
+               Secure Setup
              </div>
             <button 
               onClick={handleNext}

@@ -686,7 +686,7 @@ export default function Layout() {
               <Dialog.Title className="text-lg font-semibold tracking-tight text-content-primary font-sans">Wipe All Data?</Dialog.Title>
             </div>
             <Dialog.Description className="text-[13px] text-zinc-400 mb-6 leading-relaxed font-sans">
-              This will permanently delete every bill, transaction, and financial link you've created. You will be sent back to the setup protocol to start fresh.
+              This will permanently delete every bill, transaction, and financial link you've created. You will be sent back to the initial setup to start fresh.
             </Dialog.Description>
 
             <div className="flex justify-end gap-3">

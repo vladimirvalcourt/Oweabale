@@ -186,7 +186,7 @@ export default function Settings() {
 
                     <div className="pt-8 flex justify-end">
                       <button type="submit" className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors shadow-lg shadow-indigo-500/10">
-                        Commit Session
+                        Save Changes
                       </button>
                     </div>
                   </form>
