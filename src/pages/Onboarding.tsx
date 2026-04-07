@@ -150,11 +150,11 @@ export default function Onboarding() {
               toast.success('Setup skipped. Welcome to your dashboard.');
               navigate('/dashboard');
             }}
-            className="text-[9px] font-mono text-zinc-500 hover:text-zinc-200 uppercase tracking-widest transition-colors border border-surface-border px-3 py-1 rounded-sm hover:bg-surface-elevated"
+            className="text-[11px] font-mono text-zinc-400 hover:text-zinc-200 uppercase tracking-widest transition-colors border border-surface-border px-3 py-1.5 rounded-sm hover:bg-surface-elevated"
           >
             Skip Setup
           </button>
-          <div className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest hidden sm:block">Status: Finalizing</div>
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-widest hidden sm:block">Status: Finalizing</div>
           <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
         </div>
       </div>
@@ -205,7 +205,7 @@ export default function Onboarding() {
                         className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder-zinc-900 outline-none tnum leading-none"
                       />
                     </div>
-                    <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest pt-1">Current Balances // Liquid Assets Only</p>
+                    <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest pt-2">Current Balances // Liquid Assets Only</p>
                   </div>
                 )}
 
@@ -223,7 +223,7 @@ export default function Onboarding() {
                         className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder-zinc-900 outline-none tnum leading-none"
                       />
                     </div>
-                    <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest pt-1">Monthly Fixed Outflow // Rent, Subscriptions, Debt Mins</p>
+                    <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest pt-2">Monthly Fixed Outflow // Rent, Subscriptions, Debt Mins</p>
                   </div>
                 )}
 
@@ -241,9 +241,9 @@ export default function Onboarding() {
                         className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder-zinc-900 outline-none tnum leading-none"
                       />
                     </div>
-                    <div className="border border-surface-border p-3 bg-black/40">
-                       <span className="text-[9px] font-mono text-amber-500 uppercase tracking-widest block mb-1 font-bold">Daily Spending Limit:</span>
-                       <p className="text-[9px] font-mono text-zinc-500 uppercase leading-relaxed">Oweable will track your 3-day spending and alert you if you're going over this amount.</p>
+                    <div className="border border-surface-border p-4 bg-black/40">
+                       <span className="text-[11px] font-mono text-amber-500 uppercase tracking-widest block mb-1 font-bold">Daily Spending Limit:</span>
+                       <p className="text-[11px] font-mono text-zinc-400 uppercase leading-relaxed">Oweable will track your 3-day spending and alert you if you're going over this amount.</p>
                     </div>
                   </div>
                 )}
@@ -304,13 +304,13 @@ export default function Onboarding() {
           <button 
             onClick={handleBack}
             disabled={currentStepIndex === 0}
-            className={`font-mono text-[9px] uppercase tracking-[0.3em] transition-colors ${currentStepIndex === 0 ? 'opacity-0' : 'text-zinc-600 hover:text-zinc-300'}`}
+            className={`font-mono text-[11px] uppercase tracking-[0.3em] transition-colors ${currentStepIndex === 0 ? 'opacity-0' : 'text-zinc-500 hover:text-white'}`}
           >
             [BACK_STEP]
           </button>
           
           <div className="flex items-center gap-4">
-             <div className="hidden sm:block text-[8px] font-mono text-zinc-700 uppercase tracking-widest">
+             <div className="hidden sm:block text-[10px] font-mono text-zinc-600 uppercase tracking-widest font-medium opacity-50">
                Encrypted Session
              </div>
             <button 

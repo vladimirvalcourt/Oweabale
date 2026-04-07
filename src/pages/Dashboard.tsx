@@ -480,9 +480,9 @@ export default function Dashboard() {
             <div className="overflow-y-auto outline-none">
               {upcomingBills.length === 0 ? (
                 <div className="m-4 p-8 text-center flex flex-col items-center bg-surface-base border border-dashed border-surface-border rounded-sm">
-                  <Calendar className="w-8 h-8 text-zinc-700/50 mb-3" />
-                  <p className="text-[11px] font-mono font-bold text-zinc-500 uppercase tracking-widest">No Bills Found</p>
-                  <p className="text-[10px] font-sans text-zinc-600 mt-1 uppercase tracking-tight">System is clear</p>
+                  <Calendar className="w-8 h-8 text-zinc-600/50 mb-3" />
+                  <p className="text-[12px] font-mono font-bold text-zinc-400 uppercase tracking-widest">No Bills Found</p>
+                  <p className="text-[11px] font-sans text-zinc-500 mt-1 uppercase tracking-tight">System is clear</p>
                 </div>
               ) : (
                 <ul className="divide-y divide-surface-border">
@@ -522,7 +522,7 @@ export default function Dashboard() {
                         <div className="flex items-start gap-3">
                           <div className={`w-9 h-9 rounded bg-surface-base border flex flex-col justify-center items-center shrink-0 ${citation.daysLeft <= 7 ? 'text-rose-400 border-rose-500/30' : 'text-zinc-400 border-surface-border'}`}>
                             <span className="text-xs font-bold font-mono leading-none">{citation.daysLeft}</span>
-                            <span className="text-[9px] font-sans">Days</span>
+                            <span className="text-[11px] font-sans font-medium text-zinc-400">Days</span>
                           </div>
                           <div>
                             <p className="text-sm font-sans font-medium text-zinc-200">{citation.type}</p>
