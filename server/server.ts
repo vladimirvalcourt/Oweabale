@@ -13,11 +13,51 @@ Sentry.init({
 });
 
 // 🚀 Create the Self-Monitoring MCP Server
-// This server is the secure bridge between Oweable Financial OS and AI agents
 const server = new McpServer({
   name: "owebale-financial-os",
   version: "1.0.0",
 });
+
+import { z } from "zod";
+
+// 🛠️ Tool: Get Account Summary
+// This tool provides high-fidelity Sentry tracing for financial lookups
+server.tool(
+  "get_account_summary",
+  "Retrieves a 360-degree financial overview for a specific user ID.",
+  { userId: z.string().describe("The UUID of the user") },
+  async ({ userId }) => {
+    return Sentry.withScope(async (scope) => {
+      scope.setUser({ id: userId });
+      scope.setTag("tool", "get_account_summary");
+
+      return Sentry.startSpan({ name: "mcp_tool_get_account_summary" }, async () => {
+        try {
+          console.error(`🛡️ MCP TOOL: Loading summary for user ${userId}`);
+          
+          // Simulation of a Supabase fetch call (wrapped in Sentry for testing)
+          const mockSummary = {
+            total_assets: 125000,
+            total_liabilities: 45000,
+            net_worth: 80000,
+            status: "Healthy",
+          };
+
+          return {
+            content: [{ type: "text", text: JSON.stringify(mockSummary, null, 2) }],
+          };
+        } catch (err) {
+          const error = err as Error;
+          Sentry.captureException(error);
+          return {
+            content: [{ type: "text", text: `Error: ${error.message}` }],
+            isError: true,
+          };
+        }
+      });
+    });
+  }
+);
 
 // Helper: Stdio transport for local or edge deployment
 const transport = new StdioServerTransport();
