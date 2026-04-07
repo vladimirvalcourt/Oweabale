@@ -143,6 +143,7 @@ export interface PendingIngestion {
   };
   storagePath?: string;   // Supabase Storage path after upload
   storageUrl?: string;    // Signed URL for preview (short-lived)
+  source?: 'desktop' | 'mobile'; // Origin of the ingestion
 }
 
 export interface Notification {
@@ -861,17 +862,53 @@ export const useStore = create<AppState>((set, get) => ({
   // Ingestion Implementation
   addPendingIngestion: (ingestion) => {
     const id = Math.random().toString(36).substr(2, 9);
+    // Fires off the insert but returns ID immediately for local UI responsiveness
+    (async () => {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (userId) {
+        await supabase.from('pending_ingestions').insert({
+          user_id: userId,
+          type: ingestion.type,
+          status: ingestion.status,
+          source: ingestion.source ?? 'desktop',
+          extracted_data: ingestion.extractedData,
+          original_file: ingestion.originalFile,
+          storage_path: ingestion.storagePath,
+          storage_url: ingestion.storageUrl
+        });
+      }
+    })();
+    
     set((state) => ({
       pendingIngestions: [...state.pendingIngestions, { ...ingestion, id }]
     }));
     return id;
   },
-  updatePendingIngestion: (id, updates) => set((state) => ({
-    pendingIngestions: state.pendingIngestions.map(pi => pi.id === id ? { ...pi, ...updates } : pi)
-  })),
-  removePendingIngestion: (id) => set((state) => ({
-    pendingIngestions: state.pendingIngestions.filter(pi => pi.id !== id)
-  })),
+  updatePendingIngestion: async (id, updates) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      const patch: any = {};
+      if (updates.type) patch.type = updates.type;
+      if (updates.status) patch.status = updates.status;
+      if (updates.extractedData) patch.extracted_data = updates.extractedData;
+      if (updates.storagePath) patch.storage_path = updates.storagePath;
+      if (updates.storageUrl) patch.storage_url = updates.storageUrl;
+      
+      await supabase.from('pending_ingestions').update(patch).eq('id', id).eq('user_id', userId);
+    }
+    set((state) => ({
+      pendingIngestions: state.pendingIngestions.map(pi => pi.id === id ? { ...pi, ...updates } : pi)
+    }));
+  },
+  removePendingIngestion: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      await supabase.from('pending_ingestions').delete().eq('id', id).eq('user_id', userId);
+    }
+    set((state) => ({
+      pendingIngestions: state.pendingIngestions.filter(pi => pi.id !== id)
+    }));
+  },
   commitIngestion: async (id) => {
     const state = useStore.getState();
     const item = state.pendingIngestions.find(pi => pi.id === id);
@@ -915,6 +952,8 @@ export const useStore = create<AppState>((set, get) => ({
         transactions: [newTransaction, ...s.transactions].slice(0, 50),
         pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
       }));
+      // Remove from DB
+      if (userId) await supabase.from('pending_ingestions').delete().eq('id', id).eq('user_id', userId);
     } else if (item.type === 'bill') {
       const newBill: Bill = {
         id: commonId,
@@ -937,6 +976,8 @@ export const useStore = create<AppState>((set, get) => ({
         bills: [...s.bills, newBill],
         pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
       }));
+      // Remove from DB
+      if (userId) await supabase.from('pending_ingestions').delete().eq('id', id).eq('user_id', userId);
     } else if (item.type === 'income') {
       const newIncome: IncomeSource = {
         id: commonId,
@@ -985,6 +1026,7 @@ export const useStore = create<AppState>((set, get) => ({
         { data: citations },
         { data: deductions },
         { data: freelanceEntries },
+        { data: pendingIngestions },
         { data: profile }
       ] = await Promise.all([
         supabase.from('bills').select('*').eq('user_id', userId),
@@ -999,6 +1041,7 @@ export const useStore = create<AppState>((set, get) => ({
         supabase.from('citations').select('*').eq('user_id', userId),
         supabase.from('deductions').select('*').eq('user_id', userId),
         supabase.from('freelance_entries').select('*').eq('user_id', userId),
+        supabase.from('pending_ingestions').select('*').eq('user_id', userId),
         supabase.from('profiles').select('*').eq('id', userId).single(),
       ]);
 
@@ -1114,6 +1157,16 @@ export const useStore = create<AppState>((set, get) => ({
           date: f.date as string,
           isVaulted: (f.is_vaulted ?? f.isVaulted ?? false) as boolean,
           scouredWriteOffs: (f.scoured_write_offs ?? f.scouredWriteOffs ?? 0) as number,
+        })),
+        pendingIngestions: (pendingIngestions || []).map((pi: Record<string, any>) => ({
+          id: pi.id,
+          type: pi.type,
+          status: pi.status,
+          source: pi.source,
+          extractedData: pi.extracted_data || {},
+          originalFile: pi.original_file || {},
+          storagePath: pi.storage_path,
+          storageUrl: pi.storage_url
         })),
         user: profile ? {
           id: profile.id,

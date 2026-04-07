@@ -149,6 +149,69 @@ export default function Ingestion() {
     }
   };
 
+  // ── Auto-OCR and Signed URLs ──────────────────────────────────
+  React.useEffect(() => {
+    // 1. Generate Signed URLs for mobile syncs if missing
+    pendingIngestions.forEach(async (pi) => {
+      if (pi.storagePath && !pi.storageUrl) {
+        const { data } = await supabase.storage
+          .from('scans')
+          .createSignedUrl(pi.storagePath, 3600);
+        if (data?.signedUrl) {
+          updatePendingIngestion(pi.id, { storageUrl: data.signedUrl });
+        }
+      }
+    });
+
+    // 2. Trigger OCR for new mobile syncs
+    const pendingMobile = pendingIngestions.find(pi => pi.source === 'mobile' && pi.status === 'uploading');
+    if (pendingMobile && pendingMobile.storageUrl) {
+       fetch(pendingMobile.storageUrl)
+         .then(res => res.blob())
+         .then(blob => {
+           const file = new File([blob], 'mobile_scan.jpg', { type: 'image/jpeg' });
+           triggerManualScan(pendingMobile.id, file);
+         });
+    }
+  }, [pendingIngestions]);
+
+  const triggerManualScan = async (id: string, file: File) => {
+     // Reuses existing logic but targets specific item
+     // We'll refactor processFile to be reusable if needed, 
+     // but for now we'll do a focused parse.
+     updatePendingIngestion(id, { status: 'scanning' });
+     try {
+       const result = await Tesseract.recognize(file, 'eng');
+       const fullText = result.data.text;
+       
+       const lines = fullText.split('\n').filter(line => line.trim().length > 0);
+       const biller = lines.length > 0
+         ? (lines[0].trim().length > 3 ? lines[0].trim() : (lines[1]?.trim() || 'Unknown Payee'))
+         : 'Unknown Payee';
+
+       const amountMatches = fullText.match(/\$?\s*\d+\.\d{2}/g);
+       let maxAmount = 0;
+       if (amountMatches) {
+         const amounts = amountMatches
+           .map(m => parseFloat(m.replace(/[^0-9.]/g, '')))
+           .filter(n => !isNaN(n) && isFinite(n));
+         if (amounts.length > 0) maxAmount = Math.max(...amounts);
+       }
+
+       updatePendingIngestion(id, {
+         status: 'ready',
+         extractedData: {
+           biller: biller.substring(0, 50),
+           amount: maxAmount,
+           dueDate: new Date().toISOString().split('T')[0],
+           category: 'Utilities'
+         }
+       });
+     } catch (err) {
+       updatePendingIngestion(id, { status: 'error' });
+     }
+  };
+
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -184,6 +247,31 @@ export default function Ingestion() {
     readyItems.forEach(item => commitIngestion(item.id));
     toast.success(`Saved ${readyItems.length} items to history`);
   };
+
+  // ── Realtime Ingestion Sync ───────────────────────────────────
+  React.useEffect(() => {
+    const channel = supabase
+      .channel('ingestion-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'pending_ingestions'
+        },
+        (payload) => {
+          if (payload.new.source === 'mobile') {
+            toast.success('Mobile Sync Pulse: New Document Received');
+            useStore.getState().fetchData();
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -270,7 +358,15 @@ export default function Ingestion() {
                       {item.originalFile?.type?.includes('image') ? <FileText className="w-5 h-5 text-indigo-400" /> : <FileText className="w-5 h-5 text-zinc-500" />}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-mono font-bold text-content-primary truncate">{item.extractedData.biller || item.extractedData.name || item.originalFile?.name || 'Uploaded File'}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-xs font-mono font-bold text-content-primary truncate">{item.extractedData.biller || item.extractedData.name || item.originalFile?.name || 'Uploaded File'}</p>
+                        {item.source === 'mobile' && (
+                          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-brand-violet/10 border border-brand-violet/20" title="Source: Mobile Capture">
+                             <Smartphone className="w-2.5 h-2.5 text-brand-violet" />
+                             <span className="text-[7px] font-mono font-bold text-brand-violet uppercase">Sync</span>
+                          </div>
+                        )}
+                      </div>
                       <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest mt-1">
                         {item.originalFile?.size ? (item.originalFile.size / 1024).toFixed(1) + ' KB' : 'SCANNED'}
                       </p>

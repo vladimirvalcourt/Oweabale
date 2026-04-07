@@ -93,6 +93,27 @@
     0% { transform: translateY(0); }
     100% { transform: translateY(-50%); }
   }
+  @keyframes scan-y {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(1000%); } /* Based on height of element */
+  }
+  @keyframes scan-y-full {
+    0% { top: 0; }
+    100% { top: 100%; }
+  }
+  @keyframes progress-once {
+    0% { width: 0; }
+    100% { width: 100%; }
+  }
+  .animate-scan-y {
+    animation: scan-y-full 2.5s ease-in-out infinite;
+  }
+  .animate-progress-once {
+    animation: progress-once 1.5s ease-out forwards;
+  }
+  .shadow-glow-emerald {
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+  }
 }
 
 body {
