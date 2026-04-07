@@ -5,7 +5,7 @@
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import Layout from './components/Layout';
 import DeviceGuard from './components/DeviceGuard';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -13,33 +13,34 @@ import AuthGuard from './components/AuthGuard';
 import { AppLoader } from './components/PageSkeleton';
 import { useStore } from './store/useStore';
 import { useAuth } from './hooks/useAuth';
-import AuthPage from './pages/AuthPage';
-import Dashboard from './pages/Dashboard';
-import Obligations from './pages/Obligations';
-import Settings from './pages/Settings';
-import Ingestion from './pages/Ingestion';
-import Transactions from './pages/Transactions';
-import Freelance from './pages/Freelance';
-import Goals from './pages/Goals';
-import Income from './pages/Income';
-import Budgets from './pages/Budgets';
-import NetWorth from './pages/NetWorth';
-import Calendar from './pages/Calendar';
-import Taxes from './pages/Taxes';
-import Categories from './pages/Categories';
-import Subscriptions from './pages/Subscriptions';
-import Reports from './pages/Reports';
-import Landing from './pages/Landing';
-import Onboarding from './pages/Onboarding';
-import Pricing from './pages/Pricing';
-import Privacy from './pages/Privacy';
-import Terms from './pages/Terms';
-import Security from './pages/Security';
-import AdminDashboard from './pages/AdminDashboard';
-import Education from './pages/Education';
-import HelpDesk from './pages/HelpDesk';
+
+const AuthPage       = lazy(() => import('./pages/AuthPage'));
+const Dashboard      = lazy(() => import('./pages/Dashboard'));
+const Obligations    = lazy(() => import('./pages/Obligations'));
+const Settings       = lazy(() => import('./pages/Settings'));
+const Ingestion      = lazy(() => import('./pages/Ingestion'));
+const Transactions   = lazy(() => import('./pages/Transactions'));
+const Freelance      = lazy(() => import('./pages/Freelance'));
+const Goals          = lazy(() => import('./pages/Goals'));
+const Income         = lazy(() => import('./pages/Income'));
+const Budgets        = lazy(() => import('./pages/Budgets'));
+const NetWorth       = lazy(() => import('./pages/NetWorth'));
+const Calendar       = lazy(() => import('./pages/Calendar'));
+const Taxes          = lazy(() => import('./pages/Taxes'));
+const Categories     = lazy(() => import('./pages/Categories'));
+const Subscriptions  = lazy(() => import('./pages/Subscriptions'));
+const Reports        = lazy(() => import('./pages/Reports'));
+const Landing        = lazy(() => import('./pages/Landing'));
+const Onboarding     = lazy(() => import('./pages/Onboarding'));
+const Pricing        = lazy(() => import('./pages/Pricing'));
+const Privacy        = lazy(() => import('./pages/Privacy'));
+const Terms          = lazy(() => import('./pages/Terms'));
+const Security       = lazy(() => import('./pages/Security'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const Education      = lazy(() => import('./pages/Education'));
+const HelpDesk       = lazy(() => import('./pages/HelpDesk'));
 import AuthCallback from './pages/AuthCallback';
-import MobileCapture from './pages/MobileCapture';
+const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
 
 function AppRoutes() {
   const { user: authUser, loading: authLoading } = useAuth();
@@ -68,6 +69,7 @@ function AppRoutes() {
   }
 
   return (
+    <Suspense fallback={<AppLoader />}>
     <Routes>
       {/* ── Public routes ── */}
       <Route path="/" element={<Landing />} />
@@ -111,6 +113,7 @@ function AppRoutes() {
         </Route>
       </Route>
     </Routes>
+    </Suspense>
   );
 }
 

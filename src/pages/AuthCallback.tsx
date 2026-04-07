@@ -10,8 +10,15 @@ export default function AuthCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check if session already exists (event may have fired before component mounted)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/dashboard', { replace: true });
+      }
+    });
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
         navigate('/dashboard', { replace: true });
       } else if (event === 'SIGNED_OUT') {
         navigate('/auth', { replace: true });
