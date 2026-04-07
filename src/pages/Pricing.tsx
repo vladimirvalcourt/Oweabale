@@ -187,25 +187,16 @@ export default function Pricing() {
               
               <div className="bg-surface-raised border border-indigo-500/30 rounded-sm p-10 flex flex-col relative z-10 h-full shadow-[0_0_50px_rgba(99,102,241,0.05)]">
                 <div className="absolute top-0 right-10 transform -translate-y-1/2">
-                  <span className="bg-indigo-600 text-white text-[9px] font-mono font-bold px-3 py-1 rounded-sm uppercase tracking-[0.2em]">Prioritized</span>
+                  <span className="bg-emerald-600 text-white text-[9px] font-mono font-bold px-3 py-1 rounded-sm uppercase tracking-[0.2em]">Open Beta</span>
                 </div>
                 
                 <h3 className="text-sm font-mono font-bold uppercase tracking-[0.3em] text-content-primary mb-2">The Arsenal</h3>
-                <p className="text-zinc-500 text-xs font-mono uppercase tracking-widest mb-8 h-10 leading-relaxed">For those ready to go to war with their debt.</p>
+                <p className="text-zinc-500 text-xs font-mono uppercase tracking-widest mb-8 h-10 leading-relaxed">Full tactical suite unlocked for the Oweable Beta Trial.</p>
                 
                 <div className="mb-10 p-6 bg-surface-base border border-indigo-500/20 rounded-sm relative h-[100px] flex items-center shadow-[inset_0_0_20px_rgba(99,102,241,0.02)]">
-                  <div className={`absolute inset-0 px-6 flex items-center transition-all duration-300 ease-in-out ${!isYearly ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
-                    <span className="text-4xl font-mono font-bold text-content-primary">$12</span>
-                    <span className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest ml-3">/ Monthly</span>
-                  </div>
-                  <div className={`absolute inset-0 px-6 flex items-center transition-all duration-300 ease-in-out ${isYearly ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
-                    <div>
-                      <div className="flex items-center">
-                        <span className="text-4xl font-mono font-bold text-content-primary">$9</span>
-                        <span className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest ml-3">/ Monthly</span>
-                      </div>
-                      <div className="text-[9px] font-mono text-zinc-600 mt-2 uppercase tracking-widest">Billed annually @ $108</div>
-                    </div>
+                  <div className={`absolute inset-0 px-6 flex items-center transition-all duration-300 ease-in-out`}>
+                    <span className="text-4xl font-mono font-bold text-content-primary">$0</span>
+                    <span className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest ml-3">/ Complimentary Access</span>
                   </div>
                 </div>
                 
@@ -213,7 +204,7 @@ export default function Pricing() {
                   to="/dashboard" 
                   className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-center transition-all duration-200 mb-10 shadow-[0_0_25px_rgba(99,102,241,0.2)]"
                 >
-                  Claim Financial Freedom
+                  Start Free Beta Trial
                 </Link>
                 
                 <div className="flex flex-col gap-5 mt-auto">
