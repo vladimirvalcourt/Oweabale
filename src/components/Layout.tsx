@@ -179,9 +179,14 @@ export default function Layout() {
         <div className="shrink-0 flex items-center justify-between h-[4.5rem] px-4 border-b border-surface-border">
           <div className="flex items-center gap-2 overflow-hidden">
             {!sidebarCollapsed && (
-              <span className="brand-header-text whitespace-nowrap">
-                Oweable
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="brand-header-text whitespace-nowrap">
+                  Oweable
+                </span>
+                <span className="text-[9px] font-mono font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-1.5 py-0.5 rounded-sm uppercase tracking-widest">
+                  Beta
+                </span>
+              </div>
             )}
           </div>
           <button 
@@ -274,9 +279,14 @@ export default function Layout() {
         <div className="p-4 border-t border-surface-border bg-surface-base">
           <div className={cn("mb-4", sidebarCollapsed ? "px-0" : "px-2")}>
             {!sidebarCollapsed && (
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-[11px] font-sans text-content-tertiary font-medium">Everything synced</span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                  <span className="text-[11px] font-sans text-content-tertiary font-medium">Synced — Free Beta Trial</span>
+                </div>
+                <p className="text-[9px] font-sans text-zinc-600 leading-tight">
+                  Pricing may be introduced later with advance notice to testers.
+                </p>
               </div>
             )}
             <button

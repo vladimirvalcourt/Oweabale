@@ -88,6 +88,16 @@ export default function Pricing() {
 
       {/* Header Section */}
       <section className="relative pt-40 pb-20 overflow-hidden">
+        {/* Beta Disclaimer Banner */}
+        <div className="max-w-4xl mx-auto px-6 lg:px-8 mb-12">
+          <div className="bg-amber-400/5 border border-amber-400/20 p-4 rounded-sm flex items-center gap-4">
+            <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
+            <p className="font-mono text-[10px] text-amber-200/80 uppercase tracking-[0.1em] leading-relaxed">
+              <span className="text-amber-400 font-bold">BETA STATUS:</span> Oweable is currently free for testing. We may start charging at any time with advance notification to all active users.
+            </p>
+          </div>
+        </div>
+
         {/* Subtle Background Glow */}
         <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/10 via-surface-base/0 to-transparent pointer-events-none"></div>
 
