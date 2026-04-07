@@ -221,13 +221,13 @@ export default function Budgets() {
 
                   <div className="mt-auto pt-4 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest">
                     {isOverBudget ? (
-                      <span className="text-red-400 flex items-center gap-1.5"><AlertTriangle className="w-3 h-3" /> DEPLETED</span>
+                      <span className="text-red-400 flex items-center gap-1.5"><AlertTriangle className="w-3 h-3" /> Over Budget</span>
                     ) : isNearLimit ? (
-                      <span className="text-amber-400 flex items-center gap-1.5"><AlertTriangle className="w-3 h-3" /> WARNING</span>
+                      <span className="text-amber-400 flex items-center gap-1.5"><AlertTriangle className="w-3 h-3" /> Near Limit</span>
                     ) : (
-                      <span className="text-emerald-400 flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3" /> STABLE</span>
+                      <span className="text-emerald-400 flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3" /> On Track</span>
                     )}
-                    <span className="text-zinc-500">{percentage.toFixed(0)}% LOAD</span>
+                    <span className="text-zinc-500">{percentage.toFixed(0)}% used</span>
                   </div>
                 </motion.div>
               );

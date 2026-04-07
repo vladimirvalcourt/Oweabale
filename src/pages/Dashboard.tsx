@@ -370,7 +370,7 @@ export default function Dashboard() {
                 <Activity className="w-5 h-5" />
               </div>
               <span className={`text-[10px] font-mono px-2 py-1 rounded-sm uppercase tracking-widest font-semibold border ${burnVelocity.isHighVelocity ? 'bg-brand-expense/10 text-brand-expense border-brand-expense/20' : 'bg-surface-base text-content-tertiary border-surface-border'}`}>
-                {burnVelocity.isHighVelocity ? 'HIGH' : burnVelocity.isModerateVelocity ? 'ELEVATED' : 'STABLE'}
+                {burnVelocity.isHighVelocity ? 'High' : burnVelocity.isModerateVelocity ? 'Moderate' : 'On Track'}
               </span>
             </div>
             <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Recent Spending (72h)</h3>
@@ -420,7 +420,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="bg-surface-base border border-surface-border p-6 rounded-sm">
-              <p className="text-sm font-sans text-brand-profit font-bold">DEBT_LEVEL_ZERO</p>
+              <p className="text-sm font-sans text-brand-profit font-bold">Debt Free</p>
             </div>
           )}
         </div>
