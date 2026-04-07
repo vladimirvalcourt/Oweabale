@@ -293,134 +293,134 @@ export default function Dashboard() {
         
         {/* Runway Metric Card */}
         <div className="bg-surface-raised border border-surface-border p-6 rounded-sm shadow-sm md:flex md:flex-col md:justify-between">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <p className="text-xs font-mono text-zinc-400 uppercase tracking-widest mb-2">How long your money lasts</p>
-              <h2 className="text-5xl sm:text-6xl font-mono font-black text-white tracking-tighter tabular-nums leading-none">
+          <div className="flex justify-between items-start mb-8">
+            <div className="text-left w-full">
+              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3">Operating Runway</p>
+              <h2 className="text-5xl sm:text-6xl font-mono font-bold text-white tracking-tighter tabular-nums leading-none">
                 <AnimatedValue value={survivalMonths} decimals={1} />
-                <span className="text-xl font-sans text-zinc-500 font-medium ml-2 uppercase tracking-wide">Months</span>
+                <span className="text-2xl font-sans text-content-tertiary font-medium ml-3 uppercase tracking-wide">Months</span>
               </h2>
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-4 border-t border-surface-border pt-5">
-            <div>
-              <p className="text-[11px] font-mono font-medium text-zinc-300 uppercase tracking-wider mb-1">Liquid Cash</p>
-              <p className="text-xl font-mono text-emerald-400 font-bold">${liquidCash.toLocaleString()}</p>
+          <div className="grid grid-cols-2 gap-8 border-t border-surface-border pt-6 mt-4">
+            <div className="text-left">
+              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-2">Liquid Cash</p>
+              <p className="text-2xl font-mono text-brand-profit font-bold">${liquidCash.toLocaleString()}</p>
             </div>
-            <div>
-              <p className="text-[11px] font-mono font-medium text-zinc-300 uppercase tracking-wider mb-1">Monthly Expenses</p>
-              <p className="text-xl font-mono text-white font-bold">${Math.round(monthlyBurn).toLocaleString()}</p>
+            <div className="text-left">
+              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-2">Monthly Expenses</p>
+              <p className="text-2xl font-mono text-white font-bold">${Math.round(monthlyBurn).toLocaleString()}</p>
             </div>
           </div>
         </div>
 
         {/* Distributed 4-grid for standard numbers */}
         <div className="grid grid-cols-2 gap-4">
-            <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
-              <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">Net Worth</p>
-              <p className="text-3xl font-mono text-white font-semibold tabular-nums">$<AnimatedValue value={netWorth} /></p>
+            <div className="bg-surface-raised p-6 border border-surface-border rounded-sm shadow-sm text-left">
+              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3">Net Worth</p>
+              <p className="text-4xl font-mono text-white font-bold tabular-nums">$<AnimatedValue value={netWorth} /></p>
             </div>
-            <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
-              <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">Total Assets</p>
-              <p className="text-3xl font-mono text-white font-semibold tabular-nums">$<AnimatedValue value={totalAssets} /></p>
+            <div className="bg-surface-raised p-6 border border-surface-border rounded-sm shadow-sm text-left">
+              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3">Total Assets</p>
+              <p className="text-4xl font-mono text-white font-bold tabular-nums">$<AnimatedValue value={totalAssets} /></p>
             </div>
-            <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
-              <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                Tax Savings <ShieldCheck className="w-3 h-3 text-indigo-400" />
+            <div className="bg-surface-raised p-6 border border-surface-border rounded-sm shadow-sm text-left">
+              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3 flex items-center gap-2">
+                Tax Savings <ShieldCheck className="w-3.5 h-3.5 text-brand-tax" />
               </p>
-              <p className="text-3xl font-mono text-indigo-400 font-semibold tabular-nums">-$<AnimatedValue value={cashFlow.taxReserve} /></p>
+              <p className="text-4xl font-mono text-brand-tax font-bold tabular-nums">-$<AnimatedValue value={cashFlow.taxReserve} /></p>
             </div>
-            <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
-              <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">Monthly Surplus</p>
-              <p className="text-3xl font-mono text-emerald-400 font-semibold tabular-nums">+$<AnimatedValue value={cashFlow.surplus} /></p>
+            <div className="bg-surface-raised p-6 border border-surface-border rounded-sm shadow-sm text-left">
+              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3">Monthly Surplus</p>
+              <p className="text-4xl font-mono text-brand-profit font-bold tabular-nums">+$<AnimatedValue value={cashFlow.surplus} /></p>
             </div>
         </div>
       </div>
 
       {/* 4. Active Intelligence Grid */}
-      <h2 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400 pl-1 mt-12 mb-3">Smart Alerts</h2>
+      <h2 className="text-[12px] font-mono font-bold uppercase tracking-[0.1em] text-content-tertiary pl-1 mt-12 mb-4">Smart Alerts & Active Monitoring</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Tax Shield */}
-        <div className="bg-surface-raised rounded-sm p-6 border border-surface-border flex flex-col justify-between shadow-sm hover:border-zinc-700 transition-colors">
-          <div>
-            <div className="flex justify-between items-start mb-5">
-              <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-full flex items-center justify-center shrink-0 text-indigo-400">
+        <div className="bg-surface-raised rounded-sm p-6 border border-surface-border flex flex-col justify-between shadow-sm group transition-all text-left">
+          <div className="mb-8">
+            <div className="flex justify-between items-start mb-6">
+              <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-sm flex items-center justify-center shrink-0 text-brand-tax">
                 <ShieldCheck className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-mono bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded uppercase tracking-widest font-semibold border border-indigo-500/20">Active</span>
+              <span className="text-[10px] font-mono bg-brand-tax/10 text-brand-tax px-2 py-1 rounded-sm uppercase tracking-widest font-semibold border border-brand-tax/20">Active</span>
             </div>
-            <h3 className="text-sm font-sans font-semibold text-white mb-1">Tax Deduction Finder</h3>
-            <p className="text-xs font-sans text-zinc-400 mb-5 leading-relaxed">
+            <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Tax Deduction Finder</h3>
+            <p className="text-xs font-sans text-content-tertiary leading-relaxed">
               Automatic extraction of valid deductions from freelancer platforms and records.
             </p>
           </div>
-          <div className="bg-surface-base border border-surface-border p-4 rounded-sm">
-              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Lifetime Recovered</p>
-              <p className="text-3xl font-mono text-white font-bold tabular-nums">${lifetimeTaxShield.toLocaleString()}</p>
+          <div className="bg-surface-base border border-surface-border p-6 rounded-sm">
+              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-2">Lifetime Recovered</p>
+              <p className="text-4xl font-mono text-white font-bold tabular-nums">${lifetimeTaxShield.toLocaleString()}</p>
           </div>
         </div>
         
         {/* Spending Pulse */}
-        <div className={`bg-surface-raised rounded-sm p-6 border flex flex-col justify-between shadow-sm transition-colors ${burnVelocity.isHighVelocity ? 'border-amber-500/30' : 'border-surface-border hover:border-zinc-700'}`}>
-          <div>
-            <div className="flex justify-between items-start mb-5">
-              <div className={`w-10 h-10 border rounded-full flex items-center justify-center shrink-0 ${burnVelocity.isHighVelocity ? 'border-amber-500/30 bg-amber-500/10 text-amber-500' : 'border-surface-border bg-surface-base text-zinc-400'}`}>
+        <div className={`bg-surface-raised rounded-sm p-6 border transition-all text-left flex flex-col justify-between shadow-sm ${burnVelocity.isHighVelocity ? 'border-brand-expense/30' : 'border-surface-border'}`}>
+          <div className="mb-8">
+            <div className="flex justify-between items-start mb-6">
+              <div className={`w-10 h-10 border rounded-sm flex items-center justify-center shrink-0 ${burnVelocity.isHighVelocity ? 'border-brand-expense/30 bg-brand-expense/10 text-brand-expense' : 'border-surface-border bg-surface-base text-content-tertiary'}`}>
                 <Activity className="w-5 h-5" />
               </div>
-              <span className={`text-[10px] font-mono px-2 py-1 rounded uppercase tracking-widest font-semibold border ${burnVelocity.isHighVelocity ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-surface-base text-zinc-400 border-surface-border'}`}>
-                {burnVelocity.isHighVelocity ? 'HIGH' : burnVelocity.isModerateVelocity ? 'ELEVATED' : 'ON TRACK'}
+              <span className={`text-[10px] font-mono px-2 py-1 rounded-sm uppercase tracking-widest font-semibold border ${burnVelocity.isHighVelocity ? 'bg-brand-expense/10 text-brand-expense border-brand-expense/20' : 'bg-surface-base text-content-tertiary border-surface-border'}`}>
+                {burnVelocity.isHighVelocity ? 'HIGH' : burnVelocity.isModerateVelocity ? 'ELEVATED' : 'STABLE'}
               </span>
             </div>
-            <h3 className="text-sm font-sans font-semibold text-white mb-1">Recent Spending (Last 3 Days)</h3>
-            <p className="text-xs font-sans text-zinc-400 mb-5 leading-relaxed">
-              Tracks recent spending to help you stay on budget.
+            <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Recent Spending (72h)</h3>
+            <p className="text-xs font-sans text-content-tertiary leading-relaxed">
+              Real-time monitoring of cash outflow velocity across all connected accounts.
             </p>
           </div>
           <div>
-            <div className="flex items-baseline gap-2 mb-3">
-              <p className="text-3xl font-mono text-white tabular-nums">${burnVelocity.totalSpent.toFixed(0)}</p>
-              <p className="text-xs font-sans text-zinc-500 font-medium">/ {burnVelocity.frequency} transactions</p>
+            <div className="flex items-baseline gap-3 mb-4">
+              <p className="text-4xl font-mono text-white tabular-nums">${burnVelocity.totalSpent.toFixed(0)}</p>
+              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-wider">/ {burnVelocity.frequency} txs</p>
             </div>
             {burnVelocity.isHighVelocity && (
-              <p className="text-[11px] font-mono text-amber-500 bg-amber-500/5 p-2 rounded border border-amber-500/20">
-                Elevated spending detected. Please review recent transactions.
+              <p className="text-[11px] font-mono text-brand-expense bg-brand-expense/5 p-3 rounded-sm border border-brand-expense/20">
+                Velocity Limit Exceeded
               </p>
             )}
           </div>
         </div>
 
         {/* Debt Target */}
-        <div className="bg-surface-raised rounded-sm p-6 border border-surface-border flex flex-col justify-between shadow-sm hover:border-zinc-700 transition-colors">
-          <div>
-            <div className="flex justify-between items-start mb-5">
-              <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-full flex items-center justify-center shrink-0 text-zinc-400">
+        <div className="bg-surface-raised rounded-sm p-6 border border-surface-border flex flex-col justify-between shadow-sm text-left group transition-all">
+          <div className="mb-8">
+            <div className="flex justify-between items-start mb-6">
+              <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-sm flex items-center justify-center shrink-0 text-content-tertiary">
                 <Flame className="w-5 h-5" />
               </div>
             </div>
-            <h3 className="text-sm font-sans font-semibold text-white mb-1">Debt Payoff Plan</h3>
-            <p className="text-xs font-sans text-zinc-400 mb-5 leading-relaxed">
-              Pays off the highest interest debt first to save you the most money.
+            <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Debt Avalanche Shield</h3>
+            <p className="text-xs font-sans text-content-tertiary leading-relaxed">
+              Mathematical priority on highest interest accounts to minimize capital waste.
             </p>
           </div>
           
           {avalancheTarget ? (
             <div>
-              <div className="mb-2">
-                <p className="text-xs font-sans text-zinc-300 font-medium mb-1 truncate">Prioritizing: {avalancheTarget.name}</p>
+              <div className="mb-4">
+                <p className="text-[12px] font-mono text-brand-expense uppercase tracking-wider mb-2 truncate">Prioritizing: {avalancheTarget.name}</p>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-2xl font-mono text-white tabular-nums">${avalancheTarget.remaining.toLocaleString()}</span>
-                  <span className="text-xs font-mono text-zinc-400">{debtProgress.toFixed(1)}% Paid</span>
+                  <span className="text-4xl font-mono text-white tabular-nums">${avalancheTarget.remaining.toLocaleString()}</span>
+                  <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{debtProgress.toFixed(0)}% Clear</span>
                 </div>
               </div>
-              <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden mt-3">
-                <div className="h-full bg-indigo-500 transition-all duration-1000" style={{ width: `${debtProgress}%` }}></div>
+              <div className="w-full h-1.5 bg-zinc-900 border border-surface-border rounded-full overflow-hidden mt-4">
+                <div className="h-full bg-brand-expense transition-all duration-1000 shadow-[0_0_8px_rgba(248,113,113,0.3)]" style={{ width: `${debtProgress}%` }}></div>
               </div>
             </div>
           ) : (
-            <div className="bg-surface-base border border-surface-border p-4 rounded-sm">
-              <p className="text-sm font-sans text-emerald-400 font-medium">Debt-Free Status Achieved.</p>
+            <div className="bg-surface-base border border-surface-border p-6 rounded-sm">
+              <p className="text-sm font-sans text-brand-profit font-bold">DEBT_LEVEL_ZERO</p>
             </div>
           )}
         </div>

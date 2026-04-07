@@ -9,16 +9,19 @@
   --color-surface-raised: #151618;
   --color-surface-elevated: #1C1D21;
   --color-surface-highlight: rgba(255, 255, 255, 0.04);
-  --color-surface-border: rgba(255, 255, 255, 0.08);
-  --color-surface-border-subtle: rgba(255, 255, 255, 0.04);
+  --color-surface-border: #222222;
+  --color-surface-border-subtle: #181818;
 
   --color-content-primary: #F7F8F8;
   --color-content-secondary: #B1B6C0;
-  --color-content-tertiary: #9499A6;
-  --color-content-muted: #737887;
+  --color-content-tertiary: #808080;
+  --color-content-muted: #404040;
 
-  --color-brand-indigo: #38BDF8;
-  --color-brand-violet: #60A5FA;
+  --color-brand-indigo: #60A5FA;
+  --color-brand-violet: #818CF8;
+  --color-brand-profit: #4ADE80;
+  --color-brand-expense: #F87171;
+  --color-brand-tax: #60A5FA;
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;

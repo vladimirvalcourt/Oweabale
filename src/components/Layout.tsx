@@ -174,7 +174,7 @@ export default function Layout() {
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex flex-col bg-surface-base sidebar-recessed transition-all duration-300 ease-in-out",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-          sidebarCollapsed ? "w-20" : "w-64",
+          sidebarCollapsed ? "w-20" : "w-[240px]",
           "border-r border-surface-border"
         )}
       >
