@@ -135,10 +135,10 @@ export default function Landing() {
             </p>
             
             <Link 
-              to="/onboarding" 
+              to={user?.id ? "/dashboard" : "/auth"} 
               className="group flex items-center gap-4 bg-brand-indigo hover:bg-brand-violet text-white px-8 py-4 text-[13px] font-mono font-bold uppercase tracking-wider transition-all btn-tactile"
             >
-              Get started for free
+              {user?.id ? "Enter Dashboard" : "Get started for free"}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
