@@ -125,7 +125,7 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-40 pb-20 px-6 lg:px-8 max-w-7xl mx-auto w-full flex-1 flex flex-col justify-center">
+      <section className="pt-24 sm:pt-32 lg:pt-40 pb-12 sm:pb-20 px-6 lg:px-8 max-w-7xl mx-auto w-full flex-1 flex flex-col justify-center">
         <div ref={heroRef} className={`grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-32 items-center transition-all duration-1000 ease-out ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
           
           <div className="lg:col-span-7 flex flex-col items-start pr-0 lg:pr-12">

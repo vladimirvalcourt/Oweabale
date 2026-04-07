@@ -316,24 +316,24 @@ export default function Dashboard() {
         </div>
 
         {/* Distributed 4-grid for standard numbers */}
-        <div className="grid grid-cols-2 gap-4">
-            <div className="bg-surface-raised p-6 border border-surface-border rounded-sm shadow-sm text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-sm shadow-sm text-left">
               <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3">Net Worth</p>
-              <p className="text-4xl font-mono text-white font-bold tabular-nums">$<AnimatedValue value={netWorth} /></p>
+              <p className="text-2xl sm:text-4xl font-mono text-white font-bold tabular-nums">$<AnimatedValue value={netWorth} /></p>
             </div>
-            <div className="bg-surface-raised p-6 border border-surface-border rounded-sm shadow-sm text-left">
+            <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-sm shadow-sm text-left">
               <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3">Total Assets</p>
-              <p className="text-4xl font-mono text-white font-bold tabular-nums">$<AnimatedValue value={totalAssets} /></p>
+              <p className="text-2xl sm:text-4xl font-mono text-white font-bold tabular-nums">$<AnimatedValue value={totalAssets} /></p>
             </div>
-            <div className="bg-surface-raised p-6 border border-surface-border rounded-sm shadow-sm text-left">
+            <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-sm shadow-sm text-left">
               <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3 flex items-center gap-2">
                 Tax Savings <ShieldCheck className="w-3.5 h-3.5 text-brand-tax" />
               </p>
-              <p className="text-4xl font-mono text-brand-tax font-bold tabular-nums">-$<AnimatedValue value={cashFlow.taxReserve} /></p>
+              <p className="text-2xl sm:text-4xl font-mono text-brand-tax font-bold tabular-nums">-$<AnimatedValue value={cashFlow.taxReserve} /></p>
             </div>
-            <div className="bg-surface-raised p-6 border border-surface-border rounded-sm shadow-sm text-left">
+            <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-sm shadow-sm text-left">
               <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3">Monthly Surplus</p>
-              <p className="text-4xl font-mono text-brand-profit font-bold tabular-nums">+$<AnimatedValue value={cashFlow.surplus} /></p>
+              <p className="text-2xl sm:text-4xl font-mono text-brand-profit font-bold tabular-nums">+$<AnimatedValue value={cashFlow.surplus} /></p>
             </div>
         </div>
       </div>
@@ -443,7 +443,7 @@ export default function Dashboard() {
               </select>
             </div>
             
-            <div className="h-[280px] w-full">
+            <div className="h-[200px] sm:h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={projectedData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
