@@ -207,7 +207,7 @@ export default function Layout() {
                 {!sidebarCollapsed && (
                   <button 
                     onClick={() => toggleGroup(group.label)}
-                    className="w-full flex items-center justify-between px-4 py-2 text-[12px] font-sans font-medium text-content-tertiary hover:text-content-secondary transition-colors group/header"
+                    className="w-full flex items-center justify-between px-4 py-2 text-[12px] font-sans font-semibold text-content-secondary hover:text-content-primary transition-colors group/header"
                   >
                     <span>{group.label}</span>
                     <ChevronDown className={cn("w-3 h-3 transition-transform duration-300", isExpanded ? "rotate-0" : "-rotate-90 text-content-tertiary")} />
@@ -284,7 +284,7 @@ export default function Layout() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                  <span className="text-[11px] font-sans text-content-tertiary font-medium">Synced — Free Beta Trial</span>
+                  <span className="text-[11px] font-sans text-content-secondary font-semibold">Synced — Free Beta Trial</span>
                 </div>
                 <p className="text-[11px] font-sans text-zinc-500 leading-relaxed italic opacity-90 pl-3.5 border-l border-surface-border">
                   Pricing may be introduced later with advance notice to testers.

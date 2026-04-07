@@ -305,11 +305,11 @@ export default function Dashboard() {
           
           <div className="grid grid-cols-2 gap-4 border-t border-surface-border pt-5">
             <div>
-              <p className="text-[11px] font-mono font-medium text-zinc-400 uppercase tracking-wider mb-1">Liquid Cash</p>
+              <p className="text-[11px] font-mono font-medium text-zinc-300 uppercase tracking-wider mb-1">Liquid Cash</p>
               <p className="text-xl font-mono text-emerald-400 font-bold">${liquidCash.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-[11px] font-mono font-medium text-zinc-400 uppercase tracking-wider mb-1">Monthly Expenses</p>
+              <p className="text-[11px] font-mono font-medium text-zinc-300 uppercase tracking-wider mb-1">Monthly Expenses</p>
               <p className="text-xl font-mono text-white font-bold">${Math.round(monthlyBurn).toLocaleString()}</p>
             </div>
           </div>
@@ -318,21 +318,21 @@ export default function Dashboard() {
         {/* Distributed 4-grid for standard numbers */}
         <div className="grid grid-cols-2 gap-4">
             <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
-              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-2">Net Worth</p>
+              <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">Net Worth</p>
               <p className="text-3xl font-mono text-white font-semibold tabular-nums">$<AnimatedValue value={netWorth} /></p>
             </div>
             <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
-              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-2">Total Assets</p>
+              <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">Total Assets</p>
               <p className="text-3xl font-mono text-white font-semibold tabular-nums">$<AnimatedValue value={totalAssets} /></p>
             </div>
             <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
-              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                 Tax Savings <ShieldCheck className="w-3 h-3 text-indigo-400" />
               </p>
               <p className="text-3xl font-mono text-indigo-400 font-semibold tabular-nums">-$<AnimatedValue value={cashFlow.taxReserve} /></p>
             </div>
             <div className="bg-surface-raised p-5 border border-surface-border rounded-sm shadow-sm">
-              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-2">Monthly Surplus</p>
+              <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mb-2">Monthly Surplus</p>
               <p className="text-3xl font-mono text-emerald-400 font-semibold tabular-nums">+$<AnimatedValue value={cashFlow.surplus} /></p>
             </div>
         </div>
