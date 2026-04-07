@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /bills
+Disallow: /income
+Disallow: /freelance
+Disallow: /ingestion
+Disallow: /transactions
+Disallow: /budgets
+Disallow: /net-worth
+Disallow: /calendar
+Disallow: /taxes
+Disallow: /goals
+Disallow: /education
+Disallow: /categories
+Disallow: /subscriptions
+Disallow: /reports
+Disallow: /support
+Disallow: /settings
+Disallow: /admin
+
+Sitemap: https://www.oweable.com/sitemap.xml
