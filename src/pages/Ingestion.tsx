@@ -22,7 +22,23 @@ import { toast } from 'sonner';
 import Tesseract from 'tesseract.js';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { validateIngestionFile } from '../lib/security';
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
+
+// Upload rate limiter — max 5 files per 60 seconds
+const uploadTimestamps: number[] = [];
+const MAX_UPLOADS_PER_MINUTE = 5;
+const MAX_CONCURRENT_UPLOADS = 2;
+let activeUploads = 0;
+
+function isRateLimited(): boolean {
+  const now = Date.now();
+  // Evict entries older than 60 s
+  while (uploadTimestamps.length > 0 && now - uploadTimestamps[0] > 60_000) {
+    uploadTimestamps.shift();
+  }
+  return uploadTimestamps.length >= MAX_UPLOADS_PER_MINUTE || activeUploads >= MAX_CONCURRENT_UPLOADS;
+}
 
 export default function Ingestion() {
   const { pendingIngestions, commitIngestion, removePendingIngestion, updatePendingIngestion, addPendingIngestion } = useStore();
@@ -33,6 +49,21 @@ export default function Ingestion() {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const processFile = async (uploadedFile: File) => {
+    // ── Security: validate file before anything else ──────────
+    const validation = validateIngestionFile(uploadedFile);
+    if (!validation.ok) {
+      toast.error(validation.error);
+      return;
+    }
+
+    // ── Rate limiting ─────────────────────────────────────────
+    if (isRateLimited()) {
+      toast.error('Too many uploads. Please wait a moment before adding more files.');
+      return;
+    }
+    uploadTimestamps.push(Date.now());
+    activeUploads++;
+
     setIsExtracting(true);
     const ingestionId = addPendingIngestion({
       type: 'bill',
@@ -99,8 +130,7 @@ export default function Ingestion() {
             const textContent = await page.getTextContent();
             fullText += textContent.items.map((item: any) => item.str).join(' ') + '\n';
           }
-        } catch (pdfErr) {
-          console.error('PDF Parsing error:', pdfErr);
+        } catch {
           throw new Error('Failed to scan document binary.');
         }
       }
@@ -141,10 +171,10 @@ export default function Ingestion() {
 
       toast.success(`${uploadedFile.name.substring(0, 20)}... scanned`);
     } catch (error) {
-      console.error(error);
       updatePendingIngestion(ingestionId, { status: 'error' });
       toast.error(`Scan failed: ${uploadedFile.name}`);
     } finally {
+      activeUploads = Math.max(0, activeUploads - 1);
       setIsExtracting(false);
     }
   };
@@ -508,6 +538,7 @@ export default function Ingestion() {
                                 src={item.storageUrl}
                                 className="w-full h-[380px] border-0"
                                 title={item.originalFile?.name}
+                                sandbox="allow-same-origin"
                               />
                             ) : item.storageUrl || item.originalFile?.url ? (
                               <img

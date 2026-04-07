@@ -21,7 +21,9 @@ export default function MobileCapture() {
   const [guidanceText, setGuidanceText] = useState('Position document within the guides');
 
   useEffect(() => {
-    const cached = localStorage.getItem(`pending_upload_${sessionId}`);
+    // Use sessionStorage (not localStorage) so captured images
+    // are not persisted beyond the browser tab's lifetime.
+    const cached = sessionStorage.getItem(`pending_upload_${sessionId}`);
     if (cached) {
       setPreviewUrl(cached);
       setStatus('capturing');
@@ -35,12 +37,28 @@ export default function MobileCapture() {
        return;
     }
 
-    // New: Signal 'active' state on scan
+    // Validate token against the DB before doing anything.
+    // The query includes .eq('token', token) so if the token in the URL
+    // doesn't match what's stored, the row returns null and we abort.
     const signalActiveScan = async () => {
+      const { data: sessionRow, error: tokenErr } = await supabase
+        .from('document_capture_sessions')
+        .select('id')
+        .eq('id', sessionId)
+        .eq('token', token)
+        .single();
+
+      if (tokenErr || !sessionRow) {
+        setStatus('error');
+        setError('Session not found or token is invalid. Please scan a new QR code.');
+        return;
+      }
+
       await supabase
         .from('document_capture_sessions')
         .update({ status: 'active' })
-        .eq('id', sessionId);
+        .eq('id', sessionId)
+        .eq('token', token);
     };
     signalActiveScan();
     
@@ -69,7 +87,7 @@ export default function MobileCapture() {
       reader.onloadend = () => {
         const base64 = reader.result as string;
         setPreviewUrl(base64);
-        localStorage.setItem(`pending_upload_${sessionId}`, base64);
+        sessionStorage.setItem(`pending_upload_${sessionId}`, base64);
       };
       reader.readAsDataURL(file);
       setStatus('capturing');
@@ -79,17 +97,19 @@ export default function MobileCapture() {
 
   const handeUpload = async () => {
     const activeImage = capturedImage || (previewUrl ? dataURLtoFile(previewUrl, 'recovered_scan.jpg') : null);
-    if (!activeImage || !sessionId) return;
-    
+    if (!activeImage || !sessionId || !token) return;
+
     setStatus('uploading');
     try {
+      // Re-validate token on upload — prevents forged requests
       const { data: session, error: sessionErr } = await supabase
         .from('document_capture_sessions')
         .select('user_id')
         .eq('id', sessionId)
+        .eq('token', token)
         .single();
-        
-      if (sessionErr || !session) throw new Error('Session not found or expired.');
+
+      if (sessionErr || !session) throw new Error('Session not found or token is invalid.');
 
       const userId = session.user_id;
       const fileName = `mobile_scan_${Date.now()}.jpg`;
@@ -122,12 +142,12 @@ export default function MobileCapture() {
         type: 'bill'
       });
 
-      localStorage.removeItem(`pending_upload_${sessionId}`);
+      sessionStorage.removeItem(`pending_upload_${sessionId}`);
       setStatus('completed');
-    } catch (err: any) {
-      console.error(err);
+    } catch (err: unknown) {
       setStatus('error');
-      setError(err.message || 'Transmission failed. Ensure you are online.');
+      const msg = err instanceof Error ? err.message : 'Transmission failed. Ensure you are online.';
+      setError(msg);
     }
   };
 

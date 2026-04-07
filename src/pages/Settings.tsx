@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
+import { validateAvatarFile } from '../lib/security';
 import { supabase } from '../lib/supabase';
 import { Dialog } from '@headlessui/react';
 import { AlertTriangle, Lock, Shield, Smartphone, CreditCard as CreditCardIcon, CheckCircle2, Plus, X, Building2, Loader2, Search, Download, Fingerprint, EyeOff, FileSpreadsheet, FileText, User, Mail, BellRing, BrainCircuit, Palette, Globe, PieChart } from 'lucide-react';
@@ -127,15 +128,21 @@ export default function Settings() {
                       <div className="space-y-1">
                         <label className="inline-block cursor-pointer px-4 py-1.5 bg-transparent border border-surface-border rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-300 hover:bg-surface-elevated transition-colors relative">
                           Update Picture
-                          <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => {
-                            if (e.target.files && e.target.files[0]) {
-                              const reader = new FileReader();
-                              reader.onload = (ev) => {
-                                updateUser({ avatar: ev.target?.result as string });
-                                toast.success('Profile picture updated');
-                              };
-                              reader.readAsDataURL(e.target.files[0]);
+                          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            const validation = validateAvatarFile(file);
+                            if (!validation.ok) {
+                              toast.error(validation.error);
+                              e.target.value = '';
+                              return;
                             }
+                            const reader = new FileReader();
+                            reader.onload = (ev) => {
+                              updateUser({ avatar: ev.target?.result as string });
+                              toast.success('Profile picture updated');
+                            };
+                            reader.readAsDataURL(file);
                           }} />
                         </label>
                         <p className="text-[9px] font-mono text-zinc-600 shadow-none uppercase tracking-widest block pt-2">User ID: OWE_{user.id?.substring(0, 8)}</p>

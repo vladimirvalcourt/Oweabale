@@ -1213,8 +1213,7 @@ export const useStore = create<AppState>()(
         } : initialData.user,
         isLoading: false
       });
-    } catch (err) {
-      console.error('Error fetching from Supabase:', err);
+    } catch {
       set({ isLoading: false });
     }
   },
@@ -1228,20 +1227,27 @@ export const useStore = create<AppState>()(
     {
       name: 'oweable-store-persistence',
       storage: createJSONStorage(() => sessionStorage),
-      // Only persist specific data to keep session safe
-      partialize: (state) => ({ 
-        user: state.user,
-        bills: state.bills,
-        debts: state.debts,
-        transactions: state.transactions,
-        assets: state.assets,
-        subscriptions: state.subscriptions,
-        goals: state.goals,
-        incomes: state.incomes,
-        budgets: state.budgets,
+      // Persist ONLY non-sensitive UI/profile state.
+      // Financial records (bills, debts, transactions, assets, incomes, etc.)
+      // are re-fetched from Supabase on every authenticated session via
+      // fetchData(). Keeping them out of sessionStorage means an XSS attack
+      // or shared-device access cannot harvest raw financial data from storage.
+      partialize: (state) => ({
+        user: {
+          // Persist identity fields needed for the UI shell while data loads
+          id: state.user.id,
+          firstName: state.user.firstName,
+          lastName: state.user.lastName,
+          email: state.user.email,
+          avatar: state.user.avatar,
+          theme: state.user.theme,
+          hasCompletedOnboarding: state.user.hasCompletedOnboarding,
+          isAdmin: state.user.isAdmin,
+          // Omit: taxState, taxRate, phone, timezone, language (re-fetched from DB)
+        },
+        // Persist categories only — these are non-sensitive labels used to
+        // render the UI immediately on load before fetchData() completes.
         categories: state.categories,
-        citations: state.citations,
-        freelanceEntries: state.freelanceEntries
       }),
     }
   )
