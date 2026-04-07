@@ -67,7 +67,6 @@ function AppRoutes() {
     <Routes>
       {/* ── Public routes ── */}
       <Route path="/" element={<Landing />} />
-      <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
@@ -82,6 +81,9 @@ function AppRoutes() {
 
       {/* ── Protected routes — require authentication ── */}
       <Route element={<AuthGuard />}>
+        {/* Onboarding doesn't need Layout sidebar/topbar */}
+        <Route path="/onboarding" element={<Onboarding />} />
+        
         <Route element={<DeviceGuard><Layout /></DeviceGuard>}>
           <Route path="dashboard" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
           <Route path="bills" element={<ErrorBoundary><Obligations /></ErrorBoundary>} />
