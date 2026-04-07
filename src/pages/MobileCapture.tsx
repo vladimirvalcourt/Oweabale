@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { 
   Camera, CheckCircle2, AlertCircle, Loader2, 
-  ShieldCheck, Zap, WifiOff, RefreshCw 
+  ShieldCheck, Zap, RefreshCw, X, ArrowRight,
+  Sun, Maximize, MousePointer2, Smartphone
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 
 export default function MobileCapture() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const sessionId = searchParams.get('id');
   const token = searchParams.get('t');
   
@@ -16,6 +18,7 @@ export default function MobileCapture() {
   const [error, setError] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [guidanceText, setGuidanceText] = useState('Position document within the guides');
 
   useEffect(() => {
     const cached = localStorage.getItem(`pending_upload_${sessionId}`);
@@ -31,7 +34,23 @@ export default function MobileCapture() {
        setError('Invalid or missing capture session.');
        return;
     }
-  }, [sessionId, token]);
+    
+    // Simulate dynamic guidance
+    if (status === 'capturing' && !previewUrl) {
+      const tips = [
+        "Looking for document edges...",
+        "Hold still... focusing.",
+        "Ensure good lighting for OCR",
+        "Avoid glares on the surface"
+      ];
+      let i = 0;
+      const interval = setInterval(() => {
+        setGuidanceText(tips[i % tips.length]);
+        i++;
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [sessionId, token, status, previewUrl]);
 
   const handleCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,6 +64,7 @@ export default function MobileCapture() {
       };
       reader.readAsDataURL(file);
       setStatus('capturing');
+      setGuidanceText('Clear scan captured!');
     }
   };
 
@@ -85,7 +105,6 @@ export default function MobileCapture() {
 
       if (updateErr) throw updateErr;
 
-      // New persistable Ingestion Inbox entry
       await supabase.from('pending_ingestions').insert({
         user_id: userId,
         status: 'uploading',
@@ -96,7 +115,6 @@ export default function MobileCapture() {
 
       localStorage.removeItem(`pending_upload_${sessionId}`);
       setStatus('completed');
-      toast.success('Document uploaded to your dashboard.');
     } catch (err: any) {
       console.error(err);
       setStatus('error');
@@ -118,12 +136,17 @@ export default function MobileCapture() {
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen bg-[#08090A] flex flex-col items-center justify-center p-6 text-center">
-        <AlertCircle className="w-12 h-12 text-rose-500 mb-4" />
-        <h1 className="text-xl font-bold text-white mb-2 uppercase font-mono tracking-widest">Capture Failed</h1>
-        <p className="text-zinc-500 text-[10px] font-mono mb-8 uppercase tracking-[0.1em]">{error || 'Network error or session expired.'}</p>
-        <button onClick={() => window.location.reload()} className="w-full max-w-xs py-4 bg-zinc-800 text-white rounded-none text-xs uppercase tracking-widest font-bold flex items-center justify-center gap-2">
-           <RefreshCw className="w-4 h-4" /> [Retry_Sync]
+      <div className="min-h-screen bg-[#08090A] flex flex-col items-center justify-center p-8 text-center font-sans">
+        <AlertCircle className="w-12 h-12 text-rose-500 mb-6" />
+        <h1 className="text-xl font-bold text-white mb-3 uppercase tracking-widest font-mono">Uplink Error</h1>
+        <p className="text-zinc-500 text-xs mb-10 uppercase tracking-widest leading-relaxed">
+          {error || 'The session has reached its lifecycle limit. Please refresh the QR code on your desktop.'}
+        </p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="w-full py-4 bg-zinc-900 border border-white/10 text-white font-mono text-[10px] font-bold uppercase tracking-[0.3em] flex items-center justify-center gap-2 active:scale-95 transition-all"
+        >
+          <RefreshCw className="w-4 h-4" /> [Restart_Session]
         </button>
       </div>
     );
@@ -131,17 +154,30 @@ export default function MobileCapture() {
 
   if (status === 'completed') {
     return (
-      <div className="min-h-screen bg-[#08090A] flex flex-col items-center justify-center p-8 text-center">
+      <div className="min-h-screen bg-[#08090A] flex flex-col items-center justify-center p-8 text-center font-sans">
         <div className="relative mb-8">
-           <div className="absolute inset-0 bg-emerald-500/20 blur-xl rounded-full animate-pulse" />
-           <CheckCircle2 className="w-20 h-20 text-emerald-500 relative" />
+           <div className="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full animate-pulse" />
+           <CheckCircle2 className="w-24 h-24 text-emerald-500 relative" />
         </div>
-        <h1 className="text-2xl font-bold text-white mb-2 uppercase tracking-tighter">Uplink Successful</h1>
-        <p className="text-zinc-500 text-[11px] font-mono mb-10 uppercase tracking-[0.2em] leading-relaxed">
-          Document packet transmitted.<br/>Verification active on desktop.
+        <h1 className="text-3xl font-bold text-white mb-2 uppercase tracking-tighter">✅ Sent!</h1>
+        <p className="text-zinc-500 text-[11px] font-mono mb-12 uppercase tracking-[0.2em] leading-relaxed max-w-[280px]">
+          Your document is now being processed in your Review Inbox.<br/><br/>
+          You can put your phone away; your desktop dashboard has been updated.
         </p>
-        <div className="w-full max-w-xs h-1 bg-surface-border rounded-full overflow-hidden">
-          <div className="h-full bg-emerald-500 w-full animate-progress-once" />
+        
+        <div className="flex flex-col gap-3 w-full max-w-xs">
+          <button 
+            onClick={() => { setPreviewUrl(null); setStatus('idle'); }}
+            className="w-full py-5 bg-brand-violet text-white font-mono text-[10px] font-bold uppercase tracking-[0.3em] shadow-lg shadow-brand-violet/20 active:scale-95 transition-all"
+          >
+            Capture Another
+          </button>
+          <button 
+            onClick={() => navigate('/')}
+            className="w-full py-4 text-zinc-500 hover:text-white font-mono text-[9px] font-bold uppercase tracking-[0.4em] transition-colors"
+          >
+            Done
+          </button>
         </div>
       </div>
     );
@@ -149,90 +185,118 @@ export default function MobileCapture() {
 
   return (
     <div className="min-h-screen bg-[#08090A] flex flex-col font-sans">
-      <div className="shrink-0 h-16 border-b border-white/[0.05] px-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-1.5 h-1.5 rounded-full bg-brand-violet animate-pulse shadow-glow-indigo" />
-          <span className="text-[10px] font-mono text-zinc-400 font-bold uppercase tracking-[0.2em]">Live Mobile Uplink</span>
+      {/* Dynamic Header */}
+      <div className="shrink-0 h-20 border-b border-white/[0.05] px-6 flex items-center justify-between bg-surface-base">
+        <div className="flex flex-col gap-1">
+          <span className="text-[11px] font-bold text-white uppercase tracking-tight">Syncing to Oweable Desktop</span>
+          <div className="flex items-center gap-1.5">
+             <div className="w-1 h-1 rounded-full bg-emerald-500 shadow-glow-emerald animate-pulse" />
+             <span className="text-[8px] font-mono text-emerald-500/80 font-bold uppercase tracking-widest">Secure Connection Active</span>
+          </div>
         </div>
-        <div className="text-[9px] font-mono text-zinc-700 uppercase">SYS_LOG: {sessionId?.slice(0, 8)}</div>
+        <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center bg-white/5">
+           <Smartphone className="w-4 h-4 text-zinc-500" />
+        </div>
       </div>
 
-      <main className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 relative overflow-hidden">
+      <main className="flex-1 flex flex-col p-6 sm:p-12 relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
         
-        <div className="w-full max-w-sm flex flex-col text-center">
+        <div className="w-full max-w-sm mx-auto flex flex-col h-full">
           {!previewUrl ? (
-            <div className="space-y-10">
-              <div className="p-14 bg-surface-base border border-dashed border-white/[0.1] rounded-sm relative group active:scale-[0.98] transition-all">
-                <input 
-                  type="file" 
-                  accept="image/*" 
-                  capture="environment" 
-                  onChange={handleCapture}
-                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                />
-                <div className="flex flex-col items-center gap-6">
-                  <div className="w-24 h-24 rounded-full bg-brand-indigo/5 border border-brand-violet/20 flex items-center justify-center group-hover:scale-110 group-hover:border-brand-violet/40 transition-all relative">
-                      <div className="absolute -top-3 -left-3 w-6 h-6 border-t border-l border-brand-violet/40"></div>
-                      <div className="absolute -bottom-3 -right-3 w-6 h-6 border-b border-r border-brand-violet/40"></div>
-                      <Camera className="w-10 h-10 text-brand-violet" />
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-white font-bold text-xl uppercase tracking-tighter">Capture Protocol</p>
-                    <p className="text-zinc-600 text-[10px] font-mono uppercase tracking-[0.3em]">Ready for visual ingestion</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-px bg-white/[0.05] border border-white/[0.05]">
-                 <div className="flex items-center gap-4 p-4 bg-surface-base">
-                    <ShieldCheck className="w-4 h-4 text-brand-indigo" />
-                    <div className="text-left">
-                       <p className="text-[10px] font-mono font-bold text-zinc-300 uppercase">Edge Alignment</p>
-                       <p className="text-[9px] font-mono text-zinc-600 uppercase">Active scanning enabled</p>
+            <div className="flex flex-col h-full">
+              {/* Instructions Section */}
+              <div className="space-y-8 mt-4">
+                 <div className="flex gap-5 group">
+                    <div className="shrink-0 w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
+                       <Sun className="w-4 h-4 text-zinc-500 group-hover:text-brand-violet" />
+                    </div>
+                    <div className="space-y-1">
+                       <p className="text-[10px] font-mono font-bold text-white uppercase tracking-widest">1. Position</p>
+                       <p className="text-[9px] font-mono text-zinc-600 uppercase leading-relaxed">Place document on a flat, dark surface with good lighting.</p>
+                    </div>
+                 </div>
+                 <div className="flex gap-5 group text-left">
+                    <div className="shrink-0 w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
+                       <Maximize className="w-4 h-4 text-zinc-500 group-hover:text-brand-violet" />
+                    </div>
+                    <div className="space-y-1">
+                       <p className="text-[10px] font-mono font-bold text-white uppercase tracking-widest">2. Align</p>
+                       <p className="text-[9px] font-mono text-zinc-600 uppercase leading-relaxed">Frame the document within the onscreen guides.</p>
+                    </div>
+                 </div>
+                 <div className="flex gap-5 group text-left">
+                    <div className="shrink-0 w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
+                       <MousePointer2 className="w-4 h-4 text-zinc-500 group-hover:text-brand-violet" />
+                    </div>
+                    <div className="space-y-1">
+                       <p className="text-[10px] font-mono font-bold text-white uppercase tracking-widest">3. Capture</p>
+                       <p className="text-[9px] font-mono text-zinc-600 uppercase leading-relaxed">System snaps automatically when aligned, or you can tap.</p>
                     </div>
                  </div>
               </div>
 
-              <div className="text-[8px] font-mono text-zinc-700 uppercase tracking-[0.5em] flex items-center justify-center gap-4">
-                <div className="w-8 h-[1px] bg-zinc-800"></div>
-                UPLINK_READY_4.0
-                <div className="w-8 h-[1px] bg-zinc-800"></div>
+              {/* Shutter Section */}
+              <div className="mt-auto mb-8">
+                <div className="p-16 bg-surface-base border border-dashed border-white/[0.1] rounded-sm relative group active:scale-[0.98] transition-all overflow-hidden">
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    capture="environment" 
+                    onChange={handleCapture}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="flex flex-col items-center gap-6 relative z-1">
+                    <div className="w-24 h-24 rounded-full bg-brand-indigo/5 border border-brand-violet/20 flex items-center justify-center group-hover:scale-110 group-hover:border-brand-violet/40 transition-all">
+                        <Camera className="w-10 h-10 text-brand-violet" />
+                    </div>
+                    <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.4em] font-bold group-hover:text-white transition-colors">Launch Camera</span>
+                  </div>
+                  {/* Decorative Scan Line */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-violet/[0.03] to-transparent animate-scan-y opacity-50" />
+                </div>
               </div>
             </div>
           ) : (
-            <div className="space-y-8 animate-in slide-in-from-bottom-6 duration-700">
-               <div className="relative aspect-[3/4] w-full bg-surface-raised border border-white/[0.1] p-1.5 rounded-sm overflow-hidden shadow-2xl">
+            <div className="space-y-10 animate-in slide-in-from-bottom-8 duration-700 h-full flex flex-col py-4">
+              {/* Guidance HUD */}
+              <div className="text-center">
+                 <p className="text-[10px] font-mono text-brand-violet font-bold uppercase tracking-[0.3em] animate-pulse">
+                    [ {guidanceText} ]
+                 </p>
+              </div>
+
+               <div className="relative aspect-[3/4] w-full bg-surface-raised border border-white/[0.12] p-1.5 rounded-sm overflow-hidden shadow-2xl flex-1">
                  <img src={previewUrl} alt="Preview" className="w-full h-full object-cover grayscale brightness-110 contrast-125" />
                  
-                 <div className="absolute inset-6 border border-brand-violet/30 pointer-events-none">
-                    <div className="absolute top-0 left-0 w-3 h-3 border-t border-l border-brand-violet"></div>
-                    <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-brand-violet"></div>
-                    <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-brand-violet"></div>
-                    <div className="absolute bottom-0 right-0 w-3 h-3 border-b border-r border-brand-violet"></div>
-                    <div className="absolute top-3 left-3 text-[7px] font-mono text-brand-violet uppercase bg-black/60 px-1 font-bold">GRID_ALIGN_FIX</div>
+                 {/* Visual Viewfinder Overlay */}
+                 <div className="absolute inset-8 border border-white/20 pointer-events-none">
+                    <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-brand-violet"></div>
+                    <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-brand-violet"></div>
+                    <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-brand-violet"></div>
+                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-brand-violet"></div>
                  </div>
 
                  {status === 'uploading' && (
-                    <div className="absolute top-0 left-0 w-full h-[1px] bg-brand-violet shadow-[0_0_15px_#8b5cf6] animate-scan-y z-20"></div>
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-brand-violet shadow-[0_0_20px_#7c3aed] animate-scan-y z-20"></div>
                  )}
                </div>
 
-               <div className="flex flex-col gap-3">
+               <div className="flex flex-col gap-4 mt-auto">
                   <button 
                     onClick={handeUpload}
                     disabled={status === 'uploading'}
-                    className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-zinc-900 text-white py-5 rounded-none font-mono font-bold uppercase tracking-widest text-[12px] shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-3 group transition-all"
+                    className="w-full bg-brand-violet hover:bg-indigo-500 disabled:bg-zinc-900 text-white py-5 rounded-none font-mono font-bold uppercase tracking-widest text-[11px] shadow-xl shadow-brand-violet/20 flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
                   >
                     {status === 'uploading' ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        INITIATING UPLINK...
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Transmitting...
                       </>
                     ) : (
                       <>
-                        <Zap className="w-4 h-4 group-hover:animate-pulse" />
-                        Execute Sync
+                        <Zap className="w-4 h-4" />
+                        Send to Dashboard
                       </>
                     )}
                   </button>
@@ -244,9 +308,9 @@ export default function MobileCapture() {
                         setStatus('idle'); 
                     }}
                     disabled={status === 'uploading'}
-                    className="w-full py-4 text-zinc-600 hover:text-white transition-colors text-[9px] font-mono font-bold uppercase tracking-[0.4em]"
+                    className="w-full py-4 bg-white/5 border border-white/5 text-zinc-500 hover:text-white transition-all text-[9px] font-mono font-bold uppercase tracking-[0.4em]"
                   >
-                    [Cancel_Packet]
+                    [ Retake ]
                   </button>
                </div>
             </div>
@@ -254,8 +318,8 @@ export default function MobileCapture() {
         </div>
       </main>
 
-      <div className="shrink-0 p-10 border-t border-white/[0.03] text-center opacity-40">
-        <span className="text-[7px] font-mono text-zinc-500 uppercase tracking-[0.6em]">Encrypted Data Stream // Oweable Financial Core</span>
+      <div className="shrink-0 p-8 border-t border-white/[0.03] text-center bg-surface-base">
+        <span className="text-[7px] font-mono text-zinc-700 uppercase tracking-[0.8em]">Secure Uplink Core 4.02</span>
       </div>
     </div>
   );
