@@ -2,13 +2,7 @@ import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 
-type AuthMode = 'login' | 'signup';
-
 export default function AuthPage() {
-  const [mode, setMode] = useState<AuthMode>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
@@ -23,28 +17,6 @@ export default function AuthPage() {
       toast.error(error.message);
       setGoogleLoading(false);
     }
-    // No need to setGoogleLoading(false) on success — page redirects
-  };
-
-  const handleEmailAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const { error } =
-      mode === 'login'
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({
-            email,
-            password,
-            options: { emailRedirectTo: `${window.location.origin}/dashboard` },
-          });
-
-    if (error) {
-      toast.error(error.message);
-    } else if (mode === 'signup') {
-      toast.success('Check your email to confirm your account.');
-    }
-    setLoading(false);
   };
 
   return (
@@ -71,12 +43,10 @@ export default function AuthPage() {
             </span>
           </div>
           <h1 className="font-mono text-2xl text-white font-bold tracking-tight">
-            {mode === 'login' ? 'Sign in' : 'Create account'}
+            Sign in to Oweable
           </h1>
           <p className="font-mono text-[10px] text-zinc-500 uppercase tracking-widest mt-1">
-            {mode === 'login'
-              ? 'Your financial OS — back online.'
-              : 'Start tracking your money like a pro.'}
+            Your financial OS — Secure access only.
           </p>
         </div>
 
@@ -84,7 +54,7 @@ export default function AuthPage() {
         <button
           onClick={handleGoogleSignIn}
           disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-3 bg-white text-black font-mono text-sm font-bold py-3 px-4 hover:bg-zinc-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+          className="w-full flex items-center justify-center gap-3 bg-white text-black font-mono text-sm font-bold py-4 px-4 hover:bg-zinc-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-8"
         >
           {googleLoading ? (
             <span className="text-xs tracking-widest uppercase">Redirecting…</span>
@@ -109,81 +79,14 @@ export default function AuthPage() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Continue with Google
+              Sign in with Google
             </>
           )}
         </button>
 
-        {/* Divider */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="flex-1 h-px bg-surface-border" />
-          <span className="font-mono text-[9px] text-zinc-600 uppercase tracking-widest">or</span>
-          <div className="flex-1 h-px bg-surface-border" />
-        </div>
-
-        {/* Email / Password form */}
-        <form onSubmit={handleEmailAuth} className="space-y-3">
-          <div>
-            <label className="block font-mono text-[9px] text-zinc-500 uppercase tracking-widest mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full bg-surface-card border border-surface-border text-white font-mono text-sm px-3 py-2.5 outline-none focus:border-brand-violet transition-colors placeholder-zinc-700"
-            />
-          </div>
-
-          <div>
-            <label className="block font-mono text-[9px] text-zinc-500 uppercase tracking-widest mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              minLength={8}
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full bg-surface-card border border-surface-border text-white font-mono text-sm px-3 py-2.5 outline-none focus:border-brand-violet transition-colors placeholder-zinc-700"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-brand-violet text-white font-mono text-xs font-bold tracking-widest uppercase py-3 hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Please wait…' : mode === 'login' ? 'Sign In' : 'Create Account'}
-          </button>
-        </form>
-
-        {/* Mode toggle */}
-        <p className="font-mono text-[10px] text-zinc-500 text-center mt-6">
-          {mode === 'login' ? (
-            <>
-              No account?{' '}
-              <button
-                onClick={() => setMode('signup')}
-                className="text-brand-violet hover:underline"
-              >
-                Sign up
-              </button>
-            </>
-          ) : (
-            <>
-              Already have an account?{' '}
-              <button
-                onClick={() => setMode('login')}
-                className="text-brand-violet hover:underline"
-              >
-                Sign in
-              </button>
-            </>
-          )}
+        {/* Support Note */}
+        <p className="font-mono text-[9px] text-zinc-600 text-center mb-8 uppercase tracking-[0.15em]">
+          Enterprise encryption and biometric auth handled by Google Identity Services.
         </p>
 
         {/* Legal */}
