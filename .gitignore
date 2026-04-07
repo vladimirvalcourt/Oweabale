@@ -1,3 +1,20 @@
+# AI / Agent Artifacts — Not Part of the Core Product
+.agent/
+.agents/
+_agent/
+_agents/
+agents/
+.trae/
+trae/
+brain/
+.gemini/
+.mcp.json
+skills/
+skills-lock.json
+.claude/
+.1code/
+
+# System & Cache
 node_modules/
 build/
 dist/
@@ -7,10 +24,4 @@ coverage/
 .env*
 !.env.example
 npm-cache/
-
-# AI tool configs — not part of the project
-.claude/
-.1code/
-.mcp.json
-.gemini/
-\n# Oweable Local Cache Cleanup\n.npm-cache/
+.npm-cache/
