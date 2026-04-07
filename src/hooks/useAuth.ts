@@ -44,6 +44,15 @@ export function useAuth(): AuthState {
       }
     };
 
+    // BFCACHE RE-VALIDATION: Prevents session bypass when clicking 'Back'
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        window.location.reload(); 
+      }
+    };
+
+    window.addEventListener('pageshow', handlePageShow);
+    
     // Listen to standard user interaction events to keep session alive
     const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
     events.forEach((event) => window.addEventListener(event, resetIdleTimer));
@@ -54,6 +63,7 @@ export function useAuth(): AuthState {
     return () => {
       subscription.unsubscribe();
       clearTimeout(idleTimer);
+      window.removeEventListener('pageshow', handlePageShow);
       events.forEach((event) => window.removeEventListener(event, resetIdleTimer));
     };
   }, [session?.user?.id]); // Re-bind timeout when user changes
