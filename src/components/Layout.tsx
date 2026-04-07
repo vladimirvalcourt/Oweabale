@@ -516,7 +516,11 @@ export default function Layout() {
                     <HeadlessMenu.Item>
                       {({ active }) => (
                         <button
-                          onClick={() => toast.success('Logged out')}
+                          onClick={() => {
+                            useStore.getState().signOut();
+                            toast.success('Logged out');
+                            navigate('/auth');
+                          }}
                           className={cn(
                             'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
                             active ? 'bg-white/5 text-red-400' : 'text-zinc-400'

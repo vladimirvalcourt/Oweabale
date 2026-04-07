@@ -72,7 +72,8 @@ export default function Onboarding() {
     // Step 3/4/5 — strategy + freelance mode stored to user profile metadata
     updateUser({
       theme: formData.focus === 'detonation' ? 'Detonation' : 'Dark',
-    } as any);
+      hasCompletedOnboarding: true,
+    });
     // Notify user of active mode
     addNotification({
       title: formData.freelance ? 'Independent Contractor Mode Active' : 'Standard Mode Active',

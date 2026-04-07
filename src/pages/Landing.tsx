@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import { ArrowRight, UploadCloud, ShieldCheck, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useStore } from '../store/useStore';
 
 function useInView(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
@@ -74,6 +75,7 @@ function WordCycler() {
 
 export default function Landing() {
   const [scrolled, setScrolled] = useState(false);
+  const user = useStore((state) => state.user);
   
   const [heroRef, heroVisible] = useInView(0.1);
   const [archRef, archVisible] = useInView(0.1);
@@ -100,10 +102,10 @@ export default function Landing() {
             <Link to="/pricing" className="hover:text-content-primary transition-colors">Pricing</Link>
           </div>
           <Link 
-            to="/dashboard" 
+            to={user?.id ? "/dashboard" : "/auth"} 
             className="px-6 py-2 bg-content-primary text-surface-base hover:bg-zinc-200 text-[11px] font-mono font-bold uppercase tracking-widest transition-all btn-tactile"
           >
-            Sign In
+            {user?.id ? "Enter Dashboard" : "Sign In"}
           </Link>
         </div>
       </nav>

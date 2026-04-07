@@ -181,6 +181,7 @@ interface AppState {
     phone?: string;
     timezone?: string;
     language?: string;
+    hasCompletedOnboarding: boolean;
   };
   setTaxSettings: (state: string, rate: number) => void;
   bankConnected: boolean;
@@ -223,6 +224,7 @@ interface AppState {
   toggleFreelanceVault: (id: string) => Promise<void>;
   deleteFreelanceEntry: (id: string) => Promise<void>;
   updateUser: (user: Partial<AppState['user']>) => Promise<void>;
+  signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
 
   // Ingestion Actions
@@ -271,7 +273,8 @@ const initialData = {
     taxRate: 35.0,
     phone: '',
     timezone: 'Eastern Time (ET)',
-    language: 'English (US)'
+    language: 'English (US)',
+    hasCompletedOnboarding: false,
   },
   bankConnected: false,
   pendingIngestions: [],
@@ -746,6 +749,7 @@ export const useStore = create<AppState>((set, get) => ({
       if (user.language !== undefined) patch.language = user.language;
       if (user.taxState !== undefined) patch.tax_state = user.taxState;
       if (user.taxRate !== undefined)  patch.tax_rate = user.taxRate;
+      if (user.hasCompletedOnboarding !== undefined) patch.has_completed_onboarding = user.hasCompletedOnboarding;
       if (Object.keys(patch).length > 0) {
         await supabase.from('profiles').update(patch).eq('id', userId);
       }
@@ -781,6 +785,10 @@ export const useStore = create<AppState>((set, get) => ({
     }
     set((state) => ({ freelanceEntries: state.freelanceEntries.filter((e) => e.id !== id) }));
   },
+  signOut: async () => {
+    await supabase.auth.signOut();
+    set({ ...initialData });
+  },
   deleteAccount: async () => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
     if (userId) {
@@ -800,7 +808,7 @@ export const useStore = create<AppState>((set, get) => ({
       ]);
       await supabase.auth.signOut();
     }
-    set({ bills: [], debts: [], transactions: [], assets: [], subscriptions: [], goals: [], incomes: [], budgets: [], categories: [], citations: [], deductions: [], freelanceEntries: [], user: { id: '', firstName: '', lastName: '', email: '' } });
+    set({ ...initialData });
   },
 
   // Ingestion Implementation
@@ -1069,7 +1077,8 @@ export const useStore = create<AppState>((set, get) => ({
           theme: profile.theme,
           phone: profile.phone ?? '',
           timezone: profile.timezone ?? 'Eastern Time (ET)',
-          language: profile.language ?? 'English (US)',
+          language: profile.language || 'English (US)',
+          hasCompletedOnboarding: profile.has_completed_onboarding || false,
           taxState: profile.tax_state ?? 'CA',
           taxRate: profile.tax_rate ?? 35.0,
         } : initialData.user,

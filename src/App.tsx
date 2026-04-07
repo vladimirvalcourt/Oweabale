@@ -40,14 +40,28 @@ import Education from './pages/Education';
 import HelpDesk from './pages/HelpDesk';
 
 function AppRoutes() {
-  const { fetchData, isLoading } = useStore();
-  const { user, loading: authLoading } = useAuth();
+  const { user: authUser, loading: authLoading } = useAuth();
+  const { user, fetchData, isLoading, signOut: clearStore } = useStore();
 
   useEffect(() => {
-    if (user) fetchData();
-  }, [user]);
+    if (authUser) {
+      fetchData();
+    } else if (!authLoading) {
+      // Clear data if user is explicitly null and not loading
+      clearStore();
+    }
+  }, [authUser, authLoading]);
 
   if (authLoading || isLoading) return <AppLoader />;
+  
+  // If user is logged in but hasn't completed onboarding, redirect to onboarding 
+  // (unless already on that page)
+  const isNewUser = authUser && !user.hasCompletedOnboarding;
+  const isNotOnOnboarding = window.location.pathname !== '/onboarding';
+  
+  if (isNewUser && isNotOnOnboarding) {
+    return <Navigate to="/onboarding" replace />;
+  }
 
   return (
     <Routes>
