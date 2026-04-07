@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 
@@ -283,7 +284,9 @@ const initialData = {
   notifications: [],
 };
 
-export const useStore = create<AppState>((set, get) => ({
+export const useStore = create<AppState>()(
+  persist(
+    (set, get) => ({
   ...initialData,
   addNotification: (note) => set((state) => ({
     notifications: [
@@ -1011,7 +1014,12 @@ export const useStore = create<AppState>((set, get) => ({
     const userId = (await supabase.auth.getUser()).data.user?.id;
     if (!userId) return;
 
-    set({ isLoading: true });
+    // Only show the global loader if we have no local state (initial load)
+    // Background syncs are silent to maintain the 'Instant' OS feel
+    if (!get().user.id || get().user.id === '') {
+      set({ isLoading: true });
+    }
+
     try {
       const [
         { data: bills },
@@ -1195,4 +1203,25 @@ export const useStore = create<AppState>((set, get) => ({
   quickAddTab: 'transaction',
   openQuickAdd: (tab = 'transaction') => set({ isQuickAddOpen: true, quickAddTab: tab }),
   closeQuickAdd: () => set({ isQuickAddOpen: false }),
-}));
+    }),
+    {
+      name: 'oweable-store-persistence',
+      storage: createJSONStorage(() => sessionStorage),
+      // Only persist specific data to keep session safe
+      partialize: (state) => ({ 
+        user: state.user,
+        bills: state.bills,
+        debts: state.debts,
+        transactions: state.transactions,
+        assets: state.assets,
+        subscriptions: state.subscriptions,
+        goals: state.goals,
+        incomes: state.incomes,
+        budgets: state.budgets,
+        categories: state.categories,
+        citations: state.citations,
+        freelanceEntries: state.freelanceEntries
+      }),
+    }
+  )
+);

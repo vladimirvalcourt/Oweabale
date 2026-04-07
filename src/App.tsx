@@ -54,7 +54,9 @@ function AppRoutes() {
     }
   }, [authUser, authLoading]);
 
-  if (authLoading || isLoading) return <AppLoader />;
+  // Only block the entire app on authentication resolution. 
+  // Individual pages (like Dashboard) handle their own 'isLoading' states for data sync.
+  if (authLoading) return <AppLoader />;
   
   // If user is logged in but hasn't completed onboarding, redirect to onboarding 
   // (unless already on that page)
