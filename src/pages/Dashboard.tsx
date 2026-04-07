@@ -295,8 +295,8 @@ export default function Dashboard() {
         <div className="bg-surface-raised border border-surface-border p-6 rounded-sm shadow-sm md:flex md:flex-col md:justify-between">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <p className="text-xs font-mono text-zinc-400 uppercase tracking-widest mb-1">How long your money lasts</p>
-              <h2 className="text-6xl sm:text-7xl font-mono font-bold text-white tracking-tighter tabular-nums leading-none">
+              <p className="text-xs font-mono text-zinc-400 uppercase tracking-widest mb-2">How long your money lasts</p>
+              <h2 className="text-5xl sm:text-6xl font-mono font-black text-white tracking-tighter tabular-nums leading-none">
                 <AnimatedValue value={survivalMonths} decimals={1} />
                 <span className="text-xl font-sans text-zinc-500 font-medium ml-2 uppercase tracking-wide">Months</span>
               </h2>
@@ -305,12 +305,12 @@ export default function Dashboard() {
           
           <div className="grid grid-cols-2 gap-4 border-t border-surface-border pt-5">
             <div>
-              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1">Liquid Cash</p>
-              <p className="text-xl font-mono text-emerald-400 font-medium">${liquidCash.toLocaleString()}</p>
+              <p className="text-[11px] font-mono font-medium text-zinc-400 uppercase tracking-wider mb-1">Liquid Cash</p>
+              <p className="text-xl font-mono text-emerald-400 font-bold">${liquidCash.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-[11px] font-mono text-zinc-500 uppercase tracking-wider mb-1">Monthly Expenses</p>
-              <p className="text-xl font-mono text-white font-medium">${Math.round(monthlyBurn).toLocaleString()}</p>
+              <p className="text-[11px] font-mono font-medium text-zinc-400 uppercase tracking-wider mb-1">Monthly Expenses</p>
+              <p className="text-xl font-mono text-white font-bold">${Math.round(monthlyBurn).toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -339,7 +339,7 @@ export default function Dashboard() {
       </div>
 
       {/* 4. Active Intelligence Grid */}
-      <h2 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400 pl-1 mt-8 mb-3">Smart Alerts</h2>
+      <h2 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400 pl-1 mt-12 mb-3">Smart Alerts</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Tax Shield */}
@@ -479,10 +479,10 @@ export default function Dashboard() {
             
             <div className="overflow-y-auto outline-none">
               {upcomingBills.length === 0 ? (
-                <div className="p-8 text-center flex flex-col items-center">
-                  <Calendar className="w-8 h-8 text-zinc-600 mb-3" />
-                  <p className="text-sm font-sans font-medium text-zinc-300">No Upcoming Bills</p>
-                  <p className="text-xs text-zinc-500 mt-1">You are all caught up.</p>
+                <div className="m-4 p-8 text-center flex flex-col items-center bg-surface-base border border-dashed border-surface-border rounded-sm">
+                  <Calendar className="w-8 h-8 text-zinc-700/50 mb-3" />
+                  <p className="text-[11px] font-mono font-bold text-zinc-500 uppercase tracking-widest">No Bills Found</p>
+                  <p className="text-[10px] font-sans text-zinc-600 mt-1 uppercase tracking-tight">System is clear</p>
                 </div>
               ) : (
                 <ul className="divide-y divide-surface-border">
