@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { 
-  Camera, CheckCircle2, AlertCircle, Loader2, 
+import {
+  Camera, CheckCircle2, AlertCircle, Loader2,
   ShieldCheck, Zap, RefreshCw, X, ArrowRight,
-  Sun, Maximize, MousePointer2, Smartphone
+  Sun, Maximize, MousePointer2, Smartphone, FolderOpen
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
+import { validateIngestionFile } from '../lib/security';
 
 export default function MobileCapture() {
   const [searchParams] = useSearchParams();
@@ -82,6 +83,12 @@ export default function MobileCapture() {
   const handleCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const validation = validateIngestionFile(file);
+      if (!validation.ok) {
+        toast.error(validation.error);
+        e.target.value = '';
+        return;
+      }
       setCapturedImage(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -265,24 +272,46 @@ export default function MobileCapture() {
                  </div>
               </div>
 
-              {/* Shutter Section */}
-              <div className="mt-auto mb-8">
-                <div className="p-16 bg-surface-base border border-dashed border-white/[0.1] rounded-sm relative group active:scale-[0.98] transition-all overflow-hidden">
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    capture="environment" 
+              {/* Capture Options */}
+              <div className="mt-auto mb-8 flex flex-col gap-4">
+                {/* Option 1: Take Photo with Camera */}
+                <div className="relative p-10 bg-surface-base border border-dashed border-white/[0.1] rounded-sm group active:scale-[0.98] transition-all overflow-hidden">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="environment"
                     onChange={handleCapture}
                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                   />
-                  <div className="flex flex-col items-center gap-6 relative z-1">
-                    <div className="w-24 h-24 rounded-full bg-brand-indigo/5 border border-brand-violet/20 flex items-center justify-center group-hover:scale-110 group-hover:border-brand-violet/40 transition-all">
-                        <Camera className="w-10 h-10 text-brand-violet" />
+                  <div className="flex items-center gap-5 relative z-1">
+                    <div className="w-14 h-14 rounded-full bg-brand-indigo/5 border border-brand-violet/20 flex items-center justify-center group-hover:border-brand-violet/40 transition-all shrink-0">
+                      <Camera className="w-6 h-6 text-brand-violet" />
                     </div>
-                    <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.4em] font-bold group-hover:text-white transition-colors">Launch Camera</span>
+                    <div>
+                      <p className="text-[11px] font-mono font-bold text-white uppercase tracking-widest">Take Photo</p>
+                      <p className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest mt-1">Open camera and snap the document</p>
+                    </div>
                   </div>
-                  {/* Decorative Scan Line */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-violet/[0.03] to-transparent animate-scan-y opacity-50" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-violet/[0.03] to-transparent animate-scan-y opacity-50 pointer-events-none" />
+                </div>
+
+                {/* Option 2: Upload from Gallery or Files */}
+                <div className="relative p-10 bg-surface-base border border-dashed border-white/[0.1] rounded-sm group active:scale-[0.98] transition-all overflow-hidden">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                    onChange={handleCapture}
+                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="flex items-center gap-5 relative z-1">
+                    <div className="w-14 h-14 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center group-hover:border-white/20 transition-all shrink-0">
+                      <FolderOpen className="w-6 h-6 text-zinc-400" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-mono font-bold text-white uppercase tracking-widest">Upload from Device</p>
+                      <p className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest mt-1">Choose from gallery, files, or PDFs</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
