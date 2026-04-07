@@ -13,3 +13,4 @@ npm-cache/
 .1code/
 .mcp.json
 .gemini/
+\n# Oweable Local Cache Cleanup\n.npm-cache/
