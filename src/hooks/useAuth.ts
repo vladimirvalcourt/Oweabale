@@ -16,19 +16,11 @@ export function useAuth(): AuthState {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // SECURITY FIX: Strip OAuth hash fragments from the URL to prevent leakage to 3rd-party analytics
-    const stripHash = () => {
-      if (window.location.hash.includes('access_token')) {
-        history.replaceState(null, '', window.location.pathname + window.location.search);
-      }
-    };
-
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
-      stripHash();
     });
 
     // Listen for auth state changes
@@ -37,7 +29,6 @@ export function useAuth(): AuthState {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-        stripHash();
       }
     );
 
