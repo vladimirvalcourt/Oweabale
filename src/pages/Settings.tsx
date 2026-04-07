@@ -13,6 +13,7 @@ type Tab = 'profile' | 'notifications' | 'security' | 'billing' | 'financial' | 
 export default function Settings() {
   const user = useStore((state) => state.user);
   const updateUser = useStore((state) => state.updateUser);
+  const resetData = useStore((state) => state.resetData);
   const deleteAccount = useStore((state) => state.deleteAccount);
 
   const [activeTab, setActiveTab] = useState<Tab>('profile');
@@ -26,6 +27,7 @@ export default function Settings() {
   });
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
 
   const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +51,12 @@ export default function Settings() {
     setIsDeleteDialogOpen(false);
     toast.success('Account deleted successfully');
   };
+
+  const handleResetData = async () => {
+    await resetData();
+    setIsResetDialogOpen(false);
+  };
+
 
   const tabs = [
     { id: 'profile', name: 'Profile' },
@@ -593,22 +601,35 @@ export default function Settings() {
                 </div>
               </CollapsibleModule>
 
-              <CollapsibleModule title="Data Export" icon={Download} defaultOpen={false}>
-                <p className="text-sm text-zinc-400 mb-6">Manage your personal data and privacy settings.</p>
+              <CollapsibleModule title="Data Management" icon={Download} defaultOpen={true}>
+                <p className="text-sm text-zinc-400 mb-6">Manage your inputs and export your financial history.</p>
                 <div className="space-y-6">
-                  <div className="border border-surface-border rounded-sm p-4 bg-surface-elevated/50">
-                    <h4 className="text-sm font-medium text-content-primary">Export your data</h4>
-                    <p className="text-xs text-zinc-500 mt-1 mb-4">Download a copy of all your financial data, including bills, debts, and transactions in CSV format.</p>
-                    <button onClick={() => toast.success('Data export started. You will receive an email shortly.')} className="px-4 py-2 bg-surface-raised border border-surface-border rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest text-content-primary hover:bg-surface-border transition-colors focus:outline-none">
+                  <div className="border border-surface-border rounded-sm p-4 bg-surface-elevated/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-content-primary">Export your data</h4>
+                      <p className="text-xs text-zinc-500 mt-1">Download a copy of all your financial data in CSV format.</p>
+                    </div>
+                    <button onClick={() => toast.success('Data export started.')} className="px-4 py-2 bg-surface-raised border border-surface-border rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-300 hover:text-white transition-colors focus:outline-none">
                       Export Data
                     </button>
                   </div>
-                  <div className="pt-6 border-t border-surface-border">
-                    <h4 className="text-sm font-medium text-content-primary">Privacy Policy</h4>
-                    <p className="text-xs text-zinc-500 mt-1">We use bank-grade encryption to protect your data. We never sell your personal financial information to third parties. Read our full <a href="/privacy" className="text-indigo-500 hover:underline">Privacy Policy</a>.</p>
+
+                  <div className="border border-surface-border rounded-sm p-4 bg-surface-elevated/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h4 className="text-sm font-medium text-amber-500">Reset Account Data</h4>
+                      <p className="text-xs text-zinc-500 mt-1">Wipe everything and start over from scratch.</p>
+                    </div>
+                    <button 
+                      type="button" 
+                      onClick={() => setIsResetDialogOpen(true)}
+                      className="px-4 py-2 bg-amber-500/10 border border-amber-500/50 text-amber-500 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-colors focus:outline-none"
+                    >
+                      Reset Data
+                    </button>
                   </div>
                 </div>
               </CollapsibleModule>
+
 
               <CollapsibleModule title="Danger Zone" icon={AlertTriangle} defaultOpen={false} className="border-[#7F1D1D]/50 bg-red-500/5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -625,6 +646,39 @@ export default function Settings() {
           )}
         </div>
       </div>
+
+      {/* Reset Confirmation Modal */}
+      <Dialog open={isResetDialogOpen} onClose={() => setIsResetDialogOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="mx-auto max-w-sm rounded-sm bg-surface-raised border border-surface-border p-6 shadow-xl">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full border border-amber-500/50 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-amber-500" />
+              </div>
+              <Dialog.Title className="text-lg font-semibold tracking-tight text-content-primary">Reset Data?</Dialog.Title>
+            </div>
+            <Dialog.Description className="text-sm text-zinc-400 mb-6">
+              This will permanently delete all your bills, debts, assets, and transactions. Your account will remain active, but you will be sent back to the onboarding setup.
+            </Dialog.Description>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsResetDialogOpen(false)}
+                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-zinc-300 hover:bg-surface-elevated transition-colors outline-none"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleResetData}
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-sm text-sm font-medium transition-colors outline-none"
+              >
+                Reset Everything
+              </button>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
 
       {/* Delete Confirmation Modal */}
       <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} className="relative z-50">

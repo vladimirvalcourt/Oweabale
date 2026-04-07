@@ -225,6 +225,7 @@ interface AppState {
   deleteFreelanceEntry: (id: string) => Promise<void>;
   updateUser: (user: Partial<AppState['user']>) => Promise<void>;
   signOut: () => Promise<void>;
+  resetData: () => Promise<void>;
   deleteAccount: () => Promise<void>;
 
   // Ingestion Actions
@@ -789,6 +790,52 @@ export const useStore = create<AppState>((set, get) => ({
     await supabase.auth.signOut();
     set({ ...initialData });
   },
+  resetData: async () => {
+    const userId = get().user.id;
+    if (!userId) return;
+
+    set({ isLoading: true });
+    try {
+      // 1. CLEAR ALL RECODRS FROM ALL TABLES associated with this user
+      const tables = [
+        'bills', 'debts', 'transactions', 'assets', 'subscriptions', 
+        'goals', 'incomes', 'budgets', 'categories', 'citations', 
+        'deductions', 'freelance_entries'
+      ];
+
+      for (const table of tables) {
+        // Use RPC or individual calls if no RPC exists
+        await supabase.from(table).delete().eq('user_id', userId);
+      }
+
+      // 2. RESET ONBOARDING FLAG
+      await supabase.from('profiles').update({ 
+        has_completed_onboarding: false,
+        tax_state: 'CA',
+        tax_rate: 35.0
+      }).eq('id', userId);
+
+      // 3. RESET LOCAL STATE
+      set({
+        ...initialData,
+        user: {
+          ...get().user,
+          hasCompletedOnboarding: false,
+          taxState: 'CA',
+          taxRate: 35.0
+        }
+      });
+
+      toast.success('All data has been cleared. You are back at square one.');
+      window.location.href = '/onboarding';
+    } catch (error) {
+      console.error('Reset error:', error);
+      toast.error('Failed to reset account data');
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
   deleteAccount: async () => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
     if (userId) {

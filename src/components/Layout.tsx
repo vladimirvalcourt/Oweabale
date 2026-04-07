@@ -5,9 +5,10 @@ import {
   Settings, Repeat, BarChart3, Plus, Menu, X, ChevronDown, Inbox,
   Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LifeBuoy
 } from 'lucide-react';
-import { Menu as HeadlessMenu, Transition } from '@headlessui/react';
+import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
+import { AlertTriangle } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import QuickAddModal from './QuickAddModal';
@@ -37,8 +38,9 @@ export default function Layout() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const { bills, debts, transactions, subscriptions, goals, incomes, budgets, user, isQuickAddOpen, openQuickAdd, closeQuickAdd, pendingIngestions, notifications, markNotificationsRead, clearNotifications } = useStore();
+  const { bills, debts, transactions, subscriptions, goals, incomes, budgets, user, isQuickAddOpen, openQuickAdd, closeQuickAdd, resetData, pendingIngestions, notifications, markNotificationsRead, clearNotifications } = useStore();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isResetOpen, setIsResetOpen] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -495,7 +497,24 @@ export default function Layout() {
                     <HeadlessMenu.Item>
                       {({ active }) => (
                         <button
-                          onClick={() => toast.info('Restart Onboarding')}
+                          onClick={() => setIsResetOpen(true)}
+                          className={cn(
+                            'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
+                            active ? 'bg-amber-500/10 text-amber-500' : 'text-zinc-400'
+                          )}
+                        >
+                          <div className="w-4 h-4 flex items-center justify-center text-amber-500/70">
+                            <Activity className="w-4 h-4" />
+                          </div>
+                          <span>Restart Protocol</span>
+                        </button>
+                      )}
+                    </HeadlessMenu.Item>
+
+                    <HeadlessMenu.Item>
+                      {({ active }) => (
+                        <Link
+                          to="/onboarding"
                           className={cn(
                             'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
                             active ? 'bg-white/5 text-white' : 'text-zinc-400'
@@ -505,7 +524,7 @@ export default function Layout() {
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 14 4-4-4-4"></path><path d="M3 3.412C3 3.185 3.184 3 3.412 3H16.48c0.04 0 0.16 0.04 0.16 0.16V10a1 1 0 0 1-1 1h-12a1 1 0 0 1-1-1V3.412Z"></path><path d="M3 21v-8a1 1 0 1 1 2 0v8a1 1 0 1 1-2 0Z"></path></svg>
                           </div>
                           <span>Onboarding</span>
-                        </button>
+                        </Link>
                       )}
                     </HeadlessMenu.Item>
                   </div>
@@ -636,6 +655,42 @@ export default function Layout() {
 
       {/* Quick Add Modal */}
       <QuickAddModal isOpen={isQuickAddOpen} onClose={closeQuickAdd} />
+
+      {/* Global Reset Confirmation */}
+      <Dialog open={isResetOpen} onClose={() => setIsResetOpen(false)} className="relative z-[70]">
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="mx-auto max-w-sm rounded-sm bg-surface-raised border border-surface-border p-6 shadow-2xl">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="flex-shrink-0 w-10 h-10 rounded-full border border-amber-500/30 flex items-center justify-center bg-amber-500/5">
+                <AlertTriangle className="w-5 h-5 text-amber-500" />
+              </div>
+              <Dialog.Title className="text-lg font-semibold tracking-tight text-content-primary font-sans">Wipe All Data?</Dialog.Title>
+            </div>
+            <Dialog.Description className="text-[13px] text-zinc-400 mb-6 leading-relaxed font-sans">
+              This will permanently delete every bill, transaction, and financial link you've created. You will be sent back to the setup protocol to start fresh.
+            </Dialog.Description>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsResetOpen(false)}
+                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  await resetData();
+                  setIsResetOpen(false);
+                }}
+                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-sm text-[11px] font-mono font-bold uppercase tracking-widest transition-all shadow-lg shadow-amber-500/10"
+              >
+                Confirm Wipe
+              </button>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </div>
   );
 }

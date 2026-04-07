@@ -144,6 +144,16 @@ export default function Onboarding() {
           </div>
         </div>
         <div className="flex items-center gap-4">
+          <button 
+            onClick={() => {
+              updateUser({ hasCompletedOnboarding: true });
+              toast.success('Setup skipped. Welcome to your dashboard.');
+              navigate('/dashboard');
+            }}
+            className="text-[9px] font-mono text-zinc-500 hover:text-zinc-200 uppercase tracking-widest transition-colors border border-surface-border px-3 py-1 rounded-sm hover:bg-surface-elevated"
+          >
+            Skip Setup
+          </button>
           <div className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest hidden sm:block">Status: Finalizing</div>
           <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
         </div>
