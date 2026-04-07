@@ -349,10 +349,10 @@ export default function Ingestion() {
             onClick={() => fileInputRef.current?.click()}
           >
             <UploadCloud className={`w-12 h-12 mx-auto mb-6 transition-colors ${dragActive ? 'text-indigo-500' : 'text-zinc-700'}`} />
-            <h3 className="text-lg font-mono font-bold text-zinc-500 uppercase tracking-widest">No Documents</h3>
+            <h3 className="text-lg font-mono font-bold text-zinc-500 uppercase tracking-widest">Empty Inbox</h3>
             <p className="text-xs font-mono text-zinc-600 mt-2 uppercase tracking-widest">Drag and drop receipts or bills to start reading them</p>
             <div className="mt-8 inline-block px-10 py-3 bg-indigo-600 text-white text-[10px] font-mono font-bold uppercase tracking-[0.3em] shadow-lg shadow-indigo-500/20 btn-tactile">
-              UPLOAD DOCUMENTS
+              IMPORT FILES
             </div>
           </div>
         ) : (
@@ -412,7 +412,7 @@ export default function Ingestion() {
                         ) : item.status === 'ready' ? (
                           <>
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-glow-emerald" />
-                            <span className="text-[9px] font-mono font-black text-emerald-500 uppercase tracking-widest">Ready to Save</span>
+                            <span className="text-[9px] font-mono font-black text-emerald-500 uppercase tracking-widest">Verified</span>
                           </>
                         ) : (
                           <>

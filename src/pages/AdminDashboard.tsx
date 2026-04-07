@@ -20,7 +20,7 @@ export default function AdminDashboard() {
   // Live metrics from Supabase
   const metrics = [
     { label: "TOTAL USERS", value: profiles.length > 0 ? profiles.length.toLocaleString() : "—", status: "LIVE", color: "text-emerald-500" },
-    { label: "SERVER SPEED", value: "—", status: "MONITORING", color: "text-zinc-500" },
+    { label: "RESPONSE TIME", value: "—", status: "MONITORING", color: "text-zinc-500" },
     { label: "LOGIN SUCCESS RATE", value: "—", status: "MONITORING", color: "text-zinc-500" },
     { label: "BANK SYNC ERRORS", value: "—", status: "MONITORING", color: "text-zinc-500" },
   ];
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
               {/* Database */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <span className="text-xs flex items-center gap-2"><Database className="w-3.5 h-3.5 text-zinc-500"/> Core Database</span>
+                  <span className="text-xs flex items-center gap-2"><Database className="w-3.5 h-3.5 text-zinc-500"/> Main Database</span>
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                 </div>
                 <div className="space-y-2 text-[11px] text-zinc-500">
@@ -189,7 +189,7 @@ export default function AdminDashboard() {
               {/* Edge Functions */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <span className="text-xs flex items-center gap-2"><Cpu className="w-3.5 h-3.5 text-zinc-500"/> Background Tasks</span>
+                  <span className="text-xs flex items-center gap-2"><Cpu className="w-3.5 h-3.5 text-zinc-500"/> Background Processing</span>
                   <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
                 </div>
                 <div className="space-y-2 text-[11px] text-zinc-500">
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
               {/* Network / WAF */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <span className="text-xs flex items-center gap-2"><Network className="w-3.5 h-3.5 text-zinc-500"/> Network Traffic</span>
+                  <span className="text-xs flex items-center gap-2"><Network className="w-3.5 h-3.5 text-zinc-500"/> Network Firewall</span>
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                 </div>
                 <div className="space-y-2 text-[11px] text-zinc-500">
@@ -223,7 +223,7 @@ export default function AdminDashboard() {
           {/* Quick Actions & Maintenance */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <button className="bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 p-3 rounded-sm text-[11px] uppercase tracking-wider font-bold transition-all text-left">
-              Force App to Save Now
+              Force Global Sync Now
             </button>
             <button className="bg-white/5 hover:bg-white/10 text-white border border-white/10 p-3 rounded-sm text-[11px] uppercase tracking-wider transition-all text-left">
               Clear Website Memory
@@ -379,7 +379,7 @@ export default function AdminDashboard() {
               </button>
             </div>
             
-            {/* Global Ingestion Queue */}
+            {/* Universal Import Queue */}
             <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-5 flex items-center justify-between lg:col-span-3 border-t-2 border-t-zinc-700">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-white/5 rounded-full">
