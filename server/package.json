@@ -1,0 +1,25 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.ts",
+  "type": "module",
+  "scripts": {
+    "start": "ts-node server.ts",
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@sentry/node": "^10.47.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.2"
+  }
+}
