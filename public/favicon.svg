@@ -1,10 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <!-- Dark background -->
+  <!-- Pitch Black background -->
   <rect width="32" height="32" fill="#09090b"/>
-  <!-- Outer square border -->
-  <rect x="2" y="2" width="28" height="28" stroke="#4f46e5" stroke-width="2" fill="none"/>
-  <!-- Inner "O" letter mark -->
-  <rect x="8" y="8" width="16" height="16" stroke="#ffffff" stroke-width="2" fill="none"/>
-  <!-- Center dot accent -->
-  <rect x="14" y="14" width="4" height="4" fill="#4f46e5"/>
+  <!-- The Option 2 Geometric superscript X -->
+  <path d="M7 7 L13 16 L7 25 L11 25 L16 18 L21 25 L25 25 L19 16 L25 7 L21 7 L16 14 L11 7 Z" fill="#a855f7" />
+  <!-- Stark white inner industrial core -->
+  <rect x="15" y="15" width="2" height="2" fill="#ffffff"/>
 </svg>
