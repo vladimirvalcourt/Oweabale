@@ -8,6 +8,7 @@ import { motion } from 'motion/react';
 import { X, Copy, ExternalLink } from 'lucide-react';
 import { animate } from 'motion/react';
 import { useStore } from '../store/useStore';
+import { sanitizeUrl } from '../lib/security';
 import { calcMonthlyCashFlow, calcSurplusRouting } from '../lib/finance';
 
 // Helper for animated numbers
@@ -597,14 +598,20 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <label className="block text-xs font-sans font-medium text-zinc-500 mb-1.5">Online Payment Portal</label>
-                    <a 
-                      href={selectedCitation.paymentUrl} 
-                      target="_blank" 
-                      rel="noreferrer" 
-                      className="flex items-center justify-center gap-2 w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated focus-visible:ring-indigo-500"
-                    >
-                      Open Payment Portal <ExternalLink className="w-4 h-4" />
-                    </a>
+                    {sanitizeUrl(selectedCitation.paymentUrl) ? (
+                      <a
+                        href={sanitizeUrl(selectedCitation.paymentUrl)!}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        className="flex items-center justify-center gap-2 w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated focus-visible:ring-indigo-500"
+                      >
+                        Open Payment Portal <ExternalLink className="w-4 h-4" />
+                      </a>
+                    ) : (
+                      <span className="flex items-center justify-center gap-2 w-full bg-zinc-800 text-zinc-500 rounded px-4 py-2.5 text-sm font-medium cursor-not-allowed">
+                        No Payment Link Available
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

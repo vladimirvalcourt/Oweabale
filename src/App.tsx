@@ -77,7 +77,6 @@ function AppRoutes() {
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/security" element={<Security />} />
-      <Route path="/admin" element={<ErrorBoundary><AdminDashboard /></ErrorBoundary>} />
 
       {/* ── Auth route — redirect to dashboard if already signed in ── */}
       <Route
@@ -89,6 +88,9 @@ function AppRoutes() {
 
       {/* ── Protected routes — require authentication ── */}
       <Route element={<AuthGuard />}>
+        {/* Admin — authenticated users only (no public access) */}
+        <Route path="/admin" element={<ErrorBoundary><AdminDashboard /></ErrorBoundary>} />
+
         {/* Onboarding doesn't need Layout sidebar/topbar */}
         <Route path="/onboarding" element={<Onboarding />} />
         

@@ -795,7 +795,7 @@ export const useStore = create<AppState>()(
     set({ ...initialData });
   },
   resetData: async () => {
-    const userId = get().user.id;
+    const userId = (await supabase.auth.getUser()).data.user?.id;
     if (!userId) return;
 
     set({ isLoading: true });
@@ -843,6 +843,7 @@ export const useStore = create<AppState>()(
   deleteAccount: async () => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
     if (userId) {
+      // Delete all financial data rows first (belt-and-suspenders alongside ON DELETE CASCADE)
       await Promise.all([
         supabase.from('bills').delete().eq('user_id', userId),
         supabase.from('debts').delete().eq('user_id', userId),
@@ -857,6 +858,23 @@ export const useStore = create<AppState>()(
         supabase.from('deductions').delete().eq('user_id', userId),
         supabase.from('freelance_entries').delete().eq('user_id', userId),
       ]);
+
+      // Delete the auth.users record via a privileged Postgres RPC.
+      // Requires this function in Supabase:
+      //   CREATE OR REPLACE FUNCTION delete_user()
+      //   RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
+      //   BEGIN
+      //     DELETE FROM auth.users WHERE id = auth.uid();
+      //   END;
+      //   $$;
+      //   REVOKE ALL ON FUNCTION delete_user() FROM PUBLIC;
+      //   GRANT EXECUTE ON FUNCTION delete_user() TO authenticated;
+      const { error: rpcError } = await supabase.rpc('delete_user');
+      if (rpcError) {
+        // Fall back to sign-out only; the auth record will persist until manual cleanup.
+        console.error('delete_user RPC failed — auth record not removed:', rpcError.message);
+      }
+
       await supabase.auth.signOut();
     }
     set({ ...initialData });
