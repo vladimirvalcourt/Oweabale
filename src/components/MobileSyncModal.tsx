@@ -52,7 +52,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
           const newStatus = payload.new.status;
           if (newStatus === 'completed') {
             setStatus('completed');
-            toast.success('Mobile scan received!');
+            toast.success('Mobile Sync Pulse: New Document Received');
             setTimeout(() => {
               onSuccess?.();
               onClose();
@@ -67,7 +67,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [sessionId]);
+  }, [sessionId, onSuccess, onClose]);
 
   const createSession = async () => {
     setStatus('generating');
@@ -103,13 +103,6 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
       <div className="fixed inset-0 bg-black/95 backdrop-blur-md" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <Dialog.Panel className="mx-auto max-w-xl w-full bg-surface-raised border border-surface-border rounded-sm shadow-2xl overflow-hidden relative group">
-          {/* Scanning Line Background */}
-          {status === 'active' && (
-            <div className="absolute inset-0 pointer-events-none opacity-10">
-               <div className="w-full h-[1px] bg-brand-violet shadow-glow-indigo animate-scan-y"></div>
-            </div>
-          )}
-
           <div className="flex h-full flex-col md:flex-row">
             {/* Left Panel: Instructions */}
             <div className="w-full md:w-2/5 p-8 border-r border-surface-border bg-surface-base flex flex-col justify-between">
@@ -128,15 +121,15 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                 <div className="space-y-6">
                    <div className="flex gap-4">
                       <div className="shrink-0 w-5 h-5 rounded-full border border-surface-border flex items-center justify-center text-[10px] font-mono text-zinc-500">1</div>
-                      <p className="text-[11px] text-zinc-400 font-sans leading-relaxed uppercase tracking-wider">Open your phone camera</p>
+                      <p className="text-[11px] text-zinc-400 font-sans leading-relaxed uppercase tracking-wider">Open phone camera</p>
                    </div>
                    <div className="flex gap-4">
                       <div className="shrink-0 w-5 h-5 rounded-full border border-surface-border flex items-center justify-center text-[10px] font-mono text-zinc-500">2</div>
-                      <p className="text-[11px] text-zinc-400 font-sans leading-relaxed uppercase tracking-wider">Scan the QR code to bridge the secure uplink</p>
+                      <p className="text-[11px] text-zinc-400 font-sans leading-relaxed uppercase tracking-wider">Scan QR to bridge link</p>
                    </div>
                    <div className="flex gap-4">
                       <div className="shrink-0 w-5 h-5 rounded-full border border-surface-border flex items-center justify-center text-[10px] font-mono text-zinc-500">3</div>
-                      <p className="text-[11px] text-zinc-400 font-sans leading-relaxed uppercase tracking-wider">Upload document directly to Review Inbox</p>
+                      <p className="text-[11px] text-zinc-400 font-sans leading-relaxed uppercase tracking-wider">Upload to Review Inbox</p>
                    </div>
                 </div>
               </div>
@@ -144,9 +137,9 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
               <div className="mt-8">
                  <div className="flex items-center gap-2 mb-2">
                     <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                    <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest">Secure TLS Encryption</span>
+                    <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest">TLS Encryption Active</span>
                  </div>
-                 <div className="w-full h-1 bg-surface-border rounded-full overflow-hidden">
+                 <div className="w-full h-0.5 bg-surface-border rounded-full overflow-hidden">
                     <div className={cn("h-full bg-brand-violet transition-all duration-300", status === 'waiting' ? 'w-1/3' : status === 'active' ? 'w-2/3' : status === 'completed' ? 'w-full' : 'w-0')} />
                  </div>
               </div>
@@ -160,43 +153,33 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
 
                <AnimatePresence mode="wait">
                   {status === 'generating' ? (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-4">
+                    <motion.div key="generating" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-4">
                       <Loader2 className="w-8 h-8 text-brand-violet animate-spin" />
-                      <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Generating Secure Token...</p>
-                    </motion.div>
-                  ) : status === 'completed' ? (
-                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="flex flex-col items-center gap-6">
-                      <div className="w-20 h-20 rounded-full border-2 border-emerald-500 flex items-center justify-center bg-emerald-500/10 mb-2">
-                        <CheckCircle2 className="w-10 h-10 text-emerald-500" />
-                      </div>
-                      <div className="text-center">
-                        <h3 className="text-xl font-bold text-white mb-1 uppercase tracking-tight font-sans">Sync Successful</h3>
-                        <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em]">Transmission Finalized</p>
-                      </div>
+                      <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Generating Token...</p>
                     </motion.div>
                   ) : (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center max-w-[250px] w-full">
+                    <motion.div key="ready" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center max-w-[250px] w-full">
                        <div className="relative group/qr p-3 bg-zinc-900 border border-surface-border shadow-2xl">
-                          {status === 'waiting' && (
+                          {status === 'waiting' ? (
                              <img src={qrUrl} alt="QR Code" className="w-[200px] h-[200px] border-4 border-zinc-900 rounded-sm" />
-                          )}
-                          {status === 'active' && (
+                          ) : (
                              <div className="w-[200px] h-[200px] flex flex-col items-center justify-center bg-brand-violet/5 gap-3 border-4 border-brand-violet/20 animate-pulse">
-                                <Zap className="w-8 h-8 text-brand-violet" />
-                                <span className="text-[9px] font-mono text-brand-violet font-bold uppercase tracking-widest text-center">Mobile Session<br />Active...</span>
+                                <Zap className={`w-8 h-8 ${status === 'completed' ? 'text-brand-violet animate-bounce' : 'text-emerald-400'}`} />
+                                <span className={`text-[9px] font-mono font-bold uppercase tracking-widest text-center ${status === 'completed' ? 'text-brand-violet' : 'text-emerald-400'}`}>
+                                   {status === 'completed' ? 'RECEIVING DATA' : 'SESSION ACTIVE'}
+                                </span>
                              </div>
                           )}
                           
-                          {/* HUD Corner Accents */}
                           <div className="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-brand-violet"></div>
                           <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-brand-violet"></div>
                        </div>
                        
-                       <div className="mt-8 text-center">
-                          <p className={`text-[10px] font-mono uppercase tracking-[0.2em] transition-colors ${status === 'active' ? 'text-emerald-500 animate-pulse' : 'text-zinc-500'}`}>
-                            {status === 'active' ? '[Uplink_Established]' : '[Waiting_for_Scan]'}
-                          </p>
-                          {status === 'waiting' && <p className="text-[8px] text-zinc-700 font-mono mt-2 uppercase tracking-widest leading-relaxed">Expires in 10:00 — SECURE CHANNEL 004X</p>}
+                       <div className="mt-8 text-center min-h-[50px] flex flex-col items-center justify-center">
+                          {status === 'waiting' && <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest leading-relaxed">Scan to upload document.</p>}
+                          {status === 'active' && <p className="text-[10px] font-mono text-emerald-400 animate-pulse uppercase tracking-[0.2em] leading-relaxed">📱 Phone connected... waiting for photo.</p>}
+                          {status === 'completed' && <p className="text-[10px] font-mono text-brand-violet animate-pulse uppercase tracking-[0.2em] leading-relaxed">Receiving document...</p>}
+                          {status === 'waiting' && <p className="text-[8px] text-zinc-700 font-mono mt-2 uppercase tracking-widest leading-relaxed">Expires in 10:00 — CHANNEL 044</p>}
                        </div>
                     </motion.div>
                   )}

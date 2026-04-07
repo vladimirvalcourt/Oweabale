@@ -248,6 +248,8 @@ export default function Ingestion() {
     toast.success(`Saved ${readyItems.length} items to history`);
   };
 
+  const [recentlyAddedId, setRecentlyAddedId] = React.useState<string | null>(null);
+
   // ── Realtime Ingestion Sync ───────────────────────────────────
   React.useEffect(() => {
     const channel = supabase
@@ -261,8 +263,25 @@ export default function Ingestion() {
         },
         (payload) => {
           if (payload.new.source === 'mobile') {
-            toast.success('Mobile Sync Pulse: New Document Received');
+            const newId = payload.new.id;
+            setRecentlyAddedId(newId);
+            
+            toast.success('Document Received Successfully', {
+               description: `Mobile scan processed. Added to Review Inbox.`,
+               action: {
+                 label: 'View Now',
+                 onClick: () => {
+                   setSelectedId(newId);
+                   const element = document.getElementById(`ingestion-${newId}`);
+                   element?.scrollIntoView({ behavior: 'smooth' });
+                 }
+               }
+            });
+            
             useStore.getState().fetchData();
+            
+            // Clear highlight after 5 seconds
+            setTimeout(() => setRecentlyAddedId(null), 5000);
           }
         }
       )
@@ -351,7 +370,9 @@ export default function Ingestion() {
               <div key={item.id} className="bg-surface-base">
                 <motion.div 
                   layout
-                  className={`grid grid-cols-12 items-center px-6 py-4 hover:bg-surface-elevated/50 transition-colors group ${selectedId === item.id ? 'bg-surface-elevated/40 ring-1 ring-inset ring-indigo-500/30' : ''}`}
+                  id={`ingestion-${item.id}`}
+                  className={`grid grid-cols-12 items-center px-6 py-4 hover:bg-surface-elevated/50 transition-colors group ${selectedId === item.id ? 'bg-surface-elevated/40 ring-1 ring-inset ring-indigo-500/30' : ''} ${recentlyAddedId === item.id ? 'bg-brand-violet/10 animate-pulse-highlight' : ''}`}
+                  onClick={() => setSelectedId(item.id)}
                 >
                   <div className="col-span-8 md:col-span-4 flex items-center gap-4">
                     <div className="w-10 h-10 bg-surface-raised border border-surface-border rounded-sm flex items-center justify-center shrink-0">

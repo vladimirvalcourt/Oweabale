@@ -34,6 +34,15 @@ export default function MobileCapture() {
        setError('Invalid or missing capture session.');
        return;
     }
+
+    // New: Signal 'active' state on scan
+    const signalActiveScan = async () => {
+      await supabase
+        .from('document_capture_sessions')
+        .update({ status: 'active' })
+        .eq('id', sessionId);
+    };
+    signalActiveScan();
     
     // Simulate dynamic guidance
     if (status === 'capturing' && !previewUrl) {
