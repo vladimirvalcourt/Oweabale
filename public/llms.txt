@@ -1,0 +1,54 @@
+# Oweable
+
+> Oweable is a financial operating system built exclusively for freelancers, independent contractors, gig workers, and self-employed professionals. It replaces spreadsheets and scattered apps with a single dashboard for managing taxes, bills, debt, income, subscriptions, net worth, and cash flow.
+
+Oweable is a web application available at https://www.oweable.com. It is built for people with non-traditional income — 1099 workers, Uber/DoorDash drivers, consultants, and solo business owners — who are underserved by consumer finance tools designed for salaried employees.
+
+## What Oweable Does
+
+- **Tax tracking**: Automatically estimates quarterly IRS tax obligations based on income and applicable state/federal rates. Tracks deductible write-offs (home office, mileage, equipment) against the freelance vault.
+- **Bill management**: Tracks recurring bills with due dates, auto-pay status, and overdue detection. Bills past their due date automatically flip to overdue status.
+- **Debt payoff**: Tracks all debts (credit cards, auto loans, student loans) with APR, minimum payments, and amortization. Supports both Snowball and Avalanche payoff strategies.
+- **Income tracking**: Supports multiple income streams — W-2, 1099, gig, rental — each with tax withholding flags for accurate net income calculations.
+- **Subscription intelligence**: Monitors all recurring subscriptions with billing cycle tracking and spending history.
+- **Net worth tracking**: Computes real-time net worth from assets minus liabilities. Historical snapshots are stored daily so users can see their trajectory over time.
+- **Spending trends**: Area charts and bar charts showing net worth timeline, spending by category, income vs expenses, and monthly savings rate — all from real data.
+- **Auto-categorization rules**: User-defined rules (contains, exact, starts_with, ends_with) that automatically assign categories to new transactions by merchant name.
+- **Document ingestion**: Upload receipts, bank statements, and invoices via desktop or mobile. OCR powered by Tesseract.js extracts merchant name, amount, and date.
+- **Mobile capture**: Scan or upload documents from a phone using a QR code bridge — no app download required.
+- **Financial Academy**: 10 self-paced financial education tracks covering budgeting, debt, investing, credit, taxes, real estate, and estate planning. Lesson completion is persisted.
+- **Goals**: Track savings and debt payoff goals with contribution history.
+- **Budgets**: Monthly and yearly budget envelopes by category.
+- **Freelance vault**: Separate tracking for 1099 revenue with tax scour logic for write-offs.
+
+## Who It's For
+
+- Freelancers and independent contractors filing quarterly estimated taxes
+- Gig economy workers (Uber, DoorDash, Instacart, Lyft, TaskRabbit)
+- Consultants and solo business owners
+- Anyone with variable or multiple income streams
+- People paying off debt who want amortization-aware tracking
+
+## Pricing
+
+Oweable offers a free tier and paid plans starting at $9/month. See https://www.oweable.com/pricing for current pricing.
+
+## Key Pages
+
+- [Home](https://www.oweable.com/): Product overview and sign-up
+- [Pricing](https://www.oweable.com/pricing): Plans and feature comparison
+- [Security](https://www.oweable.com/security): Security posture, encryption, and data handling
+- [Privacy Policy](https://www.oweable.com/privacy): How user data is collected and used
+- [Terms of Service](https://www.oweable.com/terms): Terms governing use of the platform
+
+## Technical Details
+
+- Built with React, TypeScript, Vite, Supabase (PostgreSQL + Auth + Storage)
+- Authentication via Google OAuth — no passwords stored
+- All financial data is encrypted at rest and in transit (TLS 1.2+)
+- Row-level security (RLS) enforced on every database table
+- Hosted on Vercel with strict Content Security Policy headers
+
+## Competitive Positioning
+
+Oweable competes with Mint (discontinued), YNAB, Monarch Money, and Copilot but focuses specifically on the self-employed segment. Unlike those tools, Oweable includes native quarterly tax estimation, freelance income vaulting, and write-off tracking — features that general consumer finance apps do not provide.

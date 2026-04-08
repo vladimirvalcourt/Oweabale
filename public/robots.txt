@@ -1,5 +1,15 @@
+# Oweable — robots.txt
+# https://www.oweable.com
+
+# ── Standard crawlers ──────────────────────────────────────────
 User-agent: *
 Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+Allow: /llms.txt
+Allow: /.well-known/
 Disallow: /dashboard
 Disallow: /bills
 Disallow: /income
@@ -8,6 +18,7 @@ Disallow: /ingestion
 Disallow: /transactions
 Disallow: /budgets
 Disallow: /net-worth
+Disallow: /analytics
 Disallow: /calendar
 Disallow: /taxes
 Disallow: /goals
@@ -18,5 +29,86 @@ Disallow: /reports
 Disallow: /support
 Disallow: /settings
 Disallow: /admin
+Disallow: /onboarding
+Disallow: /capture
+
+# ── OpenAI / ChatGPT ───────────────────────────────────────────
+User-agent: GPTBot
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+Allow: /llms.txt
+
+# ── Perplexity ─────────────────────────────────────────────────
+User-agent: PerplexityBot
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+Allow: /llms.txt
+
+# ── Anthropic / Claude ─────────────────────────────────────────
+User-agent: ClaudeBot
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+Allow: /llms.txt
+
+User-agent: anthropic-ai
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+Allow: /llms.txt
+
+# ── Google Gemini / AI Overviews ───────────────────────────────
+User-agent: Google-Extended
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+Allow: /llms.txt
+
+# ── Meta / Llama ───────────────────────────────────────────────
+User-agent: Meta-ExternalAgent
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+Allow: /llms.txt
+
+# ── Cohere ─────────────────────────────────────────────────────
+User-agent: cohere-ai
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+Allow: /llms.txt
+
+# ── You.com ────────────────────────────────────────────────────
+User-agent: YouBot
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+Allow: /llms.txt
+
+# ── Common AI research scrapers ────────────────────────────────
+User-agent: CCBot
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
 
 Sitemap: https://www.oweable.com/sitemap.xml
