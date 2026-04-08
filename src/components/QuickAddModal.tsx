@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Terminal, AlertCircle } from 'lucide-react';
+import { X, Terminal, AlertCircle, ScanLine, Loader2, Camera } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 import { guessCategory } from '../lib/categorizer';
+import { validateIngestionFile } from '../lib/security';
 
 interface QuickAddModalProps {
   isOpen: boolean;
@@ -27,6 +28,86 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [source, setSource] = useState('salary');
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // Scan state
+  const [isScanning, setIsScanning] = useState(false);
+  const scanInputRef = useRef<HTMLInputElement>(null);
+
+  const handleScanFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validation = validateIngestionFile(file);
+    if (!validation.ok) {
+      toast.error(validation.error);
+      e.target.value = '';
+      return;
+    }
+
+    setIsScanning(true);
+    try {
+      let fullText = '';
+
+      if (file.type.startsWith('image/')) {
+        // Dynamic import to avoid bloating the initial bundle
+        const Tesseract = (await import('tesseract.js')).default;
+        const result = await Tesseract.recognize(file, 'eng');
+        fullText = result.data.text;
+      } else if (file.type === 'application/pdf') {
+        const pdfjsLib = await import('pdfjs-dist');
+        const pdfjsWorkerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        // Cap at 3 pages for speed — bills are never longer
+        const pages = Math.min(pdf.numPages, 3);
+        for (let i = 1; i <= pages; i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          fullText += textContent.items.map((item: any) => item.str).join(' ') + '\n';
+        }
+      }
+
+      // ── Extract amount (largest dollar value on the doc) ──
+      const amountMatches = fullText.match(/\$?\s*\d+\.\d{2}/g);
+      if (amountMatches) {
+        const amounts = amountMatches
+          .map(m => parseFloat(m.replace(/[^0-9.]/g, '')))
+          .filter(n => !isNaN(n) && n > 0 && n < 1_000_000);
+        if (amounts.length > 0) setAmount(Math.max(...amounts).toFixed(2));
+      }
+
+      // ── Extract merchant / biller from first meaningful line ──
+      const lines = fullText.split('\n').filter(l => l.trim().length > 2);
+      if (lines.length > 0) {
+        const name = lines[0].trim().substring(0, 50);
+        if (activeTab === 'transaction') setDescription(name);
+        else if (activeTab === 'obligation') setVendor(name);
+        // Auto-guess category from the name
+        const guessed = guessCategory(name);
+        if (guessed) setCategory(guessed);
+      }
+
+      // ── Extract date ──
+      const dateMatch = fullText.match(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/);
+      if (dateMatch) {
+        try {
+          const parsed = new Date(dateMatch[0]);
+          if (!isNaN(parsed.getTime())) {
+            const dateStr = parsed.toISOString().split('T')[0];
+            setDate(dateStr);
+            if (activeTab === 'obligation') setDueDate(dateStr);
+          }
+        } catch {}
+      }
+
+      toast.success('Document scanned — review the fields and save.');
+    } catch {
+      toast.error('Could not read document. Try a clearer photo.');
+    } finally {
+      setIsScanning(false);
+      e.target.value = '';
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -206,6 +287,38 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                 </div>
 
                 <div className="overflow-y-auto w-full">
+                  {/* Scan Document Strip */}
+                  <div className="bg-surface-base px-6 py-3 border-b border-surface-border flex items-center justify-between gap-3">
+                    <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                      Have a receipt or bill?
+                    </p>
+                    <label className={`relative flex items-center gap-2 px-4 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none
+                      ${isScanning
+                        ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
+                        : 'border-surface-border bg-surface-raised text-zinc-300 hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
+                      }`}>
+                      <input
+                        ref={scanInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                        className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full"
+                        onChange={handleScanFile}
+                        disabled={isScanning}
+                      />
+                      {isScanning ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          Scanning...
+                        </>
+                      ) : (
+                        <>
+                          <ScanLine className="w-3.5 h-3.5" />
+                          Scan Document
+                        </>
+                      )}
+                    </label>
+                  </div>
+
                   {/* Smart Input Bar */}
                   <div className="bg-surface-base p-6 border-b border-surface-border">
                     <div className="flex items-center gap-2 mb-3">
