@@ -289,9 +289,14 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                 <div className="overflow-y-auto w-full">
                   {/* Scan Document Strip */}
                   <div className="bg-surface-base px-6 py-3 border-b border-surface-border flex items-center justify-between gap-3">
-                    <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
-                      Have a receipt or bill?
-                    </p>
+                    <div>
+                      <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                        Scan receipt, image or PDF
+                      </p>
+                      <p className="text-[8px] font-mono text-zinc-700 uppercase tracking-widest mt-0.5">
+                        JPG · PNG · WEBP · PDF
+                      </p>
+                    </div>
                     <label className={`relative flex items-center gap-2 px-4 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none
                       ${isScanning
                         ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
@@ -312,8 +317,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         </>
                       ) : (
                         <>
-                          <ScanLine className="w-3.5 h-3.5" />
-                          Scan Document
+                          <Camera className="w-3.5 h-3.5" />
+                          Upload Image / PDF
                         </>
                       )}
                     </label>

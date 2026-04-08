@@ -196,23 +196,43 @@ export default function Ingestion() {
     // 2. Trigger OCR for new mobile syncs
     const pendingMobile = pendingIngestions.find(pi => pi.source === 'mobile' && pi.status === 'uploading');
     if (pendingMobile && pendingMobile.storageUrl) {
+       // Derive the MIME type from the storage path extension so PDFs are handled correctly
+       const extMatch = pendingMobile.storagePath?.split('.').pop()?.toLowerCase() ?? 'jpg';
+       const mimeMap: Record<string, string> = {
+         pdf: 'application/pdf',
+         jpg: 'image/jpeg',
+         jpeg: 'image/jpeg',
+         png: 'image/png',
+         webp: 'image/webp',
+         gif: 'image/gif',
+       };
+       const mimeType = mimeMap[extMatch] ?? 'image/jpeg';
        fetch(pendingMobile.storageUrl)
          .then(res => res.blob())
          .then(blob => {
-           const file = new File([blob], 'mobile_scan.jpg', { type: 'image/jpeg' });
+           const file = new File([blob], `mobile_scan.${extMatch}`, { type: mimeType });
            triggerManualScan(pendingMobile.id, file);
          });
     }
   }, [pendingIngestions]);
 
   const triggerManualScan = async (id: string, file: File) => {
-     // Reuses existing logic but targets specific item
-     // We'll refactor processFile to be reusable if needed, 
-     // but for now we'll do a focused parse.
      updatePendingIngestion(id, { status: 'scanning' });
      try {
-       const result = await Tesseract.recognize(file, 'eng');
-       const fullText = result.data.text;
+       let fullText = '';
+       if (file.type === 'application/pdf') {
+         const arrayBuffer = await file.arrayBuffer();
+         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+         const pages = Math.min(pdf.numPages, 3);
+         for (let i = 1; i <= pages; i++) {
+           const page = await pdf.getPage(i);
+           const textContent = await page.getTextContent();
+           fullText += textContent.items.map((item: any) => item.str).join(' ') + '\n';
+         }
+       } else {
+         const result = await Tesseract.recognize(file, 'eng');
+         fullText = result.data.text;
+       }
        
        const lines = fullText.split('\n').filter(line => line.trim().length > 0);
        const biller = lines.length > 0

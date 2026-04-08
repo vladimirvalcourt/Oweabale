@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
-import { validateIngestionFile } from '../lib/security';
+import { validateIngestionFile, safeExtFromMime } from '../lib/security';
 
 export default function MobileCapture() {
   const [searchParams] = useSearchParams();
@@ -20,6 +20,7 @@ export default function MobileCapture() {
   const [capturedImage, setCapturedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [guidanceText, setGuidanceText] = useState('Position document within the guides');
+  const [capturedFileType, setCapturedFileType] = useState<string>('image/jpeg');
 
   useEffect(() => {
     // Use sessionStorage (not localStorage) so captured images
@@ -27,6 +28,9 @@ export default function MobileCapture() {
     const cached = sessionStorage.getItem(`pending_upload_${sessionId}`);
     if (cached) {
       setPreviewUrl(cached);
+      // Derive MIME type from the stored data URL so the upload uses the correct content type
+      const mime = cached.match(/^data:([^;]+);/)?.[1] ?? 'image/jpeg';
+      setCapturedFileType(mime);
       setStatus('capturing');
     }
   }, [sessionId]);
@@ -90,6 +94,7 @@ export default function MobileCapture() {
         return;
       }
       setCapturedImage(file);
+      setCapturedFileType(file.type);
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
@@ -103,7 +108,7 @@ export default function MobileCapture() {
   };
 
   const handeUpload = async () => {
-    const activeImage = capturedImage || (previewUrl ? dataURLtoFile(previewUrl, 'recovered_scan.jpg') : null);
+    const activeImage = capturedImage || (previewUrl ? dataURLtoFile(previewUrl) : null);
     if (!activeImage || !sessionId || !token) return;
 
     setStatus('uploading');
@@ -119,13 +124,14 @@ export default function MobileCapture() {
       if (sessionErr || !session) throw new Error('Session not found or token is invalid.');
 
       const userId = session.user_id;
-      const fileName = `mobile_scan_${Date.now()}.jpg`;
+      const ext = safeExtFromMime(activeImage.type);
+      const fileName = `mobile_scan_${Date.now()}.${ext}`;
       const filePath = `incoming/${sessionId}/${fileName}`;
 
       const { error: uploadErr } = await supabase.storage
         .from('scans')
         .upload(filePath, activeImage, {
-          contentType: 'image/jpeg',
+          contentType: activeImage.type,
           upsert: true
         });
 
@@ -158,16 +164,17 @@ export default function MobileCapture() {
     }
   };
 
-  const dataURLtoFile = (dataurl: string, filename: string) => {
+  const dataURLtoFile = (dataurl: string) => {
     const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)?.[1];
+    const mime = arr[0].match(/:(.*?);/)?.[1] ?? 'image/jpeg';
+    const ext = safeExtFromMime(mime);
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
     while (n--) {
       u8arr[n] = bstr.charCodeAt(n);
     }
-    return new File([u8arr], filename, { type: mime });
+    return new File([u8arr], `recovered_scan.${ext}`, { type: mime });
   };
 
   if (status === 'error') {
@@ -325,7 +332,16 @@ export default function MobileCapture() {
               </div>
 
                <div className="relative aspect-[3/4] w-full bg-surface-raised border border-white/[0.12] p-1.5 rounded-sm overflow-hidden shadow-2xl flex-1">
-                 <img src={previewUrl} alt="Preview" className="w-full h-full object-cover grayscale brightness-110 contrast-125" />
+                 {capturedFileType === 'application/pdf' ? (
+                   <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-surface-base">
+                     <div className="w-20 h-20 rounded-sm border border-brand-violet/30 bg-brand-violet/5 flex items-center justify-center">
+                       <FolderOpen className="w-10 h-10 text-brand-violet" />
+                     </div>
+                     <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest">PDF Ready to Send</p>
+                   </div>
+                 ) : (
+                   <img src={previewUrl!} alt="Preview" className="w-full h-full object-cover grayscale brightness-110 contrast-125" />
+                 )}
                  
                  {/* Visual Viewfinder Overlay */}
                  <div className="absolute inset-8 border border-white/20 pointer-events-none">
