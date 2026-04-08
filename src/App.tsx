@@ -50,9 +50,8 @@ function AppRoutes() {
 
   useEffect(() => {
     if (authUser) {
-      fetchData();
+      fetchData(authUser.id);
     } else if (!authLoading) {
-      // Clear data if user is explicitly null and not loading
       clearStore();
     }
   }, [authUser, authLoading]);

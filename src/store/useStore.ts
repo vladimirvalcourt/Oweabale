@@ -244,7 +244,7 @@ interface AppState {
   commitIngestion: (id: string) => Promise<void>;
   
   // Supabase Syncing
-  fetchData: () => Promise<void>;
+  fetchData: (userId?: string) => Promise<void>;
   isLoading: boolean;
   
   // Modal State
@@ -1094,9 +1094,9 @@ export const useStore = create<AppState>()(
 
   // Supabase Implementation
   isLoading: false,
-  fetchData: async () => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (!userId) return;
+  fetchData: async (userId?: string) => {
+    const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
+    if (!resolvedUserId) return;
 
     // Only show the global loader if we have no local state (initial load)
     // Background syncs are silent to maintain the 'Instant' OS feel
@@ -1105,8 +1105,8 @@ export const useStore = create<AppState>()(
     }
 
     try {
-      // Silently flip any upcoming bills that are now past their due date
-      try { await supabase.rpc('flip_overdue_bills'); } catch { /* non-critical, continue */ }
+      // Fire non-critical RPC in background — do NOT await before queries
+      void (supabase.rpc('flip_overdue_bills') as unknown as Promise<unknown>).catch(() => {});
 
       const [
         { data: bills },
@@ -1125,21 +1125,21 @@ export const useStore = create<AppState>()(
         { data: profile },
         { data: categorizationRules }
       ] = await Promise.all([
-        supabase.from('bills').select('*').eq('user_id', userId),
-        supabase.from('debts').select('*').eq('user_id', userId),
-        supabase.from('transactions').select('*').eq('user_id', userId),
-        supabase.from('assets').select('*').eq('user_id', userId),
-        supabase.from('subscriptions').select('*').eq('user_id', userId),
-        supabase.from('goals').select('*').eq('user_id', userId),
-        supabase.from('incomes').select('*').eq('user_id', userId),
-        supabase.from('budgets').select('*').eq('user_id', userId),
-        supabase.from('categories').select('*').eq('user_id', userId),
-        supabase.from('citations').select('*').eq('user_id', userId),
-        supabase.from('deductions').select('*').eq('user_id', userId),
-        supabase.from('freelance_entries').select('*').eq('user_id', userId),
-        supabase.from('pending_ingestions').select('*').eq('user_id', userId),
-        supabase.from('profiles').select('*').eq('id', userId).single(),
-        supabase.from('categorization_rules').select('*').eq('user_id', userId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
+        supabase.from('bills').select('*').eq('user_id', resolvedUserId),
+        supabase.from('debts').select('*').eq('user_id', resolvedUserId),
+        supabase.from('transactions').select('*').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(500),
+        supabase.from('assets').select('*').eq('user_id', resolvedUserId),
+        supabase.from('subscriptions').select('*').eq('user_id', resolvedUserId),
+        supabase.from('goals').select('*').eq('user_id', resolvedUserId),
+        supabase.from('incomes').select('*').eq('user_id', resolvedUserId),
+        supabase.from('budgets').select('*').eq('user_id', resolvedUserId),
+        supabase.from('categories').select('*').eq('user_id', resolvedUserId),
+        supabase.from('citations').select('*').eq('user_id', resolvedUserId),
+        supabase.from('deductions').select('*').eq('user_id', resolvedUserId),
+        supabase.from('freelance_entries').select('*').eq('user_id', resolvedUserId),
+        supabase.from('pending_ingestions').select('*').eq('user_id', resolvedUserId),
+        supabase.from('profiles').select('*').eq('id', resolvedUserId).single(),
+        supabase.from('categorization_rules').select('*').eq('user_id', resolvedUserId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
       ]);
 
       set({
@@ -1300,7 +1300,7 @@ export const useStore = create<AppState>()(
           .from('net_worth_snapshots')
           .upsert(
             {
-              user_id:   userId,
+              user_id:   resolvedUserId,
               date:      today,
               net_worth: parseFloat((totalAssets - totalDebts).toFixed(2)),
               assets:    parseFloat(totalAssets.toFixed(2)),
