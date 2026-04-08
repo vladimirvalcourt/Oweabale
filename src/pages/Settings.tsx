@@ -25,6 +25,24 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState<Tab>('profile');
   const [ruleForm, setRuleForm] = useState({ match_type: 'contains' as const, match_value: '', category: '' });
   const [isApplying, setIsApplying] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Controlled state for preference checkboxes (persisted in-session)
+  const [notifPrefs, setNotifPrefs] = useState({
+    'bill-reminders': true,
+    'weekly-summary': true,
+    'new-login': true,
+    'push-reminders': true,
+    'push-payments': false,
+    'sniper-increase': true,
+    'sniper-renewal': true,
+    'detonator-milestone': true,
+    'detonator-rate': true,
+  });
+  const [privacyMode, setPrivacyMode] = useState(false);
+  const [biometrics, setBiometrics] = useState(false);
+
   const [formData, setFormData] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
@@ -34,17 +52,36 @@ export default function Settings() {
     language: user.language || 'English (US)',
   });
 
+  // Sync formData when store user loads (fetchData may complete after mount)
+  React.useEffect(() => {
+    setFormData({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone || '',
+      timezone: user.timezone || 'Eastern Time (ET)',
+      language: user.language || 'English (US)',
+    });
+  }, [user.id, user.firstName, user.lastName, user.email]);
+
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
 
-  const handleProfileSubmit = (e: React.FormEvent) => {
+  const handleProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.firstName || !formData.lastName || !formData.email) {
       toast.error('Please fill in all required fields');
       return;
     }
-    updateUser(formData);
-    toast.success('Profile updated successfully');
+    setIsSaving(true);
+    try {
+      await updateUser(formData);
+      toast.success('Profile updated successfully');
+    } catch {
+      toast.error('Failed to save profile');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -54,10 +91,16 @@ export default function Settings() {
     });
   };
 
-  const handleDeleteAccount = () => {
-    deleteAccount();
-    setIsDeleteDialogOpen(false);
-    toast.success('Account deleted successfully');
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteAccount();
+      setIsDeleteDialogOpen(false);
+      toast.success('Account deleted successfully');
+    } catch {
+      toast.error('Failed to delete account. Please try again.');
+      setIsDeleting(false);
+    }
   };
 
   const handleResetData = async () => {
@@ -136,7 +179,7 @@ export default function Settings() {
                       <div className="space-y-1">
                         <label className="inline-block cursor-pointer px-4 py-1.5 bg-transparent border border-surface-border rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-300 hover:bg-surface-elevated transition-colors relative">
                           Update Picture
-                          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => {
+                          <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="absolute inset-0 opacity-0 cursor-pointer" onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (!file) return;
                             const validation = validateAvatarFile(file);
@@ -145,12 +188,19 @@ export default function Settings() {
                               e.target.value = '';
                               return;
                             }
-                            const reader = new FileReader();
-                            reader.onload = (ev) => {
-                              updateUser({ avatar: ev.target?.result as string });
-                              toast.success('Profile picture updated');
-                            };
-                            reader.readAsDataURL(file);
+                            const ext = file.name.split('.').pop() ?? 'jpg';
+                            const path = `${user.id}/avatar.${ext}`;
+                            const { error: uploadError } = await supabase.storage
+                              .from('avatars')
+                              .upload(path, file, { upsert: true, contentType: file.type });
+                            if (uploadError) {
+                              toast.error('Failed to upload picture');
+                              return;
+                            }
+                            const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path);
+                            await updateUser({ avatar: publicUrl });
+                            toast.success('Profile picture updated');
+                            e.target.value = '';
                           }} />
                         </label>
                         <p className="text-[9px] font-mono text-zinc-600 shadow-none uppercase tracking-widest block pt-2">User ID: OWE_{user.id?.substring(0, 8)}</p>
@@ -169,8 +219,11 @@ export default function Settings() {
                       </div>
 
                       <div className="sm:col-span-4">
-                        <label htmlFor="email" className="block text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-widest mb-2">Email Address</label>
-                        <input type="email" id="email" value={formData.email} onChange={handleChange} required className="focus:border-indigo-500 block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-zinc-200 rounded-sm px-3 py-2 border transition-colors outline-none" />
+                        <label htmlFor="email" className="block text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-widest mb-2">
+                          Email Address
+                          <span className="ml-2 text-zinc-600 normal-case tracking-normal font-normal">(managed by Google)</span>
+                        </label>
+                        <input type="email" id="email" value={formData.email} readOnly className="block w-full text-[13px] font-mono border-surface-border bg-surface-base text-zinc-500 rounded-sm px-3 py-2 border outline-none cursor-not-allowed select-none" />
                       </div>
 
                       <div className="sm:col-span-4">
@@ -200,8 +253,9 @@ export default function Settings() {
                     </div>
 
                     <div className="pt-8 flex justify-end">
-                      <button type="submit" className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors shadow-lg shadow-indigo-500/10">
-                        Save Changes
+                      <button type="submit" disabled={isSaving} className="flex items-center gap-2 px-6 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors shadow-lg shadow-indigo-500/10">
+                        {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
+                        {isSaving ? 'Saving...' : 'Save Changes'}
                       </button>
                     </div>
                   </form>
@@ -282,7 +336,8 @@ export default function Settings() {
                   <div className="flex items-center h-5">
                     <input
                       type="checkbox"
-                      onChange={(e) => toast.success(e.target.checked ? 'Biometrics enabled' : 'Biometrics disabled')}
+                      checked={biometrics}
+                      onChange={(e) => { setBiometrics(e.target.checked); toast.success(e.target.checked ? 'Biometrics enabled' : 'Biometrics disabled'); }}
                       className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                     />
                   </div>
@@ -377,19 +432,12 @@ export default function Settings() {
 
               <CollapsibleModule title="Payment Methods" icon={CreditCardIcon} defaultOpen={false}>
                 <p className="text-sm text-zinc-400 mb-6">Manage payment methods used for your subscriptions.</p>
-                <div className="border border-surface-border rounded-sm p-4 flex items-center justify-between mb-4 bg-surface-elevated/50">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-8 bg-surface-raised rounded-sm flex items-center justify-center border border-surface-border">
-                      <CreditCardIcon className="w-5 h-5 text-zinc-500" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-content-primary">Visa ending in 4242</p>
-                      <p className="text-[10px] font-mono uppercase tracking-[0.1em] text-zinc-500">Expires 12/2028</p>
-                    </div>
-                  </div>
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-content-primary bg-surface-border px-2 py-1 rounded-sm">Default</span>
+                <div className="border border-surface-border border-dashed rounded-sm p-6 flex flex-col items-center justify-center text-center mb-4 bg-surface-base">
+                  <CreditCardIcon className="w-8 h-8 text-zinc-700 mb-3" />
+                  <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest">No payment method on file</p>
+                  <p className="text-[10px] font-mono text-zinc-700 mt-1">Free tier — no billing required</p>
                 </div>
-                <button onClick={() => toast.success('Add payment method opened')} className="text-sm font-medium text-content-primary hover:text-white transition-colors bg-surface-elevated px-4 py-2 border border-surface-border rounded-sm focus:outline-none">
+                <button onClick={() => toast.success('Payment method flow coming soon')} className="text-sm font-medium text-content-primary hover:text-white transition-colors bg-surface-elevated px-4 py-2 border border-surface-border rounded-sm focus:outline-none">
                   + Add Payment Method
                 </button>
               </CollapsibleModule>
@@ -402,9 +450,9 @@ export default function Settings() {
                 <p className="text-sm text-zinc-400 mb-6">Choose what updates you want to receive via email.</p>
                 <div className="space-y-6">
                   {[
-                    { id: 'bill-reminders', label: 'Bill Reminders', desc: 'Get notified 3 days before a bill is due.', defaultChecked: true },
-                    { id: 'weekly-summary', label: 'Weekly Summary', desc: 'Receive a weekly overview of your spending and upcoming bills.', defaultChecked: true },
-                    { id: 'new-login', label: 'New Device Login', desc: 'Security alerts when your account is accessed from a new device.', defaultChecked: true },
+                    { id: 'bill-reminders' as const, label: 'Bill Reminders', desc: 'Get notified 3 days before a bill is due.' },
+                    { id: 'weekly-summary' as const, label: 'Weekly Summary', desc: 'Receive a weekly overview of your spending and upcoming bills.' },
+                    { id: 'new-login' as const, label: 'New Device Login', desc: 'Security alerts when your account is accessed from a new device.' },
                   ].map((item) => (
                     <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
                       <div className="pr-4">
@@ -415,8 +463,8 @@ export default function Settings() {
                         <input
                           id={item.id}
                           type="checkbox"
-                          defaultChecked={item.defaultChecked}
-                          onChange={() => toast.success('Preference updated')}
+                          checked={notifPrefs[item.id]}
+                          onChange={(e) => { setNotifPrefs(p => ({ ...p, [item.id]: e.target.checked })); toast.success('Preference updated'); }}
                           className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                         />
                       </div>
@@ -429,8 +477,8 @@ export default function Settings() {
                 <p className="text-sm text-zinc-400 mb-6">Manage notifications delivered directly to your device.</p>
                 <div className="space-y-6">
                   {[
-                    { id: 'push-reminders', label: 'Due Date Alerts', desc: 'Immediate alerts on the day a bill is due.', defaultChecked: true },
-                    { id: 'push-payments', label: 'Payment Confirmations', desc: 'Get notified when a payment is successfully recorded.', defaultChecked: false },
+                    { id: 'push-reminders' as const, label: 'Due Date Alerts', desc: 'Immediate alerts on the day a bill is due.' },
+                    { id: 'push-payments' as const, label: 'Payment Confirmations', desc: 'Get notified when a payment is successfully recorded.' },
                   ].map((item) => (
                     <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
                       <div className="pr-4">
@@ -441,8 +489,8 @@ export default function Settings() {
                         <input
                           id={item.id}
                           type="checkbox"
-                          defaultChecked={item.defaultChecked}
-                          onChange={() => toast.success('Preference updated')}
+                          checked={notifPrefs[item.id]}
+                          onChange={(e) => { setNotifPrefs(p => ({ ...p, [item.id]: e.target.checked })); toast.success('Preference updated'); }}
                           className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                         />
                       </div>
@@ -455,10 +503,10 @@ export default function Settings() {
                 <p className="text-sm text-zinc-400 mb-6">Advanced notifications powered by our algorithms.</p>
                 <div className="space-y-6">
                   {[
-                    { id: 'sniper-increase', label: 'Subscription Sniper: Price Hikes', desc: 'Alert me instantly if a subscription price increases.', defaultChecked: true },
-                    { id: 'sniper-renewal', label: 'Subscription Sniper: Auto-Renewals', desc: 'Alert me 7 days before an annual subscription renews.', defaultChecked: true },
-                    { id: 'detonator-milestone', label: 'Debt Detonator: Milestones', desc: 'Celebrate when I pay off 25%, 50%, 75%, and 100% of a debt.', defaultChecked: true },
-                    { id: 'detonator-rate', label: 'Debt Detonator: Rate Changes', desc: 'Alert me if a variable interest rate changes.', defaultChecked: true },
+                    { id: 'sniper-increase' as const, label: 'Subscription Sniper: Price Hikes', desc: 'Alert me instantly if a subscription price increases.' },
+                    { id: 'sniper-renewal' as const, label: 'Subscription Sniper: Auto-Renewals', desc: 'Alert me 7 days before an annual subscription renews.' },
+                    { id: 'detonator-milestone' as const, label: 'Debt Detonator: Milestones', desc: 'Celebrate when I pay off 25%, 50%, 75%, and 100% of a debt.' },
+                    { id: 'detonator-rate' as const, label: 'Debt Detonator: Rate Changes', desc: 'Alert me if a variable interest rate changes.' },
                   ].map((item) => (
                     <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
                       <div className="pr-4">
@@ -469,8 +517,8 @@ export default function Settings() {
                         <input
                           id={item.id}
                           type="checkbox"
-                          defaultChecked={item.defaultChecked}
-                          onChange={() => toast.success('Smart alert updated')}
+                          checked={notifPrefs[item.id]}
+                          onChange={(e) => { setNotifPrefs(p => ({ ...p, [item.id]: e.target.checked })); toast.success('Smart alert updated'); }}
                           className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                         />
                       </div>
@@ -609,7 +657,8 @@ export default function Settings() {
                   <div className="flex items-center h-5">
                     <input
                       type="checkbox"
-                      onChange={(e) => toast.success(e.target.checked ? 'Privacy mode enabled' : 'Privacy mode disabled')}
+                      checked={privacyMode}
+                      onChange={(e) => { setPrivacyMode(e.target.checked); toast.success(e.target.checked ? 'Privacy mode enabled' : 'Privacy mode disabled'); }}
                       className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                     />
                   </div>
@@ -842,9 +891,11 @@ export default function Settings() {
               </button>
               <button
                 onClick={handleDeleteAccount}
-                className="px-4 py-2 bg-[#EF4444] hover:bg-[#DC2626] text-white rounded-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-red-500"
+                disabled={isDeleting}
+                className="flex items-center gap-2 px-4 py-2 bg-[#EF4444] hover:bg-[#DC2626] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-red-500"
               >
-                Delete
+                {isDeleting && <Loader2 className="w-3 h-3 animate-spin" />}
+                {isDeleting ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </Dialog.Panel>
