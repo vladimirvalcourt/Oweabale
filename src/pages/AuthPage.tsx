@@ -18,7 +18,7 @@ export default function AuthPage() {
       if (!containerRef.current || !w.turnstile || widgetIdRef.current) return;
       try {
         widgetIdRef.current = w.turnstile.render(containerRef.current, {
-          sitekey: '1x00000000000000000000AA', // TEST KEY — always passes
+          sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
           theme: 'light',
           size: 'flexible',
           callback: (token: string) => {
