@@ -1216,6 +1216,26 @@ export const useStore = create<AppState>()(
         } : initialData.user,
         isLoading: false
       });
+
+      // Upsert today's net worth snapshot for historical trending.
+      // Uses raw fetched arrays so we don't depend on store propagation timing.
+      try {
+        const totalAssets = (assets || []).reduce((s: number, a: any) => s + ((a.value as number) || 0), 0);
+        const totalDebts  = (debts  || []).reduce((s: number, d: any) => s + ((d.remaining as number) || 0), 0);
+        const today = new Date().toISOString().split('T')[0];
+        await supabase
+          .from('net_worth_snapshots')
+          .upsert(
+            {
+              user_id:   userId,
+              date:      today,
+              net_worth: parseFloat((totalAssets - totalDebts).toFixed(2)),
+              assets:    parseFloat(totalAssets.toFixed(2)),
+              debts:     parseFloat(totalDebts.toFixed(2)),
+            },
+            { onConflict: 'user_id,date' }
+          );
+      } catch { /* non-critical — silently skip */ }
     } catch {
       set({ isLoading: false });
     }

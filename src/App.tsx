@@ -40,6 +40,7 @@ const Security       = lazy(() => import('./pages/Security'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const Education      = lazy(() => import('./pages/Education'));
 const HelpDesk       = lazy(() => import('./pages/HelpDesk'));
+const Analytics      = lazy(() => import('./pages/Analytics'));
 import AuthCallback from './pages/AuthCallback';
 const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
 
@@ -113,6 +114,7 @@ function AppRoutes() {
           <Route path="categories" element={<ErrorBoundary><Categories /></ErrorBoundary>} />
           <Route path="subscriptions" element={<ErrorBoundary><Subscriptions /></ErrorBoundary>} />
           <Route path="reports" element={<ErrorBoundary><Reports /></ErrorBoundary>} />
+          <Route path="analytics" element={<ErrorBoundary><Analytics /></ErrorBoundary>} />
           <Route path="support" element={<ErrorBoundary><HelpDesk /></ErrorBoundary>} />
           <Route path="settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
         </Route>

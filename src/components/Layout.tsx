@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Bell, Search, Home, Receipt, CreditCard, Target, Activity,
   Settings, Repeat, BarChart3, Plus, Menu, X, ChevronDown, Inbox,
-  Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LifeBuoy
+  Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LifeBuoy, LineChart
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -141,6 +141,7 @@ export default function Layout() {
     {
       label: 'Activity',
       items: [
+        { name: 'Trends', path: '/analytics', icon: LineChart },
         { name: 'Reports', path: '/reports', icon: BarChart3 },
         { name: 'Transactions', path: '/transactions', icon: Activity },
         { name: 'Support', path: '/support', icon: LifeBuoy },
