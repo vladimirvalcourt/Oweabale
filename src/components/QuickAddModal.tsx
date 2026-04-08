@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Terminal, AlertCircle, Loader2, Camera } from 'lucide-react';
+import { X, Terminal, AlertCircle, Loader2, Camera, Eye, EyeOff } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
@@ -32,7 +32,25 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   // Scan state
   const [isScanning, setIsScanning] = useState(false);
+  const [scannedPreviewUrl, setScannedPreviewUrl] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
   const scanInputRef = useRef<HTMLInputElement>(null);
+
+  // Noise patterns that should be skipped when finding a merchant name
+  const RECEIPT_NOISE = /^(receipt|invoice|thank you|thanks|welcome|store|branch|tel:|phone:|www\.|http|address:|date:|time:|cashier|order #|order:|transaction|subtotal|total|tax|amount|change|cash|card|approved|auth|ref:|refund|void|copy|customer|#\d+|\d{3}[-.\s]\d{3}[-.\s]\d{4}|\d{1,5}\s+\w+\s+(st|ave|blvd|rd|dr|lane|ln|way|ct|pl|suite))/i;
+
+  const extractMerchantName = (lines: string[]): string | null => {
+    // Prefer lines that look like business names: mixed/upper case, no digits-only, not noise
+    for (const line of lines.slice(0, 10)) {
+      const trimmed = line.trim();
+      if (trimmed.length < 3 || trimmed.length > 60) continue;
+      if (RECEIPT_NOISE.test(trimmed)) continue;
+      if (/^\d+$/.test(trimmed)) continue; // pure number line
+      if (/^\$[\d.,]+$/.test(trimmed)) continue; // pure dollar amount
+      return trimmed.substring(0, 50);
+    }
+    return null;
+  };
 
   const handleScanFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -45,12 +63,21 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       return;
     }
 
+    // Generate preview URL for images; show PDF placeholder
+    if (file.type.startsWith('image/')) {
+      const url = URL.createObjectURL(file);
+      setScannedPreviewUrl(url);
+      setShowPreview(true);
+    } else {
+      setScannedPreviewUrl(null);
+      setShowPreview(false);
+    }
+
     setIsScanning(true);
     try {
       let fullText = '';
 
       if (file.type.startsWith('image/')) {
-        // Dynamic import to avoid bloating the initial bundle
         const Tesseract = (await import('tesseract.js')).default;
         const result = await Tesseract.recognize(file, 'eng');
         fullText = result.data.text;
@@ -60,7 +87,6 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        // Cap at 3 pages for speed — bills are never longer
         const pages = Math.min(pdf.numPages, 3);
         for (let i = 1; i <= pages; i++) {
           const page = await pdf.getPage(i);
@@ -69,28 +95,33 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         }
       }
 
-      // ── Extract amount (largest dollar value on the doc) ──
-      const amountMatches = fullText.match(/\$?\s*\d+\.\d{2}/g);
+      // ── Extract amount: largest dollar value, ignoring obvious tax/subtotal lines ──
+      const amountMatches = fullText.match(/\$?\s*\d{1,6}\.\d{2}/g);
       if (amountMatches) {
         const amounts = amountMatches
           .map(m => parseFloat(m.replace(/[^0-9.]/g, '')))
-          .filter(n => !isNaN(n) && n > 0 && n < 1_000_000);
+          .filter(n => !isNaN(n) && n > 0 && n < 100_000);
         if (amounts.length > 0) setAmount(Math.max(...amounts).toFixed(2));
       }
 
-      // ── Extract merchant / biller from first meaningful line ──
+      // ── Extract merchant: skip noise, find first meaningful line ──
       const lines = fullText.split('\n').filter(l => l.trim().length > 2);
-      if (lines.length > 0) {
-        const name = lines[0].trim().substring(0, 50);
-        if (activeTab === 'transaction') setDescription(name);
-        else if (activeTab === 'obligation') setVendor(name);
-        // Auto-guess category from the name
-        const guessed = guessCategory(name);
+      const merchantName = extractMerchantName(lines);
+      if (merchantName) {
+        if (activeTab === 'transaction') setDescription(merchantName);
+        else if (activeTab === 'obligation') setVendor(merchantName);
+        const guessed = guessCategory(merchantName);
+        if (guessed) setCategory(guessed);
+      }
+
+      // ── Fallback: if no merchant from lines, run guessCategory across full text ──
+      if (!merchantName) {
+        const guessed = guessCategory(fullText.substring(0, 500));
         if (guessed) setCategory(guessed);
       }
 
       // ── Extract date ──
-      const dateMatch = fullText.match(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/);
+      const dateMatch = fullText.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/);
       if (dateMatch) {
         try {
           const parsed = new Date(dateMatch[0]);
@@ -105,7 +136,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       if (!fullText.trim()) {
         toast.warning('Could not extract text — fill in the fields manually.');
       } else {
-        toast.success('Document scanned — review the fields and save.');
+        toast.success('Document scanned — review the pre-filled fields and save.');
       }
     } catch {
       toast.error('Could not read document. Try a clearer photo or PDF.');
@@ -130,6 +161,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       setIsScanning(false);
       setErrors({});
       if (scanInputRef.current) scanInputRef.current.value = '';
+      setScannedPreviewUrl(prev => { if (prev) URL.revokeObjectURL(prev); return null; });
+      setShowPreview(false);
     }
   }, [isOpen, quickAddTab]);
 
@@ -304,40 +337,75 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
 
                 <div className="overflow-y-auto w-full">
                   {/* Scan Document Strip */}
-                  <div className="bg-surface-base px-6 py-3 border-b border-surface-border flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
-                        Scan receipt, image or PDF
-                      </p>
-                      <p className="text-[8px] font-mono text-zinc-700 uppercase tracking-widest mt-0.5">
-                        JPG · PNG · WEBP · PDF
-                      </p>
+                  <div className="bg-surface-base border-b border-surface-border">
+                    <div className="px-6 py-3 flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                          Scan receipt, image or PDF
+                        </p>
+                        <p className="text-[8px] font-mono text-zinc-700 uppercase tracking-widest mt-0.5">
+                          JPG · PNG · WEBP · PDF
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {scannedPreviewUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setShowPreview(p => !p)}
+                            className={`p-2 rounded-sm border transition-all ${showPreview ? 'border-indigo-500/50 text-indigo-400 bg-indigo-500/10' : 'border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated'}`}
+                            title={showPreview ? 'Hide document' : 'Show document'}
+                          >
+                            {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                          </button>
+                        )}
+                        <label className={`relative flex items-center gap-2 px-4 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none
+                          ${isScanning
+                            ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
+                            : 'border-surface-border bg-surface-raised text-zinc-300 hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
+                          }`}>
+                          <input
+                            ref={scanInputRef}
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                            className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full"
+                            onChange={handleScanFile}
+                            disabled={isScanning}
+                          />
+                          {isScanning ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              Scanning...
+                            </>
+                          ) : (
+                            <>
+                              <Camera className="w-3.5 h-3.5" />
+                              {scannedPreviewUrl ? 'Rescan' : 'Upload Image / PDF'}
+                            </>
+                          )}
+                        </label>
+                      </div>
                     </div>
-                    <label className={`relative flex items-center gap-2 px-4 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none
-                      ${isScanning
-                        ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
-                        : 'border-surface-border bg-surface-raised text-zinc-300 hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
-                      }`}>
-                      <input
-                        ref={scanInputRef}
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
-                        className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full"
-                        onChange={handleScanFile}
-                        disabled={isScanning}
-                      />
-                      {isScanning ? (
-                        <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          Scanning...
-                        </>
-                      ) : (
-                        <>
-                          <Camera className="w-3.5 h-3.5" />
-                          Upload Image / PDF
-                        </>
+
+                    {/* Document Preview Panel */}
+                    <AnimatePresence>
+                      {showPreview && scannedPreviewUrl && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden border-t border-surface-border"
+                        >
+                          <div className="relative max-h-56 overflow-hidden bg-black flex items-center justify-center">
+                            <img
+                              src={scannedPreviewUrl}
+                              alt="Scanned document"
+                              className="max-h-56 w-auto object-contain"
+                            />
+                          </div>
+                        </motion.div>
                       )}
-                    </label>
+                    </AnimatePresence>
                   </div>
 
                   {/* Smart Input Bar */}
