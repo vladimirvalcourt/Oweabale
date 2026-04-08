@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 
@@ -8,26 +8,51 @@ export default function AuthPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileStatus, setTurnstileStatus] = useState<TurnstileStatus>('idle');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // Register global callbacks that Cloudflare Turnstile will call by name
-    (window as any).onTurnstileSuccess = (token: string) => {
-      setTurnstileToken(token);
-      setTurnstileStatus('solved');
-    };
-    (window as any).onTurnstileError = () => {
-      setTurnstileToken(null);
-      setTurnstileStatus('error');
-    };
-    (window as any).onTurnstileExpire = () => {
-      setTurnstileToken(null);
-      setTurnstileStatus('expired');
+    const w = window as any;
+
+    const renderWidget = () => {
+      if (!containerRef.current || !w.turnstile || widgetIdRef.current) return;
+      try {
+        widgetIdRef.current = w.turnstile.render(containerRef.current, {
+          sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
+          theme: 'light',
+          size: 'flexible',
+          callback: (token: string) => {
+            setTurnstileToken(token);
+            setTurnstileStatus('solved');
+          },
+          'error-callback': () => {
+            setTurnstileToken(null);
+            setTurnstileStatus('error');
+          },
+          'expired-callback': () => {
+            setTurnstileToken(null);
+            setTurnstileStatus('expired');
+          },
+        });
+      } catch {
+        setTurnstileStatus('error');
+      }
     };
 
+    if (w.turnstile) {
+      // Script already loaded before this component mounted
+      renderWidget();
+    } else {
+      // Script hasn't loaded yet — wire up its onload callback
+      w.onTurnstileScriptReady = renderWidget;
+    }
+
     return () => {
-      delete (window as any).onTurnstileSuccess;
-      delete (window as any).onTurnstileError;
-      delete (window as any).onTurnstileExpire;
+      delete w.onTurnstileScriptReady;
+      if (widgetIdRef.current && w.turnstile) {
+        try { w.turnstile.remove(widgetIdRef.current); } catch {}
+        widgetIdRef.current = null;
+      }
     };
   }, []);
 
@@ -42,6 +67,10 @@ export default function AuthPage() {
 
       if (verifyRes.error || !verifyRes.data?.success) {
         toast.error('Security check failed. Please try again.');
+        const w = window as any;
+        if (widgetIdRef.current && w.turnstile) {
+          try { w.turnstile.reset(widgetIdRef.current); } catch {}
+        }
         setTurnstileToken(null);
         setTurnstileStatus('idle');
         setGoogleLoading(false);
@@ -97,16 +126,8 @@ export default function AuthPage() {
           </p>
         </div>
 
-        {/* Cloudflare Turnstile — auto-rendered via data attributes */}
-        <div
-          className="cf-turnstile mb-4"
-          data-sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
-          data-callback="onTurnstileSuccess"
-          data-error-callback="onTurnstileError"
-          data-expired-callback="onTurnstileExpire"
-          data-theme="light"
-          data-size="flexible"
-        />
+        {/* Turnstile widget container */}
+        <div ref={containerRef} className="mb-4" />
         {turnstileStatus === 'expired' && (
           <p className="font-mono text-[10px] text-yellow-500 mb-2 uppercase tracking-wider">
             Security check expired — please verify again.
