@@ -15,58 +15,55 @@ export function useAuth(): AuthState {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Mount once — get initial session and subscribe to auth changes.
+  // Dep array is intentionally empty: the onAuthStateChange subscription
+  // handles all subsequent session updates without re-running this effect.
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    // SECURITY FIX: JWT Expiry Drift / Idle Timeout Protection
-    let idleTimer: NodeJS.Timeout;
-
-    const resetIdleTimer = () => {
-      clearTimeout(idleTimer);
-      if (session) {
-        idleTimer = setTimeout(() => {
-          supabase.auth.signOut();
-        }, IDLE_TIMEOUT_MS);
-      }
-    };
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
     // BFCACHE RE-VALIDATION: Prevents session bypass when clicking 'Back'
     const handlePageShow = (event: PageTransitionEvent) => {
-      if (event.persisted) {
-        window.location.reload(); 
-      }
+      if (event.persisted) window.location.reload();
     };
-
     window.addEventListener('pageshow', handlePageShow);
-    
-    // Listen to standard user interaction events to keep session alive
-    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
-    events.forEach((event) => window.addEventListener(event, resetIdleTimer));
-    
-    // Initialize the timer
-    resetIdleTimer();
 
     return () => {
       subscription.unsubscribe();
-      clearTimeout(idleTimer);
       window.removeEventListener('pageshow', handlePageShow);
-      events.forEach((event) => window.removeEventListener(event, resetIdleTimer));
     };
-  }, [session?.user?.id]); // Re-bind timeout when user changes
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Idle timeout — separate effect so it cleanly re-binds when session changes
+  // without disturbing the auth subscription above.
+  useEffect(() => {
+    if (!session) return;
+
+    let idleTimer: ReturnType<typeof setTimeout>;
+
+    const resetIdleTimer = () => {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => supabase.auth.signOut(), IDLE_TIMEOUT_MS);
+    };
+
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'] as const;
+    events.forEach(e => window.addEventListener(e, resetIdleTimer));
+    resetIdleTimer();
+
+    return () => {
+      clearTimeout(idleTimer);
+      events.forEach(e => window.removeEventListener(e, resetIdleTimer));
+    };
+  }, [session]);
 
   return { user, session, loading };
 }

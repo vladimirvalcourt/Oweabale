@@ -1098,51 +1098,33 @@ export const useStore = create<AppState>()(
     const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
     if (!resolvedUserId) return;
 
-    // Only show the global loader if we have no local state (initial load)
-    // Background syncs are silent to maintain the 'Instant' OS feel
-    if (!get().user.id || get().user.id === '') {
-      set({ isLoading: true });
-    }
+    const isFirstLoad = !get().user.id || get().user.id === '';
+    if (isFirstLoad) set({ isLoading: true });
+
+    // Fire non-critical RPC in background
+    void (supabase.rpc('flip_overdue_bills') as unknown as Promise<unknown>).catch(() => {});
 
     try {
-      // Fire non-critical RPC in background — do NOT await before queries
-      void (supabase.rpc('flip_overdue_bills') as unknown as Promise<unknown>).catch(() => {});
-
+      // ── PHASE 1: Critical data — dashboard needs this to render ──────────
       const [
+        { data: profile },
         { data: bills },
         { data: debts },
         { data: transactions },
         { data: assets },
-        { data: subscriptions },
-        { data: goals },
         { data: incomes },
-        { data: budgets },
-        { data: categories },
-        { data: citations },
-        { data: deductions },
-        { data: freelanceEntries },
-        { data: pendingIngestions },
-        { data: profile },
-        { data: categorizationRules }
       ] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', resolvedUserId).single(),
         supabase.from('bills').select('*').eq('user_id', resolvedUserId),
         supabase.from('debts').select('*').eq('user_id', resolvedUserId),
         supabase.from('transactions').select('*').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(500),
         supabase.from('assets').select('*').eq('user_id', resolvedUserId),
-        supabase.from('subscriptions').select('*').eq('user_id', resolvedUserId),
-        supabase.from('goals').select('*').eq('user_id', resolvedUserId),
         supabase.from('incomes').select('*').eq('user_id', resolvedUserId),
-        supabase.from('budgets').select('*').eq('user_id', resolvedUserId),
-        supabase.from('categories').select('*').eq('user_id', resolvedUserId),
-        supabase.from('citations').select('*').eq('user_id', resolvedUserId),
-        supabase.from('deductions').select('*').eq('user_id', resolvedUserId),
-        supabase.from('freelance_entries').select('*').eq('user_id', resolvedUserId),
-        supabase.from('pending_ingestions').select('*').eq('user_id', resolvedUserId),
-        supabase.from('profiles').select('*').eq('id', resolvedUserId).single(),
-        supabase.from('categorization_rules').select('*').eq('user_id', resolvedUserId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
       ]);
 
+      // Release the loader as soon as critical data is ready
       set({
+        isLoading: false,
         bills: (bills || []).map((b: Record<string, unknown>) => ({
           id: b.id as string,
           biller: b.biller as string,
@@ -1182,6 +1164,57 @@ export const useStore = create<AppState>()(
           purchasePrice: (a.purchase_price ?? undefined) as number | undefined,
           purchaseDate: (a.purchase_date ?? undefined) as string | undefined,
         })),
+        incomes: (incomes || []).map((i: Record<string, unknown>) => ({
+          id: i.id as string,
+          name: i.name as string,
+          amount: i.amount as number,
+          frequency: i.frequency as IncomeSource['frequency'],
+          category: i.category as string,
+          nextDate: (i.next_date ?? i.nextDate) as string,
+          status: i.status as IncomeSource['status'],
+          isTaxWithheld: (i.is_tax_withheld ?? i.isTaxWithheld ?? false) as boolean,
+        })),
+        user: profile ? {
+          id: profile.id,
+          firstName: profile.first_name,
+          lastName: profile.last_name,
+          email: profile.email,
+          avatar: profile.avatar,
+          theme: profile.theme,
+          phone: profile.phone ?? '',
+          timezone: profile.timezone ?? 'Eastern Time (ET)',
+          language: profile.language || 'English (US)',
+          hasCompletedOnboarding: profile.has_completed_onboarding || false,
+          taxState: profile.tax_state ?? '',
+          taxRate: profile.tax_rate ?? 0,
+          isAdmin: profile.is_admin === true,
+        } : get().user,
+      });
+
+      // ── PHASE 2: Secondary data — loads silently while user sees dashboard ─
+      const [
+        { data: subscriptions },
+        { data: goals },
+        { data: budgets },
+        { data: categories },
+        { data: citations },
+        { data: deductions },
+        { data: freelanceEntries },
+        { data: pendingIngestions },
+        { data: categorizationRules },
+      ] = await Promise.all([
+        supabase.from('subscriptions').select('*').eq('user_id', resolvedUserId),
+        supabase.from('goals').select('*').eq('user_id', resolvedUserId),
+        supabase.from('budgets').select('*').eq('user_id', resolvedUserId),
+        supabase.from('categories').select('*').eq('user_id', resolvedUserId),
+        supabase.from('citations').select('*').eq('user_id', resolvedUserId),
+        supabase.from('deductions').select('*').eq('user_id', resolvedUserId),
+        supabase.from('freelance_entries').select('*').eq('user_id', resolvedUserId),
+        supabase.from('pending_ingestions').select('*').eq('user_id', resolvedUserId),
+        supabase.from('categorization_rules').select('*').eq('user_id', resolvedUserId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
+      ]);
+
+      set({
         subscriptions: (subscriptions || []).map((s: Record<string, unknown>) => ({
           id: s.id as string,
           name: s.name as string,
@@ -1199,16 +1232,6 @@ export const useStore = create<AppState>()(
           deadline: g.deadline as string,
           type: g.type as Goal['type'],
           color: g.color as string,
-        })),
-        incomes: (incomes || []).map((i: Record<string, unknown>) => ({
-          id: i.id as string,
-          name: i.name as string,
-          amount: i.amount as number,
-          frequency: i.frequency as IncomeSource['frequency'],
-          category: i.category as string,
-          nextDate: (i.next_date ?? i.nextDate) as string,
-          status: i.status as IncomeSource['status'],
-          isTaxWithheld: (i.is_tax_withheld ?? i.isTaxWithheld ?? false) as boolean,
         })),
         budgets: (budgets || []).map((b: Record<string, unknown>) => ({
           id: b.id as string,
@@ -1263,23 +1286,8 @@ export const useStore = create<AppState>()(
           extractedData: pi.extracted_data || {},
           originalFile: pi.original_file || {},
           storagePath: pi.storage_path,
-          storageUrl: pi.storage_url
+          storageUrl: pi.storage_url,
         })),
-        user: profile ? {
-          id: profile.id,
-          firstName: profile.first_name,
-          lastName: profile.last_name,
-          email: profile.email,
-          avatar: profile.avatar,
-          theme: profile.theme,
-          phone: profile.phone ?? '',
-          timezone: profile.timezone ?? 'Eastern Time (ET)',
-          language: profile.language || 'English (US)',
-          hasCompletedOnboarding: profile.has_completed_onboarding || false,
-          taxState: profile.tax_state ?? 'CA',
-          taxRate: profile.tax_rate ?? 35.0,
-          isAdmin: profile.is_admin === true,
-        } : initialData.user,
         categorizationRules: (categorizationRules || []).map((r: any) => ({
           id:          r.id as string,
           match_type:  r.match_type as CategorizationRule['match_type'],
@@ -1287,11 +1295,9 @@ export const useStore = create<AppState>()(
           category:    r.category as string,
           priority:    r.priority as number,
         })),
-        isLoading: false
       });
 
       // Upsert today's net worth snapshot for historical trending.
-      // Uses raw fetched arrays so we don't depend on store propagation timing.
       try {
         const totalAssets = (assets || []).reduce((s: number, a: any) => s + ((a.value as number) || 0), 0);
         const totalDebts  = (debts  || []).reduce((s: number, d: any) => s + ((d.remaining as number) || 0), 0);
