@@ -63,6 +63,13 @@ export default function Settings() {
   const [privacyMode, setPrivacyMode] = useState(false);
   const [biometrics, setBiometrics] = useState(false);
 
+  // Preferences tab — controlled selects
+  const [prefCurrency, setPrefCurrency] = useState('USD ($)');
+  const [prefDateFormat, setPrefDateFormat] = useState('MM/DD/YYYY');
+  const [prefFiscalYear, setPrefFiscalYear] = useState('January');
+  const [prefDashboardView, setPrefDashboardView] = useState('Net Worth Overview');
+  const [prefSpendingLimit, setPrefSpendingLimit] = useState('5000');
+
   const [formData, setFormData] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
@@ -88,11 +95,12 @@ export default function Settings() {
   useEffect(() => {
     if (activeTab !== 'support') return;
     setTicketsLoading(true);
-    supabase
-      .from('support_tickets')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .then(({ data, error }) => {
+    const load = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('support_tickets')
+          .select('*')
+          .order('created_at', { ascending: false });
         if (!error && data) {
           setTickets(data.map((t: Record<string, any>) => ({
             id: t.ticket_number,
@@ -103,8 +111,11 @@ export default function Settings() {
             department: t.department,
           })));
         }
+      } finally {
         setTicketsLoading(false);
-      });
+      }
+    };
+    load();
   }, [activeTab]);
 
   const handleSubmitTicket = async (e: React.FormEvent) => {
@@ -181,8 +192,13 @@ export default function Settings() {
     }
   };
 
+  const [isResettingData, setIsResettingData] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+
   const handleResetData = async () => {
+    setIsResettingData(true);
     await resetData();
+    setIsResettingData(false);
     setIsResetDialogOpen(false);
   };
 
@@ -356,7 +372,9 @@ export default function Settings() {
                   const confirmPw = (form.elements.namedItem('confirmPassword') as HTMLInputElement).value;
                   if (newPw !== confirmPw) { toast.error('Passwords do not match'); return; }
                   if (newPw.length < 8) { toast.error('Password must be at least 8 characters'); return; }
+                  setIsUpdatingPassword(true);
                   const { error } = await supabase.auth.updateUser({ password: newPw });
+                  setIsUpdatingPassword(false);
                   if (error) { toast.error(error.message); return; }
                   toast.success('Password updated successfully');
                   form.reset();
@@ -370,8 +388,9 @@ export default function Settings() {
                     <input name="confirmPassword" type="password" required className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors" />
                   </div>
                   <div className="pt-2">
-                    <button type="submit" className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500">
-                      Update Password
+                    <button type="submit" disabled={isUpdatingPassword} className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500">
+                      {isUpdatingPassword && <Loader2 className="w-3 h-3 animate-spin" />}
+                      {isUpdatingPassword ? 'Updating...' : 'Update Password'}
                     </button>
                   </div>
                 </form>
@@ -409,7 +428,7 @@ export default function Settings() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-content-primary">App Lock</p>
-                      <p className="text-xs text-zinc-500">Currently disabled</p>
+                      <p className="text-xs text-zinc-500">{biometrics ? 'Currently enabled' : 'Currently disabled'}</p>
                     </div>
                   </div>
                   <div className="flex items-center h-5">
@@ -617,7 +636,7 @@ export default function Settings() {
                 <div className="space-y-4 max-w-md">
                   <div>
                     <label className="block text-sm font-semibold text-zinc-300">Primary Currency</label>
-                    <select className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors">
+                    <select value={prefCurrency} onChange={e => setPrefCurrency(e.target.value)} className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors">
                       <option>USD ($)</option>
                       <option>EUR (€)</option>
                       <option>GBP (£)</option>
@@ -626,7 +645,7 @@ export default function Settings() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-zinc-300">Date Format</label>
-                    <select className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors">
+                    <select value={prefDateFormat} onChange={e => setPrefDateFormat(e.target.value)} className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors">
                       <option>MM/DD/YYYY</option>
                       <option>DD/MM/YYYY</option>
                       <option>YYYY-MM-DD</option>
@@ -634,7 +653,7 @@ export default function Settings() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-zinc-300">Fiscal Year Start</label>
-                    <select className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors">
+                    <select value={prefFiscalYear} onChange={e => setPrefFiscalYear(e.target.value)} className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors">
                       <option>January</option>
                       <option>April</option>
                       <option>July</option>
@@ -643,7 +662,7 @@ export default function Settings() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-zinc-300">Default Dashboard View</label>
-                    <select className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors">
+                    <select value={prefDashboardView} onChange={e => setPrefDashboardView(e.target.value)} className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors">
                       <option>Net Worth Overview</option>
                       <option>Upcoming Bills</option>
                       <option>Debt Detonator Timeline</option>
@@ -666,7 +685,7 @@ export default function Settings() {
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <span className="text-zinc-500 sm:text-sm">$</span>
                       </div>
-                      <input type="number" defaultValue={5000} className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm py-2 border transition-colors" />
+                      <input type="number" value={prefSpendingLimit} onChange={e => setPrefSpendingLimit(e.target.value)} className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm py-2 border transition-colors" />
                     </div>
                   </div>
                   <div className="pt-2">
@@ -1070,9 +1089,11 @@ export default function Settings() {
               </button>
               <button
                 onClick={handleResetData}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-sm text-sm font-medium transition-colors outline-none"
+                disabled={isResettingData}
+                className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-medium transition-colors outline-none"
               >
-                Reset Everything
+                {isResettingData && <Loader2 className="w-3 h-3 animate-spin" />}
+                {isResettingData ? 'Resetting...' : 'Reset Everything'}
               </button>
             </div>
           </Dialog.Panel>
