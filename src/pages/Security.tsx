@@ -2,8 +2,15 @@ import React from 'react';
 import { ShieldCheck, Database, Key, ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
+import { useSEO } from '../hooks/useSEO';
 
 export default function Security() {
+  useSEO({
+    title: 'Security — Oweable',
+    description: 'How Oweable protects your financial data. TLS encryption, row-level security, Google OAuth, and regular penetration testing — built for the self-employed.',
+    canonical: 'https://www.oweable.com/security',
+  });
+
   return (
     <>
     <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-brand-violet/30">

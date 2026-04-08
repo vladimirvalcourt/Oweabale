@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import { Check, Plus, Minus } from 'lucide-react';
+import { useSEO } from '../hooks/useSEO';
 
 function useInView(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
@@ -49,6 +50,12 @@ function FaqItem({ question, answer }: { question: string, answer: string }) {
 }
 
 export default function Pricing() {
+  useSEO({
+    title: 'Pricing — Oweable',
+    description: 'Simple, transparent pricing for freelancers and self-employed professionals. Start free. Upgrade when ready.',
+    canonical: 'https://www.oweable.com/pricing',
+  });
+
   const [scrolled, setScrolled] = useState(false);
   const [isYearly, setIsYearly] = useState(false);
   

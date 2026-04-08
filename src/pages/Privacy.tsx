@@ -2,8 +2,15 @@ import React from 'react';
 import { Shield, Lock, Eye, FileText, ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
+import { useSEO } from '../hooks/useSEO';
 
 export default function Privacy() {
+  useSEO({
+    title: 'Privacy Policy — Oweable',
+    description: "Oweable's privacy policy. We don't sell your data. Learn what we collect, how we use it, and how you can delete it.",
+    canonical: 'https://www.oweable.com/privacy',
+  });
+
   return (
     <>
     <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-brand-violet/30">

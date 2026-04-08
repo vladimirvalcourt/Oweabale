@@ -2,8 +2,15 @@ import React from 'react';
 import { FileText, Award, Scale, ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
+import { useSEO } from '../hooks/useSEO';
 
 export default function Terms() {
+  useSEO({
+    title: 'Terms of Service — Oweable',
+    description: 'Terms of Service for Oweable. Read the terms that govern your use of the Oweable financial platform.',
+    canonical: 'https://www.oweable.com/terms',
+  });
+
   return (
     <>
     <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-brand-violet/30">

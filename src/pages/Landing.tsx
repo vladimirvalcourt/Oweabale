@@ -5,6 +5,7 @@ import { ArrowRight, UploadCloud, ShieldCheck, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
+import { useSEO } from '../hooks/useSEO';
 
 function useInView(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
@@ -75,6 +76,12 @@ function WordCycler() {
 }
 
 export default function Landing() {
+  useSEO({
+    title: 'Oweable — Financial OS for Freelancers & Self-Employed',
+    description: 'Oweable is the financial operating system for freelancers, independent contractors, and gig workers. Track quarterly taxes, manage bills, pay off debt, and build net worth — all in one dashboard.',
+    canonical: 'https://www.oweable.com/',
+  });
+
   const [scrolled, setScrolled] = useState(false);
   const user = useStore((state) => state.user);
   
