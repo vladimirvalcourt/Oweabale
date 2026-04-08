@@ -360,10 +360,10 @@ export default function MobileCapture() {
                   </button>
                   
                   <button 
-                    onClick={() => { 
-                        localStorage.removeItem(`pending_upload_${sessionId}`);
-                        setPreviewUrl(null); 
-                        setStatus('idle'); 
+                    onClick={() => {
+                        sessionStorage.removeItem(`pending_upload_${sessionId}`);
+                        setPreviewUrl(null);
+                        setStatus('idle');
                     }}
                     disabled={status === 'uploading'}
                     className="w-full py-4 bg-white/5 border border-white/5 text-zinc-500 hover:text-white transition-all text-[9px] font-mono font-bold uppercase tracking-[0.4em]"

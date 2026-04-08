@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog } from '@headlessui/react';
-import { 
-  X, Smartphone, Camera, Loader2, CheckCircle2, 
-  AlertTriangle, RefreshCw, Smartphone as MobileIcon, 
-  ArrowRight, ShieldCheck, Zap
+import {
+  X, Smartphone, Loader2, CheckCircle2,
+  AlertTriangle, ShieldCheck, Zap
 } from 'lucide-react';
+import QRCode from 'qrcode';
 import { supabase } from '../lib/supabase';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
@@ -20,9 +20,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
   const [token, setToken] = useState<string | null>(null);
   const [status, setStatus] = useState<'generating' | 'waiting' | 'active' | 'completed' | 'expired'>('generating');
   const [error, setError] = useState<string | null>(null);
-
-  const syncUrl = sessionId ? `${window.location.origin}/capture?id=${sessionId}&t=${token}` : '';
-  const qrUrl = sessionId ? `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(syncUrl)}&bgcolor=18181b&color=ffffff` : '';
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
@@ -30,9 +28,23 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
     } else {
       setSessionId(null);
       setToken(null);
+      setQrDataUrl(null);
       setStatus('generating');
+      setError(null);
     }
   }, [isOpen]);
+
+  // Generate QR code locally (no external requests — CSP safe)
+  useEffect(() => {
+    if (!sessionId || !token) return;
+    const syncUrl = `${window.location.origin}/capture?id=${sessionId}&t=${token}`;
+    QRCode.toDataURL(syncUrl, {
+      width: 220,
+      margin: 2,
+      color: { dark: '#ffffff', light: '#09090b' },
+      errorCorrectionLevel: 'M',
+    }).then(setQrDataUrl).catch(() => setStatus('expired'));
+  }, [sessionId, token]);
 
   // Listen for session updates
   useEffect(() => {
@@ -160,7 +172,9 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                     <motion.div key="ready" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center max-w-[250px] w-full">
                        <div className="relative group/qr p-3 bg-zinc-900 border border-surface-border shadow-2xl">
                           {status === 'waiting' ? (
-                             <img src={qrUrl} alt="QR Code" className="w-[200px] h-[200px] border-4 border-zinc-900 rounded-sm" />
+                             qrDataUrl
+                               ? <img src={qrDataUrl} alt="QR Code" className="w-[200px] h-[200px] rounded-sm" />
+                               : <div className="w-[200px] h-[200px] flex items-center justify-center"><Loader2 className="w-6 h-6 text-brand-violet animate-spin" /></div>
                           ) : (
                              <div className="w-[200px] h-[200px] flex flex-col items-center justify-center bg-brand-violet/5 gap-3 border-4 border-brand-violet/20 animate-pulse">
                                 <Zap className={`w-8 h-8 ${status === 'completed' ? 'text-brand-violet animate-bounce' : 'text-emerald-400'}`} />
