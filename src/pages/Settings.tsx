@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
 import { validateAvatarFile } from '../lib/security';
 import { supabase } from '../lib/supabase';
 import { Dialog } from '@headlessui/react';
-import { AlertTriangle, Lock, Shield, Smartphone, CreditCard as CreditCardIcon, CheckCircle2, Plus, X, Building2, Loader2, Search, Download, Fingerprint, EyeOff, FileSpreadsheet, FileText, User, Mail, BellRing, BrainCircuit, Palette, Globe, PieChart, Filter, Trash2, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Lock, Shield, Smartphone, CreditCard as CreditCardIcon, CheckCircle2, Plus, X, Building2, Loader2, Search, Download, Fingerprint, EyeOff, FileSpreadsheet, FileText, User, Mail, BellRing, BrainCircuit, Palette, Globe, PieChart, Filter, Trash2, RefreshCw, LifeBuoy, MessageSquare, AlertCircle, Clock, Send } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import BankConnection from '../components/BankConnection';
 
-type Tab = 'profile' | 'notifications' | 'security' | 'billing' | 'financial' | 'privacy' | 'integrations' | 'rules';
+type Tab = 'profile' | 'notifications' | 'security' | 'billing' | 'financial' | 'privacy' | 'integrations' | 'rules' | 'support';
+
+interface SupportTicket {
+  id: string;
+  subject: string;
+  status: 'Open' | 'In Progress' | 'Resolved';
+  priority: 'Low' | 'Normal' | 'Urgent';
+  date: string;
+  department: string;
+}
 
 export default function Settings() {
   const user = useStore((state) => state.user);
@@ -27,6 +36,17 @@ export default function Settings() {
   const [isApplying, setIsApplying] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Support tab state
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [ticketsLoading, setTicketsLoading] = useState(false);
+  const [isSubmittingTicket, setIsSubmittingTicket] = useState(false);
+  const [supportForm, setSupportForm] = useState({
+    subject: '',
+    department: 'General Support',
+    priority: 'Normal',
+    description: '',
+  });
 
   // Controlled state for preference checkboxes (persisted in-session)
   const [notifPrefs, setNotifPrefs] = useState({
@@ -63,6 +83,64 @@ export default function Settings() {
       language: user.language || 'English (US)',
     });
   }, [user.id, user.firstName, user.lastName, user.email]);
+
+  // Load tickets when support tab is opened
+  useEffect(() => {
+    if (activeTab !== 'support') return;
+    setTicketsLoading(true);
+    supabase
+      .from('support_tickets')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (!error && data) {
+          setTickets(data.map((t: Record<string, any>) => ({
+            id: t.ticket_number,
+            subject: t.subject,
+            status: t.status as SupportTicket['status'],
+            priority: t.priority as SupportTicket['priority'],
+            date: (t.created_at as string).split('T')[0],
+            department: t.department,
+          })));
+        }
+        setTicketsLoading(false);
+      });
+  }, [activeTab]);
+
+  const handleSubmitTicket = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!supportForm.subject.trim() || !supportForm.description.trim()) {
+      toast.error('Subject and description are required');
+      return;
+    }
+    setIsSubmittingTicket(true);
+    const { data, error } = await supabase
+      .from('support_tickets')
+      .insert({
+        subject: supportForm.subject.trim(),
+        description: supportForm.description.trim(),
+        department: supportForm.department,
+        priority: supportForm.priority,
+      })
+      .select()
+      .single();
+    setIsSubmittingTicket(false);
+    if (error) {
+      toast.error('Failed to submit ticket. Please try again.');
+      return;
+    }
+    const newTicket: SupportTicket = {
+      id: data.ticket_number,
+      subject: data.subject,
+      status: data.status,
+      priority: data.priority,
+      date: (data.created_at as string).split('T')[0],
+      department: data.department,
+    };
+    setTickets(prev => [newTicket, ...prev]);
+    setSupportForm({ subject: '', department: 'General Support', priority: 'Normal', description: '' });
+    toast.success(`Ticket ${data.ticket_number} submitted`);
+  };
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
@@ -118,6 +196,7 @@ export default function Settings() {
     { id: 'billing', name: 'Billing' },
     { id: 'integrations', name: 'Integrations' },
     { id: 'privacy', name: 'Data & Privacy' },
+    { id: 'support', name: 'Support' },
   ] as const;
 
   return (
@@ -827,6 +906,139 @@ export default function Settings() {
                     {isApplying ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
                     Apply Retroactively
                   </button>
+                </div>
+              </CollapsibleModule>
+            </div>
+          )}
+
+          {/* ── Support Tab ─────────────────────────────────────────── */}
+          {activeTab === 'support' && (
+            <div className="space-y-6">
+              {/* Submit a request */}
+              <CollapsibleModule title="Submit a Support Request" icon={LifeBuoy}>
+                <div className="-mx-6 -my-6 p-6 bg-surface-base">
+                  <form onSubmit={handleSubmitTicket} className="space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">
+                        What do you need help with?
+                      </label>
+                      <input
+                        type="text"
+                        value={supportForm.subject}
+                        onChange={e => setSupportForm(f => ({ ...f, subject: e.target.value }))}
+                        className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500 placeholder:text-zinc-600"
+                        placeholder="Brief summary of your issue or question..."
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">Category</label>
+                        <select
+                          value={supportForm.department}
+                          onChange={e => setSupportForm(f => ({ ...f, department: e.target.value }))}
+                          className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none"
+                        >
+                          <option>General Support</option>
+                          <option>Integrations</option>
+                          <option>Calculations</option>
+                          <option>Bug Report</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">Priority</label>
+                        <select
+                          value={supportForm.priority}
+                          onChange={e => setSupportForm(f => ({ ...f, priority: e.target.value }))}
+                          className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none"
+                        >
+                          <option value="Low">Low — general question</option>
+                          <option value="Normal">Normal — something isn't working</option>
+                          <option value="Urgent">Urgent — blocking me completely</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">
+                        Describe the issue in detail
+                      </label>
+                      <textarea
+                        value={supportForm.description}
+                        onChange={e => setSupportForm(f => ({ ...f, description: e.target.value }))}
+                        className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 h-32 resize-none placeholder:text-zinc-600"
+                        placeholder="Include steps to reproduce, what you expected vs what happened, and any relevant details..."
+                      />
+                    </div>
+
+                    <div className="flex justify-end pt-2">
+                      <button
+                        type="submit"
+                        disabled={isSubmittingTicket}
+                        className="flex items-center gap-2 px-6 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors"
+                      >
+                        {isSubmittingTicket ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
+                        {isSubmittingTicket ? 'Sending...' : 'Submit Request'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </CollapsibleModule>
+
+              {/* Ticket history */}
+              <CollapsibleModule
+                title="My Tickets"
+                icon={MessageSquare}
+                extraHeader={
+                  <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                    {tickets.length} ticket{tickets.length !== 1 ? 's' : ''}
+                  </span>
+                }
+                defaultOpen={false}
+              >
+                <div className="-mx-6 -my-6 bg-surface-base">
+                  {ticketsLoading ? (
+                    <div className="p-10 flex justify-center">
+                      <Loader2 className="w-5 h-5 text-zinc-500 animate-spin" />
+                    </div>
+                  ) : tickets.length === 0 ? (
+                    <div className="p-10 text-center">
+                      <MessageSquare className="w-7 h-7 text-zinc-700 mx-auto mb-3" />
+                      <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest">No tickets yet.</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-surface-border">
+                      {tickets.map(ticket => (
+                        <div key={ticket.id} className="p-5 hover:bg-surface-elevated transition-colors flex items-center justify-between">
+                          <div className="flex items-center gap-4 min-w-0">
+                            <div className={`p-1.5 border rounded-sm shrink-0 ${
+                              ticket.status === 'Resolved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
+                              ticket.status === 'In Progress' ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' :
+                              'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                            }`}>
+                              {ticket.status === 'Resolved' ? <CheckCircle2 className="w-4 h-4" /> :
+                               ticket.status === 'In Progress' ? <Clock className="w-4 h-4" /> :
+                               <AlertCircle className="w-4 h-4" />}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                                <span className="text-[9px] font-mono text-zinc-500">{ticket.id}</span>
+                                <span className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-sm border ${
+                                  ticket.priority === 'Urgent' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' :
+                                  'bg-surface-elevated border-surface-border text-zinc-500'
+                                }`}>{ticket.priority}</span>
+                              </div>
+                              <p className="text-sm text-content-primary truncate">{ticket.subject}</p>
+                            </div>
+                          </div>
+                          <div className="text-right shrink-0 ml-4">
+                            <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest">{ticket.status}</div>
+                            <div className="text-[10px] font-mono text-zinc-600 mt-0.5">{ticket.date}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </CollapsibleModule>
             </div>

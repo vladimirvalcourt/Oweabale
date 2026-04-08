@@ -144,7 +144,6 @@ export default function Layout() {
         { name: 'Trends', path: '/analytics', icon: LineChart },
         { name: 'Reports', path: '/reports', icon: BarChart3 },
         { name: 'Transactions', path: '/transactions', icon: Activity },
-        { name: 'Support', path: '/support', icon: LifeBuoy },
       ]
     },
     {
