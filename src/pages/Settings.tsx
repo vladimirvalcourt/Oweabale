@@ -36,6 +36,15 @@ export default function Settings() {
   const [isApplying, setIsApplying] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [mfaEnabled, setMfaEnabled] = useState<boolean | null>(null); // null = loading
+
+  // Check real MFA status from Supabase
+  useEffect(() => {
+    supabase.auth.mfa.listFactors().then(({ data }) => {
+      const verified = (data?.totp ?? []).filter((f: any) => f.status === 'verified');
+      setMfaEnabled(verified.length > 0);
+    }).catch(() => setMfaEnabled(false));
+  }, []);
 
   // Support tab state
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
@@ -400,22 +409,28 @@ export default function Settings() {
                 <p className="text-sm text-zinc-400 mb-6">Add additional security to your account using two-factor authentication.</p>
                 <div className="flex items-center justify-between border border-surface-border rounded-sm p-4 bg-surface-elevated/50">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 border border-surface-border rounded-full flex items-center justify-center bg-surface-raised">
-                      <CheckCircle2 className="w-5 h-5 text-[#22C55E]" />
+                    <div className={`w-10 h-10 border rounded-full flex items-center justify-center ${mfaEnabled ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-surface-border bg-surface-raised'}`}>
+                      {mfaEnabled === null
+                        ? <Loader2 className="w-5 h-5 text-zinc-500 animate-spin" />
+                        : mfaEnabled
+                          ? <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                          : <Shield className="w-5 h-5 text-zinc-500" />
+                      }
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-content-primary">2FA is enabled</p>
-                      <p className="text-sm text-zinc-500">Authenticator App</p>
+                      <p className="text-sm font-medium text-content-primary">
+                        {mfaEnabled === null ? 'Checking status...' : mfaEnabled ? '2FA is enabled' : '2FA is not enabled'}
+                      </p>
+                      <p className="text-sm text-zinc-500">
+                        {mfaEnabled ? 'Authenticator App' : 'Add an extra layer of security to your account'}
+                      </p>
                     </div>
                   </div>
-                  <div className="flex gap-3">
-                    <button onClick={() => toast.success('Recovery codes generated')} className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-zinc-300 hover:bg-surface-elevated transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500">
-                      Recovery Codes
+                  {mfaEnabled === false && (
+                    <button onClick={() => toast.info('2FA setup coming soon')} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-sm text-sm font-medium text-white transition-colors">
+                      Enable 2FA
                     </button>
-                    <button onClick={() => toast.success('2FA settings opened')} className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-zinc-300 hover:bg-surface-elevated transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500">
-                      Manage
-                    </button>
-                  </div>
+                  )}
                 </div>
               </CollapsibleModule>
 
@@ -444,27 +459,20 @@ export default function Settings() {
 
               <CollapsibleModule title="Active Sessions" icon={Smartphone} defaultOpen={false}>
                 <p className="text-sm text-zinc-400 mb-6">Manage and log out your active sessions on other browsers and devices.</p>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between p-4 border border-surface-border bg-surface-elevated/50 rounded-sm">
                     <div className="flex items-center gap-4">
                       <Smartphone className="w-6 h-6 text-zinc-500" />
                       <div>
-                        <p className="text-sm font-medium text-content-primary">MacBook Pro - Chrome</p>
-                        <p className="text-xs text-zinc-500">San Francisco, CA • Active now</p>
+                        <p className="text-sm font-medium text-content-primary">Current Session</p>
+                        <p className="text-xs text-zinc-500">Signed in as {user.email}</p>
                       </div>
                     </div>
-                    <span className="text-xs font-medium text-[#22C55E] border border-surface-border px-2 py-1 rounded-full bg-surface-raised">Current</span>
+                    <span className="text-xs font-medium text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded-full bg-emerald-500/10">Active</span>
                   </div>
-                  <div className="flex items-center justify-between p-4 border border-surface-border bg-surface-elevated/50 rounded-sm">
-                    <div className="flex items-center gap-4">
-                      <Smartphone className="w-6 h-6 text-zinc-500" />
-                      <div>
-                        <p className="text-sm font-medium text-content-primary">iPhone 13 - Safari</p>
-                        <p className="text-xs text-zinc-500">San Francisco, CA • Last active 2 hours ago</p>
-                      </div>
-                    </div>
-                    <button onClick={() => toast.success('Session logged out')} className="text-sm font-medium text-[#EF4444] hover:text-[#DC2626] bg-surface-raised px-3 py-1.5 rounded-sm border border-surface-border">Log out</button>
-                  </div>
+                  <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
+                    Multi-device session management is not yet available.
+                  </p>
                 </div>
               </CollapsibleModule>
             </div>
@@ -496,35 +504,10 @@ export default function Settings() {
 
               <CollapsibleModule title="Billing History" icon={Download} defaultOpen={false}>
                 <p className="text-sm text-zinc-400 mb-6">View and download your previous invoices.</p>
-                <div className="border border-surface-border rounded-sm overflow-hidden">
-                  <table className="w-full text-left text-sm text-zinc-400">
-                    <thead className="bg-surface-elevated border-b border-surface-border text-[10px] font-mono uppercase tracking-widest text-content-primary">
-                      <tr>
-                        <th className="px-6 py-3 font-medium">Date</th>
-                        <th className="px-6 py-3 font-medium">Amount</th>
-                        <th className="px-6 py-3 font-medium">Status</th>
-                        <th className="px-6 py-3 font-medium text-right">Invoice</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-surface-border">
-                      <tr className="hover:bg-surface-elevated/50 transition-colors">
-                        <td className="px-6 py-4 font-mono text-xs">Mar 15, 2026</td>
-                        <td className="px-6 py-4 font-mono text-content-primary tabular-nums">$0.00</td>
-                        <td className="px-6 py-4"><span className="text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-sm text-[10px] font-mono uppercase tracking-widest font-bold">Paid</span></td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-zinc-500 hover:text-white transition-colors bg-surface-raised border border-surface-border p-2 rounded-sm"><Download className="w-3.5 h-3.5" /></button>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-surface-elevated/50 transition-colors">
-                        <td className="px-6 py-4 font-mono text-xs">Feb 15, 2026</td>
-                        <td className="px-6 py-4 font-mono text-content-primary tabular-nums">$0.00</td>
-                        <td className="px-6 py-4"><span className="text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-sm text-[10px] font-mono uppercase tracking-widest font-bold">Paid</span></td>
-                        <td className="px-6 py-4 text-right">
-                          <button className="text-zinc-500 hover:text-white transition-colors bg-surface-raised border border-surface-border p-2 rounded-sm"><Download className="w-3.5 h-3.5" /></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div className="border border-surface-border border-dashed rounded-sm p-8 flex flex-col items-center justify-center text-center bg-surface-base">
+                  <Download className="w-7 h-7 text-zinc-700 mb-3" />
+                  <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest">No billing history</p>
+                  <p className="text-[10px] font-mono text-zinc-700 mt-1">You are on the free tier — no charges have been made.</p>
                 </div>
               </CollapsibleModule>
 

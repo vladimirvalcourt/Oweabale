@@ -8,10 +8,12 @@ export default function BankConnection() {
   const { bankConnected, connectBank } = useStore();
   const [isConnecting, setIsConnecting] = useState(false);
   const [syncTime, setSyncTime] = useState<string | null>(null);
+  const [institutionName, setInstitutionName] = useState<string>('Connected Bank');
 
   const onSuccess = async (public_token: string, metadata: any) => {
     setIsConnecting(true);
-    
+    const name = metadata?.institution?.name;
+    if (name) setInstitutionName(name);
     await connectBank(); // Hydrates global state and persists to Supabase
     setSyncTime('JUST NOW');
     toast.success('Bank connected successfully. Data hydrated.');
@@ -64,7 +66,7 @@ export default function BankConnection() {
         <div className="bg-surface-base border border-surface-border rounded-sm p-4">
           <div className="flex items-center justify-between">
             <div className="font-mono text-sm text-content-primary">
-              [STATUS: <span className="text-emerald-400 animate-pulse">ACTIVE</span>] CHASE CHECKING (...4429)
+              [STATUS: <span className="text-emerald-400 animate-pulse">ACTIVE</span>] {institutionName}
             </div>
           </div>
           <div className="mt-2 text-xs font-mono text-zinc-500">

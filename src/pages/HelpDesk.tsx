@@ -14,15 +14,20 @@ interface Ticket {
   department: string;
 }
 
-const BROADCASTS = [
-  { id: 'BRD-01', title: 'System Maintenance: Plaid API', date: '2026-04-06', type: 'warning', content: 'We are performing scheduled maintenance on the Plaid Link gateway. Bank connections may fail for the next 2 hours.' },
-  { id: 'BRD-02', title: 'Feature Release: Financial Academy', date: '2026-04-05', type: 'success', content: 'The new Financial Academy is live. 10 offensive and defensive financial strategy tracks have been enabled.' }
-];
+interface Broadcast {
+  id: string;
+  title: string;
+  date: string;
+  type: string;
+  content: string;
+}
 
 export default function HelpDesk() {
   const [activeTab, setActiveTab] = useState<'tickets' | 'broadcast'>('tickets');
   const [isNewTicketOpen, setIsNewTicketOpen] = useState(false);
   const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
+  const [broadcastsLoading, setBroadcastsLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -53,7 +58,30 @@ export default function HelpDesk() {
       }
       setIsLoading(false);
     }
+
+    async function loadBroadcasts() {
+      setBroadcastsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from('admin_broadcasts')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (!error && data) {
+          setBroadcasts(data.map((b: Record<string, any>) => ({
+            id: b.id,
+            title: b.title,
+            date: (b.created_at as string).split('T')[0],
+            type: b.type ?? 'info',
+            content: b.content,
+          })));
+        }
+      } finally {
+        setBroadcastsLoading(false);
+      }
+    }
+
     loadTickets();
+    loadBroadcasts();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -194,22 +222,31 @@ export default function HelpDesk() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6">
-          <div className="space-y-4">
-            {BROADCASTS.map(msg => (
-              <div key={msg.id} className="p-6 bg-surface-raised border border-surface-border rounded-sm relative overflow-hidden">
-                <div className={`absolute top-0 left-0 w-1 h-full ${
-                  msg.type === 'warning' ? 'bg-amber-500' : 'bg-indigo-500'
-                }`} />
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-semibold text-white">{msg.title}</h3>
-                  <span className="text-[10px] font-mono text-zinc-500">{msg.date}</span>
+          {broadcastsLoading ? (
+            <div className="p-12 flex justify-center">
+              <Loader2 className="w-5 h-5 text-zinc-500 animate-spin" />
+            </div>
+          ) : broadcasts.length === 0 ? (
+            <div className="p-12 text-center border border-surface-border rounded-sm bg-surface-raised">
+              <Radio className="w-7 h-7 text-zinc-600 mx-auto mb-3" />
+              <p className="text-sm font-mono text-zinc-400 uppercase tracking-widest">No broadcasts at this time.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {broadcasts.map(msg => (
+                <div key={msg.id} className="p-6 bg-surface-raised border border-surface-border rounded-sm relative overflow-hidden">
+                  <div className={`absolute top-0 left-0 w-1 h-full ${
+                    msg.type === 'warning' ? 'bg-amber-500' : 'bg-indigo-500'
+                  }`} />
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-semibold text-white">{msg.title}</h3>
+                    <span className="text-[10px] font-mono text-zinc-500">{msg.date}</span>
+                  </div>
+                  <p className="text-sm text-zinc-400 leading-relaxed font-mono">{msg.content}</p>
                 </div>
-                <p className="text-sm text-zinc-400 leading-relaxed font-mono">
-                  {msg.content}
-                </p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
