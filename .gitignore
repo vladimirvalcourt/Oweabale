@@ -9,9 +9,10 @@ brain/
 .gemini/
 .mcp.json
 skills-lock.json
-.claude/
+.claude/settings.json
+.claude/todos.md
+# .claude/skills/ and CLAUDE.md are intentionally versioned (Superpowers skills library)
 .1code/
-# agents/ and skills/ are intentionally versioned (Superpowers skills library)
 
 # System & Cache
 node_modules/
