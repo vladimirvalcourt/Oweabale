@@ -107,7 +107,7 @@ export default function MobileCapture() {
     }
   };
 
-  const handeUpload = async () => {
+  const handleUpload = async () => {
     const activeImage = capturedImage || (previewUrl ? dataURLtoFile(previewUrl) : null);
     if (!activeImage || !sessionId || !token) return;
 
@@ -358,7 +358,7 @@ export default function MobileCapture() {
 
                <div className="flex flex-col gap-4 mt-auto">
                   <button 
-                    onClick={handeUpload}
+                    onClick={handleUpload}
                     disabled={status === 'uploading'}
                     className="w-full bg-brand-violet hover:bg-indigo-500 disabled:bg-zinc-900 text-white py-5 rounded-none font-mono font-bold uppercase tracking-widest text-[11px] shadow-xl shadow-brand-violet/20 flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
                   >

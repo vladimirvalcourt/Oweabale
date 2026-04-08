@@ -11,7 +11,13 @@ import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { IRS_MILEAGE_RATE } from '../lib/finance';
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
+
+/** Simplified average federal income rate used for freelance tax estimates. */
+const FED_INCOME_ESTIMATE_RATE = 0.12;
+/** IRS self-employment tax rate (15.3% = 12.4% SS + 2.9% Medicare). */
+const SE_TAX_RATE = 0.153;
 
 export default function Freelance() {
   const { freelanceEntries, addFreelanceEntry, deleteFreelanceEntry, toggleFreelanceVault, user, addDeduction } = useStore();
@@ -62,7 +68,7 @@ export default function Freelance() {
       let capturedWriteOffs = 0;
       if (milesMatch) {
          const miles = parseFloat(milesMatch[1]);
-         const mileageDeduction = miles * 0.67; // 2024 IRS Rate
+         const mileageDeduction = miles * IRS_MILEAGE_RATE;
          addDeduction({
            name: `Mileage: ${client} (${miles} mi)`,
            category: 'Transportation',
@@ -104,15 +110,14 @@ export default function Freelance() {
     }
   };
 
-  const taxState = user.taxState || 'NY';
-  const stateRate = user.taxRate ?? 6.25;
-  const seTaxRate = 15.3; // Standard Self-Employment Tax
+  const taxState = user.taxState || '—';
+  const stateRate = user.taxRate ?? 0;
 
   const entriesWithMath = useMemo(() => {
     return freelanceEntries.map(entry => {
-      const fedEstimate = entry.amount * 0.12; // Simplified 12% average fed
+      const fedEstimate = entry.amount * FED_INCOME_ESTIMATE_RATE;
       const stateEstimate = entry.amount * (stateRate / 100);
-      const seEstimate = entry.amount * 0.153;
+      const seEstimate = entry.amount * SE_TAX_RATE;
       const totalLiability = fedEstimate + stateEstimate + seEstimate;
       const profit = entry.amount - totalLiability;
       

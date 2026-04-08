@@ -60,19 +60,20 @@ export default function Dashboard() {
   const liquidCash = useMemo(() => assets.filter(a => a.type === 'Cash').reduce((s, a) => s + a.value, 0), [assets]);
   
   const monthlyBurn = useMemo(() => {
-    const billsTotal = bills.reduce((s, b) => {
-      let monthly = b.amount;
-      if (b.frequency === 'Quarterly') monthly = b.amount / 3;
-      if (b.frequency === 'Yearly') monthly = b.amount / 12;
-      return s + monthly;
-    }, 0);
-    const debtMins = debts.reduce((s, d) => s + d.minPayment, 0);
-    const subTotal = subscriptions.filter(s => s.status === 'active').reduce((s, sub) => {
-      let monthly = sub.amount;
-      if (sub.frequency === 'Yearly') monthly = sub.amount / 12;
-      if (sub.frequency === 'Weekly') monthly = sub.amount * 4.33;
-      return s + monthly;
-    }, 0);
+    const toMonthly = (amount: number, frequency: string) => {
+      switch (frequency) {
+        case 'Weekly':    return amount * 4.33;
+        case 'Bi-weekly': return amount * 2.165;
+        case 'Quarterly': return amount / 3;
+        case 'Yearly':    return amount / 12;
+        default:          return amount; // Monthly
+      }
+    };
+    const billsTotal = bills.reduce((s, b) => s + toMonthly(b.amount, b.frequency), 0);
+    const debtMins = debts.reduce((s, d) => s + (d.minPayment || 0), 0);
+    const subTotal = subscriptions
+      .filter(s => s.status === 'active')
+      .reduce((s, sub) => s + toMonthly(sub.amount, sub.frequency), 0);
     return billsTotal + debtMins + subTotal;
   }, [bills, debts, subscriptions]);
 
@@ -92,7 +93,12 @@ export default function Dashboard() {
   
   const activeSubscriptions = useMemo(() => subscriptions.filter(s => s.status === 'active'), [subscriptions]);
   const monthlySubscriptionCost = useMemo(() => activeSubscriptions.reduce((acc, sub) => {
-    return acc + (sub.frequency === 'Monthly' ? sub.amount : sub.amount / 12);
+    switch (sub.frequency) {
+      case 'Weekly':    return acc + sub.amount * 4.33;
+      case 'Bi-weekly': return acc + sub.amount * 2.165;
+      case 'Yearly':    return acc + sub.amount / 12;
+      default:          return acc + sub.amount; // Monthly
+    }
   }, 0), [activeSubscriptions]);
 
   // --- Intelligent Modules ---

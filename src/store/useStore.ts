@@ -279,8 +279,8 @@ const initialData = {
     email: '',
     avatar: '',
     theme: 'Dark',
-    taxState: 'CA',
-    taxRate: 35.0,
+    taxState: '',
+    taxRate: 0,
     phone: '',
     timezone: 'Eastern Time (ET)',
     language: 'English (US)',
@@ -299,7 +299,7 @@ export const useStore = create<AppState>()(
   ...initialData,
   addNotification: (note) => set((state) => ({
     notifications: [
-      { ...note, id: Math.random().toString(36).substr(2, 9), timestamp: new Date().toISOString(), read: false },
+      { ...note, id: crypto.randomUUID(), timestamp: new Date().toISOString(), read: false },
       ...state.notifications,
     ].slice(0, 50),
   })),
@@ -325,7 +325,7 @@ export const useStore = create<AppState>()(
     if (autoCategory) transaction = { ...transaction, category: autoCategory };
 
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = Math.random().toString(36).substr(2, 9);
+    let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('transactions').insert({ ...transaction, user_id: userId }).select('id').single();
       if (error) { toast.error('Failed to sync transaction'); return; }
@@ -337,7 +337,7 @@ export const useStore = create<AppState>()(
   },
   addBill: async (bill) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = Math.random().toString(36).substr(2, 9);
+    let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('bills').insert({
         biller: bill.biller, amount: bill.amount, category: bill.category,
@@ -394,7 +394,7 @@ export const useStore = create<AppState>()(
     });
 
     const newTransaction: Transaction = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
       name: bill.biller,
       category: bill.category,
       date: new Date().toISOString().split('T')[0],
@@ -417,12 +417,12 @@ export const useStore = create<AppState>()(
       bills: state.bills.map((b) =>
         b.id === id ? { ...b, status: 'upcoming', dueDate: nextDueStr } : b
       ),
-      transactions: [newTransaction, ...state.transactions].slice(0, 50),
+      transactions: [newTransaction, ...state.transactions].slice(0, 100),
     }));
   },
   addDebt: async (debt) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = Math.random().toString(36).substr(2, 9);
+    let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('debts').insert({
         name: debt.name, type: debt.type, apr: debt.apr, remaining: debt.remaining,
@@ -476,7 +476,7 @@ export const useStore = create<AppState>()(
       if (error) { toast.error('Failed to sync debt payment'); return; }
     }
     const newTx: Transaction = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
       name: `Payment: ${debt.name}`,
       category: 'Debt Repayment',
       date: new Date().toISOString().split('T')[0],
@@ -488,12 +488,12 @@ export const useStore = create<AppState>()(
     }
     set((state) => ({
       debts: state.debts.map((d) => d.id === id ? { ...d, remaining: newRemaining, paid: newPaid } : d),
-      transactions: [newTx, ...state.transactions].slice(0, 50),
+      transactions: [newTx, ...state.transactions].slice(0, 100),
     }));
   },
   addAsset: async (asset) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = Math.random().toString(36).substr(2, 9);
+    let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('assets').insert({
         name: asset.name, value: asset.value, type: asset.type,
@@ -535,7 +535,7 @@ export const useStore = create<AppState>()(
   // ── Subscriptions ─────────────────────────────────────────────
   addSubscription: async (subscription) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = Math.random().toString(36).substr(2, 9);
+    let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('subscriptions').insert({
         name: subscription.name, amount: subscription.amount,
@@ -571,7 +571,7 @@ export const useStore = create<AppState>()(
   // ── Goals ─────────────────────────────────────────────────────
   addGoal: async (goal) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = Math.random().toString(36).substr(2, 9);
+    let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('goals').insert({
         name: goal.name, target_amount: goal.targetAmount, current_amount: goal.currentAmount,
@@ -618,7 +618,7 @@ export const useStore = create<AppState>()(
   // ── Income ────────────────────────────────────────────────────
   addIncome: async (income) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = Math.random().toString(36).substr(2, 9);
+    let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('incomes').insert({
         name: income.name, amount: income.amount, frequency: income.frequency,
@@ -656,7 +656,7 @@ export const useStore = create<AppState>()(
     if (!income) return;
     const depositAmount = amount || income.amount;
     const newTx: Transaction = {
-      id: Math.random().toString(36).substr(2, 9),
+      id: crypto.randomUUID(),
       name: `Deposit: ${income.name}`,
       category: income.category,
       date: new Date().toISOString().split('T')[0],
@@ -672,7 +672,7 @@ export const useStore = create<AppState>()(
   // ── Budgets ───────────────────────────────────────────────────
   addBudget: async (budget) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = Math.random().toString(36).substr(2, 9);
+    let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('budgets').insert({ category: budget.category, amount: budget.amount, period: budget.period, user_id: userId }).select('id').single();
       if (error) { toast.error('Failed to sync budget'); return; }
@@ -694,7 +694,7 @@ export const useStore = create<AppState>()(
   // ── Categories ────────────────────────────────────────────────
   addCategory: async (category) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = Math.random().toString(36).substr(2, 9);
+    let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('categories').insert({ name: category.name, color: category.color, type: category.type, user_id: userId }).select('id').single();
       if (error) { toast.error('Failed to sync category'); return; }
@@ -716,7 +716,7 @@ export const useStore = create<AppState>()(
   // ── Citations ─────────────────────────────────────────────────
   addCitation: async (citation) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = Math.random().toString(36).substr(2, 9);
+    let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('citations').insert({
         type: citation.type, jurisdiction: citation.jurisdiction,
@@ -739,7 +739,7 @@ export const useStore = create<AppState>()(
   // ── Deductions ────────────────────────────────────────────────
   addDeduction: async (deduction) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = Math.random().toString(36).substr(2, 9);
+    let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('deductions').insert({ name: deduction.name, category: deduction.category, amount: deduction.amount, date: deduction.date, user_id: userId }).select('id').single();
       if (error) { toast.error('Failed to sync deduction'); return; }
@@ -777,7 +777,7 @@ export const useStore = create<AppState>()(
   },
   addFreelanceEntry: async (entry) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = Math.random().toString(36).substr(2, 9);
+    let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('freelance_entries').insert({
         client: entry.client, amount: entry.amount, date: entry.date,
@@ -791,7 +791,7 @@ export const useStore = create<AppState>()(
   },
   toggleFreelanceVault: async (id) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    const current = useStore.getState().freelanceEntries.find(e => e.id === id);
+    const current = get().freelanceEntries.find(e => e.id === id);
     if (userId && current) {
       await supabase.from('freelance_entries').update({ is_vaulted: !current.isVaulted }).eq('id', id).eq('user_id', userId);
     }
@@ -827,10 +827,10 @@ export const useStore = create<AppState>()(
       }
 
       // 2. RESET ONBOARDING FLAG
-      await supabase.from('profiles').update({ 
+      await supabase.from('profiles').update({
         has_completed_onboarding: false,
-        tax_state: 'CA',
-        tax_rate: 35.0
+        tax_state: '',
+        tax_rate: 0
       }).eq('id', userId);
 
       // 3. RESET LOCAL STATE
@@ -839,8 +839,8 @@ export const useStore = create<AppState>()(
         user: {
           ...get().user,
           hasCompletedOnboarding: false,
-          taxState: 'CA',
-          taxRate: 35.0
+          taxState: '',
+          taxRate: 0
         }
       });
 
@@ -948,12 +948,12 @@ export const useStore = create<AppState>()(
 
   // Ingestion Implementation
   addPendingIngestion: (ingestion) => {
-    const id = Math.random().toString(36).substr(2, 9);
+    const id = crypto.randomUUID();
     // Fires off the insert but returns ID immediately for local UI responsiveness
     (async () => {
       const userId = (await supabase.auth.getUser()).data.user?.id;
       if (userId) {
-        await supabase.from('pending_ingestions').insert({
+        const { error } = await supabase.from('pending_ingestions').insert({
           user_id: userId,
           type: ingestion.type,
           status: ingestion.status,
@@ -963,6 +963,7 @@ export const useStore = create<AppState>()(
           storage_path: ingestion.storagePath,
           storage_url: ingestion.storageUrl
         });
+        if (error) console.error('[addPendingIngestion] DB insert failed:', error.message);
       }
     })();
     
@@ -997,13 +998,12 @@ export const useStore = create<AppState>()(
     }));
   },
   commitIngestion: async (id) => {
-    const state = useStore.getState();
-    const item = state.pendingIngestions.find(pi => pi.id === id);
+    const item = get().pendingIngestions.find(pi => pi.id === id);
     if (!item || (item.status !== 'ready' && !item.status.includes('scanning'))) return;
     const userId = (await supabase.auth.getUser()).data.user?.id;
 
     const data = item.extractedData;
-    const commonId = Math.random().toString(36).substr(2, 9);
+    const commonId = crypto.randomUUID();
     
     // Deterministic Mapping (No AI Slop)
     const getCategoryFromMerchant = (name: string): string => {
@@ -1106,7 +1106,7 @@ export const useStore = create<AppState>()(
 
     try {
       // Silently flip any upcoming bills that are now past their due date
-      await supabase.rpc('flip_overdue_bills');
+      try { await supabase.rpc('flip_overdue_bills'); } catch { /* non-critical, continue */ }
 
       const [
         { data: bills },

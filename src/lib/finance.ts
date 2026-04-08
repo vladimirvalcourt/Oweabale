@@ -2,6 +2,25 @@
 // No React, no Supabase, no side effects. All functions are deterministic.
 
 // ---------------------------------------------------------------------------
+// Financial constants
+// ---------------------------------------------------------------------------
+
+/** Conservative flat tax reserve for self-employed / freelance income (25%). */
+export const TAX_RESERVE_RATE = 0.25;
+
+/** Fraction of monthly surplus routed to the highest-APR debt. */
+export const SURPLUS_TO_DEBT_RATIO = 0.5;
+
+/** Fraction of monthly surplus routed to emergency fund. */
+export const SURPLUS_TO_EMERGENCY_RATIO = 0.2;
+
+/** Maximum months modelled in amortization schedules (50 years). */
+export const MAX_AMORTIZATION_MONTHS = 600;
+
+/** 2025 IRS standard mileage rate for business use (cents per mile → dollars). */
+export const IRS_MILEAGE_RATE = 0.70;
+
+// ---------------------------------------------------------------------------
 // Input types (mirror store interfaces, with new optional fields)
 // ---------------------------------------------------------------------------
 
@@ -126,7 +145,7 @@ export function generateAmortizationSchedule(
 
   if (balance <= 0) return rows;
 
-  for (let month = 1; month <= 600; month++) {
+  for (let month = 1; month <= MAX_AMORTIZATION_MONTHS; month++) {
     const interest = balance * monthlyRate;
     const totalPayment = Math.min(balance + interest, minPayment + extraMonthly);
     const principal = totalPayment - interest;
@@ -163,7 +182,7 @@ export function calcMonthlyCashFlow(
 
   const taxReserve = incomes.reduce((sum, inc) => {
     if (inc.status !== 'active' || inc.isTaxWithheld) return sum;
-    return sum + (normalizeToMonthly(inc.amount, inc.frequency) * 0.25);
+    return sum + (normalizeToMonthly(inc.amount, inc.frequency) * TAX_RESERVE_RATE);
   }, 0);
 
   const disposableIncome = monthlyIncome - taxReserve;
@@ -217,7 +236,7 @@ export function calcSurplusRouting(
   let toHighestAPR: SurplusAllocation['toHighestAPR'] = null;
   if (activeDebts.length > 0) {
     const topDebt = [...activeDebts].sort((a, b) => (b.apr || 0) - (a.apr || 0))[0];
-    const debtAllocation = parseFloat((surplus * 0.5).toFixed(2));
+    const debtAllocation = parseFloat((surplus * SURPLUS_TO_DEBT_RATIO).toFixed(2));
     toHighestAPR = { debtName: topDebt.name, amount: debtAllocation };
     remaining -= debtAllocation;
   }
@@ -226,7 +245,7 @@ export function calcSurplusRouting(
   const emergencyGoals = goals.filter(g => g.type === 'emergency' && g.currentAmount < g.targetAmount);
   let toEmergency = 0;
   if (emergencyGoals.length > 0) {
-    toEmergency = parseFloat((surplus * 0.2).toFixed(2));
+    toEmergency = parseFloat((surplus * SURPLUS_TO_EMERGENCY_RATIO).toFixed(2));
     remaining -= toEmergency;
   }
 
