@@ -11,26 +11,26 @@ export default defineConfig(({ mode }) => {
   const cspDirectives = isProd
     ? [
         "default-src 'self'",
-        "script-src 'self' 'wasm-unsafe-eval' https://challenges.cloudflare.com",
+        "script-src 'self' 'wasm-unsafe-eval'",
         "style-src 'self' 'unsafe-inline'",            // Tailwind injects styles at runtime
         "img-src 'self' data: https:",
         "font-src 'self' data:",
-        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com",
+        "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
         "worker-src 'self' blob:",
-        "frame-src https://*.supabase.co https://challenges.cloudflare.com",
+        "frame-src https://*.supabase.co",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
       ]
     : [
         "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://challenges.cloudflare.com", // HMR requires unsafe-inline
+        "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'", // HMR requires unsafe-inline
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: https:",
         "font-src 'self' data:",
-        "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* https://challenges.cloudflare.com",
+        "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:*",
         "worker-src 'self' blob:",
-        "frame-src https://*.supabase.co https://challenges.cloudflare.com",
+        "frame-src https://*.supabase.co",
         "object-src 'none'",
         "base-uri 'self'",
         "form-action 'self'",
