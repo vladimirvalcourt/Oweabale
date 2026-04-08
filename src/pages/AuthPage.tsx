@@ -1,16 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
-
-declare global {
-  interface Window {
-    turnstile?: {
-      render: (container: HTMLElement, options: Record<string, unknown>) => string;
-      reset: (widgetId: string) => void;
-      remove: (widgetId: string) => void;
-    };
-  }
-}
 
 type TurnstileStatus = 'idle' | 'solved' | 'expired' | 'error';
 
@@ -18,52 +8,26 @@ export default function AuthPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [turnstileStatus, setTurnstileStatus] = useState<TurnstileStatus>('idle');
-  const containerRef = useRef<HTMLDivElement>(null);
-  const widgetIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    let attempts = 0;
-    const maxAttempts = 50; // 5 seconds
-
-    const tryRender = () => {
-      if (!containerRef.current) return;
-
-      if (window.turnstile) {
-        // Remove any existing widget first
-        if (widgetIdRef.current) {
-          try { window.turnstile!.remove(widgetIdRef.current); } catch {}
-          widgetIdRef.current = null;
-        }
-        widgetIdRef.current = window.turnstile.render(containerRef.current, {
-          sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
-          theme: 'light',
-          size: 'flexible',
-          callback: (token: string) => {
-            setTurnstileToken(token);
-            setTurnstileStatus('solved');
-          },
-          'error-callback': () => {
-            setTurnstileToken(null);
-            setTurnstileStatus('error');
-          },
-          'expired-callback': () => {
-            setTurnstileToken(null);
-            setTurnstileStatus('expired');
-          },
-        });
-      } else if (attempts < maxAttempts) {
-        attempts++;
-        setTimeout(tryRender, 100);
-      }
+    // Register global callbacks that Cloudflare Turnstile will call by name
+    (window as any).onTurnstileSuccess = (token: string) => {
+      setTurnstileToken(token);
+      setTurnstileStatus('solved');
+    };
+    (window as any).onTurnstileError = () => {
+      setTurnstileToken(null);
+      setTurnstileStatus('error');
+    };
+    (window as any).onTurnstileExpire = () => {
+      setTurnstileToken(null);
+      setTurnstileStatus('expired');
     };
 
-    tryRender();
-
     return () => {
-      if (widgetIdRef.current && window.turnstile) {
-        try { window.turnstile.remove(widgetIdRef.current); } catch {}
-        widgetIdRef.current = null;
-      }
+      delete (window as any).onTurnstileSuccess;
+      delete (window as any).onTurnstileError;
+      delete (window as any).onTurnstileExpire;
     };
   }, []);
 
@@ -78,9 +42,6 @@ export default function AuthPage() {
 
       if (verifyRes.error || !verifyRes.data?.success) {
         toast.error('Security check failed. Please try again.');
-        if (widgetIdRef.current && window.turnstile) {
-          window.turnstile.reset(widgetIdRef.current);
-        }
         setTurnstileToken(null);
         setTurnstileStatus('idle');
         setGoogleLoading(false);
@@ -136,8 +97,16 @@ export default function AuthPage() {
           </p>
         </div>
 
-        {/* Turnstile widget */}
-        <div ref={containerRef} className="mb-4" />
+        {/* Cloudflare Turnstile — auto-rendered via data attributes */}
+        <div
+          className="cf-turnstile mb-4"
+          data-sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+          data-callback="onTurnstileSuccess"
+          data-error-callback="onTurnstileError"
+          data-expired-callback="onTurnstileExpire"
+          data-theme="light"
+          data-size="flexible"
+        />
         {turnstileStatus === 'expired' && (
           <p className="font-mono text-[10px] text-yellow-500 mb-2 uppercase tracking-wider">
             Security check expired — please verify again.
