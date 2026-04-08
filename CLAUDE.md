@@ -2,6 +2,7 @@
 
 ## Active Skills
 
+- Load `.claude/skills/debugging/SKILL.md` whenever a bug, error, or unexpected behavior is reported
 - Load `.claude/skills/subagent-driven-development/SKILL.md` for any multi-step build task
 - Load `.claude/skills/requesting-code-review/SKILL.md` before any merge or handoff
 - Load `.claude/skills/security/SKILL.md` whenever auth, payments, or Supabase RLS is touched
