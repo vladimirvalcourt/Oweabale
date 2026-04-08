@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
+import { type CategorizationRule, applyCategorizationRules } from '../lib/categorizationRules';
+export type { CategorizationRule };
 
 export interface Bill {
   id: string;
@@ -171,6 +173,7 @@ interface AppState {
   freelanceEntries: FreelanceEntry[];
   notifications: Notification[];
   pendingIngestions: PendingIngestion[];
+  categorizationRules: CategorizationRule[];
   user: {
     id: string;
     firstName: string;
@@ -230,6 +233,9 @@ interface AppState {
   signOut: () => Promise<void>;
   resetData: () => Promise<void>;
   deleteAccount: () => Promise<void>;
+  addCategorizationRule: (rule: Omit<CategorizationRule, 'id'>) => Promise<void>;
+  deleteCategorizationRule: (id: string) => Promise<void>;
+  applyRulesToExistingTransactions: () => Promise<number>;
 
   // Ingestion Actions
   addPendingIngestion: (ingestion: Omit<PendingIngestion, 'id'>) => string;
@@ -284,6 +290,7 @@ const initialData = {
   bankConnected: false,
   pendingIngestions: [],
   notifications: [],
+  categorizationRules: [],
 };
 
 export const useStore = create<AppState>()(
@@ -312,6 +319,11 @@ export const useStore = create<AppState>()(
     await get().fetchData();
   },
   addTransaction: async (transaction) => {
+    // Auto-apply categorization rules before saving
+    const rules = get().categorizationRules;
+    const autoCategory = applyCategorizationRules(transaction.name, rules);
+    if (autoCategory) transaction = { ...transaction, category: autoCategory };
+
     const userId = (await supabase.auth.getUser()).data.user?.id;
     let newId = Math.random().toString(36).substr(2, 9);
     if (userId) {
@@ -882,6 +894,58 @@ export const useStore = create<AppState>()(
     set({ ...initialData });
   },
 
+  // ── Categorization Rules ─────────────────────────────────────
+  addCategorizationRule: async (rule) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return;
+    const { data, error } = await supabase
+      .from('categorization_rules')
+      .insert({ ...rule, user_id: userId })
+      .select()
+      .single();
+    if (error) { toast.error('Failed to save rule'); return; }
+    const newRule: CategorizationRule = {
+      id: data.id, match_type: data.match_type,
+      match_value: data.match_value, category: data.category, priority: data.priority,
+    };
+    // Prepend: higher-priority / newest rules should be evaluated first
+    set((state) => ({ categorizationRules: [newRule, ...state.categorizationRules] }));
+    toast.success('Rule saved — future transactions will be auto-categorized');
+  },
+
+  deleteCategorizationRule: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return;
+    await supabase.from('categorization_rules').delete().eq('id', id).eq('user_id', userId);
+    set((state) => ({ categorizationRules: state.categorizationRules.filter(r => r.id !== id) }));
+  },
+
+  applyRulesToExistingTransactions: async () => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return 0;
+    const rules = get().categorizationRules;
+    if (rules.length === 0) return 0;
+    const txs = get().transactions;
+    let count = 0;
+    const updates: Promise<any>[] = [];
+    const updated = txs.map(tx => {
+      const matched = applyCategorizationRules(tx.name, rules);
+      if (matched && matched !== tx.category) {
+        count++;
+        updates.push(
+          supabase.from('transactions').update({ category: matched }).eq('id', tx.id).eq('user_id', userId)
+        );
+        return { ...tx, category: matched };
+      }
+      return tx;
+    });
+    if (count > 0) {
+      await Promise.all(updates);
+      set({ transactions: updated });
+    }
+    return count;
+  },
+
   // Ingestion Implementation
   addPendingIngestion: (ingestion) => {
     const id = Math.random().toString(36).substr(2, 9);
@@ -1058,7 +1122,8 @@ export const useStore = create<AppState>()(
         { data: deductions },
         { data: freelanceEntries },
         { data: pendingIngestions },
-        { data: profile }
+        { data: profile },
+        { data: categorizationRules }
       ] = await Promise.all([
         supabase.from('bills').select('*').eq('user_id', userId),
         supabase.from('debts').select('*').eq('user_id', userId),
@@ -1074,6 +1139,7 @@ export const useStore = create<AppState>()(
         supabase.from('freelance_entries').select('*').eq('user_id', userId),
         supabase.from('pending_ingestions').select('*').eq('user_id', userId),
         supabase.from('profiles').select('*').eq('id', userId).single(),
+        supabase.from('categorization_rules').select('*').eq('user_id', userId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
       ]);
 
       set({
@@ -1214,6 +1280,13 @@ export const useStore = create<AppState>()(
           taxRate: profile.tax_rate ?? 35.0,
           isAdmin: profile.is_admin === true,
         } : initialData.user,
+        categorizationRules: (categorizationRules || []).map((r: any) => ({
+          id:          r.id as string,
+          match_type:  r.match_type as CategorizationRule['match_type'],
+          match_value: r.match_value as string,
+          category:    r.category as string,
+          priority:    r.priority as number,
+        })),
         isLoading: false
       });
 

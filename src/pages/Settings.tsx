@@ -4,20 +4,27 @@ import { toast } from 'sonner';
 import { validateAvatarFile } from '../lib/security';
 import { supabase } from '../lib/supabase';
 import { Dialog } from '@headlessui/react';
-import { AlertTriangle, Lock, Shield, Smartphone, CreditCard as CreditCardIcon, CheckCircle2, Plus, X, Building2, Loader2, Search, Download, Fingerprint, EyeOff, FileSpreadsheet, FileText, User, Mail, BellRing, BrainCircuit, Palette, Globe, PieChart } from 'lucide-react';
+import { AlertTriangle, Lock, Shield, Smartphone, CreditCard as CreditCardIcon, CheckCircle2, Plus, X, Building2, Loader2, Search, Download, Fingerprint, EyeOff, FileSpreadsheet, FileText, User, Mail, BellRing, BrainCircuit, Palette, Globe, PieChart, Filter, Trash2, RefreshCw } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import BankConnection from '../components/BankConnection';
 
-type Tab = 'profile' | 'notifications' | 'security' | 'billing' | 'financial' | 'privacy' | 'integrations';
+type Tab = 'profile' | 'notifications' | 'security' | 'billing' | 'financial' | 'privacy' | 'integrations' | 'rules';
 
 export default function Settings() {
   const user = useStore((state) => state.user);
   const updateUser = useStore((state) => state.updateUser);
   const resetData = useStore((state) => state.resetData);
   const deleteAccount = useStore((state) => state.deleteAccount);
+  const categories = useStore((state) => state.categories);
+  const categorizationRules = useStore((state) => state.categorizationRules);
+  const addCategorizationRule = useStore((state) => state.addCategorizationRule);
+  const deleteCategorizationRule = useStore((state) => state.deleteCategorizationRule);
+  const applyRulesToExistingTransactions = useStore((state) => state.applyRulesToExistingTransactions);
 
   const [activeTab, setActiveTab] = useState<Tab>('profile');
+  const [ruleForm, setRuleForm] = useState({ match_type: 'contains' as const, match_value: '', category: '' });
+  const [isApplying, setIsApplying] = useState(false);
   const [formData, setFormData] = useState({
     firstName: user.firstName,
     lastName: user.lastName,
@@ -64,6 +71,7 @@ export default function Settings() {
     { id: 'security', name: 'Security' },
     { id: 'notifications', name: 'Notifications' },
     { id: 'financial', name: 'Preferences' },
+    { id: 'rules', name: 'Auto-Rules' },
     { id: 'billing', name: 'Billing' },
     { id: 'integrations', name: 'Integrations' },
     { id: 'privacy', name: 'Data & Privacy' },
@@ -646,6 +654,129 @@ export default function Settings() {
                   </div>
                   <button type="button" onClick={() => setIsDeleteDialogOpen(true)} className="px-4 py-2 bg-red-500/10 border border-red-500/50 text-red-500 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-red-500">
                     Delete Account
+                  </button>
+                </div>
+              </CollapsibleModule>
+            </div>
+          )}
+
+          {/* ── Auto-Rules Tab ─────────────────────────────────────── */}
+          {activeTab === 'rules' && (
+            <div className="space-y-6">
+              <CollapsibleModule title="Categorization Rules" icon={Filter}
+                extraHeader={
+                  <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                    {categorizationRules.length} rule{categorizationRules.length !== 1 ? 's' : ''}
+                  </span>
+                }
+              >
+                <div className="-mx-6 -my-6">
+                  {/* Add rule form */}
+                  <div className="p-6 border-b border-surface-border bg-surface-base">
+                    <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-4">
+                      New Rule — applied automatically when a transaction name matches
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <select
+                        value={ruleForm.match_type}
+                        onChange={e => setRuleForm(f => ({ ...f, match_type: e.target.value as any }))}
+                        className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none w-full sm:w-36"
+                      >
+                        <option value="contains">Contains</option>
+                        <option value="exact">Exact Match</option>
+                        <option value="starts_with">Starts With</option>
+                        <option value="ends_with">Ends With</option>
+                      </select>
+                      <input
+                        type="text"
+                        placeholder="e.g. STARBUCKS"
+                        value={ruleForm.match_value}
+                        onChange={e => setRuleForm(f => ({ ...f, match_value: e.target.value }))}
+                        className="flex-1 bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 placeholder:text-zinc-600"
+                      />
+                      <select
+                        value={ruleForm.category}
+                        onChange={e => setRuleForm(f => ({ ...f, category: e.target.value }))}
+                        className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none w-full sm:w-44"
+                      >
+                        <option value="">— Select category —</option>
+                        {categories.map(c => (
+                          <option key={c.id} value={c.name}>{c.name}</option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={async () => {
+                          if (!ruleForm.match_value.trim() || !ruleForm.category) {
+                            toast.error('Fill in the match value and category');
+                            return;
+                          }
+                          await addCategorizationRule({ match_type: ruleForm.match_type, match_value: ruleForm.match_value.trim(), category: ruleForm.category, priority: 0 });
+                          setRuleForm(f => ({ ...f, match_value: '' }));
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-colors shrink-0"
+                      >
+                        <Plus className="w-3 h-3" />
+                        Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Rules list */}
+                  {categorizationRules.length === 0 ? (
+                    <div className="p-10 text-center">
+                      <Filter className="w-7 h-7 text-zinc-700 mx-auto mb-3" />
+                      <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest">No rules yet — add one above.</p>
+                      <p className="text-[10px] font-mono text-zinc-600 mt-2">Example: "STARBUCKS" → Coffee</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-surface-border">
+                      {categorizationRules.map(rule => (
+                        <div key={rule.id} className="flex items-center justify-between px-6 py-3 hover:bg-surface-elevated transition-colors group">
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <span className="text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-sm shrink-0">
+                              {rule.match_type.replace('_', ' ')}
+                            </span>
+                            <span className="text-sm font-mono text-white truncate">{rule.match_value}</span>
+                            <span className="text-zinc-600 font-mono text-xs shrink-0">→</span>
+                            <span className="text-xs font-mono text-emerald-400 truncate">{rule.category}</span>
+                          </div>
+                          <button
+                            onClick={() => deleteCategorizationRule(rule.id)}
+                            className="ml-4 text-zinc-700 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
+                            title="Delete rule"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CollapsibleModule>
+
+              {/* Apply retroactively */}
+              <CollapsibleModule title="Apply to Existing Transactions" icon={RefreshCw} defaultOpen={false}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm text-zinc-400 leading-relaxed">
+                      Re-run all your rules against every transaction already in the system.
+                      Matching transactions will have their category updated.
+                    </p>
+                  </div>
+                  <button
+                    onClick={async () => {
+                      if (categorizationRules.length === 0) { toast.error('Add at least one rule first'); return; }
+                      setIsApplying(true);
+                      const count = await applyRulesToExistingTransactions();
+                      setIsApplying(false);
+                      if (count === 0) toast.success('All transactions already match your rules');
+                      else toast.success(`Updated ${count} transaction${count !== 1 ? 's' : ''}`);
+                    }}
+                    disabled={isApplying}
+                    className="flex items-center gap-2 px-4 py-2 bg-surface-elevated border border-surface-border text-zinc-300 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-surface-raised transition-colors disabled:opacity-50 shrink-0"
+                  >
+                    {isApplying ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                    Apply Retroactively
                   </button>
                 </div>
               </CollapsibleModule>
