@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { LifeBuoy, Plus, MessageSquare, AlertCircle, Clock, CheckCircle2, Send, Radio } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { LifeBuoy, Plus, MessageSquare, AlertCircle, Clock, CheckCircle2, Send, Radio, Loader2 } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
+import { supabase } from '../lib/supabase';
 
 interface Ticket {
   id: string;
@@ -13,11 +14,6 @@ interface Ticket {
   department: string;
 }
 
-const MOCK_TICKETS: Ticket[] = [
-  { id: 'TKT-8992', subject: 'Plaid Bank Connection Failing', status: 'In Progress', priority: 'Urgent', date: '2026-04-05', department: 'Integrations' },
-  { id: 'TKT-8711', subject: 'Question about Tax Scour logic', status: 'Resolved', priority: 'Normal', date: '2026-03-21', department: 'Calculations' }
-];
-
 const BROADCASTS = [
   { id: 'BRD-01', title: 'System Maintenance: Plaid API', date: '2026-04-06', type: 'warning', content: 'We are performing scheduled maintenance on the Plaid Link gateway. Bank connections may fail for the next 2 hours.' },
   { id: 'BRD-02', title: 'Feature Release: Financial Academy', date: '2026-04-05', type: 'success', content: 'The new Financial Academy is live. 10 offensive and defensive financial strategy tracks have been enabled.' }
@@ -26,8 +22,10 @@ const BROADCASTS = [
 export default function HelpDesk() {
   const [activeTab, setActiveTab] = useState<'tickets' | 'broadcast'>('tickets');
   const [isNewTicketOpen, setIsNewTicketOpen] = useState(false);
-  const [tickets, setTickets] = useState<Ticket[]>(MOCK_TICKETS);
-  
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     subject: '',
     department: 'General Support',
@@ -35,26 +33,68 @@ export default function HelpDesk() {
     description: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    async function loadTickets() {
+      setIsLoading(true);
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        setTickets(data.map((t: Record<string, any>) => ({
+          id: t.ticket_number,
+          subject: t.subject,
+          status: t.status as Ticket['status'],
+          priority: t.priority as Ticket['priority'],
+          date: (t.created_at as string).split('T')[0],
+          department: t.department,
+        })));
+      }
+      setIsLoading(false);
+    }
+    loadTickets();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.subject || !formData.description) {
+    if (!formData.subject.trim() || !formData.description.trim()) {
       toast.error('Subject and description are required');
       return;
     }
-    
+
+    setIsSubmitting(true);
+    const { data, error } = await supabase
+      .from('support_tickets')
+      .insert({
+        subject: formData.subject.trim(),
+        description: formData.description.trim(),
+        department: formData.department,
+        priority: formData.priority,
+      })
+      .select()
+      .single();
+
+    setIsSubmitting(false);
+
+    if (error) {
+      toast.error('Failed to submit ticket. Please try again.');
+      return;
+    }
+
     const newTicket: Ticket = {
-      id: `TKT-${Math.floor(Math.random() * 10000)}`,
-      subject: formData.subject,
-      status: 'Open',
-      priority: formData.priority as any,
-      date: new Date().toISOString().split('T')[0],
-      department: formData.department
+      id: data.ticket_number,
+      subject: data.subject,
+      status: data.status,
+      priority: data.priority,
+      date: (data.created_at as string).split('T')[0],
+      department: data.department,
     };
-    
+
     setTickets([newTicket, ...tickets]);
     setIsNewTicketOpen(false);
     setFormData({ subject: '', department: 'General Support', priority: 'Normal', description: '' });
-    toast.success('Support ticket submitted successfully');
+    toast.success(`Ticket ${data.ticket_number} submitted successfully`);
   };
 
   return (
@@ -64,7 +104,7 @@ export default function HelpDesk() {
           <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Support Hub</h1>
           <p className="text-sm font-mono text-zinc-400 mt-1 uppercase tracking-widest">Protocol assistance & routing.</p>
         </div>
-        
+
         <div className="flex bg-surface-elevated p-1 rounded-sm border border-surface-border inline-flex">
           <button
             onClick={() => setActiveTab('tickets')}
@@ -88,11 +128,11 @@ export default function HelpDesk() {
 
       {activeTab === 'tickets' ? (
         <div className="grid grid-cols-1 gap-6">
-          <CollapsibleModule 
-            title="Ticket Registry" 
+          <CollapsibleModule
+            title="Ticket Registry"
             icon={LifeBuoy}
             extraHeader={
-              <button 
+              <button
                 onClick={() => setIsNewTicketOpen(true)}
                 className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors"
                 title="Create New Ticket"
@@ -103,7 +143,11 @@ export default function HelpDesk() {
             }
           >
             <div className="-mx-6 -my-6 bg-surface-base">
-              {tickets.length === 0 ? (
+              {isLoading ? (
+                <div className="p-12 flex justify-center">
+                  <Loader2 className="w-5 h-5 text-zinc-500 animate-spin" />
+                </div>
+              ) : tickets.length === 0 ? (
                 <div className="p-12 text-center border-b border-surface-border">
                   <MessageSquare className="w-8 h-8 text-zinc-600 mx-auto mb-4" />
                   <p className="text-sm font-mono text-zinc-400 uppercase tracking-widest">No active support tickets.</p>
@@ -114,12 +158,12 @@ export default function HelpDesk() {
                     <div key={ticket.id} className="p-6 hover:bg-surface-elevated transition-colors flex items-center justify-between group cursor-pointer">
                       <div className="flex items-center gap-4">
                         <div className={`p-2 border rounded-sm shrink-0 flex items-center justify-center ${
-                          ticket.status === 'Resolved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' : 
+                          ticket.status === 'Resolved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
                           ticket.status === 'In Progress' ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' :
                           'bg-amber-500/10 border-amber-500/20 text-amber-500'
                         }`}>
-                          {ticket.status === 'Resolved' ? <CheckCircle2 className="w-5 h-5" /> : 
-                           ticket.status === 'In Progress' ? <Clock className="w-5 h-5" /> : 
+                          {ticket.status === 'Resolved' ? <CheckCircle2 className="w-5 h-5" /> :
+                           ticket.status === 'In Progress' ? <Clock className="w-5 h-5" /> :
                            <AlertCircle className="w-5 h-5" />}
                         </div>
                         <div>
@@ -182,12 +226,12 @@ export default function HelpDesk() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">Subject</label>
-                <input 
+                <input
                   autoFocus
-                  type="text" 
+                  type="text"
                   value={formData.subject}
                   onChange={e => setFormData({...formData, subject: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500" 
+                  className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500"
                   placeholder="Brief summary of the issue..."
                 />
               </div>
@@ -195,7 +239,7 @@ export default function HelpDesk() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">Department</label>
-                  <select 
+                  <select
                     value={formData.department}
                     onChange={e => setFormData({...formData, department: e.target.value})}
                     className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none"
@@ -208,7 +252,7 @@ export default function HelpDesk() {
                 </div>
                 <div>
                   <label className="block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">Priority</label>
-                  <select 
+                  <select
                     value={formData.priority}
                     onChange={e => setFormData({...formData, priority: e.target.value})}
                     className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none"
@@ -222,10 +266,10 @@ export default function HelpDesk() {
 
               <div>
                 <label className="block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">Description</label>
-                <textarea 
+                <textarea
                   value={formData.description}
                   onChange={e => setFormData({...formData, description: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 h-32 resize-none" 
+                  className="w-full bg-surface-base border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 h-32 resize-none"
                   placeholder="Provide context or reproduction steps..."
                 />
               </div>
@@ -234,8 +278,8 @@ export default function HelpDesk() {
                 <button type="button" onClick={() => setIsNewTicketOpen(false)} className="px-4 py-2 text-[10px] font-mono font-bold text-zinc-400 hover:text-white uppercase tracking-widest transition-colors">
                   Cancel
                 </button>
-                <button type="submit" className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors flex items-center gap-2">
-                  <Send className="w-3 h-3" />
+                <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors flex items-center gap-2">
+                  {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                   Transmit
                 </button>
               </div>

@@ -75,7 +75,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
       const user = (await supabase.auth.getUser()).data.user;
       if (!user) throw new Error('Not authenticated');
 
-      const newToken = Math.random().toString(36).substr(2, 9);
+      const newToken = crypto.randomUUID();
       const { data, error: insertErr } = await supabase
         .from('document_capture_sessions')
         .insert({
@@ -92,7 +92,6 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
       setToken(newToken);
       setStatus('waiting');
     } catch (err: any) {
-      console.error(err);
       setError(err.message);
       setStatus('expired');
     }

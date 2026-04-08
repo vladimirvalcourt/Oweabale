@@ -1041,6 +1041,9 @@ export const useStore = create<AppState>()(
     }
 
     try {
+      // Silently flip any upcoming bills that are now past their due date
+      await supabase.rpc('flip_overdue_bills');
+
       const [
         { data: bills },
         { data: debts },
