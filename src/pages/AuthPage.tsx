@@ -1,13 +1,36 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { Turnstile } from '@marsidev/react-turnstile';
+import type { TurnstileInstance } from '@marsidev/react-turnstile';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 
+type TurnstileStatus = 'idle' | 'solved' | 'expired' | 'error';
+
 export default function AuthPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const [turnstileStatus, setTurnstileStatus] = useState<TurnstileStatus>('idle');
+  const turnstileRef = useRef<TurnstileInstance>(null);
 
   const handleGoogleSignIn = async () => {
+    if (!turnstileToken || turnstileStatus !== 'solved') return;
+
     setGoogleLoading(true);
     try {
+      // Verify Turnstile token server-side before initiating OAuth
+      const verifyRes = await supabase.functions.invoke('verify-turnstile', {
+        body: { token: turnstileToken },
+      });
+
+      if (verifyRes.error || !verifyRes.data?.success) {
+        toast.error('Security check failed. Please try again.');
+        turnstileRef.current?.reset();
+        setTurnstileToken(null);
+        setTurnstileStatus('idle');
+        setGoogleLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -18,7 +41,7 @@ export default function AuthPage() {
           },
         },
       });
-      
+
       if (error) {
         throw error;
       }
@@ -59,10 +82,41 @@ export default function AuthPage() {
           </p>
         </div>
 
+        {/* Turnstile widget */}
+        <div className="mb-4">
+          <Turnstile
+            ref={turnstileRef}
+            siteKey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+            onSuccess={(token) => {
+              setTurnstileToken(token);
+              setTurnstileStatus('solved');
+            }}
+            onExpire={() => {
+              setTurnstileToken(null);
+              setTurnstileStatus('expired');
+            }}
+            onError={() => {
+              setTurnstileToken(null);
+              setTurnstileStatus('error');
+            }}
+            options={{ theme: 'dark', size: 'flexible' }}
+          />
+          {turnstileStatus === 'expired' && (
+            <p className="font-mono text-[10px] text-yellow-500 mt-1 uppercase tracking-wider">
+              Security check expired — please verify again.
+            </p>
+          )}
+          {turnstileStatus === 'error' && (
+            <p className="font-mono text-[10px] text-red-500 mt-1 uppercase tracking-wider">
+              Security check failed — please refresh and try again.
+            </p>
+          )}
+        </div>
+
         {/* Google Sign-In */}
         <button
           onClick={handleGoogleSignIn}
-          disabled={googleLoading}
+          disabled={googleLoading || turnstileStatus !== 'solved'}
           className="w-full flex items-center justify-center gap-3 bg-white text-black font-mono text-sm font-bold py-4 px-4 hover:bg-zinc-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-8"
         >
           {googleLoading ? (
