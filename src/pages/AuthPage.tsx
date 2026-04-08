@@ -99,7 +99,7 @@ export default function AuthPage() {
               setTurnstileToken(null);
               setTurnstileStatus('error');
             }}
-            options={{ theme: 'dark', size: 'flexible' }}
+            options={{ theme: 'light', size: 'flexible' }}
           />
           {turnstileStatus === 'expired' && (
             <p className="font-mono text-[10px] text-yellow-500 mt-1 uppercase tracking-wider">
