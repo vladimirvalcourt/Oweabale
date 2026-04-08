@@ -273,7 +273,7 @@ export default function Analytics() {
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
               <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval="preserveStartEnd" />
               <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={fmt} width={58} />
-              <Tooltip contentStyle={tooltipStyle} formatter={(v: any, name: string) => [fmt(Number(v)), name === 'net_worth' ? 'Net Worth' : name === 'assets' ? 'Assets' : 'Debts']} labelFormatter={(l) => l} />
+              <Tooltip contentStyle={tooltipStyle} formatter={(v: any, name: any) => [fmt(Number(v)), name === 'net_worth' ? 'Net Worth' : name === 'assets' ? 'Assets' : 'Debts']} labelFormatter={(l) => l} />
               <Area type="monotone" dataKey="assets"    stroke="#34D399" strokeWidth={1.5} fill="url(#assetsGrad)" dot={false} />
               <Area type="monotone" dataKey="net_worth" stroke="#6366F1" strokeWidth={2}   fill="url(#nwGrad)"     dot={false} />
             </AreaChart>
@@ -298,7 +298,7 @@ export default function Analytics() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
                 <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval={1} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={fmt} width={52} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v: any, name: string) => [`$${Number(v).toLocaleString()}`, name]} />
+                <Tooltip contentStyle={tooltipStyle} formatter={(v: any, name: any) => [`$${Number(v).toLocaleString()}`, name]} />
                 {topCategories.map((cat, i) => (
                   <Bar key={cat} dataKey={cat} stackId="stack" fill={CHART_COLORS[i % CHART_COLORS.length]} radius={0} />
                 ))}

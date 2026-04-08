@@ -927,7 +927,7 @@ export const useStore = create<AppState>()(
     if (rules.length === 0) return 0;
     const txs = get().transactions;
     let count = 0;
-    const updates: Promise<any>[] = [];
+    const updates: PromiseLike<any>[] = [];
     const updated = txs.map(tx => {
       const matched = applyCategorizationRules(tx.name, rules);
       if (matched && matched !== tx.category) {

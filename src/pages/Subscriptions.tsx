@@ -73,10 +73,8 @@ export default function Subscriptions() {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this subscription?')) {
-      deleteSubscription(id);
-      toast.success('Subscription deleted');
-    }
+    deleteSubscription(id);
+    toast.success('Subscription deleted');
   };
 
   const activeSubscriptions = subscriptions.filter(s => s.status === 'active');

@@ -9,6 +9,7 @@ import { motion } from 'motion/react';
 export default function Goals() {
   const { goals, addGoal, addGoalProgress, deleteGoal } = useStore();
   const [isAddingGoal, setIsAddingGoal] = useState(false);
+  const [progressInput, setProgressInput] = useState<{ id: string; value: string } | null>(null);
   const [newGoal, setNewGoal] = useState({
     name: '',
     targetAmount: '',
@@ -38,18 +39,20 @@ export default function Goals() {
     setNewGoal({ name: '', targetAmount: '', currentAmount: '', deadline: '', type: 'savings' });
   };
 
-  const handleUpdateProgress = (id: string, currentAmount: number, targetAmount: number) => {
-    const amountToAdd = window.prompt('Enter amount to add/subtract:');
-    if (amountToAdd === null || amountToAdd === '') return;
-    
-    const numAmount = Number(amountToAdd);
-    if (isNaN(numAmount)) {
-      toast.error('Please enter a valid number');
+  const handleUpdateProgress = (id: string) => {
+    setProgressInput({ id, value: '' });
+  };
+
+  const submitProgress = (e: React.FormEvent, id: string) => {
+    e.preventDefault();
+    const numAmount = Number(progressInput?.value);
+    if (!progressInput?.value || isNaN(numAmount)) {
+      toast.error('Enter a valid number');
       return;
     }
-
     addGoalProgress(id, numAmount);
     toast.success('Progress updated');
+    setProgressInput(null);
   };
 
   return (
@@ -247,21 +250,35 @@ export default function Goals() {
                       );
                     })()}
 
+                    {progressInput?.id === goal.id && (
+                      <form onSubmit={(e) => submitProgress(e, goal.id)} className="flex items-center gap-2 mb-3">
+                        <input
+                          type="number"
+                          step="0.01"
+                          autoFocus
+                          value={progressInput.value}
+                          onChange={(e) => setProgressInput({ id: goal.id, value: e.target.value })}
+                          placeholder="Amount (+/-)"
+                          className="flex-1 bg-surface-base border border-surface-border rounded-sm px-3 py-1.5 text-sm font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                        />
+                        <button type="submit" className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold transition-colors">
+                          Save
+                        </button>
+                        <button type="button" onClick={() => setProgressInput(null)} className="px-3 py-1.5 text-zinc-500 hover:text-white transition-colors text-xs">
+                          Cancel
+                        </button>
+                      </form>
+                    )}
                     <div className="flex items-center justify-between pt-4 border-t border-surface-highlight">
                       <button
-                        onClick={() => handleUpdateProgress(goal.id, goal.currentAmount, goal.targetAmount)}
+                        onClick={() => handleUpdateProgress(goal.id)}
                         disabled={isCompleted}
                         className="text-sm font-medium text-indigo-500 hover:text-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         Update Progress
                       </button>
                       <button
-                        onClick={() => {
-                          if (window.confirm('Are you sure you want to delete this goal?')) {
-                            deleteGoal(goal.id);
-                            toast.success('Goal deleted');
-                          }
-                        }}
+                        onClick={() => { deleteGoal(goal.id); toast.success('Goal deleted'); }}
                         className="text-sm font-medium text-[#EF4444] hover:text-[#DC2626] transition-colors"
                       >
                         Delete
