@@ -41,6 +41,7 @@ export default function Layout() {
   const { bills, debts, transactions, subscriptions, goals, incomes, budgets, user, isQuickAddOpen, openQuickAdd, closeQuickAdd, resetData, pendingIngestions, notifications, markNotificationsRead, clearNotifications } = useStore();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -697,13 +698,17 @@ export default function Layout() {
                 Cancel
               </button>
               <button
+                disabled={isResetting}
                 onClick={async () => {
+                  setIsResetting(true);
                   await resetData();
+                  setIsResetting(false);
                   setIsResetOpen(false);
                 }}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-sm text-[11px] font-mono font-bold uppercase tracking-widest transition-all shadow-lg shadow-amber-500/10"
+                className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-[11px] font-mono font-bold uppercase tracking-widest transition-all shadow-lg shadow-amber-500/10"
               >
-                Confirm Wipe
+                {isResetting && <Activity className="w-3 h-3 animate-spin" />}
+                {isResetting ? 'Wiping...' : 'Confirm Wipe'}
               </button>
             </div>
           </Dialog.Panel>

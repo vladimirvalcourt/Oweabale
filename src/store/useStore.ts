@@ -814,17 +814,16 @@ export const useStore = create<AppState>()(
 
     set({ isLoading: true });
     try {
-      // 1. CLEAR ALL RECODRS FROM ALL TABLES associated with this user
+      // 1. CLEAR ALL RECORDS FROM ALL TABLES associated with this user (parallel)
       const tables = [
-        'bills', 'debts', 'transactions', 'assets', 'subscriptions', 
-        'goals', 'incomes', 'budgets', 'categories', 'citations', 
-        'deductions', 'freelance_entries'
+        'bills', 'debts', 'transactions', 'assets', 'subscriptions',
+        'goals', 'incomes', 'budgets', 'categories', 'citations',
+        'deductions', 'freelance_entries', 'pending_ingestions'
       ];
 
-      for (const table of tables) {
-        // Use RPC or individual calls if no RPC exists
-        await supabase.from(table).delete().eq('user_id', userId);
-      }
+      await Promise.all(tables.map(table =>
+        supabase.from(table).delete().eq('user_id', userId)
+      ));
 
       // 2. RESET ONBOARDING FLAG
       await supabase.from('profiles').update({
