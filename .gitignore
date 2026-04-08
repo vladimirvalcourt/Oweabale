@@ -3,16 +3,15 @@
 .agents/
 _agent/
 _agents/
-agents/
 .trae/
 trae/
 brain/
 .gemini/
 .mcp.json
-skills/
 skills-lock.json
 .claude/
 .1code/
+# agents/ and skills/ are intentionally versioned (Superpowers skills library)
 
 # System & Cache
 node_modules/
