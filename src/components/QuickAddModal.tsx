@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Terminal, AlertCircle, ScanLine, Loader2, Camera } from 'lucide-react';
+import { X, Terminal, AlertCircle, Loader2, Camera } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
@@ -26,6 +26,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [dueDate, setDueDate] = useState('');
   const [vendor, setVendor] = useState('');
   const [source, setSource] = useState('salary');
+  // NLP input state
+  const [nlpText, setNlpText] = useState('');
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
   // Scan state
@@ -100,9 +102,13 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         } catch {}
       }
 
-      toast.success('Document scanned — review the fields and save.');
+      if (!fullText.trim()) {
+        toast.warning('Could not extract text — fill in the fields manually.');
+      } else {
+        toast.success('Document scanned — review the fields and save.');
+      }
     } catch {
-      toast.error('Could not read document. Try a clearer photo.');
+      toast.error('Could not read document. Try a clearer photo or PDF.');
     } finally {
       setIsScanning(false);
       e.target.value = '';
@@ -115,7 +121,15 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       setAmount('');
       setDescription('');
       setVendor('');
+      setCategory('food');
+      setDate(new Date().toISOString().split('T')[0]);
+      setType('bill');
+      setDueDate('');
+      setSource('salary');
+      setNlpText('');
+      setIsScanning(false);
       setErrors({});
+      if (scanInputRef.current) scanInputRef.current.value = '';
     }
   }, [isOpen, quickAddTab]);
 
@@ -131,7 +145,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    if (!amount || isNaN(parseFloat(amount))) newErrors.amount = "Please enter a valid amount.";
+    const parsedAmount = parseFloat(amount);
+    if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) newErrors.amount = "Please enter a valid amount greater than zero.";
     
     if (activeTab === 'transaction') {
       if (!description.trim()) newErrors.description = "Please describe the transaction.";
@@ -149,6 +164,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
 
   const handleNLPInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
+    setNlpText(val);
     
     // Simple NLP parsing
     const parts = val.trim().split(/\s+/);
@@ -331,8 +347,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       <span className="text-xs font-sans font-medium text-zinc-300">Natural Language Speed Input</span>
                     </div>
                     
-                    <textarea 
+                    <textarea
                       placeholder="e.g. 'Coffee 5.50 today' or 'Comcast bill 120 next tuesday'"
+                      value={nlpText}
                       onChange={handleNLPInput}
                       className="w-full bg-surface-raised border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm font-sans text-white placeholder-zinc-500 p-3 outline-none resize-none transition-colors"
                       rows={2}
@@ -379,6 +396,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           id="amount"
                           type="number"
                           step="0.01"
+                          min="0"
                           value={amount}
                           onChange={(e) => { setAmount(e.target.value); if(errors.amount) setErrors({...errors, amount: ''}); }}
                           placeholder="0.00"
