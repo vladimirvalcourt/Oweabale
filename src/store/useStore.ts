@@ -988,9 +988,14 @@ export const useStore = create<AppState>()(
     }));
   },
   removePendingIngestion: async (id) => {
+    const item = get().pendingIngestions.find(pi => pi.id === id);
     const userId = (await supabase.auth.getUser()).data.user?.id;
     if (userId) {
       await supabase.from('pending_ingestions').delete().eq('id', id).eq('user_id', userId);
+      // Delete the raw file from storage — best-effort, never blocks UI
+      if (item?.storagePath) {
+        supabase.storage.from('ingestion-files').remove([item.storagePath]).catch(() => {});
+      }
     }
     set((state) => ({
       pendingIngestions: state.pendingIngestions.filter(pi => pi.id !== id)
@@ -1038,8 +1043,6 @@ export const useStore = create<AppState>()(
         transactions: [newTransaction, ...s.transactions].slice(0, 50),
         pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
       }));
-      // Remove from DB
-      if (userId) await supabase.from('pending_ingestions').delete().eq('id', id).eq('user_id', userId);
     } else if (item.type === 'bill') {
       const newBill: Bill = {
         id: commonId,
@@ -1062,8 +1065,6 @@ export const useStore = create<AppState>()(
         bills: [...s.bills, newBill],
         pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
       }));
-      // Remove from DB
-      if (userId) await supabase.from('pending_ingestions').delete().eq('id', id).eq('user_id', userId);
     } else if (item.type === 'income') {
       const newIncome: IncomeSource = {
         id: commonId,
@@ -1086,6 +1087,14 @@ export const useStore = create<AppState>()(
         incomes: [...s.incomes, newIncome],
         pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
       }));
+    }
+
+    // ── Always clean up: delete DB row + raw file from storage ──
+    if (userId) {
+      await supabase.from('pending_ingestions').delete().eq('id', id).eq('user_id', userId);
+      if (item.storagePath) {
+        supabase.storage.from('ingestion-files').remove([item.storagePath]).catch(() => {});
+      }
     }
 
     toast.success(`Saved ${item.type} to history`);
