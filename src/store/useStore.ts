@@ -986,7 +986,8 @@ export const useStore = create<AppState>()(
     let newId = crypto.randomUUID();
     if (userId) {
       const { data, error } = await supabase.from('credit_fixes').insert({ ...fix, user_id: userId }).select('id').single();
-      if (!error && data?.id) newId = data.id;
+      if (error) { toast.error('Failed to save credit fix'); return; }
+      if (data?.id) newId = data.id;
     }
     set(state => ({ credit: { ...state.credit, fixes: [...state.credit.fixes, { ...fix, id: newId }] } }));
   },
@@ -1053,7 +1054,10 @@ export const useStore = create<AppState>()(
           storage_path: ingestion.storagePath,
           storage_url: ingestion.storageUrl
         });
-        if (error) console.error('[addPendingIngestion] DB insert failed:', error.message);
+        if (error) {
+          console.error('[addPendingIngestion] DB insert failed:', error.message);
+          toast.error('Upload not saved — data may disappear after sign-out. Run the database migration and try again.');
+        }
       }
     })();
     
@@ -1126,11 +1130,12 @@ export const useStore = create<AppState>()(
         type: 'expense'
       };
       if (userId) {
-        await supabase.from('transactions').insert({
+        const { error } = await supabase.from('transactions').insert({
           name: newTransaction.name, category: newTransaction.category,
           date: newTransaction.date, amount: newTransaction.amount,
           type: newTransaction.type, user_id: userId,
         });
+        if (error) { toast.error('Failed to save transaction. Please try again.'); return; }
       }
       set((s) => ({
         transactions: [newTransaction, ...s.transactions].slice(0, 50),
@@ -1148,11 +1153,12 @@ export const useStore = create<AppState>()(
         autoPay: false,
       };
       if (userId) {
-        await supabase.from('bills').insert({
+        const { error } = await supabase.from('bills').insert({
           biller: newBill.biller, amount: newBill.amount, category: newBill.category,
           due_date: newBill.dueDate, frequency: newBill.frequency,
           status: newBill.status, auto_pay: newBill.autoPay, user_id: userId,
         });
+        if (error) { toast.error('Failed to save bill. Please try again.'); return; }
       }
       set((s) => ({
         bills: [...s.bills, newBill],
@@ -1170,11 +1176,12 @@ export const useStore = create<AppState>()(
         isTaxWithheld: false,
       };
       if (userId) {
-        await supabase.from('incomes').insert({
+        const { error } = await supabase.from('incomes').insert({
           name: newIncome.name, amount: newIncome.amount, frequency: newIncome.frequency,
           category: newIncome.category, next_date: newIncome.nextDate,
           status: newIncome.status, is_tax_withheld: newIncome.isTaxWithheld, user_id: userId,
         });
+        if (error) { toast.error('Failed to save income. Please try again.'); return; }
       }
       set((s) => ({
         incomes: [...s.incomes, newIncome],
