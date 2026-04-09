@@ -135,6 +135,7 @@ export default function Layout() {
         { name: 'Income', path: '/income', icon: Vault },
         { name: 'Freelance Vault', path: '/freelance', icon: Briefcase },
         { name: 'Regular Bills', path: '/bills', icon: Receipt },
+        { name: 'Tickets & Fines', path: '/bills?tab=ambush', icon: AlertTriangle },
         { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },
         { name: 'Review Inbox', path: '/ingestion', icon: Inbox, count: pendingIngestions.length },
       ]
@@ -228,7 +229,16 @@ export default function Layout() {
                       className="overflow-hidden space-y-1"
                     >
                       {group.items.map((item) => {
-                        const isActive = location.pathname === item.path;
+                        const itemBasePath = item.path.split('?')[0];
+                        const itemTabParam = item.path.includes('?')
+                          ? new URLSearchParams(item.path.split('?')[1]).get('tab')
+                          : null;
+                        const currentTabParam = new URLSearchParams(location.search).get('tab');
+                        const isActive = location.pathname === itemBasePath && (
+                          itemTabParam !== null
+                            ? currentTabParam === itemTabParam   // nav item has a tab — must match
+                            : currentTabParam === null || !['ambush','recurring','debt'].includes(currentTabParam ?? '') // nav item has no tab — active only when no conflicting tab param
+                        );
                         const Icon = item.icon;
                         return (
                           <Link

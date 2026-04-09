@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Terminal, AlertCircle, Loader2, Camera, Eye, EyeOff } from 'lucide-react';
+import { X, Terminal, AlertCircle, Loader2, Camera, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
@@ -14,8 +14,8 @@ interface QuickAddModalProps {
 }
 
 export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
-  const { quickAddTab, addTransaction, addBill, addDebt, addIncome } = useStore();
-  const [activeTab, setActiveTab] = useState<'transaction' | 'obligation' | 'income'>('transaction');
+  const { quickAddTab, addTransaction, addBill, addDebt, addIncome, addCitation } = useStore();
+  const [activeTab, setActiveTab] = useState<'transaction' | 'obligation' | 'income' | 'citation'>('transaction');
 
   // Form states
   const [amount, setAmount] = useState('');
@@ -26,6 +26,13 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [dueDate, setDueDate] = useState('');
   const [vendor, setVendor] = useState('');
   const [source, setSource] = useState('salary');
+  // Citation-specific states
+  const [citationType, setCitationType] = useState('Toll Violation');
+  const [jurisdiction, setJurisdiction] = useState('');
+  const [citationNumber, setCitationNumber] = useState('');
+  const [penaltyFee, setPenaltyFee] = useState('');
+  const [daysLeft, setDaysLeft] = useState('30');
+  const [paymentUrl, setPaymentUrl] = useState('');
   // NLP input state
   const [nlpText, setNlpText] = useState('');
   // Validation state
@@ -104,6 +111,12 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         if (amounts.length > 0) setAmount(Math.max(...amounts).toFixed(2));
       }
 
+      // ── Auto-detect toll / traffic ticket and switch tab ──
+      const isCitationDoc = /toll|violation|citation|ticket|fine|infraction|notice of|penalty|mvd|dmv|traffic|speed|red light|parking (fine|violation|notice)|e-zpass|sunpass|fastrak|pikepass/i.test(fullText);
+      if (isCitationDoc && activeTab !== 'citation') {
+        setActiveTab('citation');
+      }
+
       // ── Extract merchant: skip noise, find first meaningful line ──
       const lines = fullText.split('\n').filter(l => l.trim().length > 2);
       const merchantName = extractMerchantName(lines);
@@ -118,6 +131,48 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       if (!merchantName) {
         const guessed = guessCategory(fullText.substring(0, 500));
         if (guessed) setCategory(guessed);
+      }
+
+      // ── Citation-specific extraction ──
+      if (isCitationDoc) {
+        // Citation / notice number
+        const citNumMatch = fullText.match(/(?:citation|notice|ticket|case|ref(?:erence)?|no\.?|#)\s*[:\-]?\s*([A-Z0-9\-]{4,20})/i);
+        if (citNumMatch) setCitationNumber(citNumMatch[1].trim());
+
+        // Jurisdiction — look for state name or abbreviation near common patterns
+        const jurisdictionMatch = fullText.match(/(?:issued by|jurisdiction|county of|city of|state of|court)[:\s]+([A-Za-z\s]{3,40})/i);
+        if (jurisdictionMatch) setJurisdiction(jurisdictionMatch[1].trim().substring(0, 40));
+
+        // Penalty / late fee — second largest dollar amount after the main fine
+        const allAmountMatches = fullText.match(/\$?\s*\d{1,6}\.\d{2}/g);
+        if (allAmountMatches) {
+          const amounts = allAmountMatches
+            .map(m => parseFloat(m.replace(/[^0-9.]/g, '')))
+            .filter(n => !isNaN(n) && n > 0)
+            .sort((a, b) => b - a);
+          if (amounts.length >= 2) setPenaltyFee(amounts[1].toFixed(2));
+        }
+
+        // Due date → days left
+        const dueDateMatch = fullText.match(/(?:due|pay by|payment due|deadline)[:\s]+(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i);
+        if (dueDateMatch) {
+          try {
+            const dueD = new Date(dueDateMatch[1]);
+            if (!isNaN(dueD.getTime())) {
+              const days = Math.max(0, Math.round((dueD.getTime() - Date.now()) / 86400000));
+              setDaysLeft(String(days));
+              setDueDate(dueD.toISOString().split('T')[0]);
+            }
+          } catch {}
+        }
+
+        // Toll operator type detection
+        if (/e-zpass|ezpass/i.test(fullText)) setCitationType('Toll Violation');
+        else if (/speed|mph|velocity/i.test(fullText)) setCitationType('Speed Camera');
+        else if (/red light|signal/i.test(fullText)) setCitationType('Red Light Camera');
+        else if (/parking/i.test(fullText)) setCitationType('Parking Ticket');
+        else if (/traffic|moving/i.test(fullText)) setCitationType('Traffic Citation');
+        else if (/toll/i.test(fullText)) setCitationType('Toll Violation');
       }
 
       // ── Extract date ──
@@ -163,6 +218,12 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       if (scanInputRef.current) scanInputRef.current.value = '';
       setScannedPreviewUrl(prev => { if (prev) URL.revokeObjectURL(prev); return null; });
       setShowPreview(false);
+      setCitationType('Toll Violation');
+      setJurisdiction('');
+      setCitationNumber('');
+      setPenaltyFee('');
+      setDaysLeft('30');
+      setPaymentUrl('');
     }
   }, [isOpen, quickAddTab]);
 
@@ -187,8 +248,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       if (!vendor.trim()) newErrors.vendor = "Please specify who is being paid.";
       if (!dueDate) newErrors.dueDate = "Please select a due date.";
     } else if (activeTab === 'income') {
-      // Incomes mostly rely on select, but we can check amount and date
       if (!date) newErrors.date = "Please select a date.";
+    } else if (activeTab === 'citation') {
+      if (!jurisdiction.trim()) newErrors.jurisdiction = "Please enter the issuing jurisdiction.";
     }
 
     setErrors(newErrors);
@@ -236,7 +298,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
     
@@ -286,6 +348,19 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
           isTaxWithheld: false
         });
         toast.success(`Income recorded`);
+      } else if (activeTab === 'citation') {
+        await addCitation({
+          type: citationType,
+          jurisdiction: jurisdiction.trim(),
+          daysLeft: parseInt(daysLeft) || 30,
+          amount: numAmount,
+          penaltyFee: parseFloat(penaltyFee) || 0,
+          date: date,
+          citationNumber: citationNumber.trim(),
+          paymentUrl: paymentUrl.trim(),
+          status: 'open',
+        });
+        toast.success(`Citation recorded`);
       }
       onClose();
     } catch (error) {
@@ -449,6 +524,15 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}
                     >
                       Income
+                    </button>
+                    <button
+                      onClick={() => { setActiveTab('citation'); setErrors({}); }}
+                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded flex items-center justify-center gap-1.5 ${
+                        activeTab === 'citation' ? 'bg-rose-500/20 text-rose-300 shadow-sm' : 'text-zinc-400 hover:text-zinc-200 hover:bg-surface-elevated'
+                      } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500`}
+                    >
+                      <AlertTriangle className="w-3 h-3" />
+                      Ticket
                     </button>
                   </div>
 
@@ -619,6 +703,98 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       </>
                     )}
 
+                    {/* CITATION FIELDS */}
+                    {activeTab === 'citation' && (
+                      <>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Type</label>
+                            <select
+                              value={citationType}
+                              onChange={(e) => setCitationType(e.target.value)}
+                              className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2 text-sm font-sans text-white outline-none cursor-pointer"
+                            >
+                              <option value="Toll Violation">Toll Violation</option>
+                              <option value="Traffic Citation">Traffic Citation</option>
+                              <option value="Parking Ticket">Parking Ticket</option>
+                              <option value="Speed Camera">Speed Camera</option>
+                              <option value="Red Light Camera">Red Light Camera</option>
+                              <option value="HOV Violation">HOV Violation</option>
+                              <option value="Other Fine">Other Fine</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Days Until Due</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={daysLeft}
+                              onChange={(e) => setDaysLeft(e.target.value)}
+                              className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2 text-sm font-sans text-white outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">
+                            Issuing Jurisdiction <span className="text-rose-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={jurisdiction}
+                            onChange={(e) => { setJurisdiction(e.target.value); if (errors.jurisdiction) setErrors({ ...errors, jurisdiction: '' }); }}
+                            placeholder="E.g., Dallas County, TX"
+                            className={`w-full bg-surface-base border ${errors.jurisdiction ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none transition-colors`}
+                          />
+                          {errors.jurisdiction && (
+                            <p className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5"><AlertCircle className="w-3 h-3" /> {errors.jurisdiction}</p>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Citation / Ticket #</label>
+                            <input
+                              type="text"
+                              value={citationNumber}
+                              onChange={(e) => setCitationNumber(e.target.value)}
+                              placeholder="E.g., TN-20394857"
+                              className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2.5 text-sm font-mono text-white placeholder-zinc-600 outline-none transition-colors uppercase"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Penalty / Late Fee ($)</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              min="0"
+                              value={penaltyFee}
+                              onChange={(e) => setPenaltyFee(e.target.value)}
+                              placeholder="0.00"
+                              className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Payment URL <span className="text-zinc-600">(optional)</span></label>
+                          <input
+                            type="url"
+                            value={paymentUrl}
+                            onChange={(e) => setPaymentUrl(e.target.value)}
+                            placeholder="https://..."
+                            className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none transition-colors"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Incident Date</label>
+                          <input
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2 text-sm font-sans text-white outline-none"
+                          />
+                        </div>
+                      </>
+                    )}
+
                     {/* INCOME FIELDS */}
                     {activeTab === 'income' && (
                       <>
@@ -666,7 +842,11 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   <button
                     type="submit"
                     form="quick-add-form"
-                    className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-sm font-sans font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-raised focus-visible:ring-indigo-500 shadow"
+                    className={`px-5 py-2 text-white rounded text-sm font-sans font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-raised shadow ${
+                      activeTab === 'citation'
+                        ? 'bg-rose-600 hover:bg-rose-500 focus-visible:ring-rose-500'
+                        : 'bg-indigo-600 hover:bg-indigo-500 focus-visible:ring-indigo-500'
+                    }`}
                   >
                     Save Entry
                   </button>
