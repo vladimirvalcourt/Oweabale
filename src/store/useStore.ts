@@ -321,13 +321,9 @@ const initialData = {
   notifications: [],
   categorizationRules: [],
   credit: {
-    score: 720, // Starting default for demo
-    lastUpdated: new Date().toISOString(),
-    factors: [
-      { id: '1', name: 'On-Time Payments', impact: 'high', status: 'excellent', description: 'You have paid 100% of your bills on time in the last 2 years.' },
-      { id: '2', name: 'Credit Usage', impact: 'high', status: 'fair', description: 'You are using 35% of your total credit limit. Try to keep this below 10%.' },
-      { id: '3', name: 'Credit Age', impact: 'medium', status: 'good', description: 'Your oldest account is 5 years old.' },
-    ],
+    score: 0,
+    lastUpdated: '',
+    factors: [],
     fixes: [],
   },
 };
@@ -873,7 +869,7 @@ export const useStore = create<AppState>()(
       const tables = [
         'bills', 'debts', 'transactions', 'assets', 'subscriptions',
         'goals', 'incomes', 'budgets', 'categories', 'citations',
-        'deductions', 'freelance_entries', 'pending_ingestions'
+        'deductions', 'freelance_entries', 'pending_ingestions', 'credit_fixes'
       ];
 
       await Promise.all(tables.map(table =>
@@ -1284,6 +1280,11 @@ export const useStore = create<AppState>()(
           status: i.status as IncomeSource['status'],
           isTaxWithheld: (i.is_tax_withheld ?? i.isTaxWithheld ?? false) as boolean,
         })),
+        credit: profile ? {
+          ...get().credit,
+          score: profile.credit_score ?? get().credit.score,
+          lastUpdated: profile.credit_last_updated ?? get().credit.lastUpdated,
+        } : get().credit,
         user: profile ? {
           id: profile.id,
           firstName: profile.first_name,
@@ -1312,6 +1313,7 @@ export const useStore = create<AppState>()(
         { data: freelanceEntries },
         { data: pendingIngestions },
         { data: categorizationRules },
+        { data: creditFixes },
       ] = await Promise.all([
         supabase.from('subscriptions').select('*').eq('user_id', resolvedUserId),
         supabase.from('goals').select('*').eq('user_id', resolvedUserId),
@@ -1322,6 +1324,7 @@ export const useStore = create<AppState>()(
         supabase.from('freelance_entries').select('*').eq('user_id', resolvedUserId),
         supabase.from('pending_ingestions').select('*').eq('user_id', resolvedUserId),
         supabase.from('categorization_rules').select('*').eq('user_id', resolvedUserId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
+        supabase.from('credit_fixes').select('*').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
       ]);
 
       set({
@@ -1405,6 +1408,17 @@ export const useStore = create<AppState>()(
           category:    r.category as string,
           priority:    r.priority as number,
         })),
+        credit: {
+          ...get().credit,
+          fixes: (creditFixes || []).map((f: Record<string, unknown>) => ({
+            id: f.id as string,
+            item: f.item as string,
+            amount: f.amount as number,
+            status: f.status as CreditFix['status'],
+            bureau: f.bureau as string,
+            notes: (f.notes ?? '') as string,
+          })),
+        },
       });
 
       // Upsert today's net worth snapshot for historical trending.

@@ -346,7 +346,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         } else {
           addDebt({
             name: vendor,
-            type: type === 'collection' ? 'Collection' : 'Loan', 
+            type: 'Loan',
             apr: parseFloat(apr) || 0, 
             remaining: numAmount,
             minPayment: parseFloat(minPayment) || 0,
@@ -662,7 +662,6 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             >
                               <option value="bill">Monthly Bill</option>
                               <option value="debt">Loan / Credit Card</option>
-                              <option value="collection">Collection / Charge-off</option>
                             </select>
                           </div>
                           <div>

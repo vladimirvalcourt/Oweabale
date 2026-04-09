@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ShieldCheck, AlertCircle, TrendingUp, HelpCircle, 
@@ -23,8 +23,7 @@ export default function CreditCenter() {
   const [fixNotes, setFixNotes] = useState('');
 
   // Defensive programming for hydrated store
-  const creditScore = credit?.score || 350;
-  const lastUpdated = credit?.lastUpdated || new Date().toISOString().split('T')[0];
+  const creditScore = credit?.score ?? 0;
   const activeFixes = (credit?.fixes || []).filter(f => f.status !== 'resolved');
   const itemsSent = (credit?.fixes || []).filter(f => f.status === 'sent').length;
   const itemsResolved = (credit?.fixes || []).filter(f => f.status === 'resolved').length;
@@ -44,11 +43,16 @@ export default function CreditCenter() {
 
   const boostTip = useMemo(() => {
     if (!highBalanceCard) return null;
-    const targetAmount = (highBalanceCard.remaining || 0) * 0.1; // 10% target
+    const remaining = highBalanceCard.remaining || 0;
+    const targetBalance = remaining * 0.1; // target 10% utilization
+    const amountToPay = remaining - targetBalance;
+    // Estimated points: higher utilization reduction = more points (capped 10–40)
+    const utilizationReduction = remaining - targetBalance;
+    const pointPotential = Math.min(40, Math.max(10, Math.floor(utilizationReduction / 500)));
     return {
       cardName: highBalanceCard.name,
-      amountToPay: (highBalanceCard.remaining || 0) - targetAmount,
-      pointPotential: 15 + Math.floor(Math.random() * 20) // Random estimate for demo
+      amountToPay,
+      pointPotential,
     };
   }, [highBalanceCard]);
 
@@ -153,11 +157,15 @@ ${user.firstName} ${user.lastName}
           >
             <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-indigo-500/50 to-transparent" />
             <p className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">Estimated Score</p>
-            <p className="text-6xl font-mono font-bold text-white tracking-tighter mb-2">{credit?.score || 0}</p>
-            <div className="flex items-center justify-center gap-2 text-[11px] font-mono uppercase tracking-widest text-emerald-500">
-              <TrendingUp className="w-3.5 h-3.5" />
-              <span>+12 pts this month</span>
-            </div>
+            <p className="text-6xl font-mono font-bold text-white tracking-tighter mb-2">{creditScore || '—'}</p>
+            {credit?.lastUpdated ? (
+              <div className="flex items-center justify-center gap-2 text-[11px] font-mono uppercase tracking-widest text-zinc-500">
+                <Calendar className="w-3 h-3" />
+                <span>Updated {new Date(credit.lastUpdated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+              </div>
+            ) : (
+              <p className="text-[11px] font-mono uppercase tracking-widest text-zinc-600">No score recorded yet</p>
+            )}
           </motion.div>
         </div>
 
@@ -210,7 +218,7 @@ ${user.firstName} ${user.lastName}
                       to <span className="text-indigo-400">10% utilization</span> 
                     </p>
                     <p className="text-sm text-zinc-400 mb-6 max-w-lg leading-relaxed">
-                      Your current utilization on this account is suppressing your score. Pay <span className="text-white font-mono">$${boostTip.amountToPay.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span> to trigger a recalculation.
+                      Your current utilization on this account is suppressing your score. Pay <span className="text-white font-mono">${boostTip.amountToPay.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span> to trigger a recalculation.
                     </p>
                     <div className="inline-flex items-center bg-black/30 border border-indigo-500/10 px-4 py-2 rounded-sm text-xs font-mono">
                       <span className="text-zinc-500 uppercase tracking-widest mr-2">Est. Boost</span>
