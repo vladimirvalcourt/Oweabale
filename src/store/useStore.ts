@@ -1089,7 +1089,9 @@ export const useStore = create<AppState>()(
       await supabase.from('pending_ingestions').delete().eq('id', id).eq('user_id', userId);
       // Delete the raw file from storage — best-effort, never blocks UI
       if (item?.storagePath) {
-        supabase.storage.from('ingestion-files').remove([item.storagePath]).catch(() => {});
+        supabase.storage.from('ingestion-files').remove([item.storagePath]).catch((err) => {
+          console.warn('[useStore] Failed to delete storage file:', item.storagePath, err.message);
+        });
       }
     }
     set((state) => ({
@@ -1188,7 +1190,9 @@ export const useStore = create<AppState>()(
     if (userId) {
       await supabase.from('pending_ingestions').delete().eq('id', id).eq('user_id', userId);
       if (item.storagePath) {
-        supabase.storage.from('ingestion-files').remove([item.storagePath]).catch(() => {});
+        supabase.storage.from('ingestion-files').remove([item.storagePath]).catch((err) => {
+          console.warn('[useStore] Failed to delete storage file after commit:', item.storagePath, err.message);
+        });
       }
     }
 
