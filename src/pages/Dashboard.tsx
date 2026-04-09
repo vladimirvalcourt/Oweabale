@@ -68,111 +68,124 @@ export default function Dashboard() {
   }, [assets, debts, incomes, bills, subscriptions]);
 
   // --- Financial Calcs ---
-  const totalAssets = useMemo(() => assets.reduce((acc, asset) => acc + asset.value, 0), [assets]);
-  const totalDebts = useMemo(() => debts.reduce((acc, debt) => acc + debt.remaining, 0), [debts]);
+  const totalAssets = useMemo(() => (assets || []).reduce((acc, asset) => acc + (asset?.value || 0), 0), [assets]);
+  const totalDebts = useMemo(() => (debts || []).reduce((acc, debt) => acc + (debt?.remaining || 0), 0), [debts]);
   const netWorth = totalAssets - totalDebts;
 
-  const liquidCash = useMemo(() => assets.filter(a => a.type === 'Cash').reduce((s, a) => s + a.value, 0), [assets]);
+  const liquidCash = useMemo(() => (assets || []).filter(a => a?.type === 'Cash').reduce((s, a) => s + (a?.value || 0), 0), [assets]);
   
   const monthlyBurn = useMemo(() => {
     const toMonthly = (amount: number, frequency: string) => {
+      const amt = amount || 0;
       switch (frequency) {
-        case 'Weekly':    return amount * 4.33;
-        case 'Bi-weekly': return amount * 2.165;
-        case 'Quarterly': return amount / 3;
-        case 'Yearly':    return amount / 12;
-        default:          return amount; // Monthly
+        case 'Weekly':    return amt * 4.33;
+        case 'Bi-weekly': return amt * 2.165;
+        case 'Quarterly': return amt / 3;
+        case 'Yearly':    return amt / 12;
+        default:          return amt; // Monthly
       }
     };
-    const billsTotal = bills.reduce((s, b) => s + toMonthly(b.amount, b.frequency), 0);
-    const debtMins = debts.reduce((s, d) => s + (d.minPayment || 0), 0);
-    const subTotal = subscriptions
-      .filter(s => s.status === 'active')
-      .reduce((s, sub) => s + toMonthly(sub.amount, sub.frequency), 0);
+    const billsTotal = (bills || []).reduce((s, b) => s + toMonthly(b?.amount, b?.frequency), 0);
+    const debtMins = (debts || []).reduce((s, d) => s + (d?.minPayment || 0), 0);
+    const subTotal = (subscriptions || [])
+      .filter(s => s?.status === 'active')
+      .reduce((s, sub) => s + toMonthly(sub?.amount, sub?.frequency), 0);
     return billsTotal + debtMins + subTotal;
   }, [bills, debts, subscriptions]);
 
   const cashFlow = useMemo(
-    () => calcMonthlyCashFlow(incomes, bills, debts, subscriptions),
+    () => calcMonthlyCashFlow(incomes || [], bills || [], debts || [], subscriptions || []),
     [incomes, bills, debts, subscriptions]
   );
 
   const surplusRouting = useMemo(
-    () => calcSurplusRouting(cashFlow.surplus, goals, debts),
+    () => calcSurplusRouting(cashFlow.surplus || 0, goals || [], debts || []),
     [cashFlow.surplus, goals, debts]
   );
 
-  const survivalMonths = Math.max(0, liquidCash / (monthlyBurn || 1));
+  const survivalMonths = isFinite(liquidCash / (monthlyBurn || 1)) ? Math.max(0, liquidCash / (monthlyBurn || 1)) : 0;
   
-  const upcomingBills = useMemo(() => bills.filter(b => b.status === 'upcoming').sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()), [bills]);
+  const upcomingBills = useMemo(() => (bills || [])
+    .filter(b => b?.status === 'upcoming' && b?.dueDate)
+    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()), 
+  [bills]);
+
+  const activeSubscriptions = useMemo(() => (subscriptions || []).filter(s => s?.status === 'active'), [subscriptions]);
   
-  const activeSubscriptions = useMemo(() => subscriptions.filter(s => s.status === 'active'), [subscriptions]);
-  const monthlySubscriptionCost = useMemo(() => activeSubscriptions.reduce((acc, sub) => {
-    switch (sub.frequency) {
-      case 'Weekly':    return acc + sub.amount * 4.33;
-      case 'Bi-weekly': return acc + sub.amount * 2.165;
-      case 'Yearly':    return acc + sub.amount / 12;
-      default:          return acc + sub.amount; // Monthly
-    }
+  const taxInsolvencyRisk = useMemo(() => {
+    const currentTaxLiability = (cashFlow?.taxReserve || 0) * 3; // Est quarterly
+    return liquidCash < currentTaxLiability;
+  }, [cashFlow.taxReserve, liquidCash]);
+
+  const subscriptionSpend = useMemo(() => activeSubscriptions.reduce((acc, sub) => {
+    const toMonthly = (amount: number, freq: string) => freq === 'Yearly' ? (amount / 12) : (amount || 0);
+    return acc + toMonthly(sub.amount, sub.frequency);
   }, 0), [activeSubscriptions]);
 
   // --- Intelligent Modules ---
 
   // 1. Debt
   const avalancheTarget = useMemo(() => {
-    const activeDebts = [...debts].filter(d => d.remaining > 0);
-    return activeDebts.sort((a, b) => b.apr - a.apr)[0] || null;
+    const activeDebts = [...(debts || [])].filter(d => (d?.remaining || 0) > 0);
+    return activeDebts.sort((a, b) => (b?.apr || 0) - (a?.apr || 0))[0] || null;
   }, [debts]);
 
   const debtProgress = useMemo(() => {
     if (!avalancheTarget) return 0;
-    return (avalancheTarget.paid / (avalancheTarget.remaining + avalancheTarget.paid)) * 100;
+    const total = (avalancheTarget.remaining || 0) + (avalancheTarget.paid || 0);
+    if (total === 0) return 0;
+    return ((avalancheTarget.paid || 0) / total) * 100;
   }, [avalancheTarget]);
 
   // 2. Cash Gap
   const { isOverdraftRisk, liquidBuffer, imminentTotal, nextPaydayStr } = useMemo(() => {
     const today = new Date();
-    const activeIncomes = incomes.filter(i => i.status === 'active' && new Date(i.nextDate) >= today);
+    const activeIncomes = (incomes || []).filter(i => i?.status === 'active' && i?.nextDate && new Date(i.nextDate) >= today);
     const nextPayday = activeIncomes.sort((a, b) => new Date(a.nextDate).getTime() - new Date(b.nextDate).getTime())[0];
     
     let sniperWindowMs = 14 * 24 * 60 * 60 * 1000;
     if (nextPayday) {
-      sniperWindowMs = new Date(nextPayday.nextDate).getTime() - today.getTime();
+      const paydayDate = new Date(nextPayday.nextDate);
+      if (!isNaN(paydayDate.getTime())) {
+        sniperWindowMs = paydayDate.getTime() - today.getTime();
+      }
     }
 
     const imminent = upcomingBills.filter(b => {
+      if (!b?.dueDate) return false;
       const msUntilDue = new Date(b.dueDate).getTime() - today.getTime();
       return msUntilDue >= 0 && msUntilDue <= sniperWindowMs;
     });
 
-    const sumImminent = imminent.reduce((s, b) => s + b.amount, 0);
+    const sumImminent = imminent.reduce((s, b) => s + (b?.amount || 0), 0);
     const buffer = liquidCash - sumImminent;
     
     return {
       isOverdraftRisk: buffer < 0,
       liquidBuffer: buffer,
       imminentTotal: sumImminent,
-      nextPaydayStr: nextPayday ? new Date(nextPayday.nextDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '14 Days'
+      nextPaydayStr: nextPayday?.nextDate ? new Date(nextPayday.nextDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '14 Days'
     };
   }, [upcomingBills, liquidCash, incomes]);
 
-  // 3. Tax Check
-  const taxInsolvencyRisk = useMemo(() => {
-    const estimatedQuarterlyLiability = cashFlow.taxReserve * 3;
-    return liquidCash < estimatedQuarterlyLiability && cashFlow.taxReserve > 0;
-  }, [liquidCash, cashFlow.taxReserve]);
+  // 3. Subscription Scrutiny
+  const redundantSubs = useMemo(() => {
+    const normalized = activeSubscriptions.map(s => ({ ...s, name: (s?.name || '').toLowerCase() }));
+    return normalized.filter(s => s.name.includes('netflix') || s.name.includes('hulu'));
+  }, [activeSubscriptions]);
 
-  // 4. Spending
+  // 4. Burn Velocity (Transactions)
   const burnVelocity = useMemo(() => {
     const today = new Date();
     const seventyTwoHoursAgo = new Date(today.getTime() - (72 * 60 * 60 * 1000));
     
-    const recentExpenses = transactions.filter(t => 
-      t.type === 'expense' && 
+    const recentExpenses = (transactions || []).filter(t => 
+      t?.type === 'expense' && 
+      t?.date &&
       new Date(t.date) >= seventyTwoHoursAgo
     );
     
-    const totalSpent = recentExpenses.reduce((sum, t) => sum + t.amount, 0);
+    const totalSpent = recentExpenses.reduce((sum, t) => sum + (t?.amount || 0), 0);
     const frequency = recentExpenses.length;
     
     const isHighVelocity = totalSpent > 500 || frequency > 8;
@@ -189,7 +202,7 @@ export default function Dashboard() {
 
   // 5. Total Tax Shield
   const lifetimeTaxShield = useMemo(() => {
-    return freelanceEntries.reduce((sum: number, e: any) => sum + (e.scouredWriteOffs || 0), 0);
+    return (freelanceEntries || []).reduce((sum: number, e: any) => sum + (e?.scouredWriteOffs || 0), 0);
   }, [freelanceEntries]);
 
 
@@ -229,22 +242,23 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
         <div className="flex items-center gap-5">
           <div className="h-14 w-14 rounded-full bg-surface-raised border border-surface-border flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
-            {user.avatar ? (
+            {user?.avatar ? (
               <img src={user.avatar} alt="Profile" className="h-full w-full object-cover" />
             ) : (
               <div className="h-full w-full flex items-center justify-center bg-indigo-500/10 text-brand-violet font-mono text-xl font-bold">
-                {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                {(user?.firstName?.charAt(0) || '')}{(user?.lastName?.charAt(0) || '')}
               </div>
             )}
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-sans font-semibold tracking-tight text-white">
-              Welcome back, <span className="text-brand-indigo">{user.firstName}</span>
+              Welcome back, <span className="text-brand-indigo">{user?.firstName || 'User'}</span>
             </h1>
             <p className="text-sm font-sans text-zinc-400 mt-1">Here is your financial overview for today.</p>
           </div>
         </div>
       </div>
+
 
       {/* 2. Action Center (Grouped Urgent Alerts) */}
       {hasActionableAlerts && (
@@ -525,7 +539,14 @@ export default function Dashboard() {
                     <li key={bill.id} className="px-6 py-4 hover:bg-surface-base transition-colors flex justify-between items-center group cursor-default">
                       <div className="flex items-center gap-4">
                         <div className="text-xs font-mono text-zinc-500 w-10 text-center uppercase">
-                          {bill.dueDate.split('-')[2]}<br/>{['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][parseInt(bill.dueDate.split('-')[1], 10) - 1]}
+                          {bill?.dueDate?.includes('-') ? (
+                            <>
+                              {bill.dueDate.split('-')[2]}<br/>
+                              {['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][parseInt(bill.dueDate.split('-')[1], 10) - 1] || '---'}
+                            </>
+                          ) : (
+                            'N/A'
+                          )}
                         </div>
                         <p className="text-sm font-sans font-medium text-zinc-200">{bill.biller}</p>
                       </div>
