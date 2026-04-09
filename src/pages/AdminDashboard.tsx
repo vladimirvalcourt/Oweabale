@@ -65,7 +65,13 @@ export default function AdminDashboard() {
   const [resolvingTicketId, setResolvingTicketId] = useState<string | null>(null);
 
   const [activityLog, setActivityLog] = useState<ActivityEntry[]>([]);
+  const [logFilter, setLogFilter] = useState('');
   const logEndRef = useRef<HTMLDivElement>(null);
+
+  const [pendingCount, setPendingCount] = useState<number | null>(null);
+  const [categoryWord, setCategoryWord] = useState('');
+  const [categoryName, setCategoryName] = useState('');
+  const [isSavingCategoryFix, setIsSavingCategoryFix] = useState(false);
 
   const addLog = useCallback((level: ActivityEntry['level'], message: string) => {
     const entry: ActivityEntry = {
@@ -125,7 +131,7 @@ export default function AdminDashboard() {
     const { data: settings } = await supabase
       .from('platform_settings')
       .select('*')
-      .eq('id', 1)
+      .eq('id', '00000000-0000-0000-0000-000000000001')
       .single();
     if (settings) {
       setTaxDeduction(settings.tax_standard_deduction?.toString() || '14600');
@@ -183,8 +189,68 @@ export default function AdminDashboard() {
       addLog('INFO', `${enrichedTickets.length} open ticket(s) loaded.`);
     }
 
+    // Pending ingestions count
+    const { count } = await supabase
+      .from('pending_ingestions')
+      .select('*', { count: 'exact', head: true });
+    setPendingCount(count ?? 0);
+
     addLog('SYS', 'Dashboard ready.');
   }
+
+  const handleForceSync = async () => {
+    addLog('SYS', 'Force sync initiated by admin...');
+    await loadAll();
+    toast.success('Platform data refreshed.');
+    addLog('SYS', 'Force sync complete.');
+  };
+
+  const handleClearMemory = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    toast.success('Browser cache cleared. Refresh to see effect.');
+    addLog('WARN', 'Admin cleared browser memory / local cache.');
+  };
+
+  const handleSaveCategoryFix = async () => {
+    if (!categoryWord.trim() || !categoryName.trim()) {
+      toast.error('Both word and category are required.');
+      return;
+    }
+    setIsSavingCategoryFix(true);
+    const { error } = await supabase.from('categorization_rules').insert({
+      match_type: 'contains',
+      match_value: categoryWord.trim().toLowerCase(),
+      category: categoryName.trim(),
+      priority: 10,
+    });
+    setIsSavingCategoryFix(false);
+    if (error) {
+      toast.error('Failed to save rule.');
+      addLog('ERROR', `Category rule save failed: ${error.message}`);
+    } else {
+      toast.success(`Rule saved: "${categoryWord}" → "${categoryName}"`);
+      addLog('INFO', `Category fix added: "${categoryWord}" → "${categoryName}"`);
+      setCategoryWord('');
+      setCategoryName('');
+    }
+  };
+
+  const handleToggleAdmin = async (userId: string, currentIsAdmin: boolean) => {
+    const newValue = !currentIsAdmin;
+    const { error } = await supabase
+      .from('profiles')
+      .update({ is_admin: newValue })
+      .eq('id', userId);
+    if (error) {
+      toast.error('Failed to update admin status.');
+      addLog('ERROR', `Admin toggle failed for user ${userId.slice(0, 8)}`);
+    } else {
+      setProfiles(prev => prev.map(p => p.id === userId ? { ...p, is_admin: newValue } : p));
+      toast.success(newValue ? 'User promoted to admin.' : 'Admin access removed.');
+      addLog('WARN', `User ${userId.slice(0, 8)} admin status → ${newValue}`);
+    }
+  };
 
   // Merge profiles with enriched auth data
   function getEnrichedProfile(profile: ProfileRow) {
@@ -220,7 +286,7 @@ export default function AdminDashboard() {
 
   const toggleMaintenance = async () => {
     const newValue = !isMaintenance;
-    const { error } = await supabase.from('platform_settings').update({ maintenance_mode: newValue }).eq('id', 1);
+    const { error } = await supabase.from('platform_settings').update({ maintenance_mode: newValue }).eq('id', '00000000-0000-0000-0000-000000000001');
     if (error) {
       toast.error('Failed to update Maintenance Mode.');
       addLog('ERROR', 'Maintenance mode toggle failed.');
@@ -233,7 +299,7 @@ export default function AdminDashboard() {
 
   const togglePlaid = async () => {
     const newValue = !isPlaidEnabled;
-    const { error } = await supabase.from('platform_settings').update({ plaid_enabled: newValue }).eq('id', 1);
+    const { error } = await supabase.from('platform_settings').update({ plaid_enabled: newValue }).eq('id', '00000000-0000-0000-0000-000000000001');
     if (error) {
       toast.error('Failed to update Bank Syncing.');
     } else {
@@ -250,7 +316,7 @@ export default function AdminDashboard() {
     const { error } = await supabase.from('platform_settings').update({
       tax_standard_deduction: deductionNum,
       tax_top_bracket: bracketNum,
-    }).eq('id', 1);
+    }).eq('id', '00000000-0000-0000-0000-000000000001');
     setIsSavingTax(false);
     if (error) {
       toast.error('Failed to update: You do not have permissions or the database rejected it.');
@@ -265,7 +331,7 @@ export default function AdminDashboard() {
     setIsSavingBroadcast(true);
     const { error } = await supabase.from('platform_settings').update({
       broadcast_message: broadcastMsg.trim() === '' ? null : broadcastMsg,
-    }).eq('id', 1);
+    }).eq('id', '00000000-0000-0000-0000-000000000001');
     setIsSavingBroadcast(false);
     if (error) {
       toast.error('Failed to push broadcast.');
@@ -425,11 +491,11 @@ export default function AdminDashboard() {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button className="bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 p-3 rounded-sm text-[11px] uppercase tracking-wider font-bold transition-all text-left">
+            <button onClick={handleForceSync} className="bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 p-3 rounded-sm text-[11px] uppercase tracking-wider font-bold transition-all text-left">
               Force Global Sync Now
             </button>
-            <button className="bg-white/5 hover:bg-white/10 text-white border border-white/10 p-3 rounded-sm text-[11px] uppercase tracking-wider transition-all text-left">
-              Clear Website Memory
+            <button onClick={handleClearMemory} className="bg-white/5 hover:bg-white/10 text-white border border-white/10 p-3 rounded-sm text-[11px] uppercase tracking-wider transition-all text-left">
+              Clear Browser Cache
             </button>
             <button
               onClick={togglePlaid}
@@ -616,11 +682,11 @@ export default function AdminDashboard() {
                 <BookOpen className="w-4 h-4" /> Fix Incorrect Categories
               </h2>
               <div className="flex gap-2 mb-2">
-                <input type="text" placeholder="Word (e.g. Starbucks)" className="w-1/2 bg-black border border-white/10 px-2 py-1.5 text-[10px] text-white font-mono rounded-sm focus:outline-none focus:border-cyan-500" />
-                <input type="text" placeholder="Category (e.g. Food)" className="w-1/2 bg-black border border-white/10 px-2 py-1.5 text-[10px] text-white font-mono rounded-sm focus:outline-none focus:border-cyan-500" />
+                <input type="text" value={categoryWord} onChange={e => setCategoryWord(e.target.value)} placeholder="Word (e.g. Starbucks)" className="w-1/2 bg-black border border-white/10 px-2 py-1.5 text-[10px] text-white font-mono rounded-sm focus:outline-none focus:border-cyan-500" />
+                <input type="text" value={categoryName} onChange={e => setCategoryName(e.target.value)} placeholder="Category (e.g. Food)" className="w-1/2 bg-black border border-white/10 px-2 py-1.5 text-[10px] text-white font-mono rounded-sm focus:outline-none focus:border-cyan-500" />
               </div>
-              <button className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 py-1.5 rounded-sm text-[10px] uppercase font-bold transition-all">
-                Save Category Fix
+              <button onClick={handleSaveCategoryFix} disabled={isSavingCategoryFix} className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 py-1.5 rounded-sm text-[10px] uppercase font-bold transition-all disabled:opacity-50">
+                {isSavingCategoryFix ? 'Saving...' : 'Save Category Fix'}
               </button>
             </div>
 
@@ -636,8 +702,12 @@ export default function AdminDashboard() {
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-2xl font-mono font-bold text-white tracking-widest">—</p>
-                <p className="text-[10px] text-zinc-600 font-bold uppercase">Not connected</p>
+                <p className="text-2xl font-mono font-bold text-white tracking-widest">
+                  {pendingCount === null ? '—' : pendingCount}
+                </p>
+                <p className={`text-[10px] font-bold uppercase ${pendingCount === null ? 'text-zinc-600' : pendingCount > 0 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                  {pendingCount === null ? 'Loading...' : pendingCount > 0 ? 'Awaiting Review' : 'All Clear'}
+                </p>
               </div>
             </div>
 
@@ -706,6 +776,13 @@ export default function AdminDashboard() {
                           : <span className="text-emerald-500">Active</span>}
                       </td>
                       <td className="py-3 px-2 text-right space-x-1.5">
+                        <button
+                          onClick={() => handleToggleAdmin(user.id, user.is_admin)}
+                          className={`px-2 py-1 rounded-sm font-bold transition-colors text-[10px] ${user.is_admin ? 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/40' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'}`}
+                          title={user.is_admin ? 'Remove admin access' : 'Promote to admin'}
+                        >
+                          {user.is_admin ? 'Demote' : 'Make Admin'}
+                        </button>
                         {user.is_banned ? (
                           <button
                             onClick={() => handleAdminAction('unban', user.id)}
@@ -758,7 +835,11 @@ export default function AdminDashboard() {
                 <span className="text-emerald-400">Initializing...</span>
               </div>
             )}
-            {activityLog.map((log, idx) => (
+            {activityLog.filter(log =>
+              !logFilter.trim() ||
+              log.message.toLowerCase().includes(logFilter.toLowerCase()) ||
+              log.level.toLowerCase().includes(logFilter.toLowerCase())
+            ).map((log, idx) => (
               <div key={idx} className={`flex gap-3 items-start border-l-2 pl-3 py-1 ${
                 log.level === 'ERROR' ? 'border-rose-500' :
                 log.level === 'WARN' ? 'border-amber-500' :
@@ -783,6 +864,8 @@ export default function AdminDashboard() {
               <span className="text-emerald-500 font-bold">{'>'}</span>
               <input
                 type="text"
+                value={logFilter}
+                onChange={e => setLogFilter(e.target.value)}
                 placeholder="Filter log..."
                 className="bg-transparent border-none w-full text-[11px] text-white focus:outline-none placeholder-zinc-700"
               />

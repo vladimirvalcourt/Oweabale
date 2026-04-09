@@ -60,14 +60,14 @@ export default function Goals() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-content-primary">Goals Overview</h1>
-          <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mt-1">Capital accumulation & debt liquidation</p>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mt-1">Save money & pay off debt</p>
         </div>
         <button
           onClick={() => setIsAddingGoal(true)}
           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          Confirm Goal
+          Add Goal
         </button>
       </div>
 
@@ -93,7 +93,7 @@ export default function Goals() {
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Operation Type</label>
+                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Goal Type</label>
                 <select
                   value={newGoal.type}
                   onChange={(e) => setNewGoal({ ...newGoal, type: e.target.value as Goal['type'] })}
@@ -105,7 +105,7 @@ export default function Goals() {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Target Magnitude</label>
+                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Target Amount</label>
                 <div className="relative">
                   <span className="absolute left-3 top-2.5 text-xs font-mono text-zinc-600">$</span>
                   <input
@@ -120,7 +120,7 @@ export default function Goals() {
                 </div>
               </div>
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Initial State</label>
+                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Starting Amount</label>
                 <div className="relative">
                   <span className="absolute left-3 top-2.5 text-xs font-mono text-zinc-600">$</span>
                   <input
@@ -134,7 +134,7 @@ export default function Goals() {
                 </div>
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Finalization Date</label>
+                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Target Date</label>
                 <input
                   type="date"
                   required
@@ -150,13 +150,13 @@ export default function Goals() {
                 onClick={() => setIsAddingGoal(false)}
                 className="px-4 py-2 text-xs font-mono uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
               >
-                Abort
+                Cancel
               </button>
               <button
                 type="submit"
                 className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors shadow-lg shadow-indigo-500/10"
               >
-                Save Goal
+                Add Goal
               </button>
             </div>
           </form>
@@ -168,7 +168,7 @@ export default function Goals() {
           <div className="w-16 h-16 border border-surface-border rounded-sm flex items-center justify-center mx-auto mb-4 bg-surface-elevated">
             <Target className="w-8 h-8 text-zinc-600" />
           </div>
-          <h3 className="text-lg font-bold tracking-tight text-content-primary mb-2 uppercase">Zero Objectives Detected</h3>
+          <h3 className="text-lg font-bold tracking-tight text-content-primary mb-2 uppercase">No goals yet</h3>
           <p className="text-[10px] font-mono text-zinc-500 max-w-sm mx-auto mb-8 uppercase tracking-[0.15em]">Establish financial targets to begin tracking.</p>
           <motion.button
             whileTap={{ scale: 0.95 }}
@@ -176,12 +176,12 @@ export default function Goals() {
             className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-2 mx-auto"
           >
             <Plus className="w-4 h-4" />
-            Getting Started
+            Create Your First Goal
           </motion.button>
         </div>
       ) : (
         <CollapsibleModule 
-          title="Active Objectives" 
+          title="Your Goals"
           icon={Target}
           extraHeader={<span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{goals.length} Objectives Active</span>}
         >

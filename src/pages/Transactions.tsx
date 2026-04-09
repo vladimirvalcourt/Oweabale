@@ -69,7 +69,7 @@ export default function Transactions() {
       </div>
 
       <CollapsibleModule 
-        title="Record Probe" 
+        title="Filter Transactions"
         icon={Filter}
         extraHeader={<span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{filteredTransactions.length} Records Detected</span>}
       >
@@ -81,7 +81,7 @@ export default function Transactions() {
               </div>
               <input
                 type="text"
-                placeholder="PROBE RECORDS..."
+                placeholder="Search transactions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="block w-full pl-10 pr-3 py-2 border border-surface-border rounded-sm leading-5 bg-surface-base text-xs font-mono uppercase tracking-widest text-zinc-200 placeholder-zinc-700 focus:outline-none focus:border-indigo-600 transition-all"
@@ -97,7 +97,7 @@ export default function Transactions() {
                 }`}
               >
                 <Filter className="w-3.5 h-3.5" />
-                Parameters
+                More Filters
               </button>
             </div>
           </div>
@@ -113,9 +113,9 @@ export default function Transactions() {
                   onChange={(e) => setFilterType(e.target.value as any)}
                   className="block w-full px-3 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus:outline-none focus:border-indigo-600 transition-colors"
                 >
-                  <option value="all">ALL STREAMS</option>
-                  <option value="income">INCOMING</option>
-                  <option value="expense">OUTGOING</option>
+                  <option value="all">All Types</option>
+                  <option value="income">Income</option>
+                  <option value="expense">Expenses</option>
                 </select>
               </div>
 
@@ -128,7 +128,7 @@ export default function Transactions() {
                   onChange={(e) => setFilterCategory(e.target.value)}
                   className="block w-full px-3 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus:outline-none focus:border-indigo-600 transition-colors"
                 >
-                  <option value="all">ALL CLASSES</option>
+                  <option value="all">All Categories</option>
                   {uniqueCategories.map(cat => (
                     <option key={cat} value={cat}>{cat.toUpperCase()}</option>
                   ))}
@@ -137,7 +137,7 @@ export default function Transactions() {
 
               <div>
                 <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2 flex items-center gap-1.5">
-                  <Calendar className="w-3 h-3" /> Window
+                  <Calendar className="w-3 h-3" /> Date Range
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -158,7 +158,7 @@ export default function Transactions() {
 
               <div>
                 <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2 flex items-center gap-1.5">
-                  <Hash className="w-3 h-3" /> Magnitude
+                  <Hash className="w-3 h-3" /> Amount Range
                 </label>
                 <div className="flex items-center gap-2">
                   <input
@@ -211,22 +211,22 @@ export default function Transactions() {
           </div>
         ) : (
         <>
-        <CollapsibleModule title="Transaction Intelligence" icon={Activity}>
+        <CollapsibleModule title="Your Transactions" icon={Activity}>
           <div className="overflow-x-auto -mx-6 -my-6">
             <table className="min-w-full divide-y divide-surface-highlight">
               <thead className="bg-surface-base">
                 <tr>
                   <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-[0.2em]">
-                    Transaction Record
+                    Description
                   </th>
                   <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-[0.2em]">
                     Timestamp
                   </th>
                   <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-[0.2em]">
-                    Classification
+                    Category
                   </th>
                   <th scope="col" className="px-6 py-4 text-right text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-[0.2em]">
-                    Magnitude
+                    Amount
                   </th>
                 </tr>
               </thead>

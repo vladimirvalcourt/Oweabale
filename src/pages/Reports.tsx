@@ -171,7 +171,7 @@ export default function Reports() {
       </div>
 
       {/* Summary Cards */}
-      <CollapsibleModule title="Performance Metrics" icon={TrendingUp}>
+      <CollapsibleModule title="Financial Summary" icon={TrendingUp}>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 -mx-6 -my-6 p-6">
           {[
             { label: 'Total Income', value: `$${filteredTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'text-emerald-400' },
@@ -190,7 +190,7 @@ export default function Reports() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Income vs Expenses */}
         <CollapsibleModule 
-          title="Cash Flow Dynamics" 
+          title="Monthly Cash Flow"
           icon={BarChart3}
         >
           <div className="flex flex-col">
@@ -213,7 +213,7 @@ export default function Reports() {
 
         {/* Spending by Category */}
         <CollapsibleModule 
-          title="Spending Taxonomy" 
+          title="Spending by Category"
           icon={PieChart}
         >
           {categoryData.length === 0 ? (
@@ -248,7 +248,7 @@ export default function Reports() {
 
       {/* Net Worth Trend */}
       <CollapsibleModule 
-        title="Net Worth Evolution" 
+        title="Net Worth Over Time"
         icon={TrendingUp}
       >
         <ResponsiveContainer width="100%" height={200}>
@@ -270,7 +270,7 @@ export default function Reports() {
 
       {/* Debt Payoff Progress */}
       <CollapsibleModule 
-        title="Debt Detonation Tracking" 
+        title="Debt Payoff Progress"
         icon={CreditCard}
         extraHeader={<span className="text-xs font-mono text-content-primary font-bold">{debtProgress.length} Accounts</span>}
       >

@@ -61,7 +61,7 @@ export default function Freelance() {
         if (amounts.length > 0) amount = Math.max(...amounts).toFixed(2);
       }
 
-      // Deduction Scouring: Mileage & Fees
+      // Finding Write-offs: Mileage & Fees
       const milesMatch = fullText.match(/(\d+\.?\d*)\s*(miles?|mi|km)/i);
       const feeMatch = fullText.match(/(\$?\s*\d+\.\d{2})\s*(fees?|commission|service)/i);
       
@@ -142,7 +142,7 @@ export default function Freelance() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.client) { toast.error('Enter who paid you.'); return; }
+    if (!formData.client) { toast.error('Enter the client name'); return; }
     if (!formData.amount || isNaN(parseFloat(formData.amount)) || parseFloat(formData.amount) <= 0) { toast.error('Enter a valid payment amount.'); return; }
     addFreelanceEntry({
       client: formData.client,
@@ -258,7 +258,7 @@ export default function Freelance() {
                              onClick={() => toggleFreelanceVault(entry.id)}
                              className={`px-4 py-2 border font-mono font-black text-[9px] uppercase tracking-tighter transition-all ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-brand-indigo bg-brand-indigo text-white hover:bg-brand-violet'}`}
                            >
-                             {entry.isVaulted ? 'Saved' : 'Mark as Saved'}
+                             {entry.isVaulted ? 'Saved' : 'Move to Tax Reserve'}
                            </button>
                            <button onClick={() => deleteFreelanceEntry(entry.id)} className="text-zinc-700 hover:text-rose-500 transition-colors p-2"><Trash2 className="w-4 h-4"/></button>
                         </div>
@@ -312,7 +312,7 @@ export default function Freelance() {
                  </div>
               </div>
               <p className="text-[9px] font-mono text-content-muted mt-4 uppercase leading-relaxed border-t border-surface-border pt-4">
-                'Saved' confirms you have physically moved these funds to a separate bank account.
+                'Saved' means you've moved this money to a separate account for taxes.
               </p>
            </div>
         </div>

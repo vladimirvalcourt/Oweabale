@@ -376,7 +376,14 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
           penaltyFee: parseFloat(penaltyFee) || 0,
           date: date,
           citationNumber: citationNumber.trim(),
-          paymentUrl: paymentUrl.trim(),
+          paymentUrl: (() => {
+            const u = paymentUrl.trim();
+            if (!u) return '';
+            try {
+              const parsed = new URL(u);
+              return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? u : '';
+            } catch { return ''; }
+          })(),
           status: 'open',
         });
         toast.success(`Citation recorded`);

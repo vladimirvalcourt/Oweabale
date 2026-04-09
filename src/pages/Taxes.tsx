@@ -223,7 +223,7 @@ export default function Taxes() {
         </div>
 
         <div className="space-y-6">
-          <CollapsibleModule title="IRS Quarterly HUD" icon={Clock}>
+          <CollapsibleModule title="Quarterly Tax Deadlines" icon={Clock}>
             <div className="space-y-4">
               {quarterlyDates.map(q => (
                 <div key={q.label} className={`p-4 rounded-sm border ${q.overdue ? 'bg-surface-raised border-surface-border opacity-50' : q.daysLeft < 15 ? 'bg-rose-500/5 border-rose-500/30 shadow-[inset_0_0_15px_rgba(244,63,94,0.05)]' : 'bg-surface-elevated border-surface-border'}`}>
@@ -253,7 +253,7 @@ export default function Taxes() {
                    <div>
                      <p className="text-[10px] font-mono font-bold text-content-primary uppercase tracking-widest">Check Your Real Pay</p>
                      <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-tight mt-1 leading-normal">
-                       DON'T SPEND EVERY DOLLAR YOU GET. SAVE AT LEAST 30% TO MAKE SURE YOU CAN PAY YOUR TAXES LATER.
+                       Don't spend all your income — set aside at least 30% for taxes.
                      </p>
                    </div>
                  </div>
@@ -262,7 +262,7 @@ export default function Taxes() {
                    <div>
                      <p className="text-[10px] font-mono font-bold text-content-primary uppercase tracking-widest">Audit for Deductions</p>
                      <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-tight mt-1 leading-normal">
-                       EVERY SOFTWARE SUB, HOME OFFICE SQUARE FOOT, AND PROFESSIONAL MEAL IS A SHIELD AGAINST TAX OVERPAYMENT.
+                       Every software subscription, home office expense, and professional meal can reduce your taxable income.
                      </p>
                    </div>
                  </div>
@@ -271,7 +271,7 @@ export default function Taxes() {
                    <div>
                      <p className="text-[10px] font-mono font-bold text-content-primary uppercase tracking-widest">Quarterly Discipline</p>
                      <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-tight mt-1 leading-normal">
-                       PAYING IN STAGES PREVENTS THE YEAR-END CRUNCH. SHIP YOUR TAXES QUARTERLY TO MAINTAIN CASHFLOW STABILITY.
+                       Pay quarterly to avoid a large tax bill at year end.
                      </p>
                    </div>
                  </div>
@@ -281,7 +281,7 @@ export default function Taxes() {
              <div className="pt-4 border-t border-surface-border">
                <h3 className="text-[10px] font-mono font-black text-rose-500 uppercase tracking-[0.2em] mb-3">Important Reminder</h3>
                <p className="text-[9px] font-mono text-zinc-500 leading-relaxed uppercase tracking-tight">
-                 THIS IS AN ESTIMATE ONLY. OWEABLE'S CALCULATIONS USE 2024 TAX RATES. PLEASE TALK TO A PROFESSIONAL FOR YOUR FINAL TAX RETURN.
+                 This is an estimate based on current tax rates. Consult a tax professional for your final return.
                </p>
              </div>
           </div>

@@ -114,9 +114,12 @@ export default function Settings() {
     setTicketsLoading(true);
     const load = async () => {
       try {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (!authUser) return;
         const { data, error } = await supabase
           .from('support_tickets')
           .select('*')
+          .eq('user_id', authUser.id)
           .order('created_at', { ascending: false });
         if (!error && data) {
           setTickets(data.map((t: Record<string, any>) => ({
@@ -142,9 +145,12 @@ export default function Settings() {
       return;
     }
     setIsSubmittingTicket(true);
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) { toast.error('Not authenticated'); setIsSubmittingTicket(false); return; }
     const { data, error } = await supabase
       .from('support_tickets')
       .insert({
+        user_id: authUser.id,
         subject: supportForm.subject.trim(),
         description: supportForm.description.trim(),
         department: supportForm.department,

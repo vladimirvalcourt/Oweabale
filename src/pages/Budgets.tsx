@@ -92,7 +92,7 @@ export default function Budgets() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-content-primary">Budget Planner</h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-zinc-500 mt-1">Resource allocation & monitoring</p>
+          <p className="text-xs font-mono uppercase tracking-widest text-zinc-500 mt-1">Set and manage your spending limits</p>
         </div>
         <button 
           onClick={openAddModal}
@@ -108,8 +108,8 @@ export default function Budgets() {
           <div className="w-16 h-16 bg-surface-elevated rounded-sm flex items-center justify-center mx-auto mb-4 border border-surface-border">
             <PieChart className="w-8 h-8 text-zinc-600" />
           </div>
-          <h3 className="text-lg font-bold text-content-primary mb-2 uppercase tracking-tight">No budgets defined</h3>
-          <p className="text-xs font-mono text-zinc-500 mb-8 max-w-sm mx-auto uppercase tracking-widest">Establish category limits to maintain financial health.</p>
+          <h3 className="text-lg font-bold text-content-primary mb-2 uppercase tracking-tight">No budgets yet</h3>
+          <p className="text-xs font-mono text-zinc-500 mb-8 max-w-sm mx-auto uppercase tracking-widest">Set spending limits to stay on track.</p>
           <motion.button 
             whileTap={{ scale: 0.95 }}
             onClick={openAddModal}
@@ -243,7 +243,7 @@ export default function Budgets() {
           <Dialog.Panel className="mx-auto max-w-sm w-full rounded-sm bg-surface-raised border border-surface-border shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-surface-border">
               <Dialog.Title className="text-xs font-mono uppercase tracking-[0.2em] text-content-primary">
-                {isEditModalOpen ? 'Modify Budget' : 'Establish Budget'}
+                {isEditModalOpen ? 'Modify Budget' : 'Create Budget'}
               </Dialog.Title>
               <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-zinc-500 hover:text-zinc-300 transition-colors">
                 <X className="w-4 h-4" />
@@ -304,13 +304,13 @@ export default function Budgets() {
                   onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }}
                   className="px-4 py-2 text-xs font-mono uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
                 >
-                  Abort
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors shadow-lg shadow-indigo-500/10"
                 >
-                  {isEditModalOpen ? 'Confirm Status' : 'Initiate Budget'}
+                  {isEditModalOpen ? 'Confirm Status' : 'Save Budget'}
                 </button>
               </div>
             </form>

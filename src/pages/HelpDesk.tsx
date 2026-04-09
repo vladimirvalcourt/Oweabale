@@ -41,9 +41,12 @@ export default function HelpDesk() {
   useEffect(() => {
     async function loadTickets() {
       setIsLoading(true);
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) { setIsLoading(false); return; }
       const { data, error } = await supabase
         .from('support_tickets')
         .select('*')
+        .eq('user_id', authUser.id)
         .order('created_at', { ascending: false });
 
       if (!error && data) {
@@ -92,9 +95,12 @@ export default function HelpDesk() {
     }
 
     setIsSubmitting(true);
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) { toast.error('Not authenticated'); setIsSubmitting(false); return; }
     const { data, error } = await supabase
       .from('support_tickets')
       .insert({
+        user_id: authUser.id,
         subject: formData.subject.trim(),
         description: formData.description.trim(),
         department: formData.department,
@@ -129,8 +135,8 @@ export default function HelpDesk() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Support Hub</h1>
-          <p className="text-sm font-mono text-zinc-400 mt-1 uppercase tracking-widest">Protocol assistance & routing.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Help & Support</h1>
+          <p className="text-sm font-mono text-zinc-400 mt-1 uppercase tracking-widest">Get help and track your support tickets</p>
         </div>
 
         <div className="flex bg-surface-elevated p-1 rounded-sm border border-surface-border inline-flex">
@@ -157,7 +163,7 @@ export default function HelpDesk() {
       {activeTab === 'tickets' ? (
         <div className="grid grid-cols-1 gap-6">
           <CollapsibleModule
-            title="Ticket Registry"
+            title="Your Support Tickets"
             icon={LifeBuoy}
             extraHeader={
               <button
@@ -317,7 +323,7 @@ export default function HelpDesk() {
                 </button>
                 <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors flex items-center gap-2">
                   {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
-                  Transmit
+                  Submit
                 </button>
               </div>
             </form>

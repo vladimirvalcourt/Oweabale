@@ -1452,12 +1452,12 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'oweable-store-persistence',
-      storage: createJSONStorage(() => sessionStorage),
+      storage: createJSONStorage(() => localStorage),
       // Persist ONLY non-sensitive UI/profile state.
       // Financial records (bills, debts, transactions, assets, incomes, etc.)
       // are re-fetched from Supabase on every authenticated session via
-      // fetchData(). Keeping them out of sessionStorage means an XSS attack
-      // or shared-device access cannot harvest raw financial data from storage.
+      // fetchData(). Raw financial data is never stored in localStorage —
+      // only identity/UI fields that allow the shell to render immediately.
       partialize: (state) => ({
         user: {
           // Persist identity fields needed for the UI shell while data loads

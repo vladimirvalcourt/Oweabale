@@ -129,7 +129,7 @@ export default function Income() {
 
   const handleDelete = (id: string) => {
     deleteIncome(id);
-    toast.success('Income source deleted');
+    toast.success('Income source removed');
   };
 
   return (
@@ -159,7 +159,7 @@ export default function Income() {
             className="mt-4 px-6 py-3 bg-content-primary hover:bg-zinc-200 text-surface-base rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 focus:outline-none"
           >
             <Plus className="w-4 h-4" />
-            Add to List
+            Add Income Source
           </motion.button>
         </div>
       ) : (

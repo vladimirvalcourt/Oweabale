@@ -132,7 +132,7 @@ export default function Calendar() {
         </div>
       </div>      {/* Month Navigation & Grid */}
       <CollapsibleModule 
-        title="Temporal Intelligence" 
+        title="Financial Calendar"
         icon={CalendarDays}
         extraHeader={<span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{Array.from(eventsByDay.values()).flat().length} Events Detected</span>}
       >
@@ -257,7 +257,7 @@ export default function Calendar() {
       )}
 
       {/* Upcoming Events List */}
-      <CollapsibleModule title="Chronological Feed" icon={ChevronRight}>
+      <CollapsibleModule title="Upcoming Events" icon={ChevronRight}>
         <div className="space-y-2 -mx-6 -my-6 p-6">
           {Array.from(eventsByDay.entries())
             .filter(([day]) => day >= today.getDate() || month !== today.getMonth() || year !== today.getFullYear())
@@ -284,7 +284,7 @@ export default function Calendar() {
               );
             })}
           {Array.from(eventsByDay.values()).flat().length === 0 && (
-            <p className="text-sm font-mono text-zinc-500 text-center py-4 uppercase tracking-[0.2em]">Zero Events Detected</p>
+            <p className="text-sm font-mono text-zinc-500 text-center py-4 uppercase tracking-[0.2em]">No upcoming events</p>
           )}
         </div>
       </CollapsibleModule>

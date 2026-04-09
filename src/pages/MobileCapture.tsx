@@ -159,7 +159,7 @@ export default function MobileCapture() {
       setStatus('completed');
     } catch (err: unknown) {
       setStatus('error');
-      const msg = err instanceof Error ? err.message : 'Transmission failed. Ensure you are online.';
+      const msg = err instanceof Error ? err.message : 'Upload failed. Ensure you are online.';
       setError(msg);
     }
   };
@@ -181,15 +181,15 @@ export default function MobileCapture() {
     return (
       <div className="min-h-screen bg-[#08090A] flex flex-col items-center justify-center p-8 text-center font-sans">
         <AlertCircle className="w-12 h-12 text-rose-500 mb-6" />
-        <h1 className="text-xl font-bold text-white mb-3 uppercase tracking-widest font-mono">Uplink Error</h1>
+        <h1 className="text-xl font-bold text-white mb-3 uppercase tracking-widest font-mono">Connection Error</h1>
         <p className="text-zinc-500 text-xs mb-10 uppercase tracking-widest leading-relaxed">
-          {error || 'The session has reached its lifecycle limit. Please refresh the QR code on your desktop.'}
+          {error || 'This session has expired. Please refresh the QR code on your desktop.'}
         </p>
-        <button 
-          onClick={() => window.location.reload()} 
+        <button
+          onClick={() => window.location.reload()}
           className="w-full py-4 bg-zinc-900 border border-white/10 text-white font-mono text-[10px] font-bold uppercase tracking-[0.3em] flex items-center justify-center gap-2 active:scale-95 transition-all"
         >
-          <RefreshCw className="w-4 h-4" /> [Restart_Session]
+          <RefreshCw className="w-4 h-4" /> Restart Session
         </button>
       </div>
     );
@@ -384,7 +384,7 @@ export default function MobileCapture() {
                     disabled={status === 'uploading'}
                     className="w-full py-4 bg-white/5 border border-white/5 text-zinc-500 hover:text-white transition-all text-[9px] font-mono font-bold uppercase tracking-[0.4em]"
                   >
-                    [ Retake ]
+                    Retake Photo
                   </button>
                </div>
             </div>
