@@ -671,6 +671,7 @@ export default function Dashboard() {
           <MenuItem className="rounded-full !h-full" icon={<LifeBuoy size={22} strokeWidth={1.5} />} onClick={() => window.location.href = '/support'} />
         </MenuContainer>
       </div>
+      </div>
     </BorderRotate>
   );
 }
