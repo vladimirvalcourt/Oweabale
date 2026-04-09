@@ -149,6 +149,23 @@ export interface PendingIngestion {
   source?: 'desktop' | 'mobile'; // Origin of the ingestion
 }
 
+export interface CreditFactor {
+  id: string;
+  name: string; // e.g., "On-Time Payments"
+  impact: 'high' | 'medium' | 'low';
+  status: 'excellent' | 'good' | 'fair' | 'poor';
+  description: string; // "How this helps or hurts you"
+}
+
+export interface CreditFix {
+  id: string;
+  item: string; // e.g., "Medical Bill Error"
+  amount: number;
+  status: 'todo' | 'sent' | 'resolved';
+  bureau: string; // "Experian", "Equifax", etc.
+  notes: string;
+}
+
 export interface Notification {
   id: string;
   title: string;
@@ -188,6 +205,12 @@ interface AppState {
     language?: string;
     hasCompletedOnboarding: boolean;
     isAdmin: boolean;
+  };
+  credit: {
+    score: number;
+    lastUpdated: string;
+    factors: CreditFactor[];
+    fixes: CreditFix[];
   };
   setTaxSettings: (state: string, rate: number) => void;
   bankConnected: boolean;
@@ -236,6 +259,12 @@ interface AppState {
   addCategorizationRule: (rule: Omit<CategorizationRule, 'id'>) => Promise<void>;
   deleteCategorizationRule: (id: string) => Promise<void>;
   applyRulesToExistingTransactions: () => Promise<number>;
+  
+  // Credit Actions
+  updateCreditScore: (score: number) => Promise<void>;
+  addCreditFix: (fix: Omit<CreditFix, 'id'>) => Promise<void>;
+  updateCreditFix: (id: string, updates: Partial<CreditFix>) => Promise<void>;
+  deleteCreditFix: (id: string) => Promise<void>;
 
   // Ingestion Actions
   addPendingIngestion: (ingestion: Omit<PendingIngestion, 'id'>) => string;
@@ -291,6 +320,16 @@ const initialData = {
   pendingIngestions: [],
   notifications: [],
   categorizationRules: [],
+  credit: {
+    score: 720, // Starting default for demo
+    lastUpdated: new Date().toISOString(),
+    factors: [
+      { id: '1', name: 'On-Time Payments', impact: 'high', status: 'excellent', description: 'You have paid 100% of your bills on time in the last 2 years.' },
+      { id: '2', name: 'Credit Usage', impact: 'high', status: 'fair', description: 'You are using 35% of your total credit limit. Try to keep this below 10%.' },
+      { id: '3', name: 'Credit Age', impact: 'medium', status: 'good', description: 'Your oldest account is 5 years old.' },
+    ],
+    fixes: [],
+  },
 };
 
 export const useStore = create<AppState>()(
@@ -368,74 +407,84 @@ export const useStore = create<AppState>()(
     set((state) => ({ bills: state.bills.filter((b) => b.id !== id) }));
   },
   markBillPaid: async (id) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    const bill = get().bills.find(b => b.id === id);
-    if (!bill) return;
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      const bill = get().bills.find(b => b.id === id);
+      if (!bill) return;
 
-    // Compute next due date based on frequency
-    const nextDue = new Date(bill.dueDate);
-    switch (bill.frequency) {
-      case 'Weekly':    nextDue.setDate(nextDue.getDate() + 7); break;
-      case 'Bi-weekly': nextDue.setDate(nextDue.getDate() + 14); break;
-      case 'Yearly':    nextDue.setFullYear(nextDue.getFullYear() + 1); break;
-      default:          nextDue.setMonth(nextDue.getMonth() + 1); // Monthly
-    }
-    const nextDueStr = nextDue.toISOString().split('T')[0];
+      // Compute next due date based on frequency
+      const nextDue = new Date(bill.dueDate);
+      switch (bill.frequency) {
+        case 'Weekly':    nextDue.setDate(nextDue.getDate() + 7); break;
+        case 'Bi-weekly': nextDue.setDate(nextDue.getDate() + 14); break;
+        case 'Yearly':    nextDue.setFullYear(nextDue.getFullYear() + 1); break;
+        default:          nextDue.setMonth(nextDue.getMonth() + 1); // Monthly
+      }
+      const nextDueStr = nextDue.toISOString().split('T')[0];
 
-    if (userId) {
-      const { error } = await supabase.from('bills').update({ status: 'upcoming', due_date: nextDueStr }).eq('id', id).eq('user_id', userId);
-      if (error) { toast.error('Failed to update bill status'); return; }
-    }
+      if (userId) {
+        const { error } = await supabase.from('bills').update({ status: 'upcoming', due_date: nextDueStr }).eq('id', id).eq('user_id', userId);
+        if (error) throw error;
+      }
 
-    get().addNotification({
-      title: `${bill.biller} Marked Paid`,
-      message: `$${bill.amount.toFixed(2)} recorded. Next due: ${nextDueStr}.`,
-      type: 'success',
-    });
-
-    const newTransaction: Transaction = {
-      id: crypto.randomUUID(),
-      name: bill.biller,
-      category: bill.category,
-      date: new Date().toISOString().split('T')[0],
-      amount: bill.amount,
-      type: 'expense',
-    };
-
-    if (userId) {
-      await supabase.from('transactions').insert({
-        name: newTransaction.name,
-        category: newTransaction.category,
-        date: newTransaction.date,
-        amount: newTransaction.amount,
-        type: newTransaction.type,
-        user_id: userId,
+      get().addNotification({
+        title: `${bill.biller} Marked Paid`,
+        message: `$${bill.amount.toFixed(2)} recorded. Next due: ${nextDueStr}.`,
+        type: 'success',
       });
-    }
 
-    set((state) => ({
-      bills: state.bills.map((b) =>
-        b.id === id ? { ...b, status: 'upcoming', dueDate: nextDueStr } : b
-      ),
-      transactions: [newTransaction, ...state.transactions].slice(0, 100),
-    }));
+      const newTransaction: Transaction = {
+        id: crypto.randomUUID(),
+        name: bill.biller,
+        category: bill.category,
+        date: new Date().toISOString().split('T')[0],
+        amount: bill.amount,
+        type: 'expense',
+      };
+
+      if (userId) {
+        await supabase.from('transactions').insert({
+          name: newTransaction.name,
+          category: newTransaction.category,
+          date: newTransaction.date,
+          amount: newTransaction.amount,
+          type: newTransaction.type,
+          user_id: userId,
+        });
+      }
+
+      set((state) => ({
+        bills: state.bills.map((b) =>
+          b.id === id ? { ...b, status: 'upcoming', dueDate: nextDueStr } : b
+        ),
+        transactions: [newTransaction, ...state.transactions].slice(0, 100),
+      }));
+    } catch (err) {
+      console.error('Error marking bill paid:', err);
+      toast.error('Failed to update bill record.');
+    }
   },
   addDebt: async (debt) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = crypto.randomUUID();
-    if (userId) {
-      const { data, error } = await supabase.from('debts').insert({
-        name: debt.name, type: debt.type, apr: debt.apr, remaining: debt.remaining,
-        min_payment: debt.minPayment, paid: debt.paid,
-        original_amount: debt.originalAmount ?? null,
-        origination_date: debt.originationDate ?? null,
-        term_months: debt.termMonths ?? null,
-        user_id: userId,
-      }).select('id').single();
-      if (error) { toast.error('Failed to sync debt'); return; }
-      if (data?.id) newId = data.id;
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      let newId = crypto.randomUUID();
+      if (userId) {
+        const { data, error } = await supabase.from('debts').insert({
+          name: debt.name, type: debt.type, apr: debt.apr, remaining: debt.remaining,
+          min_payment: debt.minPayment, paid: debt.paid,
+          original_amount: debt.originalAmount ?? null,
+          origination_date: debt.originationDate ?? null,
+          term_months: debt.termMonths ?? null,
+          user_id: userId,
+        }).select('id').single();
+        if (error) throw error;
+        if (data?.id) newId = data.id;
+      }
+      set((state) => ({ debts: [...state.debts, { ...debt, id: newId }] }));
+    } catch (err) {
+      console.error('Error adding debt:', err);
+      toast.error('Failed to sync debt record.');
     }
-    set((state) => ({ debts: [...state.debts, { ...debt, id: newId }] }));
   },
   editDebt: async (id, updatedDebt) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
@@ -525,11 +574,17 @@ export const useStore = create<AppState>()(
     }));
   },
   deleteAsset: async (id) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (userId) {
-      await supabase.from('assets').delete().eq('id', id).eq('user_id', userId);
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (userId) {
+        const { error } = await supabase.from('assets').delete().eq('id', id).eq('user_id', userId);
+        if (error) throw error;
+      }
+      set((state) => ({ assets: state.assets.filter((a) => a.id !== id) }));
+    } catch (err) {
+      console.error('Error deleting asset:', err);
+      toast.error('Failed to delete asset.');
     }
-    set((state) => ({ assets: state.assets.filter((a) => a.id !== id) }));
   },
 
   // ── Subscriptions ─────────────────────────────────────────────
@@ -915,9 +970,48 @@ export const useStore = create<AppState>()(
 
   deleteCategorizationRule: async (id) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (!userId) return;
-    await supabase.from('categorization_rules').delete().eq('id', id).eq('user_id', userId);
-    set((state) => ({ categorizationRules: state.categorizationRules.filter(r => r.id !== id) }));
+    if (userId) {
+      await supabase.from('categorization_rules').delete().eq('id', id).eq('user_id', userId);
+    }
+    set(state => ({ categorizationRules: state.categorizationRules.filter(r => r.id !== id) }));
+  },
+  
+  // ── Credit Management ──────────────────────────────────────────
+  updateCreditScore: async (score) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    const now = new Date().toISOString();
+    if (userId) {
+      await supabase.from('profiles').update({ credit_score: score, credit_last_updated: now }).eq('id', userId);
+    }
+    set(state => ({ credit: { ...state.credit, score, lastUpdated: now } }));
+  },
+  addCreditFix: async (fix) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let newId = crypto.randomUUID();
+    if (userId) {
+      const { data, error } = await supabase.from('credit_fixes').insert({ ...fix, user_id: userId }).select('id').single();
+      if (!error && data?.id) newId = data.id;
+    }
+    set(state => ({ credit: { ...state.credit, fixes: [...state.credit.fixes, { ...fix, id: newId }] } }));
+  },
+  updateCreditFix: async (id, updates) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      await supabase.from('credit_fixes').update(updates).eq('id', id).eq('user_id', userId);
+    }
+    set(state => ({
+      credit: {
+        ...state.credit,
+        fixes: state.credit.fixes.map(f => f.id === id ? { ...f, ...updates } : f)
+      }
+    }));
+  },
+  deleteCreditFix: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      await supabase.from('credit_fixes').delete().eq('id', id).eq('user_id', userId);
+    }
+    set(state => ({ credit: { ...state.credit, fixes: state.credit.fixes.filter(f => f.id !== id) } }));
   },
 
   applyRulesToExistingTransactions: async () => {

@@ -37,6 +37,7 @@ export default function Layout() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const { bills, debts, transactions, subscriptions, goals, incomes, budgets, user, isQuickAddOpen, openQuickAdd, closeQuickAdd, resetData, pendingIngestions, notifications, markNotificationsRead, clearNotifications } = useStore();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -53,6 +54,43 @@ export default function Layout() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (isSearchOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, [isSearchOpen]);
+
+  useEffect(() => {
+    let lastKey = '';
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // CMD/CTRL + K -> Search
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSearchOpen(true);
+        // We'll need a ref for the input to focus it
+      }
+
+      // Quick Add
+      if (e.key === 'q' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
+        openQuickAdd();
+      }
+
+      // Navigation chords (G then key)
+      if (lastKey === 'g' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
+        if (e.key === 'd') navigate('/dashboard');
+        if (e.key === 't') navigate('/transactions');
+        if (e.key === 'b') navigate('/bills');
+        if (e.key === 's') navigate('/settings');
+        lastKey = '';
+        return;
+      }
+      lastKey = e.key.toLowerCase();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navigate, openQuickAdd]);
 
   useEffect(() => {
     if (user?.theme === 'Light') {
@@ -156,6 +194,7 @@ export default function Layout() {
         { name: 'Academy', path: '/education', icon: GraduationCap },
         { name: 'Calendar', path: '/calendar', icon: CalendarIcon },
         { name: 'Goals', path: '/goals', icon: Target },
+        { name: 'Credit Workshop', path: '/credit', icon: ShieldCheck },
         { name: 'Taxes', path: '/taxes', icon: Calculator },
       ]
     },
@@ -357,8 +396,9 @@ export default function Layout() {
             <div className="hidden md:flex items-center max-w-md w-full relative" ref={searchRef}>
               <Search className="w-4 h-4 text-content-tertiary absolute left-3" />
               <input 
+                ref={searchInputRef}
                 type="text" 
-                placeholder="Search records (bills, debts, tx)..." 
+                placeholder="Search (CMD+K)" 
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);

@@ -124,6 +124,42 @@
   .shadow-glow-emerald {
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
   }
+
+  /* Premium Pulse Border Animation */
+  .pulse-border-container {
+    @apply relative overflow-hidden rounded-sm;
+  }
+  
+  .pulse-border-container::before {
+    content: '';
+    @apply absolute -inset-[2px] opacity-0 transition-opacity duration-500 rounded-[inherit];
+    background: conic-gradient(from 0deg, 
+      transparent 0, 
+      transparent 25%, 
+      var(--color-brand-indigo) 50%, 
+      transparent 75%, 
+      transparent 100%
+    );
+    animation: rotate-border 4s linear infinite;
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    padding: 1px;
+    z-index: 10;
+  }
+
+  .pulse-border-container:hover::before {
+    @apply opacity-100;
+  }
+
+  @keyframes rotate-border {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Static version for key dashboard elements */
+  .pulse-border-active::before {
+    @apply opacity-40;
+  }
 }
 
 body {
@@ -186,6 +222,37 @@ body {
   --color-surface-raised: #140324;
   --color-surface-elevated: #1d0534;
   --shadow-glow-indigo: 0 0 15px rgba(217, 70, 239, 0.2);
+}
+
+@property --gradient-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes gradient-rotate {
+  from {
+    --gradient-angle: 0deg;
+  }
+  to {
+    --gradient-angle: 360deg;
+  }
+}
+
+.gradient-border-auto {
+  animation: gradient-rotate var(--animation-duration) linear infinite;
+}
+
+.gradient-border-hover:hover {
+  animation: gradient-rotate var(--animation-duration) linear infinite;
+}
+
+.gradient-border-stop-hover {
+  animation: gradient-rotate var(--animation-duration) linear infinite;
+}
+
+.gradient-border-stop-hover:hover {
+  animation-play-state: paused;
 }
 
 /* Hide scrollbars globally while keeping scroll functionality */

@@ -33,12 +33,23 @@ function AnimatedValue({ value, prefix = "", suffix = "" , decimals = 0 }: { val
   );
 }
 
-import { projectNetWorth } from '../lib/finance';
+import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting } from '../lib/finance';
+import { BorderRotate } from '../components/ui/animated-gradient-border';
+import { MenuContainer, MenuItem } from '../components/ui/fluid-menu';
+import { Home, Target, ShieldCheck, LifeBuoy, Menu as MenuIcon, X } from 'lucide-react';
 
 import type { Citation } from '../store/useStore';
 
 export default function Dashboard() {
-  const { bills, debts, transactions, assets, subscriptions, incomes, goals, user, pendingIngestions, freelanceEntries, citations, resolveCitation } = useStore();
+  const bills = useStore(state => state.bills);
+  const debts = useStore(state => state.debts);
+  const transactions = useStore(state => state.transactions);
+  const assets = useStore(state => state.assets);
+  const subscriptions = useStore(state => state.subscriptions);
+  const incomes = useStore(state => state.incomes);
+  const user = useStore(state => state.user);
+  const resolveCitation = useStore(state => state.resolveCitation);
+  
   const [isLoading, setIsLoading] = useState(false);
   const [isCitationModalOpen, setIsCitationModalOpen] = useState(false);
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
@@ -195,7 +206,19 @@ export default function Dashboard() {
   const hasActionableAlerts = pendingIngestions.length > 0 || isOverdraftRisk || taxInsolvencyRisk;
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+    <BorderRotate
+      animationSpeed={15}
+      borderRadius={0}
+      borderWidth={1}
+      backgroundColor="#050607"
+      gradientColors={{
+        primary: "#6366f1", // Indigo
+        secondary: "#a855f7", // Purple
+        accent: "#ec4899" // Pink
+      }}
+      className="min-h-[100dvh]"
+    >
+      <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-6">
       
       {/* 1. Dashboard Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
@@ -625,6 +648,29 @@ export default function Dashboard() {
           </Dialog.Panel>
         </div>
       </Dialog>
-    </div>
+
+      {/* Floating Tactical Navigation */}
+      <div className="fixed bottom-8 right-8 z-[100] hidden sm:block">
+        <MenuContainer>
+          <MenuItem 
+            className="rounded-full !h-full"
+            icon={
+              <div className="relative w-6 h-6">
+                <div className="absolute inset-0 transition-all duration-300 ease-in-out origin-center opacity-100 scale-100 rotate-0 [div[data-expanded=true]_&]:opacity-0 [div[data-expanded=true]_&]:scale-0 [div[data-expanded=true]_&]:rotate-180 flex items-center justify-center">
+                  <MenuIcon size={24} strokeWidth={1.5} className="text-brand-indigo" />
+                </div>
+                <div className="absolute inset-0 transition-all duration-300 ease-in-out origin-center opacity-0 scale-0 -rotate-180 [div[data-expanded=true]_&]:opacity-100 [div[data-expanded=true]_&]:scale-100 [div[data-expanded=true]_&]:rotate-0 flex items-center justify-center">
+                  <X size={24} strokeWidth={1.5} className="text-zinc-400" />
+                </div>
+              </div>
+            } 
+          />
+          <MenuItem className="rounded-full !h-full" icon={<Home size={22} strokeWidth={1.5} />} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />
+          <MenuItem className="rounded-full !h-full" icon={<Target size={22} strokeWidth={1.5} />} onClick={() => window.location.href = '/goals'} />
+          <MenuItem className="rounded-full !h-full" icon={<ShieldCheck size={22} strokeWidth={1.5} />} onClick={() => window.location.href = '/credit'} />
+          <MenuItem className="rounded-full !h-full" icon={<LifeBuoy size={22} strokeWidth={1.5} />} onClick={() => window.location.href = '/support'} />
+        </MenuContainer>
+      </div>
+    </BorderRotate>
   );
 }

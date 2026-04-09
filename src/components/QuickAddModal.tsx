@@ -31,6 +31,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [jurisdiction, setJurisdiction] = useState('');
   const [citationNumber, setCitationNumber] = useState('');
   const [penaltyFee, setPenaltyFee] = useState('');
+  const [apr, setApr] = useState('19.99');
+  const [minPayment, setMinPayment] = useState('');
   const [daysLeft, setDaysLeft] = useState('30');
   const [paymentUrl, setPaymentUrl] = useState('');
   // Citation due date (separate from incident date, drives daysLeft)
@@ -234,6 +236,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       setJurisdiction('');
       setCitationNumber('');
       setPenaltyFee('');
+      setApr('19.99');
+      setMinPayment('');
       setDaysLeft('30');
       setCitationDueDate('');
       setPaymentUrl('');
@@ -343,9 +347,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
           addDebt({
             name: vendor,
             type: 'Card', 
-            apr: 19.99, 
+            apr: parseFloat(apr) || 19.99, 
             remaining: numAmount,
-            minPayment: Math.max(25, numAmount * 0.02),
+            minPayment: parseFloat(minPayment) || Math.max(25, numAmount * 0.02),
             paid: 0
           });
           toast.success(`Debt recorded`);
@@ -717,6 +721,34 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             </select>
                           </div>
                         </div>
+                        {type === 'debt' && (
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label htmlFor="apr" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">APR (%)</label>
+                              <input
+                                id="apr"
+                                type="number"
+                                step="0.01"
+                                value={apr}
+                                onChange={(e) => setApr(e.target.value)}
+                                placeholder="19.99"
+                                className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none"
+                              />
+                            </div>
+                            <div>
+                              <label htmlFor="minPayment" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Min Payment ($)</label>
+                              <input
+                                id="minPayment"
+                                type="number"
+                                step="0.01"
+                                value={minPayment}
+                                onChange={(e) => setMinPayment(e.target.value)}
+                                placeholder="Auto"
+                                className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none"
+                              />
+                            </div>
+                          </div>
+                        )}
                       </>
                     )}
 

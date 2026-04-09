@@ -12,6 +12,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import AuthGuard from './components/AuthGuard';
 import AdminGuard from './components/AdminGuard';
 import { AppLoader } from './components/PageSkeleton';
+import SessionWarningModal from './components/SessionWarningModal';
 import { useStore } from './store/useStore';
 import { useAuth } from './hooks/useAuth';
 
@@ -41,11 +42,12 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const Education      = lazy(() => import('./pages/Education'));
 const HelpDesk       = lazy(() => import('./pages/HelpDesk'));
 const Analytics      = lazy(() => import('./pages/Analytics'));
+const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
 import AuthCallback from './pages/AuthCallback';
 const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
 
 function AppRoutes() {
-  const { user: authUser, loading: authLoading } = useAuth();
+  const { user: authUser, loading: authLoading, showWarning, timeLeft, extendSession } = useAuth();
   const { user, fetchData, isLoading, signOut: clearStore } = useStore();
 
   useEffect(() => {
@@ -114,11 +116,18 @@ function AppRoutes() {
           <Route path="subscriptions" element={<ErrorBoundary><Subscriptions /></ErrorBoundary>} />
           <Route path="reports" element={<ErrorBoundary><Reports /></ErrorBoundary>} />
           <Route path="analytics" element={<ErrorBoundary><Analytics /></ErrorBoundary>} />
+          <Route path="credit" element={<ErrorBoundary><CreditCenter /></ErrorBoundary>} />
           <Route path="support" element={<ErrorBoundary><HelpDesk /></ErrorBoundary>} />
           <Route path="settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
         </Route>
       </Route>
     </Routes>
+    <SessionWarningModal 
+      isOpen={showWarning}
+      timeLeftSeconds={timeLeft}
+      onExtend={extendSession}
+      onLogout={() => { useStore.getState().signOut(); }}
+    />
     </Suspense>
   );
 }

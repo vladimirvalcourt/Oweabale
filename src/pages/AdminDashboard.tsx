@@ -367,7 +367,7 @@ export default function AdminDashboard() {
                 <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:via-white/20" />
                 <p className="text-[10px] text-zinc-500 mb-2">{m.label}</p>
                 <p className={`text-2xl font-bold mb-1 ${m.color}`}>{m.value}</p>
-                <p className="text-[9px] uppercase tracking-widest opacity-80">{m.status}</p>
+                <p className="text-[9px] uppercase tracking-widest opacity-80" role="status" aria-label={`Metric status: ${m.status}`}>{m.status}</p>
               </motion.div>
             ))}
           </div>
@@ -381,7 +381,7 @@ export default function AdminDashboard() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
                   <span className="text-xs flex items-center gap-2"><Database className="w-3.5 h-3.5 text-zinc-500" /> Main Database</span>
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" role="status" aria-label="System status: Healthy" />
                 </div>
                 <div className="space-y-2 text-[11px] text-zinc-500">
                   <div className="flex justify-between"><span>Processor Speed</span><span className="text-white">12% busy</span></div>
@@ -395,7 +395,7 @@ export default function AdminDashboard() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
                   <span className="text-xs flex items-center gap-2"><Cpu className="w-3.5 h-3.5 text-zinc-500" /> Background Processing</span>
-                  <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+                  <ShieldAlert className="w-3.5 h-3.5 text-amber-500" role="status" aria-label="System status: Warning, high load" />
                 </div>
                 <div className="space-y-2 text-[11px] text-zinc-500">
                   <div className="flex justify-between"><span>Tasks per minute</span><span className="text-white">342</span></div>

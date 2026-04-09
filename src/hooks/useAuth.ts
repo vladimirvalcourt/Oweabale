@@ -6,18 +6,22 @@ interface AuthState {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  showWarning: boolean;
+  timeLeft: number;
+  extendSession: () => void;
 }
 
 const IDLE_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
+const WARNING_THRESHOLD_MS = 2 * 60 * 1000; // 2 minutes
 
 export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showWarning, setShowWarning] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0);
 
   // Mount once — get initial session and subscribe to auth changes.
-  // Dep array is intentionally empty: the onAuthStateChange subscription
-  // handles all subsequent session updates without re-running this effect.
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -31,7 +35,6 @@ export function useAuth(): AuthState {
       setLoading(false);
     });
 
-    // BFCACHE RE-VALIDATION: Prevents session bypass when clicking 'Back'
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) window.location.reload();
     };
@@ -41,29 +44,53 @@ export function useAuth(): AuthState {
       subscription.unsubscribe();
       window.removeEventListener('pageshow', handlePageShow);
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Idle timeout — separate effect so it cleanly re-binds when session changes
-  // without disturbing the auth subscription above.
+  const extendSession = () => {
+    setShowWarning(false);
+    // This will trigger the reset in the effect below because it refreshes the activity timestamp
+  };
+
+  // Idle timeout management
   useEffect(() => {
-    if (!session) return;
+    if (!session) {
+      setShowWarning(false);
+      return;
+    }
 
-    let idleTimer: ReturnType<typeof setTimeout>;
+    let lastActivity = Date.now();
+    let interval: ReturnType<typeof setInterval>;
 
     const resetIdleTimer = () => {
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(() => supabase.auth.signOut(), IDLE_TIMEOUT_MS);
+      lastActivity = Date.now();
     };
+
+    const checkTimeout = () => {
+      const now = Date.now();
+      const elapsed = now - lastActivity;
+      const remaining = IDLE_TIMEOUT_MS - elapsed;
+
+      if (remaining <= 0) {
+        supabase.auth.signOut();
+        setShowWarning(false);
+      } else if (remaining <= WARNING_THRESHOLD_MS) {
+        setShowWarning(true);
+        setTimeLeft(Math.floor(remaining / 1000));
+      } else {
+        setShowWarning(false);
+      }
+    }
 
     const events = ['mousedown', 'keydown', 'scroll', 'touchstart'] as const;
     events.forEach(e => window.addEventListener(e, resetIdleTimer));
-    resetIdleTimer();
+    
+    interval = setInterval(checkTimeout, 1000);
 
     return () => {
-      clearTimeout(idleTimer);
+      clearInterval(interval);
       events.forEach(e => window.removeEventListener(e, resetIdleTimer));
     };
-  }, [session]);
+  }, [session, showWarning]); // Re-bind if session or warning changes
 
-  return { user, session, loading };
+  return { user, session, loading, showWarning, timeLeft, extendSession };
 }
