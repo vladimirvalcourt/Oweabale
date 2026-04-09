@@ -346,10 +346,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         } else {
           addDebt({
             name: vendor,
-            type: 'Card', 
-            apr: parseFloat(apr) || 19.99, 
+            type: type === 'collection' ? 'Collection' : 'Loan', 
+            apr: parseFloat(apr) || 0, 
             remaining: numAmount,
-            minPayment: parseFloat(minPayment) || Math.max(25, numAmount * 0.02),
+            minPayment: parseFloat(minPayment) || 0,
             paid: 0
           });
           toast.success(`Debt recorded`);
@@ -661,7 +661,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none cursor-pointer"
                             >
                               <option value="bill">Monthly Bill</option>
-                              <option value="debt">Debt / Loan</option>
+                              <option value="debt">Loan / Credit Card</option>
+                              <option value="collection">Collection / Charge-off</option>
                             </select>
                           </div>
                           <div>

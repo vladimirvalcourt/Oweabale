@@ -91,14 +91,22 @@ export default function Settings() {
   // Sync formData when store user loads (fetchData may complete after mount)
   React.useEffect(() => {
     setFormData({
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      email: user.email || '',
       phone: user.phone || '',
       timezone: user.timezone || 'Eastern Time (ET)',
       language: user.language || 'English (US)',
     });
-  }, [user.id, user.firstName, user.lastName, user.email]);
+  }, [
+    user.id, 
+    user.firstName, 
+    user.lastName, 
+    user.email, 
+    user.phone, 
+    user.timezone, 
+    user.language
+  ]);
 
   // Load tickets when support tab is opened
   useEffect(() => {
