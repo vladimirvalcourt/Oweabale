@@ -33,6 +33,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [penaltyFee, setPenaltyFee] = useState('');
   const [daysLeft, setDaysLeft] = useState('30');
   const [paymentUrl, setPaymentUrl] = useState('');
+  // Citation due date (separate from incident date, drives daysLeft)
+  const [citationDueDate, setCitationDueDate] = useState('');
   // NLP input state
   const [nlpText, setNlpText] = useState('');
   // Validation state
@@ -112,15 +114,17 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       }
 
       // ── Auto-detect toll / traffic ticket and switch tab ──
+      // Capture BEFORE any state updates so merchant routing uses this synchronously
       const isCitationDoc = /toll|violation|citation|ticket|fine|infraction|notice of|penalty|mvd|dmv|traffic|speed|red light|parking (fine|violation|notice)|e-zpass|sunpass|fastrak|pikepass/i.test(fullText);
       if (isCitationDoc && activeTab !== 'citation') {
         setActiveTab('citation');
       }
 
       // ── Extract merchant: skip noise, find first meaningful line ──
+      // Use isCitationDoc directly (not stale activeTab) to decide where to route the name
       const lines = fullText.split('\n').filter(l => l.trim().length > 2);
       const merchantName = extractMerchantName(lines);
-      if (merchantName) {
+      if (merchantName && !isCitationDoc) {
         if (activeTab === 'transaction') setDescription(merchantName);
         else if (activeTab === 'obligation') setVendor(merchantName);
         const guessed = guessCategory(merchantName);
@@ -161,7 +165,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
             if (!isNaN(dueD.getTime())) {
               const days = Math.max(0, Math.round((dueD.getTime() - Date.now()) / 86400000));
               setDaysLeft(String(days));
-              setDueDate(dueD.toISOString().split('T')[0]);
+              setCitationDueDate(dueD.toISOString().split('T')[0]);
             }
           } catch {}
         }
@@ -201,6 +205,14 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     }
   };
 
+  // Revoke preview blob URL whenever the modal closes to prevent memory leak
+  useEffect(() => {
+    if (!isOpen) {
+      setScannedPreviewUrl(prev => { if (prev) URL.revokeObjectURL(prev); return null; });
+      setShowPreview(false);
+    }
+  }, [isOpen]);
+
   useEffect(() => {
     if (isOpen) {
       setActiveTab(quickAddTab);
@@ -223,6 +235,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       setCitationNumber('');
       setPenaltyFee('');
       setDaysLeft('30');
+      setCitationDueDate('');
       setPaymentUrl('');
     }
   }, [isOpen, quickAddTab]);
@@ -339,7 +352,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         }
       } else if (activeTab === 'income') {
         addIncome({
-          name: source,
+          name: description.trim() || source,
           amount: numAmount,
           frequency: 'Monthly',
           category: 'Income',
@@ -349,6 +362,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         });
         toast.success(`Income recorded`);
       } else if (activeTab === 'citation') {
+        // addCitation is async and handles its own error toast internally
+        // so we don't wrap in try/catch to avoid double-toasting on failure
         await addCitation({
           type: citationType,
           jurisdiction: jurisdiction.trim(),
@@ -361,6 +376,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
           status: 'open',
         });
         toast.success(`Citation recorded`);
+        onClose();
+        return;
       }
       onClose();
     } catch (error) {
@@ -724,12 +741,20 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             </select>
                           </div>
                           <div>
-                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Days Until Due</label>
+                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">
+                              Payment Due Date
+                            </label>
                             <input
-                              type="number"
-                              min="0"
-                              value={daysLeft}
-                              onChange={(e) => setDaysLeft(e.target.value)}
+                              type="date"
+                              value={citationDueDate}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setCitationDueDate(val);
+                                if (val) {
+                                  const days = Math.max(0, Math.round((new Date(val).getTime() - Date.now()) / 86400000));
+                                  setDaysLeft(String(days));
+                                }
+                              }}
                               className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2 text-sm font-sans text-white outline-none"
                             />
                           </div>
@@ -798,10 +823,21 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     {/* INCOME FIELDS */}
                     {activeTab === 'income' && (
                       <>
+                        <div>
+                          <label htmlFor="incomeName" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Name</label>
+                          <input
+                            id="incomeName"
+                            type="text"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder="E.g., Google Paycheck, Client Invoice"
+                            className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none transition-colors"
+                          />
+                        </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Source</label>
-                            <select 
+                            <select
                               value={source}
                               onChange={(e) => setSource(e.target.value)}
                               className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none cursor-pointer"

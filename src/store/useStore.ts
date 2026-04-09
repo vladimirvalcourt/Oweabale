@@ -310,7 +310,7 @@ export const useStore = create<AppState>()(
   setTaxSettings: async (state, rate) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
     if (userId) {
-      await supabase.from('profiles').update({ tax_state: state, tax_rate: rate }).eq('id', userId);
+      await supabase.from('profiles').upsert({ id: userId, tax_state: state, tax_rate: rate });
     }
     set((s) => ({ user: { ...s.user, taxState: state, taxRate: rate } }));
   },
@@ -770,7 +770,7 @@ export const useStore = create<AppState>()(
       if (user.taxRate !== undefined)  patch.tax_rate = user.taxRate;
       if (user.hasCompletedOnboarding !== undefined) patch.has_completed_onboarding = user.hasCompletedOnboarding;
       if (Object.keys(patch).length > 0) {
-        await supabase.from('profiles').update(patch).eq('id', userId);
+        await supabase.from('profiles').upsert({ id: userId, ...patch });
       }
     }
     set((state) => ({ user: { ...state.user, ...user } }));
@@ -826,11 +826,12 @@ export const useStore = create<AppState>()(
       ));
 
       // 2. RESET ONBOARDING FLAG
-      await supabase.from('profiles').update({
+      await supabase.from('profiles').upsert({
+        id: userId,
         has_completed_onboarding: false,
         tax_state: '',
         tax_rate: 0
-      }).eq('id', userId);
+      });
 
       // 3. RESET LOCAL STATE
       set({
@@ -1113,22 +1114,25 @@ export const useStore = create<AppState>()(
     void (supabase.rpc('flip_overdue_bills') as unknown as Promise<unknown>).catch(() => {});
 
     try {
-      // ── PHASE 1: Critical data — dashboard needs this to render ──────────
       const [
-        { data: profile },
+        { data: profile, error: profileError },
         { data: bills },
         { data: debts },
         { data: transactions },
         { data: assets },
         { data: incomes },
       ] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', resolvedUserId).single(),
+        supabase.from('profiles').select('*').eq('id', resolvedUserId).maybeSingle(),
         supabase.from('bills').select('*').eq('user_id', resolvedUserId),
         supabase.from('debts').select('*').eq('user_id', resolvedUserId),
         supabase.from('transactions').select('*').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(500),
         supabase.from('assets').select('*').eq('user_id', resolvedUserId),
         supabase.from('incomes').select('*').eq('user_id', resolvedUserId),
       ]);
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        console.error('Error fetching profile:', profileError);
+      }
 
       // Release the loader as soon as critical data is ready
       set({
@@ -1196,7 +1200,7 @@ export const useStore = create<AppState>()(
           taxState: profile.tax_state ?? '',
           taxRate: profile.tax_rate ?? 0,
           isAdmin: profile.is_admin === true,
-        } : get().user,
+        } : { ...get().user, id: resolvedUserId },
       });
 
       // ── PHASE 2: Secondary data — loads silently while user sees dashboard ─
