@@ -1,15 +1,21 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Activity, ShieldCheck, Calendar, Flame, Inbox, ShieldAlert } from 'lucide-react';
+import { 
+  ArrowRight, Activity, ShieldCheck, Calendar, Flame, Inbox, ShieldAlert,
+  X, Copy, ExternalLink, Home, Target, LifeBuoy, Menu as MenuIcon 
+} from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
 import { Dialog } from '@headlessui/react';
 import { motion } from 'motion/react';
-import { X, Copy, ExternalLink } from 'lucide-react';
 import { animate } from 'motion/react';
 import { useStore } from '../store/useStore';
 import { sanitizeUrl } from '../lib/security';
-import { calcMonthlyCashFlow, calcSurplusRouting } from '../lib/finance';
+import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting } from '../lib/finance';
+import { BorderRotate } from '../components/ui/animated-gradient-border';
+import { MenuContainer, MenuItem } from '../components/ui/fluid-menu';
+
+import type { Citation } from '../store/useStore';
 
 // Helper for animated numbers
 function AnimatedValue({ value, prefix = "", suffix = "" , decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
@@ -33,12 +39,6 @@ function AnimatedValue({ value, prefix = "", suffix = "" , decimals = 0 }: { val
   );
 }
 
-import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting } from '../lib/finance';
-import { BorderRotate } from '../components/ui/animated-gradient-border';
-import { MenuContainer, MenuItem } from '../components/ui/fluid-menu';
-import { Home, Target, ShieldCheck, LifeBuoy, Menu as MenuIcon, X } from 'lucide-react';
-
-import type { Citation } from '../store/useStore';
 
 export default function Dashboard() {
   const bills = useStore(state => state.bills);
@@ -48,6 +48,10 @@ export default function Dashboard() {
   const subscriptions = useStore(state => state.subscriptions);
   const incomes = useStore(state => state.incomes);
   const user = useStore(state => state.user);
+  const goals = useStore(state => state.goals);
+  const freelanceEntries = useStore(state => state.freelanceEntries);
+  const pendingIngestions = useStore(state => state.pendingIngestions);
+  const citations = useStore(state => state.citations);
   const resolveCitation = useStore(state => state.resolveCitation);
   
   const [isLoading, setIsLoading] = useState(false);
@@ -185,8 +189,9 @@ export default function Dashboard() {
 
   // 5. Total Tax Shield
   const lifetimeTaxShield = useMemo(() => {
-    return freelanceEntries.reduce((sum, e) => sum + (e.scouredWriteOffs || 0), 0);
+    return freelanceEntries.reduce((sum: number, e: any) => sum + (e.scouredWriteOffs || 0), 0);
   }, [freelanceEntries]);
+
 
   if (isLoading) {
     return (
@@ -538,15 +543,16 @@ export default function Dashboard() {
               <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-300">Citations & Tickets</h3>
             </div>
             <div className="p-0 outline-none">
-               {citations.filter(c => c.status === 'open').length === 0 ? (
+               {citations.filter((c: any) => c.status === 'open').length === 0 ? (
                   <div className="p-8 text-center flex flex-col items-center">
                     <ShieldCheck className="w-8 h-8 text-emerald-500/50 mb-3" />
+
                     <p className="text-sm font-sans font-medium text-zinc-300">Clean Record</p>
                     <p className="text-xs text-zinc-500 mt-1">No outstanding tickets found.</p>
                   </div>
                ) : (
                  <ul className="divide-y divide-surface-border">
-                  {citations.filter(c => c.status === 'open').map((citation) => (
+                  {citations.filter((c: any) => c.status === 'open').map((citation: any) => (
                     <li key={citation.id} className="px-6 py-4 hover:bg-surface-base transition-colors">
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-start gap-3">
