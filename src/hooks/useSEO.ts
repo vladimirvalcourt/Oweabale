@@ -6,9 +6,10 @@ interface SEOOptions {
   canonical: string;
   ogTitle?: string;
   ogDescription?: string;
+  ogImage?: string;
 }
 
-export function useSEO({ title, description, canonical, ogTitle, ogDescription }: SEOOptions) {
+export function useSEO({ title, description, canonical, ogTitle, ogDescription, ogImage }: SEOOptions) {
   useEffect(() => {
     document.title = title;
 
@@ -36,5 +37,13 @@ export function useSEO({ title, description, canonical, ogTitle, ogDescription }
     // OG description
     let ogDescEl = document.querySelector<HTMLMetaElement>('meta[property="og:description"]');
     if (ogDescEl) ogDescEl.content = ogDescription ?? description;
-  }, [title, description, canonical, ogTitle, ogDescription]);
+
+    // OG image
+    let ogImageEl = document.querySelector<HTMLMetaElement>('meta[property="og:image"]');
+    if (ogImageEl && ogImage) ogImageEl.content = ogImage;
+
+    // Twitter image
+    let twitterImageEl = document.querySelector<HTMLMetaElement>('meta[name="twitter:image"]');
+    if (twitterImageEl && ogImage) twitterImageEl.content = ogImage;
+  }, [title, description, canonical, ogTitle, ogDescription, ogImage]);
 }

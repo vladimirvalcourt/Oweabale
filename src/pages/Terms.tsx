@@ -9,6 +9,7 @@ export default function Terms() {
     title: 'Terms of Service — Oweable',
     description: 'Terms of Service for Oweable. Read the terms that govern your use of the Oweable financial platform.',
     canonical: 'https://www.oweable.com/terms',
+    ogImage: 'https://www.oweable.com/og-image.svg',
   });
 
   return (

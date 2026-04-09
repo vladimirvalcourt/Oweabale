@@ -9,6 +9,7 @@ export default function Privacy() {
     title: 'Privacy Policy — Oweable',
     description: "Oweable's privacy policy. We don't sell your data. Learn what we collect, how we use it, and how you can delete it.",
     canonical: 'https://www.oweable.com/privacy',
+    ogImage: 'https://www.oweable.com/og-image.svg',
   });
 
   return (

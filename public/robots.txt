@@ -111,4 +111,53 @@ Allow: /security
 Allow: /privacy
 Allow: /terms
 
+# ── OpenAI secondary indexing crawler ─────────────────────────
+User-agent: OAI-SearchBot
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+Allow: /llms.txt
+
+# ── Microsoft Bing ─────────────────────────────────────────────
+User-agent: Bingbot
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+
+# ── Bing legacy crawler ────────────────────────────────────────
+User-agent: msnbot
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+
+# ── Apple Search / Siri ────────────────────────────────────────
+User-agent: Applebot
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+
+# ── DuckDuckGo ─────────────────────────────────────────────────
+User-agent: DuckDuckBot
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+
+# ── Yahoo / Verizon ────────────────────────────────────────────
+User-agent: Slurp
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+
 Sitemap: https://www.oweable.com/sitemap.xml

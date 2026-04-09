@@ -9,6 +9,7 @@ export default function Security() {
     title: 'Security — Oweable',
     description: 'How Oweable protects your financial data. TLS encryption, row-level security, Google OAuth, and regular penetration testing — built for the self-employed.',
     canonical: 'https://www.oweable.com/security',
+    ogImage: 'https://www.oweable.com/og-image.svg',
   });
 
   return (

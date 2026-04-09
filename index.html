@@ -93,7 +93,6 @@
       "url": "https://www.oweable.com",
       "logo": "https://www.oweable.com/favicon.svg",
       "description": "Oweable builds financial software for the self-employed and gig economy. Our mission is to give freelancers and independent contractors the same financial clarity that enterprise workers take for granted.",
-      "sameAs": [],
       "contactPoint": {
         "@type": "ContactPoint",
         "contactType": "customer support",
@@ -208,6 +207,46 @@
         },
         "query-input": "required name=search_term_string"
       }
+    }
+    </script>
+
+    <!-- 5. BreadcrumbList — site navigation for search engines -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://www.oweable.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Pricing",
+          "item": "https://www.oweable.com/pricing"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Security",
+          "item": "https://www.oweable.com/security"
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "name": "Privacy Policy",
+          "item": "https://www.oweable.com/privacy"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "Terms of Service",
+          "item": "https://www.oweable.com/terms"
+        }
+      ]
     }
     </script>
   </head>

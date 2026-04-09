@@ -75,11 +75,39 @@ function WordCycler() {
   );
 }
 
+const FAQ_ITEMS = [
+  {
+    q: 'Who is Oweable designed for?',
+    a: 'Oweable is designed for freelancers, 1099 contractors, gig economy workers (Uber, DoorDash, Instacart, Lyft), consultants, and solo business owners. Anyone with variable income or multiple income streams who needs to manage quarterly taxes will benefit most.',
+  },
+  {
+    q: 'How does Oweable help freelancers with taxes?',
+    a: 'Oweable automatically estimates your quarterly IRS tax obligations based on your tracked income and applicable state and federal self-employment tax rates. It separates W-2 income from 1099 gig income, tracks deductible write-offs, and shows exactly what you owe before each quarterly deadline.',
+  },
+  {
+    q: 'Is Oweable free?',
+    a: 'Yes — Oweable has a free tier. Paid plans with advanced features start at $9/month. See the Pricing page for a full feature comparison.',
+  },
+  {
+    q: 'How is Oweable different from YNAB or Mint?',
+    a: 'YNAB and Mint (discontinued in 2024) are built for salaried employees with predictable income. Oweable is built for self-employment: quarterly tax estimation, a freelance income vault with write-off tracking, and debt amortization with Snowball and Avalanche strategies — features those tools never offered.',
+  },
+  {
+    q: 'Does Oweable connect to my bank account?',
+    a: 'Oweable supports manual entry and document ingestion — upload receipts, bank statements, and invoices via desktop or phone camera. Automatic bank sync via Plaid is on the roadmap.',
+  },
+  {
+    q: 'Is my financial data secure?',
+    a: 'Yes. Oweable uses Google OAuth (no stored passwords), encrypts all data at rest and in transit via TLS 1.2+, and enforces row-level security on every database table so users can only ever access their own data.',
+  },
+];
+
 export default function Landing() {
   useSEO({
     title: 'Oweable — Financial OS for Freelancers & Self-Employed',
     description: 'Oweable is the financial operating system for freelancers, independent contractors, and gig workers. Track quarterly taxes, manage bills, pay off debt, and build net worth — all in one dashboard.',
     canonical: 'https://www.oweable.com/',
+    ogImage: 'https://www.oweable.com/og-image.svg',
   });
 
   const [scrolled, setScrolled] = useState(false);
@@ -290,6 +318,47 @@ export default function Landing() {
                   {feat.desc}
                 </p>
                 <div className="absolute bottom-0 left-0 w-full h-[1px] bg-brand-violet scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* What is Oweable? — plain-language definition for AI crawlers and search engines */}
+      <section id="what-is-oweable" className="py-24 border-t border-surface-border">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div className="lg:col-span-4">
+              <span className="font-mono text-xs uppercase tracking-[0.3em] text-brand-violet">Overview</span>
+              <h2 className="text-3xl font-medium tracking-tight text-content-primary mt-4">What is Oweable?</h2>
+            </div>
+            <div className="lg:col-span-8 flex flex-col gap-4 lg:pt-10">
+              <p className="text-content-secondary leading-relaxed">
+                Oweable is a financial operating system built exclusively for freelancers, independent contractors, gig economy workers, and self-employed professionals. It consolidates quarterly tax estimation, bill tracking, debt payoff planning, income management, and net worth monitoring into a single dashboard — replacing spreadsheets and disconnected apps.
+              </p>
+              <p className="text-content-secondary leading-relaxed">
+                Unlike consumer finance tools designed for salaried employees, Oweable understands 1099 income, variable earnings, and the quarterly IRS obligations that come with self-employment. It automatically estimates what you owe each quarter and tracks business write-offs to reduce your taxable income.
+              </p>
+              <p className="text-content-secondary leading-relaxed">
+                Oweable serves Uber and DoorDash drivers, freelance designers, 1099 consultants, solo business owners, and anyone whose income arrives outside a traditional W-2 paycheck.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section — indexed by search engines and AI crawlers */}
+      <section id="faq" className="py-24 border-t border-surface-border bg-surface-raised">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="mb-16">
+            <span className="font-mono text-xs uppercase tracking-[0.3em] text-brand-violet">FAQ</span>
+            <h2 className="text-3xl font-medium tracking-tight text-content-primary mt-4">Frequently asked questions</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-l border-t border-surface-border">
+            {FAQ_ITEMS.map((item, i) => (
+              <div key={i} className="border-r border-b border-surface-border p-8 bg-surface-base hover:bg-surface-raised transition-colors">
+                <h3 className="text-sm font-medium text-content-primary mb-3">{item.q}</h3>
+                <p className="text-sm text-content-secondary leading-relaxed">{item.a}</p>
               </div>
             ))}
           </div>

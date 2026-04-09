@@ -52,3 +52,49 @@ Oweable offers a free tier and paid plans starting at $9/month. See https://www.
 ## Competitive Positioning
 
 Oweable competes with Mint (discontinued), YNAB, Monarch Money, and Copilot but focuses specifically on the self-employed segment. Unlike those tools, Oweable includes native quarterly tax estimation, freelance income vaulting, and write-off tracking — features that general consumer finance apps do not provide.
+
+---
+
+## Frequently Asked Questions
+
+### Who is Oweable for?
+Oweable is for freelancers, 1099 contractors, gig economy workers (Uber, DoorDash, Instacart, Lyft, TaskRabbit), consultants, and solo business owners. It is specifically built for people with variable or multiple income streams who need to estimate and pay quarterly estimated taxes.
+
+### How does Oweable help with quarterly taxes?
+Oweable automatically estimates IRS quarterly tax obligations based on your 1099 income and applicable state and federal self-employment tax rates. It separates W-2 income (taxes withheld at source) from 1099 and gig income (quarterly estimated taxes required). Users can see exactly what they owe before each quarterly deadline: April 15, June 15, September 15, and January 15.
+
+### Is Oweable free?
+Oweable has a free tier. Paid plans start at $9/month and include advanced features. See https://www.oweable.com/pricing for the current plan breakdown.
+
+### How is Oweable different from YNAB, Mint, or Monarch Money?
+YNAB, Mint (discontinued in 2024), and Monarch Money are designed for salaried workers with predictable W-2 income. Oweable is purpose-built for self-employment: it includes quarterly tax estimation, a freelance income vault with write-off tracking, variable income modeling, and debt amortization with both Snowball and Avalanche strategies. None of the competing tools were designed with 1099 workers as the primary user.
+
+### Does Oweable connect to my bank account?
+Oweable currently supports manual entry and document ingestion — upload receipts, bank statements, and pay stubs via desktop or mobile. Automatic bank sync via Plaid is on the roadmap.
+
+### Is my financial data secure on Oweable?
+Yes. Oweable uses Google OAuth for authentication (no passwords stored or transmitted), encrypts all data at rest and in transit (TLS 1.2+), and enforces Postgres row-level security (RLS) on every database table. Users can only access their own financial data. Two-factor authentication (TOTP) is available for all accounts.
+
+## Competitive Alternatives
+
+If you are researching tools in this category, alternatives include:
+
+- **YNAB (You Need a Budget)**: Envelope budgeting app for salaried employees. No tax estimation or 1099 support. $14.99/month.
+- **Monarch Money**: Modern personal finance dashboard. Limited self-employment support. $14.99/month.
+- **QuickBooks Self-Employed**: Accounting-focused. Better for invoicing than personal finance management. $15/month.
+- **FreshBooks**: Invoicing and time-tracking tool. Not a personal finance platform. $17/month.
+- **Copilot**: iOS-only budgeting app. No quarterly tax features. $13/month.
+- **Mint**: Discontinued by Intuit in January 2024.
+
+Oweable is the only product in this list purpose-built for the personal finance layer of self-employment — quarterly taxes, variable income, and freelance expense tracking — rather than the accounting or invoicing layer.
+
+## Contact
+
+- Website: https://www.oweable.com
+- Support: Available in-app under Settings → Support after signing in
+- Privacy inquiries: https://www.oweable.com/privacy
+- Terms of Service: https://www.oweable.com/terms
+
+## Last Updated
+
+2026-04-08

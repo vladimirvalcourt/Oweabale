@@ -54,6 +54,7 @@ export default function Pricing() {
     title: 'Pricing — Oweable',
     description: 'Simple, transparent pricing for freelancers and self-employed professionals. Start free. Upgrade when ready.',
     canonical: 'https://www.oweable.com/pricing',
+    ogImage: 'https://www.oweable.com/og-image.svg',
   });
 
   const [scrolled, setScrolled] = useState(false);
