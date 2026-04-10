@@ -18,37 +18,39 @@ export default function Subscriptions() {
     status: 'active' as 'active' | 'paused' | 'cancelled',
   });
 
-  const handleAdd = (e: React.FormEvent) => {
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.amount || !formData.nextBillingDate) {
       toast.error('Please fill in all required fields');
       return;
     }
 
-    addSubscription({
+    const ok = await addSubscription({
       name: formData.name,
       amount: Number(formData.amount),
       frequency: formData.frequency,
       nextBillingDate: formData.nextBillingDate,
       status: formData.status,
     });
+    if (!ok) return;
 
     toast.success('Subscription added successfully');
     setIsAdding(false);
     setFormData({ name: '', amount: '', frequency: 'Monthly', nextBillingDate: '', status: 'active' });
   };
 
-  const handleUpdate = (e: React.FormEvent) => {
+  const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingId || !formData.name || !formData.amount || !formData.nextBillingDate) return;
 
-    editSubscription(editingId, {
+    const ok = await editSubscription(editingId, {
       name: formData.name,
       amount: Number(formData.amount),
       frequency: formData.frequency,
       nextBillingDate: formData.nextBillingDate,
       status: formData.status,
     });
+    if (!ok) return;
 
     toast.success('Subscription updated');
     setEditingId(null);
@@ -72,8 +74,9 @@ export default function Subscriptions() {
     setFormData({ name: '', amount: '', frequency: 'Monthly', nextBillingDate: '', status: 'active' });
   };
 
-  const handleDelete = (id: string) => {
-    deleteSubscription(id);
+  const handleDelete = async (id: string) => {
+    const ok = await deleteSubscription(id);
+    if (!ok) return;
     toast.success('Subscription deleted');
   };
 

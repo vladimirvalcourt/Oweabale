@@ -252,32 +252,32 @@ interface AppState {
   editDebt: (id: string, debt: Partial<Debt>) => Promise<void>;
   deleteDebt: (id: string) => Promise<void>;
   addDebtPayment: (id: string, amount: number) => Promise<void>;
-  addAsset: (asset: Omit<Asset, 'id'>) => Promise<void>;
+  addAsset: (asset: Omit<Asset, 'id'>) => Promise<boolean>;
   editAsset: (id: string, asset: Partial<Asset>) => Promise<void>;
-  deleteAsset: (id: string) => Promise<void>;
-  addSubscription: (subscription: Omit<Subscription, 'id'>) => Promise<void>;
-  editSubscription: (id: string, subscription: Partial<Subscription>) => Promise<void>;
-  deleteSubscription: (id: string) => Promise<void>;
-  addGoal: (goal: Omit<Goal, 'id'>) => Promise<void>;
-  editGoal: (id: string, goal: Partial<Goal>) => Promise<void>;
-  deleteGoal: (id: string) => Promise<void>;
-  addGoalProgress: (id: string, amount: number) => Promise<void>;
+  deleteAsset: (id: string) => Promise<boolean>;
+  addSubscription: (subscription: Omit<Subscription, 'id'>) => Promise<boolean>;
+  editSubscription: (id: string, subscription: Partial<Subscription>) => Promise<boolean>;
+  deleteSubscription: (id: string) => Promise<boolean>;
+  addGoal: (goal: Omit<Goal, 'id'>) => Promise<boolean>;
+  editGoal: (id: string, goal: Partial<Goal>) => Promise<boolean>;
+  deleteGoal: (id: string) => Promise<boolean>;
+  addGoalProgress: (id: string, amount: number) => Promise<boolean>;
   addIncome: (income: Omit<IncomeSource, 'id'>) => Promise<boolean>;
-  editIncome: (id: string, income: Partial<IncomeSource>) => Promise<void>;
-  deleteIncome: (id: string) => Promise<void>;
-  recordIncomeDeposit: (id: string, amount?: number) => Promise<void>;
-  addBudget: (budget: Omit<Budget, 'id'>) => Promise<void>;
-  editBudget: (id: string, budget: Partial<Budget>) => Promise<void>;
-  deleteBudget: (id: string) => Promise<void>;
+  editIncome: (id: string, income: Partial<IncomeSource>) => Promise<boolean>;
+  deleteIncome: (id: string) => Promise<boolean>;
+  recordIncomeDeposit: (id: string, amount?: number) => Promise<boolean>;
+  addBudget: (budget: Omit<Budget, 'id'>) => Promise<boolean>;
+  editBudget: (id: string, budget: Partial<Budget>) => Promise<boolean>;
+  deleteBudget: (id: string) => Promise<boolean>;
   addCategory: (category: Omit<Category, 'id'>) => Promise<void>;
   editCategory: (id: string, category: Partial<Category>) => Promise<void>;
   deleteCategory: (id: string) => Promise<void>;
-  addCitation: (citation: Omit<Citation, 'id'>) => Promise<void>;
-  resolveCitation: (id: string) => Promise<void>;
-  addDeduction: (deduction: Omit<Deduction, 'id'>) => Promise<void>;
-  deleteDeduction: (id: string) => Promise<void>;
+  addCitation: (citation: Omit<Citation, 'id'>) => Promise<boolean>;
+  resolveCitation: (id: string) => Promise<boolean>;
+  addDeduction: (deduction: Omit<Deduction, 'id'>) => Promise<boolean>;
+  deleteDeduction: (id: string) => Promise<boolean>;
   // Freelance Actions
-  addFreelanceEntry: (entry: Omit<FreelanceEntry, 'id'>) => Promise<void>;
+  addFreelanceEntry: (entry: Omit<FreelanceEntry, 'id'>) => Promise<boolean>;
   toggleFreelanceVault: (id: string) => Promise<void>;
   deleteFreelanceEntry: (id: string) => Promise<void>;
   updateUser: (user: Partial<AppState['user']>) => Promise<void>;
@@ -392,27 +392,26 @@ export const useStore = create<AppState>()(
     if (autoCategory) transaction = { ...transaction, category: autoCategory };
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user.id;
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) { toast.error('You must be signed in to save transactions.'); return false; }
       
       let newId = crypto.randomUUID();
-      if (userId) {
-        const { data, error } = await supabase
-          .from('transactions')
-          .insert({ 
-            name: transaction.name,
-            category: transaction.category,
-            date: transaction.date,
-            amount: transaction.amount,
-            type: transaction.type,
-            user_id: userId 
-          })
-          .select('id')
-          .single();
-          
-        if (error) throw error;
-        if (data?.id) newId = data.id;
-      }
+      const { data, error } = await supabase
+        .from('transactions')
+        .insert({ 
+          name: transaction.name,
+          category: transaction.category,
+          date: transaction.date,
+          amount: transaction.amount,
+          type: transaction.type,
+          user_id: userId 
+        })
+        .select('id')
+        .single();
+        
+      if (error) throw error;
+      if (data?.id) newId = data.id;
 
       set((state) => ({
         transactions: [{ ...transaction, id: newId }, ...state.transactions].slice(0, 100)
@@ -556,32 +555,30 @@ export const useStore = create<AppState>()(
   },
   addDebt: async (debt) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user.id;
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) { toast.error('You must be signed in to save debts.'); return false; }
       
       let newId = crypto.randomUUID();
-      if (userId) {
-        const { data, error } = await supabase
-          .from('debts')
-          .insert({
-            name: debt.name, 
-            type: debt.type, 
-            apr: debt.apr, 
-            remaining: debt.remaining,
-            min_payment: debt.minPayment, 
-            paid: debt.paid,
-            original_amount: debt.originalAmount ?? null,
-            origination_date: debt.originationDate ?? null,
-            term_months: debt.termMonths ?? null,
-            user_id: userId,
-          })
-          .select('id')
-          .single();
-          
-        if (error) throw error;
-        if (data?.id) newId = data.id;
-      }
-      
+      const { data, error } = await supabase
+        .from('debts')
+        .insert({
+          name: debt.name, 
+          type: debt.type, 
+          apr: debt.apr, 
+          remaining: debt.remaining,
+          min_payment: debt.minPayment, 
+          paid: debt.paid,
+          original_amount: debt.originalAmount ?? null,
+          origination_date: debt.originationDate ?? null,
+          term_months: debt.termMonths ?? null,
+          user_id: userId,
+        })
+        .select('id')
+        .single();
+        
+      if (error) throw error;
+      if (data?.id) newId = data.id;
       set((state) => ({ debts: [...state.debts, { ...debt, id: newId }] }));
       return true;
     } catch (error) {
@@ -646,33 +643,33 @@ export const useStore = create<AppState>()(
   },
   addAsset: async (asset) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user.id;
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) { toast.error('You must be signed in to save assets.'); return false; }
       
       let newId = crypto.randomUUID();
-      if (userId) {
-        const { data, error } = await supabase
-          .from('assets')
-          .insert({
-            name: asset.name, 
-            value: asset.value, 
-            type: asset.type,
-            appreciation_rate: asset.appreciationRate ?? null,
-            purchase_price: asset.purchasePrice ?? null,
-            purchase_date: asset.purchaseDate ?? null,
-            user_id: userId,
-          })
-          .select('id')
-          .single();
-          
-        if (error) throw error;
-        if (data?.id) newId = data.id;
-      }
-      
+      const { data, error } = await supabase
+        .from('assets')
+        .insert({
+          name: asset.name, 
+          value: asset.value, 
+          type: asset.type,
+          appreciation_rate: asset.appreciationRate ?? null,
+          purchase_price: asset.purchasePrice ?? null,
+          purchase_date: asset.purchaseDate ?? null,
+          user_id: userId,
+        })
+        .select('id')
+        .single();
+        
+      if (error) throw error;
+      if (data?.id) newId = data.id;
       set((state) => ({ assets: [...state.assets, { ...asset, id: newId }] }));
+      return true;
     } catch (error) {
       console.error('[addAsset] Sync failed:', error);
       toast.error('Failed to sync asset.');
+      return false;
     }
   },
   editAsset: async (id, updatedAsset) => {
@@ -695,52 +692,54 @@ export const useStore = create<AppState>()(
   deleteAsset: async (id) => {
     try {
       const userId = (await supabase.auth.getUser()).data.user?.id;
-      if (userId) {
-        const { error } = await supabase.from('assets').delete().eq('id', id).eq('user_id', userId);
-        if (error) throw error;
-      }
+      if (!userId) { toast.error('You must be signed in to delete assets.'); return false; }
+      const { error } = await supabase.from('assets').delete().eq('id', id).eq('user_id', userId);
+      if (error) throw error;
       set((state) => ({ assets: state.assets.filter((a) => a.id !== id) }));
+      return true;
     } catch (err) {
       console.error('Error deleting asset:', err);
       toast.error('Failed to delete asset.');
+      return false;
     }
   },
 
   // ── Subscriptions ─────────────────────────────────────────────
   addSubscription: async (subscription) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user.id;
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) { toast.error('You must be signed in to save subscriptions.'); return false; }
       
       let newId = crypto.randomUUID();
-      if (userId) {
-        const { data, error } = await supabase
-          .from('subscriptions')
-          .insert({
-            name: subscription.name, 
-            amount: subscription.amount,
-            frequency: subscription.frequency, 
-            next_billing_date: subscription.nextBillingDate,
-            status: subscription.status, 
-            price_history: subscription.priceHistory ?? [],
-            user_id: userId,
-          })
-          .select('id')
-          .single();
-          
-        if (error) throw error;
-        if (data?.id) newId = data.id;
-      }
-      
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .insert({
+          name: subscription.name, 
+          amount: subscription.amount,
+          frequency: subscription.frequency, 
+          next_billing_date: subscription.nextBillingDate,
+          status: subscription.status, 
+          price_history: subscription.priceHistory ?? [],
+          user_id: userId,
+        })
+        .select('id')
+        .single();
+        
+      if (error) throw error;
+      if (data?.id) newId = data.id;
       set((state) => ({ subscriptions: [...state.subscriptions, { ...subscription, id: newId }] }));
+      return true;
     } catch (error) {
       console.error('[addSubscription] Sync failed:', error);
       toast.error('Failed to sync subscription.');
+      return false;
     }
   },
   editSubscription: async (id, updatedSubscription) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (userId) {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to edit subscriptions.'); return false; }
       const patch: Record<string, unknown> = {};
       if (updatedSubscription.name !== undefined)            patch.name = updatedSubscription.name;
       if (updatedSubscription.amount !== undefined)          patch.amount = updatedSubscription.amount;
@@ -748,51 +747,67 @@ export const useStore = create<AppState>()(
       if (updatedSubscription.nextBillingDate !== undefined) patch.next_billing_date = updatedSubscription.nextBillingDate;
       if (updatedSubscription.status !== undefined)          patch.status = updatedSubscription.status;
       if (updatedSubscription.priceHistory !== undefined)    patch.price_history = updatedSubscription.priceHistory;
-      await supabase.from('subscriptions').update(patch).eq('id', id).eq('user_id', userId);
+      const { error } = await supabase.from('subscriptions').update(patch).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to update subscription'); return false; }
+      set((state) => ({ subscriptions: state.subscriptions.map((s) => s.id === id ? { ...s, ...updatedSubscription } : s) }));
+      return true;
+    } catch (err) {
+      console.error('[editSubscription] failed:', err);
+      toast.error('Failed to update subscription.');
+      return false;
     }
-    set((state) => ({ subscriptions: state.subscriptions.map((s) => s.id === id ? { ...s, ...updatedSubscription } : s) }));
   },
   deleteSubscription: async (id) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (userId) await supabase.from('subscriptions').delete().eq('id', id).eq('user_id', userId);
-    set((state) => ({ subscriptions: state.subscriptions.filter((s) => s.id !== id) }));
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to delete subscriptions.'); return false; }
+      const { error } = await supabase.from('subscriptions').delete().eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to delete subscription'); return false; }
+      set((state) => ({ subscriptions: state.subscriptions.filter((s) => s.id !== id) }));
+      return true;
+    } catch (err) {
+      console.error('[deleteSubscription] failed:', err);
+      toast.error('Failed to delete subscription.');
+      return false;
+    }
   },
 
   // ── Goals ─────────────────────────────────────────────────────
   addGoal: async (goal) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user.id;
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) { toast.error('You must be signed in to save goals.'); return false; }
       
       let newId = crypto.randomUUID();
-      if (userId) {
-        const { data, error } = await supabase
-          .from('goals')
-          .insert({
-            name: goal.name, 
-            target_amount: goal.targetAmount, 
-            current_amount: goal.currentAmount,
-            deadline: goal.deadline, 
-            type: goal.type, 
-            color: goal.color, 
-            user_id: userId,
-          })
-          .select('id')
-          .single();
-          
-        if (error) throw error;
-        if (data?.id) newId = data.id;
-      }
-      
+      const { data, error } = await supabase
+        .from('goals')
+        .insert({
+          name: goal.name, 
+          target_amount: goal.targetAmount, 
+          current_amount: goal.currentAmount,
+          deadline: goal.deadline, 
+          type: goal.type, 
+          color: goal.color, 
+          user_id: userId,
+        })
+        .select('id')
+        .single();
+        
+      if (error) throw error;
+      if (data?.id) newId = data.id;
       set((state) => ({ goals: [...state.goals, { ...goal, id: newId }] }));
+      return true;
     } catch (error) {
       console.error('[addGoal] Sync failed:', error);
       toast.error('Failed to sync goal.');
+      return false;
     }
   },
   editGoal: async (id, updatedGoal) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (userId) {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to edit goals.'); return false; }
       const patch: Record<string, unknown> = {};
       if (updatedGoal.name !== undefined)          patch.name = updatedGoal.name;
       if (updatedGoal.targetAmount !== undefined)  patch.target_amount = updatedGoal.targetAmount;
@@ -800,56 +815,76 @@ export const useStore = create<AppState>()(
       if (updatedGoal.deadline !== undefined)      patch.deadline = updatedGoal.deadline;
       if (updatedGoal.type !== undefined)          patch.type = updatedGoal.type;
       if (updatedGoal.color !== undefined)         patch.color = updatedGoal.color;
-      await supabase.from('goals').update(patch).eq('id', id).eq('user_id', userId);
+      const { error } = await supabase.from('goals').update(patch).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to update goal'); return false; }
+      set((state) => ({ goals: state.goals.map((g) => g.id === id ? { ...g, ...updatedGoal } : g) }));
+      return true;
+    } catch (err) {
+      console.error('[editGoal] failed:', err);
+      toast.error('Failed to update goal.');
+      return false;
     }
-    set((state) => ({ goals: state.goals.map((g) => g.id === id ? { ...g, ...updatedGoal } : g) }));
   },
   deleteGoal: async (id) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (userId) await supabase.from('goals').delete().eq('id', id).eq('user_id', userId);
-    set((state) => ({ goals: state.goals.filter((g) => g.id !== id) }));
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to delete goals.'); return false; }
+      const { error } = await supabase.from('goals').delete().eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to delete goal'); return false; }
+      set((state) => ({ goals: state.goals.filter((g) => g.id !== id) }));
+      return true;
+    } catch (err) {
+      console.error('[deleteGoal] failed:', err);
+      toast.error('Failed to delete goal.');
+      return false;
+    }
   },
   addGoalProgress: async (id, amount) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    const goal = get().goals.find(g => g.id === id);
-    if (!goal) return;
-    const newAmount = Math.max(0, Math.min(goal.targetAmount, goal.currentAmount + amount));
-    if (userId) {
-      await supabase.from('goals').update({ current_amount: newAmount }).eq('id', id).eq('user_id', userId);
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to update goals.'); return false; }
+      const goal = get().goals.find(g => g.id === id);
+      if (!goal) return false;
+      const newAmount = Math.max(0, Math.min(goal.targetAmount, goal.currentAmount + amount));
+      const { error } = await supabase.from('goals').update({ current_amount: newAmount }).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to update goal progress'); return false; }
+      if (newAmount >= goal.targetAmount) {
+        get().addNotification({ title: `Goal Complete!`, message: `"${goal.name}" has been fully funded.`, type: 'success' });
+      }
+      set((state) => ({ goals: state.goals.map((g) => g.id === id ? { ...g, currentAmount: newAmount } : g) }));
+      return true;
+    } catch (err) {
+      console.error('[addGoalProgress] failed:', err);
+      toast.error('Failed to update goal progress.');
+      return false;
     }
-    if (newAmount >= goal.targetAmount) {
-      get().addNotification({ title: `🎯 Goal Complete!`, message: `"${goal.name}" has been fully funded.`, type: 'success' });
-    }
-    set((state) => ({ goals: state.goals.map((g) => g.id === id ? { ...g, currentAmount: newAmount } : g) }));
   },
 
   // ── Income ────────────────────────────────────────────────────
   addIncome: async (income) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user.id;
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) { toast.error('You must be signed in to save income.'); return false; }
       
       let newId = crypto.randomUUID();
-      if (userId) {
-        const { data, error } = await supabase
-          .from('incomes')
-          .insert({
-            name: income.name, 
-            amount: income.amount, 
-            frequency: income.frequency,
-            category: income.category, 
-            next_date: income.nextDate,
-            status: income.status, 
-            is_tax_withheld: income.isTaxWithheld, 
-            user_id: userId,
-          })
-          .select('id')
-          .single();
-          
-        if (error) throw error;
-        if (data?.id) newId = data.id;
-      }
-      
+      const { data, error } = await supabase
+        .from('incomes')
+        .insert({
+          name: income.name, 
+          amount: income.amount, 
+          frequency: income.frequency,
+          category: income.category, 
+          next_date: income.nextDate,
+          status: income.status, 
+          is_tax_withheld: income.isTaxWithheld, 
+          user_id: userId,
+        })
+        .select('id')
+        .single();
+        
+      if (error) throw error;
+      if (data?.id) newId = data.id;
       set((state) => ({ incomes: [...state.incomes, { ...income, id: newId }] }));
       return true;
     } catch (error) {
@@ -859,8 +894,9 @@ export const useStore = create<AppState>()(
     }
   },
   editIncome: async (id, updatedIncome) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (userId) {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to edit income.'); return false; }
       const patch: Record<string, unknown> = {};
       if (updatedIncome.name !== undefined)         patch.name = updatedIncome.name;
       if (updatedIncome.amount !== undefined)       patch.amount = updatedIncome.amount;
@@ -869,72 +905,107 @@ export const useStore = create<AppState>()(
       if (updatedIncome.nextDate !== undefined)     patch.next_date = updatedIncome.nextDate;
       if (updatedIncome.status !== undefined)       patch.status = updatedIncome.status;
       if (updatedIncome.isTaxWithheld !== undefined) patch.is_tax_withheld = updatedIncome.isTaxWithheld;
-      await supabase.from('incomes').update(patch).eq('id', id).eq('user_id', userId);
+      const { error } = await supabase.from('incomes').update(patch).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to update income'); return false; }
+      set((state) => ({ incomes: state.incomes.map((i) => i.id === id ? { ...i, ...updatedIncome } : i) }));
+      return true;
+    } catch (err) {
+      console.error('[editIncome] failed:', err);
+      toast.error('Failed to update income.');
+      return false;
     }
-    set((state) => ({ incomes: state.incomes.map((i) => i.id === id ? { ...i, ...updatedIncome } : i) }));
   },
   deleteIncome: async (id) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (userId) await supabase.from('incomes').delete().eq('id', id).eq('user_id', userId);
-    set((state) => ({ incomes: state.incomes.filter((i) => i.id !== id) }));
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to delete income.'); return false; }
+      const { error } = await supabase.from('incomes').delete().eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to delete income'); return false; }
+      set((state) => ({ incomes: state.incomes.filter((i) => i.id !== id) }));
+      return true;
+    } catch (err) {
+      console.error('[deleteIncome] failed:', err);
+      toast.error('Failed to delete income.');
+      return false;
+    }
   },
   recordIncomeDeposit: async (id, amount) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    const income = get().incomes.find(i => i.id === id);
-    if (!income) return;
-    const depositAmount = amount || income.amount;
-    const newTx: Transaction = {
-      id: crypto.randomUUID(),
-      name: `Deposit: ${income.name}`,
-      category: income.category,
-      date: new Date().toISOString().split('T')[0],
-      amount: depositAmount,
-      type: 'income',
-    };
-    if (userId) {
-      await supabase.from('transactions').insert({ name: newTx.name, category: newTx.category, date: newTx.date, amount: newTx.amount, type: newTx.type, user_id: userId });
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to record deposits.'); return false; }
+      const income = get().incomes.find(i => i.id === id);
+      if (!income) return false;
+      const depositAmount = amount || income.amount;
+      const newTx: Transaction = {
+        id: crypto.randomUUID(),
+        name: `Deposit: ${income.name}`,
+        category: income.category,
+        date: new Date().toISOString().split('T')[0],
+        amount: depositAmount,
+        type: 'income',
+      };
+      const { error } = await supabase.from('transactions').insert({ name: newTx.name, category: newTx.category, date: newTx.date, amount: newTx.amount, type: newTx.type, user_id: userId });
+      if (error) { toast.error('Failed to record deposit'); return false; }
+      set((state) => ({ transactions: [newTx, ...state.transactions].slice(0, 50) }));
+      return true;
+    } catch (err) {
+      console.error('[recordIncomeDeposit] failed:', err);
+      toast.error('Failed to record deposit.');
+      return false;
     }
-    set((state) => ({ transactions: [newTx, ...state.transactions].slice(0, 50) }));
   },
 
   // ── Budgets ───────────────────────────────────────────────────
   addBudget: async (budget) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user.id;
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) { toast.error('You must be signed in to save budgets.'); return false; }
       
       let newId = crypto.randomUUID();
-      if (userId) {
-        const { data, error } = await supabase
-          .from('budgets')
-          .insert({ 
-            category: budget.category, 
-            amount: budget.amount, 
-            period: budget.period, 
-            user_id: userId 
-          })
-          .select('id')
-          .single();
-          
-        if (error) throw error;
-        if (data?.id) newId = data.id;
-      }
-      
+      const { data, error } = await supabase
+        .from('budgets')
+        .insert({ category: budget.category, amount: budget.amount, period: budget.period, user_id: userId })
+        .select('id')
+        .single();
+        
+      if (error) throw error;
+      if (data?.id) newId = data.id;
       set((state) => ({ budgets: [...state.budgets, { ...budget, id: newId }] }));
+      return true;
     } catch (error) {
       console.error('[addBudget] Sync failed:', error);
       toast.error('Failed to sync budget.');
+      return false;
     }
   },
   editBudget: async (id, updatedBudget) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (userId) await supabase.from('budgets').update(updatedBudget).eq('id', id).eq('user_id', userId);
-    set((state) => ({ budgets: state.budgets.map((b) => b.id === id ? { ...b, ...updatedBudget } : b) }));
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to edit budgets.'); return false; }
+      const { error } = await supabase.from('budgets').update(updatedBudget).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to update budget'); return false; }
+      set((state) => ({ budgets: state.budgets.map((b) => b.id === id ? { ...b, ...updatedBudget } : b) }));
+      return true;
+    } catch (err) {
+      console.error('[editBudget] failed:', err);
+      toast.error('Failed to update budget.');
+      return false;
+    }
   },
   deleteBudget: async (id) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (userId) await supabase.from('budgets').delete().eq('id', id).eq('user_id', userId);
-    set((state) => ({ budgets: state.budgets.filter((b) => b.id !== id) }));
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to delete budgets.'); return false; }
+      const { error } = await supabase.from('budgets').delete().eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to delete budget'); return false; }
+      set((state) => ({ budgets: state.budgets.filter((b) => b.id !== id) }));
+      return true;
+    } catch (err) {
+      console.error('[deleteBudget] failed:', err);
+      toast.error('Failed to delete budget.');
+      return false;
+    }
   },
 
   // ── Categories ────────────────────────────────────────────────
@@ -979,9 +1050,10 @@ export const useStore = create<AppState>()(
 
   // ── Citations ─────────────────────────────────────────────────
   addCitation: async (citation) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = crypto.randomUUID();
-    if (userId) {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to save citations.'); return false; }
+      let newId = crypto.randomUUID();
       const { data, error } = await supabase.from('citations').insert({
         type: citation.type, jurisdiction: citation.jurisdiction,
         days_left: citation.daysLeft, amount: citation.amount,
@@ -989,32 +1061,61 @@ export const useStore = create<AppState>()(
         citation_number: citation.citationNumber, payment_url: citation.paymentUrl,
         status: citation.status, user_id: userId,
       }).select('id').single();
-      if (error) { toast.error('Failed to sync citation'); return; }
+      if (error) { toast.error('Failed to sync citation'); return false; }
       if (data?.id) newId = data.id;
+      set((state) => ({ citations: [...state.citations, { ...citation, id: newId }] }));
+      return true;
+    } catch (err) {
+      console.error('[addCitation] failed:', err);
+      toast.error('Failed to save citation.');
+      return false;
     }
-    set((state) => ({ citations: [...state.citations, { ...citation, id: newId }] }));
   },
   resolveCitation: async (id) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (userId) await supabase.from('citations').update({ status: 'resolved' }).eq('id', id).eq('user_id', userId);
-    set((state) => ({ citations: state.citations.map((c) => c.id === id ? { ...c, status: 'resolved' as const } : c) }));
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to resolve citations.'); return false; }
+      const { error } = await supabase.from('citations').update({ status: 'resolved' }).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to resolve citation'); return false; }
+      set((state) => ({ citations: state.citations.map((c) => c.id === id ? { ...c, status: 'resolved' as const } : c) }));
+      return true;
+    } catch (err) {
+      console.error('[resolveCitation] failed:', err);
+      toast.error('Failed to resolve citation.');
+      return false;
+    }
   },
 
   // ── Deductions ────────────────────────────────────────────────
   addDeduction: async (deduction) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = crypto.randomUUID();
-    if (userId) {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to save deductions.'); return false; }
+      let newId = crypto.randomUUID();
       const { data, error } = await supabase.from('deductions').insert({ name: deduction.name, category: deduction.category, amount: deduction.amount, date: deduction.date, user_id: userId }).select('id').single();
-      if (error) { toast.error('Failed to sync deduction'); return; }
+      if (error) { toast.error('Failed to sync deduction'); return false; }
       if (data?.id) newId = data.id;
+      set((state) => ({ deductions: [...state.deductions, { ...deduction, id: newId }] }));
+      return true;
+    } catch (err) {
+      console.error('[addDeduction] failed:', err);
+      toast.error('Failed to save deduction.');
+      return false;
     }
-    set((state) => ({ deductions: [...state.deductions, { ...deduction, id: newId }] }));
   },
   deleteDeduction: async (id) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (userId) await supabase.from('deductions').delete().eq('id', id).eq('user_id', userId);
-    set((state) => ({ deductions: state.deductions.filter((d) => d.id !== id) }));
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to delete deductions.'); return false; }
+      const { error } = await supabase.from('deductions').delete().eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to delete deduction'); return false; }
+      set((state) => ({ deductions: state.deductions.filter((d) => d.id !== id) }));
+      return true;
+    } catch (err) {
+      console.error('[deleteDeduction] failed:', err);
+      toast.error('Failed to delete deduction.');
+      return false;
+    }
   },
 
   // ── User / Profile ────────────────────────────────────────────
@@ -1040,18 +1141,24 @@ export const useStore = create<AppState>()(
     set((state) => ({ user: { ...state.user, ...user } }));
   },
   addFreelanceEntry: async (entry) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = crypto.randomUUID();
-    if (userId) {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) { toast.error('You must be signed in to save freelance entries.'); return false; }
+      let newId = crypto.randomUUID();
       const { data, error } = await supabase.from('freelance_entries').insert({
         client: entry.client, amount: entry.amount, date: entry.date,
         is_vaulted: entry.isVaulted, scoured_write_offs: entry.scouredWriteOffs ?? 0,
         user_id: userId,
       }).select('id').single();
-      if (error) { toast.error('Failed to sync freelance entry'); return; }
+      if (error) { toast.error('Failed to sync freelance entry'); return false; }
       if (data?.id) newId = data.id;
+      set((state) => ({ freelanceEntries: [...state.freelanceEntries, { ...entry, id: newId }] }));
+      return true;
+    } catch (err) {
+      console.error('[addFreelanceEntry] failed:', err);
+      toast.error('Failed to save freelance entry.');
+      return false;
     }
-    set((state) => ({ freelanceEntries: [...state.freelanceEntries, { ...entry, id: newId }] }));
   },
   toggleFreelanceVault: async (id) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;

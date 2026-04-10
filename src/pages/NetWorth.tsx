@@ -190,7 +190,7 @@ export default function NetWorth() {
                   </div>
                   <div className="flex items-center gap-3">
                     <p className="text-sm font-mono font-medium text-emerald-400">+${asset.value.toLocaleString()}</p>
-                    <button onClick={() => { deleteAsset(asset.id); toast.success('Asset removed'); }} className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition-all">
+                    <button onClick={async () => { const ok = await deleteAsset(asset.id); if (ok) toast.success('Asset removed'); }} className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition-all">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>

@@ -18,14 +18,14 @@ export default function Goals() {
     type: 'savings' as Goal['type'],
   });
 
-  const handleAddGoal = (e: React.FormEvent) => {
+  const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newGoal.name || !newGoal.targetAmount || !newGoal.deadline) {
       toast.error('Please fill in all required fields');
       return;
     }
 
-    addGoal({
+    const ok = await addGoal({
       name: newGoal.name,
       targetAmount: Number(newGoal.targetAmount),
       currentAmount: Number(newGoal.currentAmount) || 0,
@@ -33,6 +33,7 @@ export default function Goals() {
       type: newGoal.type,
       color: newGoal.type === 'debt' ? '#dc3545' : newGoal.type === 'emergency' ? '#f59e0b' : '#6366f1',
     });
+    if (!ok) return;
 
     toast.success('Goal created successfully');
     setIsAddingGoal(false);
@@ -43,14 +44,15 @@ export default function Goals() {
     setProgressInput({ id, value: '' });
   };
 
-  const submitProgress = (e: React.FormEvent, id: string) => {
+  const submitProgress = async (e: React.FormEvent, id: string) => {
     e.preventDefault();
     const numAmount = Number(progressInput?.value);
     if (!progressInput?.value || isNaN(numAmount)) {
       toast.error('Enter a valid number');
       return;
     }
-    addGoalProgress(id, numAmount);
+    const ok = await addGoalProgress(id, numAmount);
+    if (!ok) return;
     toast.success('Progress updated');
     setProgressInput(null);
   };
@@ -278,7 +280,7 @@ export default function Goals() {
                         Update Progress
                       </button>
                       <button
-                        onClick={() => { deleteGoal(goal.id); toast.success('Goal deleted'); }}
+                        onClick={async () => { const ok = await deleteGoal(goal.id); if (ok) toast.success('Goal deleted'); }}
                         className="text-sm font-medium text-[#EF4444] hover:text-[#DC2626] transition-colors"
                       >
                         Delete

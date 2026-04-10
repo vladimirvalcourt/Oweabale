@@ -194,11 +194,12 @@ export default function Taxes() {
                       <p className="text-[9px] font-mono text-zinc-500 uppercase mb-1">Amount</p>
                       <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-sm h-10 px-3 text-sm font-mono text-white outline-none focus:border-brand-indigo transition-colors" />
                     </div>
-                    <button onClick={() => {
+                    <button onClick={async () => {
                       if (!newDeduction.name.trim()) { toast.error('Enter an expense label'); return; }
                       const amt = parseFloat(newDeduction.amount);
                       if (isNaN(amt) || amt <= 0) { toast.error('Enter a valid amount'); return; }
-                      addDeduction({ ...newDeduction, amount: amt, category: 'Business', date: new Date().toISOString() });
+                      const ok = await addDeduction({ ...newDeduction, amount: amt, category: 'Business', date: new Date().toISOString() });
+                      if (!ok) return;
                       toast.success('Deduction added');
                       setNewDeduction({name: '', amount: '', category: ''}); setShowAddForm(false);
                     }} className="bg-emerald-500 text-black h-10 px-4 text-xs font-mono font-bold uppercase rounded-sm hover:bg-emerald-400 transition-colors">Add</button>
@@ -213,7 +214,7 @@ export default function Taxes() {
                       </div>
                       <div className="flex items-center gap-4">
                         <span className="text-sm font-mono text-emerald-400">-${d.amount.toFixed(2)}</span>
-                        <button onClick={() => deleteDeduction(d.id)} className="text-zinc-600 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 className="w-4 h-4"/></button>
+                        <button onClick={async () => { await deleteDeduction(d.id); }} className="text-zinc-600 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 className="w-4 h-4"/></button>
                       </div>
                     </div>
                   ))}

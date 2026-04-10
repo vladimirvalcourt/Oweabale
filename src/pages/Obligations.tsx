@@ -431,10 +431,12 @@ export default function Obligations() {
                       {ob.type === 'ambush' && (
                         <motion.button
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => {
+                          onClick={async () => {
                             const cit = citations.find(c => c.id === ob.id);
-                            if (cit) { resolveCitation(cit.id); toast.success(`${ob.name} resolved`); }
-                            else toast.error('Citation not found');
+                            if (cit) {
+                              const ok = await resolveCitation(cit.id);
+                              if (ok) toast.success(`${ob.name} resolved`);
+                            } else toast.error('Citation not found');
                           }}
                           className="px-3 py-1 border border-rose-500/50 hover:bg-rose-500/10 text-rose-400 text-xs font-mono font-bold rounded-sm transition-colors"
                         >PAY</motion.button>

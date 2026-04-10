@@ -370,9 +370,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         if (!ok) return;
         toast.success(`Income recorded`);
       } else if (activeTab === 'citation') {
-        // addCitation is async and handles its own error toast internally
-        // so we don't wrap in try/catch to avoid double-toasting on failure
-        await addCitation({
+        const ok = await addCitation({
           type: citationType,
           jurisdiction: jurisdiction.trim(),
           daysLeft: parseInt(daysLeft) || 30,
@@ -390,6 +388,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
           })(),
           status: 'open',
         });
+        if (!ok) return;
         toast.success(`Citation recorded`);
         onClose();
         return;

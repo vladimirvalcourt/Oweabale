@@ -58,32 +58,35 @@ export default function Budgets() {
     setIsEditModalOpen(true);
   };
 
-  const handleAddSubmit = (e: React.FormEvent) => {
+  const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addBudget({
+    const ok = await addBudget({
       category: formData.category,
       amount: parseFloat(formData.amount),
       period: formData.period
     });
+    if (!ok) return;
     setIsAddModalOpen(false);
     toast.success('Budget added successfully');
   };
 
-  const handleEditSubmit = (e: React.FormEvent) => {
+  const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedBudget) {
-      editBudget(selectedBudget.id, {
+      const ok = await editBudget(selectedBudget.id, {
         category: formData.category,
         amount: parseFloat(formData.amount),
         period: formData.period
       });
+      if (!ok) return;
       setIsEditModalOpen(false);
       toast.success('Budget updated successfully');
     }
   };
 
-  const handleDelete = (id: string) => {
-    deleteBudget(id);
+  const handleDelete = async (id: string) => {
+    const ok = await deleteBudget(id);
+    if (!ok) return;
     toast.success('Budget deleted');
   };
 

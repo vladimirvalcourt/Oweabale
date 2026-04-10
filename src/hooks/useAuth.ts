@@ -51,27 +51,32 @@ export function useAuth(): AuthState {
     };
   }, []);
 
+  // lastActivity lives outside the effect so extendSession can reset it without
+  // triggering a re-render or re-mounting the idle effect.
+  const lastActivityRef = { current: Date.now() };
+
   const extendSession = () => {
+    lastActivityRef.current = Date.now();
     setShowWarning(false);
-    // This will trigger the reset in the effect below because it refreshes the activity timestamp
   };
 
-  // Idle timeout management
+  // Idle timeout management — depends only on session so it mounts once per
+  // login and is NOT re-created when showWarning toggles (which was resetting
+  // lastActivity every time the warning appeared).
   useEffect(() => {
     if (!session) {
       return;
     }
 
-    let lastActivity = Date.now();
-    let interval: ReturnType<typeof setInterval>;
+    lastActivityRef.current = Date.now();
 
     const resetIdleTimer = () => {
-      lastActivity = Date.now();
+      lastActivityRef.current = Date.now();
     };
 
     const checkTimeout = () => {
       const now = Date.now();
-      const elapsed = now - lastActivity;
+      const elapsed = now - lastActivityRef.current;
       const remaining = IDLE_TIMEOUT_MS - elapsed;
 
       if (remaining <= 0) {
@@ -83,18 +88,18 @@ export function useAuth(): AuthState {
       } else {
         setShowWarning(false);
       }
-    }
+    };
 
     const events = ['mousedown', 'keydown', 'scroll', 'touchstart'] as const;
     events.forEach(e => window.addEventListener(e, resetIdleTimer));
     
-    interval = setInterval(checkTimeout, 1000);
+    const interval = setInterval(checkTimeout, 1000);
 
     return () => {
       clearInterval(interval);
       events.forEach(e => window.removeEventListener(e, resetIdleTimer));
     };
-  }, [session, showWarning]); // Re-bind if session or warning changes
+  }, [session]); // Only re-mount when session changes, NOT when showWarning changes
 
   return { user, session, loading, showWarning, timeLeft, extendSession };
 }

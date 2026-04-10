@@ -643,7 +643,7 @@ export default function Dashboard() {
                         className="bg-surface-base border border-surface-border rounded-l px-3 py-2 text-sm font-mono text-zinc-300 w-full focus:outline-none" 
                       />
                       <button 
-                        onClick={() => toast.success('Copied to clipboard')} 
+                        onClick={() => { navigator.clipboard.writeText(selectedCitation.citationNumber).then(() => toast.success('Copied to clipboard')).catch(() => toast.error('Failed to copy')); }} 
                         className="bg-surface-border hover:bg-zinc-700 text-zinc-300 px-3 border border-l-0 border-surface-border rounded-r transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 z-10"
                         title="Copy"
                       >

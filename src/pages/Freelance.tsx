@@ -140,17 +140,18 @@ export default function Freelance() {
     .filter(e => e.isVaulted)
     .reduce((sum, e) => sum + e.totalLiability, 0);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.client) { toast.error('Enter the client name'); return; }
     if (!formData.amount || isNaN(parseFloat(formData.amount)) || parseFloat(formData.amount) <= 0) { toast.error('Enter a valid payment amount.'); return; }
-    addFreelanceEntry({
+    const ok = await addFreelanceEntry({
       client: formData.client,
       amount: parseFloat(formData.amount),
       date: formData.date,
       isVaulted: false,
       scouredWriteOffs: formData.scouredWriteOffs
     });
+    if (!ok) return;
     setFormData({ client: '', amount: '', date: new Date().toISOString().split('T')[0], scouredWriteOffs: 0 });
     setIsAddModalOpen(false);
     toast.success('Payment saved successfully');

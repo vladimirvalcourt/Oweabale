@@ -86,9 +86,9 @@ export default function Income() {
     setIsDepositModalOpen(true);
   };
 
-  const handleAddSubmit = (e: React.FormEvent) => {
+  const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addIncome({
+    const ok = await addIncome({
       name: formData.name,
       amount: parseFloat(formData.amount),
       frequency: formData.frequency as any,
@@ -97,14 +97,15 @@ export default function Income() {
       status: formData.status,
       isTaxWithheld: formData.isTaxWithheld
     });
+    if (!ok) return;
     setIsAddModalOpen(false);
     toast.success('Income source added');
   };
 
-  const handleEditSubmit = (e: React.FormEvent) => {
+  const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedIncome) {
-      editIncome(selectedIncome.id, {
+      const ok = await editIncome(selectedIncome.id, {
         name: formData.name,
         amount: parseFloat(formData.amount),
         frequency: formData.frequency as any,
@@ -113,22 +114,25 @@ export default function Income() {
         status: formData.status,
         isTaxWithheld: formData.isTaxWithheld
       });
+      if (!ok) return;
       setIsEditModalOpen(false);
       toast.success('Income source updated');
     }
   };
 
-  const handleDepositSubmit = (e: React.FormEvent) => {
+  const handleDepositSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedIncome) {
-      recordIncomeDeposit(selectedIncome.id, parseFloat(depositAmount));
+      const ok = await recordIncomeDeposit(selectedIncome.id, parseFloat(depositAmount));
+      if (!ok) return;
       setIsDepositModalOpen(false);
       toast.success('Deposit recorded');
     }
   };
 
-  const handleDelete = (id: string) => {
-    deleteIncome(id);
+  const handleDelete = async (id: string) => {
+    const ok = await deleteIncome(id);
+    if (!ok) return;
     toast.success('Income source removed');
   };
 
