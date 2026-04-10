@@ -1041,7 +1041,7 @@ export default function Settings() {
                       <textarea
                         value={supportForm.description}
                         onChange={e => setSupportForm(f => ({ ...f, description: e.target.value }))}
-                        className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 h-32 resize-none placeholder:text-zinc-600"
+                        className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 min-h-[8rem] resize-y placeholder:text-zinc-600"
                         placeholder="Include steps to reproduce, what you expected vs what happened, and any relevant details..."
                       />
                     </div>
