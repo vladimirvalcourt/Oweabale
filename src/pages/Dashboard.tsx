@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRight, Activity, ShieldCheck, Calendar, Flame, Inbox, ShieldAlert,
-  X, Copy, ExternalLink, Home, Target, LifeBuoy, Menu as MenuIcon 
+  X, Copy, ExternalLink
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
@@ -13,7 +13,6 @@ import { useStore } from '../store/useStore';
 import { sanitizeUrl } from '../lib/security';
 import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting } from '../lib/finance';
 import { BorderRotate } from '../components/ui/animated-gradient-border';
-import { MenuContainer, MenuItem } from '../components/ui/fluid-menu';
 
 import type { Citation } from '../store/useStore';
 
@@ -676,28 +675,6 @@ export default function Dashboard() {
         </div>
       </Dialog>
 
-      {/* Floating Tactical Navigation */}
-      <div className="fixed bottom-8 right-8 z-[100] hidden sm:block">
-        <MenuContainer>
-          <MenuItem 
-            className="rounded-full !h-full"
-            icon={
-              <div className="relative w-6 h-6">
-                <div className="absolute inset-0 transition-all duration-300 ease-in-out origin-center opacity-100 scale-100 rotate-0 [div[data-expanded=true]_&]:opacity-0 [div[data-expanded=true]_&]:scale-0 [div[data-expanded=true]_&]:rotate-180 flex items-center justify-center">
-                  <MenuIcon size={24} strokeWidth={1.5} className="text-brand-indigo" />
-                </div>
-                <div className="absolute inset-0 transition-all duration-300 ease-in-out origin-center opacity-0 scale-0 -rotate-180 [div[data-expanded=true]_&]:opacity-100 [div[data-expanded=true]_&]:scale-100 [div[data-expanded=true]_&]:rotate-0 flex items-center justify-center">
-                  <X size={24} strokeWidth={1.5} className="text-zinc-400" />
-                </div>
-              </div>
-            } 
-          />
-          <MenuItem className="rounded-full !h-full" icon={<Home size={22} strokeWidth={1.5} />} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} />
-          <MenuItem className="rounded-full !h-full" icon={<Target size={22} strokeWidth={1.5} />} onClick={() => window.location.href = '/goals'} />
-          <MenuItem className="rounded-full !h-full" icon={<ShieldCheck size={22} strokeWidth={1.5} />} onClick={() => window.location.href = '/credit'} />
-          <MenuItem className="rounded-full !h-full" icon={<LifeBuoy size={22} strokeWidth={1.5} />} onClick={() => window.location.href = '/support'} />
-        </MenuContainer>
-      </div>
       </div>
     </BorderRotate>
   );
