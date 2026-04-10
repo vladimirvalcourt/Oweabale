@@ -59,7 +59,6 @@ export function useAuth(): AuthState {
   // Idle timeout management
   useEffect(() => {
     if (!session) {
-      setShowWarning(false);
       return;
     }
 

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useStore } from '../store/useStore';
 import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, Hash, Tag, Download, TrendingUp } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
@@ -34,10 +34,9 @@ export default function Transactions() {
     });
   }, [transactions, searchTerm, filterType, filterCategory, dateRange, amountRange]);
 
-  useEffect(() => { setPage(1); }, [transactions, searchTerm, filterType, filterCategory, dateRange, amountRange]);
-
   const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / PAGE_SIZE));
-  const pagedTransactions = filteredTransactions.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const currentPage = Math.min(page, totalPages);
+  const pagedTransactions = filteredTransactions.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const uniqueCategories = useMemo(() => {
     const cats = new Set(transactions.map(t => t.category));
@@ -304,19 +303,19 @@ export default function Transactions() {
         {totalPages > 1 && (
           <div className="flex items-center justify-between pt-2 px-1">
             <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
-              Page {page} of {totalPages} — {filteredTransactions.length} records
+              Page {currentPage} of {totalPages} — {filteredTransactions.length} records
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
+                disabled={currentPage === 1}
                 className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 Prev
               </button>
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
+                disabled={currentPage === totalPages}
                 className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 Next

@@ -1,5 +1,5 @@
 {
-  "exclude": ["server", "supabase/functions"],
+  "exclude": ["dist", "server", "supabase/functions"],
   "compilerOptions": {
     "target": "ES2022",
     "experimentalDecorators": true,
