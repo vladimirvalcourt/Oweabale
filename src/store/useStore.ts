@@ -423,34 +423,53 @@ export const useStore = create<AppState>()(
   },
   addBill: async (bill) => {
     try {
+      console.log('[addBill] Starting bill sync:', bill);
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user.id;
       
+      console.log('[addBill] User ID:', userId);
+      
       let newId = crypto.randomUUID();
       if (userId) {
+        const insertData = {
+          biller: bill.biller, 
+          amount: bill.amount, 
+          category: bill.category,
+          due_date: bill.dueDate, 
+          frequency: bill.frequency, 
+          status: bill.status,
+          auto_pay: bill.autoPay, 
+          user_id: userId,
+        };
+        
+        console.log('[addBill] Inserting to DB:', insertData);
+        
         const { data, error } = await supabase
           .from('bills')
-          .insert({
-            biller: bill.biller, 
-            amount: bill.amount, 
-            category: bill.category,
-            due_date: bill.dueDate, 
-            frequency: bill.frequency, 
-            status: bill.status,
-            auto_pay: bill.autoPay, 
-            user_id: userId,
-          })
+          .insert(insertData)
           .select('id')
           .single();
-          
-        if (error) throw error;
+        
+        if (error) {
+          console.error('[addBill] Database error:', error);
+          console.error('[addBill] Error details:', { code: error.code, message: error.message, details: error.details });
+          throw error;
+        }
+        
+        console.log('[addBill] Success! New ID:', data?.id);
         if (data?.id) newId = data.id;
+      } else {
+        console.warn('[addBill] No user ID found - saving locally only');
       }
       
       set((state) => ({ bills: [...state.bills, { ...bill, id: newId }] }));
-    } catch (error) {
+      console.log('[addBill] Local state updated');
+    } catch (error: any) {
       console.error('[addBill] Sync failed:', error);
-      toast.error('Failed to sync bill record.');
+      console.error('[addBill] Error name:', error?.name);
+      console.error('[addBill] Error message:', error?.message);
+      console.error('[addBill] Full error object:', error);
+      toast.error(`Failed to sync bill record: ${error?.message || 'Unknown error'}`);
     }
   },
   editBill: async (id, updatedBill) => {
@@ -1390,22 +1409,30 @@ export const useStore = create<AppState>()(
   isLoading: false,
   fetchData: async (userId?: string) => {
     const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
-    if (!resolvedUserId) return;
+    if (!resolvedUserId) {
+      console.warn('[fetchData] No user ID available');
+      return;
+    }
+
+    console.log('[fetchData] Starting data fetch for user:', resolvedUserId);
 
     const isFirstLoad = !get().user.id || get().user.id === '';
     if (isFirstLoad) set({ isLoading: true });
 
     // Fire non-critical RPC in background
-    void (supabase.rpc('flip_overdue_bills') as unknown as Promise<unknown>).catch(() => {});
+    void (supabase.rpc('flip_overdue_bills') as unknown as Promise<unknown>).catch((err) => {
+      console.warn('[fetchData] flip_overdue_bills RPC failed:', err);
+    });
 
     try {
+      console.log('[fetchData] Fetching bills...');
       const [
         { data: profile, error: profileError },
-        { data: bills },
-        { data: debts },
-        { data: transactions },
-        { data: assets },
-        { data: incomes },
+        { data: bills, error: billsError },
+        { data: debts, error: debtsError },
+        { data: transactions, error: transactionsError },
+        { data: assets, error: assetsError },
+        { data: incomes, error: incomesError },
       ] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', resolvedUserId).maybeSingle(),
         supabase.from('bills').select('*').eq('user_id', resolvedUserId),
@@ -1415,8 +1442,21 @@ export const useStore = create<AppState>()(
         supabase.from('incomes').select('*').eq('user_id', resolvedUserId),
       ]);
 
+      // Log any errors
+      if (billsError) {
+        console.error('[fetchData] Bills fetch error:', billsError);
+        console.error('[fetchData] Bills error details:', { code: billsError.code, message: billsError.message });
+      } else {
+        console.log('[fetchData] Bills fetched successfully:', bills?.length || 0, 'bills');
+      }
+      
+      if (debtsError) console.error('[fetchData] Debts fetch error:', debtsError);
+      if (transactionsError) console.error('[fetchData] Transactions fetch error:', transactionsError);
+      if (assetsError) console.error('[fetchData] Assets fetch error:', assetsError);
+      if (incomesError) console.error('[fetchData] Incomes fetch error:', incomesError);
+
       if (profileError && profileError.code !== 'PGRST116') {
-        console.error('Error fetching profile:', profileError);
+        console.error('[fetchData] Profile fetch error:', profileError);
       }
 
       // Release the loader as soon as critical data is ready
