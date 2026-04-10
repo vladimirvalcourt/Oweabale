@@ -2,50 +2,73 @@ import { useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../store/useStore';
 
+const VISIBILITY_REFETCH_MS = 45_000;
+
 /**
- * useDataSync Hook
+ * Keeps Zustand in sync with Supabase for the signed-in user.
  *
- * Self-contained sync between Supabase Auth and Zustand store.
- * Strategy:
- *   1. On mount, call getSession() immediately — this covers page refresh
- *      where the session is already in localStorage and available synchronously.
- *   2. Listen to onAuthStateChange for INITIAL_SESSION, SIGNED_IN, and
- *      TOKEN_REFRESHED — all three can fire on a cold load or refresh.
- *   3. On SIGNED_OUT, clear local state only (never touch DB).
+ * - **On load / refresh:** When `authLoading` becomes false and we have a user id,
+ *   we call `fetchData(userId)` so bills and all financial rows load from the DB.
+ *   Financial data is not persisted in localStorage (see store `partialize`); the
+ *   server is the source of truth.
+ * - **After sign-out:** Clears local UI state only (not the database).
+ * - **Tab focus:** Optionally refetches (throttled) when the tab becomes visible so
+ *   long-lived sessions see updates made elsewhere.
  */
-export function useDataSync() {
+export function useDataSync({
+  authUserId,
+  authLoading,
+}: {
+  authUserId: string | null;
+  authLoading: boolean;
+}) {
   const { fetchData, clearLocalData } = useStore();
-  const hasFetched = useRef(false);
+  const hadSessionRef = useRef(false);
+  const lastVisibilityFetchRef = useRef(0);
 
+  // Primary path: refetch whenever auth finishes and we know the user id
+  // (matches the pattern: useEffect(() => { if (user) fetch(); }, [user])).
   useEffect(() => {
-    // Path 1: Immediate session check on mount.
-    // Covers page refresh — session is in localStorage and resolves synchronously.
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user && !hasFetched.current) {
-        hasFetched.current = true;
-        fetchData(session.user.id);
-      }
-    });
+    if (authLoading) return;
 
-    // Path 2: Auth state change events.
-    // Covers INITIAL_SESSION (fired on refresh), SIGNED_IN (fresh login),
-    // TOKEN_REFRESHED (background token renewal).
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (
-        (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') &&
-        session?.user &&
-        !hasFetched.current
-      ) {
-        hasFetched.current = true;
-        fetchData(session.user.id);
-      } else if (event === 'SIGNED_OUT') {
+    if (authUserId) {
+      hadSessionRef.current = true;
+      void fetchData(authUserId);
+      return;
+    }
+
+    // Only clear when transitioning from signed-in → signed-out (not on every
+    // landing-page visit for anonymous users).
+    if (hadSessionRef.current) {
+      hadSessionRef.current = false;
+      clearLocalData();
+    }
+  }, [authLoading, authUserId, fetchData, clearLocalData]);
+
+  // Secondary path: explicit sign-out from other tabs / Supabase client
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        hadSessionRef.current = false;
         clearLocalData();
-        hasFetched.current = false;
       }
     });
+    return () => subscription.unsubscribe();
+  }, [clearLocalData]);
 
-    return () => {
-      subscription.unsubscribe();
+  // Refetch when returning to the tab (throttled) — helps long sessions without full reload.
+  useEffect(() => {
+    if (authLoading || !authUserId) return;
+
+    const onVisibility = () => {
+      if (document.visibilityState !== 'visible') return;
+      const now = Date.now();
+      if (now - lastVisibilityFetchRef.current < VISIBILITY_REFETCH_MS) return;
+      lastVisibilityFetchRef.current = now;
+      void fetchData(authUserId);
     };
-  }, []); // Intentionally empty — runs once on mount, auth events handle the rest
+
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, [authLoading, authUserId, fetchData]);
 }

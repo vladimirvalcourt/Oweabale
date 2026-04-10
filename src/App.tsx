@@ -52,7 +52,7 @@ function AppRoutes() {
   const { user: authUser, showWarning, timeLeft, extendSession, loading: authLoading } = useAuth();
   const { user } = useStore();
   
-  useDataSync();
+  useDataSync({ authUserId: authUser?.id ?? null, authLoading });
 
   // Only block the entire app on authentication resolution. 
   // Individual pages (like Dashboard) handle their own 'isLoading' states for data sync.
