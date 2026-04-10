@@ -31,13 +31,13 @@ function useInView(threshold = 0.15) {
 }
 
 const CYCLE_WORDS = [
-  'Freelancers',
+  'Anyone with Debt',
   'Uber Drivers',
-  'Tax Savings',
-  'Paying Tolls',
-  'Managing Bills',
-  'Protecting Profit',
-  'DoorDashers'
+  'Paying Bills',
+  'Managing Debt',
+  'Building Stability',
+  'DoorDashers',
+  'Financial Freedom'
 ];
 
 function WordCycler() {
@@ -78,11 +78,11 @@ function WordCycler() {
 const FAQ_ITEMS = [
   {
     q: 'Who is Oweable designed for?',
-    a: 'Oweable is designed for freelancers, 1099 contractors, gig economy workers (Uber, DoorDash, Instacart, Lyft), consultants, and solo business owners. Anyone with variable income or multiple income streams who needs to manage quarterly taxes will benefit most.',
+    a: 'Oweable is for anyone dealing with debt, bills, or financial pressure — whether you\'re paying off credit cards, juggling monthly bills on a tight income, recovering from medical debt, or just trying to build stability. Gig workers, salaried employees, single parents, recent grads, and anyone who needs clarity on their finances will benefit.',
   },
   {
-    q: 'How does Oweable help freelancers with taxes?',
-    a: 'Oweable automatically estimates your quarterly IRS tax obligations based on your tracked income and applicable state and federal self-employment tax rates. It separates W-2 income from 1099 gig income, tracks deductible write-offs, and shows exactly what you owe before each quarterly deadline.',
+    q: 'Can Oweable help me if I\'m not self-employed?',
+    a: 'Absolutely. While Oweable includes tools for 1099 and gig workers, most of its features — debt payoff tracking, bill management, net worth monitoring, credit repair tools, and spending analytics — are built for anyone under financial pressure, regardless of how they earn.',
   },
   {
     q: 'Is Oweable free?',
@@ -104,8 +104,8 @@ const FAQ_ITEMS = [
 
 export default function Landing() {
   useSEO({
-    title: 'Oweable — Financial OS for Freelancers & Self-Employed',
-    description: 'Oweable is the financial operating system for freelancers, independent contractors, and gig workers. Track quarterly taxes, manage bills, pay off debt, and build net worth — all in one dashboard.',
+    title: 'Oweable — Financial OS for Debt, Bills & Financial Clarity',
+    description: 'Oweable is the financial operating system for anyone dealing with debt, bills, or financial pressure. Track spending, pay off debt, manage bills, and build net worth — all in one dashboard.',
     canonical: 'https://www.oweable.com/',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -180,7 +180,7 @@ export default function Landing() {
             </h1>
             
             <p className="text-lg font-medium text-zinc-300 max-w-lg leading-[1.6] mb-10 border-l-2 border-brand-violet/30 pl-6">
-              A high-precision command center to track your gig earnings, automate your tax reserves, and defend your profit with clinical accuracy.
+              A precision command center to tame your bills, eliminate debt, track your income, and build financial clarity — no matter where you're starting from.
             </p>
             
             <Link 
@@ -334,13 +334,13 @@ export default function Landing() {
             </div>
             <div className="lg:col-span-8 flex flex-col gap-4 lg:pt-10">
               <p className="text-content-secondary leading-relaxed">
-                Oweable is a financial operating system built exclusively for freelancers, independent contractors, gig economy workers, and self-employed professionals. It consolidates quarterly tax estimation, bill tracking, debt payoff planning, income management, and net worth monitoring into a single dashboard — replacing spreadsheets and disconnected apps.
+                Oweable is a financial operating system for anyone dealing with debt, bills, or financial pressure. It consolidates bill tracking, debt payoff planning, income management, credit tools, and net worth monitoring into a single dashboard — replacing spreadsheets and disconnected apps.
               </p>
               <p className="text-content-secondary leading-relaxed">
-                Unlike consumer finance tools designed for salaried employees, Oweable understands 1099 income, variable earnings, and the quarterly IRS obligations that come with self-employment. It automatically estimates what you owe each quarter and tracks business write-offs to reduce your taxable income.
+                Unlike consumer finance tools built only for people with predictable salaries, Oweable works for real financial situations — variable income, multiple debt types, tight budgets, and the messy middle ground most people actually live in. It also includes quarterly tax tools for gig workers and 1099 contractors.
               </p>
               <p className="text-content-secondary leading-relaxed">
-                Oweable serves Uber and DoorDash drivers, freelance designers, 1099 consultants, solo business owners, and anyone whose income arrives outside a traditional W-2 paycheck.
+                Oweable serves single parents juggling bills, people recovering from medical or credit card debt, gig workers, recent grads with student loans, and anyone who needs a clear picture of where they stand financially — and a plan to get ahead.
               </p>
             </div>
           </div>

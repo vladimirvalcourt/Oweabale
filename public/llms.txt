@@ -1,8 +1,8 @@
 # Oweable
 
-> Oweable is a financial operating system built exclusively for freelancers, independent contractors, gig workers, and self-employed professionals. It replaces spreadsheets and scattered apps with a single dashboard for managing taxes, bills, debt, income, subscriptions, net worth, and cash flow.
+> Oweable is a financial operating system for anyone dealing with debt, bills, or financial pressure. It replaces spreadsheets and scattered apps with a single dashboard for managing bills, debt, income, credit, net worth, subscriptions, and cash flow — with additional tools for gig and 1099 workers.
 
-Oweable is a web application available at https://www.oweable.com. It is built for people with non-traditional income — 1099 workers, Uber/DoorDash drivers, consultants, and solo business owners — who are underserved by consumer finance tools designed for salaried employees.
+Oweable is a web application available at https://www.oweable.com. It is built for people under financial pressure — those paying off debt, managing bills on tight budgets, recovering from medical or credit card debt, single parents, recent graduates, gig workers, and 1099 contractors — who are underserved by consumer finance tools designed for people with stable, predictable salaries.
 
 ## What Oweable Does
 
@@ -58,7 +58,7 @@ Oweable competes with Mint (discontinued), YNAB, Monarch Money, and Copilot but 
 ## Frequently Asked Questions
 
 ### Who is Oweable for?
-Oweable is for freelancers, 1099 contractors, gig economy workers (Uber, DoorDash, Instacart, Lyft, TaskRabbit), consultants, and solo business owners. It is specifically built for people with variable or multiple income streams who need to estimate and pay quarterly estimated taxes.
+Oweable is for anyone under financial pressure — people paying off credit card or medical debt, single parents managing bills, recent graduates with student loans, gig workers (Uber, DoorDash, Instacart, Lyft, TaskRabbit), 1099 contractors, salaried employees on tight budgets, and anyone who needs a clear picture of their finances and a plan to get ahead.
 
 ### How does Oweable help with quarterly taxes?
 Oweable automatically estimates IRS quarterly tax obligations based on your 1099 income and applicable state and federal self-employment tax rates. It separates W-2 income (taxes withheld at source) from 1099 and gig income (quarterly estimated taxes required). Users can see exactly what they owe before each quarterly deadline: April 15, June 15, September 15, and January 15.

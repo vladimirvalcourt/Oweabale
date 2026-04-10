@@ -52,7 +52,7 @@ function FaqItem({ question, answer }: { question: string, answer: string }) {
 export default function Pricing() {
   useSEO({
     title: 'Pricing — Oweable',
-    description: 'Simple, transparent pricing for freelancers and self-employed professionals. Start free. Upgrade when ready.',
+    description: 'Simple, transparent pricing for anyone dealing with debt, bills, or financial pressure. Start free. Upgrade when ready.',
     canonical: 'https://www.oweable.com/pricing',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });

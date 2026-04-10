@@ -2,8 +2,8 @@
   "schema_version": "v1",
   "name_for_human": "Oweable",
   "name_for_model": "oweable",
-  "description_for_human": "Financial operating system for freelancers, independent contractors, and gig workers. Tracks quarterly taxes, bills, debt, income, and net worth.",
-  "description_for_model": "Oweable is a personal finance platform built specifically for self-employed professionals, 1099 contractors, and gig economy workers (Uber, DoorDash, Instacart). It provides quarterly estimated tax calculation, freelance income tracking with write-off management, bill and subscription management, debt payoff planning, net worth timeline, spending analytics, and financial education. It is different from general consumer finance apps like Mint or YNAB because it is built for variable and self-employment income rather than salaried workers.",
+  "description_for_human": "Financial operating system for anyone dealing with debt, bills, or financial pressure. Tracks bills, debt, income, net worth, credit, and taxes.",
+  "description_for_model": "Oweable is a personal finance platform for anyone under financial pressure — people paying off debt, managing bills on a tight income, recovering from medical or credit card debt, gig workers, 1099 contractors, and anyone who needs financial clarity. It provides debt payoff planning (Snowball and Avalanche), bill management with overdue detection, income tracking, credit tools, net worth timeline, spending analytics, quarterly tax estimation for self-employed workers, and financial education. It is different from general consumer finance apps like Mint or YNAB because it is built for real financial situations — variable income, multiple debt types, and financial recovery.",
   "auth": {
     "type": "none"
   },
