@@ -1541,6 +1541,24 @@ export const useStore = create<AppState>()(
       console.warn('[fetchData] flip_overdue_bills RPC failed:', err);
     });
 
+    // Start Phase 2 queries immediately — runs in parallel with Phase 1
+    // so total load time = max(phase1, phase2) instead of phase1 + phase2.
+    const phase2Promise = Promise.all([
+      supabase.from('goals').select('*').eq('user_id', resolvedUserId),
+      supabase.from('budgets').select('*').eq('user_id', resolvedUserId),
+      supabase.from('categories').select('*').eq('user_id', resolvedUserId),
+      supabase.from('citations').select('*').eq('user_id', resolvedUserId),
+      supabase.from('deductions').select('*').eq('user_id', resolvedUserId),
+      supabase.from('freelance_entries').select('*').eq('user_id', resolvedUserId),
+      supabase.from('pending_ingestions').select('*').eq('user_id', resolvedUserId),
+      supabase.from('categorization_rules').select('*').eq('user_id', resolvedUserId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
+      supabase.from('credit_fixes').select('*').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
+      supabase.from('admin_broadcasts').select('*').order('created_at', { ascending: false }).limit(10),
+      supabase.from('platform_settings').select('*').maybeSingle(),
+      supabase.from('net_worth_snapshots').select('*').eq('user_id', resolvedUserId).order('date', { ascending: true }).limit(90),
+      supabase.from('credit_factors').select('*').eq('user_id', resolvedUserId),
+    ]);
+
     try {
       const [
         { data: profile, error: profileError },
@@ -1549,6 +1567,7 @@ export const useStore = create<AppState>()(
         { data: transactions, error: transactionsError },
         { data: assets, error: assetsError },
         { data: incomes, error: incomesError },
+        { data: subscriptions },
       ] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', resolvedUserId).maybeSingle(),
         supabase.from('bills').select('*').eq('user_id', resolvedUserId),
@@ -1556,6 +1575,7 @@ export const useStore = create<AppState>()(
         supabase.from('transactions').select('*').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(500),
         supabase.from('assets').select('*').eq('user_id', resolvedUserId),
         supabase.from('incomes').select('*').eq('user_id', resolvedUserId),
+        supabase.from('subscriptions').select('*').eq('user_id', resolvedUserId),
       ]);
 
       // Log any errors
@@ -1625,6 +1645,15 @@ export const useStore = create<AppState>()(
           status: i.status as IncomeSource['status'],
           isTaxWithheld: (i.is_tax_withheld ?? i.isTaxWithheld ?? false) as boolean,
         })),
+        subscriptions: (subscriptions || []).map((s: Record<string, unknown>) => ({
+          id: s.id as string,
+          name: s.name as string,
+          amount: s.amount as number,
+          frequency: s.frequency as string,
+          nextBillingDate: (s.next_billing_date ?? s.nextBillingDate) as string,
+          status: s.status as Subscription['status'],
+          priceHistory: (s.price_history ?? s.priceHistory ?? []) as { date: string; amount: number }[],
+        })),
         credit: profile ? {
           ...get().credit,
           score: profile.credit_score ?? get().credit.score,
@@ -1647,9 +1676,10 @@ export const useStore = create<AppState>()(
         } : { ...get().user, id: resolvedUserId },
       });
 
-      // ── PHASE 2: Secondary data — loads silently while user sees dashboard ─
+      // ── PHASE 2: Awaiting the promise started before Phase 1 ─────────────
+      // By now Phase 2 has been running in parallel — total cost is
+      // max(phase1, phase2) not phase1 + phase2.
       const [
-        { data: subscriptions },
         { data: goals },
         { data: budgets },
         { data: categories },
@@ -1663,33 +1693,9 @@ export const useStore = create<AppState>()(
         { data: platformSettings },
         { data: netWorthSnapshots },
         { data: creditFactors },
-      ] = await Promise.all([
-        supabase.from('subscriptions').select('*').eq('user_id', resolvedUserId),
-        supabase.from('goals').select('*').eq('user_id', resolvedUserId),
-        supabase.from('budgets').select('*').eq('user_id', resolvedUserId),
-        supabase.from('categories').select('*').eq('user_id', resolvedUserId),
-        supabase.from('citations').select('*').eq('user_id', resolvedUserId),
-        supabase.from('deductions').select('*').eq('user_id', resolvedUserId),
-        supabase.from('freelance_entries').select('*').eq('user_id', resolvedUserId),
-        supabase.from('pending_ingestions').select('*').eq('user_id', resolvedUserId),
-        supabase.from('categorization_rules').select('*').eq('user_id', resolvedUserId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
-        supabase.from('credit_fixes').select('*').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
-        supabase.from('admin_broadcasts').select('*').order('created_at', { ascending: false }).limit(10),
-        supabase.from('platform_settings').select('*').maybeSingle(),
-        supabase.from('net_worth_snapshots').select('*').eq('user_id', resolvedUserId).order('date', { ascending: true }).limit(90),
-        supabase.from('credit_factors').select('*').eq('user_id', resolvedUserId),
-      ]);
+      ] = await phase2Promise;
 
       set({
-        subscriptions: (subscriptions || []).map((s: Record<string, unknown>) => ({
-          id: s.id as string,
-          name: s.name as string,
-          amount: s.amount as number,
-          frequency: s.frequency as string,
-          nextBillingDate: (s.next_billing_date ?? s.nextBillingDate) as string,
-          status: s.status as Subscription['status'],
-          priceHistory: (s.price_history ?? s.priceHistory ?? []) as { date: string; amount: number }[],
-        })),
         goals: (goals || []).map((g: Record<string, unknown>) => ({
           id: g.id as string,
           name: g.name as string,
