@@ -2,41 +2,58 @@
 -- Migration: Fix Bills Sync Issue
 -- Purpose: Ensure bills table exists with correct schema and RLS policies
 -- Date: 2026-04-10
+-- Fixes: Bill sync failures due to missing table or incorrect RLS
 -- ============================================================
 
--- 1. Ensure bills table exists with correct schema
-CREATE TABLE IF NOT EXISTS bills (
-  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id    UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-  biller     TEXT NOT NULL,
-  amount     DECIMAL(12,2) NOT NULL CHECK (amount > 0),
-  category   TEXT,
-  due_date   DATE NOT NULL,
-  frequency  TEXT,
-  status     TEXT CHECK (status IN ('upcoming', 'paid', 'overdue')),
-  auto_pay   BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+BEGIN;
+
+-- Step 1: Create bills table if it doesn't exist
+CREATE TABLE IF NOT EXISTS public.bills (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL,
+  biller TEXT NOT NULL,
+  amount NUMERIC(12,2) NOT NULL CHECK (amount > 0),
+  category TEXT,
+  due_date DATE NOT NULL,
+  frequency TEXT,
+  status TEXT DEFAULT 'upcoming' CHECK (status IN ('upcoming', 'paid', 'overdue')),
+  auto_pay BOOLEAN DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 2. Enable Row Level Security
-ALTER TABLE bills ENABLE ROW LEVEL SECURITY;
+-- Step 2: Add foreign key constraint if not exists
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints 
+    WHERE constraint_name = 'bills_user_id_fkey' 
+    AND table_name = 'bills'
+  ) THEN
+    ALTER TABLE public.bills 
+      ADD CONSTRAINT bills_user_id_fkey 
+      FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE;
+  END IF;
+END $$;
 
--- 3. Drop existing policy if it exists (to avoid conflicts)
-DROP POLICY IF EXISTS "Users can manage their own bills" ON bills;
+-- Step 3: Enable Row Level Security
+ALTER TABLE public.bills ENABLE ROW LEVEL SECURITY;
 
--- 4. Create comprehensive RLS policy for all operations
+-- Step 4: Drop and recreate RLS policy to ensure it's correct
+DROP POLICY IF EXISTS "Users can manage their own bills" ON public.bills;
+
 CREATE POLICY "Users can manage their own bills"
-  ON bills
+  ON public.bills
   FOR ALL
+  TO authenticated
   USING (auth.uid() = user_id)
   WITH CHECK (auth.uid() = user_id);
 
--- 5. Ensure index exists for performance
-CREATE INDEX IF NOT EXISTS idx_bills_user_id ON bills(user_id);
+-- Step 5: Create performance index
+CREATE INDEX IF NOT EXISTS idx_bills_user_id ON public.bills(user_id);
 
--- 6. Add updated_at trigger if it doesn't exist
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+-- Step 6: Create or replace the updated_at trigger function
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
@@ -44,16 +61,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS update_bills_updated_at ON bills;
-CREATE TRIGGER update_bills_updated_at
-  BEFORE UPDATE ON bills
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
+-- Step 7: Apply updated_at trigger to bills table
+DROP TRIGGER IF EXISTS update_bills_updated_at ON public.bills;
 
--- 7. Verify the setup
+CREATE TRIGGER update_bills_updated_at
+  BEFORE UPDATE ON public.bills
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_updated_at_column();
+
+COMMIT;
+
+-- Verification
 DO $$
 BEGIN
-  RAISE NOTICE 'Bills table migration completed successfully';
-  RAISE NOTICE 'RLS Policy: Users can manage their own bills';
-  RAISE NOTICE 'Index: idx_bills_user_id created';
+  RAISE NOTICE '✅ Bills table migration completed successfully';
+  RAISE NOTICE '✅ RLS Policy enabled for authenticated users';
+  RAISE NOTICE '✅ Index created on user_id for performance';
+  RAISE NOTICE '✅ Auto-update trigger configured';
 END $$;
