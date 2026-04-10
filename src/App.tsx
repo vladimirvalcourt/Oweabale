@@ -46,17 +46,14 @@ const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
 import AuthCallback from './pages/AuthCallback';
 const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
 
-function AppRoutes() {
-  const { user: authUser, loading: authLoading, showWarning, timeLeft, extendSession } = useAuth();
-  const { user, fetchData, isLoading, signOut: clearStore } = useStore();
+import { useDataSync } from './hooks/useDataSync';
 
-  useEffect(() => {
-    if (authUser) {
-      fetchData(authUser.id);
-    } else if (!authLoading) {
-      clearStore();
-    }
-  }, [authUser, authLoading]);
+function AppRoutes() {
+  const { user: authUser, showWarning, timeLeft, extendSession, loading: authLoading } = useAuth();
+  const { user } = useStore();
+  
+  // Use the new centralized DataSync hook
+  const { isReady } = useDataSync();
 
   // Only block the entire app on authentication resolution. 
   // Individual pages (like Dashboard) handle their own 'isLoading' states for data sync.

@@ -1,6 +1,19 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { createClient } from '@supabase/supabase-js';
 import { z } from "zod";
+
+// Initialize Supabase client using environment variables
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceRoleKey) {
+  console.error('Missing Supabase credentials. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your environment.');
+}
+
+const supabase = supabaseUrl && supabaseServiceRoleKey 
+  ? createClient(supabaseUrl, supabaseServiceRoleKey)
+  : null;
 
 // 🚀 Create the High-Performance MCP Server
 const server = new McpServer({
@@ -18,17 +31,37 @@ server.tool(
     try {
       console.error(`🛡️ MCP TOOL: Loading summary for user ${userId}`);
       
-      // Simulation of a financial search on Oweable
-      const mockSummary = {
-        total_assets: 125000,
-        total_liabilities: 45000,
-        net_worth: 80000,
-        status: "Healthy",
-      };
+      // If Supabase client is available, fetch real data; otherwise return mock
+      if (supabase) {
+        // Fetch actual data from Supabase
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('financial_data')
+          .eq('id', userId)
+          .single();
+        
+        if (error) {
+          console.error("Supabase error:", error);
+          throw error;
+        }
+        
+        return {
+          content: [{ type: "text", text: JSON.stringify(data?.financial_data || {}, null, 2) }],
+        };
+      } else {
+        // Fallback to mock data if Supabase isn't configured
+        console.warn("Supabase not configured, using mock data");
+        const mockSummary = {
+          total_assets: 125000,
+          total_liabilities: 45000,
+          net_worth: 80000,
+          status: "Healthy",
+        };
 
-      return {
-        content: [{ type: "text", text: JSON.stringify(mockSummary, null, 2) }],
-      };
+        return {
+          content: [{ type: "text", text: JSON.stringify(mockSummary, null, 2) }],
+        };
+      }
     } catch (err) {
       const error = err as Error;
       console.error("🛡️ TOOL FAULT:", error.message);

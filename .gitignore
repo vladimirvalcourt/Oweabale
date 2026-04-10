@@ -25,4 +25,6 @@ coverage/
 !.env.example
 npm-cache/
 .npm-cache/
+.npm_cache/
+
 .vercel

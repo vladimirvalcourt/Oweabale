@@ -359,30 +359,68 @@ export const useStore = create<AppState>()(
     const autoCategory = applyCategorizationRules(transaction.name, rules);
     if (autoCategory) transaction = { ...transaction, category: autoCategory };
 
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = crypto.randomUUID();
-    if (userId) {
-      const { data, error } = await supabase.from('transactions').insert({ ...transaction, user_id: userId }).select('id').single();
-      if (error) { toast.error('Failed to sync transaction'); return; }
-      if (data?.id) newId = data.id;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user.id;
+      
+      let newId = crypto.randomUUID();
+      if (userId) {
+        const { data, error } = await supabase
+          .from('transactions')
+          .insert({ 
+            name: transaction.name,
+            category: transaction.category,
+            date: transaction.date,
+            amount: transaction.amount,
+            type: transaction.type,
+            user_id: userId 
+          })
+          .select('id')
+          .single();
+          
+        if (error) throw error;
+        if (data?.id) newId = data.id;
+      }
+
+      set((state) => ({
+        transactions: [{ ...transaction, id: newId }, ...state.transactions].slice(0, 100)
+      }));
+    } catch (error) {
+      console.error('[addTransaction] Sync failed:', error);
+      toast.error('Failed to save transaction to database.');
     }
-    set((state) => ({
-      transactions: [{ ...transaction, id: newId }, ...state.transactions].slice(0, 100)
-    }));
   },
   addBill: async (bill) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = crypto.randomUUID();
-    if (userId) {
-      const { data, error } = await supabase.from('bills').insert({
-        biller: bill.biller, amount: bill.amount, category: bill.category,
-        due_date: bill.dueDate, frequency: bill.frequency, status: bill.status,
-        auto_pay: bill.autoPay, user_id: userId,
-      }).select('id').single();
-      if (error) { toast.error('Failed to sync bill'); return; }
-      if (data?.id) newId = data.id;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user.id;
+      
+      let newId = crypto.randomUUID();
+      if (userId) {
+        const { data, error } = await supabase
+          .from('bills')
+          .insert({
+            biller: bill.biller, 
+            amount: bill.amount, 
+            category: bill.category,
+            due_date: bill.dueDate, 
+            frequency: bill.frequency, 
+            status: bill.status,
+            auto_pay: bill.autoPay, 
+            user_id: userId,
+          })
+          .select('id')
+          .single();
+          
+        if (error) throw error;
+        if (data?.id) newId = data.id;
+      }
+      
+      set((state) => ({ bills: [...state.bills, { ...bill, id: newId }] }));
+    } catch (error) {
+      console.error('[addBill] Sync failed:', error);
+      toast.error('Failed to sync bill record.');
     }
-    set((state) => ({ bills: [...state.bills, { ...bill, id: newId }] }));
   },
   editBill: async (id, updatedBill) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
@@ -462,23 +500,35 @@ export const useStore = create<AppState>()(
   },
   addDebt: async (debt) => {
     try {
-      const userId = (await supabase.auth.getUser()).data.user?.id;
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user.id;
+      
       let newId = crypto.randomUUID();
       if (userId) {
-        const { data, error } = await supabase.from('debts').insert({
-          name: debt.name, type: debt.type, apr: debt.apr, remaining: debt.remaining,
-          min_payment: debt.minPayment, paid: debt.paid,
-          original_amount: debt.originalAmount ?? null,
-          origination_date: debt.originationDate ?? null,
-          term_months: debt.termMonths ?? null,
-          user_id: userId,
-        }).select('id').single();
+        const { data, error } = await supabase
+          .from('debts')
+          .insert({
+            name: debt.name, 
+            type: debt.type, 
+            apr: debt.apr, 
+            remaining: debt.remaining,
+            min_payment: debt.minPayment, 
+            paid: debt.paid,
+            original_amount: debt.originalAmount ?? null,
+            origination_date: debt.originationDate ?? null,
+            term_months: debt.termMonths ?? null,
+            user_id: userId,
+          })
+          .select('id')
+          .single();
+          
         if (error) throw error;
         if (data?.id) newId = data.id;
       }
+      
       set((state) => ({ debts: [...state.debts, { ...debt, id: newId }] }));
-    } catch (err) {
-      console.error('Error adding debt:', err);
+    } catch (error) {
+      console.error('[addDebt] Sync failed:', error);
       toast.error('Failed to sync debt record.');
     }
   },
@@ -537,20 +587,35 @@ export const useStore = create<AppState>()(
     }));
   },
   addAsset: async (asset) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = crypto.randomUUID();
-    if (userId) {
-      const { data, error } = await supabase.from('assets').insert({
-        name: asset.name, value: asset.value, type: asset.type,
-        appreciation_rate: asset.appreciationRate ?? null,
-        purchase_price: asset.purchasePrice ?? null,
-        purchase_date: asset.purchaseDate ?? null,
-        user_id: userId,
-      }).select('id').single();
-      if (error) { toast.error('Failed to sync asset'); return; }
-      if (data?.id) newId = data.id;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user.id;
+      
+      let newId = crypto.randomUUID();
+      if (userId) {
+        const { data, error } = await supabase
+          .from('assets')
+          .insert({
+            name: asset.name, 
+            value: asset.value, 
+            type: asset.type,
+            appreciation_rate: asset.appreciationRate ?? null,
+            purchase_price: asset.purchasePrice ?? null,
+            purchase_date: asset.purchaseDate ?? null,
+            user_id: userId,
+          })
+          .select('id')
+          .single();
+          
+        if (error) throw error;
+        if (data?.id) newId = data.id;
+      }
+      
+      set((state) => ({ assets: [...state.assets, { ...asset, id: newId }] }));
+    } catch (error) {
+      console.error('[addAsset] Sync failed:', error);
+      toast.error('Failed to sync asset.');
     }
-    set((state) => ({ assets: [...state.assets, { ...asset, id: newId }] }));
   },
   editAsset: async (id, updatedAsset) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
@@ -585,19 +650,35 @@ export const useStore = create<AppState>()(
 
   // ── Subscriptions ─────────────────────────────────────────────
   addSubscription: async (subscription) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = crypto.randomUUID();
-    if (userId) {
-      const { data, error } = await supabase.from('subscriptions').insert({
-        name: subscription.name, amount: subscription.amount,
-        frequency: subscription.frequency, next_billing_date: subscription.nextBillingDate,
-        status: subscription.status, price_history: subscription.priceHistory ?? [],
-        user_id: userId,
-      }).select('id').single();
-      if (error) { toast.error('Failed to sync subscription'); return; }
-      if (data?.id) newId = data.id;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user.id;
+      
+      let newId = crypto.randomUUID();
+      if (userId) {
+        const { data, error } = await supabase
+          .from('subscriptions')
+          .insert({
+            name: subscription.name, 
+            amount: subscription.amount,
+            frequency: subscription.frequency, 
+            next_billing_date: subscription.nextBillingDate,
+            status: subscription.status, 
+            price_history: subscription.priceHistory ?? [],
+            user_id: userId,
+          })
+          .select('id')
+          .single();
+          
+        if (error) throw error;
+        if (data?.id) newId = data.id;
+      }
+      
+      set((state) => ({ subscriptions: [...state.subscriptions, { ...subscription, id: newId }] }));
+    } catch (error) {
+      console.error('[addSubscription] Sync failed:', error);
+      toast.error('Failed to sync subscription.');
     }
-    set((state) => ({ subscriptions: [...state.subscriptions, { ...subscription, id: newId }] }));
   },
   editSubscription: async (id, updatedSubscription) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
@@ -621,17 +702,35 @@ export const useStore = create<AppState>()(
 
   // ── Goals ─────────────────────────────────────────────────────
   addGoal: async (goal) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = crypto.randomUUID();
-    if (userId) {
-      const { data, error } = await supabase.from('goals').insert({
-        name: goal.name, target_amount: goal.targetAmount, current_amount: goal.currentAmount,
-        deadline: goal.deadline, type: goal.type, color: goal.color, user_id: userId,
-      }).select('id').single();
-      if (error) { toast.error('Failed to sync goal'); return; }
-      if (data?.id) newId = data.id;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user.id;
+      
+      let newId = crypto.randomUUID();
+      if (userId) {
+        const { data, error } = await supabase
+          .from('goals')
+          .insert({
+            name: goal.name, 
+            target_amount: goal.targetAmount, 
+            current_amount: goal.currentAmount,
+            deadline: goal.deadline, 
+            type: goal.type, 
+            color: goal.color, 
+            user_id: userId,
+          })
+          .select('id')
+          .single();
+          
+        if (error) throw error;
+        if (data?.id) newId = data.id;
+      }
+      
+      set((state) => ({ goals: [...state.goals, { ...goal, id: newId }] }));
+    } catch (error) {
+      console.error('[addGoal] Sync failed:', error);
+      toast.error('Failed to sync goal.');
     }
-    set((state) => ({ goals: [...state.goals, { ...goal, id: newId }] }));
   },
   editGoal: async (id, updatedGoal) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
@@ -668,18 +767,36 @@ export const useStore = create<AppState>()(
 
   // ── Income ────────────────────────────────────────────────────
   addIncome: async (income) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = crypto.randomUUID();
-    if (userId) {
-      const { data, error } = await supabase.from('incomes').insert({
-        name: income.name, amount: income.amount, frequency: income.frequency,
-        category: income.category, next_date: income.nextDate,
-        status: income.status, is_tax_withheld: income.isTaxWithheld, user_id: userId,
-      }).select('id').single();
-      if (error) { toast.error('Failed to sync income'); return; }
-      if (data?.id) newId = data.id;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user.id;
+      
+      let newId = crypto.randomUUID();
+      if (userId) {
+        const { data, error } = await supabase
+          .from('incomes')
+          .insert({
+            name: income.name, 
+            amount: income.amount, 
+            frequency: income.frequency,
+            category: income.category, 
+            next_date: income.nextDate,
+            status: income.status, 
+            is_tax_withheld: income.isTaxWithheld, 
+            user_id: userId,
+          })
+          .select('id')
+          .single();
+          
+        if (error) throw error;
+        if (data?.id) newId = data.id;
+      }
+      
+      set((state) => ({ incomes: [...state.incomes, { ...income, id: newId }] }));
+    } catch (error) {
+      console.error('[addIncome] Sync failed:', error);
+      toast.error('Failed to sync income source.');
     }
-    set((state) => ({ incomes: [...state.incomes, { ...income, id: newId }] }));
   },
   editIncome: async (id, updatedIncome) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
@@ -722,14 +839,32 @@ export const useStore = create<AppState>()(
 
   // ── Budgets ───────────────────────────────────────────────────
   addBudget: async (budget) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = crypto.randomUUID();
-    if (userId) {
-      const { data, error } = await supabase.from('budgets').insert({ category: budget.category, amount: budget.amount, period: budget.period, user_id: userId }).select('id').single();
-      if (error) { toast.error('Failed to sync budget'); return; }
-      if (data?.id) newId = data.id;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user.id;
+      
+      let newId = crypto.randomUUID();
+      if (userId) {
+        const { data, error } = await supabase
+          .from('budgets')
+          .insert({ 
+            category: budget.category, 
+            amount: budget.amount, 
+            period: budget.period, 
+            user_id: userId 
+          })
+          .select('id')
+          .single();
+          
+        if (error) throw error;
+        if (data?.id) newId = data.id;
+      }
+      
+      set((state) => ({ budgets: [...state.budgets, { ...budget, id: newId }] }));
+    } catch (error) {
+      console.error('[addBudget] Sync failed:', error);
+      toast.error('Failed to sync budget.');
     }
-    set((state) => ({ budgets: [...state.budgets, { ...budget, id: newId }] }));
   },
   editBudget: async (id, updatedBudget) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
@@ -744,14 +879,32 @@ export const useStore = create<AppState>()(
 
   // ── Categories ────────────────────────────────────────────────
   addCategory: async (category) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    let newId = crypto.randomUUID();
-    if (userId) {
-      const { data, error } = await supabase.from('categories').insert({ name: category.name, color: category.color, type: category.type, user_id: userId }).select('id').single();
-      if (error) { toast.error('Failed to sync category'); return; }
-      if (data?.id) newId = data.id;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user.id;
+      
+      let newId = crypto.randomUUID();
+      if (userId) {
+        const { data, error } = await supabase
+          .from('categories')
+          .insert({ 
+            name: category.name, 
+            color: category.color, 
+            type: category.type, 
+            user_id: userId 
+          })
+          .select('id')
+          .single();
+          
+        if (error) throw error;
+        if (data?.id) newId = data.id;
+      }
+      
+      set((state) => ({ categories: [...state.categories, { ...category, id: newId }] }));
+    } catch (error) {
+      console.error('[addCategory] Sync failed:', error);
+      toast.error('Failed to sync category.');
     }
-    set((state) => ({ categories: [...state.categories, { ...category, id: newId }] }));
   },
   editCategory: async (id, updatedCategory) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
