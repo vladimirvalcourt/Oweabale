@@ -23,11 +23,13 @@ Oweable is a web application available at https://www.oweable.com. It is built f
 
 ## Who It's For
 
-- Freelancers and independent contractors filing quarterly estimated taxes
+- Anyone dealing with debt, bills, or financial pressure
+- People paying off credit card, medical, or student loan debt
+- Single parents and households managing tight budgets
 - Gig economy workers (Uber, DoorDash, Instacart, Lyft, TaskRabbit)
-- Consultants and solo business owners
-- Anyone with variable or multiple income streams
-- People paying off debt who want amortization-aware tracking
+- 1099 contractors and self-employed professionals needing quarterly tax tools
+- Salaried employees who need better visibility into their finances
+- Anyone building toward financial stability from any starting point
 
 ## Pricing
 

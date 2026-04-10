@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
-import { ArrowRight, UploadCloud, ShieldCheck, Zap } from 'lucide-react';
+import { ArrowRight, UploadCloud, Target, BarChart2, TrendingUp, BookOpen, CalendarClock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
@@ -77,12 +77,16 @@ function WordCycler() {
 
 const FAQ_ITEMS = [
   {
-    q: 'Who is Oweable designed for?',
-    a: 'Oweable is for anyone dealing with debt, bills, or financial pressure — whether you\'re paying off credit cards, juggling monthly bills on a tight income, recovering from medical debt, or just trying to build stability. Gig workers, salaried employees, single parents, recent grads, and anyone who needs clarity on their finances will benefit.',
+    q: 'Who is Oweable for?',
+    a: 'Anyone dealing with debt, bills, or financial pressure. That includes people paying off credit cards or medical debt, single parents juggling bills, recent grads with student loans, gig workers, salaried employees on tight budgets, and anyone who wants a clear picture of where they stand — and a real plan to get ahead.',
   },
   {
-    q: 'Can Oweable help me if I\'m not self-employed?',
-    a: 'Absolutely. While Oweable includes tools for 1099 and gig workers, most of its features — debt payoff tracking, bill management, net worth monitoring, credit repair tools, and spending analytics — are built for anyone under financial pressure, regardless of how they earn.',
+    q: 'How does Oweable help me pay off debt faster?',
+    a: 'Oweable\'s Debt Detonator lets you choose between the Avalanche strategy (highest interest first — minimizes total interest paid) or the Snowball strategy (smallest balance first — builds momentum). It calculates your exact debt-free date, projects total interest saved, and generates a month-by-month amortization schedule for every debt.',
+  },
+  {
+    q: 'Can I track all my bills in one place?',
+    a: 'Yes. Add any recurring bill — rent, utilities, subscriptions, insurance — with its due date and frequency. Oweable automatically flags bills that go overdue, calculates your total monthly burn rate, and shows everything on a financial calendar so nothing slips through the cracks.',
   },
   {
     q: 'Is Oweable free?',
@@ -90,15 +94,11 @@ const FAQ_ITEMS = [
   },
   {
     q: 'How is Oweable different from YNAB or Mint?',
-    a: 'YNAB and Mint (discontinued in 2024) are built for salaried employees with predictable income. Oweable is built for self-employment: quarterly tax estimation, a freelance income vault with write-off tracking, and debt amortization with Snowball and Avalanche strategies — features those tools never offered.',
-  },
-  {
-    q: 'Does Oweable connect to my bank account?',
-    a: 'Oweable supports manual entry and document ingestion — upload receipts, bank statements, and invoices via desktop or phone camera. Automatic bank sync via Plaid is on the roadmap.',
+    a: 'YNAB and Mint are built for people with stable, predictable salaries. Oweable is built for real financial situations — multiple debt types, tight budgets, variable income, and financial recovery. It includes debt amortization, credit tracking, bill overdue detection, net worth projection, subscription price-hike alerts, and tax tools for gig workers — features those apps never offered.',
   },
   {
     q: 'Is my financial data secure?',
-    a: 'Yes. Oweable uses Google OAuth (no stored passwords), encrypts all data at rest and in transit via TLS 1.2+, and enforces row-level security on every database table so users can only ever access their own data.',
+    a: 'Yes. Oweable uses Google OAuth (no passwords stored), encrypts all data at rest and in transit via TLS 1.2+, and enforces row-level security on every database table — so your data is never accessible to anyone else.',
   },
 ];
 
@@ -291,26 +291,41 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-l border-t border-surface-border">
             {[
               {
+                icon: Target,
+                title: "Debt Detonator",
+                desc: "Choose Avalanche (highest interest first) or Snowball (smallest balance first). Get your exact debt-free date, total interest saved, and a month-by-month payoff schedule for every debt."
+              },
+              {
+                icon: CalendarClock,
+                title: "Bill Command Center",
+                desc: "Track every recurring bill — rent, utilities, insurance, subscriptions — with due dates and auto-overdue detection. See your full monthly burn rate and never miss a payment again."
+              },
+              {
+                icon: TrendingUp,
+                title: "Net Worth Engine",
+                desc: "Real-time net worth from assets minus liabilities. Tracks a daily historical snapshot every time you log in and projects your 12-month trajectory so you can see where you're headed."
+              },
+              {
+                icon: BarChart2,
+                title: "Spending Intelligence",
+                desc: "Area charts and bar charts showing spending by category, income vs. expenses, savings rate, and cash flow — all built from your real data. Export any view as CSV."
+              },
+              {
                 icon: UploadCloud,
-                title: "Statement Scanning",
-                desc: "Drop your Uber, Lyft, or DoorDash pay statements. We'll automatically capture your gross earnings and platform fees."
+                title: "Document Scanning",
+                desc: "Upload receipts, bank statements, and invoices from desktop or phone. OCR automatically extracts the biller, amount, and due date — no manual typing required."
               },
               {
-                icon: ShieldCheck,
-                title: "Tax Defense Shield",
-                desc: "Every dollar you earn is instantly shielded. We calculate your 15.3% SE tax and state-specific liability exactly."
-              },
-              {
-                icon: Zap,
-                title: "Deduction Scouring",
-                desc: "Automatic mileage detection at the 2024 IRS rate ($0.67/mi). We find the hidden write-offs in your work statements."
+                icon: BookOpen,
+                title: "Financial Academy",
+                desc: "10 self-paced education tracks covering budgeting, debt payoff, credit repair, investing, taxes, real estate, and estate planning. Progress is saved so you can pick up where you left off."
               }
             ].map((feat, i) => (
-              <div 
-                key={i} 
+              <div
+                key={i}
                 className="border-r border-b border-surface-border p-10 bg-surface-base hover:bg-surface-raised transition-colors group relative overflow-hidden"
               >
-                <feat.icon />
+                <feat.icon className="w-5 h-5 text-brand-violet mb-4" />
                 <h3 className="text-lg font-medium text-content-primary mb-3">
                   {feat.title}
                 </h3>
