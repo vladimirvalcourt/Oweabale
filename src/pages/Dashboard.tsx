@@ -53,7 +53,7 @@ export default function Dashboard() {
   const citations = useStore(state => state.citations);
   const resolveCitation = useStore(state => state.resolveCitation);
   
-  const [isLoading, setIsLoading] = useState(false);
+  const isLoading = useStore(state => state.isLoading);
   const [isCitationModalOpen, setIsCitationModalOpen] = useState(false);
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
 
@@ -526,7 +526,13 @@ export default function Dashboard() {
             </div>
             
             <div className="overflow-y-auto outline-none">
-              {upcomingBills.length === 0 ? (
+              {isLoading ? (
+                <div className="space-y-2 p-4 animate-pulse">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="h-12 bg-zinc-800 rounded-sm" />
+                  ))}
+                </div>
+              ) : upcomingBills.length === 0 ? (
                 <div className="m-4 p-8 text-center flex flex-col items-center bg-surface-base border border-dashed border-surface-border rounded-sm">
                   <Calendar className="w-8 h-8 text-zinc-600/50 mb-3" />
                   <p className="text-[12px] font-mono font-bold text-zinc-400 uppercase tracking-widest">No Bills Found</p>

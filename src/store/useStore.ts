@@ -1534,8 +1534,7 @@ export const useStore = create<AppState>()(
       return;
     }
 
-    const isFirstLoad = !get().user.id || get().user.id === '';
-    if (isFirstLoad) set({ isLoading: true });
+    set({ isLoading: true });
 
     // Fire non-critical RPC in background
     void (supabase.rpc('flip_overdue_bills') as unknown as Promise<unknown>).catch((err) => {
