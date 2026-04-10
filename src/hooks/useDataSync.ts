@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
+import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../store/useStore';
-import { useAuth } from './useAuth';
 
 /**
  * useDataSync Hook
@@ -10,8 +10,7 @@ import { useAuth } from './useAuth';
  * Handles initial data fetching, auth state changes, and prevents duplicate listeners or 
  * memory leaks during Vite HMR (Hot Module Replacement).
  */
-export function useDataSync() {
-  const { user: authUser, loading: authLoading } = useAuth();
+export function useDataSync({ authUser, authLoading }: { authUser: User | null; authLoading: boolean }) {
   const { fetchData, clearLocalData } = useStore();
   const isInitialized = useRef(false);
 
@@ -21,14 +20,12 @@ export function useDataSync() {
 
     // Handle Sign-In / Initial Load
     if (authUser && !isInitialized.current) {
-      console.log('[DataSync] User authenticated, fetching data...', authUser.id);
       fetchData(authUser.id);
       isInitialized.current = true;
     }
 
     // Handle Sign-Out
     if (!authUser && isInitialized.current) {
-      console.log('[DataSync] User signed out, clearing store...');
       clearLocalData();
       isInitialized.current = false;
     }

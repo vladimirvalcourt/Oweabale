@@ -53,7 +53,7 @@ function AppRoutes() {
   const { user } = useStore();
   
   // Use the new centralized DataSync hook
-  useDataSync();
+  useDataSync({ authUser, authLoading });
 
   // Only block the entire app on authentication resolution. 
   // Individual pages (like Dashboard) handle their own 'isLoading' states for data sync.
