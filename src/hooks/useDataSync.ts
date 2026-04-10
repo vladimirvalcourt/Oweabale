@@ -12,7 +12,7 @@ import { useAuth } from './useAuth';
  */
 export function useDataSync() {
   const { user: authUser, loading: authLoading } = useAuth();
-  const { fetchData, resetData } = useStore();
+  const { fetchData, clearLocalData } = useStore();
   const isInitialized = useRef(false);
 
   useEffect(() => {
@@ -29,10 +29,10 @@ export function useDataSync() {
     // Handle Sign-Out
     if (!authUser && isInitialized.current) {
       console.log('[DataSync] User signed out, clearing store...');
-      resetData();
+      clearLocalData();
       isInitialized.current = false;
     }
-  }, [authUser, authLoading, fetchData, resetData]);
+  }, [authUser, authLoading, fetchData, clearLocalData]);
 
   // Sync logic for Vite HMR resilience
   useEffect(() => {
@@ -41,7 +41,7 @@ export function useDataSync() {
         fetchData(session.user.id);
         isInitialized.current = true;
       } else if (event === 'SIGNED_OUT') {
-        resetData();
+        clearLocalData();
         isInitialized.current = false;
       }
     });
@@ -49,7 +49,7 @@ export function useDataSync() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [fetchData, resetData]);
+  }, [fetchData, clearLocalData]);
 
   return { isReady: !authLoading };
 }

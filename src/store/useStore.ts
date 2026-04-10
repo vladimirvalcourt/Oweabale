@@ -282,6 +282,7 @@ interface AppState {
   deleteFreelanceEntry: (id: string) => Promise<void>;
   updateUser: (user: Partial<AppState['user']>) => Promise<void>;
   signOut: () => Promise<void>;
+  clearLocalData: () => void;
   resetData: () => Promise<void>;
   deleteAccount: () => Promise<void>;
   addCategorizationRule: (rule: Omit<CategorizationRule, 'id'>) => Promise<void>;
@@ -1068,6 +1069,9 @@ export const useStore = create<AppState>()(
   },
   signOut: async () => {
     await supabase.auth.signOut();
+    set({ ...initialData });
+  },
+  clearLocalData: () => {
     set({ ...initialData });
   },
   resetData: async () => {
