@@ -4,7 +4,7 @@ import {
   Terminal, Users, Database, Activity, ShieldCheck, ShieldAlert, Cpu, Network,
   ArrowLeft, Key, Zap, CheckCircle2, TrendingUp, Radio, LifeBuoy, Bot,
   Landmark, BookOpen, Clock, AlertTriangle, Coins, Search, RefreshCw,
-  XCircle, ChevronRight
+  XCircle, ChevronRight, ThumbsUp, Star
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { supabase } from '../lib/supabase';
@@ -39,6 +39,16 @@ interface SupportTicket {
   userEmail?: string;
 }
 
+interface UserFeedback {
+  id: string;
+  user_id: string;
+  type: 'general' | 'feature_request' | 'bug';
+  rating: number | null;
+  message: string;
+  created_at: string;
+  userEmail?: string;
+}
+
 interface ActivityEntry {
   time: string;
   level: 'INFO' | 'WARN' | 'ERROR' | 'SYS';
@@ -63,6 +73,9 @@ export default function AdminDashboard() {
   const [openTickets, setOpenTickets] = useState<SupportTicket[]>([]);
   const [ticketsLoading, setTicketsLoading] = useState(false);
   const [resolvingTicketId, setResolvingTicketId] = useState<string | null>(null);
+
+  const [userFeedback, setUserFeedback] = useState<UserFeedback[]>([]);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
 
   const [activityLog, setActivityLog] = useState<ActivityEntry[]>([]);
   const [logFilter, setLogFilter] = useState('');
@@ -187,6 +200,26 @@ export default function AdminDashboard() {
       }));
       setOpenTickets(enrichedTickets);
       addLog('INFO', `${enrichedTickets.length} open ticket(s) loaded.`);
+    }
+
+    // User feedback
+    setFeedbackLoading(true);
+    const { data: feedbackData, error: feedbackErr } = await supabase
+      .from('user_feedback')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+    setFeedbackLoading(false);
+    if (feedbackErr) {
+      addLog('ERROR', `Feedback load failed: ${feedbackErr.message}`);
+    } else if (feedbackData) {
+      const profileMap: Record<string, string> = {};
+      profileData?.forEach(p => { if (p.email) profileMap[p.id] = p.email; });
+      setUserFeedback((feedbackData as UserFeedback[]).map(f => ({
+        ...f,
+        userEmail: profileMap[f.user_id] || f.user_id.slice(0, 8),
+      })));
+      addLog('INFO', `${feedbackData.length} feedback submission(s) loaded.`);
     }
 
     // Pending ingestions count
@@ -608,6 +641,54 @@ export default function AdminDashboard() {
                         {resolvingTicketId === ticket.id ? '...' : 'Resolve'}
                       </button>
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* User Feedback */}
+            <div className="bg-[#0A0A0A] border border-white/10 rounded-sm border-t-2 border-t-indigo-500/50 flex flex-col">
+              <div className="p-5 border-b border-white/10">
+                <h2 className="text-xs font-bold text-zinc-400 flex items-center gap-2">
+                  <ThumbsUp className="w-4 h-4" /> User Feedback
+                  {userFeedback.length > 0 && (
+                    <span className="ml-auto text-[10px] font-bold bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded-sm">
+                      {userFeedback.length} total
+                    </span>
+                  )}
+                </h2>
+              </div>
+              <div className="p-3 flex-1 overflow-y-auto max-h-64 space-y-2">
+                {feedbackLoading && (
+                  <p className="text-[11px] text-zinc-600 p-2">Loading feedback...</p>
+                )}
+                {!feedbackLoading && userFeedback.length === 0 && (
+                  <p className="text-[11px] text-zinc-600 p-2">No feedback submitted yet.</p>
+                )}
+                {userFeedback.map(fb => (
+                  <div key={fb.id} className="bg-black/40 border border-white/5 rounded-sm p-2.5 space-y-1.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-zinc-500">{fb.userEmail} · {new Date(fb.created_at).toLocaleDateString()}</p>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {fb.rating && (
+                          <div className="flex items-center gap-0.5">
+                            {[1,2,3,4,5].map(s => (
+                              <Star key={s} className={`w-2.5 h-2.5 ${s <= fb.rating! ? 'fill-amber-400 text-amber-400' : 'text-zinc-700'}`} />
+                            ))}
+                          </div>
+                        )}
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded-sm font-bold ${
+                          fb.type === 'bug' ? 'bg-rose-500/20 text-rose-400' :
+                          fb.type === 'feature_request' ? 'bg-indigo-500/20 text-indigo-400' :
+                          'bg-white/5 text-zinc-500'
+                        }`}>
+                          {fb.type === 'feature_request' ? 'Feature' : fb.type === 'bug' ? 'Bug' : 'General'}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-zinc-400 leading-relaxed">{fb.message}</p>
                   </div>
                 ))}
               </div>
