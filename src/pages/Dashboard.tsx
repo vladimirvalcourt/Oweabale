@@ -288,7 +288,7 @@ export default function Dashboard() {
 
             {/* Overdraft Risk Action */}
             {isOverdraftRisk && (
-              <Link to="/obligations" className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 rounded-sm">
+              <Link to="/bills" className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 rounded-sm">
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
                   className="bg-rose-500/10 border border-rose-500/30 p-5 rounded-sm flex items-center justify-between hover:bg-rose-500/15 transition-all shadow-sm group"
@@ -522,7 +522,7 @@ export default function Dashboard() {
           <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit max-h-[350px]">
             <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
               <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-300">Upcoming Bills</h3>
-              <Link to="/obligations" className="text-xs font-sans text-indigo-400 hover:text-indigo-300 transition-colors font-medium">See all</Link>
+              <Link to="/bills" className="text-xs font-sans text-indigo-400 hover:text-indigo-300 transition-colors font-medium">See all</Link>
             </div>
             
             <div className="overflow-y-auto outline-none">

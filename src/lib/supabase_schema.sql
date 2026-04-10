@@ -381,7 +381,7 @@ CREATE POLICY "Admins manage broadcasts" ON admin_broadcasts FOR ALL USING (EXIS
 
 -- 21. PLATFORM SETTINGS
 CREATE TABLE IF NOT EXISTS platform_settings (
-  id                    INTEGER PRIMARY KEY DEFAULT 1,
+  id                    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   maintenance_mode      BOOLEAN NOT NULL DEFAULT FALSE,
   plaid_enabled         BOOLEAN NOT NULL DEFAULT TRUE,
   broadcast_message     TEXT NOT NULL DEFAULT '',
@@ -393,8 +393,8 @@ CREATE TABLE IF NOT EXISTS platform_settings (
 
 -- Seed the single settings row
 INSERT INTO platform_settings (id)
-VALUES (1)
-ON CONFLICT (id) DO NOTHING;
+VALUES (gen_random_uuid())
+ON CONFLICT DO NOTHING;
 
 ALTER TABLE platform_settings ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Authenticated users read platform_settings" ON platform_settings;

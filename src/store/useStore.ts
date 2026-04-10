@@ -157,6 +157,31 @@ export interface CreditFactor {
   description: string; // "How this helps or hurts you"
 }
 
+export interface AdminBroadcast {
+  id: string;
+  title: string;
+  content: string;
+  type: 'info' | 'warning' | 'error';
+  createdAt: string;
+}
+
+export interface PlatformSettings {
+  id: string;
+  maintenanceMode: boolean;
+  plaidEnabled: boolean;
+  broadcastMessage: string;
+  taxStandardDeduction: number;
+  taxTopBracket: number;
+}
+
+export interface NetWorthSnapshot {
+  id: string;
+  date: string;
+  netWorth: number;
+  assets: number;
+  debts: number;
+}
+
 export interface CreditFix {
   id: string;
   item: string; // e.g., "Medical Bill Error"
@@ -191,6 +216,9 @@ interface AppState {
   notifications: Notification[];
   pendingIngestions: PendingIngestion[];
   categorizationRules: CategorizationRule[];
+  adminBroadcasts: AdminBroadcast[];
+  platformSettings: PlatformSettings | null;
+  netWorthSnapshots: NetWorthSnapshot[];
   user: {
     id: string;
     firstName: string;
@@ -320,6 +348,9 @@ const initialData = {
   pendingIngestions: [],
   notifications: [],
   categorizationRules: [],
+  adminBroadcasts: [],
+  platformSettings: null,
+  netWorthSnapshots: [],
   credit: {
     score: 0,
     lastUpdated: '',
@@ -1474,6 +1505,10 @@ export const useStore = create<AppState>()(
         { data: pendingIngestions },
         { data: categorizationRules },
         { data: creditFixes },
+        { data: adminBroadcasts },
+        { data: platformSettings },
+        { data: netWorthSnapshots },
+        { data: creditFactors },
       ] = await Promise.all([
         supabase.from('subscriptions').select('*').eq('user_id', resolvedUserId),
         supabase.from('goals').select('*').eq('user_id', resolvedUserId),
@@ -1485,6 +1520,10 @@ export const useStore = create<AppState>()(
         supabase.from('pending_ingestions').select('*').eq('user_id', resolvedUserId),
         supabase.from('categorization_rules').select('*').eq('user_id', resolvedUserId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
         supabase.from('credit_fixes').select('*').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
+        supabase.from('admin_broadcasts').select('*').order('created_at', { ascending: false }).limit(10),
+        supabase.from('platform_settings').select('*').maybeSingle(),
+        supabase.from('net_worth_snapshots').select('*').eq('user_id', resolvedUserId).order('date', { ascending: true }).limit(90),
+        supabase.from('credit_factors').select('*').eq('user_id', resolvedUserId),
       ]);
 
       set({
@@ -1578,7 +1617,36 @@ export const useStore = create<AppState>()(
             bureau: f.bureau as string,
             notes: (f.notes ?? '') as string,
           })),
+          factors: (creditFactors || []).map((f: Record<string, unknown>) => ({
+            id: f.id as string,
+            name: f.name as string,
+            impact: f.impact as 'high' | 'medium' | 'low',
+            status: f.status as 'excellent' | 'good' | 'fair' | 'poor',
+            description: f.description as string,
+          })),
         },
+        adminBroadcasts: (adminBroadcasts || []).map((b: Record<string, unknown>) => ({
+          id: b.id as string,
+          title: b.title as string,
+          content: b.content as string,
+          type: b.type as 'info' | 'warning' | 'error',
+          createdAt: b.created_at as string,
+        })),
+        platformSettings: platformSettings ? {
+          id: platformSettings.id as string,
+          maintenanceMode: platformSettings.maintenance_mode as boolean,
+          plaidEnabled: platformSettings.plaid_enabled as boolean,
+          broadcastMessage: platformSettings.broadcast_message as string,
+          taxStandardDeduction: platformSettings.tax_standard_deduction as number,
+          taxTopBracket: platformSettings.tax_top_bracket as number,
+        } : null,
+        netWorthSnapshots: (netWorthSnapshots || []).map((s: Record<string, unknown>) => ({
+          id: s.id as string,
+          date: s.date as string,
+          netWorth: s.net_worth as number,
+          assets: s.assets as number,
+          debts: s.debts as number,
+        })),
       });
 
       // Upsert today's net worth snapshot for historical trending.

@@ -90,10 +90,10 @@ CREATE TABLE IF NOT EXISTS platform_settings (
   updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Seed the single settings row
+-- Seed the single settings row (use deterministic UUID for consistency)
 INSERT INTO platform_settings (id)
 VALUES ('00000000-0000-0000-0000-000000000001')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT DO NOTHING;
 
 ALTER TABLE platform_settings ENABLE ROW LEVEL SECURITY;
 

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import type { Database } from '../types/supabase';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -33,6 +34,3 @@ export const getProfile = async (userId: string) => {
   if (error) throw error;
   return data;
 };
-
-// Types for Supabase tables (matching useStore.ts)
-// You can generate these using `npx supabase gen types typescript --project-id YOUR_PROJECT_ID > src/types/supabase.ts`
