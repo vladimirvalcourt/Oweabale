@@ -1,52 +1,51 @@
 import { useEffect, useRef } from 'react';
-import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../store/useStore';
 
 /**
  * useDataSync Hook
- * 
- * Orchestrates the synchronization between Supabase Auth and the global Zustand store.
- * Handles initial data fetching, auth state changes, and prevents duplicate listeners or 
- * memory leaks during Vite HMR (Hot Module Replacement).
+ *
+ * Self-contained sync between Supabase Auth and Zustand store.
+ * Strategy:
+ *   1. On mount, call getSession() immediately — this covers page refresh
+ *      where the session is already in localStorage and available synchronously.
+ *   2. Listen to onAuthStateChange for INITIAL_SESSION, SIGNED_IN, and
+ *      TOKEN_REFRESHED — all three can fire on a cold load or refresh.
+ *   3. On SIGNED_OUT, clear local state only (never touch DB).
  */
-export function useDataSync({ authUser, authLoading }: { authUser: User | null; authLoading: boolean }) {
+export function useDataSync() {
   const { fetchData, clearLocalData } = useStore();
-  const isInitialized = useRef(false);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
-    // If auth is still loading, do nothing
-    if (authLoading) return;
-
-    // Handle Sign-In / Initial Load
-    if (authUser && !isInitialized.current) {
-      fetchData(authUser.id);
-      isInitialized.current = true;
-    }
-
-    // Handle Sign-Out
-    if (!authUser && isInitialized.current) {
-      clearLocalData();
-      isInitialized.current = false;
-    }
-  }, [authUser, authLoading, fetchData, clearLocalData]);
-
-  // Sync logic for Vite HMR resilience
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
+    // Path 1: Immediate session check on mount.
+    // Covers page refresh — session is in localStorage and resolves synchronously.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user && !hasFetched.current) {
+        hasFetched.current = true;
         fetchData(session.user.id);
-        isInitialized.current = true;
+      }
+    });
+
+    // Path 2: Auth state change events.
+    // Covers INITIAL_SESSION (fired on refresh), SIGNED_IN (fresh login),
+    // TOKEN_REFRESHED (background token renewal).
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (
+        (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') &&
+        session?.user &&
+        !hasFetched.current
+      ) {
+        hasFetched.current = true;
+        fetchData(session.user.id);
       } else if (event === 'SIGNED_OUT') {
         clearLocalData();
-        isInitialized.current = false;
+        hasFetched.current = false;
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [fetchData, clearLocalData]);
-
-  return { isReady: !authLoading };
+  }, []); // Intentionally empty — runs once on mount, auth events handle the rest
 }
