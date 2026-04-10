@@ -2,7 +2,7 @@
  * Bills & Debts — Total Bills & Debt record
  * Avalanche/Snowball payoff algorithm with projected payoff dates and interest savings.
  */
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Receipt, CreditCard, AlertTriangle, ShieldAlert,
   FileText, CheckCircle2, Flame,
@@ -106,37 +106,41 @@ export default function Obligations() {
   const [showDetonator, setShowDetonator] = useState(true);
   const [expandedDebtId, setExpandedDebtId] = useState<string | null>(null);
 
-  // Map live bills from store into Obligation shape
-  const recurringObligations: Obligation[] = bills.map(b => ({
-    id: b.id,
-    name: b.biller,
-    type: 'recurring' as ObligationType,
-    subType: b.frequency === 'Monthly' ? 'Fixed Bill' : `${b.frequency} Bill`,
-    dueDate: b.dueDate,
-    amount: b.amount,
-    icon: Receipt,
-  }));
-  const allObligations: Obligation[] = [
-    ...recurringObligations,
-    ...debts.map(d => ({
-      id: d.id,
-      name: d.name,
-      type: 'debt' as ObligationType,
-      subType: d.type,
-      dueDate: new Date(Date.now() + 20 * 86400000).toISOString().split('T')[0],
-      amount: d.remaining,
-      icon: CreditCard,
-    })),
-    ...citations.filter(c => c.status === 'open').map(c => ({
-      id: c.id,
-      name: `${c.type} — ${c.jurisdiction}`,
-      type: 'ambush' as ObligationType,
-      subType: 'Citation',
-      dueDate: new Date(Date.now() + c.daysLeft * 86400000).toISOString().split('T')[0],
-      amount: c.amount,
-      icon: ShieldAlert,
-    })),
-  ];
+  /** Stable anchor for synthetic due dates (set once per mount). */
+  const [scheduleBaseMs] = useState(() => Date.now());
+
+  const allObligations: Obligation[] = useMemo(() => {
+    const recurringObligations: Obligation[] = bills.map(b => ({
+      id: b.id,
+      name: b.biller,
+      type: 'recurring' as ObligationType,
+      subType: b.frequency === 'Monthly' ? 'Fixed Bill' : `${b.frequency} Bill`,
+      dueDate: b.dueDate,
+      amount: b.amount,
+      icon: Receipt,
+    }));
+    return [
+      ...recurringObligations,
+      ...debts.map(d => ({
+        id: d.id,
+        name: d.name,
+        type: 'debt' as ObligationType,
+        subType: d.type,
+        dueDate: new Date(scheduleBaseMs + 20 * 86400000).toISOString().split('T')[0],
+        amount: d.remaining,
+        icon: CreditCard,
+      })),
+      ...citations.filter(c => c.status === 'open').map(c => ({
+        id: c.id,
+        name: `${c.type} — ${c.jurisdiction}`,
+        type: 'ambush' as ObligationType,
+        subType: 'Citation',
+        dueDate: new Date(scheduleBaseMs + c.daysLeft * 86400000).toISOString().split('T')[0],
+        amount: c.amount,
+        icon: ShieldAlert,
+      })),
+    ];
+  }, [bills, debts, citations, scheduleBaseMs]);
 
   const filteredObligations = allObligations
     .filter(ob => activeTab === 'all' || ob.type === activeTab)

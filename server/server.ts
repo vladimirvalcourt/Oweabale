@@ -1,3 +1,10 @@
+/**
+ * Oweable MCP server — stdio transport with Supabase service role when configured.
+ *
+ * Security: Any process that can invoke this server can read `profiles.financial_data`
+ * for arbitrary user IDs. Run only on trusted hosts, restrict OS/file permissions,
+ * and never expose this binary or its env (SUPABASE_SERVICE_ROLE_KEY) to untrusted callers.
+ */
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createClient } from '@supabase/supabase-js';
@@ -15,6 +22,12 @@ const supabase = supabaseUrl && supabaseServiceRoleKey
   ? createClient(supabaseUrl, supabaseServiceRoleKey)
   : null;
 
+if (supabase) {
+  console.error(
+    '[owebale-mcp] Service role client active. Treat this process as highly privileged; restrict who can execute it.'
+  );
+}
+
 // 🚀 Create the High-Performance MCP Server
 const server = new McpServer({
   name: "owebale-financial-os",
@@ -26,7 +39,7 @@ const server = new McpServer({
 server.tool(
   "get_account_summary",
   "Retrieves a 360-degree financial overview for a specific user ID.",
-  { userId: z.string().describe("The UUID of the user") },
+  { userId: z.string().uuid().describe("The UUID of the user") },
   async ({ userId }) => {
     try {
       console.error(`🛡️ MCP TOOL: Loading summary for user ${userId}`);

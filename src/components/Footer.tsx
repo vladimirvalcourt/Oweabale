@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Twitter, Github, Linkedin } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -54,17 +53,12 @@ export default function Footer() {
             <span className="opacity-30">/</span>
             <span>© {new Date().getFullYear()} All Rights Reserved</span>
           </div>
-          <div className="flex items-center gap-4 text-content-muted">
-            <a href="#" className="hover:text-brand-violet transition-colors" aria-label="Twitter">
-              <Twitter className="w-4 h-4" />
-            </a>
-            <a href="#" className="hover:text-brand-violet transition-colors" aria-label="GitHub">
-              <Github className="w-4 h-4" />
-            </a>
-            <a href="#" className="hover:text-brand-violet transition-colors" aria-label="LinkedIn">
-              <Linkedin className="w-4 h-4" />
-            </a>
-          </div>
+          <Link
+            to="/support"
+            className="text-[10px] font-mono uppercase tracking-widest text-content-muted hover:text-brand-violet transition-colors"
+          >
+            Contact support
+          </Link>
         </div>
       </div>
     </footer>

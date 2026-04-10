@@ -4,8 +4,7 @@
  */
 
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Toaster } from 'sonner';
-import { useEffect, lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import Layout from './components/Layout';
 import DeviceGuard from './components/DeviceGuard';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -47,13 +46,14 @@ import AuthCallback from './pages/AuthCallback';
 const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
 
 import { useDataSync } from './hooks/useDataSync';
+import { ThemedToaster } from './components/ThemedToaster';
 
 function AppRoutes() {
   const { user: authUser, showWarning, timeLeft, extendSession, loading: authLoading } = useAuth();
   const { user } = useStore();
   
   // Use the new centralized DataSync hook
-  const { isReady } = useDataSync();
+  useDataSync();
 
   // Only block the entire app on authentication resolution. 
   // Individual pages (like Dashboard) handle their own 'isLoading' states for data sync.
@@ -132,17 +132,7 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            background: '#141414',
-            color: '#FAFAFA',
-            border: '1px solid #262626',
-            borderRadius: '2px',
-          },
-        }}
-      />
+      <ThemedToaster />
       <ErrorBoundary>
         <AppRoutes />
       </ErrorBoundary>

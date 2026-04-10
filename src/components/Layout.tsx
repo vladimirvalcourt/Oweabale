@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  Bell, Search, Home, Receipt, CreditCard, Target, Activity,
-  Settings, Repeat, BarChart3, Plus, Menu, X, ChevronDown, Inbox,
-  Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LifeBuoy, LineChart, ShieldCheck
+  Bell, Search, Home, Receipt, Target, Activity,
+  Settings, Repeat, BarChart3, Plus, X, ChevronDown, Inbox,
+  Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LineChart, ShieldCheck
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -38,6 +38,7 @@ export default function Layout() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const gChordAtRef = useRef<number | null>(null);
 
   const { bills, debts, transactions, subscriptions, goals, incomes, budgets, user, isQuickAddOpen, openQuickAdd, closeQuickAdd, resetData, pendingIngestions, notifications, markNotificationsRead, clearNotifications } = useStore();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -62,30 +63,61 @@ export default function Layout() {
   }, [isSearchOpen]);
 
   useEffect(() => {
-    let lastKey = '';
+    const CHORD_MS = 1000;
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      // CMD/CTRL + K -> Search
+      const el = e.target as HTMLElement;
+      const inTextField =
+        el.tagName === 'INPUT' ||
+        el.tagName === 'TEXTAREA' ||
+        el.isContentEditable;
+
+      if (inTextField) {
+        gChordAtRef.current = null;
+      }
+
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setIsSearchOpen(true);
-        // We'll need a ref for the input to focus it
-      }
-
-      // Quick Add
-      if (e.key === 'q' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
-        openQuickAdd();
-      }
-
-      // Navigation chords (G then key)
-      if (lastKey === 'g' && !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement).tagName)) {
-        if (e.key === 'd') navigate('/dashboard');
-        if (e.key === 't') navigate('/transactions');
-        if (e.key === 'b') navigate('/bills');
-        if (e.key === 's') navigate('/settings');
-        lastKey = '';
         return;
       }
-      lastKey = e.key.toLowerCase();
+
+      if (e.key === 'q' && !inTextField) {
+        openQuickAdd();
+        return;
+      }
+
+      if (!inTextField && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        const now = Date.now();
+        const lower = e.key.toLowerCase();
+
+        if (gChordAtRef.current !== null && now - gChordAtRef.current < CHORD_MS) {
+          if (lower === 'd') {
+            navigate('/dashboard');
+            e.preventDefault();
+          } else if (lower === 't') {
+            navigate('/transactions');
+            e.preventDefault();
+          } else if (lower === 'b') {
+            navigate('/bills');
+            e.preventDefault();
+          } else if (lower === 's') {
+            navigate('/settings');
+            e.preventDefault();
+          }
+          gChordAtRef.current = null;
+          return;
+        }
+
+        if (lower === 'g') {
+          gChordAtRef.current = now;
+          return;
+        }
+      }
+
+      if (!inTextField) {
+        gChordAtRef.current = null;
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -126,7 +158,7 @@ export default function Layout() {
 
     transactions.forEach(tx => {
       if (tx.name.toLowerCase().includes(query) || tx.category.toLowerCase().includes(query)) {
-        results.push({ type: 'Transaction', name: tx.name, detail: `$${tx.amount} - ${tx.date}`, path: '/' });
+        results.push({ type: 'Transaction', name: tx.name, detail: `$${tx.amount} - ${tx.date}`, path: '/transactions' });
       }
     });
 
@@ -204,8 +236,9 @@ export default function Layout() {
     <div className="min-h-[100dvh] bg-surface-base font-sans text-content-primary flex">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black/80 lg:hidden"
+          aria-hidden="true"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -233,7 +266,9 @@ export default function Layout() {
             )}
           </div>
           <button 
-            className="lg:hidden text-content-tertiary hover:text-content-secondary p-2 transition-colors"
+            type="button"
+            aria-label="Close navigation menu"
+            className="lg:hidden text-content-tertiary hover:text-content-secondary p-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm"
             onClick={() => setSidebarOpen(false)}
           >
             <MorphingMenuIcon isOpen={sidebarOpen} className="text-content-primary" />
@@ -247,8 +282,10 @@ export default function Layout() {
               <div key={group.label} className="space-y-1">
                 {!sidebarCollapsed && (
                   <button 
+                    type="button"
                     onClick={() => toggleGroup(group.label)}
-                    className="w-full flex items-center justify-between px-4 py-2 text-[12px] font-sans font-semibold text-content-secondary hover:text-content-primary transition-colors group/header"
+                    aria-expanded={isExpanded}
+                    className="w-full flex items-center justify-between px-4 py-2 text-[12px] font-sans font-semibold text-content-secondary hover:text-content-primary transition-colors group/header focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
                   >
                     <span>{group.label}</span>
                     <ChevronDown className={cn("w-3 h-3 transition-transform duration-300", isExpanded ? "rotate-0" : "-rotate-90 text-content-tertiary")} />
@@ -257,16 +294,14 @@ export default function Layout() {
                 {/* Collapsed view line separator */}
                 {sidebarCollapsed && <div className="h-[1px] bg-surface-border mx-2 my-4 opacity-50" />}
 
-                <AnimatePresence initial={false}>
-                  {(isExpanded || sidebarCollapsed) && (
-                    <motion.div 
-                      key={group.label}
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ type: 'spring', damping: 20, stiffness: 150 }}
-                      className="overflow-hidden space-y-1"
-                    >
+                <div
+                  className={cn(
+                    'grid transition-[grid-template-rows] duration-300 ease-out',
+                    isExpanded || sidebarCollapsed ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+                  )}
+                >
+                  <div className="min-h-0 overflow-hidden">
+                    <div className="space-y-1">
                       {group.items.map((item) => {
                         const itemBasePath = item.path.split('?')[0];
                         const itemTabParam = item.path.includes('?')
@@ -319,9 +354,9 @@ export default function Layout() {
                           </Link>
                         );
                       })}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                    </div>
+                  </div>
+                </div>
               </div>
             );
           })}
@@ -342,6 +377,7 @@ export default function Layout() {
               </div>
             )}
             <button
+              type="button"
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
               className={cn(
                 "flex items-center w-full py-2 text-[12px] font-sans font-medium text-content-tertiary bg-surface-raised border border-surface-border rounded-sm hover:text-content-primary hover:bg-surface-highlight transition-all group",
@@ -355,6 +391,7 @@ export default function Layout() {
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 useStore.getState().signOut();
                 toast.success('Session Terminated');
@@ -386,7 +423,9 @@ export default function Layout() {
         <header className="shrink-0 bg-surface-base topbar-groove sticky top-0 z-30 h-[4.5rem] flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-surface-border">
           <div className="flex items-center gap-4 flex-1">
             <button 
-              className="lg:hidden text-zinc-500 hover:text-zinc-300"
+              type="button"
+              aria-label="Open navigation menu"
+              className="lg:hidden text-zinc-500 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm p-1"
               onClick={() => setSidebarOpen(true)}
             >
               <MorphingMenuIcon isOpen={sidebarOpen} className="scale-110" />
@@ -394,18 +433,23 @@ export default function Layout() {
             
             {/* Global Search (Desktop) */}
             <div className="hidden md:flex items-center max-w-md w-full relative" ref={searchRef}>
-              <Search className="w-4 h-4 text-content-tertiary absolute left-3" />
+              <label htmlFor="layout-global-search" className="sr-only">
+                Search bills, transactions, subscriptions, and budgets
+              </label>
+              <Search className="w-4 h-4 text-content-tertiary absolute left-3 pointer-events-none" aria-hidden />
               <input 
+                id="layout-global-search"
                 ref={searchInputRef}
                 type="text" 
-                placeholder="Search (CMD+K)" 
+                placeholder="Search (⌘K)" 
+                autoComplete="off"
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   setIsSearchOpen(true);
                 }}
                 onFocus={() => setIsSearchOpen(true)}
-                className="w-full pl-9 pr-4 py-2 bg-surface-highlight rounded-md text-[13px] font-sans text-content-primary placeholder-content-tertiary focus:outline-none focus:bg-surface-border-subtle transition-all search-carved border focus:border-content-secondary"
+                className="w-full pl-9 pr-4 py-2 bg-surface-highlight rounded-md text-[13px] font-sans text-content-primary placeholder-content-tertiary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus:bg-surface-border-subtle transition-all search-carved border focus:border-content-secondary"
               />
               
               {/* Search Dropdown */}
@@ -441,23 +485,29 @@ export default function Layout() {
           <div className="flex items-center gap-2 sm:gap-4">
             {/* Search Icon (Mobile) */}
             <button 
+              type="button"
+              aria-label="Open search"
               onClick={() => setIsMobileSearchOpen(true)} 
-              className="md:hidden text-zinc-500 hover:text-zinc-300 transition-colors p-1"
+              className="md:hidden text-zinc-500 hover:text-zinc-300 transition-colors p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm min-w-11 min-h-11 flex items-center justify-center"
             >
               <Search className="w-4 h-4" />
             </button>
 
             {/* Quick Add Button */}
             <button
+              type="button"
+              aria-label="Quick add transaction or bill"
               onClick={() => openQuickAdd()}
-              className="hidden sm:flex items-center gap-2 bg-brand-indigo hover:bg-brand-violet text-white text-[12px] font-mono font-bold uppercase tracking-wider transition-all btn-tactile px-5 py-2"
+              className="hidden sm:flex items-center gap-2 bg-brand-indigo hover:bg-brand-violet text-white text-[12px] font-mono font-bold uppercase tracking-wider transition-all btn-tactile px-5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base focus-visible:ring-white"
             >
               <Plus className="w-3.5 h-3.5" />
               Quick Add
             </button>
             <button
+              type="button"
+              aria-label="Quick add transaction or bill"
               onClick={() => openQuickAdd()}
-              className="sm:hidden flex items-center justify-center w-8 h-8 bg-brand-indigo hover:bg-brand-violet text-white transition-all btn-tactile"
+              className="sm:hidden flex items-center justify-center w-11 h-11 bg-brand-indigo hover:bg-brand-violet text-white transition-all btn-tactile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <Plus className="w-3.5 h-3.5" />
             </button>
@@ -465,8 +515,12 @@ export default function Layout() {
             {/* Notifications */}
             <div className="relative">
               <button
+                type="button"
+                aria-label="Notifications"
+                aria-expanded={isNotifOpen}
+                aria-haspopup="true"
                 onClick={() => { setIsNotifOpen(v => !v); if (!isNotifOpen) markNotificationsRead(); }}
-                className="relative p-1 overflow-visible group"
+                className="relative p-1 overflow-visible group min-w-11 min-h-11 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm"
               >
                 <TactileIcon icon={Bell} size={16} className="text-content-tertiary group-hover:text-content-primary" />
                 {notifications.filter(n => !n.read).length > 0 && (
@@ -503,7 +557,10 @@ export default function Layout() {
 
             {/* Profile Dropdown */}
             <HeadlessMenu as="div" className="relative">
-              <HeadlessMenu.Button className="h-8 w-8 rounded-full bg-surface-raised border border-surface-border flex items-center justify-center overflow-hidden cursor-pointer hover:bg-surface-elevated transition-colors focus:outline-none">
+              <HeadlessMenu.Button
+                aria-label="Account menu"
+                className="h-11 w-11 rounded-full bg-surface-raised border border-surface-border flex items-center justify-center overflow-hidden cursor-pointer hover:bg-surface-elevated transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+              >
                 {user?.avatar ? (
                   <img src={user.avatar} alt="Profile" className="h-full w-full object-cover" data-no-invert />
                 ) : (
@@ -666,21 +723,28 @@ export default function Layout() {
       {isMobileSearchOpen && (
         <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm md:hidden flex flex-col">
           <div className="p-4 bg-surface-raised border-b border-surface-border flex items-center gap-3">
-            <Search className="w-5 h-5 text-zinc-500 shrink-0" />
+            <label htmlFor="layout-mobile-search" className="sr-only">
+              Search bills, transactions, debts, and more
+            </label>
+            <Search className="w-5 h-5 text-zinc-500 shrink-0" aria-hidden />
             <input 
+              id="layout-mobile-search"
               autoFocus
               type="text" 
               placeholder="Search bills, transactions, debts..." 
+              autoComplete="off"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none text-base text-zinc-200 placeholder-zinc-600 focus:outline-none focus:ring-0"
+              className="flex-1 bg-transparent border-none text-base text-zinc-200 placeholder-zinc-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm px-1"
             />
             <button 
+              type="button"
+              aria-label="Close search"
               onClick={() => {
                 setIsMobileSearchOpen(false);
                 setSearchQuery('');
               }}
-              className="p-1 text-zinc-500 hover:text-zinc-300"
+              className="p-2 text-zinc-500 hover:text-zinc-300 min-w-11 min-h-11 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm"
             >
               <X className="w-5 h-5" />
             </button>

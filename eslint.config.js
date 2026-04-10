@@ -1,4 +1,5 @@
 import js from '@eslint/js';
+import globals from 'globals';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import reactPlugin from 'eslint-plugin-react';
@@ -16,18 +17,7 @@ export default [
         ecmaFeatures: { jsx: true },
       },
       globals: {
-        window: 'readonly',
-        document: 'readonly',
-        console: 'readonly',
-        URL: 'readonly',
-        File: 'readonly',
-        FileReader: 'readonly',
-        Blob: 'readonly',
-        Math: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        Promise: 'readonly',
-        fetch: 'readonly',
+        ...globals.browser,
       },
     },
     plugins: {
@@ -46,13 +36,18 @@ export default [
       ...reactPlugin.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off', // Not needed with React 17+ JSX transform
       'react/prop-types': 'off',         // We use TypeScript instead
+      'react/no-unescaped-entities': 'warn',
 
       // React Hooks
       ...reactHooksPlugin.configs.recommended.rules,
+      'react-hooks/set-state-in-effect': 'warn',
 
       // General
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-unused-vars': 'off', // Handled by @typescript-eslint/no-unused-vars
+      'no-undef': 'off', // TypeScript handles undefined identifiers; avoids false positives on types
+      'no-empty': 'warn',
+      'no-useless-escape': 'warn',
     },
     settings: {
       react: {

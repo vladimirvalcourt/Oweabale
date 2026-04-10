@@ -29,7 +29,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+    <div className="min-h-screen bg-surface-base flex items-center justify-center px-4">
       {/* Background grid */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -61,9 +61,10 @@ export default function AuthPage() {
 
         {/* Google Sign-In */}
         <button
+          type="button"
           onClick={handleGoogleSignIn}
           disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-3 bg-white text-black font-mono text-sm font-bold py-4 px-4 hover:bg-zinc-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-8"
+          className="w-full flex items-center justify-center gap-3 bg-white text-black font-mono text-sm font-bold py-4 px-4 hover:bg-zinc-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-violet focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
         >
           {googleLoading ? (
             <span className="text-xs tracking-widest uppercase">Redirecting…</span>

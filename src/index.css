@@ -39,6 +39,18 @@
 }
 
 @layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
   .shadow-stripe-dark {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   }
@@ -209,9 +221,9 @@ body {
 :root[data-theme="ghost"] {
   --color-brand-indigo: #ffffff;
   --color-brand-violet: #d4d4d4;
-  --color-surface-base: #000000;
-  --color-surface-raised: #0a0a0a;
-  --color-surface-elevated: #121212;
+  --color-surface-base: #0a0a0a;
+  --color-surface-raised: #111111;
+  --color-surface-elevated: #181818;
   --shadow-glow-indigo: 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
@@ -255,13 +267,61 @@ body {
   animation-play-state: paused;
 }
 
-/* Hide scrollbars globally while keeping scroll functionality */
-html, body {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* Light theme — toggled via `theme-light` on <html> (see Layout) */
+:root.theme-light {
+  --color-surface-base: #f1f2f4;
+  --color-surface-raised: #ffffff;
+  --color-surface-elevated: #e8eaee;
+  --color-surface-highlight: rgba(0, 0, 0, 0.04);
+  --color-surface-border: #d1d5db;
+  --color-surface-border-subtle: #e5e7eb;
+
+  --color-content-primary: #111827;
+  --color-content-secondary: #4b5563;
+  --color-content-tertiary: #6b7280;
+  --color-content-muted: #9ca3af;
+
+  --shadow-tactile: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-tactile-hover: inset 0 1px 0 rgba(255, 255, 255, 1), 0 2px 6px rgba(0, 0, 0, 0.08);
+  --shadow-glow-indigo: 0 0 12px rgba(37, 99, 235, 0.2);
 }
-html::-webkit-scrollbar, body::-webkit-scrollbar {
-  display: none;
+
+:root.theme-light .brand-header-text {
+  text-shadow: none;
+}
+
+/* Sonner — map to app surface tokens */
+[data-sonner-toaster][data-sonner-theme='dark'] {
+  --normal-bg: var(--color-surface-raised);
+  --normal-border: var(--color-surface-border);
+  --normal-text: var(--color-content-primary);
+  --border-radius: 0px;
+}
+
+[data-sonner-toaster][data-sonner-theme='dark'] [data-description] {
+  color: var(--color-content-secondary) !important;
+}
+
+[data-sonner-toaster][data-sonner-theme='light'] {
+  --normal-bg: var(--color-surface-raised);
+  --normal-border: var(--color-surface-border);
+  --normal-text: var(--color-content-primary);
+  --border-radius: 0px;
+}
+
+[data-sonner-toaster][data-sonner-theme='light'] [data-description] {
+  color: var(--color-content-secondary) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 .scrollbar-hide {

@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Building2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 
 interface BrandLogoProps {
@@ -13,43 +12,36 @@ interface BrandLogoProps {
 const getBrandColor = (name: string): string => {
   const hash = name.split('').reduce((acc, char) => char.charCodeAt(0) + ((acc << 5) - acc), 0);
   const h = Math.abs(hash) % 360;
-  return `hsla(${h}, 70%, 50%, 0.15)`;
+  return `hsla(${h}, 55%, 42%, 0.35)`;
 };
 
-export const BrandLogo: React.FC<BrandLogoProps> = ({ name, className, size = 'md', fallbackIcon }) => {
-  const [hasError, setHasError] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const domainGuess = `${name.toLowerCase().replace(/[^a-z0-9]/g, '')}.com`;
-  
-  // Special overrides for common brands to ensure accurate domains
-  const getDomain = (n: string) => {
-    const lower = n.toLowerCase();
-    if (lower.includes('apple')) return 'apple.com';
-    if (lower.includes('chase')) return 'chase.com';
-    if (lower.includes('netflix')) return 'netflix.com';
-    if (lower.includes('starbucks')) return 'starbucks.com';
-    if (lower.includes('amazon')) return 'amazon.com';
-    if (lower.includes('verizon')) return 'verizon.com';
-    if (lower.includes('spotify')) return 'spotify.com';
-    if (lower.includes('uber')) return 'uber.com';
-    if (lower.includes('landlord')) return ''; // No logo for generic landlord
-    return domainGuess;
-  };
+function initialsFromName(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
-  const domain = getDomain(name);
+export const BrandLogo: React.FC<BrandLogoProps> = ({ name, className, size = 'md', fallbackIcon }) => {
   const colorGlow = getBrandColor(name);
+  const initials = initialsFromName(name);
 
   const sizeClasses = {
     sm: 'w-6 h-6',
     md: 'w-8 h-8',
-    lg: 'w-10 h-10'
+    lg: 'w-10 h-10',
+  };
+  const textSize = {
+    sm: 'text-[9px]',
+    md: 'text-[11px]',
+    lg: 'text-xs',
   };
 
-  if (!domain || hasError) {
+  if (!name.trim()) {
     return (
-      <div 
+      <div
         className={cn(
-          "flex items-center justify-center rounded-md bg-surface-raised border border-surface-border shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] shrink-0", 
+          'flex items-center justify-center rounded-md bg-surface-raised border border-surface-border shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] shrink-0',
           sizeClasses[size],
           className
         )}
@@ -60,31 +52,18 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({ name, className, size = 'm
   }
 
   return (
-    <div 
+    <div
       className={cn(
-        "relative rounded-md bg-white border border-surface-border shrink-0 overflow-hidden flex items-center justify-center transition-all duration-500",
+        'relative rounded-md border border-surface-border shrink-0 overflow-hidden flex items-center justify-center font-mono font-bold text-content-primary bg-surface-elevated select-none tracking-tight',
         sizeClasses[size],
+        textSize[size],
         className
       )}
-      style={{ boxShadow: `inset 0 2px 4px rgba(0,0,0,0.1), 0 0 12px ${colorGlow}` }}
+      style={{ boxShadow: `inset 0 1px 2px rgba(0,0,0,0.15), 0 0 10px ${colorGlow}` }}
+      title={name}
+      aria-label={`${name} brand`}
     >
-      <AnimatePresence>
-        {!isLoaded && !hasError && (
-          <motion.div 
-            className="absolute inset-0 bg-zinc-200 animate-pulse"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          />
-        )}
-      </AnimatePresence>
-      <img 
-        src={`https://logo.clearbit.com/${domain}?size=128`}
-        alt={`${name} logo`}
-        className={cn("w-full h-full object-contain p-1 transition-all duration-500", isLoaded ? "opacity-100 blur-0" : "opacity-0 blur-sm")}
-        onLoad={() => setIsLoaded(true)}
-        onError={() => { setHasError(true); setIsLoaded(true); }}
-      />
+      {initials}
     </div>
   );
 };

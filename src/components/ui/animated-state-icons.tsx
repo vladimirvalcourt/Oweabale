@@ -1,7 +1,5 @@
-"use client";
-
-import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect } from "react";
 
 interface StateIconProps {

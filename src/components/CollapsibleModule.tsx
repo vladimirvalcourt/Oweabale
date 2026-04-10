@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
+import { cn } from '../lib/utils';
 
 interface CollapsibleModuleProps {
   title: string;
@@ -11,14 +11,26 @@ interface CollapsibleModuleProps {
   className?: string;
 }
 
-export function CollapsibleModule({ title, icon: Icon, children, defaultOpen = true, extraHeader, className = "" }: CollapsibleModuleProps) {
+export function CollapsibleModule({
+  title,
+  icon: Icon,
+  children,
+  defaultOpen = true,
+  extraHeader,
+  className = '',
+}: CollapsibleModuleProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
+  const panelId = React.useId();
 
   return (
     <div className={`bg-surface-raised border border-surface-border rounded-sm overflow-hidden flex flex-col ${className}`}>
-      <div 
+      <button
+        type="button"
+        id={`${panelId}-trigger`}
+        aria-expanded={isOpen}
+        aria-controls={panelId}
         onClick={() => setIsOpen(!isOpen)}
-        className="px-6 py-3 bg-surface-elevated/80 border-b border-surface-border flex items-center justify-between cursor-pointer group active:translate-y-[1px] hover:bg-surface-highlight transition-all border-t border-t-white/5"
+        className="w-full text-left px-6 py-3 bg-surface-elevated/80 border-b border-surface-border flex items-center justify-between cursor-pointer group active:translate-y-[1px] hover:bg-surface-highlight transition-all border-t border-t-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-indigo"
       >
         <div className="flex items-center gap-3">
           {Icon && <Icon className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 transition-colors" />}
@@ -26,22 +38,26 @@ export function CollapsibleModule({ title, icon: Icon, children, defaultOpen = t
         </div>
         <div className="flex items-center gap-4">
           {!isOpen && extraHeader}
-          <div className="flex items-center justify-center w-5 h-5">
-            {isOpen ? <ChevronUp className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" /> : <ChevronDown className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />}
+          <div className="flex items-center justify-center w-5 h-5" aria-hidden>
+            {isOpen ? (
+              <ChevronUp className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+            ) : (
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+            )}
           </div>
         </div>
-      </div>
+      </button>
 
-      <motion.div
-        initial={false}
-        animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        className="overflow-hidden"
+      <div
+        className={cn(
+          'grid transition-[grid-template-rows] duration-300 ease-out',
+          isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        )}
       >
-        <div className="p-6">
-          {children}
+        <div id={panelId} role="region" aria-labelledby={`${panelId}-trigger`} className="min-h-0 overflow-hidden">
+          <div className="p-6">{children}</div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
