@@ -426,38 +426,38 @@ export const useStore = create<AppState>()(
   },
   addBill: async (bill) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const userId = session?.user.id;
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) {
+        toast.error('You must be signed in to save bills.');
+        return false;
+      }
       
       let newId = crypto.randomUUID();
-      if (userId) {
-        const insertData = {
-          biller: bill.biller, 
-          amount: bill.amount, 
-          category: bill.category,
-          due_date: bill.dueDate, 
-          frequency: bill.frequency, 
-          status: bill.status,
-          auto_pay: bill.autoPay, 
-          user_id: userId,
-        };
-        
-        const { data, error } = await supabase
-          .from('bills')
-          .insert(insertData)
-          .select('id')
-          .single();
-        
-        if (error) {
-          console.error('[addBill] Database error:', error);
-          console.error('[addBill] Error details:', { code: error.code, message: error.message, details: error.details });
-          throw error;
-        }
-        
-        if (data?.id) newId = data.id;
-      } else {
-        console.warn('[addBill] No user ID found - saving locally only');
+      const insertData = {
+        biller: bill.biller, 
+        amount: bill.amount, 
+        category: bill.category,
+        due_date: bill.dueDate, 
+        frequency: bill.frequency, 
+        status: bill.status,
+        auto_pay: bill.autoPay, 
+        user_id: userId,
+      };
+      
+      const { data, error } = await supabase
+        .from('bills')
+        .insert(insertData)
+        .select('id')
+        .single();
+      
+      if (error) {
+        console.error('[addBill] Database error:', error);
+        console.error('[addBill] Error details:', { code: error.code, message: error.message, details: error.details });
+        throw error;
       }
+      
+      if (data?.id) newId = data.id;
       
       set((state) => ({ bills: [...state.bills, { ...bill, id: newId }] }));
       return true;
