@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS credit_fixes (
 
 ALTER TABLE credit_fixes ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users manage own credit_fixes" ON credit_fixes;
 CREATE POLICY "Users manage own credit_fixes"
   ON credit_fixes FOR ALL
   USING (auth.uid() = user_id)
@@ -48,6 +49,7 @@ CREATE TABLE IF NOT EXISTS freelance_entries (
 
 ALTER TABLE freelance_entries ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users manage own freelance_entries" ON freelance_entries;
 CREATE POLICY "Users manage own freelance_entries"
   ON freelance_entries FOR ALL
   USING (auth.uid() = user_id)
@@ -71,6 +73,7 @@ CREATE TABLE IF NOT EXISTS pending_ingestions (
 
 ALTER TABLE pending_ingestions ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users manage own pending_ingestions" ON pending_ingestions;
 CREATE POLICY "Users manage own pending_ingestions"
   ON pending_ingestions FOR ALL
   USING (auth.uid() = user_id)
@@ -90,20 +93,39 @@ CREATE TABLE IF NOT EXISTS platform_settings (
   updated_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Seed the single settings row (use deterministic UUID for consistency)
-INSERT INTO platform_settings (id)
-VALUES ('00000000-0000-0000-0000-000000000001')
-ON CONFLICT DO NOTHING;
+-- Seed the single settings row.
+-- Remote projects may have `platform_settings.id` as INTEGER (older schema) or UUID (newer schema).
+DO $$
+DECLARE
+  id_type TEXT;
+BEGIN
+  SELECT data_type
+    INTO id_type
+  FROM information_schema.columns
+  WHERE table_schema = 'public'
+    AND table_name = 'platform_settings'
+    AND column_name = 'id';
+
+  IF id_type = 'integer' THEN
+    INSERT INTO platform_settings (id) VALUES (1)
+    ON CONFLICT DO NOTHING;
+  ELSE
+    INSERT INTO platform_settings (id) VALUES ('00000000-0000-0000-0000-000000000001'::uuid)
+    ON CONFLICT DO NOTHING;
+  END IF;
+END $$;
 
 ALTER TABLE platform_settings ENABLE ROW LEVEL SECURITY;
 
 -- All authenticated users can read platform settings
+DROP POLICY IF EXISTS "Authenticated users can read platform_settings" ON platform_settings;
 CREATE POLICY "Authenticated users can read platform_settings"
   ON platform_settings FOR SELECT
   TO authenticated
   USING (TRUE);
 
 -- Only admins can write
+DROP POLICY IF EXISTS "Admins can modify platform_settings" ON platform_settings;
 CREATE POLICY "Admins can modify platform_settings"
   ON platform_settings FOR ALL
   USING (
@@ -132,12 +154,14 @@ CREATE TABLE IF NOT EXISTS admin_broadcasts (
 ALTER TABLE admin_broadcasts ENABLE ROW LEVEL SECURITY;
 
 -- All authenticated users can read broadcasts
+DROP POLICY IF EXISTS "Authenticated users can read broadcasts" ON admin_broadcasts;
 CREATE POLICY "Authenticated users can read broadcasts"
   ON admin_broadcasts FOR SELECT
   TO authenticated
   USING (TRUE);
 
 -- Only admins can create/update/delete broadcasts
+DROP POLICY IF EXISTS "Admins manage broadcasts" ON admin_broadcasts;
 CREATE POLICY "Admins manage broadcasts"
   ON admin_broadcasts FOR ALL
   USING (

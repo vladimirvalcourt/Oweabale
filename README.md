@@ -10,7 +10,7 @@ Ultra-premium personal finance dashboard for debt elimination, tax defense, and 
 npm install
 npm run dev       # http://localhost:3000
 npm run build     # production build
-npm run lint      # TypeScript type check (tsc --noEmit)
+npm run lint      # TypeScript + ESLint
 ```
 
 ---
@@ -25,7 +25,7 @@ npm run lint      # TypeScript type check (tsc --noEmit)
 | Database | Supabase (PostgreSQL + Auth) |
 | Styling | Tailwind CSS v4 |
 | Charts | Recharts |
-| Animations | Motion (Framer Motion v12) |
+| Animations | Motion (`motion/react`) |
 | Notifications | Sonner |
 | Icons | Lucide React |
 | PDF Parsing | pdfjs-dist v5 (npm, NOT CDN) |
@@ -68,7 +68,7 @@ npm run lint      # TypeScript type check (tsc --noEmit)
   /components
     Layout.tsx                # App shell: sidebar, header, search, QuickAdd
     QuickAddModal.tsx         # Global quick-entry modal (transaction/bill/income)
-    DeviceGuard.tsx           # Blocks <768px viewports
+    DeviceGuard.tsx           # Pass-through wrapper (reserved for future gating)
     CollapsibleModule.tsx     # Shared collapsible card wrapper
     BrandLogo.tsx             # Auto-generates brand initials/logo
     BankConnection.tsx        # Plaid link integration
@@ -105,7 +105,43 @@ Create `.env` in the project root:
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
+
+# Server-only (used by server/server.ts). Keep secret.
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
+
+---
+
+## Backend (Supabase) — local vs remote
+
+This app’s “backend” is Supabase (Postgres + Auth + Storage) plus an optional local stdio MCP server in `server/server.ts`.
+
+### Local Supabase (requires Docker Desktop)
+
+- Install and start Docker Desktop
+- Then:
+
+```bash
+supabase --version
+supabase start
+supabase db reset
+```
+
+### Remote Supabase
+
+- Ensure your Supabase project is **unpaused** and your account has access.
+- Then you can link and push migrations:
+
+```bash
+supabase projects list
+supabase link --project-ref <your-project-ref>
+supabase db push
+```
+
+### MCP (Supabase MCP server)
+
+Cursor reads `.cursor/mcp.json` for MCP servers. This repo includes a Supabase MCP configuration there; if tools don’t show up, you likely need to authenticate in Cursor.
 
 ---
 

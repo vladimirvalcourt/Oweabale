@@ -25,6 +25,7 @@ BEGIN
 END;
 $$;
 
+DROP TRIGGER IF EXISTS trg_set_ticket_number ON support_tickets;
 CREATE TRIGGER trg_set_ticket_number
   BEFORE INSERT ON support_tickets
   FOR EACH ROW
@@ -33,15 +34,18 @@ CREATE TRIGGER trg_set_ticket_number
 ALTER TABLE support_tickets ENABLE ROW LEVEL SECURITY;
 
 -- Users can view and create their own tickets
+DROP POLICY IF EXISTS "Users can view own tickets" ON support_tickets;
 CREATE POLICY "Users can view own tickets"
   ON support_tickets FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can create own tickets" ON support_tickets;
 CREATE POLICY "Users can create own tickets"
   ON support_tickets FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
 -- Admins have full access
+DROP POLICY IF EXISTS "Admins have full access to tickets" ON support_tickets;
 CREATE POLICY "Admins have full access to tickets"
   ON support_tickets FOR ALL
   USING (

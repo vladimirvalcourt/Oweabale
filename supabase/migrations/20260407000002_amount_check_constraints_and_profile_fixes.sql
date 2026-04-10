@@ -26,6 +26,7 @@ ALTER TABLE deductions   ADD CONSTRAINT deductions_amount_positive   CHECK (amou
 -- delete_user() RPC removes the auth record, but an explicit
 -- policy enables profile self-deletion independently if needed.
 
+DROP POLICY IF EXISTS "Users can delete their own profile" ON profiles;
 CREATE POLICY "Users can delete their own profile"
   ON profiles FOR DELETE
   USING (auth.uid() = id);
@@ -38,6 +39,7 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT 
 
 -- Admin-only SELECT policy: admins can read all profiles
 -- (required for the User Management table in AdminDashboard)
+DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
 CREATE POLICY "Admins can view all profiles"
   ON profiles FOR SELECT
   USING (

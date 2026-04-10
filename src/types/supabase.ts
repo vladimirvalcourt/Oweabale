@@ -3,7 +3,7 @@
  * Generated from supabase_schema.sql
  * 
  * To regenerate automatically:
- * npx supabase gen types typescript --project-id hjgrslcapdmmgxeppguu > src/types/supabase.ts
+ * npx supabase gen types typescript --project-id <your-project-ref> > src/types/supabase.ts
  */
 
 export type Json =
