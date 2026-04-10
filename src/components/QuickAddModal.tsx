@@ -323,17 +323,18 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
 
     try {
       if (activeTab === 'transaction') {
-        addTransaction({
+        const ok = await addTransaction({
           name: description,
           amount: numAmount,
           category: category,
           date: date,
           type: 'expense'
         });
+        if (!ok) return;
         toast.success(`Transaction saved`);
       } else if (activeTab === 'obligation') {
         if (type === 'bill') {
-          addBill({
+          const ok = await addBill({
             biller: vendor,
             amount: numAmount,
             category: category,
@@ -342,9 +343,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
             status: 'upcoming',
             autoPay: false
           });
+          if (!ok) return;
           toast.success(`Bill added`);
         } else {
-          addDebt({
+          const ok = await addDebt({
             name: vendor,
             type: 'Loan',
             apr: parseFloat(apr) || 0, 
@@ -352,10 +354,11 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
             minPayment: parseFloat(minPayment) || 0,
             paid: 0
           });
+          if (!ok) return;
           toast.success(`Debt recorded`);
         }
       } else if (activeTab === 'income') {
-        addIncome({
+        const ok = await addIncome({
           name: description.trim() || source,
           amount: numAmount,
           frequency: 'Monthly',
@@ -364,6 +367,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
           status: 'active',
           isTaxWithheld: false
         });
+        if (!ok) return;
         toast.success(`Income recorded`);
       } else if (activeTab === 'citation') {
         // addCitation is async and handles its own error toast internally

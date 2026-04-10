@@ -243,12 +243,12 @@ interface AppState {
   setTaxSettings: (state: string, rate: number) => void;
   bankConnected: boolean;
   connectBank: () => Promise<void>;
-  addTransaction: (transaction: Omit<Transaction, 'id'>) => void;
-  addBill: (bill: Omit<Bill, 'id'>) => void;
+  addTransaction: (transaction: Omit<Transaction, 'id'>) => Promise<boolean>;
+  addBill: (bill: Omit<Bill, 'id'>) => Promise<boolean>;
   editBill: (id: string, bill: Partial<Bill>) => void;
   deleteBill: (id: string) => void;
   markBillPaid: (id: string) => void;
-  addDebt: (debt: Omit<Debt, 'id'>) => void;
+  addDebt: (debt: Omit<Debt, 'id'>) => Promise<boolean>;
   editDebt: (id: string, debt: Partial<Debt>) => Promise<void>;
   deleteDebt: (id: string) => Promise<void>;
   addDebtPayment: (id: string, amount: number) => Promise<void>;
@@ -262,7 +262,7 @@ interface AppState {
   editGoal: (id: string, goal: Partial<Goal>) => Promise<void>;
   deleteGoal: (id: string) => Promise<void>;
   addGoalProgress: (id: string, amount: number) => Promise<void>;
-  addIncome: (income: Omit<IncomeSource, 'id'>) => Promise<void>;
+  addIncome: (income: Omit<IncomeSource, 'id'>) => Promise<boolean>;
   editIncome: (id: string, income: Partial<IncomeSource>) => Promise<void>;
   deleteIncome: (id: string) => Promise<void>;
   recordIncomeDeposit: (id: string, amount?: number) => Promise<void>;
@@ -417,18 +417,17 @@ export const useStore = create<AppState>()(
       set((state) => ({
         transactions: [{ ...transaction, id: newId }, ...state.transactions].slice(0, 100)
       }));
+      return true;
     } catch (error) {
       console.error('[addTransaction] Sync failed:', error);
       toast.error('Failed to save transaction to database.');
+      return false;
     }
   },
   addBill: async (bill) => {
     try {
-      console.log('[addBill] Starting bill sync:', bill);
       const { data: { session } } = await supabase.auth.getSession();
       const userId = session?.user.id;
-      
-      console.log('[addBill] User ID:', userId);
       
       let newId = crypto.randomUUID();
       if (userId) {
@@ -443,8 +442,6 @@ export const useStore = create<AppState>()(
           user_id: userId,
         };
         
-        console.log('[addBill] Inserting to DB:', insertData);
-        
         const { data, error } = await supabase
           .from('bills')
           .insert(insertData)
@@ -457,20 +454,20 @@ export const useStore = create<AppState>()(
           throw error;
         }
         
-        console.log('[addBill] Success! New ID:', data?.id);
         if (data?.id) newId = data.id;
       } else {
         console.warn('[addBill] No user ID found - saving locally only');
       }
       
       set((state) => ({ bills: [...state.bills, { ...bill, id: newId }] }));
-      console.log('[addBill] Local state updated');
+      return true;
     } catch (error: any) {
       console.error('[addBill] Sync failed:', error);
       console.error('[addBill] Error name:', error?.name);
       console.error('[addBill] Error message:', error?.message);
       console.error('[addBill] Full error object:', error);
       toast.error(`Failed to sync bill record: ${error?.message || 'Unknown error'}`);
+      return false;
     }
   },
   editBill: async (id, updatedBill) => {
@@ -586,9 +583,11 @@ export const useStore = create<AppState>()(
       }
       
       set((state) => ({ debts: [...state.debts, { ...debt, id: newId }] }));
+      return true;
     } catch (error) {
       console.error('[addDebt] Sync failed:', error);
       toast.error('Failed to sync debt record.');
+      return false;
     }
   },
   editDebt: async (id, updatedDebt) => {
@@ -852,9 +851,11 @@ export const useStore = create<AppState>()(
       }
       
       set((state) => ({ incomes: [...state.incomes, { ...income, id: newId }] }));
+      return true;
     } catch (error) {
       console.error('[addIncome] Sync failed:', error);
       toast.error('Failed to sync income source.');
+      return false;
     }
   },
   editIncome: async (id, updatedIncome) => {
@@ -1426,8 +1427,6 @@ export const useStore = create<AppState>()(
       return;
     }
 
-    console.log('[fetchData] Starting data fetch for user:', resolvedUserId);
-
     const isFirstLoad = !get().user.id || get().user.id === '';
     if (isFirstLoad) set({ isLoading: true });
 
@@ -1437,7 +1436,6 @@ export const useStore = create<AppState>()(
     });
 
     try {
-      console.log('[fetchData] Fetching bills...');
       const [
         { data: profile, error: profileError },
         { data: bills, error: billsError },
@@ -1458,8 +1456,6 @@ export const useStore = create<AppState>()(
       if (billsError) {
         console.error('[fetchData] Bills fetch error:', billsError);
         console.error('[fetchData] Bills error details:', { code: billsError.code, message: billsError.message });
-      } else {
-        console.log('[fetchData] Bills fetched successfully:', bills?.length || 0, 'bills');
       }
       
       if (debtsError) console.error('[fetchData] Debts fetch error:', debtsError);
