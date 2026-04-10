@@ -475,7 +475,15 @@ export const useStore = create<AppState>()(
   editBill: async (id, updatedBill) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
     if (userId) {
-      const { error } = await supabase.from('bills').update(updatedBill).eq('id', id).eq('user_id', userId);
+      const dbUpdate: Record<string, unknown> = {};
+      if (updatedBill.biller !== undefined) dbUpdate.biller = updatedBill.biller;
+      if (updatedBill.amount !== undefined) dbUpdate.amount = updatedBill.amount;
+      if (updatedBill.category !== undefined) dbUpdate.category = updatedBill.category;
+      if (updatedBill.dueDate !== undefined) dbUpdate.due_date = updatedBill.dueDate;
+      if (updatedBill.frequency !== undefined) dbUpdate.frequency = updatedBill.frequency;
+      if (updatedBill.status !== undefined) dbUpdate.status = updatedBill.status;
+      if (updatedBill.autoPay !== undefined) dbUpdate.auto_pay = updatedBill.autoPay;
+      const { error } = await supabase.from('bills').update(dbUpdate).eq('id', id).eq('user_id', userId);
       if (error) { toast.error('Failed to update bill'); return; }
     }
     set((state) => ({
