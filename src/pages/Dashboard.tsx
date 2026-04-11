@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
-  ArrowRight, Activity, ShieldCheck, Calendar, Flame, Inbox, ShieldAlert,
+  ArrowRight, Activity, ShieldCheck, Flame, Inbox, ShieldAlert,
   X, Copy, ExternalLink
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -159,8 +159,6 @@ export default function Dashboard() {
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()), 
   [bills]);
 
-  const activeSubscriptions = useMemo(() => (subscriptions || []).filter(s => s?.status === 'active'), [subscriptions]);
-  
   const taxInsolvencyRisk = useMemo(() => {
     const currentTaxLiability = (cashFlow?.taxReserve || 0) * 3; // Est quarterly
     return liquidCash < currentTaxLiability;
@@ -188,11 +186,6 @@ export default function Dashboard() {
     }
     setDismissedLowTaxFingerprint(lowTaxFingerprint);
   }, [lowTaxFingerprint]);
-
-  const subscriptionSpend = useMemo(() => activeSubscriptions.reduce((acc, sub) => {
-    const toMonthly = (amount: number, freq: string) => freq === 'Yearly' ? (amount / 12) : (amount || 0);
-    return acc + toMonthly(sub.amount, sub.frequency);
-  }, 0), [activeSubscriptions]);
 
   // --- Intelligent Modules ---
 
@@ -240,12 +233,6 @@ export default function Dashboard() {
     };
   }, [upcomingBills, liquidCash, incomes]);
 
-  // 3. Subscription Scrutiny
-  const redundantSubs = useMemo(() => {
-    const normalized = activeSubscriptions.map(s => ({ ...s, name: (s?.name || '').toLowerCase() }));
-    return normalized.filter(s => s.name.includes('netflix') || s.name.includes('hulu'));
-  }, [activeSubscriptions]);
-
   // 4. Burn Velocity (Transactions)
   const burnVelocity = useMemo(() => {
     const today = new Date();
@@ -277,6 +264,28 @@ export default function Dashboard() {
     return (freelanceEntries || []).reduce((sum: number, e: any) => sum + (e?.scouredWriteOffs || 0), 0);
   }, [freelanceEntries]);
 
+  const hasOutstandingDebt = useMemo(
+    () => (debts || []).some((d) => (d?.remaining || 0) > 0),
+    [debts],
+  );
+
+  /** Smart Alerts cards: only when the underlying feature has real data. */
+  const showTaxDeductionCard = (freelanceEntries?.length ?? 0) > 0 || lifetimeTaxShield > 0;
+  const showSpendingPulseCard = burnVelocity.frequency > 0 || burnVelocity.totalSpent > 0;
+  const showDebtAvalancheCard = hasOutstandingDebt;
+
+  const smartAlertsVisibleCount = [showTaxDeductionCard, showSpendingPulseCard, showDebtAvalancheCard].filter(
+    Boolean,
+  ).length;
+
+  const openCitations = useMemo(
+    () => (citations || []).filter((c: Citation) => c.status === 'open'),
+    [citations],
+  );
+
+  const hasBillsSidebar = upcomingBills.length > 0;
+  const hasCitationsSidebar = openCitations.length > 0;
+  const hasLowerSidebar = hasBillsSidebar || hasCitationsSidebar;
 
   // Full-page skeleton until Supabase data has been merged into the store.
   if (isLoading) {
@@ -475,99 +484,131 @@ export default function Dashboard() {
       </div>
       </section>
 
-      {/* 4. Active Intelligence Grid */}
-      <h2 className="text-[12px] font-mono font-bold uppercase tracking-[0.1em] text-content-tertiary pl-1 mt-12 mb-4">Smart Alerts & Active Monitoring</h2>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Tax Shield */}
-        <div className="bg-surface-raised rounded-sm p-6 border border-surface-border flex flex-col justify-between shadow-sm group transition-all text-left">
-          <div className="mb-8">
-            <div className="flex justify-between items-start mb-6">
-              <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-sm flex items-center justify-center shrink-0 text-brand-tax">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <span className="text-[10px] font-mono bg-brand-tax/10 text-brand-tax px-2 py-1 rounded-sm uppercase tracking-widest font-semibold border border-brand-tax/20">Active</span>
-            </div>
-            <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Tax Deduction Finder</h3>
-            <p className="text-xs font-sans text-content-tertiary leading-relaxed">
-              Automatic extraction of valid deductions from freelancer platforms and records.
-            </p>
-          </div>
-          <div className="bg-surface-base border border-surface-border p-6 rounded-sm">
-              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-2">Lifetime Recovered</p>
-              <p className="text-4xl font-mono text-white font-bold tabular-nums">${lifetimeTaxShield.toLocaleString()}</p>
-          </div>
-        </div>
-        
-        {/* Spending Pulse */}
-        <div className={`bg-surface-raised rounded-sm p-6 border transition-all text-left flex flex-col justify-between shadow-sm ${burnVelocity.isHighVelocity ? 'border-brand-expense/30' : 'border-surface-border'}`}>
-          <div className="mb-8">
-            <div className="flex justify-between items-start mb-6">
-              <div className={`w-10 h-10 border rounded-sm flex items-center justify-center shrink-0 ${burnVelocity.isHighVelocity ? 'border-brand-expense/30 bg-brand-expense/10 text-brand-expense' : 'border-surface-border bg-surface-base text-content-tertiary'}`}>
-                <Activity className="w-5 h-5" />
-              </div>
-              <span className={`text-[10px] font-mono px-2 py-1 rounded-sm uppercase tracking-widest font-semibold border ${burnVelocity.isHighVelocity ? 'bg-brand-expense/10 text-brand-expense border-brand-expense/20' : 'bg-surface-base text-content-tertiary border-surface-border'}`}>
-                {burnVelocity.isHighVelocity ? 'High' : burnVelocity.isModerateVelocity ? 'Moderate' : 'On Track'}
-              </span>
-            </div>
-            <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Recent Spending (72h)</h3>
-            <p className="text-xs font-sans text-content-tertiary leading-relaxed">
-              Real-time monitoring of cash outflow velocity across all connected accounts.
-            </p>
-          </div>
-          <div>
-            <div className="flex items-baseline gap-3 mb-4">
-              <p className="text-4xl font-mono text-white tabular-nums">${burnVelocity.totalSpent.toFixed(0)}</p>
-              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-wider">/ {burnVelocity.frequency} txs</p>
-            </div>
-            {burnVelocity.isHighVelocity && (
-              <p className="text-[11px] font-mono text-brand-expense bg-brand-expense/5 p-3 rounded-sm border border-brand-expense/20">
-                Velocity Limit Exceeded
-              </p>
-            )}
-          </div>
-        </div>
-
-        {/* Debt Target */}
-        <div className="bg-surface-raised rounded-sm p-6 border border-surface-border flex flex-col justify-between shadow-sm text-left group transition-all">
-          <div className="mb-8">
-            <div className="flex justify-between items-start mb-6">
-              <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-sm flex items-center justify-center shrink-0 text-content-tertiary">
-                <Flame className="w-5 h-5" />
-              </div>
-            </div>
-            <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Debt Avalanche Shield</h3>
-            <p className="text-xs font-sans text-content-tertiary leading-relaxed">
-              Mathematical priority on highest interest accounts to minimize capital waste.
-            </p>
-          </div>
-          
-          {avalancheTarget ? (
-            <div>
-              <div className="mb-4">
-                <p className="text-[12px] font-mono text-brand-expense uppercase tracking-wider mb-2 truncate">Prioritizing: {avalancheTarget.name}</p>
-                <div className="flex justify-between items-baseline">
-                  <span className="text-4xl font-mono text-white tabular-nums">${avalancheTarget.remaining.toLocaleString()}</span>
-                  <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{debtProgress.toFixed(0)}% Clear</span>
+      {/* 4. Active Intelligence Grid — only modules that have underlying data */}
+      {smartAlertsVisibleCount > 0 && (
+        <>
+          <h2 className="text-[12px] font-mono font-bold uppercase tracking-[0.1em] text-content-tertiary pl-1 mt-12 mb-4">
+            Smart Alerts & Active Monitoring
+          </h2>
+          <div
+            className={
+              smartAlertsVisibleCount === 1
+                ? 'grid grid-cols-1 gap-6 max-w-xl'
+                : smartAlertsVisibleCount === 2
+                  ? 'grid grid-cols-1 lg:grid-cols-2 gap-6'
+                  : 'grid grid-cols-1 lg:grid-cols-3 gap-6'
+            }
+          >
+            {showTaxDeductionCard && (
+              <div className="bg-surface-raised rounded-sm p-6 border border-surface-border flex flex-col justify-between shadow-sm group transition-all text-left">
+                <div className="mb-8">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-sm flex items-center justify-center shrink-0 text-brand-tax">
+                      <ShieldCheck className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-mono bg-brand-tax/10 text-brand-tax px-2 py-1 rounded-sm uppercase tracking-widest font-semibold border border-brand-tax/20">
+                      Active
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Tax Deduction Finder</h3>
+                  <p className="text-xs font-sans text-content-tertiary leading-relaxed">
+                    Automatic extraction of valid deductions from freelancer platforms and records.
+                  </p>
+                </div>
+                <div className="bg-surface-base border border-surface-border p-6 rounded-sm">
+                  <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-2">Lifetime Recovered</p>
+                  <p className="text-4xl font-mono text-white font-bold tabular-nums">${lifetimeTaxShield.toLocaleString()}</p>
                 </div>
               </div>
-              <div className="w-full h-1.5 bg-zinc-900 border border-surface-border rounded-full overflow-hidden mt-4">
-                <div className="h-full bg-brand-expense transition-all duration-1000 shadow-[0_0_8px_rgba(248,113,113,0.3)]" style={{ width: `${debtProgress}%` }}></div>
+            )}
+
+            {showSpendingPulseCard && (
+              <div
+                className={`bg-surface-raised rounded-sm p-6 border transition-all text-left flex flex-col justify-between shadow-sm ${
+                  burnVelocity.isHighVelocity ? 'border-brand-expense/30' : 'border-surface-border'
+                }`}
+              >
+                <div className="mb-8">
+                  <div className="flex justify-between items-start mb-6">
+                    <div
+                      className={`w-10 h-10 border rounded-sm flex items-center justify-center shrink-0 ${
+                        burnVelocity.isHighVelocity
+                          ? 'border-brand-expense/30 bg-brand-expense/10 text-brand-expense'
+                          : 'border-surface-border bg-surface-base text-content-tertiary'
+                      }`}
+                    >
+                      <Activity className="w-5 h-5" />
+                    </div>
+                    <span
+                      className={`text-[10px] font-mono px-2 py-1 rounded-sm uppercase tracking-widest font-semibold border ${
+                        burnVelocity.isHighVelocity
+                          ? 'bg-brand-expense/10 text-brand-expense border-brand-expense/20'
+                          : 'bg-surface-base text-content-tertiary border-surface-border'
+                      }`}
+                    >
+                      {burnVelocity.isHighVelocity ? 'High' : burnVelocity.isModerateVelocity ? 'Moderate' : 'On Track'}
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Recent Spending (72h)</h3>
+                  <p className="text-xs font-sans text-content-tertiary leading-relaxed">
+                    Real-time monitoring of cash outflow velocity across all connected accounts.
+                  </p>
+                </div>
+                <div>
+                  <div className="flex items-baseline gap-3 mb-4">
+                    <p className="text-4xl font-mono text-white tabular-nums">${burnVelocity.totalSpent.toFixed(0)}</p>
+                    <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-wider">/ {burnVelocity.frequency} txs</p>
+                  </div>
+                  {burnVelocity.isHighVelocity && (
+                    <p className="text-[11px] font-mono text-brand-expense bg-brand-expense/5 p-3 rounded-sm border border-brand-expense/20">
+                      Velocity Limit Exceeded
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="bg-surface-base border border-surface-border p-6 rounded-sm">
-              <p className="text-sm font-sans text-brand-profit font-bold">Debt Free</p>
-            </div>
-          )}
-        </div>
-      </div>
+            )}
+
+            {showDebtAvalancheCard && avalancheTarget && (
+              <div className="bg-surface-raised rounded-sm p-6 border border-surface-border flex flex-col justify-between shadow-sm text-left group transition-all">
+                <div className="mb-8">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-sm flex items-center justify-center shrink-0 text-content-tertiary">
+                      <Flame className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Debt Avalanche Shield</h3>
+                  <p className="text-xs font-sans text-content-tertiary leading-relaxed">
+                    Mathematical priority on highest interest accounts to minimize capital waste.
+                  </p>
+                </div>
+
+                <div>
+                  <div className="mb-4">
+                    <p className="text-[12px] font-mono text-brand-expense uppercase tracking-wider mb-2 truncate">
+                      Prioritizing: {avalancheTarget.name}
+                    </p>
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-4xl font-mono text-white tabular-nums">${avalancheTarget.remaining.toLocaleString()}</span>
+                      <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{debtProgress.toFixed(0)}% Clear</span>
+                    </div>
+                  </div>
+                  <div className="w-full h-1.5 bg-zinc-900 border border-surface-border rounded-full overflow-hidden mt-4">
+                    <div
+                      className="h-full bg-brand-expense transition-all duration-1000 shadow-[0_0_8px_rgba(248,113,113,0.3)]"
+                      style={{ width: `${debtProgress}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </>
+      )}
 
       {/* 5. Lower Content Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-        
+      <div className={`grid grid-cols-1 gap-6 mt-8 ${hasLowerSidebar ? 'lg:grid-cols-3' : ''}`}>
         {/* Timeline Chart */}
-        <div className="lg:col-span-2">
+        <div className={hasLowerSidebar ? 'lg:col-span-2' : ''}>
           <div className="bg-surface-raised rounded-sm border border-surface-border p-6 shadow-sm">
             <div className="flex justify-between items-center mb-6">
               <div>
@@ -604,98 +645,97 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Sidebar Lists */}
-        <div className="space-y-6">
-          
-          {/* Upcoming Obligations */}
-          <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit max-h-[350px]">
-            <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
-              <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-300">Upcoming Bills</h3>
-              <Link to="/bills" className="text-xs font-sans text-indigo-400 hover:text-indigo-300 transition-colors font-medium">See all</Link>
-            </div>
-            
-            <div className="overflow-y-auto outline-none">
-              {isLoading ? (
-                <div className="space-y-2 p-4 animate-pulse">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="h-12 bg-zinc-800 rounded-sm" />
-                  ))}
+        {/* Sidebar: only when there is something to show */}
+        {hasLowerSidebar && (
+          <div className="space-y-6">
+            {hasBillsSidebar && (
+              <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit max-h-[350px]">
+                <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
+                  <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-300">Upcoming Bills</h3>
+                  <Link to="/bills" className="text-xs font-sans text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
+                    See all
+                  </Link>
                 </div>
-              ) : upcomingBills.length === 0 ? (
-                <div className="m-4 p-8 text-center flex flex-col items-center bg-surface-base border border-dashed border-surface-border rounded-sm">
-                  <Calendar className="w-8 h-8 text-zinc-600/50 mb-3" />
-                  <p className="text-[12px] font-mono font-bold text-zinc-400 uppercase tracking-widest">No Bills Found</p>
-                  <p className="text-[11px] font-sans text-zinc-500 mt-1 uppercase tracking-tight">System is clear</p>
-                </div>
-              ) : (
-                <ul className="divide-y divide-surface-border">
-                  {upcomingBills.slice(0, 4).map((bill) => (
-                    <li key={bill.id} className="px-6 py-4 hover:bg-surface-base transition-colors flex justify-between items-center group cursor-default">
-                      <div className="flex items-center gap-4">
-                        <div className="text-xs font-mono text-zinc-500 w-10 text-center uppercase">
-                          {bill?.dueDate?.includes('-') ? (
-                            <>
-                              {bill.dueDate.split('-')[2]}<br/>
-                              {['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][parseInt(bill.dueDate.split('-')[1], 10) - 1] || '---'}
-                            </>
-                          ) : (
-                            'N/A'
-                          )}
-                        </div>
-                        <p className="text-sm font-sans font-medium text-zinc-200">{bill.biller}</p>
-                      </div>
-                      <p className="text-sm font-mono text-zinc-300 font-medium tabular-nums">${bill.amount.toFixed(2)}</p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
 
-              {/* Citations / Tickets */}
-          <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit">
-            <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
-              <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-300">Citations & Tickets</h3>
-            </div>
-            <div className="p-0 outline-none">
-               {citations.filter((c: any) => c.status === 'open').length === 0 ? (
-                  <div className="p-8 text-center flex flex-col items-center">
-                    <ShieldCheck className="w-8 h-8 text-emerald-500/50 mb-3" />
-
-                    <p className="text-sm font-sans font-medium text-zinc-300">Clean Record</p>
-                    <p className="text-xs text-zinc-500 mt-1">No outstanding tickets found.</p>
-                  </div>
-               ) : (
-                 <ul className="divide-y divide-surface-border">
-                  {citations.filter((c: any) => c.status === 'open').map((citation: any) => (
-                    <li key={citation.id} className="px-6 py-4 hover:bg-surface-base transition-colors">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-start gap-3">
-                          <div className={`w-9 h-9 rounded bg-surface-base border flex flex-col justify-center items-center shrink-0 ${citation.daysLeft <= 7 ? 'text-rose-400 border-rose-500/30' : 'text-zinc-400 border-surface-border'}`}>
-                            <span className="text-xs font-bold font-mono leading-none">{citation.daysLeft}</span>
-                            <span className="text-[11px] font-sans font-medium text-zinc-400">Days</span>
-                          </div>
-                          <div>
-                            <p className="text-sm font-sans font-medium text-zinc-200">{citation.type}</p>
-                            <p className="text-xs font-sans text-zinc-500">{citation.jurisdiction}</p>
-                          </div>
-                        </div>
-                        <p className="text-sm font-mono font-bold text-zinc-300 tabular-nums">${citation.amount.toFixed(2)}</p>
-                      </div>
-                      <button 
-                        onClick={() => { setSelectedCitation(citation); setIsCitationModalOpen(true); }}
-                        className={`w-full text-xs font-sans font-medium py-2 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-raised ${citation.daysLeft <= 7 ? 'bg-rose-500 hover:bg-rose-600 text-white focus-visible:ring-rose-500' : 'bg-surface-border hover:bg-zinc-700 text-zinc-200 focus-visible:ring-zinc-400'}`}
+                <div className="overflow-y-auto outline-none">
+                  <ul className="divide-y divide-surface-border">
+                    {upcomingBills.slice(0, 4).map((bill) => (
+                      <li
+                        key={bill.id}
+                        className="px-6 py-4 hover:bg-surface-base transition-colors flex justify-between items-center group cursor-default"
                       >
-                        Resolve Ticket
-                      </button>
-                    </li>
-                  ))}
-                 </ul>
-               )}
-            </div>
-          </div>
+                        <div className="flex items-center gap-4">
+                          <div className="text-xs font-mono text-zinc-500 w-10 text-center uppercase">
+                            {bill?.dueDate?.includes('-') ? (
+                              <>
+                                {bill.dueDate.split('-')[2]}
+                                <br />
+                                {['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'][
+                                  parseInt(bill.dueDate.split('-')[1], 10) - 1
+                                ] || '---'}
+                              </>
+                            ) : (
+                              'N/A'
+                            )}
+                          </div>
+                          <p className="text-sm font-sans font-medium text-zinc-200">{bill.biller}</p>
+                        </div>
+                        <p className="text-sm font-mono text-zinc-300 font-medium tabular-nums">${bill.amount.toFixed(2)}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
 
-        </div>
+            {hasCitationsSidebar && (
+              <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit">
+                <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
+                  <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-300">Citations & Tickets</h3>
+                </div>
+                <div className="p-0 outline-none">
+                  <ul className="divide-y divide-surface-border">
+                    {openCitations.map((citation) => (
+                      <li key={citation.id} className="px-6 py-4 hover:bg-surface-base transition-colors">
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex items-start gap-3">
+                            <div
+                              className={`w-9 h-9 rounded bg-surface-base border flex flex-col justify-center items-center shrink-0 ${
+                                citation.daysLeft <= 7 ? 'text-rose-400 border-rose-500/30' : 'text-zinc-400 border-surface-border'
+                              }`}
+                            >
+                              <span className="text-xs font-bold font-mono leading-none">{citation.daysLeft}</span>
+                              <span className="text-[11px] font-sans font-medium text-zinc-400">Days</span>
+                            </div>
+                            <div>
+                              <p className="text-sm font-sans font-medium text-zinc-200">{citation.type}</p>
+                              <p className="text-xs font-sans text-zinc-500">{citation.jurisdiction}</p>
+                            </div>
+                          </div>
+                          <p className="text-sm font-mono font-bold text-zinc-300 tabular-nums">${citation.amount.toFixed(2)}</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedCitation(citation);
+                            setIsCitationModalOpen(true);
+                          }}
+                          className={`w-full text-xs font-sans font-medium py-2 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-raised ${
+                            citation.daysLeft <= 7
+                              ? 'bg-rose-500 hover:bg-rose-600 text-white focus-visible:ring-rose-500'
+                              : 'bg-surface-border hover:bg-zinc-700 text-zinc-200 focus-visible:ring-zinc-400'
+                          }`}
+                        >
+                          Resolve Ticket
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
        {/* Citation Resolution Modal */}
