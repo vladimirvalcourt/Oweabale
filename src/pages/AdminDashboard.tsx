@@ -335,7 +335,7 @@ export default function AdminDashboard() {
   const metrics = [
     { label: 'TOTAL USERS', value: profiles.length > 0 ? profiles.length.toLocaleString() : '—', status: 'LIVE', color: 'text-emerald-500' },
     { label: 'OPEN TICKETS', value: openTickets.length > 0 ? openTickets.length.toString() : '0', status: ticketsLoading ? 'LOADING' : 'LIVE', color: openTickets.length > 0 ? 'text-amber-500' : 'text-emerald-500' },
-    { label: 'BANNED USERS', value: bannedCount > 0 ? bannedCount.toString() : '0', status: 'LIVE', color: bannedCount > 0 ? 'text-rose-500' : 'text-zinc-500' },
+    { label: 'BANNED USERS', value: bannedCount > 0 ? bannedCount.toString() : '0', status: 'LIVE', color: bannedCount > 0 ? 'text-rose-500' : 'text-content-tertiary' },
     { label: 'IN ONBOARDING', value: inOnboardingCount > 0 ? inOnboardingCount.toString() : '0', status: 'LIVE', color: 'text-indigo-400' },
   ];
 
@@ -458,11 +458,11 @@ export default function AdminDashboard() {
   const priorityColor = (p: string) => {
     if (p === 'Urgent') return 'text-rose-400 bg-rose-500/10';
     if (p === 'Normal') return 'text-amber-400 bg-amber-500/10';
-    return 'text-zinc-400 bg-white/5';
+    return 'text-content-tertiary bg-white/5';
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-zinc-300 font-mono flex flex-col p-4 sm:p-8">
+    <div className="min-h-screen bg-[#050505] text-content-secondary font-mono flex flex-col p-4 sm:p-8">
       <PrivacyScreenWhenHidden />
 
       {/* Header */}
@@ -472,17 +472,17 @@ export default function AdminDashboard() {
             <Terminal className="w-6 h-6 text-indigo-500" />
             <h1 className="text-xl text-white font-bold tracking-widest">Admin Dashboard</h1>
           </div>
-          <p className="text-xs text-zinc-500 uppercase tracking-widest">Platform Owner Controls</p>
+          <p className="text-xs text-content-tertiary uppercase tracking-widest">Platform Owner Controls</p>
         </div>
         <div className="flex flex-col items-end gap-2">
           <p className="text-sm font-bold text-emerald-500">{systemTime.toLocaleTimeString()}</p>
           <button
             onClick={loadAll}
-            className="text-xs text-zinc-500 hover:text-white flex items-center gap-1 transition-colors"
+            className="text-xs text-content-tertiary hover:text-white flex items-center gap-1 transition-colors"
           >
             <RefreshCw className="w-3 h-3" /> Refresh All
           </button>
-          <Link to="/" className="text-xs text-zinc-500 hover:text-white flex items-center gap-1 transition-colors">
+          <Link to="/" className="text-xs text-content-tertiary hover:text-white flex items-center gap-1 transition-colors">
             <ArrowLeft className="w-3 h-3" /> Back to Main Site
           </Link>
         </div>
@@ -505,7 +505,7 @@ export default function AdminDashboard() {
                 className="bg-[#0A0A0A] border border-white/10 p-5 rounded-sm relative overflow-hidden group hover:border-white/20 transition-colors"
               >
                 <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-white/5 to-transparent group-hover:via-white/20" />
-                <p className="text-[10px] text-zinc-500 mb-2">{m.label}</p>
+                <p className="text-[10px] text-content-tertiary mb-2">{m.label}</p>
                 <p className={`text-2xl font-bold mb-1 ${m.color}`}>{m.value}</p>
                 <p className="text-[9px] uppercase tracking-widest opacity-80" role="status" aria-label={`Metric status: ${m.status}`}>{m.status}</p>
               </motion.div>
@@ -514,16 +514,16 @@ export default function AdminDashboard() {
 
           {/* Infrastructure Health */}
           <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-6">
-            <h2 className="text-xs font-bold text-zinc-400 mb-6 flex items-center gap-2">
+            <h2 className="text-xs font-bold text-content-tertiary mb-6 flex items-center gap-2">
               <Activity className="w-4 h-4" /> System Health Status
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <span className="text-xs flex items-center gap-2"><Database className="w-3.5 h-3.5 text-zinc-500" /> Main Database</span>
+                  <span className="text-xs flex items-center gap-2"><Database className="w-3.5 h-3.5 text-content-tertiary" /> Main Database</span>
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" role="status" aria-label="System status: Healthy" />
                 </div>
-                <div className="space-y-2 text-[11px] text-zinc-500">
+                <div className="space-y-2 text-[11px] text-content-tertiary">
                   <div className="flex justify-between"><span>Processor Speed</span><span className="text-white">12% busy</span></div>
                   <div className="flex justify-between"><span>Memory Used</span><span className="text-white">4.1 / 16 GB</span></div>
                   <div className="flex justify-between"><span>Storage Speed</span><span className="text-white">8 MB/s</span></div>
@@ -534,10 +534,10 @@ export default function AdminDashboard() {
               </div>
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <span className="text-xs flex items-center gap-2"><Cpu className="w-3.5 h-3.5 text-zinc-500" /> Background Processing</span>
+                  <span className="text-xs flex items-center gap-2"><Cpu className="w-3.5 h-3.5 text-content-tertiary" /> Background Processing</span>
                   <ShieldAlert className="w-3.5 h-3.5 text-amber-500" role="status" aria-label="System status: Warning, high load" />
                 </div>
-                <div className="space-y-2 text-[11px] text-zinc-500">
+                <div className="space-y-2 text-[11px] text-content-tertiary">
                   <div className="flex justify-between"><span>Tasks per minute</span><span className="text-white">342</span></div>
                   <div className="flex justify-between"><span>Average Wait Time</span><span className="text-amber-500">850ms</span></div>
                   <div className="flex justify-between"><span>Delayed Starts</span><span className="text-white">12</span></div>
@@ -548,10 +548,10 @@ export default function AdminDashboard() {
               </div>
               <div className="space-y-4">
                 <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <span className="text-xs flex items-center gap-2"><Network className="w-3.5 h-3.5 text-zinc-500" /> Network Firewall</span>
+                  <span className="text-xs flex items-center gap-2"><Network className="w-3.5 h-3.5 text-content-tertiary" /> Network Firewall</span>
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                 </div>
-                <div className="space-y-2 text-[11px] text-zinc-500">
+                <div className="space-y-2 text-[11px] text-content-tertiary">
                   <div className="flex justify-between"><span>Incoming Data</span><span className="text-white">2.4 Mbps</span></div>
                   <div className="flex justify-between"><span>Outgoing Data</span><span className="text-white">1.1 Mbps</span></div>
                   <div className="flex justify-between"><span>Blocked Hackers</span><span className="text-white">44 IPs</span></div>
@@ -591,25 +591,25 @@ export default function AdminDashboard() {
 
             {/* Business Overview */}
             <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-5 border-t-2 border-t-indigo-500/50 flex flex-col">
-              <h2 className="text-xs font-bold text-zinc-400 flex items-center gap-2 mb-4">
+              <h2 className="text-xs font-bold text-content-tertiary flex items-center gap-2 mb-4">
                 <TrendingUp className="w-4 h-4" /> Business Overview
               </h2>
               <div className="space-y-4 flex-1">
                 <div>
-                  <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-1">Monthly Revenue</p>
-                  <p className="text-xl font-bold text-white">— <span className="text-[11px] text-zinc-600 font-normal">No billing integration yet</span></p>
+                  <p className="text-[10px] text-content-tertiary uppercase tracking-widest mb-1">Monthly Revenue</p>
+                  <p className="text-xl font-bold text-white">— <span className="text-[11px] text-content-muted font-normal">No billing integration yet</span></p>
                 </div>
                 <div className="space-y-2 text-[11px]">
                   <div className="flex justify-between items-center pb-2 border-b border-white/5">
-                    <span className="text-zinc-500">Total Accounts</span>
+                    <span className="text-content-tertiary">Total Accounts</span>
                     <span className="text-white">{profiles.length}</span>
                   </div>
                   <div className="flex justify-between items-center pb-2 border-b border-white/5">
-                    <span className="text-zinc-500">Completed Onboarding</span>
+                    <span className="text-content-tertiary">Completed Onboarding</span>
                     <span className="text-white">{profiles.filter(p => p.has_completed_onboarding).length}</span>
                   </div>
                   <div className="flex justify-between items-center pb-2 border-b border-white/5">
-                    <span className="text-zinc-500">Admins</span>
+                    <span className="text-content-tertiary">Admins</span>
                     <span className="text-indigo-400">{profiles.filter(p => p.is_admin).length}</span>
                   </div>
                 </div>
@@ -618,13 +618,13 @@ export default function AdminDashboard() {
 
             {/* Global Broadcasts */}
             <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-5 border-t-2 border-t-amber-500/50 flex flex-col">
-              <h2 className="text-xs font-bold text-zinc-400 flex items-center gap-2 mb-4">
+              <h2 className="text-xs font-bold text-content-tertiary flex items-center gap-2 mb-4">
                 <Radio className="w-4 h-4" /> Message All Users
               </h2>
               <div className="flex-1 flex flex-col">
-                <p className="text-[10px] text-zinc-500 mb-2">Show a red warning banner to everyone on the app right now.</p>
+                <p className="text-[10px] text-content-tertiary mb-2">Show a red warning banner to everyone on the app right now.</p>
                 <textarea
-                  className="w-full bg-black border border-white/10 p-2 text-[11px] text-white rounded-sm focus:outline-none focus:border-amber-500 resize-none h-16 mb-3 placeholder-zinc-700"
+                  className="w-full bg-black border border-white/10 p-2 text-[11px] text-white rounded-sm focus:outline-none focus:border-amber-500 resize-none h-16 mb-3 placeholder:text-content-muted"
                   placeholder="e.g., 'Expected downtime in 15 minutes.'"
                   value={broadcastMsg}
                   onChange={(e) => setBroadcastMsg(e.target.value)}
@@ -642,7 +642,7 @@ export default function AdminDashboard() {
             {/* Support Tickets */}
             <div className="bg-[#0A0A0A] border border-white/10 rounded-sm border-t-2 border-t-rose-500/50 flex flex-col">
               <div className="p-5 border-b border-white/10">
-                <h2 className="text-xs font-bold text-zinc-400 flex items-center gap-2">
+                <h2 className="text-xs font-bold text-content-tertiary flex items-center gap-2">
                   <LifeBuoy className="w-4 h-4" /> User Support Requests
                   {openTickets.length > 0 && (
                     <span className="ml-auto text-[10px] font-bold bg-rose-500/20 text-rose-400 px-1.5 py-0.5 rounded-sm">
@@ -653,25 +653,25 @@ export default function AdminDashboard() {
               </div>
               <div className="p-3 flex-1 overflow-y-auto max-h-64 space-y-2">
                 {ticketsLoading && (
-                  <p className="text-[11px] text-zinc-600 p-2">Loading tickets...</p>
+                  <p className="text-[11px] text-content-muted p-2">Loading tickets...</p>
                 )}
                 {!ticketsLoading && openTickets.length === 0 && (
-                  <p className="text-[11px] text-zinc-600 p-2">No open support tickets.</p>
+                  <p className="text-[11px] text-content-muted p-2">No open support tickets.</p>
                 )}
                 {openTickets.map(ticket => (
                   <div key={ticket.id} className="bg-black/40 border border-white/5 rounded-sm p-2.5 space-y-1.5">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="text-[10px] text-zinc-500">{ticket.ticket_number} · {ticket.userEmail}</p>
+                        <p className="text-[10px] text-content-tertiary">{ticket.ticket_number} · {ticket.userEmail}</p>
                         <p className="text-[11px] text-white font-bold truncate">{ticket.subject}</p>
                       </div>
                       <span className={`text-[9px] px-1.5 py-0.5 rounded-sm font-bold shrink-0 ${priorityColor(ticket.priority)}`}>
                         {ticket.priority}
                       </span>
                     </div>
-                    <p className="text-[10px] text-zinc-500 line-clamp-2">{ticket.description}</p>
+                    <p className="text-[10px] text-content-tertiary line-clamp-2">{ticket.description}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-zinc-600">
+                      <span className="text-[10px] text-content-muted">
                         {new Date(ticket.created_at).toLocaleDateString()}
                       </span>
                       <button
@@ -690,7 +690,7 @@ export default function AdminDashboard() {
             {/* User Feedback */}
             <div className="bg-[#0A0A0A] border border-white/10 rounded-sm border-t-2 border-t-indigo-500/50 flex flex-col">
               <div className="p-5 border-b border-white/10">
-                <h2 className="text-xs font-bold text-zinc-400 flex items-center gap-2">
+                <h2 className="text-xs font-bold text-content-tertiary flex items-center gap-2">
                   <ThumbsUp className="w-4 h-4" /> User Feedback
                   {userFeedback.length > 0 && (
                     <span className="ml-auto text-[10px] font-bold bg-indigo-500/20 text-indigo-400 px-1.5 py-0.5 rounded-sm">
@@ -701,35 +701,35 @@ export default function AdminDashboard() {
               </div>
               <div className="p-3 flex-1 overflow-y-auto max-h-64 space-y-2">
                 {feedbackLoading && (
-                  <p className="text-[11px] text-zinc-600 p-2">Loading feedback...</p>
+                  <p className="text-[11px] text-content-muted p-2">Loading feedback...</p>
                 )}
                 {!feedbackLoading && userFeedback.length === 0 && (
-                  <p className="text-[11px] text-zinc-600 p-2">No feedback submitted yet.</p>
+                  <p className="text-[11px] text-content-muted p-2">No feedback submitted yet.</p>
                 )}
                 {userFeedback.map(fb => (
                   <div key={fb.id} className="bg-black/40 border border-white/5 rounded-sm p-2.5 space-y-1.5">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="text-[10px] text-zinc-500">{fb.userEmail} · {new Date(fb.created_at).toLocaleDateString()}</p>
+                        <p className="text-[10px] text-content-tertiary">{fb.userEmail} · {new Date(fb.created_at).toLocaleDateString()}</p>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {fb.rating && (
                           <div className="flex items-center gap-0.5">
                             {[1,2,3,4,5].map(s => (
-                              <Star key={s} className={`w-2.5 h-2.5 ${s <= fb.rating! ? 'fill-amber-400 text-amber-400' : 'text-zinc-700'}`} />
+                              <Star key={s} className={`w-2.5 h-2.5 ${s <= fb.rating! ? 'fill-amber-400 text-amber-400' : 'text-content-muted'}`} />
                             ))}
                           </div>
                         )}
                         <span className={`text-[9px] px-1.5 py-0.5 rounded-sm font-bold ${
                           fb.type === 'bug' ? 'bg-rose-500/20 text-rose-400' :
                           fb.type === 'feature_request' ? 'bg-indigo-500/20 text-indigo-400' :
-                          'bg-white/5 text-zinc-500'
+                          'bg-white/5 text-content-tertiary'
                         }`}>
                           {fb.type === 'feature_request' ? 'Feature' : fb.type === 'bug' ? 'Bug' : 'General'}
                         </span>
                       </div>
                     </div>
-                    <p className="text-[10px] text-zinc-400 leading-relaxed">{fb.message}</p>
+                    <p className="text-[10px] text-content-tertiary leading-relaxed">{fb.message}</p>
                   </div>
                 ))}
               </div>
@@ -742,16 +742,16 @@ export default function AdminDashboard() {
 
             {/* Tax Engine */}
             <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-5 border-t-2 border-t-emerald-500/50">
-              <h2 className="text-xs font-bold text-zinc-400 flex items-center gap-2 mb-4">
+              <h2 className="text-xs font-bold text-content-tertiary flex items-center gap-2 mb-4">
                 <Landmark className="w-4 h-4" /> Platform Tax Settings
               </h2>
               <div className="space-y-4">
                 <div>
-                  <label className="text-[10px] text-zinc-500 uppercase tracking-widest block mb-1">Standard Deduction Amount</label>
+                  <label className="text-[10px] text-content-tertiary uppercase tracking-widest block mb-1">Standard Deduction Amount</label>
                   <input type="text" value={taxDeduction} onChange={(e) => setTaxDeduction(e.target.value)} className="w-full bg-black border border-white/10 px-3 py-2 text-[11px] text-emerald-400 font-mono rounded-sm focus:outline-none focus:border-emerald-500" />
                 </div>
                 <div>
-                  <label className="text-[10px] text-zinc-500 uppercase tracking-widest block mb-1">Highest Tax Bracket %</label>
+                  <label className="text-[10px] text-content-tertiary uppercase tracking-widest block mb-1">Highest Tax Bracket %</label>
                   <input type="text" value={taxBracket} onChange={(e) => setTaxBracket(e.target.value)} className="w-full bg-black border border-white/10 px-3 py-2 text-[11px] text-emerald-400 font-mono rounded-sm focus:outline-none focus:border-emerald-500" />
                 </div>
                 <button
@@ -766,7 +766,7 @@ export default function AdminDashboard() {
 
             {/* Plaid Health */}
             <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-5 border-t-2 border-t-indigo-500/50">
-              <h2 className="text-xs font-bold text-zinc-400 flex items-center gap-2 mb-4">
+              <h2 className="text-xs font-bold text-content-tertiary flex items-center gap-2 mb-4">
                 <Activity className="w-4 h-4" /> Bank Connection Status
               </h2>
               <div className="space-y-3">
@@ -783,38 +783,38 @@ export default function AdminDashboard() {
                   </button>
                 </div>
                 <div className="flex justify-between items-center gap-2">
-                  <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider">Linked items</p>
+                  <p className="text-[10px] text-content-tertiary font-mono uppercase tracking-wider">Linked items</p>
                   <button
                     type="button"
                     onClick={refreshPlaidStats}
                     disabled={plaidStatsLoading}
-                    className="text-[10px] px-2 py-1 rounded-sm font-bold bg-white/5 text-zinc-400 hover:bg-white/10 border border-white/10 inline-flex items-center gap-1 disabled:opacity-50"
+                    className="text-[10px] px-2 py-1 rounded-sm font-bold bg-white/5 text-content-tertiary hover:bg-white/10 border border-white/10 inline-flex items-center gap-1 disabled:opacity-50"
                   >
                     <RefreshCw className={`w-3 h-3 ${plaidStatsLoading ? 'animate-spin' : ''}`} />
                     Refresh
                   </button>
                 </div>
                 {plaidStats ? (
-                  <dl className="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] font-mono text-zinc-400">
-                    <dt className="text-zinc-600">Items</dt>
-                    <dd className="text-right text-zinc-300">{plaidStats.total_items}</dd>
-                    <dt className="text-zinc-600">Users</dt>
-                    <dd className="text-right text-zinc-300">{plaidStats.distinct_users}</dd>
-                    <dt className="text-zinc-600">Sync errors</dt>
+                  <dl className="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] font-mono text-content-tertiary">
+                    <dt className="text-content-muted">Items</dt>
+                    <dd className="text-right text-content-secondary">{plaidStats.total_items}</dd>
+                    <dt className="text-content-muted">Users</dt>
+                    <dd className="text-right text-content-secondary">{plaidStats.distinct_users}</dd>
+                    <dt className="text-content-muted">Sync errors</dt>
                     <dd className={`text-right ${plaidStats.items_with_sync_error > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                       {plaidStats.items_with_sync_error}
                     </dd>
-                    <dt className="text-zinc-600">Need relink</dt>
-                    <dd className={`text-right ${plaidStats.items_needing_relink > 0 ? 'text-amber-400' : 'text-zinc-300'}`}>
+                    <dt className="text-content-muted">Need relink</dt>
+                    <dd className={`text-right ${plaidStats.items_needing_relink > 0 ? 'text-amber-400' : 'text-content-secondary'}`}>
                       {plaidStats.items_needing_relink}
                     </dd>
-                    <dt className="text-zinc-600">Never synced</dt>
-                    <dd className="text-right text-zinc-300">{plaidStats.items_never_synced}</dd>
-                    <dt className="text-zinc-600">Stale 24h</dt>
-                    <dd className="text-right text-zinc-300">{plaidStats.items_stale_24h}</dd>
+                    <dt className="text-content-muted">Never synced</dt>
+                    <dd className="text-right text-content-secondary">{plaidStats.items_never_synced}</dd>
+                    <dt className="text-content-muted">Stale 24h</dt>
+                    <dd className="text-right text-content-secondary">{plaidStats.items_stale_24h}</dd>
                   </dl>
                 ) : (
-                  <p className="text-[10px] text-zinc-600">No metrics yet — refresh or check admin-actions.</p>
+                  <p className="text-[10px] text-content-muted">No metrics yet — refresh or check admin-actions.</p>
                 )}
               </div>
             </div>
@@ -822,18 +822,18 @@ export default function AdminDashboard() {
             {/* AI / NLP */}
             <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-5 border-t-2 border-t-cyan-500/50 flex flex-col">
               <div className="mb-4">
-                <h2 className="text-xs font-bold text-zinc-400 flex items-center gap-2 mb-2">
+                <h2 className="text-xs font-bold text-content-tertiary flex items-center gap-2 mb-2">
                   <Coins className="w-4 h-4" /> Smart Feature Daily Cost
                 </h2>
                 <div className="flex items-end justify-between border-b border-white/5 pb-2">
-                  <span className="text-xl font-mono text-cyan-400">— <span className="text-[10px] text-zinc-500">not connected</span></span>
-                  <span className="text-[10px] text-zinc-500">Limit: $50/day</span>
+                  <span className="text-xl font-mono text-cyan-400">— <span className="text-[10px] text-content-tertiary">not connected</span></span>
+                  <span className="text-[10px] text-content-tertiary">Limit: $50/day</span>
                 </div>
                 <div className="w-full bg-white/5 h-1 mt-2 rounded-full overflow-hidden">
                   <div className="bg-cyan-500 h-full w-0" />
                 </div>
               </div>
-              <h2 className="text-xs font-bold text-zinc-400 flex items-center gap-2 mt-4 mb-2">
+              <h2 className="text-xs font-bold text-content-tertiary flex items-center gap-2 mt-4 mb-2">
                 <BookOpen className="w-4 h-4" /> Fix Incorrect Categories
               </h2>
               <div className="flex gap-2 mb-2">
@@ -849,18 +849,18 @@ export default function AdminDashboard() {
             <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-5 flex items-center justify-between lg:col-span-3 border-t-2 border-t-zinc-700">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-white/5 rounded-full">
-                  <Clock className="w-5 h-5 text-zinc-400" />
+                  <Clock className="w-5 h-5 text-content-tertiary" />
                 </div>
                 <div>
-                  <h2 className="text-xs font-bold text-zinc-400">PENDING TRANSACTIONS TO PROCESS</h2>
-                  <p className="text-[10px] text-zinc-500 mt-1">Number of transactions waiting to be added to user accounts.</p>
+                  <h2 className="text-xs font-bold text-content-tertiary">PENDING TRANSACTIONS TO PROCESS</h2>
+                  <p className="text-[10px] text-content-tertiary mt-1">Number of transactions waiting to be added to user accounts.</p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-2xl font-mono font-bold text-white tracking-widest">
                   {pendingCount === null ? '—' : pendingCount}
                 </p>
-                <p className={`text-[10px] font-bold uppercase ${pendingCount === null ? 'text-zinc-600' : pendingCount > 0 ? 'text-amber-500' : 'text-emerald-500'}`}>
+                <p className={`text-[10px] font-bold uppercase ${pendingCount === null ? 'text-content-muted' : pendingCount > 0 ? 'text-amber-500' : 'text-emerald-500'}`}>
                   {pendingCount === null ? 'Loading...' : pendingCount > 0 ? 'Awaiting Review' : 'All Clear'}
                 </p>
               </div>
@@ -871,25 +871,25 @@ export default function AdminDashboard() {
           {/* User Management */}
           <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-6 overflow-x-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xs font-bold text-zinc-400 flex items-center gap-2">
+              <h2 className="text-xs font-bold text-content-tertiary flex items-center gap-2">
                 <Users className="w-4 h-4" /> User Controls List
-                <span className="text-zinc-600 font-normal">({filteredProfiles.length} shown)</span>
+                <span className="text-content-muted font-normal">({filteredProfiles.length} shown)</span>
               </h2>
               <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-zinc-600" />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-content-muted" />
                 <input
                   type="text"
                   placeholder="Search email or ID..."
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
-                  className="bg-black border border-white/10 pl-7 pr-3 py-1.5 text-[11px] rounded-sm focus:outline-none focus:border-indigo-500 w-52 text-white placeholder-zinc-700"
+                  className="bg-black border border-white/10 pl-7 pr-3 py-1.5 text-[11px] rounded-sm focus:outline-none focus:border-indigo-500 w-52 text-white placeholder:text-content-muted"
                 />
               </div>
             </div>
 
             <table className="w-full text-left text-[11px] border-collapse whitespace-nowrap">
               <thead>
-                <tr className="border-b border-white/10 text-zinc-500">
+                <tr className="border-b border-white/10 text-content-tertiary">
                   <th className="pb-3 px-2 font-normal">Account</th>
                   <th className="pb-3 px-2 font-normal">Joined</th>
                   <th className="pb-3 px-2 font-normal">Onboarding</th>
@@ -898,10 +898,10 @@ export default function AdminDashboard() {
                   <th className="pb-3 px-2 font-normal text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="text-zinc-300">
+              <tbody className="text-content-secondary">
                 {filteredProfiles.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="py-6 px-2 text-center text-zinc-600">
+                    <td colSpan={6} className="py-6 px-2 text-center text-content-muted">
                       {userSearch ? 'No users match your search.' : 'No users found.'}
                     </td>
                   </tr>
@@ -918,13 +918,13 @@ export default function AdminDashboard() {
                           {user.is_admin && <span className="ml-1.5 text-[9px] bg-indigo-500/20 text-indigo-400 px-1 py-0.5 rounded-sm font-bold">ADMIN</span>}
                         </div>
                       </td>
-                      <td className="py-3 px-2 text-zinc-500">{enriched.joinedAt}</td>
+                      <td className="py-3 px-2 text-content-tertiary">{enriched.joinedAt}</td>
                       <td className="py-3 px-2">
                         {user.has_completed_onboarding
                           ? <span className="text-emerald-500">Complete</span>
                           : <span className="text-amber-500">In Progress</span>}
                       </td>
-                      <td className="py-3 px-2 text-zinc-400">{enriched.lastLogin}</td>
+                      <td className="py-3 px-2 text-content-tertiary">{enriched.lastLogin}</td>
                       <td className="py-3 px-2">
                         {user.is_banned
                           ? <span className="text-rose-500 font-bold">Banned</span>
@@ -933,7 +933,7 @@ export default function AdminDashboard() {
                       <td className="py-3 px-2 text-right space-x-1.5">
                         <button
                           onClick={() => handleToggleAdmin(user.id, user.is_admin)}
-                          className={`px-2 py-1 rounded-sm font-bold transition-colors text-[10px] ${user.is_admin ? 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/40' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'}`}
+                          className={`px-2 py-1 rounded-sm font-bold transition-colors text-[10px] ${user.is_admin ? 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/40' : 'bg-zinc-800 text-content-tertiary hover:bg-zinc-700 hover:text-white'}`}
                           title={user.is_admin ? 'Remove admin access' : 'Promote to admin'}
                         >
                           {user.is_admin ? 'Demote' : 'Make Admin'}
@@ -972,7 +972,7 @@ export default function AdminDashboard() {
         {/* Right Column: Live Activity Log */}
         <div className="bg-[#0A0A0A] border border-white/10 rounded-sm flex flex-col h-full overflow-hidden relative">
           <div className="p-4 border-b border-white/5 flex items-center justify-between bg-black/40 xl:sticky top-0 sticky">
-            <h2 className="text-[11px] font-bold text-zinc-400 flex items-center gap-2">
+            <h2 className="text-[11px] font-bold text-content-tertiary flex items-center gap-2">
               <Zap className="w-3.5 h-3.5 text-amber-500" /> LIVE ACTIVITY LOG
             </h2>
             <div className="flex gap-1.5">
@@ -1001,14 +1001,14 @@ export default function AdminDashboard() {
                 log.level === 'SYS' ? 'border-emerald-500' :
                 'border-white/10'
               }`}>
-                <span className="text-zinc-600 shrink-0">{log.time}</span>
+                <span className="text-content-muted shrink-0">{log.time}</span>
                 <span className={`shrink-0 font-bold ${
                   log.level === 'ERROR' ? 'text-rose-500' :
                   log.level === 'WARN' ? 'text-amber-500' :
                   log.level === 'SYS' ? 'text-emerald-500' :
                   'text-indigo-400'
                 }`}>[{log.level}]</span>
-                <span className="text-zinc-300 break-words">{log.message}</span>
+                <span className="text-content-secondary break-words">{log.message}</span>
               </div>
             ))}
             <div ref={logEndRef} />
@@ -1022,7 +1022,7 @@ export default function AdminDashboard() {
                 value={logFilter}
                 onChange={e => setLogFilter(e.target.value)}
                 placeholder="Filter log..."
-                className="bg-transparent border-none w-full text-[11px] text-white focus:outline-none placeholder-zinc-700"
+                className="bg-transparent border-none w-full text-[11px] text-white focus:outline-none placeholder:text-content-muted"
               />
             </div>
           </div>

@@ -55,7 +55,7 @@ export default function SessionWarningModal({ isOpen, timeLeftSeconds, onExtend,
                   </span>
                 </div>
                 
-                <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                <p className="text-sm text-content-tertiary leading-relaxed mb-6">
                   For your security, Oweable will automatically sign you out due to inactivity. Do you want to stay logged in?
                 </p>
 
@@ -68,7 +68,7 @@ export default function SessionWarningModal({ isOpen, timeLeftSeconds, onExtend,
                   </button>
                   <button
                     onClick={onLogout}
-                    className="w-full bg-transparent border border-white/10 hover:border-zinc-500 text-zinc-500 hover:text-white py-2 rounded-sm font-mono font-bold text-[10px] uppercase tracking-widest transition-all"
+                    className="w-full bg-transparent border border-white/10 hover:border-content-muted text-content-tertiary hover:text-white py-2 rounded-sm font-mono font-bold text-[10px] uppercase tracking-widest transition-all"
                   >
                     Logout Now
                   </button>
@@ -76,8 +76,8 @@ export default function SessionWarningModal({ isOpen, timeLeftSeconds, onExtend,
               </div>
 
               <div className="bg-black/60 px-6 py-4 border-t border-white/5 flex items-center gap-3">
-                <Shield className="w-4 h-4 text-zinc-600" />
-                <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest">
+                <Shield className="w-4 h-4 text-content-muted" />
+                <span className="text-[9px] font-mono text-content-muted uppercase tracking-widest">
                   Enterprise-grade session isolation active
                 </span>
               </div>

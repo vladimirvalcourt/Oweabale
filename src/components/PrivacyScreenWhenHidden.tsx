@@ -19,7 +19,7 @@ export function PrivacyScreenWhenHidden() {
 
   return (
     <div
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-[#08090A] text-zinc-500"
+      className="fixed inset-0 z-[10000] flex items-center justify-center bg-[#08090A] text-content-tertiary"
       aria-hidden="true"
     >
       <p className="text-[10px] font-mono uppercase tracking-[0.25em]">Oweable — hidden for privacy</p>

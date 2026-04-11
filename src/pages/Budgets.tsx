@@ -110,7 +110,7 @@ export default function Budgets() {
       {budgets.length === 0 ? (
         <div className="bg-surface-raised border border-surface-border rounded-sm p-12 text-center">
           <div className="w-16 h-16 bg-surface-elevated rounded-sm flex items-center justify-center mx-auto mb-4 border border-surface-border">
-            <PieChart className="w-8 h-8 text-zinc-600" />
+            <PieChart className="w-8 h-8 text-content-muted" />
           </div>
           <h3 className="text-lg font-semibold text-content-primary mb-2">No budgets yet</h3>
           <p className="text-sm text-content-tertiary mb-8 max-w-sm mx-auto">Add a limit per category so you can see spending against it each month.</p>
@@ -165,7 +165,7 @@ export default function Budgets() {
                     </div>
                     
                     <Menu as="div" className="relative inline-block text-left">
-                      <Menu.Button className="text-zinc-500 hover:text-zinc-300 transition-colors p-1 rounded-md focus:outline-none">
+                      <Menu.Button className="text-content-tertiary hover:text-content-secondary transition-colors p-1 rounded-md focus:outline-none">
                         <MoreHorizontal className="w-5 h-5" />
                       </Menu.Button>
                       <Transition
@@ -184,10 +184,10 @@ export default function Budgets() {
                                 <button
                                   onClick={() => openEditModal(budget)}
                                   className={`${
-                                    active ? 'bg-surface-elevated text-zinc-200' : 'text-zinc-400'
+                                    active ? 'bg-surface-elevated text-content-primary' : 'text-content-tertiary'
                                   } group flex w-full items-center px-4 py-2 text-sm`}
                                 >
-                                  <Edit2 className="mr-3 h-4 w-4 text-zinc-500" />
+                                  <Edit2 className="mr-3 h-4 w-4 text-content-tertiary" />
                                   Edit Budget
                                 </button>
                               )}
@@ -232,7 +232,7 @@ export default function Budgets() {
                     ) : (
                       <span className="text-emerald-400 flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3" /> On Track</span>
                     )}
-                    <span className="text-zinc-500">{percentage.toFixed(0)}% used</span>
+                    <span className="text-content-tertiary">{percentage.toFixed(0)}% used</span>
                   </div>
                 </motion.div>
               );
@@ -250,7 +250,7 @@ export default function Budgets() {
               <Dialog.Title className="text-base font-sans font-semibold text-content-primary">
                 {isEditModalOpen ? 'Edit budget' : 'New budget'}
               </Dialog.Title>
-              <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-zinc-500 hover:text-zinc-300 transition-colors">
+              <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-content-tertiary hover:text-content-secondary transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -277,7 +277,7 @@ export default function Budgets() {
               <div>
                 <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Amount</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-xs font-mono text-zinc-600">$</span>
+                  <span className="absolute left-3 top-2.5 text-xs font-mono text-content-muted">$</span>
                   <input 
                     type="number" 
                     required

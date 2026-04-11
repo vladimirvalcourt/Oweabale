@@ -75,7 +75,7 @@ export default function Categories() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-content-primary">Categories</h1>
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500 mt-1">Saved categories for transaction analysis</p>
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-tertiary mt-1">Saved categories for transaction analysis</p>
         </div>
         <button
           onClick={() => {
@@ -96,7 +96,7 @@ export default function Categories() {
             <h3 className="text-lg font-semibold tracking-tight text-content-primary">
               {editingId ? 'Edit Category' : 'Create New Category'}
             </h3>
-            <button onClick={() => { setIsAdding(false); cancelEdit(); }} className="text-zinc-500 hover:text-zinc-300 transition-colors">
+            <button onClick={() => { setIsAdding(false); cancelEdit(); }} className="text-content-tertiary hover:text-content-secondary transition-colors">
               <span className="sr-only">Close</span>
               &times;
             </button>
@@ -104,29 +104,29 @@ export default function Categories() {
           <form onSubmit={editingId ? handleUpdate : handleAdd} className="space-y-4">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div>
-                <label className="block text-sm font-semibold text-zinc-300">Category Name</label>
+                <label className="block text-sm font-semibold text-content-secondary">Category Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors"
+                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors"
                   placeholder="e.g., Groceries"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-zinc-300">Type</label>
+                <label className="block text-sm font-semibold text-content-secondary">Type</label>
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-zinc-200 rounded-sm px-3 py-2 border transition-colors"
+                  className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors"
                 >
                   <option value="expense">Expense</option>
                   <option value="income">Income</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-zinc-300">Color</label>
+                <label className="block text-sm font-semibold text-content-secondary">Color</label>
                 <div className="mt-1 flex items-center gap-3">
                   <input
                     type="color"
@@ -134,7 +134,7 @@ export default function Categories() {
                     onChange={(e) => setFormData({ ...formData, color: e.target.value })}
                     className="h-9 w-14 p-1 border border-surface-border bg-surface-base rounded-sm cursor-pointer"
                   />
-                  <span className="text-sm text-zinc-500">{formData.color}</span>
+                  <span className="text-sm text-content-tertiary">{formData.color}</span>
                 </div>
               </div>
             </div>
@@ -142,7 +142,7 @@ export default function Categories() {
               <button
                 type="button"
                 onClick={() => { setIsAdding(false); cancelEdit(); }}
-                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-zinc-300 hover:bg-surface-elevated transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500"
+                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500"
               >
                 Cancel
               </button>
@@ -160,10 +160,10 @@ export default function Categories() {
       {categories.length === 0 && !isAdding ? (
         <div className="bg-surface-raised rounded-sm border border-surface-border p-12 text-center">
           <div className="w-16 h-16 border border-surface-border rounded-full flex items-center justify-center mx-auto mb-4">
-            <Tags className="w-8 h-8 text-zinc-500" />
+            <Tags className="w-8 h-8 text-content-tertiary" />
           </div>
           <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No categories found</h3>
-          <p className="text-sm text-zinc-400 max-w-sm mx-auto mb-6">
+          <p className="text-sm text-content-tertiary max-w-sm mx-auto mb-6">
             Categories help you organize your transactions and understand your spending habits.
           </p>
           <motion.button
@@ -179,7 +179,7 @@ export default function Categories() {
         <CollapsibleModule 
           title="Manage Categories" 
           icon={Tags}
-          extraHeader={<span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{categories.length} Categories Saved</span>}
+          extraHeader={<span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{categories.length} Categories Saved</span>}
         >
           <div className="bg-surface-raised rounded-sm border border-surface-border overflow-hidden -mx-6 -my-6">
             <motion.ul 
@@ -206,14 +206,14 @@ export default function Categories() {
                     </div>
                     <div>
                       <h4 className="text-sm font-mono font-bold uppercase tracking-widest text-content-primary">{category.name}</h4>
-                      <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest mt-1">{category.type} stream</p>
+                      <p className="text-[9px] font-mono text-content-tertiary uppercase tracking-widest mt-1">{category.type} stream</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <motion.button
                       whileTap={{ scale: 0.9 }}
                       onClick={() => startEdit(category)}
-                      className="p-2 text-zinc-500 hover:text-indigo-400 rounded-sm hover:bg-surface-border transition-colors"
+                      className="p-2 text-content-tertiary hover:text-indigo-400 rounded-sm hover:bg-surface-border transition-colors"
                       title="Edit"
                     >
                       <Edit2 className="w-4 h-4" />
@@ -221,7 +221,7 @@ export default function Categories() {
                     <motion.button
                       whileTap={{ scale: 0.9 }}
                       onClick={() => handleDelete(category.id)}
-                      className="p-2 text-zinc-500 hover:text-red-400 rounded-sm hover:bg-surface-border transition-colors"
+                      className="p-2 text-content-tertiary hover:text-red-400 rounded-sm hover:bg-surface-border transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />

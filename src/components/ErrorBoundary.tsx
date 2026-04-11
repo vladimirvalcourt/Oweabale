@@ -49,19 +49,19 @@ export class ErrorBoundary extends Component<Props, State> {
             <h2 className="text-[11px] font-mono font-bold text-red-400 uppercase tracking-[0.3em] mb-2">
               Render Fault Detected
             </h2>
-            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-6">
+            <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest mb-6">
               This component encountered an unrecoverable error.
             </p>
 
             {import.meta.env.DEV && this.state.error && (
-              <pre className="text-left text-[9px] font-mono text-zinc-600 bg-black/50 border border-surface-border p-3 mb-6 overflow-auto max-h-32 text-wrap">
+              <pre className="text-left text-[9px] font-mono text-content-muted bg-black/50 border border-surface-border p-3 mb-6 overflow-auto max-h-32 text-wrap">
                 {this.state.error.message}
               </pre>
             )}
 
             <button
               onClick={this.handleReset}
-              className="px-6 py-2 border border-zinc-700 text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-300 hover:bg-surface-elevated hover:text-white transition-all flex items-center gap-2 mx-auto"
+              className="px-6 py-2 border border-zinc-700 text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated hover:text-white transition-all flex items-center gap-2 mx-auto"
             >
               <RefreshCw className="w-3 h-3" />
               Attempt Recovery

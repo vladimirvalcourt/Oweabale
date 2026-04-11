@@ -63,7 +63,7 @@ export default function Transactions() {
             a.href = url; a.download = 'oweable-transactions.csv'; a.click();
             URL.revokeObjectURL(url);
           }}
-          className="flex items-center gap-2 px-4 py-2 border border-surface-border text-zinc-300 text-sm font-medium hover:bg-surface-elevated rounded-sm transition-colors"
+          className="flex items-center gap-2 px-4 py-2 border border-surface-border text-content-secondary text-sm font-medium hover:bg-surface-elevated rounded-sm transition-colors"
         >
           <Download className="w-4 h-4" /> Export CSV
         </button>
@@ -72,20 +72,20 @@ export default function Transactions() {
       <CollapsibleModule 
         title="Filter Transactions"
         icon={Filter}
-        extraHeader={<span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{filteredTransactions.length} Records Detected</span>}
+        extraHeader={<span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{filteredTransactions.length} Records Detected</span>}
       >
         <div className="-mx-6 -my-6 p-6 space-y-4">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
             <div className="relative w-full sm:max-w-xs">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-zinc-500" />
+                <Search className="h-4 w-4 text-content-tertiary" />
               </div>
               <input
                 type="text"
                 placeholder="Search transactions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-surface-border rounded-sm leading-5 bg-surface-base text-xs font-mono uppercase tracking-widest text-zinc-200 placeholder-zinc-700 focus:outline-none focus:border-indigo-600 transition-all"
+                className="block w-full pl-10 pr-3 py-2 border border-surface-border rounded-sm leading-5 bg-surface-base text-xs font-mono uppercase tracking-widest text-content-primary placeholder:text-content-muted focus:outline-none focus:border-indigo-600 transition-all"
               />
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -94,7 +94,7 @@ export default function Transactions() {
                 className={`px-4 py-2 border rounded-sm text-[10px] font-mono uppercase tracking-widest flex items-center gap-2 transition-all ${
                   showAdvancedFilters 
                     ? 'bg-indigo-600 border-indigo-600 text-white' 
-                    : 'bg-transparent border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated'
+                    : 'bg-transparent border-surface-border text-content-tertiary hover:text-white hover:bg-surface-elevated'
                 }`}
               >
                 <Filter className="w-3.5 h-3.5" />
@@ -106,7 +106,7 @@ export default function Transactions() {
           {showAdvancedFilters && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-surface-border">
               <div>
-                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2 flex items-center gap-1.5">
+                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
                   <Activity className="w-3 h-3" /> Type
                 </label>
                 <select
@@ -121,7 +121,7 @@ export default function Transactions() {
               </div>
 
               <div>
-                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2 flex items-center gap-1.5">
+                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
                   <Tag className="w-3 h-3" /> Category
                 </label>
                 <select
@@ -137,7 +137,7 @@ export default function Transactions() {
               </div>
 
               <div>
-                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2 flex items-center gap-1.5">
+                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
                   <Calendar className="w-3 h-3" /> Date Range
                 </label>
                 <div className="flex items-center gap-2">
@@ -158,7 +158,7 @@ export default function Transactions() {
               </div>
 
               <div>
-                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-zinc-600 mb-2 flex items-center gap-1.5">
+                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
                   <Hash className="w-3 h-3" /> Amount Range
                 </label>
                 <div className="flex items-center gap-2">
@@ -167,7 +167,7 @@ export default function Transactions() {
                     placeholder="MIN"
                     value={amountRange.min}
                     onChange={(e) => setAmountRange({...amountRange, min: e.target.value})}
-                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary placeholder-zinc-700 focus:outline-none focus:border-indigo-600 transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary placeholder:text-content-muted focus:outline-none focus:border-indigo-600 transition-colors"
                   />
                   <span className="text-surface-border">::</span>
                   <input
@@ -175,7 +175,7 @@ export default function Transactions() {
                     placeholder="MAX"
                     value={amountRange.max}
                     onChange={(e) => setAmountRange({...amountRange, max: e.target.value})}
-                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary placeholder-zinc-700 focus:outline-none focus:border-indigo-600 transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary placeholder:text-content-muted focus:outline-none focus:border-indigo-600 transition-colors"
                   />
                 </div>
               </div>
@@ -187,10 +187,10 @@ export default function Transactions() {
         {filteredTransactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 text-center">
             <div className="w-16 h-16 border border-surface-border rounded-full flex items-center justify-center mb-4">
-              <Activity className="w-8 h-8 text-zinc-500" />
+              <Activity className="w-8 h-8 text-content-tertiary" />
             </div>
             <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-1">No transactions found</h3>
-            <p className="text-sm text-zinc-400 max-w-sm">
+            <p className="text-sm text-content-tertiary max-w-sm">
               {searchTerm || filterType !== 'all' 
                 ? "We couldn't find any transactions matching your current filters."
                 : "You don't have any transaction history yet. Pay a bill or record a debt payment to see it here."}
@@ -221,7 +221,7 @@ export default function Transactions() {
                   setDateRange({start: '', end: ''});
                   setAmountRange({min: '', max: ''});
                 }}
-                className="mt-4 px-4 py-2 bg-transparent border border-surface-border rounded-md text-sm font-medium text-zinc-300 hover:bg-surface-elevated transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500"
+                className="mt-4 px-4 py-2 bg-transparent border border-surface-border rounded-md text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500"
               >
                 Clear Filters
               </button>
@@ -234,16 +234,16 @@ export default function Transactions() {
             <table className="min-w-full divide-y divide-surface-highlight">
               <thead className="bg-surface-base">
                 <tr>
-                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-[0.2em]">
+                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
                     Description
                   </th>
-                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-[0.2em]">
+                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
                     Timestamp
                   </th>
-                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-[0.2em]">
+                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
                     Category
                   </th>
-                  <th scope="col" className="px-6 py-4 text-right text-[10px] font-mono font-bold text-zinc-600 uppercase tracking-[0.2em]">
+                  <th scope="col" className="px-6 py-4 text-right text-[10px] font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
                     Amount
                   </th>
                 </tr>
@@ -279,7 +279,7 @@ export default function Transactions() {
                                 transaction.type === 'income' ? (
                                   <ArrowUpRight className="h-5 w-5 text-emerald-500" />
                                 ) : (
-                                  <ArrowDownRight className="h-5 w-5 text-zinc-600" />
+                                  <ArrowDownRight className="h-5 w-5 text-content-muted" />
                                 )
                               }
                             />
@@ -295,12 +295,12 @@ export default function Transactions() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                        <td className="px-6 py-4 whitespace-nowrap text-[10px] font-mono text-content-tertiary uppercase tracking-widest">
                           {transaction.date}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex flex-col gap-1">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold uppercase tracking-widest bg-surface-base border border-surface-border text-zinc-500 group-hover:text-zinc-300 transition-colors">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-sm text-[9px] font-mono font-bold uppercase tracking-widest bg-surface-base border border-surface-border text-content-tertiary group-hover:text-content-secondary transition-colors">
                               {transaction.category}
                             </span>
                           </div>
@@ -321,21 +321,21 @@ export default function Transactions() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between pt-2 px-1">
-            <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
+            <span className="text-[10px] font-mono text-content-muted uppercase tracking-widest">
               Page {currentPage} of {totalPages} — {filteredTransactions.length} records
             </span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-content-tertiary hover:text-white hover:bg-surface-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Prev
               </button>
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-content-tertiary hover:text-white hover:bg-surface-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>

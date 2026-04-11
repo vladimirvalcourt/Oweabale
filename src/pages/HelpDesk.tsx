@@ -136,14 +136,14 @@ export default function HelpDesk() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Help & Support</h1>
-          <p className="text-sm font-mono text-zinc-400 mt-1 uppercase tracking-widest">Get help and track your support tickets</p>
+          <p className="text-sm font-mono text-content-tertiary mt-1 uppercase tracking-widest">Get help and track your support tickets</p>
         </div>
 
         <div className="flex bg-surface-elevated p-1 rounded-sm border border-surface-border inline-flex">
           <button
             onClick={() => setActiveTab('tickets')}
             className={`px-6 py-2 text-[10px] font-mono uppercase tracking-widest transition-colors ${
-              activeTab === 'tickets' ? 'bg-surface-raised text-white border border-surface-border shadow-sm' : 'text-zinc-500 hover:text-zinc-300'
+              activeTab === 'tickets' ? 'bg-surface-raised text-white border border-surface-border shadow-sm' : 'text-content-tertiary hover:text-content-secondary'
             }`}
           >
             My Tickets
@@ -151,7 +151,7 @@ export default function HelpDesk() {
           <button
             onClick={() => setActiveTab('broadcast')}
             className={`px-6 py-2 text-[10px] font-mono uppercase tracking-widest transition-colors flex items-center gap-2 ${
-              activeTab === 'broadcast' ? 'bg-surface-raised text-white border border-surface-border shadow-sm' : 'text-zinc-500 hover:text-zinc-300'
+              activeTab === 'broadcast' ? 'bg-surface-raised text-white border border-surface-border shadow-sm' : 'text-content-tertiary hover:text-content-secondary'
             }`}
           >
             <Radio className="w-3 h-3" />
@@ -179,12 +179,12 @@ export default function HelpDesk() {
             <div className="-mx-6 -my-6 bg-surface-base">
               {isLoading ? (
                 <div className="p-12 flex justify-center">
-                  <Loader2 className="w-5 h-5 text-zinc-500 animate-spin" />
+                  <Loader2 className="w-5 h-5 text-content-tertiary animate-spin" />
                 </div>
               ) : tickets.length === 0 ? (
                 <div className="p-12 text-center border-b border-surface-border">
-                  <MessageSquare className="w-8 h-8 text-zinc-600 mx-auto mb-4" />
-                  <p className="text-sm font-mono text-zinc-400 uppercase tracking-widest">No active support tickets.</p>
+                  <MessageSquare className="w-8 h-8 text-content-muted mx-auto mb-4" />
+                  <p className="text-sm font-mono text-content-tertiary uppercase tracking-widest">No active support tickets.</p>
                 </div>
               ) : (
                 <div className="divide-y divide-surface-border">
@@ -202,22 +202,22 @@ export default function HelpDesk() {
                         </div>
                         <div>
                           <div className="flex items-center gap-3 mb-1">
-                            <span className="text-[10px] font-mono text-zinc-500">{ticket.id}</span>
+                            <span className="text-[10px] font-mono text-content-tertiary">{ticket.id}</span>
                             <span className={`text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-sm border ${
                               ticket.priority === 'Urgent' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' :
-                              ticket.priority === 'Normal' ? 'bg-surface-elevated border-surface-border text-zinc-400' :
-                              'bg-surface-elevated border-surface-border text-zinc-500'
+                              ticket.priority === 'Normal' ? 'bg-surface-elevated border-surface-border text-content-tertiary' :
+                              'bg-surface-elevated border-surface-border text-content-tertiary'
                             }`}>
                               {ticket.priority}
                             </span>
-                            <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest">{ticket.department}</span>
+                            <span className="text-[9px] font-mono text-content-muted uppercase tracking-widest">{ticket.department}</span>
                           </div>
                           <h3 className="text-sm font-semibold text-content-primary group-hover:text-white transition-colors">{ticket.subject}</h3>
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">{ticket.status}</div>
-                        <div className="text-[10px] font-mono text-zinc-600">{ticket.date}</div>
+                        <div className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest mb-1">{ticket.status}</div>
+                        <div className="text-[10px] font-mono text-content-muted">{ticket.date}</div>
                       </div>
                     </div>
                   ))}
@@ -230,12 +230,12 @@ export default function HelpDesk() {
         <div className="grid grid-cols-1 gap-6">
           {broadcastsLoading ? (
             <div className="p-12 flex justify-center">
-              <Loader2 className="w-5 h-5 text-zinc-500 animate-spin" />
+              <Loader2 className="w-5 h-5 text-content-tertiary animate-spin" />
             </div>
           ) : broadcasts.length === 0 ? (
             <div className="p-12 text-center border border-surface-border rounded-sm bg-surface-raised">
-              <Radio className="w-7 h-7 text-zinc-600 mx-auto mb-3" />
-              <p className="text-sm font-mono text-zinc-400 uppercase tracking-widest">No broadcasts at this time.</p>
+              <Radio className="w-7 h-7 text-content-muted mx-auto mb-3" />
+              <p className="text-sm font-mono text-content-tertiary uppercase tracking-widest">No broadcasts at this time.</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -246,9 +246,9 @@ export default function HelpDesk() {
                   }`} />
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-sm font-semibold text-white">{msg.title}</h3>
-                    <span className="text-[10px] font-mono text-zinc-500">{msg.date}</span>
+                    <span className="text-[10px] font-mono text-content-tertiary">{msg.date}</span>
                   </div>
-                  <p className="text-sm text-zinc-400 leading-relaxed font-mono">{msg.content}</p>
+                  <p className="text-sm text-content-tertiary leading-relaxed font-mono">{msg.content}</p>
                 </div>
               ))}
             </div>
@@ -268,7 +268,7 @@ export default function HelpDesk() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">Subject</label>
+                <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">Subject</label>
                 <input
                   autoFocus
                   type="text"
@@ -281,7 +281,7 @@ export default function HelpDesk() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">Department</label>
+                  <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">Department</label>
                   <select
                     value={formData.department}
                     onChange={e => setFormData({...formData, department: e.target.value})}
@@ -294,7 +294,7 @@ export default function HelpDesk() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">Priority</label>
+                  <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">Priority</label>
                   <select
                     value={formData.priority}
                     onChange={e => setFormData({...formData, priority: e.target.value})}
@@ -308,7 +308,7 @@ export default function HelpDesk() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest mb-2">Description</label>
+                <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={e => setFormData({...formData, description: e.target.value})}
@@ -318,7 +318,7 @@ export default function HelpDesk() {
               </div>
 
               <div className="pt-4 flex justify-end gap-3 border-t border-surface-border">
-                <button type="button" onClick={() => setIsNewTicketOpen(false)} className="px-4 py-2 text-[10px] font-mono font-bold text-zinc-400 hover:text-white uppercase tracking-widest transition-colors">
+                <button type="button" onClick={() => setIsNewTicketOpen(false)} className="px-4 py-2 text-[10px] font-mono font-bold text-content-tertiary hover:text-white uppercase tracking-widest transition-colors">
                   Cancel
                 </button>
                 <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors flex items-center gap-2">

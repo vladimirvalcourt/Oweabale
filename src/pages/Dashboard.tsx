@@ -331,7 +331,7 @@ export default function Dashboard() {
             <h1 className="text-2xl sm:text-3xl font-sans font-semibold tracking-tight text-white">
               Welcome back, <span className="text-brand-indigo">{user?.firstName || 'User'}</span>
             </h1>
-            <p className="text-sm font-sans text-zinc-400 mt-1">Here is your financial overview for today.</p>
+            <p className="text-sm font-sans text-content-tertiary mt-1">Here is your financial overview for today.</p>
           </div>
         </div>
       </div>
@@ -583,7 +583,7 @@ export default function Dashboard() {
                     </p>
                     <div className="flex justify-between items-baseline">
                       <span className="text-4xl font-mono text-white tabular-nums">${avalancheTarget.remaining.toLocaleString()}</span>
-                      <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{debtProgress.toFixed(0)}% Clear</span>
+                      <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{debtProgress.toFixed(0)}% Clear</span>
                     </div>
                   </div>
                   <div className="w-full h-1.5 bg-zinc-900 border border-surface-border rounded-full overflow-hidden mt-4">
@@ -607,9 +607,9 @@ export default function Dashboard() {
             <div className="flex justify-between items-center mb-6">
               <div>
                 <h3 className="text-sm font-sans font-semibold text-white">Cash Flow Trajectory</h3>
-                <p className="text-xs font-sans text-zinc-400 mt-1">Projected balances across all accounts</p>
+                <p className="text-xs font-sans text-content-tertiary mt-1">Projected balances across all accounts</p>
               </div>
-              <select className="text-xs font-sans bg-surface-base border border-surface-border text-zinc-300 rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+              <select className="text-xs font-sans bg-surface-base border border-surface-border text-content-secondary rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
                 <option>Next 30 Days</option>
                 <option>Next 90 Days</option>
               </select>
@@ -645,7 +645,7 @@ export default function Dashboard() {
             {hasBillsSidebar && (
               <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit max-h-[350px]">
                 <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
-                  <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-300">Upcoming Bills</h3>
+                  <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-content-secondary">Upcoming Bills</h3>
                   <Link to="/bills" className="text-xs font-sans text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
                     See all
                   </Link>
@@ -659,7 +659,7 @@ export default function Dashboard() {
                         className="px-6 py-4 hover:bg-surface-base transition-colors flex justify-between items-center group cursor-default"
                       >
                         <div className="flex items-center gap-4">
-                          <div className="text-xs font-mono text-zinc-500 w-10 text-center uppercase">
+                          <div className="text-xs font-mono text-content-tertiary w-10 text-center uppercase">
                             {bill?.dueDate?.includes('-') ? (
                               <>
                                 {bill.dueDate.split('-')[2]}
@@ -672,9 +672,9 @@ export default function Dashboard() {
                               'N/A'
                             )}
                           </div>
-                          <p className="text-sm font-sans font-medium text-zinc-200">{bill.biller}</p>
+                          <p className="text-sm font-sans font-medium text-content-primary">{bill.biller}</p>
                         </div>
-                        <p className="text-sm font-mono text-zinc-300 font-medium tabular-nums">${bill.amount.toFixed(2)}</p>
+                        <p className="text-sm font-mono text-content-secondary font-medium tabular-nums">${bill.amount.toFixed(2)}</p>
                       </li>
                     ))}
                   </ul>
@@ -685,7 +685,7 @@ export default function Dashboard() {
             {hasCitationsSidebar && (
               <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit">
                 <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
-                  <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-300">Citations & Tickets</h3>
+                  <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-content-secondary">Citations & Tickets</h3>
                 </div>
                 <div className="p-0 outline-none">
                   <ul className="divide-y divide-surface-border">
@@ -695,18 +695,18 @@ export default function Dashboard() {
                           <div className="flex items-start gap-3">
                             <div
                               className={`w-9 h-9 rounded bg-surface-base border flex flex-col justify-center items-center shrink-0 ${
-                                citation.daysLeft <= 7 ? 'text-rose-400 border-rose-500/30' : 'text-zinc-400 border-surface-border'
+                                citation.daysLeft <= 7 ? 'text-rose-400 border-rose-500/30' : 'text-content-tertiary border-surface-border'
                               }`}
                             >
                               <span className="text-xs font-bold font-mono leading-none">{citation.daysLeft}</span>
-                              <span className="text-[11px] font-sans font-medium text-zinc-400">Days</span>
+                              <span className="text-[11px] font-sans font-medium text-content-tertiary">Days</span>
                             </div>
                             <div>
-                              <p className="text-sm font-sans font-medium text-zinc-200">{citation.type}</p>
-                              <p className="text-xs font-sans text-zinc-500">{citation.jurisdiction}</p>
+                              <p className="text-sm font-sans font-medium text-content-primary">{citation.type}</p>
+                              <p className="text-xs font-sans text-content-tertiary">{citation.jurisdiction}</p>
                             </div>
                           </div>
-                          <p className="text-sm font-mono font-bold text-zinc-300 tabular-nums">${citation.amount.toFixed(2)}</p>
+                          <p className="text-sm font-mono font-bold text-content-secondary tabular-nums">${citation.amount.toFixed(2)}</p>
                         </div>
                         <button
                           type="button"
@@ -717,7 +717,7 @@ export default function Dashboard() {
                           className={`w-full text-xs font-sans font-medium py-2 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-raised ${
                             citation.daysLeft <= 7
                               ? 'bg-rose-500 hover:bg-rose-600 text-white focus-visible:ring-rose-500'
-                              : 'bg-surface-border hover:bg-zinc-700 text-zinc-200 focus-visible:ring-zinc-400'
+                              : 'bg-surface-border hover:bg-zinc-700 text-content-primary focus-visible:ring-zinc-400'
                           }`}
                         >
                           Resolve Ticket
@@ -738,12 +738,12 @@ export default function Dashboard() {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-sm w-full rounded shadow-xl bg-surface-elevated border border-surface-border overflow-hidden">
             <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-surface-raised">
-              <Dialog.Title className="text-sm font-sans font-semibold text-zinc-200">
+              <Dialog.Title className="text-sm font-sans font-semibold text-content-primary">
                 Ticket Details
               </Dialog.Title>
               <button 
                 onClick={() => setIsCitationModalOpen(false)} 
-                className="text-zinc-500 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded-sm"
+                className="text-content-tertiary hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded-sm"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -753,7 +753,7 @@ export default function Dashboard() {
               <div className="p-6 space-y-6">
                 <div>
                   <h4 className="text-lg font-sans font-medium text-white mb-1">{selectedCitation.type}</h4>
-                  <p className="text-sm text-zinc-400">{selectedCitation.jurisdiction}</p>
+                  <p className="text-sm text-content-tertiary">{selectedCitation.jurisdiction}</p>
                   {selectedCitation.daysLeft <= 7 && (
                      <p className="text-xs font-medium text-rose-400 mt-2 bg-rose-500/10 px-2 py-1 rounded inline-block">
                        Due in {selectedCitation.daysLeft} days. ${selectedCitation.penaltyFee} penalty fee approaching.
@@ -763,17 +763,17 @@ export default function Dashboard() {
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-sans font-medium text-zinc-500 mb-1.5">Citation Number</label>
+                    <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Citation Number</label>
                     <div className="flex">
                       <input 
                         type="text" 
                         readOnly 
                         value={selectedCitation.citationNumber} 
-                        className="bg-surface-base border border-surface-border rounded-l px-3 py-2 text-sm font-mono text-zinc-300 w-full focus:outline-none" 
+                        className="bg-surface-base border border-surface-border rounded-l px-3 py-2 text-sm font-mono text-content-secondary w-full focus:outline-none" 
                       />
                       <button 
                         onClick={() => { navigator.clipboard.writeText(selectedCitation.citationNumber).then(() => toast.success('Copied to clipboard')).catch(() => toast.error('Failed to copy')); }} 
-                        className="bg-surface-border hover:bg-zinc-700 text-zinc-300 px-3 border border-l-0 border-surface-border rounded-r transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 z-10"
+                        className="bg-surface-border hover:bg-zinc-700 text-content-secondary px-3 border border-l-0 border-surface-border rounded-r transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 z-10"
                         title="Copy"
                       >
                         <Copy className="w-4 h-4" />
@@ -781,7 +781,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-sans font-medium text-zinc-500 mb-1.5">Online Payment Portal</label>
+                    <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Online Payment Portal</label>
                     {sanitizeUrl(selectedCitation.paymentUrl) ? (
                       <a
                         href={sanitizeUrl(selectedCitation.paymentUrl)!}
@@ -792,7 +792,7 @@ export default function Dashboard() {
                         Open Payment Portal <ExternalLink className="w-4 h-4" />
                       </a>
                     ) : (
-                      <span className="flex items-center justify-center gap-2 w-full bg-zinc-800 text-zinc-500 rounded px-4 py-2.5 text-sm font-medium cursor-not-allowed">
+                      <span className="flex items-center justify-center gap-2 w-full bg-zinc-800 text-content-tertiary rounded px-4 py-2.5 text-sm font-medium cursor-not-allowed">
                         No Payment Link Available
                       </span>
                     )}

@@ -121,11 +121,11 @@ export default function Taxes() {
           <div className="flex bg-surface-raised border border-surface-border rounded-sm p-1">
             <button
               onClick={() => setFilingStatus('single')}
-              className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${filingStatus === 'single' ? 'bg-brand-cta text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${filingStatus === 'single' ? 'bg-brand-cta text-white' : 'text-content-tertiary hover:text-content-secondary'}`}
             >Single</button>
             <button
               onClick={() => setFilingStatus('married')}
-              className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${filingStatus === 'married' ? 'bg-brand-cta text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${filingStatus === 'married' ? 'bg-brand-cta text-white' : 'text-content-tertiary hover:text-content-secondary'}`}
             >Married</button>
           </div>
         </div>
@@ -136,7 +136,7 @@ export default function Taxes() {
         <Zap className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
         <div>
           <p className="text-sm font-sans font-semibold text-amber-400 mb-1">Freelancer tip: the savings rule</p>
-          <p className="text-sm text-zinc-300 leading-relaxed font-sans">
+          <p className="text-sm text-content-secondary leading-relaxed font-sans">
             As a freelancer in <strong>{STATE_TAX_MAP[taxState].name}</strong>, you pay both sides of Social Security & Medicare. This is an extra <strong>15.3%</strong> cost that regular employees don't see. Oweable has factored this into your current <strong>${(stateRate + 15.3 + (incomeStats.total > 0 ? fedTax/incomeStats.total*100 : 0)).toFixed(1)}%</strong> estimated savings rate.
           </p>
         </div>
@@ -146,7 +146,7 @@ export default function Taxes() {
         <div className="lg:col-span-2 space-y-6">
           <CollapsibleModule title="Yearly Tax Estimates" icon={Calculator}>
             <div className="flex flex-col items-center justify-center py-10">
-              <p className="metric-label normal-case text-zinc-500 mb-2">Estimated total liability</p>
+              <p className="metric-label normal-case text-content-tertiary mb-2">Estimated total liability</p>
               <h2 className="text-6xl font-bold font-mono text-white tabular-nums tracking-tighter data-numeric">
                 ${totalLiability.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </h2>
@@ -164,15 +164,15 @@ export default function Taxes() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-surface-border border-t border-surface-border">
               <div className="bg-surface-elevated p-4">
-                <p className="metric-label normal-case text-zinc-500 mb-1">Self-employment (FICA)</p>
+                <p className="metric-label normal-case text-content-tertiary mb-1">Self-employment (FICA)</p>
                 <p className="text-sm font-mono tabular-nums text-content-primary font-bold data-numeric">${seTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
               </div>
               <div className="bg-surface-elevated p-4">
-                <p className="metric-label normal-case text-zinc-500 mb-1">Federal income tax</p>
+                <p className="metric-label normal-case text-content-tertiary mb-1">Federal income tax</p>
                 <p className="text-sm font-mono tabular-nums text-content-primary font-bold data-numeric">${fedTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
               </div>
               <div className="bg-surface-elevated p-4">
-                <p className="metric-label normal-case text-zinc-500 mb-1">State tax ({taxState})</p>
+                <p className="metric-label normal-case text-content-tertiary mb-1">State tax ({taxState})</p>
                 <p className="text-sm font-mono tabular-nums text-content-primary font-bold data-numeric">${stateTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
               </div>
             </div>
@@ -214,7 +214,7 @@ export default function Taxes() {
                       </div>
                       <div className="flex items-center gap-4">
                         <span className="text-sm font-mono tabular-nums text-emerald-400 data-numeric">-${d.amount.toFixed(2)}</span>
-                        <button onClick={async () => { await deleteDeduction(d.id); }} className="text-zinc-600 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 className="w-4 h-4"/></button>
+                        <button onClick={async () => { await deleteDeduction(d.id); }} className="text-content-muted hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 className="w-4 h-4"/></button>
                       </div>
                     </div>
                   ))}
@@ -229,8 +229,8 @@ export default function Taxes() {
               {quarterlyDates.map(q => (
                 <div key={q.label} className={`p-4 rounded-sm border ${q.overdue ? 'bg-surface-raised border-surface-border opacity-50' : q.daysLeft < 15 ? 'bg-rose-500/5 border-rose-500/30 shadow-[inset_0_0_15px_rgba(244,63,94,0.05)]' : 'bg-surface-elevated border-surface-border'}`}>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-xs font-sans font-semibold text-zinc-400">{q.label} estimated payment</span>
-                    {q.overdue ? <span className="bg-zinc-800 text-zinc-500 text-xs px-2 py-0.5 rounded-sm">Completed</span> : <span className="text-emerald-400 text-xs font-sans font-medium">{q.daysLeft}d left</span>}
+                    <span className="text-xs font-sans font-semibold text-content-tertiary">{q.label} estimated payment</span>
+                    {q.overdue ? <span className="bg-zinc-800 text-content-tertiary text-xs px-2 py-0.5 rounded-sm">Completed</span> : <span className="text-emerald-400 text-xs font-sans font-medium">{q.daysLeft}d left</span>}
                   </div>
                   <div className="flex items-center justify-between gap-4">
                     <p className="text-xs text-content-tertiary">Due {q.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>

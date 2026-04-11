@@ -78,7 +78,7 @@ export default function Goals() {
         <div className="bg-surface-raised rounded-sm border border-surface-border p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-base font-sans font-semibold text-content-primary">New goal</h3>
-            <button onClick={() => setIsAddingGoal(false)} className="text-zinc-500 hover:text-zinc-300 transition-colors">
+            <button onClick={() => setIsAddingGoal(false)} className="text-content-tertiary hover:text-content-secondary transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -110,7 +110,7 @@ export default function Goals() {
               <div>
                 <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Target amount</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-xs font-mono text-zinc-600">$</span>
+                  <span className="absolute left-3 top-2.5 text-xs font-mono text-content-muted">$</span>
                   <input
                     type="number"
                     required
@@ -125,7 +125,7 @@ export default function Goals() {
               <div>
                 <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Starting amount</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-xs font-mono text-zinc-600">$</span>
+                  <span className="absolute left-3 top-2.5 text-xs font-mono text-content-muted">$</span>
                   <input
                     type="number"
                     min="0"
@@ -169,7 +169,7 @@ export default function Goals() {
       {goals.length === 0 && !isAddingGoal ? (
         <div className="bg-surface-raised rounded-sm border border-surface-border border-dashed p-12 text-center">
           <div className="w-16 h-16 border border-surface-border rounded-sm flex items-center justify-center mx-auto mb-4 bg-surface-elevated">
-            <Target className="w-8 h-8 text-zinc-600" />
+            <Target className="w-8 h-8 text-content-muted" />
           </div>
           <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No goals yet</h3>
           <p className="text-sm text-content-tertiary max-w-sm mx-auto mb-8">Set a target amount and date—progress updates as you add money.</p>
@@ -230,9 +230,9 @@ export default function Goals() {
                     <div className="mb-2 flex justify-between items-end">
                       <div>
                         <span className="text-2xl font-bold font-mono tabular-nums text-content-primary">${goal.currentAmount.toLocaleString()}</span>
-                        <span className="text-sm text-zinc-500 ml-1">/ ${goal.targetAmount.toLocaleString()}</span>
+                        <span className="text-sm text-content-tertiary ml-1">/ ${goal.targetAmount.toLocaleString()}</span>
                       </div>
-                      <span className="text-sm font-medium text-zinc-300">{progress.toFixed(1)}%</span>
+                      <span className="text-sm font-medium text-content-secondary">{progress.toFixed(1)}%</span>
                     </div>
 
                     <div className="w-full bg-surface-base rounded-none h-2 mb-4">
@@ -248,7 +248,7 @@ export default function Goals() {
                       const needed = (goal.targetAmount - goal.currentAmount) / monthsLeft;
                       return (
                         <div className="flex items-center justify-between bg-surface-base border border-surface-border rounded-sm px-3 py-2 mb-4">
-                          <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Needed / month</span>
+                          <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Needed / month</span>
                           <span className="text-sm font-mono font-bold text-indigo-400">${needed.toFixed(0)}/mo</span>
                         </div>
                       );
@@ -268,7 +268,7 @@ export default function Goals() {
                         <button type="submit" className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold transition-colors">
                           Save
                         </button>
-                        <button type="button" onClick={() => setProgressInput(null)} className="px-3 py-1.5 text-zinc-500 hover:text-white transition-colors text-xs">
+                        <button type="button" onClick={() => setProgressInput(null)} className="px-3 py-1.5 text-content-tertiary hover:text-white transition-colors text-xs">
                           Cancel
                         </button>
                       </form>

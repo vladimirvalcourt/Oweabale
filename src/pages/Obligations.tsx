@@ -215,14 +215,14 @@ export default function Obligations() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-surface-elevated border border-surface-border p-5 rounded-sm">
-          <div className="flex items-center gap-2 text-zinc-500 mb-3">
+          <div className="flex items-center gap-2 text-content-tertiary mb-3">
             <Receipt className="w-3.5 h-3.5" />
             <span className="metric-label normal-case text-[11px]">Monthly payments</span>
           </div>
           <p className="text-2xl font-mono text-red-400 font-bold">${totalMonthlyBurn.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
         <div className="bg-surface-elevated border border-surface-border p-5 rounded-sm">
-          <div className="flex items-center gap-2 text-zinc-500 mb-3">
+          <div className="flex items-center gap-2 text-content-tertiary mb-3">
             <CreditCard className="w-3.5 h-3.5" />
             <span className="metric-label normal-case text-[11px]">Total debt</span>
           </div>
@@ -230,7 +230,7 @@ export default function Obligations() {
         </div>
         <div className={`bg-surface-elevated border p-5 rounded-sm relative overflow-hidden ${urgentTotal > 0 ? 'border-rose-500/50' : 'border-surface-border'}`}>
           {urgentTotal > 0 && <div className="absolute inset-0 bg-rose-500/3" />}
-          <div className="flex items-center gap-2 text-zinc-500 mb-3 relative z-10">
+          <div className="flex items-center gap-2 text-content-tertiary mb-3 relative z-10">
             <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
             <span className="metric-label normal-case text-[11px]">Urgent tickets</span>
             {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold text-rose-400 border border-rose-500/50 px-1 rounded-sm ml-auto">{urgentCitations.length} DUE</span>}
@@ -261,7 +261,7 @@ export default function Obligations() {
                     key={s}
                     onClick={() => setStrategy(s)}
                     className={`px-3 py-1.5 text-xs font-mono rounded-sm transition-colors uppercase tracking-wider ${
-                      strategy === s ? 'bg-indigo-600 text-white' : 'text-zinc-500 hover:text-zinc-300'
+                      strategy === s ? 'bg-indigo-600 text-white' : 'text-content-tertiary hover:text-content-secondary'
                     }`}
                   >
                     {s === 'avalanche' ? '⚡ Highest Interest First' : '❄️ Smallest Debt First'}
@@ -269,35 +269,35 @@ export default function Obligations() {
                 ))}
               </div>
               <div className="flex items-center gap-3 bg-surface-base border border-surface-border rounded-sm px-3 py-1.5">
-                <Calculator className="w-3.5 h-3.5 text-zinc-500" />
-                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Extra per month:</span>
-                <button onClick={() => setExtraPayment(e => Math.max(0, e - 100))} className="text-zinc-500 hover:text-white"><Minus className="w-3 h-3" /></button>
+                <Calculator className="w-3.5 h-3.5 text-content-tertiary" />
+                <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Extra per month:</span>
+                <button onClick={() => setExtraPayment(e => Math.max(0, e - 100))} className="text-content-tertiary hover:text-white"><Minus className="w-3 h-3" /></button>
                 <span className="text-sm font-mono text-content-primary w-16 text-center">${extraPayment}</span>
-                <button onClick={() => setExtraPayment(e => e + 100)} className="text-zinc-500 hover:text-white"><Plus className="w-3 h-3" /></button>
+                <button onClick={() => setExtraPayment(e => e + 100)} className="text-content-tertiary hover:text-white"><Plus className="w-3 h-3" /></button>
               </div>
             </div>
 
             {/* Summary */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
               <div className="bg-surface-elevated border border-surface-border rounded-sm p-4">
-                <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mb-1">Debt-Free Date</p>
+                <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Debt-Free Date</p>
                 <p className="text-lg font-mono font-bold text-indigo-400">{payoffResult.months > 0 ? monthsToDate(payoffResult.months) : '—'}</p>
-                <p className="text-[10px] font-mono text-zinc-600">{payoffResult.months} months</p>
+                <p className="text-[10px] font-mono text-content-muted">{payoffResult.months} months</p>
               </div>
               <div className="bg-surface-elevated border border-surface-border rounded-sm p-4">
-                <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mb-1">Interest Paid</p>
+                <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Paid</p>
                 <p className="text-lg font-mono font-bold text-red-400">${payoffResult.totalInterest.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
               </div>
               <div className="bg-surface-elevated border border-emerald-500/20 rounded-sm p-4">
-                <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider mb-1">Interest Saved</p>
+                <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Saved</p>
                 <p className="text-lg font-mono font-bold text-emerald-400">${interestSaved.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
-                <p className="text-[10px] font-mono text-zinc-600">vs. minimum payments only</p>
+                <p className="text-[10px] font-mono text-content-muted">vs. minimum payments only</p>
               </div>
             </div>
 
             {/* Per-debt timeline bars */}
             <div className="space-y-4">
-              <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Payoff Order — {strategy === 'avalanche' ? 'Highest Interest First' : 'Smallest Balance First'}</p>
+              <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Payoff Order — {strategy === 'avalanche' ? 'Highest Interest First' : 'Smallest Balance First'}</p>
               {[...debts]
                 .sort((a, b) => strategy === 'avalanche' ? b.apr - a.apr : a.remaining - b.remaining)
                 .map((d, i) => {
@@ -309,21 +309,21 @@ export default function Obligations() {
                         <div className="flex items-center gap-2">
                           <span className="w-5 h-5 bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 text-[10px] font-mono font-bold flex items-center justify-center rounded-sm">{i + 1}</span>
                           <span className="text-sm text-content-primary">{d.name}</span>
-                          <span className="text-[10px] font-mono text-zinc-600 border border-surface-border px-1.5 py-0.5 rounded-sm">{d.apr}% interest rate</span>
+                          <span className="text-[10px] font-mono text-content-muted border border-surface-border px-1.5 py-0.5 rounded-sm">{d.apr}% interest rate</span>
                         </div>
-                        <span className="text-xs font-mono text-zinc-400">${d.remaining.toLocaleString()} left</span>
+                        <span className="text-xs font-mono text-content-tertiary">${d.remaining.toLocaleString()} left</span>
                       </div>
                       <div className="w-full h-1.5 bg-surface-border rounded-none overflow-hidden">
                         <div className="h-full bg-indigo-500 transition-all duration-700" style={{ width: `${pct}%` }} />
                       </div>
-                      <div className="flex justify-between text-[10px] font-mono text-zinc-600 mt-0.5">
+                      <div className="flex justify-between text-[10px] font-mono text-content-muted mt-0.5">
                         <span>{pct}% paid</span>
                         <span>Min: ${d.minPayment}/mo</span>
                       </div>
                       <div className="mt-1">
                         <button
                           onClick={() => setExpandedDebtId(isExpanded ? null : d.id)}
-                          className="text-[10px] font-mono text-zinc-600 hover:text-indigo-400 transition-colors uppercase tracking-widest flex items-center gap-1"
+                          className="text-[10px] font-mono text-content-muted hover:text-indigo-400 transition-colors uppercase tracking-widest flex items-center gap-1"
                         >
                           {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                           {isExpanded ? 'Hide Schedule' : 'Show 12-Month Schedule'}
@@ -339,7 +339,7 @@ export default function Obligations() {
                         const totalInterest12 = schedule.reduce((s, r) => s + r.interest, 0);
                         return (
                           <div className="mt-3 border-t border-surface-border pt-3">
-                            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">
+                            <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest mb-2">
                               Principal vs. Interest — First 12 Months
                             </p>
                             <div className="h-[120px] w-full">
@@ -359,7 +359,7 @@ export default function Obligations() {
                             <div className="flex gap-4 mt-2">
                               <span className="text-[10px] font-mono text-indigo-400">■ Principal</span>
                               <span className="text-[10px] font-mono text-red-400">■ Interest</span>
-                              <span className="text-[10px] font-mono text-zinc-600 ml-auto">
+                              <span className="text-[10px] font-mono text-content-muted ml-auto">
                                 12-mo interest: ${totalInterest12.toFixed(2)}
                               </span>
                             </div>
@@ -382,12 +382,12 @@ export default function Obligations() {
               key={tab.key}
               onClick={() => selectTab(tab.key)}
               className={`pb-3 text-sm font-medium transition-colors relative flex items-center gap-1.5 ${
-                activeTab === tab.key ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
+                activeTab === tab.key ? 'text-white' : 'text-content-tertiary hover:text-content-secondary'
               }`}
             >
               {tab.label}
               <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-sm ${
-                activeTab === tab.key ? 'bg-indigo-600/30 text-indigo-400' : 'bg-surface-elevated text-zinc-600'
+                activeTab === tab.key ? 'bg-indigo-600/30 text-indigo-400' : 'bg-surface-elevated text-content-muted'
               }`}>{tab.count}</span>
               {activeTab === tab.key && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500" />}
             </button>
@@ -401,11 +401,11 @@ export default function Obligations() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-surface-border bg-surface-raised">
-                <th className="px-6 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Description</th>
-                <th className="px-6 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Category</th>
-                <th className="px-6 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-wider">Due Date</th>
-                <th className="px-6 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-wider text-right">Amount</th>
-                <th className="px-6 py-3 text-[10px] font-mono text-zinc-500 uppercase tracking-wider text-right">Action</th>
+                <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Description</th>
+                <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Due Date</th>
+                <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider text-right">Amount</th>
+                <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider text-right">Action</th>
               </tr>
             </thead>
             <motion.tbody 
@@ -428,7 +428,7 @@ export default function Obligations() {
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <BrandLogo name={ob.name} fallbackIcon={<Icon className="w-3.5 h-3.5 text-zinc-400" />} />
+                        <BrandLogo name={ob.name} fallbackIcon={<Icon className="w-3.5 h-3.5 text-content-tertiary" />} />
                         <span className="text-sm font-medium text-content-primary">{ob.name}</span>
                       </div>
                     </td>
@@ -436,11 +436,11 @@ export default function Obligations() {
                       <span className={`text-xs font-mono px-2 py-0.5 rounded-sm border ${
                         ob.type === 'debt' ? 'border-indigo-500/30 text-indigo-400 bg-indigo-500/10' :
                         ob.type === 'ambush' ? 'border-rose-500/30 text-rose-400 bg-rose-500/10' :
-                        'border-surface-border text-zinc-500 bg-surface-elevated'
+                        'border-surface-border text-content-tertiary bg-surface-elevated'
                       }`}>{ob.subType}</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`text-sm font-mono ${isPastDue ? 'text-rose-400' : 'text-zinc-300'}`}>
+                      <span className={`text-sm font-mono ${isPastDue ? 'text-rose-400' : 'text-content-secondary'}`}>
                         {ob.dueDate}
                         {isPastDue && <span className="ml-2 text-[10px] font-bold">OVERDUE</span>}
                       </span>
@@ -455,7 +455,7 @@ export default function Obligations() {
                         <motion.button whileTap={{ scale: 0.95 }} onClick={() => toast.success(`Targeting ${ob.name} for payoff`)} className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono font-bold rounded-sm transition-colors">TARGET</motion.button>
                       )}
                       {ob.type === 'recurring' && (
-                        <motion.button whileTap={{ scale: 0.95 }} onClick={() => toast.success(`Reviewing ${ob.name}`)} className="px-3 py-1 border border-surface-border hover:border-zinc-500 text-zinc-300 text-xs font-mono rounded-sm transition-colors">REVIEW</motion.button>
+                        <motion.button whileTap={{ scale: 0.95 }} onClick={() => toast.success(`Reviewing ${ob.name}`)} className="px-3 py-1 border border-surface-border hover:border-content-muted text-content-secondary text-xs font-mono rounded-sm transition-colors">REVIEW</motion.button>
                       )}
                       {ob.type === 'ambush' && (
                         <motion.button
@@ -477,7 +477,7 @@ export default function Obligations() {
               {filteredObligations.length === 0 && (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center">
-                    <div className="flex flex-col items-center justify-center text-zinc-500">
+                    <div className="flex flex-col items-center justify-center text-content-tertiary">
                       <CheckCircle2 className="w-8 h-8 mb-3 text-emerald-500/50" />
                       <p className="text-sm font-mono">No obligations in this category.</p>
                     </div>

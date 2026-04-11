@@ -57,7 +57,7 @@ export function MenuItem({ children, onClick, disabled = false, icon, isActive =
   return (
     <button
       className={`relative block w-full h-16 text-center group transition-all
-        ${disabled ? "text-zinc-600 cursor-not-allowed" : "text-zinc-400 hover:text-white"}
+        ${disabled ? "text-content-muted cursor-not-allowed" : "text-content-tertiary hover:text-white"}
         ${isActive ? "bg-white/5 text-white" : ""}
         ${className}
       `}

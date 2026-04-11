@@ -61,7 +61,7 @@ export default function NetWorth() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Net Worth</h1>
-          <p className="text-sm text-zinc-400 mt-1">Track your total assets minus total liabilities over time.</p>
+          <p className="text-sm text-content-tertiary mt-1">Track your total assets minus total liabilities over time.</p>
         </div>
       </div>
 
@@ -83,7 +83,7 @@ export default function NetWorth() {
           <p className="text-4xl font-bold font-mono tabular-nums text-content-primary data-numeric">
             $<AnimatedValue value={totalAssets} decimals={2} />
           </p>
-          <div className="mt-3 flex items-center text-sm text-zinc-500 font-sans">
+          <div className="mt-3 flex items-center text-sm text-content-tertiary font-sans">
             <span>Across {assets.length} accounts</span>
           </div>
         </div>
@@ -93,7 +93,7 @@ export default function NetWorth() {
           <p className="text-4xl font-bold font-mono tabular-nums text-content-primary data-numeric">
             $<AnimatedValue value={totalLiabilities} decimals={2} />
           </p>
-          <div className="mt-3 flex items-center text-sm text-zinc-500 font-sans">
+          <div className="mt-3 flex items-center text-sm text-content-tertiary font-sans">
             <span>Across {debts.length} accounts</span>
           </div>
         </div>
@@ -106,13 +106,13 @@ export default function NetWorth() {
           <button
             type="button"
             onClick={() => setExtraMonthly(e => Math.max(0, e - 100))}
-            className="text-zinc-500 hover:text-white text-sm font-mono transition-colors"
+            className="text-content-tertiary hover:text-white text-sm font-mono transition-colors"
           >−</button>
           <span className="text-sm font-mono text-content-primary w-20 text-center tabular-nums">${extraMonthly.toLocaleString()}</span>
           <button
             type="button"
             onClick={() => setExtraMonthly(e => e + 100)}
-            className="text-zinc-500 hover:text-white text-sm font-mono transition-colors"
+            className="text-content-tertiary hover:text-white text-sm font-mono transition-colors"
           >+</button>
           {extraMonthly > 0 && (
             <span className="text-xs font-sans text-brand-indigo ml-2">Accelerated payoff</span>
@@ -166,9 +166,9 @@ export default function NetWorth() {
                   <div key={item.name} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-none" style={{ backgroundColor: ASSET_COLORS[i % ASSET_COLORS.length] }} />
-                      <span className="text-xs font-mono text-zinc-400">{item.name}</span>
+                      <span className="text-xs font-mono text-content-tertiary">{item.name}</span>
                     </div>
-                    <span className="text-xs font-mono text-zinc-300">{((item.value / totalAssets) * 100).toFixed(1)}%</span>
+                    <span className="text-xs font-mono text-content-secondary">{((item.value / totalAssets) * 100).toFixed(1)}%</span>
                   </div>
                 ))}
               </div>
@@ -186,17 +186,17 @@ export default function NetWorth() {
         >
           <div className="divide-y divide-surface-border -mx-6 -my-6">
             {assets.length === 0 ? (
-              <div className="p-6 text-center text-zinc-500 text-sm font-mono">No assets added yet.</div>
+              <div className="p-6 text-center text-content-tertiary text-sm font-mono">No assets added yet.</div>
             ) : (
               assets.map(asset => (
                 <div key={asset.id} className="px-6 py-3 flex justify-between items-center hover:bg-surface-elevated transition-colors group">
                   <div>
                     <p className="text-sm font-medium text-content-primary">{asset.name}</p>
-                    <p className="text-xs font-mono text-zinc-500">{asset.type}</p>
+                    <p className="text-xs font-mono text-content-tertiary">{asset.type}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <p className="text-sm font-mono font-medium text-emerald-400">+${asset.value.toLocaleString()}</p>
-                    <button onClick={async () => { const ok = await deleteAsset(asset.id); if (ok) toast.success('Asset removed'); }} className="opacity-0 group-hover:opacity-100 text-zinc-600 hover:text-red-400 transition-all">
+                    <button onClick={async () => { const ok = await deleteAsset(asset.id); if (ok) toast.success('Asset removed'); }} className="opacity-0 group-hover:opacity-100 text-content-muted hover:text-red-400 transition-all">
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -214,13 +214,13 @@ export default function NetWorth() {
         >
           <div className="divide-y divide-surface-border -mx-6 -my-6">
             {debts.length === 0 ? (
-              <div className="p-6 text-center text-zinc-500 text-sm font-mono">No liabilities added yet.</div>
+              <div className="p-6 text-center text-content-tertiary text-sm font-mono">No liabilities added yet.</div>
             ) : (
               debts.map(debt => (
                 <div key={debt.id} className="px-6 py-3 flex justify-between items-center hover:bg-surface-elevated transition-colors">
                   <div>
                     <p className="text-sm font-medium text-content-primary">{debt.name}</p>
-                    <p className="text-xs font-mono text-zinc-500">{debt.type} · {debt.apr}% APR</p>
+                    <p className="text-xs font-mono text-content-tertiary">{debt.type} · {debt.apr}% APR</p>
                   </div>
                   <p className="text-sm font-mono font-medium text-red-400">-${debt.remaining.toLocaleString()}</p>
                 </div>

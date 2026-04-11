@@ -37,13 +37,13 @@ function FaqItem({ question, answer }: { question: string, answer: string }) {
       >
         <span className="text-lg font-medium text-content-primary group-hover:text-indigo-400 transition-colors">{question}</span>
         {isOpen ? (
-          <Minus className="w-5 h-5 text-zinc-500 group-hover:text-indigo-400 transition-colors" />
+          <Minus className="w-5 h-5 text-content-tertiary group-hover:text-indigo-400 transition-colors" />
         ) : (
-          <Plus className="w-5 h-5 text-zinc-500 group-hover:text-indigo-400 transition-colors" />
+          <Plus className="w-5 h-5 text-content-tertiary group-hover:text-indigo-400 transition-colors" />
         )}
       </button>
       <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-40 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
-        <p className="text-zinc-400 leading-relaxed">{answer}</p>
+        <p className="text-content-tertiary leading-relaxed">{answer}</p>
       </div>
     </div>
   );
@@ -80,7 +80,7 @@ export default function Pricing() {
           <Link to="/" className="brand-header-text text-xl text-content-primary transition-colors duration-200">
             Oweable
           </Link>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-content-tertiary">
             <Link to="/#features" className="hover:text-white transition-colors duration-200">Features</Link>
             <Link to="/pricing" className="text-white transition-colors duration-200">Pricing</Link>
             <Link to="/dashboard" className="hover:text-white transition-colors duration-200">Sign In</Link>
@@ -123,7 +123,7 @@ export default function Pricing() {
             Priced for maximum leverage.
           </h1>
           
-          <p className="text-base md:text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed font-light">
+          <p className="text-base md:text-lg text-content-tertiary max-w-2xl mx-auto leading-relaxed font-light">
             Stop paying for apps that just track your debt. Invest in the arsenal that eliminates it.
           </p>
         </div>
@@ -145,14 +145,14 @@ export default function Pricing() {
                 <button 
                   type="button"
                   onClick={() => setIsYearly(false)}
-                  className={`relative z-10 w-[100px] py-1.5 text-xs font-sans font-medium transition-colors duration-300 ${!isYearly ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                  className={`relative z-10 w-[100px] py-1.5 text-xs font-sans font-medium transition-colors duration-300 ${!isYearly ? 'text-white' : 'text-content-tertiary hover:text-content-secondary'}`}
                 >
                   Monthly
                 </button>
                 <button 
                   type="button"
                   onClick={() => setIsYearly(true)}
-                  className={`relative z-10 w-[100px] py-1.5 text-xs font-sans font-medium transition-colors duration-300 ${isYearly ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                  className={`relative z-10 w-[100px] py-1.5 text-xs font-sans font-medium transition-colors duration-300 ${isYearly ? 'text-white' : 'text-content-tertiary hover:text-content-secondary'}`}
                 >
                   Yearly
                 </button>
@@ -170,11 +170,11 @@ export default function Pricing() {
             {/* Card 1: The Tracker */}
             <div className={`bg-surface-raised border border-surface-border rounded-sm p-10 flex flex-col transition-all duration-700 ease-out delay-[100ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
               <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Tracker</h3>
-              <p className="text-zinc-500 text-sm mb-8 h-10 leading-relaxed">Core balances and bills without the full suite.</p>
+              <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Core balances and bills without the full suite.</p>
               
               <div className="mb-10 p-6 bg-surface-base border border-surface-border rounded-sm">
                 <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">$0</span>
-                <span className="text-zinc-600 text-sm ml-3">forever free</span>
+                <span className="text-content-muted text-sm ml-3">forever free</span>
               </div>
               
               <Link 
@@ -186,16 +186,16 @@ export default function Pricing() {
               
               <div className="flex flex-col gap-5 mt-auto">
                 <div className="flex items-start gap-3">
-                  <Check className="w-3.5 h-3.5 text-zinc-500 shrink-0 mt-0.5" />
-                  <span className="text-zinc-400 text-sm">3 basic accounts</span>
+                  <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
+                  <span className="text-content-tertiary text-sm">3 basic accounts</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Check className="w-3.5 h-3.5 text-zinc-500 shrink-0 mt-0.5" />
-                  <span className="text-zinc-400 text-sm">Manual bill entry</span>
+                  <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
+                  <span className="text-content-tertiary text-sm">Manual bill entry</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Check className="w-3.5 h-3.5 text-zinc-500 shrink-0 mt-0.5" />
-                  <span className="text-zinc-400 text-sm">Standard net worth chart</span>
+                  <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
+                  <span className="text-content-tertiary text-sm">Standard net worth chart</span>
                 </div>
               </div>
             </div>
@@ -211,12 +211,12 @@ export default function Pricing() {
                 </div>
                 
                 <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Full suite</h3>
-                <p className="text-zinc-500 text-sm mb-8 h-10 leading-relaxed">Everything in the app during open beta.</p>
+                <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Everything in the app during open beta.</p>
                 
                 <div className="mb-10 p-6 bg-surface-base border border-indigo-500/20 rounded-sm relative h-[100px] flex items-center shadow-[inset_0_0_20px_rgba(99,102,241,0.02)]">
                   <div className={`absolute inset-0 px-6 flex items-center transition-all duration-300 ease-in-out`}>
                     <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">$0</span>
-                    <span className="text-zinc-600 text-sm ml-3">complimentary beta</span>
+                    <span className="text-content-muted text-sm ml-3">complimentary beta</span>
                   </div>
                 </div>
                 
@@ -230,19 +230,19 @@ export default function Pricing() {
                 <div className="flex flex-col gap-5 mt-auto">
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                    <span className="text-zinc-400 text-sm">Unlimited account sync</span>
+                    <span className="text-content-tertiary text-sm">Unlimited account sync</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                    <span className="text-zinc-400 text-sm">Debt payoff planner (avalanche & snowball)</span>
+                    <span className="text-content-tertiary text-sm">Debt payoff planner (avalanche & snowball)</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                    <span className="text-zinc-400 text-sm">Subscription price-change alerts</span>
+                    <span className="text-content-tertiary text-sm">Subscription price-change alerts</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                    <span className="text-zinc-400 text-sm">Tax tools for freelancers</span>
+                    <span className="text-content-tertiary text-sm">Tax tools for freelancers</span>
                   </div>
                 </div>
               </div>

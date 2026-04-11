@@ -150,7 +150,7 @@ export default function Reports() {
                 key={r}
                 onClick={() => setDateRange(r)}
                 className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${
-                  dateRange === r ? 'bg-surface-border text-white' : 'text-zinc-500 hover:text-zinc-300'
+                  dateRange === r ? 'bg-surface-border text-white' : 'text-content-tertiary hover:text-content-secondary'
                 }`}
               >
                 {r === '30d' ? '30D' : r === '90d' ? '90D' : '1Y'}
@@ -162,7 +162,7 @@ export default function Reports() {
               filteredTx.map(t => ({ date: t.date, name: t.name, category: t.category, amount: t.amount.toFixed(2), type: t.type })),
               `oweable-report-${dateRange}.csv`
             )}
-            className="flex items-center gap-2 bg-transparent border border-surface-border text-zinc-300 px-4 py-2 rounded-sm text-sm font-medium hover:bg-surface-elevated transition-colors"
+            className="flex items-center gap-2 bg-transparent border border-surface-border text-content-secondary px-4 py-2 rounded-sm text-sm font-medium hover:bg-surface-elevated transition-colors"
           >
             <Download className="w-4 h-4" />
             Export CSV
@@ -180,7 +180,7 @@ export default function Reports() {
             { label: 'Transactions', value: filteredTx.length.toString(), color: 'text-amber-400' },
           ].map(card => (
             <div key={card.label} className="bg-surface-elevated border border-surface-border rounded-sm p-5">
-              <p className="metric-label normal-case text-zinc-500 mb-2">{card.label}</p>
+              <p className="metric-label normal-case text-content-tertiary mb-2">{card.label}</p>
               <p className={`text-2xl font-mono font-bold tabular-nums data-numeric ${card.color}`}>{card.value}</p>
             </div>
           ))}
@@ -286,7 +286,7 @@ export default function Reports() {
                     <span className="ml-2 text-xs text-content-tertiary">{d.apr}% APR</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-mono tabular-nums text-zinc-400 data-numeric">${d.remaining.toLocaleString()} left</span>
+                    <span className="text-xs font-mono tabular-nums text-content-tertiary data-numeric">${d.remaining.toLocaleString()} left</span>
                     <span className="ml-2 text-xs font-mono tabular-nums text-indigo-400 data-numeric">{d.pct}%</span>
                   </div>
                 </div>

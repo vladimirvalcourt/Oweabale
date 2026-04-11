@@ -313,15 +313,19 @@ body {
 
   --color-content-primary: #111827;
   --color-content-secondary: #4b5563;
-  --color-content-tertiary: #6b7280;
-  /* Muted on white/light surfaces — #9ca3af fails AA on #fff */
-  --color-content-muted: #5f6670;
+  /* ≥4.5:1 on #f1f2f4 / #fff for normal text (WCAG AA) */
+  --color-content-tertiary: #5b636e;
+  --color-content-muted: #525a63;
 
   --shadow-tactile: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(0, 0, 0, 0.06);
   --shadow-tactile-hover: inset 0 1px 0 rgba(255, 255, 255, 1), 0 2px 6px rgba(0, 0, 0, 0.08);
   --shadow-glow-indigo: 0 0 12px rgba(37, 99, 235, 0.2);
   --color-brand-cta: #4338ca;
   --color-brand-cta-hover: #4f46e5;
+  /* Brighter blues fail AA on white; use darker hues for inline text/icons */
+  --color-brand-indigo: #2563eb;
+  --color-brand-violet: #4f46e5;
+  --color-brand-tax: #2563eb;
 }
 
 :root.theme-light .brand-header-text {

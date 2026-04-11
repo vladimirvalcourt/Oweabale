@@ -88,7 +88,7 @@ export function AppLoader() {
         </div>
         <div className="absolute -inset-2 border border-brand-violet/10 animate-pulse" />
       </div>
-      <p className="text-[9px] font-mono text-zinc-700 uppercase tracking-[0.4em]">
+      <p className="text-[9px] font-mono text-content-muted uppercase tracking-[0.4em]">
         Syncing Financial Data
       </p>
     </div>

@@ -180,7 +180,7 @@ function BankConnectionPlaid() {
     <div className="bg-surface-elevated rounded-sm border border-surface-border p-6">
       <div className="mb-6">
         <h3 className="text-xs font-mono uppercase tracking-widest text-content-primary">Data Sources</h3>
-        <p className="mt-1 text-sm text-zinc-400">
+        <p className="mt-1 text-sm text-content-tertiary">
           Connect your bank with Plaid. Credentials stay with Plaid; we store a secure access token on the server only.
           Transactions sync automatically and you can refresh on demand.
         </p>
@@ -217,7 +217,7 @@ function BankConnectionPlaid() {
               <AlertTriangle className="w-5 h-5 shrink-0 text-amber-400" />
               <div className="min-w-0">
                 <p className="text-sm font-mono text-amber-200">Bank needs attention</p>
-                <p className="mt-1 text-xs text-zinc-400">
+                <p className="mt-1 text-xs text-content-tertiary">
                   Your institution requires you to sign in again. Use Fix connection to complete Plaid Link update mode.
                 </p>
                 <button
@@ -251,7 +251,7 @@ function BankConnectionPlaid() {
                   type="button"
                   onClick={handleFixConnectionClick}
                   disabled={isConnecting || !plaidGloballyEnabled}
-                  className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-surface-border text-zinc-300 font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-sm disabled:opacity-60"
+                  className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-surface-border text-content-secondary font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-sm disabled:opacity-60"
                 >
                   Reconnect
                 </button>
@@ -266,7 +266,7 @@ function BankConnectionPlaid() {
                 </button>
               </div>
             </div>
-            <div className="mt-3 text-xs font-mono text-zinc-500">
+            <div className="mt-3 text-xs font-mono text-content-tertiary">
               {lastSyncLabel
                 ? `Last transaction sync: ${lastSyncLabel}`
                 : 'No sync yet — use Sync now or wait for automatic updates.'}

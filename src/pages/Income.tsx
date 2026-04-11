@@ -156,7 +156,7 @@ export default function Income() {
       {incomes.length === 0 ? (
         <div className="bg-surface-raised rounded-sm border border-surface-border py-20 px-6 flex flex-col items-center justify-center text-center">
           <div className="w-12 h-12 border border-surface-border bg-surface-elevated rounded-none flex items-center justify-center mb-4">
-            <Vault className="w-5 h-5 text-zinc-500" />
+            <Vault className="w-5 h-5 text-content-tertiary" />
           </div>
           <h2 className="text-lg font-sans font-semibold text-content-primary mb-2">No income yet</h2>
           <p className="text-sm text-content-tertiary max-w-md">Add salary or freelance sources to forecast cash flow and tax set-aside.</p>
@@ -185,8 +185,8 @@ export default function Income() {
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 -mx-6 -my-6 p-6">
               <div className="bg-surface-elevated rounded-sm border border-surface-border p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="w-3.5 h-3.5 text-zinc-500" />
-                  <p className="metric-label normal-case text-zinc-500">Expected monthly</p>
+                  <TrendingUp className="w-3.5 h-3.5 text-content-tertiary" />
+                  <p className="metric-label normal-case text-content-tertiary">Expected monthly</p>
                 </div>
                 <p className="mt-2 text-2xl font-bold font-mono tabular-nums text-content-primary data-numeric">
                   ${totalMonthlyIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}
@@ -194,11 +194,11 @@ export default function Income() {
               </div>
               <div className="bg-surface-elevated rounded-sm border border-surface-border p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <Vault className="w-3.5 h-3.5 text-zinc-500" />
-                  <p className="metric-label normal-case text-zinc-500">Active sources</p>
+                  <Vault className="w-3.5 h-3.5 text-content-tertiary" />
+                  <p className="metric-label normal-case text-content-tertiary">Active sources</p>
                 </div>
                 <p className="mt-2 text-2xl font-bold font-mono tabular-nums text-content-primary data-numeric">
-                  {activeSourcesCount} <span className="text-sm text-zinc-500 font-normal font-sans">/ {incomes.length}</span>
+                  {activeSourcesCount} <span className="text-sm text-content-tertiary font-normal font-sans">/ {incomes.length}</span>
                 </p>
               </div>
             </div>
@@ -222,7 +222,7 @@ export default function Income() {
                   }}
                 >
                   {income.status === 'paused' && (
-                    <div className="absolute top-0 right-0 bg-surface-border text-zinc-400 text-xs font-sans font-medium px-2 py-1 border-b border-l border-surface-border">
+                    <div className="absolute top-0 right-0 bg-surface-border text-content-tertiary text-xs font-sans font-medium px-2 py-1 border-b border-l border-surface-border">
                       Paused
                     </div>
                   )}
@@ -238,7 +238,7 @@ export default function Income() {
                     </div>
                     
                     <Menu as="div" className="relative inline-block text-left">
-                      <Menu.Button className="text-zinc-500 hover:text-content-primary transition-colors p-1 rounded-sm focus:outline-none">
+                      <Menu.Button className="text-content-tertiary hover:text-content-primary transition-colors p-1 rounded-sm focus:outline-none">
                         <MoreHorizontal className="w-4 h-4" />
                       </Menu.Button>
                       <Transition
@@ -257,10 +257,10 @@ export default function Income() {
                                 <button
                                   onClick={() => openDepositModal(income)}
                                   className={`${
-                                    active ? 'bg-surface-border text-content-primary' : 'text-zinc-300'
+                                    active ? 'bg-surface-border text-content-primary' : 'text-content-secondary'
                                   } group flex w-full items-center px-4 py-2 text-sm font-sans`}
                                 >
-                                  <ArrowDownCircle className="mr-3 h-3.5 w-3.5 text-zinc-400" />
+                                  <ArrowDownCircle className="mr-3 h-3.5 w-3.5 text-content-tertiary" />
                                   Log deposit
                                 </button>
                               )}
@@ -270,10 +270,10 @@ export default function Income() {
                                 <button
                                   onClick={() => openEditModal(income)}
                                   className={`${
-                                    active ? 'bg-surface-border text-content-primary' : 'text-zinc-300'
+                                    active ? 'bg-surface-border text-content-primary' : 'text-content-secondary'
                                   } group flex w-full items-center px-4 py-2 text-sm font-sans`}
                                 >
-                                  <Edit2 className="mr-3 h-3.5 w-3.5 text-zinc-400" />
+                                  <Edit2 className="mr-3 h-3.5 w-3.5 text-content-tertiary" />
                                   Edit
                                 </button>
                               )}
@@ -324,7 +324,7 @@ export default function Income() {
               <Dialog.Title className="text-base font-sans font-semibold text-content-primary">
                 {isEditModalOpen ? 'Edit income source' : 'New income source'}
               </Dialog.Title>
-              <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-zinc-500 hover:text-white transition-colors">
+              <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-content-tertiary hover:text-white transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -346,7 +346,7 @@ export default function Income() {
                 <div>
                   <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Amount</label>
                   <div className="relative">
-                    <span className="absolute left-3 top-2 text-zinc-500 font-mono">$</span>
+                    <span className="absolute left-3 top-2 text-content-tertiary font-mono">$</span>
                     <input 
                       type="number" 
                       required
@@ -447,7 +447,7 @@ export default function Income() {
           <Dialog.Panel className="mx-auto max-w-sm w-full rounded-sm bg-surface-raised border border-surface-border shadow-2xl">
             <div className="flex items-center justify-between p-4 border-b border-surface-border bg-surface-elevated">
               <Dialog.Title className="text-base font-sans font-semibold text-content-primary">Log deposit</Dialog.Title>
-              <button onClick={() => setIsDepositModalOpen(false)} className="text-zinc-500 hover:text-white transition-colors">
+              <button onClick={() => setIsDepositModalOpen(false)} className="text-content-tertiary hover:text-white transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -461,7 +461,7 @@ export default function Income() {
               <div>
                 <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Amount received</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-2 text-zinc-500 font-mono">$</span>
+                  <span className="absolute left-3 top-2 text-content-tertiary font-mono">$</span>
                   <input 
                     type="number" 
                     required

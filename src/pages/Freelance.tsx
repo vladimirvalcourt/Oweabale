@@ -221,7 +221,7 @@ export default function Freelance() {
                <div className="divide-y divide-surface-border">
                   {entriesWithMath.length === 0 ? (
                     <div className="px-6 py-20 text-center flex flex-col items-center">
-                       <Zap className="w-12 h-12 text-zinc-700 mb-4" />
+                       <Zap className="w-12 h-12 text-content-muted mb-4" />
                        <p className="text-content-tertiary text-sm leading-relaxed max-w-xs">
                          No payments yet. Add earnings to see estimated tax set-aside.
                        </p>
@@ -231,7 +231,7 @@ export default function Freelance() {
                       <div key={entry.id} className="px-6 py-6 hover:bg-surface-elevated/40 transition-colors group flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div className="flex items-start gap-4">
                            <div className={`w-12 h-12 flex items-center justify-center shrink-0 border ${entry.isVaulted ? 'border-emerald-500/20 bg-emerald-500/10' : 'border-surface-border bg-surface-raised'}`}>
-                             {entry.isVaulted ? <ShieldCheck className="w-6 h-6 text-emerald-500" /> : <ShieldAlert className="w-6 h-6 text-zinc-600" />}
+                             {entry.isVaulted ? <ShieldCheck className="w-6 h-6 text-emerald-500" /> : <ShieldAlert className="w-6 h-6 text-content-muted" />}
                            </div>
                            <div className="space-y-1">
                               <h3 className="font-sans font-semibold text-white text-sm">{entry.client}</h3>
@@ -263,7 +263,7 @@ export default function Freelance() {
                            >
                              {entry.isVaulted ? 'Saved' : 'Move to tax reserve'}
                            </button>
-                           <button onClick={() => deleteFreelanceEntry(entry.id)} className="text-zinc-700 hover:text-rose-500 transition-colors p-2"><Trash2 className="w-4 h-4"/></button>
+                           <button onClick={() => deleteFreelanceEntry(entry.id)} className="text-content-muted hover:text-rose-500 transition-colors p-2"><Trash2 className="w-4 h-4"/></button>
                         </div>
                       </div>
                     ))

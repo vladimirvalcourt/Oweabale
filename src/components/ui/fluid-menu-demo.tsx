@@ -7,7 +7,7 @@ export function MenuDemo() {
     <div className="flex flex-col items-center gap-8 p-8">
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-sans font-bold text-white uppercase italic tracking-tight">Fluid Navigation</h2>
-        <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Experimental Pulse Menu</p>
+        <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">Experimental Pulse Menu</p>
       </div>
       
       <div className="relative mt-4">
@@ -21,7 +21,7 @@ export function MenuDemo() {
                   <MenuIcon size={24} strokeWidth={1.5} className="text-brand-indigo" />
                 </div>
                 <div className="absolute inset-0 transition-all duration-300 ease-in-out origin-center opacity-0 scale-0 -rotate-180 [div[data-expanded=true]_&]:opacity-100 [div[data-expanded=true]_&]:scale-100 [div[data-expanded=true]_&]:rotate-0 flex items-center justify-center">
-                  <X size={24} strokeWidth={1.5} className="text-zinc-400" />
+                  <X size={24} strokeWidth={1.5} className="text-content-tertiary" />
                 </div>
               </div>
             } 

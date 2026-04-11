@@ -47,14 +47,14 @@ export default function AuthPage() {
             <div className="w-5 h-5 border-2 border-brand-violet flex items-center justify-center">
               <div className="w-2 h-2 bg-brand-violet" />
             </div>
-            <span className="font-mono text-xs text-zinc-500 tracking-[0.2em] uppercase">
+            <span className="font-mono text-xs text-content-tertiary tracking-[0.2em] uppercase">
               Oweable
             </span>
           </div>
           <h1 className="font-mono text-2xl text-white font-bold tracking-tight">
             Sign in to Oweable
           </h1>
-          <p className="font-mono text-xs text-zinc-400 uppercase tracking-[0.2em] mt-2">
+          <p className="font-mono text-xs text-content-tertiary uppercase tracking-[0.2em] mt-2">
             Your financial OS — Secure access only.
           </p>
         </div>
@@ -95,17 +95,17 @@ export default function AuthPage() {
         </button>
 
         {/* Support Note */}
-        <p className="font-mono text-[11px] text-zinc-500 text-center mb-10 uppercase tracking-[0.1em] leading-relaxed">
+        <p className="font-mono text-[11px] text-content-tertiary text-center mb-10 uppercase tracking-[0.1em] leading-relaxed">
           Enterprise encryption and biometric auth <br />
           handled by Google Identity Services.
         </p>
 
         {/* Legal */}
-        <p className="font-mono text-[10px] text-zinc-600 text-center mt-6 leading-relaxed uppercase tracking-wider">
+        <p className="font-mono text-[10px] text-content-muted text-center mt-6 leading-relaxed uppercase tracking-wider">
           By continuing, you agree to our{' '}
-          <a href="/terms" className="text-zinc-400 hover:text-white underline underline-offset-2">Terms</a>
+          <a href="/terms" className="text-content-tertiary hover:text-white underline underline-offset-2">Terms</a>
           {' '}and{' '}
-          <a href="/privacy" className="text-zinc-400 hover:text-white underline underline-offset-2">Privacy Policy</a>.
+          <a href="/privacy" className="text-content-tertiary hover:text-white underline underline-offset-2">Privacy Policy</a>.
         </p>
       </div>
     </div>

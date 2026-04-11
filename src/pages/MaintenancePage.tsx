@@ -15,7 +15,7 @@ export default function MaintenancePage() {
       <h1 className="text-2xl font-semibold text-content-primary tracking-tight mb-2 text-center">
         We&apos;re upgrading Oweable
       </h1>
-      <p className="text-sm text-zinc-500 text-center max-w-md mb-10">
+      <p className="text-sm text-content-tertiary text-center max-w-md mb-10">
         The app is temporarily unavailable while we ship improvements. Please try again soon, or sign out and
         browse the public site.
       </p>

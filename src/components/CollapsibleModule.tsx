@@ -33,16 +33,16 @@ export function CollapsibleModule({
         className="w-full text-left px-6 py-3 bg-surface-elevated/80 border-b border-surface-border flex items-center justify-between cursor-pointer group active:translate-y-[1px] hover:bg-surface-highlight transition-all border-t border-t-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-indigo"
       >
         <div className="flex items-center gap-3">
-          {Icon && <Icon className="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 transition-colors" />}
+          {Icon && <Icon className="w-3.5 h-3.5 text-content-tertiary group-hover:text-content-secondary transition-colors" />}
           <h3 className="brand-header-text group-hover:text-content-primary transition-colors text-[10px]">{title}</h3>
         </div>
         <div className="flex items-center gap-4">
           {!isOpen && extraHeader}
           <div className="flex items-center justify-center w-5 h-5" aria-hidden>
             {isOpen ? (
-              <ChevronUp className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+              <ChevronUp className="w-3.5 h-3.5 text-content-muted group-hover:text-content-tertiary transition-colors" />
             ) : (
-              <ChevronDown className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+              <ChevronDown className="w-3.5 h-3.5 text-content-muted group-hover:text-content-tertiary transition-colors" />
             )}
           </div>
         </div>

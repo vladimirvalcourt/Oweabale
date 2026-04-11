@@ -448,7 +448,7 @@ export default function Layout() {
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
                   <span className="text-[11px] font-sans text-content-secondary font-semibold">Synced — Free Beta Trial</span>
                 </div>
-                <p className="text-[11px] font-sans text-zinc-500 leading-relaxed italic opacity-90 pl-3.5 border-l border-surface-border">
+                <p className="text-[11px] font-sans text-content-tertiary leading-relaxed italic opacity-90 pl-3.5 border-l border-surface-border">
                   Pricing may be introduced later with advance notice to testers.
                 </p>
               </div>
@@ -503,7 +503,7 @@ export default function Layout() {
             <button 
               type="button"
               aria-label="Open navigation menu"
-              className="lg:hidden text-zinc-500 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm p-1"
+              className="lg:hidden text-content-tertiary hover:text-content-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm p-1"
               onClick={() => setSidebarOpen(true)}
             >
               <MorphingMenuIcon isOpen={sidebarOpen} className="scale-110" />
@@ -544,15 +544,15 @@ export default function Layout() {
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium text-content-primary">{result.name}</span>
-                              <span className="text-xs text-zinc-500 bg-surface-elevated px-1.5 py-0.5 rounded">{result.type}</span>
+                              <span className="text-xs text-content-tertiary bg-surface-elevated px-1.5 py-0.5 rounded">{result.type}</span>
                             </div>
-                            <span className="text-xs text-zinc-400 mt-0.5">{result.detail}</span>
+                            <span className="text-xs text-content-tertiary mt-0.5">{result.detail}</span>
                           </button>
                         </li>
                       ))}
                     </ul>
                   ) : (
-                    <div className="px-4 py-3 text-sm text-zinc-500 text-center">
+                    <div className="px-4 py-3 text-sm text-content-tertiary text-center">
                       No results found for "{searchQuery}"
                     </div>
                   )}
@@ -575,7 +575,7 @@ export default function Layout() {
               type="button"
               aria-label="Open search"
               onClick={() => setIsMobileSearchOpen(true)} 
-              className="md:hidden text-zinc-500 hover:text-zinc-300 transition-colors p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm min-w-11 min-h-11 flex items-center justify-center"
+              className="md:hidden text-content-tertiary hover:text-content-secondary transition-colors p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm min-w-11 min-h-11 flex items-center justify-center"
             >
               <Search className="w-4 h-4" />
             </button>
@@ -618,21 +618,21 @@ export default function Layout() {
               {isNotifOpen && (
                 <div className="absolute right-0 top-full mt-2 w-80 bg-[#0C0D0E]/98 backdrop-blur-xl border border-white/10 rounded-sm shadow-2xl z-50 overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
-                    <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-300">Notifications</span>
-                    <button onClick={() => clearNotifications()} className="text-[10px] font-mono text-zinc-600 hover:text-zinc-400 uppercase tracking-widest transition-colors">Clear all</button>
+                    <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-content-secondary">Notifications</span>
+                    <button onClick={() => clearNotifications()} className="text-[10px] font-mono text-content-muted hover:text-content-tertiary uppercase tracking-widest transition-colors">Clear all</button>
                   </div>
                   <div className="max-h-80 overflow-y-auto scrollbar-hide">
                     {notifications.length === 0 ? (
-                      <div className="px-4 py-8 text-center text-zinc-600 text-[11px] font-mono uppercase tracking-widest">No notifications</div>
+                      <div className="px-4 py-8 text-center text-content-muted text-[11px] font-mono uppercase tracking-widest">No notifications</div>
                     ) : (
                       notifications.map((n: Notification) => (
                         <div key={n.id} className={cn('px-4 py-3 border-b border-white/5 last:border-0', !n.read && 'bg-indigo-500/5')}>
                           <div className="flex items-start gap-2">
                             <div className={cn('w-1.5 h-1.5 rounded-full mt-1.5 shrink-0', n.type === 'success' ? 'bg-emerald-500' : n.type === 'warning' ? 'bg-amber-500' : n.type === 'error' ? 'bg-red-500' : 'bg-indigo-500')} />
                             <div>
-                              <p className="text-[12px] font-mono text-zinc-200 font-medium">{n.title}</p>
-                              <p className="text-[11px] font-mono text-zinc-500 mt-0.5 leading-relaxed">{n.message}</p>
-                              <p className="text-[10px] font-mono text-zinc-700 mt-1">{new Date(n.timestamp).toLocaleTimeString()}</p>
+                              <p className="text-[12px] font-mono text-content-primary font-medium">{n.title}</p>
+                              <p className="text-[11px] font-mono text-content-tertiary mt-0.5 leading-relaxed">{n.message}</p>
+                              <p className="text-[10px] font-mono text-content-muted mt-1">{new Date(n.timestamp).toLocaleTimeString()}</p>
                             </div>
                           </div>
                         </div>
@@ -682,10 +682,10 @@ export default function Layout() {
                           to="/settings"
                           className={cn(
                             'flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
-                            active ? 'bg-white/5 text-white' : 'text-zinc-400'
+                            active ? 'bg-white/5 text-white' : 'text-content-tertiary'
                           )}
                         >
-                          <div className="w-4 h-4 flex items-center justify-center text-zinc-500">
+                          <div className="w-4 h-4 flex items-center justify-center text-content-tertiary">
                             <Settings className="w-4 h-4" />
                           </div>
                           <span>Settings</span>
@@ -705,7 +705,7 @@ export default function Layout() {
                           to="/"
                           className={cn(
                             'flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
-                            active ? 'bg-white/5 text-white' : 'text-zinc-400'
+                            active ? 'bg-white/5 text-white' : 'text-content-tertiary'
                           )}
                         >
                           <div className="w-4 h-4 flex items-center justify-center">
@@ -722,7 +722,7 @@ export default function Layout() {
                           onClick={() => setIsResetOpen(true)}
                           className={cn(
                             'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
-                            active ? 'bg-amber-500/10 text-amber-500' : 'text-zinc-400'
+                            active ? 'bg-amber-500/10 text-amber-500' : 'text-content-tertiary'
                           )}
                         >
                           <div className="w-4 h-4 flex items-center justify-center text-amber-500/70">
@@ -739,7 +739,7 @@ export default function Layout() {
                           to="/onboarding"
                           className={cn(
                             'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
-                            active ? 'bg-white/5 text-white' : 'text-zinc-400'
+                            active ? 'bg-white/5 text-white' : 'text-content-tertiary'
                           )}
                         >
                           <div className="w-4 h-4 flex items-center justify-center">
@@ -764,7 +764,7 @@ export default function Layout() {
                           }}
                           className={cn(
                             'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
-                            active ? 'bg-white/5 text-red-400' : 'text-zinc-400'
+                            active ? 'bg-white/5 text-red-400' : 'text-content-tertiary'
                           )}
                         >
                           <div className="w-4 h-4 flex items-center justify-center">
@@ -803,13 +803,13 @@ export default function Layout() {
         {/* Footer */}
         <footer className="bg-surface-base border-t border-surface-border py-6 px-4 sm:px-6 lg:px-8 mt-auto">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-zinc-500">
+            <p className="text-sm text-content-tertiary">
               &copy; {new Date().getFullYear()} Oweable Inc. All rights reserved.
             </p>
-            <div className="flex items-center gap-6 text-sm text-zinc-500">
-              <Link to="/privacy" className="hover:text-zinc-300 transition-colors">Privacy Policy</Link>
-              <Link to="/terms" className="hover:text-zinc-300 transition-colors">Terms of Service</Link>
-              <Link to="/security" className="hover:text-zinc-300 transition-colors">Security</Link>
+            <div className="flex items-center gap-6 text-sm text-content-tertiary">
+              <Link to="/privacy" className="hover:text-content-secondary transition-colors">Privacy Policy</Link>
+              <Link to="/terms" className="hover:text-content-secondary transition-colors">Terms of Service</Link>
+              <Link to="/security" className="hover:text-content-secondary transition-colors">Security</Link>
             </div>
           </div>
         </footer>
@@ -822,7 +822,7 @@ export default function Layout() {
             <label htmlFor="layout-mobile-search" className="sr-only">
               Search bills, transactions, debts, and more
             </label>
-            <Search className="w-5 h-5 text-zinc-500 shrink-0" aria-hidden />
+            <Search className="w-5 h-5 text-content-tertiary shrink-0" aria-hidden />
             <input 
               id="layout-mobile-search"
               autoFocus
@@ -831,7 +831,7 @@ export default function Layout() {
               autoComplete="off"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none text-base text-zinc-200 placeholder-zinc-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm px-1"
+              className="flex-1 bg-transparent border-none text-base text-content-primary placeholder:text-content-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm px-1"
             />
             <button 
               type="button"
@@ -842,7 +842,7 @@ export default function Layout() {
                   setSearchQuery('');
                 });
               }}
-              className="p-2 text-zinc-500 hover:text-zinc-300 min-w-11 min-h-11 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm"
+              className="p-2 text-content-tertiary hover:text-content-secondary min-w-11 min-h-11 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm"
             >
               <X className="w-5 h-5" />
             </button>
@@ -860,20 +860,20 @@ export default function Layout() {
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-base font-medium text-content-primary">{result.name}</span>
-                          <span className="text-xs text-zinc-500 bg-surface-elevated px-1.5 py-0.5 rounded">{result.type}</span>
+                          <span className="text-xs text-content-tertiary bg-surface-elevated px-1.5 py-0.5 rounded">{result.type}</span>
                         </div>
-                        <span className="text-sm text-zinc-400 mt-1">{result.detail}</span>
+                        <span className="text-sm text-content-tertiary mt-1">{result.detail}</span>
                       </button>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <div className="px-4 py-8 text-center text-zinc-500">
+                <div className="px-4 py-8 text-center text-content-tertiary">
                   No results found for "{searchQuery}"
                 </div>
               )
             ) : (
-              <div className="px-4 py-8 text-center text-zinc-600 text-sm">
+              <div className="px-4 py-8 text-center text-content-muted text-sm">
                 Type to start searching...
               </div>
             )}
@@ -895,14 +895,14 @@ export default function Layout() {
               </div>
               <Dialog.Title className="text-lg font-semibold tracking-tight text-content-primary font-sans">Wipe All Data?</Dialog.Title>
             </div>
-            <Dialog.Description className="text-[13px] text-zinc-400 mb-6 leading-relaxed font-sans">
+            <Dialog.Description className="text-[13px] text-content-tertiary mb-6 leading-relaxed font-sans">
               This will permanently delete every bill, transaction, and financial link you've created. You will be sent back to the initial setup to start fresh.
             </Dialog.Description>
 
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setIsResetOpen(false)}
-                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-[11px] font-mono font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-200 transition-colors"
+                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-[11px] font-mono font-bold uppercase tracking-widest text-content-tertiary hover:text-content-primary transition-colors"
               >
                 Cancel
               </button>

@@ -131,16 +131,16 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                 
                 <div className="space-y-6">
                    <div className="flex gap-4">
-                      <div className="shrink-0 w-5 h-5 rounded-full border border-surface-border flex items-center justify-center text-[10px] font-mono text-zinc-500">1</div>
-                      <p className="text-[11px] text-zinc-400 font-sans leading-relaxed uppercase tracking-wider">Open phone camera</p>
+                      <div className="shrink-0 w-5 h-5 rounded-full border border-surface-border flex items-center justify-center text-[10px] font-mono text-content-tertiary">1</div>
+                      <p className="text-[11px] text-content-tertiary font-sans leading-relaxed uppercase tracking-wider">Open phone camera</p>
                    </div>
                    <div className="flex gap-4">
-                      <div className="shrink-0 w-5 h-5 rounded-full border border-surface-border flex items-center justify-center text-[10px] font-mono text-zinc-500">2</div>
-                      <p className="text-[11px] text-zinc-400 font-sans leading-relaxed uppercase tracking-wider">Scan QR to bridge link</p>
+                      <div className="shrink-0 w-5 h-5 rounded-full border border-surface-border flex items-center justify-center text-[10px] font-mono text-content-tertiary">2</div>
+                      <p className="text-[11px] text-content-tertiary font-sans leading-relaxed uppercase tracking-wider">Scan QR to bridge link</p>
                    </div>
                    <div className="flex gap-4">
-                      <div className="shrink-0 w-5 h-5 rounded-full border border-surface-border flex items-center justify-center text-[10px] font-mono text-zinc-500">3</div>
-                      <p className="text-[11px] text-zinc-400 font-sans leading-relaxed uppercase tracking-wider">Upload to Review Inbox</p>
+                      <div className="shrink-0 w-5 h-5 rounded-full border border-surface-border flex items-center justify-center text-[10px] font-mono text-content-tertiary">3</div>
+                      <p className="text-[11px] text-content-tertiary font-sans leading-relaxed uppercase tracking-wider">Upload to Review Inbox</p>
                    </div>
                 </div>
               </div>
@@ -148,7 +148,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
               <div className="mt-8">
                  <div className="flex items-center gap-2 mb-2">
                     <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                    <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest">TLS Encryption Active</span>
+                    <span className="text-[9px] font-mono text-content-muted uppercase tracking-widest">TLS Encryption Active</span>
                  </div>
                  <div className="w-full h-0.5 bg-surface-border rounded-full overflow-hidden">
                     <div className={cn("h-full bg-brand-violet transition-all duration-300", status === 'waiting' ? 'w-1/3' : status === 'active' ? 'w-2/3' : status === 'completed' ? 'w-full' : 'w-0')} />
@@ -158,7 +158,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
 
             {/* Right Panel: QR Display */}
             <div className="flex-1 p-10 flex flex-col items-center justify-center bg-surface-raised relative">
-               <button onClick={onClose} className="absolute top-4 right-4 text-zinc-600 hover:text-white transition-colors">
+               <button onClick={onClose} className="absolute top-4 right-4 text-content-muted hover:text-white transition-colors">
                  <X className="w-5 h-5" />
                </button>
 
@@ -166,7 +166,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                   {status === 'generating' ? (
                     <motion.div key="generating" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-4">
                       <Loader2 className="w-8 h-8 text-brand-violet animate-spin" />
-                      <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Generating Token...</p>
+                      <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">Generating Token...</p>
                     </motion.div>
                   ) : (
                     <motion.div key="ready" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center max-w-[250px] w-full">
@@ -189,7 +189,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                        </div>
                        
                        <div className="mt-8 text-center min-h-[50px] flex flex-col items-center justify-center">
-                          {status === 'waiting' && <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest leading-relaxed">Scan to upload document.</p>}
+                          {status === 'waiting' && <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest leading-relaxed">Scan to upload document.</p>}
                           {status === 'active' && <p className="text-[10px] font-mono text-emerald-400 animate-pulse uppercase tracking-[0.2em] leading-relaxed">📱 Phone connected... waiting for photo.</p>}
                           {status === 'completed' && <p className="text-[10px] font-mono text-brand-violet animate-pulse uppercase tracking-[0.2em] leading-relaxed">Receiving document...</p>}
                        </div>

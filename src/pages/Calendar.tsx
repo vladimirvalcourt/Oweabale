@@ -124,7 +124,7 @@ export default function Calendar() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Financial Calendar</h1>
-          <p className="text-sm text-zinc-400 mt-1">All financial events plotted in time.</p>
+          <p className="text-sm text-content-tertiary mt-1">All financial events plotted in time.</p>
         </div>
         {/* Legend */}
         <div className="flex flex-wrap items-center gap-4">
@@ -134,7 +134,7 @@ export default function Calendar() {
             return (
               <div key={type} className="flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-none ${cfg.color}`} />
-                <span className="text-[11px] font-mono text-zinc-500 capitalize">{type}</span>
+                <span className="text-[11px] font-mono text-content-tertiary capitalize">{type}</span>
               </div>
             );
           })}
@@ -143,13 +143,13 @@ export default function Calendar() {
       <CollapsibleModule 
         title="Financial Calendar"
         icon={CalendarDays}
-        extraHeader={<span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{Array.from(eventsByDay.values()).flat().length} Events Detected</span>}
+        extraHeader={<span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{Array.from(eventsByDay.values()).flat().length} Events Detected</span>}
       >
         <div className="bg-surface-raised border border-surface-border rounded-sm overflow-hidden -mx-6 -my-6">
           <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border bg-surface-elevated">
             <button
               onClick={prevMonth}
-              className="p-1.5 text-zinc-500 hover:text-white hover:bg-surface-border rounded-sm transition-colors"
+              className="p-1.5 text-content-tertiary hover:text-white hover:bg-surface-border rounded-sm transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -160,7 +160,7 @@ export default function Calendar() {
             </div>
             <button
               onClick={nextMonth}
-              className="p-1.5 text-zinc-500 hover:text-white hover:bg-surface-border rounded-sm transition-colors"
+              className="p-1.5 text-content-tertiary hover:text-white hover:bg-surface-border rounded-sm transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -169,7 +169,7 @@ export default function Calendar() {
           {/* Day Labels */}
           <div className="grid grid-cols-7 border-b border-surface-border bg-surface-base">
             {DAYS.map(d => (
-              <div key={d} className="py-2 text-center text-[10px] font-mono text-zinc-300 uppercase tracking-wider">
+              <div key={d} className="py-2 text-center text-[10px] font-mono text-content-secondary uppercase tracking-wider">
                 {d}
               </div>
             ))}
@@ -213,12 +213,12 @@ export default function Calendar() {
                               className={`flex items-center gap-1 px-1 py-0.5 rounded-sm bg-surface-elevated border border-surface-border`}
                             >
                               <span className={`w-1.5 h-1.5 rounded-none shrink-0 ${cfg.color}`} />
-                              <span className="text-[9px] font-mono text-zinc-200 truncate">{ev.label}</span>
+                              <span className="text-[9px] font-mono text-content-primary truncate">{ev.label}</span>
                             </div>
                           );
                         })}
                         {events.length > 3 && (
-                          <div className="text-[9px] font-mono text-zinc-600 pl-1">+{events.length - 3} more</div>
+                          <div className="text-[9px] font-mono text-content-muted pl-1">+{events.length - 3} more</div>
                         )}
                       </div>
                     </>
@@ -238,7 +238,7 @@ export default function Calendar() {
           onClick={e => e.stopPropagation()}
         >
           <div className="flex items-center gap-2 mb-3 pb-3 border-b border-surface-border">
-            <CalendarDays className="w-3.5 h-3.5 text-zinc-400" />
+            <CalendarDays className="w-3.5 h-3.5 text-content-tertiary" />
             <span className="text-xs font-mono font-bold text-content-primary uppercase tracking-wider">
               {MONTHS[month]} {popover.day}
             </span>
@@ -251,7 +251,7 @@ export default function Calendar() {
                 <div key={ev.id} className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <Icon className={`w-3 h-3 ${cfg.text}`} />
-                    <span className="text-xs font-mono text-zinc-300">{ev.label}</span>
+                    <span className="text-xs font-mono text-content-secondary">{ev.label}</span>
                   </div>
                   {ev.amount !== undefined && (
                     <span className={`text-xs font-mono font-bold ${ev.type === 'income' ? 'text-emerald-400' : 'text-red-400'}`}>
@@ -279,9 +279,9 @@ export default function Calendar() {
               return (
                 <div key={ev.id} className="flex items-center justify-between py-2 border-b border-surface-highlight last:border-0 hover:bg-surface-elevated transition-colors rounded-sm px-2">
                   <div className="flex items-center gap-3">
-                    <div className={`text-[10px] font-mono text-zinc-500 w-8 text-center uppercase tracking-widest`}>{ev.day}</div>
+                    <div className={`text-[10px] font-mono text-content-tertiary w-8 text-center uppercase tracking-widest`}>{ev.day}</div>
                     <Icon className={`w-3.5 h-3.5 ${cfg.text}`} />
-                    <span className="text-sm font-mono text-zinc-300 uppercase tracking-widest">{ev.label}</span>
+                    <span className="text-sm font-mono text-content-secondary uppercase tracking-widest">{ev.label}</span>
                     <span className={`text-[9px] font-mono ${cfg.text} uppercase tracking-widest border border-surface-border px-1.5 rounded-sm bg-surface-base`}>{ev.type}</span>
                   </div>
                   {ev.amount !== undefined && (
@@ -293,7 +293,7 @@ export default function Calendar() {
               );
             })}
           {Array.from(eventsByDay.values()).flat().length === 0 && (
-            <p className="text-sm font-mono text-zinc-500 text-center py-4 uppercase tracking-[0.2em]">No upcoming events</p>
+            <p className="text-sm font-mono text-content-tertiary text-center py-4 uppercase tracking-[0.2em]">No upcoming events</p>
           )}
         </div>
       </CollapsibleModule>

@@ -197,7 +197,7 @@ export default function Landing() {
                   useStore.getState().signOut();
                   toast.success('Session Terminated');
                 }}
-                className="hidden sm:block px-6 py-2 bg-transparent border border-surface-border hover:border-zinc-500 text-zinc-400 hover:text-zinc-200 text-sm font-sans font-medium transition-all btn-tactile"
+                className="hidden sm:block px-6 py-2 bg-transparent border border-surface-border hover:border-content-muted text-content-tertiary hover:text-content-primary text-sm font-sans font-medium transition-all btn-tactile"
               >
                 Sign out
               </button>
@@ -232,7 +232,7 @@ export default function Landing() {
               </span>
             </h1>
             
-            <p className="text-lg font-medium text-zinc-300 max-w-lg leading-[1.6] mb-10 border-l-2 border-brand-violet/30 pl-6">
+            <p className="text-lg font-medium text-content-secondary max-w-lg leading-[1.6] mb-10 border-l-2 border-brand-violet/30 pl-6">
               A precision command center to tame your bills, eliminate debt, track your income, and build financial clarity — no matter where you're starting from.
             </p>
             

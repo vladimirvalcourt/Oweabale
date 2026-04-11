@@ -4,7 +4,7 @@ import { Star, Zap, Shield, Heart, Download, Play, Settings, User, Mail, Phone }
 function Default() {
   return (
     <BorderRotate className="w-96 h-64">
-      <div className="w-full h-full flex items-center justify-center text-zinc-500 font-mono text-xs italic">
+      <div className="w-full h-full flex items-center justify-center text-content-tertiary font-mono text-xs italic">
         Basic Placeholder
       </div>
     </BorderRotate>

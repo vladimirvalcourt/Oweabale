@@ -413,7 +413,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   </Dialog.Title>
                   <button 
                     onClick={onClose} 
-                    className="text-zinc-400 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-sm"
+                    className="text-content-tertiary hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-sm"
                   >
                     <span className="sr-only">Close</span>
                     <X className="w-5 h-5" />
@@ -425,10 +425,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   <div className="bg-surface-base border-b border-surface-border">
                     <div className="px-6 py-3 flex items-center justify-between gap-3">
                       <div>
-                        <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
+                        <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">
                           Scan receipt, image or PDF
                         </p>
-                        <p className="text-[8px] font-mono text-zinc-700 uppercase tracking-widest mt-0.5">
+                        <p className="text-[8px] font-mono text-content-muted uppercase tracking-widest mt-0.5">
                           JPG · PNG · WEBP · PDF
                         </p>
                       </div>
@@ -437,7 +437,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           <button
                             type="button"
                             onClick={() => setShowPreview(p => !p)}
-                            className={`p-2 rounded-sm border transition-all ${showPreview ? 'border-indigo-500/50 text-indigo-400 bg-indigo-500/10' : 'border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated'}`}
+                            className={`p-2 rounded-sm border transition-all ${showPreview ? 'border-indigo-500/50 text-indigo-400 bg-indigo-500/10' : 'border-surface-border text-content-tertiary hover:text-white hover:bg-surface-elevated'}`}
                             title={showPreview ? 'Hide document' : 'Show document'}
                           >
                             {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -446,7 +446,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         <label className={`relative flex items-center gap-2 px-3 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none shrink-0
                           ${isScanning
                             ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
-                            : 'border-surface-border bg-surface-raised text-zinc-300 hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
+                            : 'border-surface-border bg-surface-raised text-content-secondary hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
                           }`}>
                           <input
                             ref={scanCameraInputRef}
@@ -463,7 +463,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         <label className={`relative flex items-center gap-2 px-3 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none shrink-0
                           ${isScanning
                             ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
-                            : 'border-surface-border bg-surface-raised text-zinc-300 hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
+                            : 'border-surface-border bg-surface-raised text-content-secondary hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
                           }`}>
                           <input
                             ref={scanFileInputRef}
@@ -514,14 +514,14 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   <div className="bg-surface-base p-6 border-b border-surface-border">
                     <div className="flex items-center gap-2 mb-3">
                       <Terminal className="w-4 h-4 text-indigo-400" />
-                      <span className="text-xs font-sans font-medium text-zinc-300">Natural Language Speed Input</span>
+                      <span className="text-xs font-sans font-medium text-content-secondary">Natural Language Speed Input</span>
                     </div>
                     
                     <textarea
                       placeholder="e.g. 'Coffee 5.50 today' or 'Comcast bill 120 next tuesday'"
                       value={nlpText}
                       onChange={handleNLPInput}
-                      className="w-full bg-surface-raised border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm font-sans text-white placeholder-zinc-500 p-3 outline-none resize-none transition-colors"
+                      className="w-full bg-surface-raised border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm font-sans text-white placeholder:text-content-muted p-3 outline-none resize-none transition-colors"
                       rows={2}
                     />
                   </div>
@@ -531,7 +531,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     <button
                       onClick={() => { setActiveTab('transaction'); setErrors({}); }}
                       className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded ${
-                        activeTab === 'transaction' ? 'bg-surface-border text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200 hover:bg-surface-elevated'
+                        activeTab === 'transaction' ? 'bg-surface-border text-white shadow-sm' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}
                     >
                       Expense
@@ -539,7 +539,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     <button
                       onClick={() => { setActiveTab('obligation'); setErrors({}); }}
                       className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded ${
-                        activeTab === 'obligation' ? 'bg-surface-border text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200 hover:bg-surface-elevated'
+                        activeTab === 'obligation' ? 'bg-surface-border text-white shadow-sm' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}
                     >
                       Bill/Debt
@@ -547,7 +547,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     <button
                       onClick={() => { setActiveTab('income'); setErrors({}); }}
                       className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded ${
-                        activeTab === 'income' ? 'bg-surface-border text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200 hover:bg-surface-elevated'
+                        activeTab === 'income' ? 'bg-surface-border text-white shadow-sm' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500`}
                     >
                       Income
@@ -555,7 +555,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     <button
                       onClick={() => { setActiveTab('citation'); setErrors({}); }}
                       className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded flex items-center justify-center gap-1.5 ${
-                        activeTab === 'citation' ? 'bg-rose-500/20 text-rose-300 shadow-sm' : 'text-zinc-400 hover:text-zinc-200 hover:bg-surface-elevated'
+                        activeTab === 'citation' ? 'bg-rose-500/20 text-rose-300 shadow-sm' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500`}
                     >
                       <AlertTriangle className="w-3 h-3" />
@@ -568,9 +568,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     
                     {/* AMOUNT FIELD (ALWAYS PRESENT) */}
                     <div>
-                      <label htmlFor="amount" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Amount</label>
+                      <label htmlFor="amount" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Amount</label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-content-tertiary font-medium">$</span>
                         <input
                           id="amount"
                           type="number"
@@ -579,7 +579,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           value={amount}
                           onChange={(e) => { setAmount(e.target.value); if(errors.amount) setErrors({...errors, amount: ''}); }}
                           placeholder="0.00"
-                          className={`w-full bg-surface-base border ${errors.amount ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 pl-7 py-2.5 text-base font-sans font-semibold text-white placeholder-zinc-600 outline-none transition-colors`}
+                          className={`w-full bg-surface-base border ${errors.amount ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 pl-7 py-2.5 text-base font-sans font-semibold text-white placeholder:text-content-muted outline-none transition-colors`}
                         />
                       </div>
                       {errors.amount && (
@@ -591,7 +591,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     {activeTab === 'transaction' && (
                       <>
                         <div>
-                          <label htmlFor="description" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Description</label>
+                          <label htmlFor="description" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Description</label>
                           <div className="flex gap-3">
                             <div className="flex-1">
                               <input
@@ -600,7 +600,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 value={description}
                                 onChange={(e) => { setDescription(e.target.value); if(errors.description) setErrors({...errors, description: ''}); }}
                                 placeholder="E.g., Whole Foods"
-                                className={`w-full bg-surface-base border ${errors.description ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none transition-colors`}
+                                className={`w-full bg-surface-base border ${errors.description ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2.5 text-sm font-sans text-white placeholder:text-content-muted outline-none transition-colors`}
                               />
                             </div>
                             {description.length > 2 && (
@@ -616,7 +616,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label htmlFor="category" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Category</label>
+                            <label htmlFor="category" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Category</label>
                             <select 
                               id="category"
                               value={category}
@@ -642,7 +642,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             </select>
                           </div>
                           <div>
-                            <label htmlFor="date" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Date</label>
+                            <label htmlFor="date" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Date</label>
                             <input
                               id="date"
                               type="date"
@@ -660,7 +660,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       <>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Type</label>
+                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Type</label>
                             <select 
                               value={obligationKind}
                               onChange={(e) => setObligationKind(e.target.value as ObligationKind)}
@@ -672,14 +672,14 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               <option value="debt-card">Credit card</option>
                               <option value="debt-loan">Loan</option>
                             </select>
-                            <p className="text-[10px] font-mono text-zinc-500 mt-1.5 leading-snug">
+                            <p className="text-[10px] font-mono text-content-tertiary mt-1.5 leading-snug">
                               {obligationKind.startsWith('bill-')
                                 ? 'Amount is per bill cycle (weekly, bi-weekly, or monthly).'
                                 : 'Balance owed; APR and minimum payment are optional.'}
                             </p>
                           </div>
                           <div>
-                            <label htmlFor="dueDate" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Due Date</label>
+                            <label htmlFor="dueDate" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Due Date</label>
                             <input
                               id="dueDate"
                               type="date"
@@ -692,7 +692,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label htmlFor="vendor" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Biller Name</label>
+                            <label htmlFor="vendor" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Biller Name</label>
                             <div className="flex gap-3">
                               <div className="flex-1">
                                 <input
@@ -707,7 +707,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                         ? 'E.g., Chase Sapphire'
                                         : 'E.g., SoFi Personal Loan'
                                   }
-                                  className={`w-full bg-surface-base border ${errors.vendor ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none transition-colors`}
+                                  className={`w-full bg-surface-base border ${errors.vendor ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2.5 text-sm font-sans text-white placeholder:text-content-muted outline-none transition-colors`}
                                 />
                               </div>
                             </div>
@@ -716,7 +716,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             )}
                           </div>
                           <div>
-                            <label htmlFor="billCategory" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Category</label>
+                            <label htmlFor="billCategory" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Category</label>
                             <select 
                               id="billCategory"
                               value={category}
@@ -744,7 +744,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         {obligationKind.startsWith('debt-') && (
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <label htmlFor="apr" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">APR (%)</label>
+                              <label htmlFor="apr" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">APR (%)</label>
                               <input
                                 id="apr"
                                 type="number"
@@ -756,7 +756,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               />
                             </div>
                             <div>
-                              <label htmlFor="minPayment" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Min Payment ($)</label>
+                              <label htmlFor="minPayment" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Min Payment ($)</label>
                               <input
                                 id="minPayment"
                                 type="number"
@@ -777,7 +777,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       <>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Type</label>
+                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Type</label>
                             <select
                               value={citationType}
                               onChange={(e) => setCitationType(e.target.value)}
@@ -793,7 +793,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             </select>
                           </div>
                           <div>
-                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">
+                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
                               Payment Due Date
                             </label>
                             <input
@@ -812,7 +812,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">
+                          <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
                             Issuing Jurisdiction <span className="text-rose-500">*</span>
                           </label>
                           <input
@@ -820,7 +820,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             value={jurisdiction}
                             onChange={(e) => { setJurisdiction(e.target.value); if (errors.jurisdiction) setErrors({ ...errors, jurisdiction: '' }); }}
                             placeholder="E.g., Dallas County, TX"
-                            className={`w-full bg-surface-base border ${errors.jurisdiction ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none transition-colors`}
+                            className={`w-full bg-surface-base border ${errors.jurisdiction ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2.5 text-sm font-sans text-white placeholder:text-content-muted outline-none transition-colors`}
                           />
                           {errors.jurisdiction && (
                             <p className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5"><AlertCircle className="w-3 h-3" /> {errors.jurisdiction}</p>
@@ -828,17 +828,17 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Citation / Ticket #</label>
+                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Citation / Ticket #</label>
                             <input
                               type="text"
                               value={citationNumber}
                               onChange={(e) => setCitationNumber(e.target.value)}
                               placeholder="E.g., TN-20394857"
-                              className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2.5 text-sm font-mono text-white placeholder-zinc-600 outline-none transition-colors uppercase"
+                              className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2.5 text-sm font-mono text-white placeholder:text-content-muted outline-none transition-colors uppercase"
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Penalty / Late Fee ($)</label>
+                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Penalty / Late Fee ($)</label>
                             <input
                               type="number"
                               step="0.01"
@@ -846,22 +846,22 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               value={penaltyFee}
                               onChange={(e) => setPenaltyFee(e.target.value)}
                               placeholder="0.00"
-                              className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none"
+                              className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2.5 text-sm font-sans text-white placeholder:text-content-muted outline-none"
                             />
                           </div>
                         </div>
                         <div>
-                          <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Payment URL <span className="text-zinc-600">(optional)</span></label>
+                          <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Payment URL <span className="text-content-muted">(optional)</span></label>
                           <input
                             type="url"
                             value={paymentUrl}
                             onChange={(e) => setPaymentUrl(e.target.value)}
                             placeholder="https://..."
-                            className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none transition-colors"
+                            className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2.5 text-sm font-sans text-white placeholder:text-content-muted outline-none transition-colors"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Incident Date</label>
+                          <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Incident Date</label>
                           <input
                             type="date"
                             value={date}
@@ -876,19 +876,19 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     {activeTab === 'income' && (
                       <>
                         <div>
-                          <label htmlFor="incomeName" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Name</label>
+                          <label htmlFor="incomeName" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Name</label>
                           <input
                             id="incomeName"
                             type="text"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="E.g., Google Paycheck, Client Invoice"
-                            className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none transition-colors"
+                            className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2.5 text-sm font-sans text-white placeholder:text-content-muted outline-none transition-colors"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Source</label>
+                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Source</label>
                             <select
                               value={source}
                               onChange={(e) => setSource(e.target.value)}
@@ -901,7 +901,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             </select>
                           </div>
                           <div>
-                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Frequency</label>
+                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Frequency</label>
                             <select
                               value={incomeFrequency}
                               onChange={(e) => setIncomeFrequency(e.target.value as IncomeSource['frequency'])}
@@ -915,7 +915,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           </div>
                         </div>
                         <div>
-                          <label htmlFor="incDate" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Next pay date</label>
+                          <label htmlFor="incDate" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Next pay date</label>
                           <input
                             id="incDate"
                             type="date"
@@ -936,7 +936,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   <button
                     type="button"
                     onClick={onClose}
-                    className="px-4 py-2 text-sm font-sans font-medium text-zinc-400 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 rounded"
+                    className="px-4 py-2 text-sm font-sans font-medium text-content-tertiary hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500 rounded"
                   >
                     Cancel
                   </button>

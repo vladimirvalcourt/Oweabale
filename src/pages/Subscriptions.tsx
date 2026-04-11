@@ -156,7 +156,7 @@ export default function Subscriptions() {
             <p className="metric-label normal-case mb-2 flex items-center gap-1.5">
               <TrendingUp className="w-3 h-3 shrink-0" aria-hidden /> Price hikes
             </p>
-            <p className={`text-2xl font-bold font-mono tabular-nums data-numeric ${hikedSubs.length > 0 ? 'text-amber-400' : 'text-zinc-600'}`}>
+            <p className={`text-2xl font-bold font-mono tabular-nums data-numeric ${hikedSubs.length > 0 ? 'text-amber-400' : 'text-content-muted'}`}>
               {hikedSubs.length}
             </p>
             <p className="mt-1 text-xs text-content-tertiary truncate">
@@ -179,7 +179,7 @@ export default function Subscriptions() {
             <h3 className="text-base font-sans font-semibold text-content-primary">
               {editingId ? 'Edit subscription' : 'Add subscription'}
             </h3>
-            <button onClick={() => { setIsAdding(false); cancelEdit(); }} className="text-zinc-500 hover:text-zinc-300 transition-colors">
+            <button onClick={() => { setIsAdding(false); cancelEdit(); }} className="text-content-tertiary hover:text-content-secondary transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -199,7 +199,7 @@ export default function Subscriptions() {
               <div>
                 <label className="block text-sm font-sans font-medium text-content-secondary mb-1.5">Amount</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-xs font-mono text-zinc-600">$</span>
+                  <span className="absolute left-3 top-2.5 text-xs font-mono text-content-muted">$</span>
                   <input
                     type="number"
                     required
@@ -258,7 +258,7 @@ export default function Subscriptions() {
       {subscriptions.length === 0 && !isAdding ? (
         <div className="bg-surface-raised rounded-sm border border-surface-border border-dashed p-12 text-center">
           <div className="w-16 h-16 border border-surface-border rounded-sm flex items-center justify-center mx-auto mb-4">
-            <Repeat className="w-8 h-8 text-zinc-500" />
+            <Repeat className="w-8 h-8 text-content-tertiary" />
           </div>
           <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No subscriptions yet</h3>
           <p className="text-sm text-content-tertiary max-w-sm mx-auto mb-8">
@@ -291,7 +291,7 @@ export default function Subscriptions() {
                 }}
               >
                 <div className="flex items-center gap-4">
-                  <BrandLogo size="lg" name={sub.name} fallbackIcon={<Repeat className="w-5 h-5 text-zinc-600" />} />
+                  <BrandLogo size="lg" name={sub.name} fallbackIcon={<Repeat className="w-5 h-5 text-content-muted" />} />
                   <div>
                     <h4 className="text-sm font-sans font-semibold text-content-primary flex items-center gap-2">
                       {sub.name}
@@ -310,7 +310,7 @@ export default function Subscriptions() {
                       <span className={`inline-flex items-center text-xs font-sans font-medium ${
                         sub.status === 'active' ? 'text-emerald-400' :
                         sub.status === 'paused' ? 'text-amber-400' :
-                        'text-zinc-400'
+                        'text-content-tertiary'
                       }`}>
                         {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
                       </span>
@@ -318,7 +318,7 @@ export default function Subscriptions() {
                       {(() => {
                         const hike = getPriceHike(sub);
                         if (!hike) return null;
-                        return <span className="text-[10px] font-mono text-zinc-600">(was ${hike.prev.toFixed(2)})</span>;
+                        return <span className="text-[10px] font-mono text-content-muted">(was ${hike.prev.toFixed(2)})</span>;
                       })()}
                     </div>
                   </div>
@@ -331,14 +331,14 @@ export default function Subscriptions() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => startEdit(sub)}
-                      className="p-2 text-zinc-500 hover:text-zinc-300 rounded-md hover:bg-surface-elevated transition-colors"
+                      className="p-2 text-content-tertiary hover:text-content-secondary rounded-md hover:bg-surface-elevated transition-colors"
                       title="Edit"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(sub.id)}
-                      className="p-2 text-zinc-500 hover:text-[#EF4444] rounded-md hover:bg-surface-elevated transition-colors"
+                      className="p-2 text-content-tertiary hover:text-[#EF4444] rounded-md hover:bg-surface-elevated transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />

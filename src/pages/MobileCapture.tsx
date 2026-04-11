@@ -189,7 +189,7 @@ export default function MobileCapture() {
       <div className="min-h-screen bg-[#08090A] flex flex-col items-center justify-center p-8 text-center font-sans">
         <AlertCircle className="w-12 h-12 text-rose-500 mb-6" />
         <h1 className="text-xl font-bold text-white mb-3 uppercase tracking-widest font-mono">Connection Error</h1>
-        <p className="text-zinc-500 text-xs mb-10 uppercase tracking-widest leading-relaxed">
+        <p className="text-content-tertiary text-xs mb-10 uppercase tracking-widest leading-relaxed">
           {error || 'This session has expired. Please refresh the QR code on your desktop.'}
         </p>
         <button
@@ -210,7 +210,7 @@ export default function MobileCapture() {
            <CheckCircle2 className="w-24 h-24 text-emerald-500 relative" />
         </div>
         <h1 className="text-3xl font-bold text-white mb-2 uppercase tracking-tighter">✅ Sent!</h1>
-        <p className="text-zinc-500 text-[11px] font-mono mb-12 uppercase tracking-[0.2em] leading-relaxed max-w-[280px]">
+        <p className="text-content-tertiary text-[11px] font-mono mb-12 uppercase tracking-[0.2em] leading-relaxed max-w-[280px]">
           Your document is now being processed in your Review Inbox.<br/><br/>
           You can put your phone away; your desktop dashboard has been updated.
         </p>
@@ -224,7 +224,7 @@ export default function MobileCapture() {
           </button>
           <button 
             onClick={() => navigate('/')}
-            className="w-full py-4 text-zinc-500 hover:text-white font-mono text-[9px] font-bold uppercase tracking-[0.4em] transition-colors"
+            className="w-full py-4 text-content-tertiary hover:text-white font-mono text-[9px] font-bold uppercase tracking-[0.4em] transition-colors"
           >
             Done
           </button>
@@ -245,7 +245,7 @@ export default function MobileCapture() {
           </div>
         </div>
         <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center bg-white/5">
-           <Smartphone className="w-4 h-4 text-zinc-500" />
+           <Smartphone className="w-4 h-4 text-content-tertiary" />
         </div>
       </div>
 
@@ -259,29 +259,29 @@ export default function MobileCapture() {
               <div className="space-y-8 mt-4">
                  <div className="flex gap-5 group">
                     <div className="shrink-0 w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
-                       <Sun className="w-4 h-4 text-zinc-500 group-hover:text-brand-violet" />
+                       <Sun className="w-4 h-4 text-content-tertiary group-hover:text-brand-violet" />
                     </div>
                     <div className="space-y-1">
                        <p className="text-[10px] font-mono font-bold text-white uppercase tracking-widest">1. Position</p>
-                       <p className="text-[9px] font-mono text-zinc-600 uppercase leading-relaxed">Place document on a flat, dark surface with good lighting.</p>
+                       <p className="text-[9px] font-mono text-content-muted uppercase leading-relaxed">Place document on a flat, dark surface with good lighting.</p>
                     </div>
                  </div>
                  <div className="flex gap-5 group text-left">
                     <div className="shrink-0 w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
-                       <Maximize className="w-4 h-4 text-zinc-500 group-hover:text-brand-violet" />
+                       <Maximize className="w-4 h-4 text-content-tertiary group-hover:text-brand-violet" />
                     </div>
                     <div className="space-y-1">
                        <p className="text-[10px] font-mono font-bold text-white uppercase tracking-widest">2. Align</p>
-                       <p className="text-[9px] font-mono text-zinc-600 uppercase leading-relaxed">Frame the document within the onscreen guides.</p>
+                       <p className="text-[9px] font-mono text-content-muted uppercase leading-relaxed">Frame the document within the onscreen guides.</p>
                     </div>
                  </div>
                  <div className="flex gap-5 group text-left">
                     <div className="shrink-0 w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
-                       <MousePointer2 className="w-4 h-4 text-zinc-500 group-hover:text-brand-violet" />
+                       <MousePointer2 className="w-4 h-4 text-content-tertiary group-hover:text-brand-violet" />
                     </div>
                     <div className="space-y-1">
                        <p className="text-[10px] font-mono font-bold text-white uppercase tracking-widest">3. Capture</p>
-                       <p className="text-[9px] font-mono text-zinc-600 uppercase leading-relaxed">System snaps automatically when aligned, or you can tap.</p>
+                       <p className="text-[9px] font-mono text-content-muted uppercase leading-relaxed">System snaps automatically when aligned, or you can tap.</p>
                     </div>
                  </div>
               </div>
@@ -303,7 +303,7 @@ export default function MobileCapture() {
                     </div>
                     <div>
                       <p className="text-[11px] font-mono font-bold text-white uppercase tracking-widest">Take Photo</p>
-                      <p className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest mt-1">Open camera and snap the document</p>
+                      <p className="text-[9px] font-mono text-content-muted uppercase tracking-widest mt-1">Open camera and snap the document</p>
                     </div>
                   </div>
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-violet/[0.03] to-transparent animate-scan-y opacity-50 pointer-events-none" />
@@ -319,11 +319,11 @@ export default function MobileCapture() {
                   />
                   <div className="flex items-center gap-5 relative z-1">
                     <div className="w-14 h-14 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center group-hover:border-white/20 transition-all shrink-0">
-                      <FolderOpen className="w-6 h-6 text-zinc-400" />
+                      <FolderOpen className="w-6 h-6 text-content-tertiary" />
                     </div>
                     <div>
                       <p className="text-[11px] font-mono font-bold text-white uppercase tracking-widest">Upload from Device</p>
-                      <p className="text-[9px] font-mono text-zinc-600 uppercase tracking-widest mt-1">Choose from gallery, files, or PDFs</p>
+                      <p className="text-[9px] font-mono text-content-muted uppercase tracking-widest mt-1">Choose from gallery, files, or PDFs</p>
                     </div>
                   </div>
                 </div>
@@ -344,7 +344,7 @@ export default function MobileCapture() {
                      <div className="w-20 h-20 rounded-sm border border-brand-violet/30 bg-brand-violet/5 flex items-center justify-center">
                        <FolderOpen className="w-10 h-10 text-brand-violet" />
                      </div>
-                     <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest">PDF Ready to Send</p>
+                     <p className="text-[11px] font-mono text-content-tertiary uppercase tracking-widest">PDF Ready to Send</p>
                    </div>
                  ) : (
                    <img src={previewUrl!} alt="Preview" className="w-full h-full object-cover grayscale brightness-110 contrast-125" />
@@ -389,7 +389,7 @@ export default function MobileCapture() {
                         setStatus('idle');
                     }}
                     disabled={status === 'uploading'}
-                    className="w-full py-4 bg-white/5 border border-white/5 text-zinc-500 hover:text-white transition-all text-[9px] font-mono font-bold uppercase tracking-[0.4em]"
+                    className="w-full py-4 bg-white/5 border border-white/5 text-content-tertiary hover:text-white transition-all text-[9px] font-mono font-bold uppercase tracking-[0.4em]"
                   >
                     Retake Photo
                   </button>
@@ -400,7 +400,7 @@ export default function MobileCapture() {
       </main>
 
       <div className="shrink-0 p-8 border-t border-white/[0.03] text-center bg-surface-base">
-        <span className="text-[7px] font-mono text-zinc-700 uppercase tracking-[0.8em]">Secure Uplink Core 4.02</span>
+        <span className="text-[7px] font-mono text-content-muted uppercase tracking-[0.8em]">Secure Uplink Core 4.02</span>
       </div>
     </div>
   );

@@ -46,7 +46,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({ name, className, size = 'm
           className
         )}
       >
-        {fallbackIcon || <Building2 className="w-1/2 h-1/2 text-zinc-600" />}
+        {fallbackIcon || <Building2 className="w-1/2 h-1/2 text-content-muted" />}
       </div>
     );
   }

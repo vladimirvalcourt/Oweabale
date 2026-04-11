@@ -164,7 +164,7 @@ export default function Onboarding() {
                 toast.success('Setup skipped.');
                 navigate('/dashboard');
               }}
-              className="text-[11px] font-mono text-zinc-400 hover:text-zinc-200 uppercase tracking-widest transition-colors border border-surface-border px-3 py-1.5 rounded-sm hover:bg-surface-elevated"
+              className="text-[11px] font-mono text-content-tertiary hover:text-content-primary uppercase tracking-widest transition-colors border border-surface-border px-3 py-1.5 rounded-sm hover:bg-surface-elevated"
             >
               Skip Setup
             </button>
@@ -190,7 +190,7 @@ export default function Onboarding() {
             Welcome,<br />
             <span className="text-brand-violet">{firstName}.</span>
           </h1>
-          <p className="text-zinc-400 font-mono text-[12px] normal-case tracking-normal mb-4 max-w-md leading-relaxed">
+          <p className="text-content-tertiary font-mono text-[12px] normal-case tracking-normal mb-4 max-w-md leading-relaxed">
             In a couple of minutes you will have a working dashboard: cash, bills, and a default strategy. Everything you enter here is optional — add or edit the rest anytime.
           </p>
           <p className="text-content-tertiary font-mono text-[11px] uppercase tracking-[0.2em] mb-10">
@@ -221,8 +221,8 @@ export default function Onboarding() {
           <div className="bg-surface-raised border border-surface-border p-6 relative">
             <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-brand-violet" />
             <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-brand-violet" />
-            <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest mb-5">
-              <span className="text-white font-bold">5 short steps</span> &nbsp;·&nbsp; ~2 minutes &nbsp;·&nbsp; Leave fields blank and continue, or use <span className="text-zinc-300">Skip Setup</span> anytime
+            <p className="text-[11px] font-mono text-content-tertiary uppercase tracking-widest mb-5">
+              <span className="text-white font-bold">5 short steps</span> &nbsp;·&nbsp; ~2 minutes &nbsp;·&nbsp; Leave fields blank and continue, or use <span className="text-content-secondary">Skip Setup</span> anytime
             </p>
             <div className="flex items-center justify-between gap-4">
               <div className="flex gap-1 h-2 items-end">
@@ -288,11 +288,11 @@ export default function Onboarding() {
               toast.success('Setup skipped. Welcome to your dashboard.');
               navigate('/dashboard');
             }}
-            className="text-[11px] font-mono text-zinc-400 hover:text-zinc-200 uppercase tracking-widest transition-colors border border-surface-border px-3 py-1.5 rounded-sm hover:bg-surface-elevated"
+            className="text-[11px] font-mono text-content-tertiary hover:text-content-primary uppercase tracking-widest transition-colors border border-surface-border px-3 py-1.5 rounded-sm hover:bg-surface-elevated"
           >
             Skip Setup
           </button>
-          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-widest hidden sm:block">
+          <div className="text-[11px] font-mono text-content-tertiary uppercase tracking-widest hidden sm:block">
             Step {currentStepIndex + 1} of {STEPS.length}
           </div>
           <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse hidden sm:block" />
@@ -324,9 +324,9 @@ export default function Onboarding() {
               <h1 className="text-3xl md:text-4xl font-sans font-bold tracking-tight text-white mb-1 uppercase">
                 {currentStep.title}
               </h1>
-              <p className="text-zinc-500 font-mono text-[10px] uppercase tracking-[0.2em] mb-2">{currentStep.subtitle}</p>
+              <p className="text-content-tertiary font-mono text-[10px] uppercase tracking-[0.2em] mb-2">{currentStep.subtitle}</p>
               {currentStepIndex <= 2 && (
-                <p className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest mb-8">
+                <p className="text-content-muted font-mono text-[10px] uppercase tracking-widest mb-8">
                   Optional — leave blank and continue, or add from the dashboard later.
                 </p>
               )}
@@ -340,7 +340,7 @@ export default function Onboarding() {
                 {currentStep.id === 'assets' && (
                   <div className="space-y-4">
                     <div className="flex items-end border-b border-surface-border group-focus-within:border-brand-violet transition-all">
-                      <span className="text-zinc-500 font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
+                      <span className="text-content-tertiary font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
                       <input 
                         autoFocus
                         type="text"
@@ -348,17 +348,17 @@ export default function Onboarding() {
                         placeholder="0.00"
                         value={formData.cash}
                         onChange={e => setFormData({...formData, cash: e.target.value})}
-                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder-zinc-900 outline-none tnum leading-none"
+                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder:text-content-muted outline-none tnum leading-none"
                       />
                     </div>
-                    <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest pt-2">Current Balances // Liquid Assets Only</p>
+                    <p className="text-[11px] font-mono text-content-tertiary uppercase tracking-widest pt-2">Current Balances // Liquid Assets Only</p>
                   </div>
                 )}
 
                 {currentStep.id === 'obligations' && (
                   <div className="space-y-4">
                     <div className="flex items-end border-b border-surface-border group-focus-within:border-brand-violet transition-all">
-                      <span className="text-zinc-500 font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
+                      <span className="text-content-tertiary font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
                       <input 
                         autoFocus
                         type="text"
@@ -366,17 +366,17 @@ export default function Onboarding() {
                         placeholder="0.00"
                         value={formData.bills}
                         onChange={e => setFormData({...formData, bills: e.target.value})}
-                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder-zinc-900 outline-none tnum leading-none"
+                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder:text-content-muted outline-none tnum leading-none"
                       />
                     </div>
-                    <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest pt-2">Monthly Fixed Outflow // Rent, Subscriptions, Debt Mins</p>
+                    <p className="text-[11px] font-mono text-content-tertiary uppercase tracking-widest pt-2">Monthly Fixed Outflow // Rent, Subscriptions, Debt Mins</p>
                   </div>
                 )}
 
                 {currentStep.id === 'velocity' && (
                   <div className="space-y-6">
                     <div className="flex items-end border-b border-surface-border group-focus-within:border-brand-violet transition-all">
-                      <span className="text-zinc-500 font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
+                      <span className="text-content-tertiary font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
                       <input 
                         autoFocus
                         type="text"
@@ -384,12 +384,12 @@ export default function Onboarding() {
                         placeholder="0.00"
                         value={formData.dailyLimit}
                         onChange={e => setFormData({...formData, dailyLimit: e.target.value})}
-                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder-zinc-900 outline-none tnum leading-none"
+                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder:text-content-muted outline-none tnum leading-none"
                       />
                     </div>
                     <div className="border border-surface-border p-4 bg-black/40">
                        <span className="text-[11px] font-mono text-amber-500 uppercase tracking-widest block mb-1 font-bold">What we do with this</span>
-                       <p className="text-[11px] font-mono text-zinc-400 normal-case leading-relaxed">We create a monthly &quot;Flexible spending&quot; budget (~30× your daily number) so you see it on the Budgets page. Tune it anytime as real transactions come in.</p>
+                       <p className="text-[11px] font-mono text-content-tertiary normal-case leading-relaxed">We create a monthly &quot;Flexible spending&quot; budget (~30× your daily number) so you see it on the Budgets page. Tune it anytime as real transactions come in.</p>
                     </div>
                   </div>
                 )}
@@ -398,7 +398,7 @@ export default function Onboarding() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button 
                       onClick={() => setFormData({...formData, focus: 'stacking'})}
-                      className={`p-5 border transition-all text-left group ${formData.focus === 'stacking' ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
+                      className={`p-5 border transition-all text-left group ${formData.focus === 'stacking' ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-content-tertiary'}`}
                     >
                       <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Save & Grow</h3>
                       <p className="text-[9px] font-mono uppercase leading-relaxed text-content-tertiary">Focus on growth trajectory and asset accumulation.</p>
@@ -406,7 +406,7 @@ export default function Onboarding() {
 
                     <button 
                       onClick={() => setFormData({...formData, focus: 'detonation'})}
-                      className={`p-5 border transition-all text-left group ${formData.focus === 'detonation' ? 'bg-surface-elevated text-white border-rose-500' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
+                      className={`p-5 border transition-all text-left group ${formData.focus === 'detonation' ? 'bg-surface-elevated text-white border-rose-500' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-content-tertiary'}`}
                     >
                       <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Pay Off Debt Fast</h3>
                       <p className="text-[9px] font-mono uppercase leading-relaxed text-content-tertiary">Focus on highest APR targets and accelerated repayment.</p>
@@ -418,7 +418,7 @@ export default function Onboarding() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button 
                       onClick={() => setFormData({...formData, freelance: true})}
-                      className={`p-5 border transition-all text-left group ${formData.freelance === true ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
+                      className={`p-5 border transition-all text-left group ${formData.freelance === true ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-content-tertiary'}`}
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest">Independent Contractor</h3>
@@ -429,7 +429,7 @@ export default function Onboarding() {
 
                     <button 
                       onClick={() => setFormData({...formData, freelance: false})}
-                      className={`p-5 border transition-all text-left group ${formData.freelance === false ? 'bg-zinc-800 text-white border-zinc-700' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
+                      className={`p-5 border transition-all text-left group ${formData.freelance === false ? 'bg-zinc-800 text-white border-zinc-700' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-content-tertiary'}`}
                     >
                       <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Traditional (W2)</h3>
                       <p className="text-[9px] font-mono uppercase leading-relaxed text-content-tertiary">Standard household budgeting and debt elimination.</p>
@@ -450,7 +450,7 @@ export default function Onboarding() {
           <button 
             onClick={handleBack}
             disabled={currentStepIndex === 0}
-            className={`font-mono text-[11px] uppercase tracking-[0.3em] transition-colors ${currentStepIndex === 0 ? 'opacity-0' : 'text-zinc-500 hover:text-white'}`}
+            className={`font-mono text-[11px] uppercase tracking-[0.3em] transition-colors ${currentStepIndex === 0 ? 'opacity-0' : 'text-content-tertiary hover:text-white'}`}
           >
             Back
           </button>

@@ -197,8 +197,8 @@ export default function Education() {
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="w-full flex items-center justify-between px-2 pb-2 group"
           >
-            <h2 className="text-xs font-sans font-medium text-zinc-500 group-hover:text-white transition-colors">Available courses</h2>
-            <ChevronDown className={`w-4 h-4 text-zinc-500 group-hover:text-white transition-all duration-300 ${isSidebarOpen ? 'rotate-180' : ''}`} />
+            <h2 className="text-xs font-sans font-medium text-content-tertiary group-hover:text-white transition-colors">Available courses</h2>
+            <ChevronDown className={`w-4 h-4 text-content-tertiary group-hover:text-white transition-all duration-300 ${isSidebarOpen ? 'rotate-180' : ''}`} />
           </button>
 
           <AnimatePresence initial={false}>
@@ -224,7 +224,7 @@ export default function Education() {
                           : 'border-surface-border bg-surface-elevated hover:bg-surface-base'
                       }`}
                     >
-                      <div className={`p-2 rounded-sm shrink-0 ${isSelected ? 'bg-indigo-500/10 text-indigo-400' : 'bg-surface-base border border-surface-border text-zinc-400'}`}>
+                      <div className={`p-2 rounded-sm shrink-0 ${isSelected ? 'bg-indigo-500/10 text-indigo-400' : 'bg-surface-base border border-surface-border text-content-tertiary'}`}>
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -295,7 +295,7 @@ export default function Education() {
                             className="group flex items-center justify-between p-4 bg-surface-base border border-surface-border rounded-sm hover:border-zinc-600 transition-colors cursor-pointer"
                           >
                             <div className="flex items-center gap-4">
-                              <div className={`p-1.5 rounded-sm ${isDone ? 'text-emerald-500' : 'text-zinc-500 group-hover:text-white transition-colors'}`}>
+                              <div className={`p-1.5 rounded-sm ${isDone ? 'text-emerald-500' : 'text-content-tertiary group-hover:text-white transition-colors'}`}>
                                 {isDone ? <CheckCircle2 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
                               </div>
                               <div>
@@ -307,7 +307,7 @@ export default function Education() {
                               <span className="text-xs text-content-tertiary px-2 py-1 bg-surface-elevated border border-surface-border hidden sm:block">
                                 {lesson.readTime}
                               </span>
-                              <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-white transition-colors" />
+                              <ArrowRight className="w-4 h-4 text-content-muted group-hover:text-white transition-colors" />
                             </div>
                           </div>
                         );
@@ -370,14 +370,14 @@ export default function Education() {
                         </div>
                         <button
                           onClick={() => setViewerOpen(false)}
-                          className="text-zinc-500 hover:text-white"
+                          className="text-content-tertiary hover:text-white"
                         >
                           <ArrowRight className="w-5 h-5" />
                         </button>
                       </div>
 
                       <div className="px-6 py-8 bg-surface-base">
-                        <div className="prose prose-invert max-w-none text-zinc-300 text-sm leading-relaxed font-sans whitespace-pre-wrap">
+                        <div className="prose prose-invert max-w-none text-content-secondary text-sm leading-relaxed font-sans whitespace-pre-wrap">
                           {activeLesson.content}
                         </div>
                       </div>

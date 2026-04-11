@@ -199,7 +199,7 @@ export default function Analytics() {
               key={p}
               onClick={() => setPeriod(p)}
               className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${
-                period === p ? 'bg-surface-border text-white' : 'text-zinc-500 hover:text-zinc-300'
+                period === p ? 'bg-surface-border text-white' : 'text-content-tertiary hover:text-content-secondary'
               }`}
             >
               {p}
@@ -221,7 +221,7 @@ export default function Analytics() {
             label: `Net Worth Δ (${period})`,
             value: netWorthDelta !== null ? `${isPositiveDelta ? '+' : ''}${fmt(netWorthDelta)}` : '—',
             sub: netWorthDelta !== null ? (isPositiveDelta ? 'Growing' : 'Declining') : 'Need 2+ data points',
-            color: isPositiveDelta ? 'text-emerald-400' : netWorthDelta !== null ? 'text-red-400' : 'text-zinc-400',
+            color: isPositiveDelta ? 'text-emerald-400' : netWorthDelta !== null ? 'text-red-400' : 'text-content-tertiary',
           },
           {
             label: 'YTD Saved',
@@ -237,7 +237,7 @@ export default function Analytics() {
           },
         ].map(card => (
           <div key={card.label} className="bg-surface-elevated border border-surface-border rounded-sm p-5">
-            <p className="metric-label normal-case text-zinc-500 mb-2">{card.label}</p>
+            <p className="metric-label normal-case text-content-tertiary mb-2">{card.label}</p>
             <p className={`text-2xl font-mono font-bold tabular-nums data-numeric ${card.color}`}>{card.value}</p>
             <p className="text-xs text-content-tertiary mt-1 truncate">{card.sub}</p>
           </div>
@@ -252,7 +252,7 @@ export default function Analytics() {
           </div>
         ) : chartSnapshots.length < 2 ? (
           <div className="h-64 flex flex-col items-center justify-center gap-3">
-            <Activity className="w-8 h-8 text-zinc-700" />
+            <Activity className="w-8 h-8 text-content-muted" />
             <p className="text-sm text-content-tertiary text-center max-w-sm">
               History builds automatically each day you log in. Check back tomorrow for your first trend line.
             </p>
