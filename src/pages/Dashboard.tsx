@@ -259,6 +259,11 @@ export default function Dashboard() {
     };
   }, [transactions]);
 
+  const hasAnyExpenseTransactions = useMemo(
+    () => (transactions || []).some((t) => t?.type === 'expense'),
+    [transactions],
+  );
+
   // 5. Total Tax Shield
   const lifetimeTaxShield = useMemo(() => {
     return (freelanceEntries || []).reduce((sum: number, e: any) => sum + (e?.scouredWriteOffs || 0), 0);
@@ -271,7 +276,9 @@ export default function Dashboard() {
 
   /** Smart Alerts cards: only when the underlying feature has real data. */
   const showTaxDeductionCard = (freelanceEntries?.length ?? 0) > 0 || lifetimeTaxShield > 0;
-  const showSpendingPulseCard = burnVelocity.frequency > 0 || burnVelocity.totalSpent > 0;
+  /** Show if any expense exists in history, or there was activity in the last 72h. */
+  const showSpendingPulseCard =
+    hasAnyExpenseTransactions || burnVelocity.frequency > 0 || burnVelocity.totalSpent > 0;
   const showDebtAvalancheCard = hasOutstandingDebt;
 
   const smartAlertsVisibleCount = [showTaxDeductionCard, showSpendingPulseCard, showDebtAvalancheCard].filter(
