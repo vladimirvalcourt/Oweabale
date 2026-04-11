@@ -30,7 +30,7 @@ const STEPS: Step[] = [
     id: 'velocity',
     title: 'Spending Limit',
     subtitle: 'Daily Spending Target',
-    description: 'Setting a daily limit helps us keep your budget on track.'
+    description: 'Optional rough cap — we turn it into a monthly budget line you can edit anytime.'
   },
   {
     id: 'strategy',
@@ -72,15 +72,27 @@ export default function Onboarding() {
     if (formData.bills && parseFloat(formData.bills) > 0) {
       assetPromises.push(addBudget({ category: 'General', amount: parseFloat(formData.bills), period: 'Monthly' }));
     }
+    if (formData.dailyLimit && parseFloat(formData.dailyLimit) > 0) {
+      const daily = parseFloat(formData.dailyLimit);
+      assetPromises.push(
+        addBudget({
+          category: 'Flexible spending',
+          amount: Math.round(daily * 30 * 100) / 100,
+          period: 'Monthly',
+        })
+      );
+    }
     await Promise.all(assetPromises);
+    const freelanceOn = formData.freelance === true;
     // Step 3/4/5 — strategy stored on profile; must finish before navigation or the next load will re-show onboarding.
     const saved = await updateUser({
       theme: formData.focus === 'detonation' ? 'Detonation' : 'Dark',
       hasCompletedOnboarding: true,
     });
     if (!saved) return false;
+    // freelance === true only for contractors; null/false → standard household messaging
     addNotification({
-      title: formData.freelance ? 'Independent Contractor Mode Active' : 'Standard Mode Active',
+      title: freelanceOn ? 'Independent Contractor Mode Active' : 'Standard Mode Active',
       message: formData.focus === 'detonation'
         ? 'Debt Detonation strategy selected. Highest APR targets prioritized.'
         : 'Wealth Stacking strategy selected. Growth trajectory enabled.',
@@ -178,6 +190,9 @@ export default function Onboarding() {
             Welcome,<br />
             <span className="text-brand-violet">{firstName}.</span>
           </h1>
+          <p className="text-zinc-400 font-mono text-[12px] normal-case tracking-normal mb-4 max-w-md leading-relaxed">
+            In a couple of minutes you will have a working dashboard: cash, bills, and a default strategy. Everything you enter here is optional — add or edit the rest anytime.
+          </p>
           <p className="text-zinc-500 font-mono text-[11px] uppercase tracking-[0.2em] mb-10">
             Your financial command center is ready to be configured.
           </p>
@@ -207,7 +222,7 @@ export default function Onboarding() {
             <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-brand-violet" />
             <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-brand-violet" />
             <p className="text-[11px] font-mono text-zinc-400 uppercase tracking-widest mb-5">
-              <span className="text-white font-bold">5-step setup</span> &nbsp;·&nbsp; Takes about 2 minutes &nbsp;·&nbsp; You can skip any step
+              <span className="text-white font-bold">5 short steps</span> &nbsp;·&nbsp; ~2 minutes &nbsp;·&nbsp; Leave fields blank and continue, or use <span className="text-zinc-300">Skip Setup</span> anytime
             </p>
             <div className="flex items-center justify-between gap-4">
               <div className="flex gap-1 h-2 items-end">
@@ -250,9 +265,12 @@ export default function Onboarding() {
       </div>
 
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 flex justify-between items-center h-12 px-6 border-b border-surface-border bg-surface-base/50 backdrop-blur-md z-20">
-        <div className="flex items-center gap-6">
-          <div className="text-[10px] font-mono text-white tracking-[0.2em] font-bold uppercase">Getting Started</div>
+        <div className="absolute top-0 left-0 right-0 flex justify-between items-center h-12 px-4 sm:px-6 border-b border-surface-border bg-surface-base/50 backdrop-blur-md z-20 gap-2">
+        <div className="flex items-center gap-3 sm:gap-6 min-w-0">
+          <div className="text-[10px] font-mono text-white tracking-[0.2em] font-bold uppercase shrink-0">Getting Started</div>
+          <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest md:hidden shrink-0">
+            {currentStepIndex + 1}/{STEPS.length}
+          </div>
           <div className="hidden md:flex gap-1 h-2 items-end">
             {STEPS.map((_, idx) => (
               <div 
@@ -262,7 +280,7 @@ export default function Onboarding() {
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <button 
             onClick={async () => {
               const ok = await updateUser({ hasCompletedOnboarding: true });
@@ -274,8 +292,10 @@ export default function Onboarding() {
           >
             Skip Setup
           </button>
-          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-widest hidden sm:block">Status: Finalizing</div>
-          <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="text-[11px] font-mono text-zinc-500 uppercase tracking-widest hidden sm:block">
+            Step {currentStepIndex + 1} of {STEPS.length}
+          </div>
+          <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse hidden sm:block" />
         </div>
       </div>
 
@@ -304,7 +324,13 @@ export default function Onboarding() {
               <h1 className="text-3xl md:text-4xl font-sans font-bold tracking-tight text-white mb-1 uppercase">
                 {currentStep.title}
               </h1>
-              <p className="text-zinc-500 font-mono text-[10px] uppercase tracking-[0.2em] mb-8">{currentStep.subtitle}</p>
+              <p className="text-zinc-500 font-mono text-[10px] uppercase tracking-[0.2em] mb-2">{currentStep.subtitle}</p>
+              {currentStepIndex <= 2 && (
+                <p className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest mb-8">
+                  Optional — leave blank and continue, or add from the dashboard later.
+                </p>
+              )}
+              {currentStepIndex > 2 && <div className="mb-8" />}
 
               {/* Input Control Area - Refined Padding */}
               <div className="w-full bg-surface-raised border border-surface-border p-6 md:p-10 shadow-2xl relative group">
@@ -362,8 +388,8 @@ export default function Onboarding() {
                       />
                     </div>
                     <div className="border border-surface-border p-4 bg-black/40">
-                       <span className="text-[11px] font-mono text-amber-500 uppercase tracking-widest block mb-1 font-bold">Daily Spending Limit:</span>
-                       <p className="text-[11px] font-mono text-zinc-400 uppercase leading-relaxed">Oweable will track your 3-day spending and alert you if you're going over this amount.</p>
+                       <span className="text-[11px] font-mono text-amber-500 uppercase tracking-widest block mb-1 font-bold">What we do with this</span>
+                       <p className="text-[11px] font-mono text-zinc-400 normal-case leading-relaxed">We create a monthly &quot;Flexible spending&quot; budget (~30× your daily number) so you see it on the Budgets page. Tune it anytime as real transactions come in.</p>
                     </div>
                   </div>
                 )}
@@ -392,7 +418,7 @@ export default function Onboarding() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button 
                       onClick={() => setFormData({...formData, freelance: true})}
-                      className={`p-5 border transition-all text-left group ${formData.freelance ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
+                      className={`p-5 border transition-all text-left group ${formData.freelance === true ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest">Independent Contractor</h3>
