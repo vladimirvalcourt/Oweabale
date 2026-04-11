@@ -68,32 +68,32 @@ export default function NetWorth() {
       {/* Top Level Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="bg-surface-raised rounded-sm border border-surface-border p-6 relative overflow-hidden">
-          <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-2 font-bold">Total Net Worth</p>
-          <p className={`text-4xl font-bold font-mono tabular-nums ${netWorth >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+          <p className="metric-label mb-2 normal-case font-semibold">Total net worth</p>
+          <p className={`text-4xl font-bold font-mono tabular-nums data-numeric ${netWorth >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
             $<AnimatedValue value={netWorth} decimals={2} />
           </p>
-          <div className="mt-3 flex items-center text-sm text-emerald-400 font-mono">
+          <div className="mt-3 flex items-center text-sm text-emerald-400 font-sans">
             <TrendingUp className="w-4 h-4 mr-1" />
             <span>+2.4% from last month</span>
           </div>
         </div>
 
         <div className="bg-surface-raised rounded-sm border border-surface-border p-6 relative overflow-hidden">
-          <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-2 font-bold">Total Assets</p>
-          <p className="text-4xl font-bold font-mono tabular-nums text-content-primary">
+          <p className="metric-label mb-2 normal-case font-semibold">Total assets</p>
+          <p className="text-4xl font-bold font-mono tabular-nums text-content-primary data-numeric">
             $<AnimatedValue value={totalAssets} decimals={2} />
           </p>
-          <div className="mt-3 flex items-center text-sm text-zinc-500 font-mono">
+          <div className="mt-3 flex items-center text-sm text-zinc-500 font-sans">
             <span>Across {assets.length} accounts</span>
           </div>
         </div>
 
         <div className="bg-surface-raised rounded-sm border border-surface-border p-6 relative overflow-hidden">
-          <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-2 font-bold">Total Liabilities</p>
-          <p className="text-4xl font-bold font-mono tabular-nums text-content-primary">
+          <p className="metric-label mb-2 normal-case font-semibold">Total liabilities</p>
+          <p className="text-4xl font-bold font-mono tabular-nums text-content-primary data-numeric">
             $<AnimatedValue value={totalLiabilities} decimals={2} />
           </p>
-          <div className="mt-3 flex items-center text-sm text-zinc-500 font-mono">
+          <div className="mt-3 flex items-center text-sm text-zinc-500 font-sans">
             <span>Across {debts.length} accounts</span>
           </div>
         </div>
@@ -102,18 +102,20 @@ export default function NetWorth() {
       {/* Forward Projection — 12 months */}
       <CollapsibleModule title="Net Worth Projection — 12 Months Forward" icon={TrendingUp}>
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Extra/mo:</span>
+          <span className="text-xs font-sans text-content-tertiary">Extra per month</span>
           <button
+            type="button"
             onClick={() => setExtraMonthly(e => Math.max(0, e - 100))}
             className="text-zinc-500 hover:text-white text-sm font-mono transition-colors"
           >−</button>
-          <span className="text-sm font-mono text-content-primary w-20 text-center">${extraMonthly.toLocaleString()}</span>
+          <span className="text-sm font-mono text-content-primary w-20 text-center tabular-nums">${extraMonthly.toLocaleString()}</span>
           <button
+            type="button"
             onClick={() => setExtraMonthly(e => e + 100)}
             className="text-zinc-500 hover:text-white text-sm font-mono transition-colors"
           >+</button>
           {extraMonthly > 0 && (
-            <span className="text-[10px] font-mono text-indigo-400 ml-2">accelerated payoff active</span>
+            <span className="text-xs font-sans text-brand-indigo ml-2">Accelerated payoff</span>
           )}
         </div>
         <div className="h-[260px] w-full">

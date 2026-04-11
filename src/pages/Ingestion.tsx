@@ -346,29 +346,29 @@ export default function Ingestion() {
           <button 
             type="button"
             onClick={() => cameraInputRef.current?.click()}
-            className="px-6 py-2.5 bg-surface-raised border border-surface-border hover:bg-surface-elevated text-zinc-300 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 btn-tactile shrink-0"
+            className="px-6 py-2.5 bg-surface-raised border border-surface-border hover:bg-surface-elevated text-zinc-300 rounded-sm text-xs font-sans font-semibold transition-colors flex items-center gap-2 btn-tactile shrink-0"
           >
             <Camera className="w-4 h-4" /> Camera
           </button>
           <button 
             onClick={() => setIsSyncOpen(true)}
-            className="px-6 py-2.5 bg-brand-violet/10 border border-brand-violet/30 hover:bg-brand-violet/20 text-brand-violet rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 btn-tactile"
+            className="px-6 py-2.5 bg-brand-violet/10 border border-brand-violet/30 hover:bg-brand-violet/20 text-brand-violet rounded-sm text-xs font-sans font-semibold transition-colors flex items-center gap-2 btn-tactile"
           >
-            <Smartphone className="w-4 h-4" /> SCAN VIA PHONE
+            <Smartphone className="w-4 h-4" /> Scan via phone
           </button>
           <button 
             onClick={() => fileInputRef.current?.click()}
-            className="px-6 py-2.5 bg-surface-raised border border-surface-border hover:bg-surface-elevated text-zinc-300 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 btn-tactile"
+            className="px-6 py-2.5 bg-surface-raised border border-surface-border hover:bg-surface-elevated text-zinc-300 rounded-sm text-xs font-sans font-semibold transition-colors flex items-center gap-2 btn-tactile"
           >
-            <UploadCloud className="w-4 h-4" /> UPLOAD DOCUMENTS
+            <UploadCloud className="w-4 h-4" /> Upload documents
           </button>
 
           {pendingIngestions.some(pi => pi.status === 'ready') && (
             <button 
               onClick={handleBulkCommit}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 shadow-lg shadow-indigo-500/10 btn-tactile"
+              className="px-6 py-2.5 bg-brand-cta hover:bg-brand-cta-hover text-white rounded-sm text-xs font-sans font-semibold transition-colors flex items-center gap-2 shadow-sm btn-tactile"
             >
-              <FileCheck className="w-4 h-4" /> SAVE ALL READY
+              <FileCheck className="w-4 h-4" /> Save all ready
             </button>
           )}
         </div>
@@ -387,21 +387,21 @@ export default function Ingestion() {
             onClick={() => fileInputRef.current?.click()}
           >
             <UploadCloud className={`w-12 h-12 mx-auto mb-6 transition-colors ${dragActive ? 'text-indigo-500' : 'text-zinc-700'}`} />
-            <h3 className="text-lg font-mono font-bold text-zinc-500 uppercase tracking-widest">Empty Inbox</h3>
-            <p className="text-xs font-mono text-zinc-600 mt-2 uppercase tracking-widest">Drop a PDF or photo — we extract amounts and save when possible</p>
-            <div className="mt-8 inline-block px-10 py-3 bg-indigo-600 text-white text-[10px] font-mono font-bold uppercase tracking-[0.3em] shadow-lg shadow-indigo-500/20 btn-tactile">
-              IMPORT FILES
+            <h3 className="text-lg font-sans font-semibold text-content-primary">Inbox is empty</h3>
+            <p className="text-sm text-content-tertiary mt-2 max-w-md mx-auto">Drop a PDF or photo, or upload from your computer. We read amounts and line items when possible.</p>
+            <div className="mt-8 inline-block px-8 py-3 rounded-sm bg-brand-cta text-white text-sm font-sans font-semibold shadow-sm btn-tactile">
+              Choose files
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-px bg-surface-border border border-surface-border rounded-sm overflow-hidden shadow-2xl">
             {/* Table Header */}
             <div className="hidden md:grid grid-cols-12 bg-surface-elevated px-6 py-3 border-b border-surface-border">
-              <div className="col-span-4 text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em]">Document</div>
-              <div className="col-span-2 text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em]">Status</div>
-              <div className="col-span-2 text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em]">Amount</div>
-              <div className="col-span-2 text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em]">Type</div>
-              <div className="col-span-2 text-right text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em]">Action</div>
+              <div className="col-span-4 section-label normal-case text-[10px]">Document</div>
+              <div className="col-span-2 section-label normal-case text-[10px]">Status</div>
+              <div className="col-span-2 section-label normal-case text-[10px]">Amount</div>
+              <div className="col-span-2 section-label normal-case text-[10px]">Type</div>
+              <div className="col-span-2 text-right section-label normal-case text-[10px]">Action</div>
             </div>
 
             {pendingIngestions.map((item) => {

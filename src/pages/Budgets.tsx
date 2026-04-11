@@ -95,14 +95,15 @@ export default function Budgets() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-content-primary">Budget Planner</h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-zinc-500 mt-1">Set and manage your spending limits</p>
+          <p className="text-sm text-content-tertiary mt-1">Set and manage your spending limits.</p>
         </div>
         <button 
           onClick={openAddModal}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-sm font-bold transition-colors flex items-center gap-2 self-start sm:self-auto focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-600"
+          type="button"
+          className="px-4 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-white"
         >
-          <Plus className="w-4 h-4" />
-          Create Budget
+          <Plus className="w-4 h-4 shrink-0" aria-hidden />
+          Create budget
         </button>
       </div>
 
@@ -111,22 +112,23 @@ export default function Budgets() {
           <div className="w-16 h-16 bg-surface-elevated rounded-sm flex items-center justify-center mx-auto mb-4 border border-surface-border">
             <PieChart className="w-8 h-8 text-zinc-600" />
           </div>
-          <h3 className="text-lg font-bold text-content-primary mb-2 uppercase tracking-tight">No budgets yet</h3>
-          <p className="text-xs font-mono text-zinc-500 mb-8 max-w-sm mx-auto uppercase tracking-widest">Set spending limits to stay on track.</p>
+          <h3 className="text-lg font-semibold text-content-primary mb-2">No budgets yet</h3>
+          <p className="text-sm text-content-tertiary mb-8 max-w-sm mx-auto">Add a limit per category so you can see spending against it each month.</p>
           <motion.button 
             whileTap={{ scale: 0.95 }}
+            type="button"
             onClick={openAddModal}
-            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors inline-flex items-center gap-2"
+            className="px-6 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold transition-colors inline-flex items-center gap-2 shadow-sm"
           >
-            <Plus className="w-4 h-4" />
-            Create Budget
+            <Plus className="w-4 h-4 shrink-0" aria-hidden />
+            Create your first budget
           </motion.button>
         </div>
       ) : (
         <CollapsibleModule 
           title="Budget Limits" 
           icon={PieChart}
-          extraHeader={<span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{budgets.length} Budgets Active</span>}
+          extraHeader={<span className="text-xs font-sans text-content-tertiary">{budgets.length} active</span>}
         >
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 -mx-6 -my-6 p-6"
@@ -158,8 +160,8 @@ export default function Budgets() {
                 >
                   <div className="flex justify-between items-start mb-6">
                     <div>
-                      <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-content-primary">{budget.category}</h3>
-                      <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-1.5">{budget.period} Threshold</p>
+                      <h3 className="text-sm font-semibold text-content-primary">{budget.category}</h3>
+                      <p className="metric-label mt-1.5 normal-case">{budget.period} limit</p>
                     </div>
                     
                     <Menu as="div" className="relative inline-block text-left">
@@ -213,8 +215,8 @@ export default function Budgets() {
                     <p className="text-3xl font-bold font-mono tabular-nums text-content-primary">
                       ${spent.toLocaleString('en-US', { minimumFractionDigits: 0 })}
                     </p>
-                    <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.1em] mb-1">
-                      TARGET: ${budget.amount.toLocaleString()}
+                    <p className="text-xs font-sans text-content-tertiary mb-1">
+                      Target ${budget.amount.toLocaleString()}
                     </p>
                   </div>
 
@@ -222,7 +224,7 @@ export default function Budgets() {
                     <div className={`${progressColor} h-full transition-all duration-700 ease-out`} style={{ width: `${percentage}%` }}></div>
                   </div>
 
-                  <div className="mt-auto pt-4 flex items-center justify-between text-[10px] font-mono uppercase tracking-widest">
+                  <div className="mt-auto pt-4 flex items-center justify-between text-xs font-sans text-content-tertiary">
                     {isOverBudget ? (
                       <span className="text-red-400 flex items-center gap-1.5"><AlertTriangle className="w-3 h-3" /> Over Budget</span>
                     ) : isNearLimit ? (
@@ -245,8 +247,8 @@ export default function Budgets() {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-sm w-full rounded-sm bg-surface-raised border border-surface-border shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-surface-border">
-              <Dialog.Title className="text-xs font-mono uppercase tracking-[0.2em] text-content-primary">
-                {isEditModalOpen ? 'Modify Budget' : 'Create Budget'}
+              <Dialog.Title className="text-base font-sans font-semibold text-content-primary">
+                {isEditModalOpen ? 'Edit budget' : 'New budget'}
               </Dialog.Title>
               <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-zinc-500 hover:text-zinc-300 transition-colors">
                 <X className="w-4 h-4" />
@@ -255,7 +257,7 @@ export default function Budgets() {
             
             <form onSubmit={isEditModalOpen ? handleEditSubmit : handleAddSubmit} className="p-6 space-y-6">
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Category Selection</label>
+                <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Category</label>
                 <select 
                   required
                   value={formData.category}
@@ -273,7 +275,7 @@ export default function Budgets() {
               </div>
               
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Threshold Amount</label>
+                <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Amount</label>
                 <div className="relative">
                   <span className="absolute left-3 top-2.5 text-xs font-mono text-zinc-600">$</span>
                   <input 
@@ -290,7 +292,7 @@ export default function Budgets() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Billing Cycle</label>
+                <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Period</label>
                 <select 
                   value={formData.period}
                   onChange={(e) => setFormData({...formData, period: e.target.value as 'Monthly' | 'Yearly'})}
@@ -305,15 +307,15 @@ export default function Budgets() {
                 <button
                   type="button"
                   onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }}
-                  className="px-4 py-2 text-xs font-mono uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
+                  className="px-4 py-2 text-sm font-sans font-medium text-content-tertiary hover:text-content-primary transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors shadow-lg shadow-indigo-500/10"
+                  className="px-6 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold transition-colors shadow-sm"
                 >
-                  {isEditModalOpen ? 'Confirm Status' : 'Save Budget'}
+                  {isEditModalOpen ? 'Save changes' : 'Save budget'}
                 </button>
               </div>
             </form>

@@ -118,50 +118,57 @@ export default function Subscriptions() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-content-primary">Subscriptions</h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-zinc-500 mt-1">Recurring liabilities management</p>
+          <p className="text-sm text-content-tertiary mt-1">Recurring charges and renewal dates in one place.</p>
         </div>
         <button
+          type="button"
           onClick={() => {
             setIsAdding(true);
             setEditingId(null);
             setFormData({ name: '', amount: '', frequency: 'Monthly', nextBillingDate: '', status: 'active' });
           }}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-sm font-bold transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-600"
+          className="px-4 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-600"
         >
-          <Plus className="w-4 h-4" />
-          Add Subscription
+          <Plus className="w-4 h-4 shrink-0" aria-hidden />
+          Add subscription
         </button>
       </div>
 
       {/* Overview Stats */}
       <CollapsibleModule 
-        title="Subscription Health" 
+        title="Subscription overview" 
         icon={TrendingUp}
-        extraHeader={<span className="text-xs font-mono text-content-primary font-bold">${monthlyCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}/mo</span>}
+        extraHeader={
+          <span className="text-sm font-mono tabular-nums font-semibold text-content-primary data-numeric">
+            ${monthlyCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}/mo
+          </span>
+        }
       >
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 -mx-6 -my-6 p-6">
           <div className="bg-surface-elevated overflow-hidden rounded-sm border border-surface-border p-5">
-            <p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Monthly Cost</p>
-            <p className="text-2xl font-bold font-mono tabular-nums text-content-primary">
+            <p className="metric-label normal-case mb-2">Monthly cost</p>
+            <p className="text-2xl font-bold font-mono tabular-nums text-content-primary data-numeric">
               ${monthlyCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </p>
-            <p className="mt-1 text-xs font-mono text-zinc-500">Across {activeSubscriptions.length} active subscriptions</p>
+            <p className="mt-1 text-xs text-content-tertiary">Across {activeSubscriptions.length} active</p>
           </div>
           <div className="bg-surface-elevated rounded-sm border border-surface-border p-5">
-            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.2em] mb-2 flex items-center gap-1.5">
-              <TrendingUp className="w-3 h-3" /> Price Hikes
+            <p className="metric-label normal-case mb-2 flex items-center gap-1.5">
+              <TrendingUp className="w-3 h-3 shrink-0" aria-hidden /> Price hikes
             </p>
-            <p className={`text-2xl font-bold font-mono tabular-nums ${hikedSubs.length > 0 ? 'text-amber-400' : 'text-zinc-600'}`}>
+            <p className={`text-2xl font-bold font-mono tabular-nums data-numeric ${hikedSubs.length > 0 ? 'text-amber-400' : 'text-zinc-600'}`}>
               {hikedSubs.length}
             </p>
-            <p className="mt-1 text-xs font-mono text-zinc-500 truncate">
-              {hikedSubs.length > 0 ? hikedSubs.map(s => s.name).join(', ') : 'No price increases found'}
+            <p className="mt-1 text-xs text-content-tertiary truncate">
+              {hikedSubs.length > 0 ? hikedSubs.map(s => s.name).join(', ') : 'No recent price increases'}
             </p>
           </div>
           <div className="bg-surface-elevated overflow-hidden rounded-sm border border-surface-border p-5">
-            <p className="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-2">Annual Cost</p>
-            <p className="text-2xl font-bold font-mono tabular-nums text-content-primary">${(monthlyCost * 12).toLocaleString('en-US', { minimumFractionDigits: 0 })}</p>
-            <p className="mt-1 text-xs font-mono text-zinc-500">Projected yearly spend</p>
+            <p className="metric-label normal-case mb-2">Annual cost</p>
+            <p className="text-2xl font-bold font-mono tabular-nums text-content-primary data-numeric">
+              ${(monthlyCost * 12).toLocaleString('en-US', { minimumFractionDigits: 0 })}
+            </p>
+            <p className="mt-1 text-xs text-content-tertiary">Projected yearly spend</p>
           </div>
         </div>
       </CollapsibleModule>
@@ -169,8 +176,8 @@ export default function Subscriptions() {
       {(isAdding || editingId) && (
         <div className="bg-surface-raised rounded-sm border border-surface-border p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-content-primary">
-              {editingId ? 'Edit Entry' : 'Manual Entry'}
+            <h3 className="text-base font-sans font-semibold text-content-primary">
+              {editingId ? 'Edit subscription' : 'Add subscription'}
             </h3>
             <button onClick={() => { setIsAdding(false); cancelEdit(); }} className="text-zinc-500 hover:text-zinc-300 transition-colors">
               <X className="w-4 h-4" />
@@ -179,7 +186,7 @@ export default function Subscriptions() {
           <form onSubmit={editingId ? handleUpdate : handleAdd} className="space-y-6">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Service Name</label>
+                <label className="block text-sm font-sans font-medium text-content-secondary mb-1.5">Service name</label>
                 <input
                   type="text"
                   required
@@ -190,7 +197,7 @@ export default function Subscriptions() {
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Amount</label>
+                <label className="block text-sm font-sans font-medium text-content-secondary mb-1.5">Amount</label>
                 <div className="relative">
                   <span className="absolute left-3 top-2.5 text-xs font-mono text-zinc-600">$</span>
                   <input
@@ -206,7 +213,7 @@ export default function Subscriptions() {
                 </div>
               </div>
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Frequency</label>
+                <label className="block text-sm font-sans font-medium text-content-secondary mb-1.5">Frequency</label>
                 <select
                   value={formData.frequency}
                   onChange={(e) => setFormData({ ...formData, frequency: e.target.value as SubFrequency })}
@@ -219,7 +226,7 @@ export default function Subscriptions() {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Next Billing</label>
+                <label className="block text-sm font-sans font-medium text-content-secondary mb-1.5">Next billing</label>
                 <input
                   type="date"
                   required
@@ -233,15 +240,15 @@ export default function Subscriptions() {
               <button
                 type="button"
                 onClick={() => { setIsAdding(false); cancelEdit(); }}
-                className="px-4 py-2 text-xs font-mono uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
+                className="px-4 py-2 text-sm font-sans font-medium text-content-tertiary hover:text-content-primary transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors shadow-lg shadow-indigo-500/10"
+                className="px-6 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors"
               >
-                {editingId ? 'Commit Changes' : 'Add to Ledger'}
+                {editingId ? 'Save changes' : 'Add subscription'}
               </button>
             </div>
           </form>
@@ -253,20 +260,21 @@ export default function Subscriptions() {
           <div className="w-16 h-16 border border-surface-border rounded-sm flex items-center justify-center mx-auto mb-4">
             <Repeat className="w-8 h-8 text-zinc-500" />
           </div>
-          <h3 className="text-lg font-bold tracking-tight text-content-primary mb-2">No active subscriptions</h3>
-          <p className="text-xs font-mono text-zinc-500 max-w-sm mx-auto mb-8 uppercase tracking-widest">
-            Ready to track Netflix, Spotify, and more.
+          <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No subscriptions yet</h3>
+          <p className="text-sm text-content-tertiary max-w-sm mx-auto mb-8">
+            Add recurring charges so renewal dates and monthly cost stay visible.
           </p>
           <button
+            type="button"
             onClick={() => setIsAdding(true)}
-            className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-sm font-bold transition-colors flex items-center gap-2 mx-auto"
+            className="px-8 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 mx-auto"
           >
-            <Plus className="w-4 h-4" />
-            Begin Tracking
+            <Plus className="w-4 h-4 shrink-0" aria-hidden />
+            Add subscription
           </button>
         </div>
       ) : (
-        <CollapsibleModule title="Recurring Liabilities" icon={Repeat}>
+        <CollapsibleModule title="Your subscriptions" icon={Repeat}>
           <motion.ul 
             className="divide-y divide-surface-highlight -mx-6 -my-6"
             initial="hidden"
@@ -285,7 +293,7 @@ export default function Subscriptions() {
                 <div className="flex items-center gap-4">
                   <BrandLogo size="lg" name={sub.name} fallbackIcon={<Repeat className="w-5 h-5 text-zinc-600" />} />
                   <div>
-                    <h4 className="text-sm font-bold text-content-primary flex items-center gap-2">
+                    <h4 className="text-sm font-sans font-semibold text-content-primary flex items-center gap-2">
                       {sub.name}
                       {(() => {
                         const hike = getPriceHike(sub);
@@ -299,14 +307,14 @@ export default function Subscriptions() {
                       })()}
                     </h4>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`inline-flex items-center text-xs font-mono font-medium ${
+                      <span className={`inline-flex items-center text-xs font-sans font-medium ${
                         sub.status === 'active' ? 'text-emerald-400' :
                         sub.status === 'paused' ? 'text-amber-400' :
                         'text-zinc-400'
                       }`}>
                         {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
                       </span>
-                      <span className="text-xs font-mono text-zinc-500">Renews {sub.nextBillingDate}</span>
+                      <span className="text-xs font-sans text-content-tertiary">Renews {sub.nextBillingDate}</span>
                       {(() => {
                         const hike = getPriceHike(sub);
                         if (!hike) return null;
@@ -317,8 +325,8 @@ export default function Subscriptions() {
                 </div>
                 <div className="flex items-center justify-between sm:justify-end gap-12 w-full sm:w-auto">
                   <div className="text-right">
-                    <p className="text-base font-bold font-mono tabular-nums text-content-primary">${sub.amount.toFixed(2)}</p>
-                    <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{sub.frequency}</p>
+                    <p className="text-base font-bold font-mono tabular-nums text-content-primary data-numeric">${sub.amount.toFixed(2)}</p>
+                    <p className="text-xs text-content-tertiary normal-case">{sub.frequency}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <button

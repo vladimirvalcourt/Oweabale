@@ -62,21 +62,22 @@ export default function Goals() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-content-primary">Goals Overview</h1>
-          <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mt-1">Save money & pay off debt</p>
+          <p className="text-sm text-content-tertiary mt-1">Savings, debt payoff, and emergency fund targets.</p>
         </div>
         <button
+          type="button"
           onClick={() => setIsAddingGoal(true)}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-2"
+          className="px-4 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2"
         >
-          <Plus className="w-4 h-4" />
-          Add Goal
+          <Plus className="w-4 h-4 shrink-0" aria-hidden />
+          Add goal
         </button>
       </div>
 
       {isAddingGoal && (
         <div className="bg-surface-raised rounded-sm border border-surface-border p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xs font-mono uppercase tracking-[0.2em] text-content-primary">Goal Definition</h3>
+            <h3 className="text-base font-sans font-semibold text-content-primary">New goal</h3>
             <button onClick={() => setIsAddingGoal(false)} className="text-zinc-500 hover:text-zinc-300 transition-colors">
               <X className="w-4 h-4" />
             </button>
@@ -84,7 +85,7 @@ export default function Goals() {
           <form onSubmit={handleAddGoal} className="space-y-6">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Subject</label>
+                <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Name</label>
                 <input
                   type="text"
                   required
@@ -95,19 +96,19 @@ export default function Goals() {
                 />
               </div>
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Goal Type</label>
+                <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Type</label>
                 <select
                   value={newGoal.type}
                   onChange={(e) => setNewGoal({ ...newGoal, type: e.target.value as Goal['type'] })}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm font-mono uppercase text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
                 >
-                  <option value="savings">SAVINGS</option>
-                  <option value="debt">DEBT PAYOFF</option>
-                  <option value="emergency">EMERGENCY FUND</option>
+                  <option value="savings">Savings</option>
+                  <option value="debt">Debt payoff</option>
+                  <option value="emergency">Emergency fund</option>
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Target Amount</label>
+                <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Target amount</label>
                 <div className="relative">
                   <span className="absolute left-3 top-2.5 text-xs font-mono text-zinc-600">$</span>
                   <input
@@ -122,7 +123,7 @@ export default function Goals() {
                 </div>
               </div>
               <div>
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Starting Amount</label>
+                <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Starting amount</label>
                 <div className="relative">
                   <span className="absolute left-3 top-2.5 text-xs font-mono text-zinc-600">$</span>
                   <input
@@ -136,7 +137,7 @@ export default function Goals() {
                 </div>
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-2">Target Date</label>
+                <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Target date</label>
                 <input
                   type="date"
                   required
@@ -150,15 +151,15 @@ export default function Goals() {
               <button
                 type="button"
                 onClick={() => setIsAddingGoal(false)}
-                className="px-4 py-2 text-xs font-mono uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
+                className="px-4 py-2 text-sm font-sans font-medium text-content-tertiary hover:text-content-primary transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors shadow-lg shadow-indigo-500/10"
+                className="px-6 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold transition-colors shadow-sm"
               >
-                Add Goal
+                Save goal
               </button>
             </div>
           </form>
@@ -170,22 +171,23 @@ export default function Goals() {
           <div className="w-16 h-16 border border-surface-border rounded-sm flex items-center justify-center mx-auto mb-4 bg-surface-elevated">
             <Target className="w-8 h-8 text-zinc-600" />
           </div>
-          <h3 className="text-lg font-bold tracking-tight text-content-primary mb-2 uppercase">No goals yet</h3>
-          <p className="text-[10px] font-mono text-zinc-500 max-w-sm mx-auto mb-8 uppercase tracking-[0.15em]">Establish financial targets to begin tracking.</p>
+          <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No goals yet</h3>
+          <p className="text-sm text-content-tertiary max-w-sm mx-auto mb-8">Set a target amount and date—progress updates as you add money.</p>
           <motion.button
             whileTap={{ scale: 0.95 }}
+            type="button"
             onClick={() => setIsAddingGoal(true)}
-            className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-2 mx-auto"
+            className="px-8 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold transition-colors flex items-center gap-2 mx-auto shadow-sm"
           >
-            <Plus className="w-4 h-4" />
-            Create Your First Goal
+            <Plus className="w-4 h-4 shrink-0" aria-hidden />
+            Create your first goal
           </motion.button>
         </div>
       ) : (
         <CollapsibleModule 
           title="Your Goals"
           icon={Target}
-          extraHeader={<span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">{goals.length} Objectives Active</span>}
+          extraHeader={<span className="text-xs font-sans text-content-tertiary">{goals.length} active</span>}
         >
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-2 gap-6 -mx-6 -my-6 p-6"
@@ -214,8 +216,8 @@ export default function Goals() {
                           {isSavings ? <TrendingUp className="w-5 h-5 text-emerald-500" /> : <TrendingDown className="w-5 h-5 text-indigo-500" />}
                         </div>
                         <div>
-                          <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-content-primary">{goal.name}</h3>
-                          <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest mt-1.5">{goal.type} goal • target: {new Date(goal.deadline).toLocaleDateString()}</p>
+                          <h3 className="text-sm font-semibold text-content-primary">{goal.name}</h3>
+                          <p className="text-xs text-content-tertiary mt-1.5 capitalize">{goal.type} · due {new Date(goal.deadline).toLocaleDateString()}</p>
                         </div>
                       </div>
                       {isCompleted && (

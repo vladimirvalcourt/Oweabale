@@ -183,15 +183,16 @@ export default function Obligations() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-content-primary mb-1 uppercase">BILLS & DEBTS</h1>
-          <p className="text-zinc-400 text-sm">A complete record of everything you owe.</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-content-primary mb-1">Bills & debts</h1>
+          <p className="text-sm text-content-tertiary">Everything you owe, in one place.</p>
         </div>
         <button 
+          type="button"
           onClick={() => openQuickAdd(activeTab === 'ambush' ? 'citation' : 'obligation')}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-all flex items-center gap-2 self-start btn-tactile"
+          className="px-4 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile"
         >
-          <Plus className="w-4 h-4" />
-          {activeTab === 'ambush' ? 'ADD TICKET / FINE' : 'ADD BILL'}
+          <Plus className="w-4 h-4 shrink-0" aria-hidden />
+          {activeTab === 'ambush' ? 'Add ticket or fine' : 'Add bill'}
         </button>
       </div>
       {/* Stats */}
@@ -199,14 +200,14 @@ export default function Obligations() {
         <div className="bg-surface-elevated border border-surface-border p-5 rounded-sm">
           <div className="flex items-center gap-2 text-zinc-500 mb-3">
             <Receipt className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-mono uppercase tracking-wider">Monthly Payments</span>
+            <span className="metric-label normal-case text-[11px]">Monthly payments</span>
           </div>
           <p className="text-2xl font-mono text-red-400 font-bold">${totalMonthlyBurn.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
         <div className="bg-surface-elevated border border-surface-border p-5 rounded-sm">
           <div className="flex items-center gap-2 text-zinc-500 mb-3">
             <CreditCard className="w-3.5 h-3.5" />
-            <span className="text-[10px] font-mono uppercase tracking-wider">Total Debt</span>
+            <span className="metric-label normal-case text-[11px]">Total debt</span>
           </div>
           <p className="text-2xl font-mono text-amber-400 font-bold">${activePrincipal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
@@ -214,7 +215,7 @@ export default function Obligations() {
           {urgentTotal > 0 && <div className="absolute inset-0 bg-rose-500/3" />}
           <div className="flex items-center gap-2 text-zinc-500 mb-3 relative z-10">
             <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
-            <span className="text-[10px] font-mono uppercase tracking-wider">Urgent Tickets</span>
+            <span className="metric-label normal-case text-[11px]">Urgent tickets</span>
             {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold text-rose-400 border border-rose-500/50 px-1 rounded-sm ml-auto">{urgentCitations.length} DUE</span>}
           </div>
           <p className={`text-2xl font-mono font-bold relative z-10 ${urgentTotal > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
@@ -229,8 +230,8 @@ export default function Obligations() {
           title="Debt Payoff Plan" 
           icon={Flame}
           extraHeader={
-            <span className="text-[10px] font-mono text-zinc-600 bg-surface-base border border-surface-border px-2 py-0.5 rounded-sm">
-              Payoff: {payoffResult.months > 0 ? monthsToDate(payoffResult.months) : 'N/A'}
+            <span className="text-xs font-sans text-content-tertiary bg-surface-base border border-surface-border px-2 py-0.5 rounded-sm">
+              Payoff {payoffResult.months > 0 ? monthsToDate(payoffResult.months) : '—'}
             </span>
           }
         >
