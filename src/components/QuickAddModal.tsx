@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Terminal, AlertCircle, Loader2, Camera, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { X, Terminal, AlertCircle, Loader2, Camera, Eye, EyeOff, AlertTriangle, UploadCloud } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { toast } from 'sonner';
 import { useStore, type IncomeSource } from '../store/useStore';
 import { guessCategory } from '../lib/categorizer';
 import { validateIngestionFile } from '../lib/security';
+import { extractCitationFieldsFromText, looksLikeCitationDocument } from '../lib/citationFromDocument';
 
 interface QuickAddModalProps {
   isOpen: boolean;
@@ -49,7 +50,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [isScanning, setIsScanning] = useState(false);
   const [scannedPreviewUrl, setScannedPreviewUrl] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
-  const scanInputRef = useRef<HTMLInputElement>(null);
+  const scanFileInputRef = useRef<HTMLInputElement>(null);
+  const scanCameraInputRef = useRef<HTMLInputElement>(null);
 
   // Noise patterns that should be skipped when finding a merchant name
   const RECEIPT_NOISE = /^(receipt|invoice|thank you|thanks|welcome|store|branch|tel:|phone:|www\.|http|address:|date:|time:|cashier|order #|order:|transaction|subtotal|total|tax|amount|change|cash|card|approved|auth|ref:|refund|void|copy|customer|#\d+|\d{3}[-.\s]\d{3}[-.\s]\d{4}|\d{1,5}\s+\w+\s+(st|ave|blvd|rd|dr|lane|ln|way|ct|pl|suite))/i;
@@ -120,14 +122,12 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       }
 
       // ── Auto-detect toll / traffic ticket and switch tab ──
-      // Capture BEFORE any state updates so merchant routing uses this synchronously
-      const isCitationDoc = /toll|violation|citation|ticket|fine|infraction|notice of|penalty|mvd|dmv|traffic|speed|red light|parking (fine|violation|notice)|e-zpass|sunpass|fastrak|pikepass/i.test(fullText);
+      const isCitationDoc = looksLikeCitationDocument(fullText);
       if (isCitationDoc && activeTab !== 'citation') {
         setActiveTab('citation');
       }
 
       // ── Extract merchant: skip noise, find first meaningful line ──
-      // Use isCitationDoc directly (not stale activeTab) to decide where to route the name
       const lines = fullText.split('\n').filter(l => l.trim().length > 2);
       const merchantName = extractMerchantName(lines);
       if (merchantName && !isCitationDoc) {
@@ -137,52 +137,19 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         if (guessed) setCategory(guessed);
       }
 
-      // ── Fallback: if no merchant from lines, run guessCategory across full text ──
       if (!merchantName) {
         const guessed = guessCategory(fullText.substring(0, 500));
         if (guessed) setCategory(guessed);
       }
 
-      // ── Citation-specific extraction ──
       if (isCitationDoc) {
-        // Citation / notice number
-        const citNumMatch = fullText.match(/(?:citation|notice|ticket|case|ref(?:erence)?|no\.?|#)\s*[:\-]?\s*([A-Z0-9\-]{4,20})/i);
-        if (citNumMatch) setCitationNumber(citNumMatch[1].trim());
-
-        // Jurisdiction — look for state name or abbreviation near common patterns
-        const jurisdictionMatch = fullText.match(/(?:issued by|jurisdiction|county of|city of|state of|court)[:\s]+([A-Za-z\s]{3,40})/i);
-        if (jurisdictionMatch) setJurisdiction(jurisdictionMatch[1].trim().substring(0, 40));
-
-        // Penalty / late fee — second largest dollar amount after the main fine
-        const allAmountMatches = fullText.match(/\$?\s*\d{1,6}\.\d{2}/g);
-        if (allAmountMatches) {
-          const amounts = allAmountMatches
-            .map(m => parseFloat(m.replace(/[^0-9.]/g, '')))
-            .filter(n => !isNaN(n) && n > 0)
-            .sort((a, b) => b - a);
-          if (amounts.length >= 2) setPenaltyFee(amounts[1].toFixed(2));
-        }
-
-        // Due date → days left
-        const dueDateMatch = fullText.match(/(?:due|pay by|payment due|deadline)[:\s]+(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/i);
-        if (dueDateMatch) {
-          try {
-            const dueD = new Date(dueDateMatch[1]);
-            if (!isNaN(dueD.getTime())) {
-              const days = Math.max(0, Math.round((dueD.getTime() - Date.now()) / 86400000));
-              setDaysLeft(String(days));
-              setCitationDueDate(dueD.toISOString().split('T')[0]);
-            }
-          } catch {}
-        }
-
-        // Toll operator type detection
-        if (/e-zpass|ezpass/i.test(fullText)) setCitationType('Toll Violation');
-        else if (/speed|mph|velocity/i.test(fullText)) setCitationType('Speed Camera');
-        else if (/red light|signal/i.test(fullText)) setCitationType('Red Light Camera');
-        else if (/parking/i.test(fullText)) setCitationType('Parking Ticket');
-        else if (/traffic|moving/i.test(fullText)) setCitationType('Traffic Citation');
-        else if (/toll/i.test(fullText)) setCitationType('Toll Violation');
+        const cit = extractCitationFieldsFromText(fullText);
+        if (cit.citationNumber) setCitationNumber(cit.citationNumber);
+        if (cit.jurisdiction) setJurisdiction(cit.jurisdiction);
+        if (cit.penaltyFee) setPenaltyFee(cit.penaltyFee);
+        setDaysLeft(cit.daysLeft);
+        if (cit.citationDueDate) setCitationDueDate(cit.citationDueDate);
+        setCitationType(cit.citationType);
       }
 
       // ── Extract date ──
@@ -234,7 +201,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       setNlpText('');
       setIsScanning(false);
       setErrors({});
-      if (scanInputRef.current) scanInputRef.current.value = '';
+      if (scanFileInputRef.current) scanFileInputRef.current.value = '';
+      if (scanCameraInputRef.current) scanCameraInputRef.current.value = '';
       setScannedPreviewUrl(prev => { if (prev) URL.revokeObjectURL(prev); return null; });
       setShowPreview(false);
       setCitationType('Toll Violation');
@@ -464,7 +432,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           JPG · PNG · WEBP · PDF
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center justify-end gap-2">
                         {scannedPreviewUrl && (
                           <button
                             type="button"
@@ -475,13 +443,30 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                           </button>
                         )}
-                        <label className={`relative flex items-center gap-2 px-4 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none
+                        <label className={`relative flex items-center gap-2 px-3 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none shrink-0
                           ${isScanning
                             ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
                             : 'border-surface-border bg-surface-raised text-zinc-300 hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
                           }`}>
                           <input
-                            ref={scanInputRef}
+                            ref={scanCameraInputRef}
+                            type="file"
+                            accept="image/*"
+                            capture="environment"
+                            className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full"
+                            onChange={handleScanFile}
+                            disabled={isScanning}
+                          />
+                          <Camera className="w-3.5 h-3.5" />
+                          Camera
+                        </label>
+                        <label className={`relative flex items-center gap-2 px-3 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none shrink-0
+                          ${isScanning
+                            ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
+                            : 'border-surface-border bg-surface-raised text-zinc-300 hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
+                          }`}>
+                          <input
+                            ref={scanFileInputRef}
                             type="file"
                             accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
                             className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full"
@@ -495,8 +480,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             </>
                           ) : (
                             <>
-                              <Camera className="w-3.5 h-3.5" />
-                              {scannedPreviewUrl ? 'Rescan' : 'Upload Image / PDF'}
+                              <UploadCloud className="w-3.5 h-3.5" />
+                              {scannedPreviewUrl ? 'Rescan file' : 'Upload file'}
                             </>
                           )}
                         </label>

@@ -128,7 +128,7 @@ export interface FreelanceEntry {
 
 export interface PendingIngestion {
   id: string;
-  type: 'bill' | 'debt' | 'transaction' | 'income';
+  type: 'bill' | 'debt' | 'transaction' | 'income' | 'citation';
   status: 'scanning' | 'uploading' | 'ready' | 'error' | string;
   extractedData: {
     name?: string;
@@ -138,6 +138,13 @@ export interface PendingIngestion {
     dueDate?: string;
     category?: string;
     source?: string;
+    /** Tickets, tolls, fines (when type === 'citation') */
+    citationType?: string;
+    jurisdiction?: string;
+    citationNumber?: string;
+    penaltyFee?: number;
+    paymentUrl?: string;
+    daysLeft?: number;
   };
   originalFile?: {
     name: string;
@@ -322,7 +329,7 @@ interface AppState {
   closeQuickAdd: () => void;
 }
 
-type TabType = 'transaction' | 'obligation' | 'income';
+export type TabType = 'transaction' | 'obligation' | 'income' | 'citation';
 
 const initialData = {
   bills: [],
@@ -1566,6 +1573,42 @@ export const useStore = create<AppState>()(
       }
       set((s) => ({
         incomes: [...s.incomes, newIncome],
+        pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
+      }));
+    } else if (item.type === 'citation') {
+      const jurisdiction = (data.jurisdiction || data.biller || '').trim();
+      if (!jurisdiction) {
+        toast.error('Enter issuing jurisdiction before saving this ticket or fine.');
+        return;
+      }
+      const daysLeft =
+        typeof data.daysLeft === 'number' && !isNaN(data.daysLeft)
+          ? Math.max(0, Math.floor(data.daysLeft))
+          : parseInt(String(data.daysLeft ?? '30'), 10) || 30;
+      const penaltyFee =
+        typeof data.penaltyFee === 'number' && !isNaN(data.penaltyFee) ? data.penaltyFee : 0;
+      const ok = await get().addCitation({
+        type: data.citationType || 'Toll Violation',
+        jurisdiction,
+        daysLeft,
+        amount: data.amount || 0,
+        penaltyFee,
+        date: data.date || data.dueDate || new Date().toISOString().split('T')[0],
+        citationNumber: (data.citationNumber || '').trim(),
+        paymentUrl: (() => {
+          const u = (data.paymentUrl || '').trim();
+          if (!u) return '';
+          try {
+            const parsed = new URL(u);
+            return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? u : '';
+          } catch {
+            return '';
+          }
+        })(),
+        status: 'open',
+      });
+      if (!ok) return;
+      set((s) => ({
         pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
       }));
     }

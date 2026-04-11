@@ -12,7 +12,8 @@ import {
   UploadCloud,
   CloudUpload,
   ExternalLink,
-  Smartphone
+  Smartphone,
+  Camera
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useStore } from '../store/useStore';
@@ -23,7 +24,76 @@ import Tesseract from 'tesseract.js';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { validateIngestionFile } from '../lib/security';
+import { extractCitationFieldsFromText, looksLikeCitationDocument } from '../lib/citationFromDocument';
+import type { PendingIngestion } from '../store/useStore';
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
+
+/** Shared OCR → bill vs ticket/fine routing for desktop upload and mobile sync. */
+function buildScanExtraction(fullText: string): Pick<PendingIngestion, 'type' | 'extractedData'> {
+  const lines = fullText.split('\n').filter((line) => line.trim().length > 0);
+  const biller =
+    lines.length > 0
+      ? lines[0].trim().length > 3
+        ? lines[0].trim()
+        : lines[1]?.trim() || 'Unknown Payee'
+      : 'Unknown Payee';
+
+  const amountMatches = fullText.match(/\$?\s*\d+\.\d{2}/g);
+  let maxAmount = 0;
+  if (amountMatches) {
+    const amounts = amountMatches
+      .map((m) => parseFloat(m.replace(/[^0-9.]/g, '')))
+      .filter((n) => !isNaN(n) && isFinite(n));
+    if (amounts.length > 0) maxAmount = Math.max(...amounts);
+  }
+
+  const dateMatch = fullText.match(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/);
+  let dueDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  let incidentDate = dueDate;
+  if (dateMatch) {
+    try {
+      const parsed = new Date(dateMatch[0]);
+      if (!isNaN(parsed.getTime())) {
+        incidentDate = parsed.toISOString().split('T')[0];
+        dueDate = incidentDate;
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  if (looksLikeCitationDocument(fullText)) {
+    const cit = extractCitationFieldsFromText(fullText);
+    const penaltyParsed = cit.penaltyFee ? parseFloat(cit.penaltyFee) : 0;
+    const daysParsed = parseInt(cit.daysLeft, 10);
+    return {
+      type: 'citation',
+      extractedData: {
+        biller: (cit.jurisdiction || biller).substring(0, 50),
+        jurisdiction: cit.jurisdiction,
+        citationType: cit.citationType,
+        citationNumber: cit.citationNumber,
+        penaltyFee: Number.isFinite(penaltyParsed) ? penaltyParsed : 0,
+        daysLeft: Number.isFinite(daysParsed) ? daysParsed : 30,
+        amount: maxAmount,
+        dueDate: cit.citationDueDate || dueDate,
+        date: incidentDate,
+        category: 'Transportation',
+        paymentUrl: '',
+      },
+    };
+  }
+
+  return {
+    type: 'bill',
+    extractedData: {
+      biller: biller.substring(0, 50),
+      amount: maxAmount,
+      dueDate,
+      category: 'Utilities',
+    },
+  };
+}
 
 // Upload rate limiter — max 5 files per 60 seconds
 const uploadTimestamps: number[] = [];
@@ -47,6 +117,7 @@ export default function Ingestion() {
   const [dragActive, setDragActive] = useState(false);
   const [isSyncOpen, setIsSyncOpen] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const cameraInputRef = React.useRef<HTMLInputElement>(null);
 
   const processFile = async (uploadedFile: File) => {
     // ── Security: validate file before anything else ──────────
@@ -135,38 +206,12 @@ export default function Ingestion() {
         }
       }
 
-      // ── Step 3: Entity extraction ──
-      const lines = fullText.split('\n').filter(line => line.trim().length > 0);
-      const biller = lines.length > 0
-        ? (lines[0].trim().length > 3 ? lines[0].trim() : (lines[1]?.trim() || 'Unknown Payee'))
-        : 'Unknown Payee';
-
-      const amountMatches = fullText.match(/\$?\s*\d+\.\d{2}/g);
-      let maxAmount = 0;
-      if (amountMatches) {
-        const amounts = amountMatches
-          .map(m => parseFloat(m.replace(/[^0-9.]/g, '')))
-          .filter(n => !isNaN(n) && isFinite(n));
-        if (amounts.length > 0) maxAmount = Math.max(...amounts);
-      }
-
-      const dateMatch = fullText.match(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/);
-      let dueDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-      if (dateMatch) {
-        try {
-          const parsed = new Date(dateMatch[0]);
-          if (!isNaN(parsed.getTime())) dueDate = parsed.toISOString().split('T')[0];
-        } catch (_) {}
-      }
-
+      // ── Step 3: Entity extraction (bills vs tickets / tolls) ──
+      const { type: ingestionType, extractedData } = buildScanExtraction(fullText);
       updatePendingIngestion(ingestionId, {
         status: 'ready',
-        extractedData: {
-          biller: biller.substring(0, 50),
-          amount: maxAmount,
-          dueDate,
-          category: 'Utilities'
-        }
+        type: ingestionType,
+        extractedData,
       });
 
       toast.success(`${uploadedFile.name.substring(0, 20)}... scanned`);
@@ -234,28 +279,11 @@ export default function Ingestion() {
          fullText = result.data.text;
        }
        
-       const lines = fullText.split('\n').filter(line => line.trim().length > 0);
-       const biller = lines.length > 0
-         ? (lines[0].trim().length > 3 ? lines[0].trim() : (lines[1]?.trim() || 'Unknown Payee'))
-         : 'Unknown Payee';
-
-       const amountMatches = fullText.match(/\$?\s*\d+\.\d{2}/g);
-       let maxAmount = 0;
-       if (amountMatches) {
-         const amounts = amountMatches
-           .map(m => parseFloat(m.replace(/[^0-9.]/g, '')))
-           .filter(n => !isNaN(n) && isFinite(n));
-         if (amounts.length > 0) maxAmount = Math.max(...amounts);
-       }
-
+       const { type: ingestionType, extractedData } = buildScanExtraction(fullText);
        updatePendingIngestion(id, {
          status: 'ready',
-         extractedData: {
-           biller: biller.substring(0, 50),
-           amount: maxAmount,
-           dueDate: new Date().toISOString().split('T')[0],
-           category: 'Utilities'
-         }
+         type: ingestionType,
+         extractedData,
        });
      } catch (err) {
        updatePendingIngestion(id, { status: 'error' });
@@ -362,6 +390,21 @@ export default function Ingestion() {
             accept=".pdf,image/*" 
             onChange={handleFileSelect} 
           />
+          <input
+            type="file"
+            ref={cameraInputRef}
+            className="hidden"
+            accept="image/*"
+            capture="environment"
+            onChange={handleFileSelect}
+          />
+          <button 
+            type="button"
+            onClick={() => cameraInputRef.current?.click()}
+            className="px-6 py-2.5 bg-surface-raised border border-surface-border hover:bg-surface-elevated text-zinc-300 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 btn-tactile shrink-0"
+          >
+            <Camera className="w-4 h-4" /> Camera
+          </button>
           <button 
             onClick={() => setIsSyncOpen(true)}
             className="px-6 py-2.5 bg-brand-violet/10 border border-brand-violet/30 hover:bg-brand-violet/20 text-brand-violet rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 btn-tactile"
@@ -441,6 +484,24 @@ export default function Ingestion() {
                       <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest mt-1">
                         {item.originalFile?.size ? (item.originalFile.size / 1024).toFixed(1) + ' KB' : 'SCANNED'}
                       </p>
+                      <div className="mt-2 md:hidden">
+                        <label className="sr-only">Document type</label>
+                        <select
+                          value={item.type}
+                          onChange={(e) =>
+                            updatePendingIngestion(item.id, {
+                              type: e.target.value as PendingIngestion['type'],
+                            })
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          className="w-full max-w-[200px] bg-surface-raised border border-surface-border text-[9px] font-mono font-bold uppercase tracking-widest text-zinc-400 rounded-sm px-2 py-1 outline-none focus:border-indigo-500"
+                        >
+                          <option value="transaction">Transaction</option>
+                          <option value="bill">Bill</option>
+                          <option value="income">Income</option>
+                          <option value="citation">Ticket / Fine</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
 
@@ -488,12 +549,17 @@ export default function Ingestion() {
                   <div className="hidden md:block md:col-span-2">
                     <select 
                       value={item.type}
-                      onChange={(e) => updatePendingIngestion(item.id, { type: e.target.value as 'transaction' | 'bill' | 'income' | 'debt' })}
+                      onChange={(e) =>
+                        updatePendingIngestion(item.id, {
+                          type: e.target.value as PendingIngestion['type'],
+                        })
+                      }
                       className="bg-surface-raised border border-surface-border text-[9px] font-mono font-bold uppercase tracking-widest text-zinc-400 rounded-sm px-2 py-1 outline-none focus:border-indigo-500 transition-colors"
                     >
                       <option value="transaction">Transaction</option>
                       <option value="bill">Bill</option>
                       <option value="income">Income</option>
+                      <option value="citation">Ticket / Fine</option>
                     </select>
                   </div>
 
@@ -582,49 +648,189 @@ export default function Ingestion() {
                             <span className="w-2 h-2 bg-indigo-500 rounded-none inline-block" /> Document Review
                           </h3>
                           <div className="space-y-8 flex-1">
-                            <div className="grid grid-cols-2 gap-8">
-                              <div>
-                                <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Merchant / Payee</label>
-                                <input 
-                                  value={item.extractedData.biller || ''} 
-                                  onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, biller: e.target.value, name: e.target.value } })}
-                                  className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors uppercase tracking-widest"
-                                />
+                            {item.type === 'citation' ? (
+                              <>
+                                <div className="grid grid-cols-2 gap-8">
+                                  <div>
+                                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Ticket type</label>
+                                    <select
+                                      value={item.extractedData.citationType || 'Toll Violation'}
+                                      onChange={(e) =>
+                                        updatePendingIngestion(item.id, {
+                                          extractedData: { ...item.extractedData, citationType: e.target.value },
+                                        })
+                                      }
+                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-zinc-300 focus:outline-none focus:border-rose-500 transition-colors"
+                                    >
+                                      <option value="Toll Violation">Toll Violation</option>
+                                      <option value="Traffic Citation">Traffic Citation</option>
+                                      <option value="Parking Ticket">Parking Ticket</option>
+                                      <option value="Speed Camera">Speed Camera</option>
+                                      <option value="Red Light Camera">Red Light Camera</option>
+                                      <option value="HOV Violation">HOV Violation</option>
+                                      <option value="Other Fine">Other Fine</option>
+                                    </select>
+                                  </div>
+                                  <div>
+                                    <label className="text-[9px] font-mono text-rose-400/90 uppercase tracking-[0.2em] block mb-3 font-black">
+                                      Issuing jurisdiction *
+                                    </label>
+                                    <input
+                                      value={item.extractedData.jurisdiction || item.extractedData.biller || ''}
+                                      onChange={(e) =>
+                                        updatePendingIngestion(item.id, {
+                                          extractedData: {
+                                            ...item.extractedData,
+                                            jurisdiction: e.target.value,
+                                            biller: e.target.value,
+                                          },
+                                        })
+                                      }
+                                      placeholder="E.g., Harris County, TX"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-rose-500 transition-colors"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-8">
+                                  <div>
+                                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Citation / notice #</label>
+                                    <input
+                                      value={item.extractedData.citationNumber || ''}
+                                      onChange={(e) =>
+                                        updatePendingIngestion(item.id, {
+                                          extractedData: { ...item.extractedData, citationNumber: e.target.value },
+                                        })
+                                      }
+                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-rose-500 transition-colors uppercase"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Penalty / late fee ($)</label>
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      min="0"
+                                      value={item.extractedData.penaltyFee ?? ''}
+                                      onChange={(e) =>
+                                        updatePendingIngestion(item.id, {
+                                          extractedData: {
+                                            ...item.extractedData,
+                                            penaltyFee: parseFloat(e.target.value) || 0,
+                                          },
+                                        })
+                                      }
+                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-rose-500 transition-colors"
+                                    />
+                                  </div>
+                                </div>
+                                <div>
+                                  <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Payment URL (optional)</label>
+                                  <input
+                                    type="url"
+                                    value={item.extractedData.paymentUrl || ''}
+                                    onChange={(e) =>
+                                      updatePendingIngestion(item.id, {
+                                        extractedData: { ...item.extractedData, paymentUrl: e.target.value },
+                                      })
+                                    }
+                                    placeholder="https://…"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-rose-500 transition-colors"
+                                  />
+                                </div>
+                                <div className="grid grid-cols-2 gap-8">
+                                  <div>
+                                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Incident date</label>
+                                    <input
+                                      type="date"
+                                      value={item.extractedData.date || ''}
+                                      onChange={(e) =>
+                                        updatePendingIngestion(item.id, {
+                                          extractedData: { ...item.extractedData, date: e.target.value },
+                                        })
+                                      }
+                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-rose-500 transition-colors"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Days until due</label>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      value={item.extractedData.daysLeft ?? ''}
+                                      onChange={(e) =>
+                                        updatePendingIngestion(item.id, {
+                                          extractedData: {
+                                            ...item.extractedData,
+                                            daysLeft: parseInt(e.target.value, 10) || 0,
+                                          },
+                                        })
+                                      }
+                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-rose-500 transition-colors"
+                                    />
+                                  </div>
+                                </div>
+                              </>
+                            ) : (
+                              <div className="grid grid-cols-2 gap-8">
+                                <div>
+                                  <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Merchant / Payee</label>
+                                  <input 
+                                    value={item.extractedData.biller || ''} 
+                                    onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, biller: e.target.value, name: e.target.value } })}
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors uppercase tracking-widest"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Category</label>
+                                  <select 
+                                    value={item.extractedData.category || ''}
+                                    onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, category: e.target.value } })}
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-zinc-400 focus:outline-none focus:border-indigo-500 transition-colors uppercase tracking-widest"
+                                  >
+                                    <option value="Utilities">Utilities</option>
+                                    <option value="Food & Dining">Food & Dining</option>
+                                    <option value="Housing">Housing</option>
+                                    <option value="Transportation">Transportation</option>
+                                    <option value="Subscriptions">Subscriptions</option>
+                                    <option value="Health">Health</option>
+                                    <option value="Shopping">Shopping</option>
+                                  </select>
+                                </div>
                               </div>
-                              <div>
-                                <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Category</label>
-                                <select 
-                                  value={item.extractedData.category || ''}
-                                  onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, category: e.target.value } })}
-                                  className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-zinc-400 focus:outline-none focus:border-indigo-500 transition-colors uppercase tracking-widest"
-                                >
-                                  <option value="Utilities">Utilities</option>
-                                  <option value="Food & Dining">Food & Dining</option>
-                                  <option value="Housing">Housing</option>
-                                  <option value="Transportation">Transportation</option>
-                                  <option value="Subscriptions">Subscriptions</option>
-                                  <option value="Health">Health</option>
-                                  <option value="Shopping">Shopping</option>
-                                </select>
-                              </div>
-                            </div>
+                            )}
 
                             <div className="grid grid-cols-2 gap-8">
                               <div>
                                 <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Amount ($)</label>
                                 <input 
                                   type="number"
-                                  value={item.extractedData.amount || ''} 
+                                  value={item.extractedData.amount ?? ''} 
                                   onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, amount: parseFloat(e.target.value) } })}
                                   className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xl font-mono text-[#4ade80] focus:outline-none focus:border-[#4ade80] transition-colors font-bold"
                                 />
                               </div>
                               <div>
-                                <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Due Date</label>
+                                <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">
+                                  {item.type === 'citation' ? 'Payment due date' : 'Due Date'}
+                                </label>
                                 <input 
                                   type="date"
                                   value={item.extractedData.dueDate || item.extractedData.date || ''} 
-                                  onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, dueDate: e.target.value, date: e.target.value } })}
+                                  onChange={(e) => {
+                                    const v = e.target.value;
+                                    if (item.type === 'citation') {
+                                      const days = v
+                                        ? Math.max(0, Math.round((new Date(v + 'T12:00:00').getTime() - Date.now()) / 86400000))
+                                        : (item.extractedData.daysLeft ?? 30);
+                                      updatePendingIngestion(item.id, {
+                                        extractedData: { ...item.extractedData, dueDate: v, daysLeft: days },
+                                      });
+                                    } else {
+                                      updatePendingIngestion(item.id, {
+                                        extractedData: { ...item.extractedData, dueDate: v, date: v },
+                                      });
+                                    }
+                                  }}
                                   className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
                                 />
                               </div>

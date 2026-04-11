@@ -187,11 +187,11 @@ export default function Obligations() {
           <p className="text-zinc-400 text-sm">A complete record of everything you owe.</p>
         </div>
         <button 
-          onClick={() => openQuickAdd('obligation')}
+          onClick={() => openQuickAdd(activeTab === 'ambush' ? 'citation' : 'obligation')}
           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-all flex items-center gap-2 self-start btn-tactile"
         >
           <Plus className="w-4 h-4" />
-          ADD BILL
+          {activeTab === 'ambush' ? 'ADD TICKET / FINE' : 'ADD BILL'}
         </button>
       </div>
       {/* Stats */}
