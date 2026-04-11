@@ -13,6 +13,9 @@ interface QuickAddModalProps {
   onClose: () => void;
 }
 
+/** Quick Add → Bill/Debt: bill cadence or debt instrument (card vs loan). */
+type ObligationKind = 'bill-weekly' | 'bill-biweekly' | 'bill-monthly' | 'debt-card' | 'debt-loan';
+
 export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const { quickAddTab, addTransaction, addBill, addDebt, addIncome, addCitation } = useStore();
   const [activeTab, setActiveTab] = useState<'transaction' | 'obligation' | 'income' | 'citation'>('transaction');
@@ -22,7 +25,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('food');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [type, setType] = useState('bill');
+  const [obligationKind, setObligationKind] = useState<ObligationKind>('bill-monthly');
   const [dueDate, setDueDate] = useState('');
   const [vendor, setVendor] = useState('');
   const [source, setSource] = useState('salary');
@@ -223,7 +226,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       setVendor('');
       setCategory('food');
       setDate(new Date().toISOString().split('T')[0]);
-      setType('bill');
+      setObligationKind('bill-monthly');
       setDueDate('');
       setSource('salary');
       setNlpText('');
@@ -333,13 +336,19 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         if (!ok) return;
         toast.success(`Transaction saved`);
       } else if (activeTab === 'obligation') {
-        if (type === 'bill') {
+        if (obligationKind.startsWith('bill-')) {
+          const freq =
+            obligationKind === 'bill-weekly'
+              ? 'Weekly'
+              : obligationKind === 'bill-biweekly'
+                ? 'Bi-weekly'
+                : 'Monthly';
           const ok = await addBill({
             biller: vendor,
             amount: numAmount,
             category: category,
             dueDate: dueDate || date,
-            frequency: 'Monthly',
+            frequency: freq,
             status: 'upcoming',
             autoPay: false
           });
@@ -348,8 +357,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         } else {
           const ok = await addDebt({
             name: vendor,
-            type: 'Loan',
-            apr: parseFloat(apr) || 0, 
+            type: obligationKind === 'debt-card' ? 'Credit Card' : 'Loan',
+            apr: parseFloat(apr) || 0,
             remaining: numAmount,
             minPayment: parseFloat(minPayment) || 0,
             paid: 0
@@ -652,7 +661,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               type="date"
                               value={date}
                               onChange={(e) => setDate(e.target.value)}
-                              className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none"
+                              className="input-date-dark w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans outline-none"
                             />
                           </div>
                         </div>
@@ -666,13 +675,21 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           <div>
                             <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Type</label>
                             <select 
-                              value={type}
-                              onChange={(e) => setType(e.target.value)}
+                              value={obligationKind}
+                              onChange={(e) => setObligationKind(e.target.value as ObligationKind)}
                               className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none cursor-pointer"
                             >
-                              <option value="bill">Monthly Bill</option>
-                              <option value="debt">Loan / Credit Card</option>
+                              <option value="bill-weekly">Weekly bill</option>
+                              <option value="bill-biweekly">Bi-weekly bill</option>
+                              <option value="bill-monthly">Monthly bill</option>
+                              <option value="debt-card">Credit card</option>
+                              <option value="debt-loan">Loan</option>
                             </select>
+                            <p className="text-[10px] font-mono text-zinc-500 mt-1.5 leading-snug">
+                              {obligationKind.startsWith('bill-')
+                                ? 'Amount is per bill cycle (weekly, bi-weekly, or monthly).'
+                                : 'Balance owed; APR and minimum payment are optional.'}
+                            </p>
                           </div>
                           <div>
                             <label htmlFor="dueDate" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Due Date</label>
@@ -681,7 +698,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               type="date"
                               value={dueDate}
                               onChange={(e) => { setDueDate(e.target.value); if(errors.dueDate) setErrors({...errors, dueDate: ''}); }}
-                              className={`w-full bg-surface-base border ${errors.dueDate ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none`}
+                              className={`input-date-dark w-full bg-surface-base border ${errors.dueDate ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans outline-none`}
                             />
                             {errors.dueDate && <p className="text-xs text-red-400 mt-1.5">{errors.dueDate}</p>}
                           </div>
@@ -696,7 +713,13 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                   type="text"
                                   value={vendor}
                                   onChange={(e) => { setVendor(e.target.value); if(errors.vendor) setErrors({...errors, vendor: ''}); }}
-                                  placeholder={type === 'bill' ? "E.g., AT&T" : "E.g., Chase Sapphire"}
+                                  placeholder={
+                                    obligationKind.startsWith('bill-')
+                                      ? 'E.g., AT&T'
+                                      : obligationKind === 'debt-card'
+                                        ? 'E.g., Chase Sapphire'
+                                        : 'E.g., SoFi Personal Loan'
+                                  }
                                   className={`w-full bg-surface-base border ${errors.vendor ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2.5 text-sm font-sans text-white placeholder-zinc-600 outline-none transition-colors`}
                                 />
                               </div>
@@ -731,7 +754,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             </select>
                           </div>
                         </div>
-                        {type === 'debt' && (
+                        {obligationKind.startsWith('debt-') && (
                           <div className="grid grid-cols-2 gap-4">
                             <div>
                               <label htmlFor="apr" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">APR (%)</label>
@@ -797,7 +820,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                   setDaysLeft(String(days));
                                 }
                               }}
-                              className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2 text-sm font-sans text-white outline-none"
+                              className="input-date-dark w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2 text-sm font-sans outline-none"
                             />
                           </div>
                         </div>
@@ -856,7 +879,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             type="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            className="w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2 text-sm font-sans text-white outline-none"
+                            className="input-date-dark w-full bg-surface-base border border-surface-border rounded focus:border-rose-500 focus:ring-1 focus:ring-rose-500 px-3 py-2 text-sm font-sans outline-none"
                           />
                         </div>
                       </>
@@ -897,7 +920,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               type="date"
                               value={date}
                               onChange={(e) => { setDate(e.target.value); if(errors.date) setErrors({...errors, date: ''}); }}
-                              className={`w-full bg-surface-base border ${errors.date ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none`}
+                              className={`input-date-dark w-full bg-surface-base border ${errors.date ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans outline-none`}
                             />
                             {errors.date && <p className="text-xs text-red-400 mt-1.5">{errors.date}</p>}
                           </div>

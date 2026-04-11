@@ -160,7 +160,7 @@ export default function Calendar() {
           {/* Day Labels */}
           <div className="grid grid-cols-7 border-b border-surface-border bg-surface-base">
             {DAYS.map(d => (
-              <div key={d} className="py-2 text-center text-[10px] font-mono text-zinc-600 uppercase tracking-wider">
+              <div key={d} className="py-2 text-center text-[10px] font-mono text-zinc-300 uppercase tracking-wider">
                 {d}
               </div>
             ))}
@@ -191,7 +191,7 @@ export default function Calendar() {
                   {isCurrentMonth && (
                     <>
                       <div className={`w-6 h-6 flex items-center justify-center text-xs font-mono mb-1 rounded-sm
-                        ${isToday ? 'bg-indigo-600 text-white font-bold' : 'text-zinc-400'}
+                        ${isToday ? 'bg-indigo-600 text-white font-bold' : 'text-white'}
                       `}>
                         {dayNum}
                       </div>
@@ -204,7 +204,7 @@ export default function Calendar() {
                               className={`flex items-center gap-1 px-1 py-0.5 rounded-sm bg-surface-elevated border border-surface-border`}
                             >
                               <span className={`w-1.5 h-1.5 rounded-none shrink-0 ${cfg.color}`} />
-                              <span className="text-[9px] font-mono text-zinc-400 truncate">{ev.label}</span>
+                              <span className="text-[9px] font-mono text-zinc-200 truncate">{ev.label}</span>
                             </div>
                           );
                         })}

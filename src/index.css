@@ -133,6 +133,17 @@
   .animate-pulse-highlight {
     animation: pulse-highlight 2s ease-in-out infinite;
   }
+
+  /** Native date/datetime inputs: avoid black text/icon on dark surfaces (WebKit + Firefox). */
+  .input-date-dark {
+    color-scheme: dark;
+    color: var(--color-content-primary);
+  }
+  .input-date-dark::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.85;
+  }
+
   .shadow-glow-emerald {
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
   }

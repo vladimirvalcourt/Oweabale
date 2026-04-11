@@ -385,7 +385,7 @@ export default function Income() {
                     required
                     value={formData.nextDate}
                     onChange={(e) => setFormData({...formData, nextDate: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm font-mono text-content-primary focus:outline-none focus:border-zinc-500 css-color-scheme-dark"
+                    className="input-date-dark w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm font-mono text-content-primary focus:outline-none focus:border-zinc-500"
                     style={{ colorScheme: 'dark' }}
                   />
                 </div>
