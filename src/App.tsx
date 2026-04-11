@@ -40,6 +40,7 @@ const Security       = lazy(() => import('./pages/Security'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const Education      = lazy(() => import('./pages/Education'));
 const HelpDesk       = lazy(() => import('./pages/HelpDesk'));
+const Changelog      = lazy(() => import('./pages/Changelog'));
 const Analytics      = lazy(() => import('./pages/Analytics'));
 const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
 import AuthCallback from './pages/AuthCallback';
@@ -119,6 +120,7 @@ function AppRoutes() {
           <Route path="analytics" element={<ErrorBoundary><Analytics /></ErrorBoundary>} />
           <Route path="credit" element={<ErrorBoundary><CreditCenter /></ErrorBoundary>} />
           <Route path="support" element={<ErrorBoundary><HelpDesk /></ErrorBoundary>} />
+          <Route path="changelog" element={<ErrorBoundary><Changelog /></ErrorBoundary>} />
           <Route path="settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
         </Route>
       </Route>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   ArrowRight, Activity, ShieldCheck, Calendar, Flame, Inbox, ShieldAlert,
   X, Copy, ExternalLink
@@ -40,6 +40,7 @@ function AnimatedValue({ value, prefix = "", suffix = "" , decimals = 0 }: { val
 
 
 export default function Dashboard() {
+  const location = useLocation();
   const bills = useStore(state => state.bills);
   const debts = useStore(state => state.debts);
   const transactions = useStore(state => state.transactions);
@@ -58,7 +59,13 @@ export default function Dashboard() {
   const [isCitationModalOpen, setIsCitationModalOpen] = useState(false);
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
 
-
+  useEffect(() => {
+    if (location.hash === '#cash-flow') {
+      requestAnimationFrame(() => {
+        document.getElementById('cash-flow')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, [location.hash]);
 
   const projectedData = useMemo(() => {
     return projectNetWorth(assets, debts, incomes, bills, subscriptions, 6, 0).map(r => ({
@@ -346,7 +353,8 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* 3. Primary Metrics Panel */}
+      {/* 3. Primary Metrics Panel — anchor for sidebar "Cash flow" */}
+      <section id="cash-flow" className="scroll-mt-24">
       <h2 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400 pl-1 mt-8 mb-3">Core Financials</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
@@ -396,6 +404,7 @@ export default function Dashboard() {
             </div>
         </div>
       </div>
+      </section>
 
       {/* 4. Active Intelligence Grid */}
       <h2 className="text-[12px] font-mono font-bold uppercase tracking-[0.1em] text-content-tertiary pl-1 mt-12 mb-4">Smart Alerts & Active Monitoring</h2>

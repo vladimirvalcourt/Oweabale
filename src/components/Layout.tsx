@@ -3,7 +3,8 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Bell, Search, Home, Receipt, Target, Activity,
   Settings, Repeat, BarChart3, Plus, X, ChevronDown, Inbox,
-  Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LineChart, ShieldCheck
+  Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LineChart, ShieldCheck,
+  Tags, LifeBuoy, ScrollText, Wand2, Wallet, Clock
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -23,8 +24,8 @@ export default function Layout() {
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     'Overview': true,
     'Activity': false,
-    'Planning': false,
-    'Account': false
+    'Planning & Growth': false,
+    'More': false,
   });
 
   const toggleGroup = (label: string) => {
@@ -40,7 +41,7 @@ export default function Layout() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const gChordAtRef = useRef<number | null>(null);
 
-  const { bills, debts, transactions, subscriptions, goals, incomes, budgets, user, isQuickAddOpen, openQuickAdd, closeQuickAdd, resetData, pendingIngestions, notifications, markNotificationsRead, clearNotifications } = useStore();
+  const { bills, debts, transactions, subscriptions, goals, incomes, budgets, user, isQuickAddOpen, openQuickAdd, closeQuickAdd, resetData, pendingIngestions, notifications, markNotificationsRead, clearNotifications, citations } = useStore();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -186,8 +187,36 @@ export default function Layout() {
       }
     });
 
+    const pushNavShortcut = (keywords: string[], type: string, name: string, detail: string, path: string) => {
+      if (keywords.some((k) => query.includes(k))) {
+        results.push({ type, name, detail, path });
+      }
+    };
+    pushNavShortcut(['categor', 'tags', 'labels'], 'Navigation', 'Categories', 'Spending categories', '/categories');
+    pushNavShortcut(['support', 'help desk', 'help', 'ticket'], 'Navigation', 'Help & Support', 'Tickets & broadcasts', '/support');
+    pushNavShortcut(['changelog', 'what\'s new', 'release'], 'Navigation', 'Changelog', 'Product updates', '/changelog');
+    pushNavShortcut(['auto-rule', 'automation', 'categorization rule'], 'Navigation', 'Auto-Rules', 'Transaction rules in Settings', '/settings?tab=rules');
+
     return results.slice(0, 8); // Limit to 8 results
   }, [searchQuery, bills, debts, transactions, subscriptions, goals, incomes, budgets]);
+
+  const dueSoonCount = React.useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const weekMs = 7 * 86400000;
+    let n = 0;
+    for (const b of bills) {
+      if (!b?.dueDate) continue;
+      const raw = b.dueDate.includes('T') ? b.dueDate : `${b.dueDate}T12:00:00`;
+      const due = new Date(raw);
+      due.setHours(0, 0, 0, 0);
+      if (due.getTime() - today.getTime() <= weekMs) n++;
+    }
+    for (const c of citations) {
+      if (c.status === 'open' && c.daysLeft <= 7) n++;
+    }
+    return n;
+  }, [bills, citations]);
 
   const handleSearchSelect = (path: string) => {
     navigate(path);
@@ -197,14 +226,25 @@ export default function Layout() {
 
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
 
-  const navGroups = [
+  /** Hash fragments used by sidebar deep links — default route link stays inactive when one of these is set. */
+  const NAV_ROUTE_HASHES: Record<string, string[]> = {
+    '/dashboard': ['cash-flow'],
+    '/bills': ['due-soon'],
+  };
+
+  const navGroups: {
+    label: string;
+    items: { name: string; path: string; icon: typeof Home; count?: number; hash?: string }[];
+  }[] = [
     {
       label: 'Overview',
       items: [
         { name: 'Dashboard', path: '/dashboard', icon: Home },
+        { name: 'Cash flow', path: '/dashboard', icon: Wallet, hash: 'cash-flow' },
         { name: 'Income', path: '/income', icon: Vault },
         { name: 'Freelance Vault', path: '/freelance', icon: Briefcase },
         { name: 'Regular Bills', path: '/bills', icon: Receipt },
+        { name: 'Due soon', path: '/bills', icon: Clock, hash: 'due-soon', count: dueSoonCount },
         { name: 'Tickets & Fines', path: '/bills?tab=ambush', icon: AlertTriangle },
         { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },
         { name: 'Review Inbox', path: '/ingestion', icon: Inbox, count: pendingIngestions.length },
@@ -228,6 +268,15 @@ export default function Layout() {
         { name: 'Goals', path: '/goals', icon: Target },
         { name: 'Credit Workshop', path: '/credit', icon: ShieldCheck },
         { name: 'Taxes', path: '/taxes', icon: Calculator },
+      ]
+    },
+    {
+      label: 'More',
+      items: [
+        { name: 'Categories', path: '/categories', icon: Tags },
+        { name: 'Help & Support', path: '/support', icon: LifeBuoy },
+        { name: 'Changelog', path: '/changelog', icon: ScrollText },
+        { name: 'Auto-rules', path: '/settings?tab=rules', icon: Wand2 },
       ]
     },
   ];
@@ -303,21 +352,27 @@ export default function Layout() {
                   <div className="min-h-0 overflow-hidden">
                     <div className="space-y-1">
                       {group.items.map((item) => {
+                        const queryPart = item.path.includes('?') ? item.path.split('?')[1] : '';
                         const itemBasePath = item.path.split('?')[0];
-                        const itemTabParam = item.path.includes('?')
-                          ? new URLSearchParams(item.path.split('?')[1]).get('tab')
-                          : null;
+                        const itemTabParam = queryPart ? new URLSearchParams(queryPart).get('tab') : null;
                         const currentTabParam = new URLSearchParams(location.search).get('tab');
-                        const isActive = location.pathname === itemBasePath && (
+                        const tabMatches =
                           itemTabParam !== null
-                            ? currentTabParam === itemTabParam   // nav item has a tab — must match
-                            : currentTabParam === null || !['ambush','recurring','debt'].includes(currentTabParam ?? '') // nav item has no tab — active only when no conflicting tab param
-                        );
+                            ? currentTabParam === itemTabParam
+                            : itemBasePath === '/bills'
+                              ? currentTabParam === null || !['ambush', 'recurring', 'debt'].includes(currentTabParam ?? '')
+                              : currentTabParam === null;
+                        const hashSlug = location.hash.replace(/^#/, '');
+                        const hashMatches = item.hash
+                          ? location.hash === `#${item.hash}`
+                          : !hashSlug || !(NAV_ROUTE_HASHES[itemBasePath] ?? []).includes(hashSlug);
+                        const isActive = location.pathname === itemBasePath && tabMatches && hashMatches;
+                        const linkTo = item.hash ? `${itemBasePath}${queryPart ? `?${queryPart}` : ''}#${item.hash}` : item.path;
                         const Icon = item.icon;
                         return (
                           <Link
                             key={item.name}
-                            to={item.path}
+                            to={linkTo}
                             onClick={() => setSidebarOpen(false)}
                             className={cn(
                               "flex items-center gap-3 px-4 py-2 transition-all group relative rounded-sm mx-1",

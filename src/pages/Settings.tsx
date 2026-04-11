@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
 import { validateAvatarFile } from '../lib/security';
@@ -28,7 +29,10 @@ interface UserFeedback {
   created_at: string;
 }
 
+const SETTINGS_TAB_IDS: Tab[] = ['profile', 'notifications', 'security', 'billing', 'financial', 'privacy', 'integrations', 'rules', 'support', 'feedback'];
+
 export default function Settings() {
+  const [searchParams] = useSearchParams();
   const user = useStore((state) => state.user);
   const updateUser = useStore((state) => state.updateUser);
   const resetData = useStore((state) => state.resetData);
@@ -53,6 +57,11 @@ export default function Settings() {
       setMfaEnabled(verified.length > 0);
     }).catch(() => setMfaEnabled(false));
   }, []);
+
+  useEffect(() => {
+    const t = searchParams.get('tab');
+    if (t && SETTINGS_TAB_IDS.includes(t as Tab)) setActiveTab(t as Tab);
+  }, [searchParams]);
 
   // Support tab state
   const [tickets, setTickets] = useState<SupportTicket[]>([]);

@@ -2,7 +2,8 @@
  * Bills & Debts — Total Bills & Debt record
  * Avalanche/Snowball payoff algorithm with projected payoff dates and interest savings.
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Receipt, CreditCard, AlertTriangle, ShieldAlert,
   FileText, CheckCircle2, Flame,
@@ -96,6 +97,7 @@ function monthsToDate(months: number): string {
 }
 
 export default function Obligations() {
+  const location = useLocation();
   const { bills, debts, citations, resolveCitation, openQuickAdd } = useStore();
   const [activeTab, setActiveTab] = useState<FilterTab>(() => {
     const param = new URLSearchParams(window.location.search).get('tab');
@@ -105,6 +107,14 @@ export default function Obligations() {
   const [extraPayment, setExtraPayment] = useState(0);
   const [showDetonator, setShowDetonator] = useState(true);
   const [expandedDebtId, setExpandedDebtId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (location.hash === '#due-soon') {
+      requestAnimationFrame(() => {
+        document.getElementById('due-soon')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, [location.hash]);
 
   /** Stable anchor for synthetic due dates (set once per mount). */
   const [scheduleBaseMs] = useState(() => Date.now());
@@ -367,6 +377,7 @@ export default function Obligations() {
         </div>
       </div>
 
+      <div id="due-soon" className="scroll-mt-24">
       <CollapsibleModule title="Scheduled Payments" icon={FileText}>
         <div className="overflow-x-auto -mx-6 -my-6">
           <table className="w-full text-left border-collapse">
@@ -459,6 +470,7 @@ export default function Obligations() {
           </table>
         </div>
       </CollapsibleModule>
+      </div>
     </div>
   );
 }
