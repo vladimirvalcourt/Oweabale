@@ -49,6 +49,7 @@ CREATE POLICY "Admins manage platform_settings"
 -- ── support_tickets ───────────────────────────────────────────
 DROP POLICY IF EXISTS "Admins have full access to tickets" ON public.support_tickets;
 DROP POLICY IF EXISTS "Admins view all tickets"           ON public.support_tickets;
+DROP POLICY IF EXISTS "Admins manage tickets"             ON public.support_tickets;
 CREATE POLICY "Admins manage tickets"
   ON public.support_tickets FOR ALL
   USING (_internal.is_admin())

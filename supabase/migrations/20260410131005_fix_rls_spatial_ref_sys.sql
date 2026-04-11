@@ -36,4 +36,8 @@ BEGIN
   );
 
   RAISE NOTICE 'RLS enabled on %', tgt::text;
+EXCEPTION
+  WHEN SQLSTATE '42501' THEN
+    -- Managed PostGIS: spatial_ref_sys is often owned by supabase_admin; migration role cannot ALTER.
+    RAISE NOTICE 'spatial_ref_sys RLS skipped (42501: not owner — expected on some Supabase projects).';
 END $$;
