@@ -310,7 +310,7 @@ export default function Layout() {
       {/* Sidebar */}
       <aside 
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col bg-surface-base sidebar-recessed transition-all duration-300 ease-in-out",
+          "fixed inset-y-0 left-0 z-50 flex flex-col bg-surface-base transition-all duration-300 ease-in-out",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           sidebarCollapsed ? "w-20" : "w-[240px]",
           "border-r border-surface-border"
@@ -486,11 +486,12 @@ export default function Layout() {
       <div 
         className={cn(
           "flex-1 flex flex-col h-[100dvh] overflow-y-auto scrollbar-hide transition-all duration-300 ease-in-out",
-          sidebarCollapsed ? "lg:pl-20" : "lg:pl-64"
+          /* pl must match aside width (240px), not pl-64 (256px), or the top hairline gaps under the search */
+          sidebarCollapsed ? "lg:pl-20" : "lg:pl-[240px]"
         )}
       >
         {/* Top Bar */}
-        <header className="shrink-0 bg-surface-base topbar-groove sticky top-0 z-30 h-[4.5rem] flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-surface-border">
+        <header className="shrink-0 bg-surface-base sticky top-0 z-30 h-[4.5rem] flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-surface-border">
           <div className="flex items-center gap-4 flex-1">
             <button 
               type="button"
@@ -519,7 +520,7 @@ export default function Layout() {
                   setIsSearchOpen(true);
                 }}
                 onFocus={() => setIsSearchOpen(true)}
-                className="w-full pl-9 pr-4 py-2 bg-surface-highlight rounded-md text-[13px] font-sans text-content-primary placeholder-content-tertiary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus:bg-surface-border-subtle transition-all search-carved border focus:border-content-secondary"
+                className="w-full pl-9 pr-4 py-2 bg-surface-highlight rounded-md text-[13px] font-sans text-content-primary placeholder-content-tertiary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus:bg-surface-border-subtle transition-all border border-surface-border focus:border-content-secondary"
               />
               
               {/* Search Dropdown */}
