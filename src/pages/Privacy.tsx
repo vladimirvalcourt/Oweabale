@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Lock, Eye, FileText, ChevronLeft } from 'lucide-react';
+import { Eye, ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import { useSEO } from '../hooks/useSEO';
@@ -16,22 +16,22 @@ export default function Privacy() {
     <>
     <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-brand-violet/30">
       <div className="max-w-3xl mx-auto">
-        <Link to="/" className="inline-flex items-center gap-2 text-content-tertiary hover:text-brand-violet transition-colors mb-12 font-mono text-[10px] uppercase tracking-widest">
-          <ChevronLeft className="w-4 h-4" /> Back to Terminal
+        <Link to="/" className="inline-flex items-center gap-2 text-sm text-content-tertiary hover:text-brand-violet transition-colors mb-12 font-sans">
+          <ChevronLeft className="w-4 h-4 shrink-0" aria-hidden /> Back to home
         </Link>
         
         <header className="mb-16 border-l-4 border-brand-violet pl-8">
           <div className="flex items-center gap-3 text-brand-violet mb-4">
-            <Eye className="w-6 h-6" />
-            <span className="font-mono text-xs uppercase tracking-[0.3em]">Protocol // 01</span>
+            <Eye className="w-6 h-6 shrink-0" aria-hidden />
+            <span className="text-xs font-sans font-medium">Legal</span>
           </div>
           <h1 className="text-4xl md:text-6xl font-medium tracking-tight mb-4">Privacy Policy</h1>
-          <p className="text-content-tertiary font-mono text-[10px] uppercase tracking-widest">Last Updated: April 2026</p>
+          <p className="text-sm text-content-tertiary">Last updated April 2026</p>
         </header>
 
         <div className="space-y-12 text-content-secondary leading-relaxed">
           <section>
-            <h2 className="text-content-primary font-mono text-xs uppercase tracking-[0.2em] mb-4 border-b border-surface-border pb-2">01. Data Collection</h2>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">1. Data collection</h2>
             <p className="mb-4">
               Oweable collects specific financial telemetry required to provide autonomous accounting services. This includes transaction metadata, pay statements from supported gig platforms (Uber, Lyft, DoorDash), and your voluntary tax profile inputs.
             </p>
@@ -41,21 +41,21 @@ export default function Privacy() {
           </section>
 
           <section>
-            <h2 className="text-content-primary font-mono text-xs uppercase tracking-[0.2em] mb-4 border-b border-surface-border pb-2">02. Encryption Standards</h2>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">2. Encryption standards</h2>
             <p>
               All sensitive identifiers are encrypted both at rest (AES-256) and in transit (TLS 1.3). Access to raw data is restricted to core system processes; Oweable employees cannot view your specific transaction history without explicit support authorization.
             </p>
           </section>
 
           <section>
-            <h2 className="text-content-primary font-mono text-xs uppercase tracking-[0.2em] mb-4 border-b border-surface-border pb-2">03. Third-Party Integrations</h2>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">3. Third-party integrations</h2>
             <p>
               We utilize select partners for banking connectivity and document parsing. These partners are strictly vetted and are contractually prohibited from using your data for any purpose other than facilitating Oweable's core functions.
             </p>
           </section>
 
           <section>
-            <h2 className="text-content-primary font-mono text-xs uppercase tracking-[0.2em] mb-4 border-b border-surface-border pb-2">04. Your Rights</h2>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">4. Your rights</h2>
             <p>
               Under our "Right to Fade" policy, you may export your entire data vault at any time. Upon account termination, all identifying records are purged from our active systems within 72 hours.
             </p>
