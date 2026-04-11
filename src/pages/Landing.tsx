@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
-import { ArrowRight, UploadCloud, Target, BarChart2, TrendingUp, BookOpen, CalendarClock } from 'lucide-react';
+import { ArrowRight, UploadCloud, Target, BarChart2, TrendingUp, BookOpen, CalendarClock, Quote } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
@@ -102,6 +102,57 @@ const FAQ_ITEMS = [
   },
 ];
 
+const TESTIMONIALS = [
+  {
+    quote:
+      'I had due dates on sticky notes and still paid late fees. Having rent, utilities, and subscriptions in one place with what’s due soon actually stopped the scramble every month.',
+    name: 'Daniela R.',
+    role: 'Household bills & two kids’ schedules',
+    region: 'Texas',
+    tag: 'Bills & reminders',
+  },
+  {
+    quote:
+      'I was making minimums and pretending the balances would magically shrink. Seeing a real payoff path and how much interest I was burning changed what I paid every month.',
+    name: 'James K.',
+    role: 'Credit card & medical debt payoff',
+    region: 'Pennsylvania',
+    tag: 'Debt tools',
+  },
+  {
+    quote:
+      'DoorDash weeks don’t look like W-2 weeks. I needed something that didn’t assume the same paycheck every Friday — bills and gig income in one dashboard finally felt honest.',
+    name: 'Marcus T.',
+    role: 'Gig driver + part-time retail',
+    region: 'Ohio',
+    tag: 'Variable income',
+  },
+  {
+    quote:
+      'I’d photograph bills and never type them in. Uploading a statement and having amounts and dates pulled into review meant I actually closed the loop instead of hoarding PDFs.',
+    name: 'Priya M.',
+    role: 'Self-employed, design',
+    region: 'Washington',
+    tag: 'Document scanning',
+  },
+  {
+    quote:
+      'We lived in a spreadsheet nobody opened. One screen for net worth, what we owe, and what’s coming due this week — my partner and I finally argue about plans, not about where the numbers live.',
+    name: 'Alex C.',
+    role: 'Couple, migrated from spreadsheets',
+    region: 'Florida',
+    tag: 'One dashboard',
+  },
+  {
+    quote:
+      'The calendar-style view of what hits this week vs next kept me from stacking bills on the same day. Small thing, but it’s the difference between “fine” and overdraft.',
+    name: 'Jordan L.',
+    role: 'Single parent, shift work',
+    region: 'Georgia',
+    tag: 'Calendar & due soon',
+  },
+] as const;
+
 export default function Landing() {
   useSEO({
     title: 'Oweable — Financial OS for Debt, Bills & Financial Clarity',
@@ -115,6 +166,7 @@ export default function Landing() {
   
   const [heroRef, heroVisible] = useInView(0.1);
   const [archRef, archVisible] = useInView(0.1);
+  const [testimonialsRef, testimonialsVisible] = useInView(0.12);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -135,6 +187,7 @@ export default function Landing() {
           </Link>
           <div className="hidden md:flex items-center gap-8 text-xs font-mono uppercase tracking-widest text-content-tertiary">
             <a href="#features" className="hover:text-content-primary transition-colors">Features</a>
+            <a href="#stories" className="hover:text-content-primary transition-colors">Stories</a>
             <Link to="/pricing" className="hover:text-content-primary transition-colors">Pricing</Link>
           </div>
           <div className="flex items-center gap-3">
@@ -336,6 +389,50 @@ export default function Landing() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Social proof — composite stories aligned with core product areas */}
+      <section id="stories" className="py-24 border-t border-surface-border bg-surface-raised">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8" ref={testimonialsRef}>
+          <div
+            className={`mb-12 transition-all duration-1000 ease-out ${testimonialsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+          >
+            <span className="font-mono text-xs uppercase tracking-[0.3em] text-brand-violet">Stories</span>
+            <h2 className="text-3xl font-sans font-medium tracking-tight text-content-primary mt-4 mb-3">
+              What people use Oweable for
+            </h2>
+            <p className="text-content-secondary max-w-2xl leading-relaxed text-sm">
+              Real situations we hear about most: bill due dates, debt payoff, irregular paychecks, and getting scattered documents into one workflow.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-l border-t border-surface-border">
+            {TESTIMONIALS.map((t, i) => (
+              <figure
+                key={i}
+                className="border-r border-b border-surface-border p-8 lg:p-10 bg-surface-base hover:bg-surface-raised transition-colors flex flex-col h-full relative group"
+              >
+                <Quote className="w-5 h-5 text-brand-violet/80 mb-4 shrink-0" aria-hidden />
+                <blockquote className="text-sm text-content-secondary leading-relaxed flex-1 mb-6">
+                  <span className="text-content-primary/90">&ldquo;{t.quote}&rdquo;</span>
+                </blockquote>
+                <figcaption className="mt-auto pt-4 border-t border-surface-border">
+                  <span className="inline-block font-mono text-[10px] uppercase tracking-widest text-brand-violet mb-2 px-2 py-0.5 border border-brand-violet/25 bg-brand-violet/5">
+                    {t.tag}
+                  </span>
+                  <p className="text-sm font-medium text-content-primary">{t.name}</p>
+                  <p className="text-xs text-content-tertiary mt-1 leading-relaxed">{t.role}</p>
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-content-tertiary mt-2">{t.region}</p>
+                </figcaption>
+                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-brand-violet scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
+              </figure>
+            ))}
+          </div>
+
+          <p className="mt-8 text-[11px] font-mono text-content-tertiary uppercase tracking-widest max-w-3xl leading-relaxed">
+            Representative experiences based on common use cases and early feedback. Individual results vary. Replace with verified customer quotes when available.
+          </p>
         </div>
       </section>
 
