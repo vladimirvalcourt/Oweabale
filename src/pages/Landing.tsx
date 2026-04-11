@@ -53,9 +53,9 @@ function WordCycler() {
   const longestWord = CYCLE_WORDS.reduce((a, b) => a.length > b.length ? a : b);
 
   return (
-    <span className="inline-grid grid-cols-1 grid-rows-1 relative text-left align-baseline">
-      {/* Invisible spacer to maintain width based on longest word */}
-      <span className="col-start-1 row-start-1 opacity-0 pointer-events-none select-none h-0 sm:h-auto overflow-hidden pr-1">
+    <span className="inline-grid grid-cols-1 grid-rows-1 relative text-left align-baseline min-h-[1.1em]">
+      {/* Invisible spacer reserves width/height so cycling copy does not shift layout */}
+      <span className="col-start-1 row-start-1 invisible pointer-events-none select-none pr-1">
         {longestWord}.
       </span>
       
@@ -172,14 +172,14 @@ export default function Landing() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
     <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-brand-violet/30 flex flex-col">
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-surface-base/90 backdrop-blur-sm border-b border-surface-border py-4' : 'bg-transparent py-6 border-b border-transparent'}`}>
+      <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-surface-base/90 backdrop-blur-sm border-surface-border' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <Link to="/" className="brand-header-text flex items-center gap-2">
             <div className="w-2 h-2 bg-brand-violet shadow-glow-indigo"></div>

@@ -238,8 +238,11 @@ export default function Layout() {
 
   const handleSearchSelect = (path: string) => {
     navigate(path);
-    setIsSearchOpen(false);
-    setSearchQuery('');
+    startTransition(() => {
+      setIsSearchOpen(false);
+      setIsMobileSearchOpen(false);
+      setSearchQuery('');
+    });
   };
 
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
@@ -647,7 +650,15 @@ export default function Layout() {
                 className="h-11 w-11 rounded-full bg-surface-raised border border-surface-border flex items-center justify-center overflow-hidden cursor-pointer hover:bg-surface-elevated transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
               >
                 {user?.avatar ? (
-                  <img src={user.avatar} alt="Profile" className="h-full w-full object-cover" data-no-invert />
+                  <img
+                    src={user.avatar}
+                    alt="Profile"
+                    width={44}
+                    height={44}
+                    decoding="async"
+                    className="h-full w-full object-cover"
+                    data-no-invert
+                  />
                 ) : (
                   <div className="h-full w-full flex items-center justify-center bg-brand-indigo/10">
                     <span className="text-xs font-sans font-semibold text-brand-indigo">{user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}</span>
@@ -826,8 +837,10 @@ export default function Layout() {
               type="button"
               aria-label="Close search"
               onClick={() => {
-                setIsMobileSearchOpen(false);
-                setSearchQuery('');
+                startTransition(() => {
+                  setIsMobileSearchOpen(false);
+                  setSearchQuery('');
+                });
               }}
               className="p-2 text-zinc-500 hover:text-zinc-300 min-w-11 min-h-11 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm"
             >
@@ -842,10 +855,7 @@ export default function Layout() {
                   {searchResults.map((result, index) => (
                     <li key={index}>
                       <button
-                        onClick={() => {
-                          handleSearchSelect(result.path);
-                          setIsMobileSearchOpen(false);
-                        }}
+                        onClick={() => handleSearchSelect(result.path)}
                         className="w-full text-left px-4 py-3 hover:bg-surface-elevated transition-colors flex flex-col border-b border-surface-border/50"
                       >
                         <div className="flex items-center justify-between">
