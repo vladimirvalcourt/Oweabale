@@ -4,8 +4,53 @@ import { Lock, Loader2, RefreshCw, Unplug, AlertTriangle } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
 import { createPlaidLinkToken, exchangePlaidPublicToken } from '../lib/plaid';
+import { isPlaidLinkUiEnabled } from '../lib/featureFlags';
 
-export default function BankConnection() {
+/** When Plaid UI is off, show coming-soon; still allow disconnect if a link exists from earlier testing. */
+function BankConnectionGated() {
+  const { bankConnected, plaidInstitutionName, disconnectBank } = useStore();
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
+
+  const handleDisconnect = async () => {
+    setIsDisconnecting(true);
+    try {
+      await disconnectBank();
+      toast.success('Bank connection removed.');
+    } finally {
+      setIsDisconnecting(false);
+    }
+  };
+
+  return (
+    <div className="bg-surface-elevated rounded-sm border border-surface-border p-6">
+      <h3 className="text-sm font-sans font-semibold text-content-primary">Bank connections</h3>
+      <p className="mt-2 text-sm text-content-tertiary leading-relaxed">
+        Automatic bank linking isn&apos;t available yet. We&apos;re finishing the integration and will enable it here when
+        it&apos;s ready.
+      </p>
+      {bankConnected && (
+        <div className="mt-4 rounded-sm border border-surface-border bg-surface-base p-4">
+          <p className="text-sm text-content-secondary">
+            A bank was linked previously:{' '}
+            <span className="font-medium text-content-primary">{plaidInstitutionName?.trim() || 'Unknown institution'}</span>
+          </p>
+          <p className="mt-2 text-xs text-content-tertiary">You can disconnect to clear the stored connection.</p>
+          <button
+            type="button"
+            onClick={handleDisconnect}
+            disabled={isDisconnecting}
+            className="mt-3 inline-flex items-center gap-2 rounded-sm border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-sm font-sans font-medium text-rose-300 transition-colors hover:bg-rose-500/20 disabled:opacity-60"
+          >
+            {isDisconnecting ? <Loader2 className="h-4 w-4 animate-spin shrink-0" aria-hidden /> : <Unplug className="h-4 w-4 shrink-0" aria-hidden />}
+            Disconnect bank
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BankConnectionPlaid() {
   const {
     bankConnected,
     connectBank,
@@ -129,17 +174,15 @@ export default function BankConnection() {
   };
 
   const displayName = plaidInstitutionName?.trim() || 'Connected bank';
-  const lastSyncLabel = plaidLastSyncAt
-    ? new Date(plaidLastSyncAt).toLocaleString()
-    : null;
+  const lastSyncLabel = plaidLastSyncAt ? new Date(plaidLastSyncAt).toLocaleString() : null;
 
   return (
     <div className="bg-surface-elevated rounded-sm border border-surface-border p-6">
       <div className="mb-6">
         <h3 className="text-xs font-mono uppercase tracking-widest text-content-primary">Data Sources</h3>
         <p className="mt-1 text-sm text-zinc-400">
-          Connect your bank with Plaid. Credentials stay with Plaid; we store a secure access token on the server
-          only. Transactions sync automatically and you can refresh on demand.
+          Connect your bank with Plaid. Credentials stay with Plaid; we store a secure access token on the server only.
+          Transactions sync automatically and you can refresh on demand.
         </p>
       </div>
 
@@ -175,8 +218,7 @@ export default function BankConnection() {
               <div className="min-w-0">
                 <p className="text-sm font-mono text-amber-200">Bank needs attention</p>
                 <p className="mt-1 text-xs text-zinc-400">
-                  Your institution requires you to sign in again. Use Fix connection to complete Plaid Link update
-                  mode.
+                  Your institution requires you to sign in again. Use Fix connection to complete Plaid Link update mode.
                 </p>
                 <button
                   type="button"
@@ -225,11 +267,20 @@ export default function BankConnection() {
               </div>
             </div>
             <div className="mt-3 text-xs font-mono text-zinc-500">
-              {lastSyncLabel ? `Last transaction sync: ${lastSyncLabel}` : 'No sync yet — use Sync now or wait for automatic updates.'}
+              {lastSyncLabel
+                ? `Last transaction sync: ${lastSyncLabel}`
+                : 'No sync yet — use Sync now or wait for automatic updates.'}
             </div>
           </div>
         </div>
       )}
     </div>
   );
+}
+
+export default function BankConnection() {
+  if (!isPlaidLinkUiEnabled()) {
+    return <BankConnectionGated />;
+  }
+  return <BankConnectionPlaid />;
 }

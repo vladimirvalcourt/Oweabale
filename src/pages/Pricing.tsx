@@ -268,7 +268,7 @@ export default function Pricing() {
               />
               <FaqItem 
                 question="Is my financial data secure?" 
-                answer="We use bank-level 256-bit encryption. We don't sell your data, and we don't store your bank credentials. We use Plaid to securely connect to your institutions." 
+                answer="We use bank-level 256-bit encryption. We don't sell your data, and we don't store your bank credentials. When bank linking is available, we plan to use established connection providers so you never give us your login password directly." 
               />
               <FaqItem 
                 question="How does the Debt Detonator work?" 

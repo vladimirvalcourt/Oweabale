@@ -9,6 +9,8 @@ declare module '*?url' {
 interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL: string;
   readonly VITE_SUPABASE_ANON_KEY: string;
+  /** When `"true"`, show Plaid bank linking in Settings → Integrations. */
+  readonly VITE_PLAID_LINK_UI_ENABLED?: string;
 }
 
 interface ImportMeta {
