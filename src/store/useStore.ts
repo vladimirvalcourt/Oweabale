@@ -1123,26 +1123,34 @@ export const useStore = create<AppState>()(
   // ── User / Profile ────────────────────────────────────────────
   updateUser: async (user) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (userId) {
-      const patch: Record<string, unknown> = {};
-      if (user.firstName !== undefined) patch.first_name = user.firstName;
-      if (user.lastName !== undefined)  patch.last_name = user.lastName;
-      if (user.email !== undefined)     patch.email = user.email;
-      if (user.avatar !== undefined)    patch.avatar = user.avatar;
-      if (user.theme !== undefined)     patch.theme = user.theme;
-      if (user.phone !== undefined)    patch.phone = user.phone;
-      if (user.timezone !== undefined) patch.timezone = user.timezone;
-      if (user.language !== undefined) patch.language = user.language;
-      if (user.taxState !== undefined) patch.tax_state = user.taxState;
-      if (user.taxRate !== undefined)  patch.tax_rate = user.taxRate;
-      if (user.hasCompletedOnboarding !== undefined) patch.has_completed_onboarding = user.hasCompletedOnboarding;
-      if (Object.keys(patch).length > 0) {
-        const { error } = await supabase.from('profiles').update(patch).eq('id', userId);
-        if (error) {
-          console.error('[updateUser] profile update failed:', error.message);
-          toast.error('Could not save profile. Please try again.');
-          return false;
-        }
+    const patch: Record<string, unknown> = {};
+    if (user.firstName !== undefined) patch.first_name = user.firstName;
+    if (user.lastName !== undefined)  patch.last_name = user.lastName;
+    if (user.email !== undefined)     patch.email = user.email;
+    if (user.avatar !== undefined)    patch.avatar = user.avatar;
+    if (user.theme !== undefined)     patch.theme = user.theme;
+    if (user.phone !== undefined)    patch.phone = user.phone;
+    if (user.timezone !== undefined) patch.timezone = user.timezone;
+    if (user.language !== undefined) patch.language = user.language;
+    if (user.taxState !== undefined) patch.tax_state = user.taxState;
+    if (user.taxRate !== undefined)  patch.tax_rate = user.taxRate;
+    if (user.hasCompletedOnboarding !== undefined) patch.has_completed_onboarding = user.hasCompletedOnboarding;
+
+    if (Object.keys(patch).length > 0) {
+      if (!userId) {
+        console.error('[updateUser] no authenticated user — cannot persist profile');
+        toast.error('Could not save profile. Please try again.');
+        return false;
+      }
+      // Use upsert so users without a profiles row (e.g. trigger missed) still persist;
+      // plain .update() affects 0 rows and leaves has_completed_onboarding false on reload.
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ id: userId, ...patch }, { onConflict: 'id' });
+      if (error) {
+        console.error('[updateUser] profile upsert failed:', error.message, error.code);
+        toast.error('Could not save profile. Please try again.');
+        return false;
       }
     }
     set((state) => ({ user: { ...state.user, ...user } }));
