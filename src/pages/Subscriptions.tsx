@@ -9,6 +9,12 @@ import { motion } from 'motion/react';
 
 type SubFrequency = 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Yearly';
 
+const SUB_FREQUENCIES: SubFrequency[] = ['Weekly', 'Bi-weekly', 'Monthly', 'Yearly'];
+
+function toSubFrequency(value: string): SubFrequency {
+  return SUB_FREQUENCIES.includes(value as SubFrequency) ? (value as SubFrequency) : 'Monthly';
+}
+
 export default function Subscriptions() {
   const { subscriptions, addSubscription, editSubscription, deleteSubscription } = useStore();
   const [isAdding, setIsAdding] = useState(false);
@@ -65,7 +71,7 @@ export default function Subscriptions() {
     setFormData({
       name: sub.name,
       amount: sub.amount.toString(),
-      frequency: sub.frequency,
+      frequency: toSubFrequency(sub.frequency),
       nextBillingDate: sub.nextBillingDate,
       status: sub.status,
     });

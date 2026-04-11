@@ -35,3 +35,7 @@ npm-cache/
 .npm_cache/
 
 .vercel
+
+# Reference clones (awesome-vite, etc.) — not part of the app
+.ref/
+stats.html

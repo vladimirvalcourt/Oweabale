@@ -11,7 +11,7 @@ export async function createPlaidLinkToken(): Promise<{ link_token: string } | {
 
 export async function exchangePlaidPublicToken(
   public_token: string,
-  metadata?: { institution?: { name?: string; institution_id?: string } },
+  metadata?: { institution?: { name?: string; institution_id?: string } | null },
 ): Promise<{ ok: true } | { error: string }> {
   const { data, error } = await supabase.functions.invoke('plaid-exchange', {
     method: 'POST',

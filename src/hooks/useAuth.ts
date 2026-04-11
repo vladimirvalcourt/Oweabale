@@ -105,7 +105,7 @@ export function useAuth(): AuthState {
     };
   }, []);
 
-  const lastActivityRef = { current: Date.now() };
+  const lastActivityRef = useRef(0);
 
   const extendSession = () => {
     lastActivityRef.current = Date.now();

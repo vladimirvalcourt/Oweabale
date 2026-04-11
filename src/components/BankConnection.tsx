@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { usePlaidLink } from 'react-plaid-link';
+import { usePlaidLink, type PlaidLinkOnSuccess } from 'react-plaid-link';
 import { Lock, Loader2 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
@@ -14,11 +14,8 @@ export default function BankConnection() {
 
   const plaidGloballyEnabled = platformSettings?.plaidEnabled !== false;
 
-  const onSuccess = useCallback(
-    async (
-      public_token: string,
-      metadata: { institution?: { name?: string; institution_id?: string } },
-    ) => {
+  const onSuccess = useCallback<PlaidLinkOnSuccess>(
+    async (public_token, metadata) => {
       setIsConnecting(true);
       try {
         const result = await exchangePlaidPublicToken(public_token, metadata);
