@@ -34,6 +34,8 @@ export interface Database {
           has_completed_onboarding: boolean | null
           credit_score: number | null
           credit_last_updated: string | null
+          plaid_institution_name: string | null
+          plaid_linked_at: string | null
           completed_lessons: string[]
           created_at: string
           updated_at: string
@@ -54,6 +56,8 @@ export interface Database {
           has_completed_onboarding?: boolean | null
           credit_score?: number | null
           credit_last_updated?: string | null
+          plaid_institution_name?: string | null
+          plaid_linked_at?: string | null
           completed_lessons?: string[]
           created_at?: string
           updated_at?: string
@@ -74,6 +78,8 @@ export interface Database {
           has_completed_onboarding?: boolean | null
           credit_score?: number | null
           credit_last_updated?: string | null
+          plaid_institution_name?: string | null
+          plaid_linked_at?: string | null
           completed_lessons?: string[]
           created_at?: string
           updated_at?: string

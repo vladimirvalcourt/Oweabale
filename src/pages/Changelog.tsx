@@ -4,6 +4,14 @@ import { ScrollText } from 'lucide-react';
 const ENTRIES: { date: string; title: string; bullets: string[] }[] = [
   {
     date: '2026-04',
+    title: 'Plaid bank linking',
+    bullets: [
+      'Settings → Integrations: real Plaid Link via Edge Functions (link token + public_token exchange). Access tokens stay in `plaid_items`; profile stores institution name and linked time.',
+      'Requires Supabase secrets: PLAID_CLIENT_ID, PLAID_SECRET, PLAID_ENV; deploy functions `plaid-link-token` and `plaid-exchange`.',
+    ],
+  },
+  {
+    date: '2026-04',
     title: 'Navigation & focus',
     bullets: [
       'Sidebar: Cash flow anchor on Dashboard, Due soon badge on Bills, More section for Categories, Support, Changelog, and Auto-rules.',
@@ -25,7 +33,7 @@ export default function Changelog() {
       </div>
       <ul className="space-y-8">
         {ENTRIES.map((entry) => (
-          <li key={entry.date} className="border border-surface-border rounded-sm bg-surface-raised p-6">
+          <li key={`${entry.date}-${entry.title}`} className="border border-surface-border rounded-sm bg-surface-raised p-6">
             <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1">{entry.date}</p>
             <h2 className="text-lg font-semibold text-content-primary mb-3">{entry.title}</h2>
             <ul className="list-disc pl-5 space-y-2 text-sm text-zinc-300 leading-relaxed">

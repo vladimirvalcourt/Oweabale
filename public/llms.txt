@@ -72,7 +72,7 @@ Oweable has a free tier. Paid plans start at $9/month and include advanced featu
 YNAB, Mint (discontinued in 2024), and Monarch Money are designed for salaried workers with predictable W-2 income. Oweable is purpose-built for self-employment: it includes quarterly tax estimation, a freelance income vault with write-off tracking, variable income modeling, and debt amortization with both Snowball and Avalanche strategies. None of the competing tools were designed with 1099 workers as the primary user.
 
 ### Does Oweable connect to my bank account?
-Oweable currently supports manual entry and document ingestion — upload receipts, bank statements, and pay stubs via desktop or mobile. Automatic bank sync via Plaid is on the roadmap.
+Oweable supports manual entry, document ingestion, and optional bank linking via Plaid (Settings → Integrations). Server-side tokens; automatic transaction import may follow in a later release.
 
 ### Is my financial data secure on Oweable?
 Yes. Oweable uses Google OAuth for authentication (no passwords stored or transmitted), encrypts all data at rest and in transit (TLS 1.2+), and enforces Postgres row-level security (RLS) on every database table. Users can only access their own financial data. Two-factor authentication (TOTP) is available for all accounts.

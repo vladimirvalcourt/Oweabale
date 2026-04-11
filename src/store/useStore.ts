@@ -242,6 +242,8 @@ interface AppState {
   };
   setTaxSettings: (state: string, rate: number) => void;
   bankConnected: boolean;
+  /** Display name from last Plaid Link completion (profile). */
+  plaidInstitutionName: string | null;
   connectBank: () => Promise<void>;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => Promise<boolean>;
   addBill: (bill: Omit<Bill, 'id'>) => Promise<boolean>;
@@ -346,6 +348,7 @@ const initialData = {
     isAdmin: false,
   },
   bankConnected: false,
+  plaidInstitutionName: null,
   pendingIngestions: [],
   notifications: [],
   categorizationRules: [],
@@ -382,7 +385,6 @@ export const useStore = create<AppState>()(
     set((s) => ({ user: { ...s.user, taxState: state, taxRate: rate } }));
   },
   connectBank: async () => {
-    set({ bankConnected: true });
     await get().fetchData();
   },
   addTransaction: async (transaction) => {
@@ -1200,11 +1202,15 @@ export const useStore = create<AppState>()(
       ));
 
       // 2. RESET ONBOARDING FLAG
+      await supabase.from('plaid_items').delete().eq('user_id', userId);
+
       await supabase.from('profiles').upsert({
         id: userId,
         has_completed_onboarding: false,
         tax_state: '',
-        tax_rate: 0
+        tax_rate: 0,
+        plaid_institution_name: null,
+        plaid_linked_at: null,
       });
 
       // 3. RESET LOCAL STATE
@@ -1215,7 +1221,9 @@ export const useStore = create<AppState>()(
           hasCompletedOnboarding: false,
           taxState: '',
           taxRate: 0
-        }
+        },
+        bankConnected: false,
+        plaidInstitutionName: null,
       });
 
       toast.success('All data has been cleared. You are back at square one.');
@@ -1657,6 +1665,10 @@ export const useStore = create<AppState>()(
           status: s.status as Subscription['status'],
           priceHistory: (s.price_history ?? s.priceHistory ?? []) as { date: string; amount: number }[],
         })),
+        bankConnected: !!(profile && (profile as Record<string, unknown>).plaid_linked_at),
+        plaidInstitutionName: profile
+          ? (((profile as Record<string, unknown>).plaid_institution_name as string | null) ?? null)
+          : null,
         credit: profile ? {
           ...get().credit,
           score: profile.credit_score ?? get().credit.score,
