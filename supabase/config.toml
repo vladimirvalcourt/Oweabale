@@ -371,6 +371,13 @@ port = 54327
 backend = "postgres"
 
 # Experimental features may be deprecated any time
+# Plaid: webhook has no Supabase JWT; plaid-sync validates user JWT or PLAID_CRON_SECRET in code.
+[functions.plaid-webhook]
+verify_jwt = false
+
+[functions.plaid-sync]
+verify_jwt = false
+
 [experimental]
 # Configures Postgres storage engine to use OrioleDB (S3)
 orioledb_version = ""

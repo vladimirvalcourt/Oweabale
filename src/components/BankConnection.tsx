@@ -1,15 +1,27 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { usePlaidLink, type PlaidLinkOnSuccess } from 'react-plaid-link';
-import { Lock, Loader2 } from 'lucide-react';
+import { Lock, Loader2, RefreshCw, Unplug, AlertTriangle } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
 import { createPlaidLinkToken, exchangePlaidPublicToken } from '../lib/plaid';
 
 export default function BankConnection() {
-  const { bankConnected, connectBank, plaidInstitutionName, platformSettings } = useStore();
+  const {
+    bankConnected,
+    connectBank,
+    disconnectBank,
+    syncPlaidTransactions,
+    plaidInstitutionName,
+    plaidLastSyncAt,
+    plaidNeedsRelink,
+    platformSettings,
+  } = useStore();
   const [isConnecting, setIsConnecting] = useState(false);
-  const [syncTime, setSyncTime] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [linkToken, setLinkToken] = useState<string | null>(null);
+  const linkIntentRef = useRef<'create' | 'update'>('create');
+  const [activeLinkFlow, setActiveLinkFlow] = useState<'idle' | 'create' | 'update'>('idle');
   const openedRef = useRef(false);
 
   const plaidGloballyEnabled = platformSettings?.plaidEnabled !== false;
@@ -24,15 +36,21 @@ export default function BankConnection() {
           return;
         }
         await connectBank();
-        setSyncTime(new Date().toLocaleString());
-        toast.success('Bank connected successfully.');
+        const synced = await syncPlaidTransactions({ quiet: true });
+        const intent = linkIntentRef.current;
+        toast.success(intent === 'update' ? 'Bank connection updated.' : 'Bank connected successfully.');
+        if (!synced) {
+          toast.error('Connection saved, but initial sync failed — try Sync now in a moment.');
+        }
       } finally {
         setIsConnecting(false);
         setLinkToken(null);
+        linkIntentRef.current = 'create';
+        setActiveLinkFlow('idle');
         openedRef.current = false;
       }
     },
-    [connectBank],
+    [connectBank, syncPlaidTransactions],
   );
 
   const { open, ready } = usePlaidLink({
@@ -40,6 +58,8 @@ export default function BankConnection() {
     onSuccess,
     onExit: () => {
       setLinkToken(null);
+      linkIntentRef.current = 'create';
+      setActiveLinkFlow('idle');
       openedRef.current = false;
     },
   });
@@ -58,6 +78,8 @@ export default function BankConnection() {
       return;
     }
     setIsConnecting(true);
+    setActiveLinkFlow('create');
+    linkIntentRef.current = 'create';
     const res = await createPlaidLinkToken();
     if ('error' in res) {
       toast.error(res.error);
@@ -68,7 +90,48 @@ export default function BankConnection() {
     setIsConnecting(false);
   };
 
+  const handleFixConnectionClick = async () => {
+    if (!plaidGloballyEnabled) {
+      toast.error('Bank linking is temporarily unavailable.');
+      return;
+    }
+    setIsConnecting(true);
+    setActiveLinkFlow('update');
+    linkIntentRef.current = 'update';
+    const res = await createPlaidLinkToken({ mode: 'update' });
+    if ('error' in res) {
+      toast.error(res.error);
+      setIsConnecting(false);
+      linkIntentRef.current = 'create';
+      setActiveLinkFlow('idle');
+      return;
+    }
+    setLinkToken(res.link_token);
+    setIsConnecting(false);
+  };
+
+  const handleSyncClick = async () => {
+    setIsSyncing(true);
+    try {
+      await syncPlaidTransactions();
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleDisconnectClick = async () => {
+    setIsDisconnecting(true);
+    try {
+      await disconnectBank();
+    } finally {
+      setIsDisconnecting(false);
+    }
+  };
+
   const displayName = plaidInstitutionName?.trim() || 'Connected bank';
+  const lastSyncLabel = plaidLastSyncAt
+    ? new Date(plaidLastSyncAt).toLocaleString()
+    : null;
 
   return (
     <div className="bg-surface-elevated rounded-sm border border-surface-border p-6">
@@ -76,7 +139,7 @@ export default function BankConnection() {
         <h3 className="text-xs font-mono uppercase tracking-widest text-content-primary">Data Sources</h3>
         <p className="mt-1 text-sm text-zinc-400">
           Connect your bank with Plaid. Credentials stay with Plaid; we store a secure access token on the server
-          only.
+          only. Transactions sync automatically and you can refresh on demand.
         </p>
       </div>
 
@@ -105,14 +168,65 @@ export default function BankConnection() {
           )}
         </div>
       ) : (
-        <div className="bg-surface-base border border-surface-border rounded-sm p-4">
-          <div className="flex items-center justify-between">
-            <div className="font-mono text-sm text-content-primary">
-              [STATUS: <span className="text-emerald-400 animate-pulse">ACTIVE</span>] {displayName}
+        <div className="space-y-4">
+          {plaidNeedsRelink && (
+            <div className="flex items-start gap-3 rounded-sm border border-amber-500/40 bg-amber-500/10 p-4">
+              <AlertTriangle className="w-5 h-5 shrink-0 text-amber-400" />
+              <div className="min-w-0">
+                <p className="text-sm font-mono text-amber-200">Bank needs attention</p>
+                <p className="mt-1 text-xs text-zinc-400">
+                  Your institution requires you to sign in again. Use Fix connection to complete Plaid Link update
+                  mode.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleFixConnectionClick}
+                  disabled={isConnecting || !plaidGloballyEnabled}
+                  className="mt-3 bg-amber-500/20 text-amber-200 hover:bg-amber-500/30 font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-sm border border-amber-500/30 disabled:opacity-60"
+                >
+                  {isConnecting && activeLinkFlow === 'update' ? 'Opening…' : 'Fix connection'}
+                </button>
+              </div>
             </div>
-          </div>
-          <div className="mt-2 text-xs font-mono text-zinc-500">
-            {syncTime ? `LAST SYNC: ${syncTime}` : 'Linked — automatic transaction import can be enabled in a future update.'}
+          )}
+
+          <div className="bg-surface-base border border-surface-border rounded-sm p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="font-mono text-sm text-content-primary">
+                [STATUS: <span className="text-emerald-400 animate-pulse">ACTIVE</span>] {displayName}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleSyncClick}
+                  disabled={isSyncing || !plaidGloballyEnabled}
+                  className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-surface-border text-content-primary font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-sm disabled:opacity-60"
+                >
+                  {isSyncing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                  Sync now
+                </button>
+                <button
+                  type="button"
+                  onClick={handleFixConnectionClick}
+                  disabled={isConnecting || !plaidGloballyEnabled}
+                  className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-surface-border text-zinc-300 font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-sm disabled:opacity-60"
+                >
+                  Reconnect
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDisconnectClick}
+                  disabled={isDisconnecting}
+                  className="inline-flex items-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-sm disabled:opacity-60"
+                >
+                  {isDisconnecting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Unplug className="w-3.5 h-3.5" />}
+                  Disconnect
+                </button>
+              </div>
+            </div>
+            <div className="mt-3 text-xs font-mono text-zinc-500">
+              {lastSyncLabel ? `Last transaction sync: ${lastSyncLabel}` : 'No sync yet — use Sync now or wait for automatic updates.'}
+            </div>
           </div>
         </div>
       )}

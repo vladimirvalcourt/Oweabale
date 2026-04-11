@@ -1,52 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const ALLOWED_ORIGINS = new Set([
-  'https://oweable.com',
-  'https://www.oweable.com',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-]);
-
-function corsHeaders(origin: string | null) {
-  const o = origin && ALLOWED_ORIGINS.has(origin) ? origin : 'https://oweable.com';
-  return {
-    'Access-Control-Allow-Origin': o,
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  };
-}
-
-function plaidBaseUrl(): string {
-  const env = (Deno.env.get('PLAID_ENV') ?? 'sandbox').toLowerCase();
-  if (env === 'production') return 'https://production.plaid.com';
-  if (env === 'development') return 'https://development.plaid.com';
-  return 'https://sandbox.plaid.com';
-}
-
-async function plaidPost(path: string, body: Record<string, unknown>) {
-  const clientId = Deno.env.get('PLAID_CLIENT_ID');
-  const secret = Deno.env.get('PLAID_SECRET');
-  if (!clientId || !secret) {
-    throw new Error('Plaid is not configured (PLAID_CLIENT_ID / PLAID_SECRET)');
-  }
-  const res = await fetch(`${plaidBaseUrl()}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      client_id: clientId,
-      secret,
-      ...body,
-    }),
-  });
-  const json = (await res.json()) as {
-    error_message?: string;
-    access_token?: string;
-    item_id?: string;
-  };
-  if (!res.ok) {
-    throw new Error(json.error_message ?? `Plaid HTTP ${res.status}`);
-  }
-  return json;
-}
+import { corsHeaders } from '../_shared/cors.ts';
+import { plaidPost } from '../_shared/plaid_client.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
@@ -100,7 +54,10 @@ Deno.serve(async (req: Request) => {
     const public_token = body.public_token;
     if (!public_token) throw new Error('Missing public_token');
 
-    const exchange = await plaidPost('/item/public_token/exchange', {
+    const exchange = await plaidPost<{
+      access_token?: string;
+      item_id?: string;
+    }>('/item/public_token/exchange', {
       public_token,
     });
 
@@ -122,19 +79,24 @@ Deno.serve(async (req: Request) => {
         institution_id: institutionId,
         institution_name: institutionName,
         updated_at: now,
+        item_login_required: false,
+        last_sync_error: null,
       },
       { onConflict: 'item_id' },
     );
 
     if (upsertErr) throw upsertErr;
 
-    const { error: profileErr } = await supabaseAdmin
-      .from('profiles')
-      .update({
+    const { error: profileErr } = await supabaseAdmin.from('profiles').upsert(
+      {
+        id: user.id,
         plaid_institution_name: institutionName,
         plaid_linked_at: now,
-      })
-      .eq('id', user.id);
+        plaid_needs_relink: false,
+        updated_at: now,
+      },
+      { onConflict: 'id' },
+    );
 
     if (profileErr) throw profileErr;
 

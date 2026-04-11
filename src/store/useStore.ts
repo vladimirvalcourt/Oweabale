@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { type CategorizationRule, applyCategorizationRules } from '../lib/categorizationRules';
+import { disconnectPlaid, syncPlaidTransactions as invokePlaidSync } from '../lib/plaid';
 export type { CategorizationRule };
 
 export interface Bill {
@@ -244,7 +245,11 @@ interface AppState {
   bankConnected: boolean;
   /** Display name from last Plaid Link completion (profile). */
   plaidInstitutionName: string | null;
+  plaidLastSyncAt: string | null;
+  plaidNeedsRelink: boolean;
   connectBank: () => Promise<void>;
+  disconnectBank: () => Promise<void>;
+  syncPlaidTransactions: (opts?: { quiet?: boolean }) => Promise<boolean>;
   addTransaction: (transaction: Omit<Transaction, 'id'>) => Promise<boolean>;
   addBill: (bill: Omit<Bill, 'id'>) => Promise<boolean>;
   editBill: (id: string, bill: Partial<Bill>) => void;
@@ -349,6 +354,8 @@ const initialData = {
   },
   bankConnected: false,
   plaidInstitutionName: null,
+  plaidLastSyncAt: null,
+  plaidNeedsRelink: false,
   pendingIngestions: [],
   notifications: [],
   categorizationRules: [],
@@ -386,6 +393,31 @@ export const useStore = create<AppState>()(
   },
   connectBank: async () => {
     await get().fetchData();
+  },
+  disconnectBank: async () => {
+    const r = await disconnectPlaid();
+    if ('error' in r) {
+      toast.error(r.error);
+      return;
+    }
+    await get().fetchData();
+    toast.success('Bank disconnected.');
+  },
+  syncPlaidTransactions: async (opts?: { quiet?: boolean }) => {
+    const r = await invokePlaidSync();
+    if ('error' in r) {
+      if (!opts?.quiet) toast.error(r.error);
+      return false;
+    }
+    await get().fetchData();
+    if (!opts?.quiet) {
+      if (r.errors > 0) {
+        toast.message(`Sync finished with ${r.errors} item error(s). Check bank status.`);
+      } else {
+        toast.success('Transactions synced.');
+      }
+    }
+    return true;
   },
   addTransaction: async (transaction) => {
     // Auto-apply categorization rules before saving
@@ -1225,6 +1257,8 @@ export const useStore = create<AppState>()(
         tax_rate: 0,
         plaid_institution_name: null,
         plaid_linked_at: null,
+        plaid_last_sync_at: null,
+        plaid_needs_relink: false,
       });
 
       // 3. RESET LOCAL STATE
@@ -1238,6 +1272,8 @@ export const useStore = create<AppState>()(
         },
         bankConnected: false,
         plaidInstitutionName: null,
+        plaidLastSyncAt: null,
+        plaidNeedsRelink: false,
       });
 
       toast.success('All data has been cleared. You are back at square one.');
@@ -1647,10 +1683,10 @@ export const useStore = create<AppState>()(
         transactions: (transactions || []).map((t: Record<string, unknown>) => ({
           id: t.id as string,
           name: t.name as string,
-          category: t.category as string,
+          category: (t.category ?? '') as string,
           date: t.date as string,
           amount: t.amount as number,
-          type: t.type as Transaction['type'],
+          type: (t.type ?? 'expense') as Transaction['type'],
         })),
         assets: (assets || []).map((a: Record<string, unknown>) => ({
           id: a.id as string,
@@ -1684,6 +1720,12 @@ export const useStore = create<AppState>()(
         plaidInstitutionName: profile
           ? (((profile as Record<string, unknown>).plaid_institution_name as string | null) ?? null)
           : null,
+        plaidLastSyncAt: profile
+          ? (((profile as Record<string, unknown>).plaid_last_sync_at as string | null) ?? null)
+          : null,
+        plaidNeedsRelink: profile
+          ? ((profile as Record<string, unknown>).plaid_needs_relink === true)
+          : false,
         credit: profile ? {
           ...get().credit,
           score: profile.credit_score ?? get().credit.score,

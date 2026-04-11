@@ -47,45 +47,38 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const bodyJson = (await req.json().catch(() => ({}))) as { mode?: string };
-    const isUpdate = bodyJson.mode === 'update';
-    const clientName = Deno.env.get('PLAID_CLIENT_NAME') ?? 'Oweable';
+    const { data: items, error: listErr } = await supabaseAdmin
+      .from('plaid_items')
+      .select('id, access_token')
+      .eq('user_id', user.id);
 
-    let out: { link_token?: string };
+    if (listErr) throw listErr;
 
-    if (isUpdate) {
-      const { data: item, error: itemErr } = await supabaseAdmin
-        .from('plaid_items')
-        .select('access_token')
-        .eq('user_id', user.id)
-        .limit(1)
-        .maybeSingle();
-
-      if (itemErr) throw itemErr;
-      if (!item?.access_token) {
-        throw new Error('No linked bank to update. Connect a bank first.');
+    for (const row of items ?? []) {
+      try {
+        await plaidPost('/item/remove', { access_token: row.access_token });
+      } catch {
+        /* continue — still delete local row */
       }
-
-      out = await plaidPost<{ link_token?: string }>('/link/token/create', {
-        user: { client_user_id: user.id },
-        client_name: clientName,
-        access_token: item.access_token,
-        country_codes: ['US'],
-        language: 'en',
-      });
-    } else {
-      out = await plaidPost<{ link_token?: string }>('/link/token/create', {
-        user: { client_user_id: user.id },
-        client_name: clientName,
-        products: ['transactions'],
-        country_codes: ['US'],
-        language: 'en',
-      });
     }
 
-    if (!out.link_token) throw new Error('No link_token from Plaid');
+    const { error: delErr } = await supabaseAdmin.from('plaid_items').delete().eq('user_id', user.id);
+    if (delErr) throw delErr;
 
-    return new Response(JSON.stringify({ link_token: out.link_token }), {
+    const now = new Date().toISOString();
+    const { error: profErr } = await supabaseAdmin
+      .from('profiles')
+      .update({
+        plaid_institution_name: null,
+        plaid_linked_at: null,
+        plaid_last_sync_at: null,
+        plaid_needs_relink: false,
+        updated_at: now,
+      })
+      .eq('id', user.id);
+    if (profErr) throw profErr;
+
+    return new Response(JSON.stringify({ ok: true }), {
       headers: { ...ch, 'Content-Type': 'application/json' },
     });
   } catch (e) {

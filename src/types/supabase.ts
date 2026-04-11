@@ -36,6 +36,8 @@ export interface Database {
           credit_last_updated: string | null
           plaid_institution_name: string | null
           plaid_linked_at: string | null
+          plaid_last_sync_at: string | null
+          plaid_needs_relink: boolean
           completed_lessons: string[]
           created_at: string
           updated_at: string
@@ -58,6 +60,8 @@ export interface Database {
           credit_last_updated?: string | null
           plaid_institution_name?: string | null
           plaid_linked_at?: string | null
+          plaid_last_sync_at?: string | null
+          plaid_needs_relink?: boolean
           completed_lessons?: string[]
           created_at?: string
           updated_at?: string
@@ -80,6 +84,8 @@ export interface Database {
           credit_last_updated?: string | null
           plaid_institution_name?: string | null
           plaid_linked_at?: string | null
+          plaid_last_sync_at?: string | null
+          plaid_needs_relink?: boolean
           completed_lessons?: string[]
           created_at?: string
           updated_at?: string
@@ -182,6 +188,9 @@ export interface Database {
           date: string
           amount: number
           type: 'income' | 'expense' | null
+          source: 'manual' | 'plaid'
+          plaid_transaction_id: string | null
+          plaid_account_id: string | null
           created_at: string
         }
         Insert: {
@@ -192,6 +201,9 @@ export interface Database {
           date: string
           amount: number
           type?: 'income' | 'expense' | null
+          source?: 'manual' | 'plaid'
+          plaid_transaction_id?: string | null
+          plaid_account_id?: string | null
           created_at?: string
         }
         Update: {
@@ -202,6 +214,9 @@ export interface Database {
           date?: string
           amount?: number
           type?: 'income' | 'expense' | null
+          source?: 'manual' | 'plaid'
+          plaid_transaction_id?: string | null
+          plaid_account_id?: string | null
           created_at?: string
         }
       }

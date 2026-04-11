@@ -1,6 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
-import { plaidPost } from '../_shared/plaid_client.ts';
+import { runSyncAllForUser, runSyncStaleItems } from '../_shared/plaid_sync_runner.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
@@ -28,8 +28,23 @@ Deno.serve(async (req: Request) => {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader?.startsWith('Bearer ')) {
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const cronSecret = Deno.env.get('PLAID_CRON_SECRET');
+    const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+
+    if (cronSecret && bearer === cronSecret) {
+      const maxItems = Number(Deno.env.get('PLAID_SYNC_BATCH_SIZE') ?? '40');
+      const olderThanHours = Number(Deno.env.get('PLAID_SYNC_STALE_HOURS') ?? '6');
+      const result = await runSyncStaleItems(supabaseAdmin, {
+        maxItems: Number.isFinite(maxItems) ? maxItems : 40,
+        olderThanHours: Number.isFinite(olderThanHours) ? olderThanHours : 6,
+      });
+      return new Response(JSON.stringify({ ok: true, ...result }), {
+        headers: { ...ch, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!authHeader.startsWith('Bearer ')) {
       throw new Error('Missing Authorization header');
     }
     const jwt = authHeader.replace('Bearer ', '');
@@ -47,45 +62,8 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const bodyJson = (await req.json().catch(() => ({}))) as { mode?: string };
-    const isUpdate = bodyJson.mode === 'update';
-    const clientName = Deno.env.get('PLAID_CLIENT_NAME') ?? 'Oweable';
-
-    let out: { link_token?: string };
-
-    if (isUpdate) {
-      const { data: item, error: itemErr } = await supabaseAdmin
-        .from('plaid_items')
-        .select('access_token')
-        .eq('user_id', user.id)
-        .limit(1)
-        .maybeSingle();
-
-      if (itemErr) throw itemErr;
-      if (!item?.access_token) {
-        throw new Error('No linked bank to update. Connect a bank first.');
-      }
-
-      out = await plaidPost<{ link_token?: string }>('/link/token/create', {
-        user: { client_user_id: user.id },
-        client_name: clientName,
-        access_token: item.access_token,
-        country_codes: ['US'],
-        language: 'en',
-      });
-    } else {
-      out = await plaidPost<{ link_token?: string }>('/link/token/create', {
-        user: { client_user_id: user.id },
-        client_name: clientName,
-        products: ['transactions'],
-        country_codes: ['US'],
-        language: 'en',
-      });
-    }
-
-    if (!out.link_token) throw new Error('No link_token from Plaid');
-
-    return new Response(JSON.stringify({ link_token: out.link_token }), {
+    const result = await runSyncAllForUser(supabaseAdmin, user.id);
+    return new Response(JSON.stringify({ ok: true, ...result }), {
       headers: { ...ch, 'Content-Type': 'application/json' },
     });
   } catch (e) {

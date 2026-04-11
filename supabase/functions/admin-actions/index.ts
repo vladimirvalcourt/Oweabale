@@ -52,6 +52,40 @@ Deno.serve(async (req: Request) => {
       })
     }
 
+    if (action === 'plaid_stats') {
+      const { data: items, error } = await supabaseAdmin
+        .from('plaid_items')
+        .select(
+          'user_id, item_id, institution_name, last_sync_at, last_sync_error, last_webhook_at, item_login_required, created_at',
+        )
+      if (error) throw error
+      const rows = items ?? []
+      const userIds = new Set(rows.map((r) => r.user_id))
+      const withError = rows.filter((r) => r.last_sync_error != null && String(r.last_sync_error).length > 0)
+        .length
+      const needRelink = rows.filter((r) => r.item_login_required === true).length
+      const neverSynced = rows.filter((r) => r.last_sync_at == null).length
+      const stale24h = Date.now() - 24 * 3600 * 1000
+      const stale = rows.filter((r) => {
+        if (!r.last_sync_at) return true
+        return new Date(r.last_sync_at).getTime() < stale24h
+      }).length
+
+      return new Response(
+        JSON.stringify({
+          plaid_stats: {
+            total_items: rows.length,
+            distinct_users: userIds.size,
+            items_with_sync_error: withError,
+            items_needing_relink: needRelink,
+            items_never_synced: neverSynced,
+            items_stale_24h: stale,
+          },
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      )
+    }
+
     // All other actions require a targetUserId
     if (!targetUserId) throw new Error('Missing targetUserId')
     if (targetUserId === user.id) throw new Error('Cannot perform this action on your own account')

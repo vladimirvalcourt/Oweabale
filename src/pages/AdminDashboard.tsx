@@ -28,6 +28,15 @@ interface ProfileRow {
   created_at: string | null;
 }
 
+interface PlaidHealthStats {
+  total_items: number;
+  distinct_users: number;
+  items_with_sync_error: number;
+  items_needing_relink: number;
+  items_never_synced: number;
+  items_stale_24h: number;
+}
+
 interface SupportTicket {
   id: string;
   ticket_number: string;
@@ -63,6 +72,8 @@ export default function AdminDashboard() {
   const [broadcastMsg, setBroadcastMsg] = useState('');
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [isPlaidEnabled, setIsPlaidEnabled] = useState(true);
+  const [plaidStats, setPlaidStats] = useState<PlaidHealthStats | null>(null);
+  const [plaidStatsLoading, setPlaidStatsLoading] = useState(false);
 
   const [isSavingTax, setIsSavingTax] = useState(false);
   const [isSavingBroadcast, setIsSavingBroadcast] = useState(false);
@@ -178,6 +189,16 @@ export default function AdminDashboard() {
     } else if (enriched?.users) {
       setEnrichedUsers(enriched.users as EnrichedUser[]);
       addLog('INFO', 'Auth user data enriched.');
+    }
+
+    const { data: plaidData, error: plaidStatsErr } = await supabase.functions.invoke('admin-actions', {
+      body: { action: 'plaid_stats' },
+    });
+    if (plaidStatsErr) {
+      addLog('WARN', `Plaid stats failed: ${plaidStatsErr.message}`);
+    } else if (plaidData?.plaid_stats) {
+      setPlaidStats(plaidData.plaid_stats as PlaidHealthStats);
+      addLog('INFO', 'Plaid link health loaded.');
     }
 
     // Support tickets (open/in-progress)
@@ -317,6 +338,24 @@ export default function AdminDashboard() {
     { label: 'BANNED USERS', value: bannedCount > 0 ? bannedCount.toString() : '0', status: 'LIVE', color: bannedCount > 0 ? 'text-rose-500' : 'text-zinc-500' },
     { label: 'IN ONBOARDING', value: inOnboardingCount > 0 ? inOnboardingCount.toString() : '0', status: 'LIVE', color: 'text-indigo-400' },
   ];
+
+  const refreshPlaidStats = useCallback(async () => {
+    setPlaidStatsLoading(true);
+    const { data, error } = await supabase.functions.invoke('admin-actions', {
+      body: { action: 'plaid_stats' },
+    });
+    setPlaidStatsLoading(false);
+    if (error) {
+      toast.error(error.message);
+      addLog('WARN', `Plaid stats refresh failed: ${error.message}`);
+      return;
+    }
+    if (data?.plaid_stats) {
+      setPlaidStats(data.plaid_stats as PlaidHealthStats);
+      addLog('INFO', 'Plaid metrics refreshed.');
+      toast.success('Plaid metrics refreshed.');
+    }
+  }, [addLog]);
 
   const toggleMaintenance = async () => {
     const newValue = !isMaintenance;
@@ -743,7 +782,40 @@ export default function AdminDashboard() {
                     {isPlaidEnabled ? 'Turn Off' : 'Turn On'}
                   </button>
                 </div>
-                <p className="text-[10px] text-zinc-600">Individual bank status requires live Plaid webhook integration.</p>
+                <div className="flex justify-between items-center gap-2">
+                  <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-wider">Linked items</p>
+                  <button
+                    type="button"
+                    onClick={refreshPlaidStats}
+                    disabled={plaidStatsLoading}
+                    className="text-[10px] px-2 py-1 rounded-sm font-bold bg-white/5 text-zinc-400 hover:bg-white/10 border border-white/10 inline-flex items-center gap-1 disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${plaidStatsLoading ? 'animate-spin' : ''}`} />
+                    Refresh
+                  </button>
+                </div>
+                {plaidStats ? (
+                  <dl className="grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] font-mono text-zinc-400">
+                    <dt className="text-zinc-600">Items</dt>
+                    <dd className="text-right text-zinc-300">{plaidStats.total_items}</dd>
+                    <dt className="text-zinc-600">Users</dt>
+                    <dd className="text-right text-zinc-300">{plaidStats.distinct_users}</dd>
+                    <dt className="text-zinc-600">Sync errors</dt>
+                    <dd className={`text-right ${plaidStats.items_with_sync_error > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                      {plaidStats.items_with_sync_error}
+                    </dd>
+                    <dt className="text-zinc-600">Need relink</dt>
+                    <dd className={`text-right ${plaidStats.items_needing_relink > 0 ? 'text-amber-400' : 'text-zinc-300'}`}>
+                      {plaidStats.items_needing_relink}
+                    </dd>
+                    <dt className="text-zinc-600">Never synced</dt>
+                    <dd className="text-right text-zinc-300">{plaidStats.items_never_synced}</dd>
+                    <dt className="text-zinc-600">Stale 24h</dt>
+                    <dd className="text-right text-zinc-300">{plaidStats.items_stale_24h}</dd>
+                  </dl>
+                ) : (
+                  <p className="text-[10px] text-zinc-600">No metrics yet — refresh or check admin-actions.</p>
+                )}
               </div>
             </div>
 
