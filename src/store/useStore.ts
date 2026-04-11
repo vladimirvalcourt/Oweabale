@@ -1894,16 +1894,26 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'oweable-store-persistence',
-      // Session-scoped like Supabase auth — avoids leaving identity shell on disk after the browser session ends.
-      storage: createJSONStorage(() => sessionStorage),
-      // Persist ONLY non-sensitive UI/profile state (never JWTs — those stay in Supabase client storage).
-      // Financial records (bills, debts, transactions, assets, incomes, etc.)
-      // are re-fetched from Supabase on every authenticated session via
-      // fetchData(). Raw financial data is never persisted here —
-      // only identity/UI fields that allow the shell to render immediately.
+      // Safe sessionStorage wrapper — if the browser quota is exceeded (5 MB)
+      // the write is silently skipped so fetchData never crashes.
+      storage: createJSONStorage(() => ({
+        getItem: (key: string) => {
+          try { return sessionStorage.getItem(key); } catch { return null; }
+        },
+        setItem: (key: string, value: string) => {
+          try { sessionStorage.setItem(key, value); } catch { /* quota exceeded — skip, app still works */ }
+        },
+        removeItem: (key: string) => {
+          try { sessionStorage.removeItem(key); } catch { /* ignore */ }
+        },
+      })),
+      // Persist ONLY the tiny identity shell needed to render the UI before
+      // fetchData() completes. Financial data (bills, debts, transactions, etc.)
+      // is always re-fetched from Supabase on every authenticated session.
+      // Categories are excluded — they are re-fetched quickly and excluding
+      // them keeps the persisted payload well under the 5 MB sessionStorage quota.
       partialize: (state) => ({
         user: {
-          // Persist identity fields needed for the UI shell while data loads
           id: state.user.id,
           firstName: state.user.firstName,
           lastName: state.user.lastName,
@@ -1912,11 +1922,7 @@ export const useStore = create<AppState>()(
           theme: state.user.theme,
           hasCompletedOnboarding: state.user.hasCompletedOnboarding,
           isAdmin: state.user.isAdmin,
-          // Omit: taxState, taxRate, phone, timezone, language (re-fetched from DB)
         },
-        // Persist categories only — these are non-sensitive labels used to
-        // render the UI immediately on load before fetchData() completes.
-        categories: state.categories,
       }),
     }
   )
