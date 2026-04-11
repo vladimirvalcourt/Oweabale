@@ -409,12 +409,12 @@ export default function Settings() {
                     <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6 pt-4">
                       <div className="sm:col-span-3">
                         <label htmlFor="firstName" className="block text-[10px] font-mono font-bold text-content-muted uppercase tracking-widest mb-2">First Name</label>
-                        <input type="text" id="firstName" value={formData.firstName} onChange={handleChange} required className="focus:border-indigo-500 block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors outline-none" />
+                        <input type="text" id="firstName" value={formData.firstName} onChange={handleChange} required className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors" />
                       </div>
 
                       <div className="sm:col-span-3">
                         <label htmlFor="lastName" className="block text-[10px] font-mono font-bold text-content-muted uppercase tracking-widest mb-2">Last Name</label>
-                        <input type="text" id="lastName" value={formData.lastName} onChange={handleChange} required className="focus:border-indigo-500 block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors outline-none" />
+                        <input type="text" id="lastName" value={formData.lastName} onChange={handleChange} required className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors" />
                       </div>
 
                       <div className="sm:col-span-4">
@@ -422,17 +422,17 @@ export default function Settings() {
                           Email Address
                           <span className="ml-2 text-content-muted normal-case tracking-normal font-normal">(managed by Google)</span>
                         </label>
-                        <input type="email" id="email" value={formData.email} readOnly className="block w-full text-[13px] font-mono border-surface-border bg-surface-base text-content-tertiary rounded-sm px-3 py-2 border outline-none cursor-not-allowed select-none" />
+                        <input type="email" id="email" value={formData.email} readOnly className="block w-full text-[13px] font-mono border-surface-border bg-surface-base text-content-tertiary rounded-sm px-3 py-2 border focus-app-field cursor-not-allowed select-none" />
                       </div>
 
                       <div className="sm:col-span-4">
                         <label htmlFor="phone" className="block text-[10px] font-mono font-bold text-content-muted uppercase tracking-widest mb-2">Phone Number</label>
-                        <input type="tel" id="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" className="focus:border-indigo-500 block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors outline-none" />
+                        <input type="tel" id="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors" />
                       </div>
 
                       <div className="sm:col-span-3">
                         <label htmlFor="timezone" className="block text-[10px] font-mono font-bold text-content-muted uppercase tracking-widest mb-2">Timezone</label>
-                        <select id="timezone" value={formData.timezone} onChange={handleChange} className="focus:border-indigo-500 block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors outline-none appearance-none">
+                        <select id="timezone" value={formData.timezone} onChange={handleChange} className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors appearance-none">
                           <option value="Pacific Time (PT)">Pacific Time (PT)</option>
                           <option value="Eastern Time (ET)">Eastern Time (ET)</option>
                           <option value="Central Time (CT)">Central Time (CT)</option>
@@ -442,7 +442,7 @@ export default function Settings() {
 
                       <div className="sm:col-span-3">
                         <label htmlFor="language" className="block text-[10px] font-mono font-bold text-content-muted uppercase tracking-widest mb-2">Language</label>
-                        <select id="language" value={formData.language} onChange={handleChange} className="focus:border-indigo-500 block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors outline-none appearance-none">
+                        <select id="language" value={formData.language} onChange={handleChange} className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors appearance-none">
                           <option value="English (US)">English (US)</option>
                           <option value="Spanish">Spanish</option>
                           <option value="French">French</option>
@@ -485,14 +485,14 @@ export default function Settings() {
                 }}>
                   <div>
                     <label className="block text-sm font-semibold text-content-secondary">New Password</label>
-                    <input name="newPassword" type="password" required minLength={8} className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors" />
+                    <input name="newPassword" type="password" required minLength={8} className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors" />
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-content-secondary">Confirm Password</label>
-                    <input name="confirmPassword" type="password" required className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors" />
+                    <input name="confirmPassword" type="password" required className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors" />
                   </div>
                   <div className="pt-2">
-                    <button type="submit" disabled={isUpdatingPassword} className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500">
+                    <button type="submit" disabled={isUpdatingPassword} className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-medium transition-colors focus-app">
                       {isUpdatingPassword && <Loader2 className="w-3 h-3 animate-spin" />}
                       {isUpdatingPassword ? 'Updating...' : 'Update Password'}
                     </button>
@@ -546,7 +546,7 @@ export default function Settings() {
                       type="checkbox"
                       checked={biometrics}
                       onChange={(e) => { setBiometrics(e.target.checked); toast.success(e.target.checked ? 'Biometrics enabled' : 'Biometrics disabled'); }}
-                      className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                      className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                     />
                   </div>
                 </div>
@@ -613,7 +613,7 @@ export default function Settings() {
                   <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">No payment method on file</p>
                   <p className="text-[10px] font-mono text-content-muted mt-1">Free tier — no billing required</p>
                 </div>
-                <button onClick={() => toast.success('Payment method flow coming soon')} className="text-sm font-medium text-content-primary hover:text-white transition-colors bg-surface-elevated px-4 py-2 border border-surface-border rounded-sm focus:outline-none">
+                <button onClick={() => toast.success('Payment method flow coming soon')} className="text-sm font-medium text-content-primary hover:text-white transition-colors bg-surface-elevated px-4 py-2 border border-surface-border rounded-sm focus-app">
                   + Add Payment Method
                 </button>
               </CollapsibleModule>
@@ -641,7 +641,7 @@ export default function Settings() {
                           type="checkbox"
                           checked={notifPrefs[item.id]}
                           onChange={(e) => { setNotifPrefs(p => ({ ...p, [item.id]: e.target.checked })); toast.success('Preference updated'); }}
-                          className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                          className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                         />
                       </div>
                     </div>
@@ -667,7 +667,7 @@ export default function Settings() {
                           type="checkbox"
                           checked={notifPrefs[item.id]}
                           onChange={(e) => { setNotifPrefs(p => ({ ...p, [item.id]: e.target.checked })); toast.success('Preference updated'); }}
-                          className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                          className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                         />
                       </div>
                     </div>
@@ -695,7 +695,7 @@ export default function Settings() {
                           type="checkbox"
                           checked={notifPrefs[item.id]}
                           onChange={(e) => { setNotifPrefs(p => ({ ...p, [item.id]: e.target.checked })); toast.success('Smart alert updated'); }}
-                          className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                          className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                         />
                       </div>
                     </div>
@@ -714,7 +714,7 @@ export default function Settings() {
                 <div className="space-y-4 max-w-md">
                   <div>
                     <label className="block text-sm font-semibold text-content-secondary">Primary Currency</label>
-                    <select value={prefCurrency} onChange={e => setPrefCurrency(e.target.value)} className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors">
+                    <select value={prefCurrency} onChange={e => setPrefCurrency(e.target.value)} className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors">
                       <option>USD ($)</option>
                       <option>EUR (€)</option>
                       <option>GBP (£)</option>
@@ -723,7 +723,7 @@ export default function Settings() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-content-secondary">Date Format</label>
-                    <select value={prefDateFormat} onChange={e => setPrefDateFormat(e.target.value)} className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors">
+                    <select value={prefDateFormat} onChange={e => setPrefDateFormat(e.target.value)} className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors">
                       <option>MM/DD/YYYY</option>
                       <option>DD/MM/YYYY</option>
                       <option>YYYY-MM-DD</option>
@@ -731,7 +731,7 @@ export default function Settings() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-content-secondary">Fiscal Year Start</label>
-                    <select value={prefFiscalYear} onChange={e => setPrefFiscalYear(e.target.value)} className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors">
+                    <select value={prefFiscalYear} onChange={e => setPrefFiscalYear(e.target.value)} className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors">
                       <option>January</option>
                       <option>April</option>
                       <option>July</option>
@@ -740,14 +740,14 @@ export default function Settings() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-content-secondary">Default Dashboard View</label>
-                    <select value={prefDashboardView} onChange={e => setPrefDashboardView(e.target.value)} className="mt-1 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors">
+                    <select value={prefDashboardView} onChange={e => setPrefDashboardView(e.target.value)} className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors">
                       <option>Net Worth Overview</option>
                       <option>Upcoming Bills</option>
                       <option>Debt Detonator Timeline</option>
                     </select>
                   </div>
                   <div className="pt-2">
-                    <button onClick={() => toast.success('Preferences saved')} className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500">
+                    <button onClick={() => toast.success('Preferences saved')} className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-sm text-sm font-medium transition-colors focus-app">
                       Save Preferences
                     </button>
                   </div>
@@ -763,11 +763,11 @@ export default function Settings() {
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <span className="text-content-tertiary sm:text-sm">$</span>
                       </div>
-                      <input type="number" value={prefSpendingLimit} onChange={e => setPrefSpendingLimit(e.target.value)} className="focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm py-2 border transition-colors" />
+                      <input type="number" value={prefSpendingLimit} onChange={e => setPrefSpendingLimit(e.target.value)} className="focus-app-field-indigo block w-full pl-7 sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm py-2 border transition-colors" />
                     </div>
                   </div>
                   <div className="pt-2">
-                    <button onClick={() => toast.success('Budget limits updated')} className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500">
+                    <button onClick={() => toast.success('Budget limits updated')} className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-sm text-sm font-medium transition-colors focus-app">
                       Update Limits
                     </button>
                   </div>
@@ -835,7 +835,7 @@ export default function Settings() {
                       type="checkbox"
                       checked={privacyMode}
                       onChange={(e) => { setPrivacyMode(e.target.checked); toast.success(e.target.checked ? 'Privacy mode enabled' : 'Privacy mode disabled'); }}
-                      className="h-4 w-4 text-indigo-500 focus:ring-indigo-500 bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                      className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                     />
                   </div>
                 </div>
@@ -849,7 +849,7 @@ export default function Settings() {
                       <h4 className="text-sm font-medium text-content-primary">Export your data</h4>
                       <p className="text-xs text-content-tertiary mt-1">Download a copy of all your financial data in CSV format.</p>
                     </div>
-                    <button onClick={() => toast.success('Data export started.')} className="px-4 py-2 bg-surface-raised border border-surface-border rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:text-white transition-colors focus:outline-none">
+                    <button onClick={() => toast.success('Data export started.')} className="px-4 py-2 bg-surface-raised border border-surface-border rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:text-white transition-colors focus-app">
                       Export Data
                     </button>
                   </div>
@@ -862,7 +862,7 @@ export default function Settings() {
                     <button 
                       type="button" 
                       onClick={() => setIsResetDialogOpen(true)}
-                      className="px-4 py-2 bg-amber-500/10 border border-amber-500/50 text-amber-500 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-colors focus:outline-none"
+                      className="px-4 py-2 bg-amber-500/10 border border-amber-500/50 text-amber-500 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-colors focus-app"
                     >
                       Reset Data
                     </button>
@@ -877,7 +877,7 @@ export default function Settings() {
                     <h4 className="text-sm font-medium text-content-primary">Delete Account</h4>
                     <p className="text-xs text-content-tertiary mt-1">Permanently delete your account and all associated data.</p>
                   </div>
-                  <button type="button" onClick={() => setIsDeleteDialogOpen(true)} className="px-4 py-2 bg-red-500/10 border border-red-500/50 text-red-500 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-red-500">
+                  <button type="button" onClick={() => setIsDeleteDialogOpen(true)} className="px-4 py-2 bg-red-500/10 border border-red-500/50 text-red-500 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-colors focus-app">
                     Delete Account
                   </button>
                 </div>
@@ -905,7 +905,7 @@ export default function Settings() {
                       <select
                         value={ruleForm.match_type}
                         onChange={e => setRuleForm(f => ({ ...f, match_type: e.target.value as any }))}
-                        className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none w-full sm:w-36"
+                        className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-sm px-3 py-2 focus-app-field-indigo appearance-none w-full sm:w-36"
                       >
                         <option value="contains">Contains</option>
                         <option value="exact">Exact Match</option>
@@ -917,12 +917,12 @@ export default function Settings() {
                         placeholder="e.g. STARBUCKS"
                         value={ruleForm.match_value}
                         onChange={e => setRuleForm(f => ({ ...f, match_value: e.target.value }))}
-                        className="flex-1 bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 placeholder:text-content-muted"
+                        className="flex-1 bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-sm px-3 py-2 focus-app-field-indigo placeholder:text-content-muted"
                       />
                       <select
                         value={ruleForm.category}
                         onChange={e => setRuleForm(f => ({ ...f, category: e.target.value }))}
-                        className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none w-full sm:w-44"
+                        className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-sm px-3 py-2 focus-app-field-indigo appearance-none w-full sm:w-44"
                       >
                         <option value="">— Select category —</option>
                         {categories.map(c => (
@@ -1023,7 +1023,7 @@ export default function Settings() {
                         type="text"
                         value={supportForm.subject}
                         onChange={e => setSupportForm(f => ({ ...f, subject: e.target.value }))}
-                        className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500 placeholder:text-content-muted"
+                        className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo placeholder:text-content-muted"
                         placeholder="Brief summary of your issue or question..."
                       />
                     </div>
@@ -1034,7 +1034,7 @@ export default function Settings() {
                         <select
                           value={supportForm.department}
                           onChange={e => setSupportForm(f => ({ ...f, department: e.target.value }))}
-                          className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none"
+                          className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo appearance-none"
                         >
                           <option>General Support</option>
                           <option>Integrations</option>
@@ -1047,7 +1047,7 @@ export default function Settings() {
                         <select
                           value={supportForm.priority}
                           onChange={e => setSupportForm(f => ({ ...f, priority: e.target.value }))}
-                          className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none"
+                          className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo appearance-none"
                         >
                           <option value="Low">Low — general question</option>
                           <option value="Normal">Normal — something isn't working</option>
@@ -1063,7 +1063,7 @@ export default function Settings() {
                       <textarea
                         value={supportForm.description}
                         onChange={e => setSupportForm(f => ({ ...f, description: e.target.value }))}
-                        className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 min-h-[8rem] resize-y placeholder:text-content-muted"
+                        className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 focus-app-field-indigo min-h-[8rem] resize-y placeholder:text-content-muted"
                         placeholder="Include steps to reproduce, what you expected vs what happened, and any relevant details..."
                       />
                     </div>
@@ -1153,7 +1153,7 @@ export default function Settings() {
                         <select
                           value={feedbackForm.type}
                           onChange={e => setFeedbackForm(f => ({ ...f, type: e.target.value }))}
-                          className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none"
+                          className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo appearance-none"
                         >
                           <option value="general">General Feedback</option>
                           <option value="feature_request">Feature Request</option>
@@ -1181,7 +1181,7 @@ export default function Settings() {
                       <textarea
                         value={feedbackForm.message}
                         onChange={e => setFeedbackForm(f => ({ ...f, message: e.target.value }))}
-                        className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 h-28 resize-none placeholder:text-content-muted"
+                        className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 focus-app-field-indigo h-28 resize-none placeholder:text-content-muted"
                         placeholder="Tell us what's working, what's not, or what you'd like to see..."
                       />
                     </div>
@@ -1272,14 +1272,14 @@ export default function Settings() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setIsResetDialogOpen(false)}
-                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors outline-none"
+                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
               >
                 Cancel
               </button>
               <button
                 onClick={handleResetData}
                 disabled={isResettingData}
-                className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-medium transition-colors outline-none"
+                className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-medium transition-colors focus-app"
               >
                 {isResettingData && <Loader2 className="w-3 h-3 animate-spin" />}
                 {isResettingData ? 'Resetting...' : 'Reset Everything'}
@@ -1307,14 +1307,14 @@ export default function Settings() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setIsDeleteDialogOpen(false)}
-                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500"
+                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteAccount}
                 disabled={isDeleting}
-                className="flex items-center gap-2 px-4 py-2 bg-[#EF4444] hover:bg-[#DC2626] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-red-500"
+                className="flex items-center gap-2 px-4 py-2 bg-[#EF4444] hover:bg-[#DC2626] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-medium transition-colors focus-app"
               >
                 {isDeleting && <Loader2 className="w-3 h-3 animate-spin" />}
                 {isDeleting ? 'Deleting...' : 'Delete'}

@@ -348,7 +348,7 @@ export default function Onboarding() {
                         placeholder="0.00"
                         value={formData.cash}
                         onChange={e => setFormData({...formData, cash: e.target.value})}
-                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder:text-content-muted outline-none tnum leading-none"
+                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder:text-content-muted focus-app-field tnum leading-none"
                       />
                     </div>
                     <p className="text-[11px] font-mono text-content-tertiary uppercase tracking-widest pt-2">Current Balances // Liquid Assets Only</p>
@@ -366,7 +366,7 @@ export default function Onboarding() {
                         placeholder="0.00"
                         value={formData.bills}
                         onChange={e => setFormData({...formData, bills: e.target.value})}
-                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder:text-content-muted outline-none tnum leading-none"
+                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder:text-content-muted focus-app-field tnum leading-none"
                       />
                     </div>
                     <p className="text-[11px] font-mono text-content-tertiary uppercase tracking-widest pt-2">Monthly Fixed Outflow // Rent, Subscriptions, Debt Mins</p>
@@ -384,7 +384,7 @@ export default function Onboarding() {
                         placeholder="0.00"
                         value={formData.dailyLimit}
                         onChange={e => setFormData({...formData, dailyLimit: e.target.value})}
-                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder:text-content-muted outline-none tnum leading-none"
+                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder:text-content-muted focus-app-field tnum leading-none"
                       />
                     </div>
                     <div className="border border-surface-border p-4 bg-black/40">

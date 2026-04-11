@@ -237,7 +237,7 @@ ${user.firstName} ${user.lastName}
                 </button>
               </div>
               
-              <div className="flex-1 divide-y divide-surface-border overflow-y-auto max-h-[500px] outline-none">
+              <div className="flex-1 divide-y divide-surface-border overflow-y-auto max-h-[500px] focus-app">
                 {(!credit?.fixes || credit.fixes.length === 0) ? (
                   <div className="p-12 text-center space-y-4">
                     <div className="mx-auto w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-content-muted">
@@ -341,7 +341,7 @@ ${user.firstName} ${user.lastName}
                       value={fixItem}
                       onChange={e => setFixItem(e.target.value)}
                       placeholder="e.g., Inaccurate Medical Collection"
-                      className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus:border-indigo-500 outline-none placeholder:text-content-muted"
+                      className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus-app-field-indigo placeholder:text-content-muted"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -352,7 +352,7 @@ ${user.firstName} ${user.lastName}
                         value={fixAmount}
                         onChange={e => setFixAmount(e.target.value)}
                         placeholder="0.00"
-                        className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus:border-indigo-500 outline-none"
+                        className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus-app-field-indigo"
                       />
                     </div>
                     <div>
@@ -360,7 +360,7 @@ ${user.firstName} ${user.lastName}
                       <select 
                         value={fixBureau}
                         onChange={e => setFixBureau(e.target.value)}
-                        className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus:border-indigo-500 outline-none h-[46px]"
+                        className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus-app-field-indigo h-[46px]"
                       >
                         <option>Experian</option>
                         <option>Equifax</option>
@@ -375,7 +375,7 @@ ${user.firstName} ${user.lastName}
                       value={fixNotes}
                       onChange={e => setFixNotes(e.target.value)}
                       placeholder="Explain why this is incorrect..."
-                      className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus:border-indigo-500 outline-none h-24 resize-none placeholder:text-content-muted"
+                      className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus-app-field-indigo h-24 resize-none placeholder:text-content-muted"
                     />
                   </div>
                   <div className="flex gap-3 pt-4">

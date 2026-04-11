@@ -33,7 +33,7 @@ function FaqItem({ question, answer }: { question: string, answer: string }) {
     <div className="border-b border-surface-border py-6">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full text-left focus:outline-none group"
+        className="flex items-center justify-between w-full text-left focus-app group"
       >
         <span className="text-lg font-medium text-content-primary group-hover:text-indigo-400 transition-colors">{question}</span>
         {isOpen ? (

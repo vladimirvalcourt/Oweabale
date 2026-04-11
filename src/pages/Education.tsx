@@ -385,7 +385,7 @@ export default function Education() {
                       <div className="bg-surface-elevated border-t border-surface-border px-4 py-4 sm:px-6 flex justify-end">
                         <button
                           type="button"
-                          className="inline-flex items-center gap-2 justify-center rounded-sm bg-indigo-500 px-6 py-2.5 text-xs font-mono font-bold uppercase tracking-widest text-white hover:bg-indigo-400 focus:outline-none transition-colors"
+                          className="inline-flex items-center gap-2 justify-center rounded-sm bg-indigo-500 px-6 py-2.5 text-xs font-mono font-bold uppercase tracking-widest text-white hover:bg-indigo-400 focus-app transition-colors"
                           onClick={markComplete}
                         >
                           <CheckCircle2 className="w-4 h-4" />

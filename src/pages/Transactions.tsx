@@ -85,7 +85,7 @@ export default function Transactions() {
                 placeholder="Search transactions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-surface-border rounded-sm leading-5 bg-surface-base text-xs font-mono uppercase tracking-widest text-content-primary placeholder:text-content-muted focus:outline-none focus:border-indigo-600 transition-all"
+                className="block w-full pl-10 pr-3 py-2 border border-surface-border rounded-sm leading-5 bg-surface-base text-xs font-mono uppercase tracking-widest text-content-primary placeholder:text-content-muted focus-app-field-indigo-600 transition-all"
               />
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -112,7 +112,7 @@ export default function Transactions() {
                 <select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value as any)}
-                  className="block w-full px-3 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus:outline-none focus:border-indigo-600 transition-colors"
+                  className="block w-full px-3 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus-app-field-indigo-600 transition-colors"
                 >
                   <option value="all">All Types</option>
                   <option value="income">Income</option>
@@ -127,7 +127,7 @@ export default function Transactions() {
                 <select
                   value={filterCategory}
                   onChange={(e) => setFilterCategory(e.target.value)}
-                  className="block w-full px-3 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus:outline-none focus:border-indigo-600 transition-colors"
+                  className="block w-full px-3 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus-app-field-indigo-600 transition-colors"
                 >
                   <option value="all">All Categories</option>
                   {uniqueCategories.map(cat => (
@@ -145,14 +145,14 @@ export default function Transactions() {
                     type="date"
                     value={dateRange.start}
                     onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
-                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary focus:outline-none focus:border-indigo-600 transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary focus-app-field-indigo-600 transition-colors"
                   />
                   <span className="text-surface-border">::</span>
                   <input
                     type="date"
                     value={dateRange.end}
                     onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
-                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary focus:outline-none focus:border-indigo-600 transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary focus-app-field-indigo-600 transition-colors"
                   />
                 </div>
               </div>
@@ -167,7 +167,7 @@ export default function Transactions() {
                     placeholder="MIN"
                     value={amountRange.min}
                     onChange={(e) => setAmountRange({...amountRange, min: e.target.value})}
-                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary placeholder:text-content-muted focus:outline-none focus:border-indigo-600 transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary placeholder:text-content-muted focus-app-field-indigo-600 transition-colors"
                   />
                   <span className="text-surface-border">::</span>
                   <input
@@ -175,7 +175,7 @@ export default function Transactions() {
                     placeholder="MAX"
                     value={amountRange.max}
                     onChange={(e) => setAmountRange({...amountRange, max: e.target.value})}
-                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary placeholder:text-content-muted focus:outline-none focus:border-indigo-600 transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-sm bg-surface-base text-[10px] font-mono text-content-primary placeholder:text-content-muted focus-app-field-indigo-600 transition-colors"
                   />
                 </div>
               </div>
@@ -206,7 +206,7 @@ export default function Transactions() {
                 <button
                   type="button"
                   onClick={() => openQuickAdd()}
-                  className="mt-6 inline-flex items-center justify-center gap-2 rounded-sm bg-brand-cta px-5 py-2.5 text-sm font-sans font-semibold text-white shadow-sm transition-colors hover:bg-brand-cta-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+                  className="mt-6 inline-flex items-center justify-center gap-2 rounded-sm bg-brand-cta px-5 py-2.5 text-sm font-sans font-semibold text-white shadow-sm transition-colors hover:bg-brand-cta-hover focus-app"
                 >
                   Add your first transaction
                 </button>
@@ -221,7 +221,7 @@ export default function Transactions() {
                   setDateRange({start: '', end: ''});
                   setAmountRange({min: '', max: ''});
                 }}
-                className="mt-4 px-4 py-2 bg-transparent border border-surface-border rounded-md text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-500"
+                className="mt-4 px-4 py-2 bg-transparent border border-surface-border rounded-md text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
               >
                 Clear Filters
               </button>

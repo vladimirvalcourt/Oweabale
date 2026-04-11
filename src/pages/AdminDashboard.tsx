@@ -624,7 +624,7 @@ export default function AdminDashboard() {
               <div className="flex-1 flex flex-col">
                 <p className="text-[10px] text-content-tertiary mb-2">Show a red warning banner to everyone on the app right now.</p>
                 <textarea
-                  className="w-full bg-black border border-white/10 p-2 text-[11px] text-white rounded-sm focus:outline-none focus:border-amber-500 resize-none h-16 mb-3 placeholder:text-content-muted"
+                  className="w-full bg-black border border-white/10 p-2 text-[11px] text-white rounded-sm focus-app-field-amber resize-none h-16 mb-3 placeholder:text-content-muted"
                   placeholder="e.g., 'Expected downtime in 15 minutes.'"
                   value={broadcastMsg}
                   onChange={(e) => setBroadcastMsg(e.target.value)}
@@ -748,11 +748,11 @@ export default function AdminDashboard() {
               <div className="space-y-4">
                 <div>
                   <label className="text-[10px] text-content-tertiary uppercase tracking-widest block mb-1">Standard Deduction Amount</label>
-                  <input type="text" value={taxDeduction} onChange={(e) => setTaxDeduction(e.target.value)} className="w-full bg-black border border-white/10 px-3 py-2 text-[11px] text-emerald-400 font-mono rounded-sm focus:outline-none focus:border-emerald-500" />
+                  <input type="text" value={taxDeduction} onChange={(e) => setTaxDeduction(e.target.value)} className="w-full bg-black border border-white/10 px-3 py-2 text-[11px] text-emerald-400 font-mono rounded-sm focus-app-field-emerald" />
                 </div>
                 <div>
                   <label className="text-[10px] text-content-tertiary uppercase tracking-widest block mb-1">Highest Tax Bracket %</label>
-                  <input type="text" value={taxBracket} onChange={(e) => setTaxBracket(e.target.value)} className="w-full bg-black border border-white/10 px-3 py-2 text-[11px] text-emerald-400 font-mono rounded-sm focus:outline-none focus:border-emerald-500" />
+                  <input type="text" value={taxBracket} onChange={(e) => setTaxBracket(e.target.value)} className="w-full bg-black border border-white/10 px-3 py-2 text-[11px] text-emerald-400 font-mono rounded-sm focus-app-field-emerald" />
                 </div>
                 <button
                   onClick={handleSaveTax}
@@ -837,8 +837,8 @@ export default function AdminDashboard() {
                 <BookOpen className="w-4 h-4" /> Fix Incorrect Categories
               </h2>
               <div className="flex gap-2 mb-2">
-                <input type="text" value={categoryWord} onChange={e => setCategoryWord(e.target.value)} placeholder="Word (e.g. Starbucks)" className="w-1/2 bg-black border border-white/10 px-2 py-1.5 text-[10px] text-white font-mono rounded-sm focus:outline-none focus:border-cyan-500" />
-                <input type="text" value={categoryName} onChange={e => setCategoryName(e.target.value)} placeholder="Category (e.g. Food)" className="w-1/2 bg-black border border-white/10 px-2 py-1.5 text-[10px] text-white font-mono rounded-sm focus:outline-none focus:border-cyan-500" />
+                <input type="text" value={categoryWord} onChange={e => setCategoryWord(e.target.value)} placeholder="Word (e.g. Starbucks)" className="w-1/2 bg-black border border-white/10 px-2 py-1.5 text-[10px] text-white font-mono rounded-sm focus-app-field-cyan" />
+                <input type="text" value={categoryName} onChange={e => setCategoryName(e.target.value)} placeholder="Category (e.g. Food)" className="w-1/2 bg-black border border-white/10 px-2 py-1.5 text-[10px] text-white font-mono rounded-sm focus-app-field-cyan" />
               </div>
               <button onClick={handleSaveCategoryFix} disabled={isSavingCategoryFix} className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 py-1.5 rounded-sm text-[10px] uppercase font-bold transition-all disabled:opacity-50">
                 {isSavingCategoryFix ? 'Saving...' : 'Save Category Fix'}
@@ -882,7 +882,7 @@ export default function AdminDashboard() {
                   placeholder="Search email or ID..."
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
-                  className="bg-black border border-white/10 pl-7 pr-3 py-1.5 text-[11px] rounded-sm focus:outline-none focus:border-indigo-500 w-52 text-white placeholder:text-content-muted"
+                  className="bg-black border border-white/10 pl-7 pr-3 py-1.5 text-[11px] rounded-sm focus-app-field-indigo w-52 text-white placeholder:text-content-muted"
                 />
               </div>
             </div>
@@ -1022,7 +1022,7 @@ export default function AdminDashboard() {
                 value={logFilter}
                 onChange={e => setLogFilter(e.target.value)}
                 placeholder="Filter log..."
-                className="bg-transparent border-none w-full text-[11px] text-white focus:outline-none placeholder:text-content-muted"
+                className="bg-transparent border-none w-full text-[11px] text-white focus-app placeholder:text-content-muted"
               />
             </div>
           </div>

@@ -30,7 +30,7 @@ export function Menu({ trigger, children, align = "left", showChevron = true }: 
         <div
           className={`absolute ${
             align === "right" ? "right-0" : "left-0"
-          } mt-2 w-56 rounded-md bg-surface-raised shadow-xl ring-1 ring-white/10 focus:outline-none z-50`}
+          } mt-2 w-56 rounded-md bg-surface-raised shadow-xl ring-1 ring-white/10 focus-app z-50`}
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="menu-button"

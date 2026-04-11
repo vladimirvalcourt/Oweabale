@@ -453,7 +453,7 @@ export default function Ingestion() {
                             })
                           }
                           onClick={(e) => e.stopPropagation()}
-                          className="w-full max-w-[200px] bg-surface-raised border border-surface-border text-[9px] font-mono font-bold uppercase tracking-widest text-content-tertiary rounded-sm px-2 py-1 outline-none focus:border-indigo-500"
+                          className="w-full max-w-[200px] bg-surface-raised border border-surface-border text-[9px] font-mono font-bold uppercase tracking-widest text-content-tertiary rounded-sm px-2 py-1 focus-app-field-indigo"
                         >
                           <option value="transaction">Transaction</option>
                           <option value="bill">Bill</option>
@@ -514,7 +514,7 @@ export default function Ingestion() {
                           type: e.target.value as PendingIngestion['type'],
                         })
                       }
-                      className="bg-surface-raised border border-surface-border text-[9px] font-mono font-bold uppercase tracking-widest text-content-tertiary rounded-sm px-2 py-1 outline-none focus:border-indigo-500 transition-colors"
+                      className="bg-surface-raised border border-surface-border text-[9px] font-mono font-bold uppercase tracking-widest text-content-tertiary rounded-sm px-2 py-1 focus-app-field-indigo transition-colors"
                     >
                       <option value="transaction">Transaction</option>
                       <option value="bill">Bill</option>
@@ -621,7 +621,7 @@ export default function Ingestion() {
                                           extractedData: { ...item.extractedData, citationType: e.target.value },
                                         })
                                       }
-                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-secondary focus:outline-none focus:border-rose-500 transition-colors"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-secondary focus-app-field-rose transition-colors"
                                     >
                                       <option value="Toll Violation">Toll Violation</option>
                                       <option value="Traffic Citation">Traffic Citation</option>
@@ -648,7 +648,7 @@ export default function Ingestion() {
                                         })
                                       }
                                       placeholder="E.g., Harris County, TX"
-                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-rose-500 transition-colors"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
                                     />
                                   </div>
                                 </div>
@@ -662,7 +662,7 @@ export default function Ingestion() {
                                           extractedData: { ...item.extractedData, citationNumber: e.target.value },
                                         })
                                       }
-                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-rose-500 transition-colors uppercase"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors uppercase"
                                     />
                                   </div>
                                   <div>
@@ -680,7 +680,7 @@ export default function Ingestion() {
                                           },
                                         })
                                       }
-                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-rose-500 transition-colors"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
                                     />
                                   </div>
                                 </div>
@@ -695,7 +695,7 @@ export default function Ingestion() {
                                       })
                                     }
                                     placeholder="https://…"
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-rose-500 transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
                                   />
                                 </div>
                                 <div className="grid grid-cols-2 gap-8">
@@ -709,7 +709,7 @@ export default function Ingestion() {
                                           extractedData: { ...item.extractedData, date: e.target.value },
                                         })
                                       }
-                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-rose-500 transition-colors"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
                                     />
                                   </div>
                                   <div>
@@ -726,7 +726,7 @@ export default function Ingestion() {
                                           },
                                         })
                                       }
-                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-rose-500 transition-colors"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
                                     />
                                   </div>
                                 </div>
@@ -742,7 +742,7 @@ export default function Ingestion() {
                                         extractedData: { ...item.extractedData, biller: e.target.value, name: e.target.value },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
                                   />
                                 </div>
                                 <div>
@@ -754,7 +754,7 @@ export default function Ingestion() {
                                         extractedData: { ...item.extractedData, category: e.target.value },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-tertiary focus:outline-none focus:border-indigo-500 transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field-indigo transition-colors"
                                   >
                                     <option value="utilities">Utilities</option>
                                     <option value="housing">Housing</option>
@@ -789,7 +789,7 @@ export default function Ingestion() {
                                         },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
                                   />
                                 </div>
                                 <div>
@@ -801,7 +801,7 @@ export default function Ingestion() {
                                         extractedData: { ...item.extractedData, category: e.target.value },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-tertiary focus:outline-none focus:border-indigo-500 transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field-indigo transition-colors"
                                   >
                                     <option value="Salary">Salary</option>
                                     <option value="Freelance">Freelance</option>
@@ -821,7 +821,7 @@ export default function Ingestion() {
                                         extractedData: { ...item.extractedData, biller: e.target.value, name: e.target.value },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
                                   />
                                 </div>
                                 <div>
@@ -838,7 +838,7 @@ export default function Ingestion() {
                                         },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
                                   />
                                 </div>
                                 <div className="col-span-2">
@@ -856,7 +856,7 @@ export default function Ingestion() {
                                         },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
                                   />
                                 </div>
                               </div>
@@ -867,7 +867,7 @@ export default function Ingestion() {
                                   <input 
                                     value={item.extractedData.biller || ''} 
                                     onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, biller: e.target.value, name: e.target.value } })}
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors uppercase tracking-widest"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors uppercase tracking-widest"
                                   />
                                 </div>
                                 <div>
@@ -875,7 +875,7 @@ export default function Ingestion() {
                                   <select 
                                     value={item.extractedData.category || 'utilities'}
                                     onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, category: e.target.value } })}
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-tertiary focus:outline-none focus:border-indigo-500 transition-colors uppercase tracking-widest"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field-indigo transition-colors uppercase tracking-widest"
                                   >
                                     <option value="utilities">Utilities</option>
                                     <option value="housing">Housing</option>
@@ -901,7 +901,7 @@ export default function Ingestion() {
                                   type="number"
                                   value={item.extractedData.amount ?? ''} 
                                   onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, amount: parseFloat(e.target.value) } })}
-                                  className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xl font-mono text-[#4ade80] focus:outline-none focus:border-[#4ade80] transition-colors font-bold"
+                                  className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xl font-mono text-[#4ade80] focus-app focus:border-[#4ade80] transition-colors font-bold"
                                 />
                               </div>
                               <div>
@@ -932,7 +932,7 @@ export default function Ingestion() {
                                       });
                                     }
                                   }}
-                                  className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                                  className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
                                 />
                               </div>
                             </div>

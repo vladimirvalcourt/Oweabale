@@ -146,7 +146,7 @@ export default function Income() {
         <button 
           type="button"
           onClick={openAddModal}
-          className="px-4 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-600 text-sm font-sans font-semibold"
+          className="px-4 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus-app text-sm font-sans font-semibold"
         >
           <Plus className="w-3.5 h-3.5 shrink-0" aria-hidden />
           Add income
@@ -164,7 +164,7 @@ export default function Income() {
             type="button"
             whileTap={{ scale: 0.95 }}
             onClick={openAddModal}
-            className="mt-6 px-6 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 focus:outline-none"
+            className="mt-6 px-6 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 focus-app"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Add income source
@@ -238,7 +238,7 @@ export default function Income() {
                     </div>
                     
                     <Menu as="div" className="relative inline-block text-left">
-                      <Menu.Button className="text-content-tertiary hover:text-content-primary transition-colors p-1 rounded-sm focus:outline-none">
+                      <Menu.Button className="text-content-tertiary hover:text-content-primary transition-colors p-1 rounded-sm focus-app">
                         <MoreHorizontal className="w-4 h-4" />
                       </Menu.Button>
                       <Transition
@@ -250,7 +250,7 @@ export default function Income() {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                       >
-                        <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-sm bg-surface-elevated border border-surface-border shadow-xl focus:outline-none z-10 py-1">
+                        <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-sm bg-surface-elevated border border-surface-border shadow-xl focus-app z-10 py-1">
                           <div className="py-1">
                             <Menu.Item>
                               {({ active }) => (
@@ -337,7 +337,7 @@ export default function Income() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-zinc-500"
+                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-zinc"
                   placeholder="e.g. Acme Corp"
                 />
               </div>
@@ -354,7 +354,7 @@ export default function Income() {
                       min="0"
                       value={formData.amount}
                       onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                      className="w-full bg-surface-base border border-surface-border rounded-sm pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus:outline-none focus:border-zinc-500"
+                      className="w-full bg-surface-base border border-surface-border rounded-sm pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-zinc"
                       placeholder="0.00"
                     />
                   </div>
@@ -364,7 +364,7 @@ export default function Income() {
                   <select 
                     value={formData.frequency}
                     onChange={(e) => setFormData({...formData, frequency: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-zinc-500"
+                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-zinc"
                   >
                     <option value="Weekly">Weekly</option>
                     <option value="Bi-weekly">Bi-weekly</option>
@@ -382,7 +382,7 @@ export default function Income() {
                     required
                     value={formData.category}
                     onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-zinc-500"
+                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-zinc"
                     placeholder="Salary"
                   />
                 </div>
@@ -393,7 +393,7 @@ export default function Income() {
                     required
                     value={formData.nextDate}
                     onChange={(e) => setFormData({...formData, nextDate: e.target.value})}
-                    className="input-date-dark w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm font-mono text-content-primary focus:outline-none focus:border-zinc-500"
+                    className="input-date-dark w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm font-mono text-content-primary focus-app-field-zinc"
                     style={{ colorScheme: 'dark' }}
                   />
                 </div>
@@ -404,7 +404,7 @@ export default function Income() {
                 <select 
                   value={formData.status}
                   onChange={(e) => setFormData({...formData, status: e.target.value as 'active' | 'paused'})}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-zinc-500"
+                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-zinc"
                 >
                   <option value="active">Active</option>
                   <option value="paused">Paused</option>
@@ -418,7 +418,7 @@ export default function Income() {
                     type="checkbox"
                     checked={formData.isTaxWithheld}
                     onChange={(e) => setFormData({...formData, isTaxWithheld: e.target.checked})}
-                    className="w-4 h-4 rounded-sm border-surface-border text-brand-indigo focus:ring-brand-indigo bg-surface-raised cursor-pointer"
+                    className="w-4 h-4 rounded-sm border-surface-border text-brand-indigo focus-app bg-surface-raised cursor-pointer"
                   />
                   <div className="flex-1">
                     <p className="text-sm font-sans font-medium text-content-primary">Taxes already withheld</p>
@@ -430,7 +430,7 @@ export default function Income() {
               <div className="pt-6">
                 <button
                   type="submit"
-                  className="w-full rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors py-3 focus:outline-none"
+                  className="w-full rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors py-3 focus-app"
                 >
                   {isEditModalOpen ? 'Save changes' : 'Add income'}
                 </button>
@@ -469,7 +469,7 @@ export default function Income() {
                     min="0.01"
                     value={depositAmount}
                     onChange={(e) => setDepositAmount(e.target.value)}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm pl-7 pr-3 py-2 text-xl font-mono font-bold text-content-primary focus:outline-none focus:border-zinc-500"
+                    className="w-full bg-surface-base border border-surface-border rounded-sm pl-7 pr-3 py-2 text-xl font-mono font-bold text-content-primary focus-app-field-zinc"
                   />
                 </div>
               </div>
@@ -477,7 +477,7 @@ export default function Income() {
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors py-3 focus:outline-none block"
+                  className="w-full rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors py-3 focus-app block"
                 >
                   Confirm deposit
                 </button>

@@ -412,7 +412,7 @@ export default function Layout() {
           <button 
             type="button"
             aria-label="Close navigation menu"
-            className="lg:hidden text-content-tertiary hover:text-content-secondary p-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm"
+            className="lg:hidden text-content-tertiary hover:text-content-secondary p-2 transition-colors focus-app rounded-sm"
             onClick={closeSidebarMobile}
           >
             <MorphingMenuIcon isOpen={sidebarOpen} className="text-content-primary" />
@@ -429,7 +429,7 @@ export default function Layout() {
                     type="button"
                     onClick={() => toggleGroup(group.label)}
                     aria-expanded={isExpanded}
-                    className="w-full flex items-center justify-between px-4 py-2 text-[12px] font-sans font-semibold text-content-secondary hover:text-content-primary transition-colors group/header focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+                    className="w-full flex items-center justify-between px-4 py-2 text-[12px] font-sans font-semibold text-content-secondary hover:text-content-primary transition-colors group/header focus-app"
                   >
                     <span>{group.label}</span>
                     <ChevronDown className={cn("w-3 h-3 transition-transform duration-300", isExpanded ? "rotate-0" : "-rotate-90 text-content-tertiary")} />
@@ -561,7 +561,7 @@ export default function Layout() {
             <button 
               type="button"
               aria-label="Open navigation menu"
-              className="lg:hidden text-content-tertiary hover:text-content-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm p-1"
+              className="lg:hidden text-content-tertiary hover:text-content-secondary focus-app rounded-sm p-1"
               onClick={() => setSidebarOpen(true)}
             >
               <MorphingMenuIcon isOpen={sidebarOpen} className="scale-110" />
@@ -586,7 +586,7 @@ export default function Layout() {
                   setIsSearchOpen(true);
                 }}
                 onFocus={() => setIsSearchOpen(true)}
-                className="w-full pl-9 pr-4 py-2 bg-surface-highlight rounded-md text-[13px] font-sans text-content-primary placeholder-content-tertiary focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus:bg-surface-border-subtle transition-all border border-surface-border focus:border-content-secondary"
+                className="w-full pl-9 pr-4 py-2 bg-surface-highlight rounded-md text-[13px] font-sans text-content-primary placeholder-content-tertiary focus:bg-surface-border-subtle transition-all border border-surface-border focus-app-field-neutral"
               />
               
               {/* Search Dropdown */}
@@ -633,7 +633,7 @@ export default function Layout() {
               type="button"
               aria-label="Open search"
               onClick={() => setIsMobileSearchOpen(true)} 
-              className="md:hidden text-content-tertiary hover:text-content-secondary transition-colors p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm min-w-11 min-h-11 flex items-center justify-center"
+              className="md:hidden text-content-tertiary hover:text-content-secondary transition-colors p-1 focus-app rounded-sm min-w-11 min-h-11 flex items-center justify-center"
             >
               <Search className="w-4 h-4" />
             </button>
@@ -644,7 +644,7 @@ export default function Layout() {
               aria-label="Quick add income, bill, or transaction"
               title="Quick add (keyboard Q)"
               onClick={() => openQuickAdd()}
-              className="hidden sm:inline-flex items-center gap-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-all btn-tactile px-5 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base focus-visible:ring-white"
+              className="hidden sm:inline-flex items-center gap-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-all btn-tactile px-5 py-2.5 focus-app"
             >
               <Plus className="w-4 h-4 shrink-0" aria-hidden />
               Add entry
@@ -653,7 +653,7 @@ export default function Layout() {
               type="button"
               aria-label="Quick add transaction or bill"
               onClick={() => openQuickAdd()}
-              className="sm:hidden flex items-center justify-center w-11 h-11 bg-brand-cta hover:bg-brand-cta-hover text-white transition-all btn-tactile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="sm:hidden flex items-center justify-center w-11 h-11 bg-brand-cta hover:bg-brand-cta-hover text-white transition-all btn-tactile focus-app"
             >
               <Plus className="w-3.5 h-3.5" />
             </button>
@@ -666,7 +666,7 @@ export default function Layout() {
                 aria-expanded={isNotifOpen}
                 aria-haspopup="true"
                 onClick={() => { setIsNotifOpen(v => !v); if (!isNotifOpen) markNotificationsRead(); }}
-                className="relative p-1 overflow-visible group min-w-11 min-h-11 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm"
+                className="relative p-1 overflow-visible group min-w-11 min-h-11 flex items-center justify-center focus-app rounded-sm"
               >
                 <TactileIcon icon={Bell} size={16} className="text-content-tertiary group-hover:text-content-primary" />
                 {notifications.filter(n => !n.read).length > 0 && (
@@ -705,7 +705,7 @@ export default function Layout() {
             <HeadlessMenu as="div" className="relative">
               <HeadlessMenu.Button
                 aria-label="Account menu"
-                className="h-11 w-11 rounded-full bg-surface-raised border border-surface-border flex items-center justify-center overflow-hidden cursor-pointer hover:bg-surface-elevated transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+                className="h-11 w-11 rounded-full bg-surface-raised border border-surface-border flex items-center justify-center overflow-hidden cursor-pointer hover:bg-surface-elevated transition-colors focus-app"
               >
                 {user?.avatar ? (
                   <img
@@ -732,7 +732,7 @@ export default function Layout() {
                 leaveFrom="opacity-100 scale-100 translate-y-0"
                 leaveTo="opacity-0 scale-[0.96] -translate-y-1"
               >
-                <HeadlessMenu.Items className="absolute right-0 mt-3 w-56 origin-top-right bg-[#0C0D0E]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] outline-none overflow-hidden z-50">
+                <HeadlessMenu.Items className="absolute right-0 mt-3 w-56 origin-top-right bg-[#0C0D0E]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] focus-app overflow-hidden z-50">
                   <div className="py-1">
                     <HeadlessMenu.Item>
                       {({ active }) => (
@@ -877,7 +877,7 @@ export default function Layout() {
               autoComplete="off"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none text-base text-content-primary placeholder:text-content-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm px-1"
+              className="flex-1 bg-transparent border-none text-base text-content-primary placeholder:text-content-muted focus-app rounded-sm px-1"
             />
             <button 
               type="button"
@@ -888,7 +888,7 @@ export default function Layout() {
                   setSearchQuery('');
                 });
               }}
-              className="p-2 text-content-tertiary hover:text-content-secondary min-w-11 min-h-11 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm"
+              className="p-2 text-content-tertiary hover:text-content-secondary min-w-11 min-h-11 flex items-center justify-center focus-app rounded-sm"
             >
               <X className="w-5 h-5" />
             </button>

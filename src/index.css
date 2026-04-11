@@ -92,6 +92,52 @@
   .data-numeric {
     @apply font-mono tabular-nums;
   }
+
+  /* Focus — no default ring/square. Use focus-app for controls; focus-app-field* for inputs (indigo default, rose/zinc/brand-indigo/Admin hues as needed). */
+  .focus-app {
+    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0;
+  }
+
+  .focus-app-field {
+    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0;
+  }
+
+  .focus-app-field-indigo {
+    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-indigo-500;
+  }
+
+  .focus-app-field-rose {
+    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-rose-500;
+  }
+
+  .focus-app-field-neutral {
+    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-content-secondary;
+  }
+
+  .focus-app-field-indigo-600 {
+    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-indigo-600;
+  }
+
+  .focus-app-field-zinc {
+    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-zinc-500;
+  }
+
+  .focus-app-field-amber {
+    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-amber-500;
+  }
+
+  .focus-app-field-emerald {
+    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-emerald-500;
+  }
+
+  .focus-app-field-cyan {
+    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-cyan-500;
+  }
+
+  .focus-app-field-brand-indigo {
+    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-brand-indigo;
+  }
+
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-3px); }

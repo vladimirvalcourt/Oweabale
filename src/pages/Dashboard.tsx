@@ -345,7 +345,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 gap-3">
             {/* Ingestion Action */}
             {pendingIngestions.length > 0 && (
-              <Link to="/ingestion" className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 rounded-sm">
+              <Link to="/ingestion" className="block focus-app rounded-sm">
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
                   className="bg-indigo-500/10 border border-indigo-500/20 p-5 rounded-sm flex items-center justify-between hover:bg-indigo-500/15 transition-all shadow-sm group"
@@ -366,7 +366,7 @@ export default function Dashboard() {
 
             {/* Overdraft Risk Action */}
             {isOverdraftRisk && (
-              <Link to="/bills" className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 rounded-sm">
+              <Link to="/bills" className="block focus-app rounded-sm">
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
                   className="bg-rose-500/10 border border-rose-500/30 p-5 rounded-sm flex items-center justify-between hover:bg-rose-500/15 transition-all shadow-sm group"
@@ -396,7 +396,7 @@ export default function Dashboard() {
               >
                 <Link
                   to="/taxes"
-                  className="flex flex-1 items-center justify-between gap-4 p-5 min-w-0 hover:bg-amber-500/15 transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-inset rounded-sm sm:rounded-none"
+                  className="flex flex-1 items-center justify-between gap-4 p-5 min-w-0 hover:bg-amber-500/15 transition-all group focus-app rounded-sm sm:rounded-none"
                 >
                   <div className="flex items-center gap-5 min-w-0">
                     <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center shrink-0">
@@ -416,7 +416,7 @@ export default function Dashboard() {
                     type="button"
                     onClick={dismissLowTaxReserveAlert}
                     aria-label="Dismiss low tax reserve alert"
-                    className="w-full sm:w-auto px-5 py-3 sm:py-0 text-xs font-sans font-semibold uppercase tracking-wide text-amber-200/90 hover:bg-amber-500/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-inset"
+                    className="w-full sm:w-auto px-5 py-3 sm:py-0 text-xs font-sans font-semibold uppercase tracking-wide text-amber-200/90 hover:bg-amber-500/15 transition-colors focus-app"
                   >
                     Got it
                   </button>
@@ -609,7 +609,7 @@ export default function Dashboard() {
                 <h3 className="text-sm font-sans font-semibold text-white">Cash Flow Trajectory</h3>
                 <p className="text-xs font-sans text-content-tertiary mt-1">Projected balances across all accounts</p>
               </div>
-              <select className="text-xs font-sans bg-surface-base border border-surface-border text-content-secondary rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+              <select className="text-xs font-sans bg-surface-base border border-surface-border text-content-secondary rounded px-3 py-1.5 focus-app-field cursor-pointer">
                 <option>Next 30 Days</option>
                 <option>Next 90 Days</option>
               </select>
@@ -651,7 +651,7 @@ export default function Dashboard() {
                   </Link>
                 </div>
 
-                <div className="overflow-y-auto outline-none">
+                <div className="overflow-y-auto focus-app">
                   <ul className="divide-y divide-surface-border">
                     {upcomingBills.slice(0, 4).map((bill) => (
                       <li
@@ -687,7 +687,7 @@ export default function Dashboard() {
                 <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
                   <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-content-secondary">Citations & Tickets</h3>
                 </div>
-                <div className="p-0 outline-none">
+                <div className="p-0 focus-app">
                   <ul className="divide-y divide-surface-border">
                     {openCitations.map((citation) => (
                       <li key={citation.id} className="px-6 py-4 hover:bg-surface-base transition-colors">
@@ -714,10 +714,10 @@ export default function Dashboard() {
                             setSelectedCitation(citation);
                             setIsCitationModalOpen(true);
                           }}
-                          className={`w-full text-xs font-sans font-medium py-2 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-surface-raised ${
+                          className={`w-full text-xs font-sans font-medium py-2 rounded transition-colors focus-app ${
                             citation.daysLeft <= 7
-                              ? 'bg-rose-500 hover:bg-rose-600 text-white focus-visible:ring-rose-500'
-                              : 'bg-surface-border hover:bg-zinc-700 text-content-primary focus-visible:ring-zinc-400'
+                              ? 'bg-rose-500 hover:bg-rose-600 text-white'
+                              : 'bg-surface-border hover:bg-zinc-700 text-content-primary'
                           }`}
                         >
                           Resolve Ticket
@@ -743,7 +743,7 @@ export default function Dashboard() {
               </Dialog.Title>
               <button 
                 onClick={() => setIsCitationModalOpen(false)} 
-                className="text-content-tertiary hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 rounded-sm"
+                className="text-content-tertiary hover:text-white transition-colors focus-app rounded-sm"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -769,11 +769,11 @@ export default function Dashboard() {
                         type="text" 
                         readOnly 
                         value={selectedCitation.citationNumber} 
-                        className="bg-surface-base border border-surface-border rounded-l px-3 py-2 text-sm font-mono text-content-secondary w-full focus:outline-none" 
+                        className="bg-surface-base border border-surface-border rounded-l px-3 py-2 text-sm font-mono text-content-secondary w-full focus-app-field" 
                       />
                       <button 
                         onClick={() => { navigator.clipboard.writeText(selectedCitation.citationNumber).then(() => toast.success('Copied to clipboard')).catch(() => toast.error('Failed to copy')); }} 
-                        className="bg-surface-border hover:bg-zinc-700 text-content-secondary px-3 border border-l-0 border-surface-border rounded-r transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 z-10"
+                        className="bg-surface-border hover:bg-zinc-700 text-content-secondary px-3 border border-l-0 border-surface-border rounded-r transition-colors focus-app z-10"
                         title="Copy"
                       >
                         <Copy className="w-4 h-4" />
@@ -787,7 +787,7 @@ export default function Dashboard() {
                         href={sanitizeUrl(selectedCitation.paymentUrl)!}
                         target="_blank"
                         rel="noreferrer noopener"
-                        className="flex items-center justify-center gap-2 w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded px-4 py-2.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-elevated focus-visible:ring-indigo-500"
+                        className="flex items-center justify-center gap-2 w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded px-4 py-2.5 text-sm font-medium transition-colors focus-app"
                       >
                         Open Payment Portal <ExternalLink className="w-4 h-4" />
                       </a>

@@ -274,7 +274,7 @@ export default function HelpDesk() {
                   type="text"
                   value={formData.subject}
                   onChange={e => setFormData({...formData, subject: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500"
+                  className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo"
                   placeholder="Brief summary of the issue..."
                 />
               </div>
@@ -285,7 +285,7 @@ export default function HelpDesk() {
                   <select
                     value={formData.department}
                     onChange={e => setFormData({...formData, department: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none"
+                    className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo appearance-none"
                   >
                     <option>General Support</option>
                     <option>Integrations</option>
@@ -298,7 +298,7 @@ export default function HelpDesk() {
                   <select
                     value={formData.priority}
                     onChange={e => setFormData({...formData, priority: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 outline-none focus:border-indigo-500 appearance-none"
+                    className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo appearance-none"
                   >
                     <option value="Low">Low</option>
                     <option value="Normal">Normal</option>
@@ -312,7 +312,7 @@ export default function HelpDesk() {
                 <textarea
                   value={formData.description}
                   onChange={e => setFormData({...formData, description: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 outline-none focus:border-indigo-500 min-h-[8rem] resize-y"
+                  className="w-full bg-surface-base border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 focus-app-field-indigo min-h-[8rem] resize-y"
                   placeholder="Provide context or reproduction steps..."
                 />
               </div>

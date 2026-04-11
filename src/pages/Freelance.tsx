@@ -342,11 +342,11 @@ export default function Freelance() {
                <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
                     <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Who paid you?</label>
-                    <input autoFocus type="text" value={formData.client} onChange={e => setFormData({...formData, client: e.target.value})} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white outline-none focus:border-brand-indigo transition-colors rounded-sm" placeholder="e.g. Acme Studio" />
+                    <input autoFocus type="text" value={formData.client} onChange={e => setFormData({...formData, client: e.target.value})} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white focus-app-field-brand-indigo transition-colors rounded-sm" placeholder="e.g. Acme Studio" />
                   </div>
                   <div>
                     <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Payment amount</label>
-                    <input type="number" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white font-mono tabular-nums outline-none focus:border-brand-indigo transition-colors rounded-sm" placeholder="0.00" />
+                    <input type="number" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white font-mono tabular-nums focus-app-field-brand-indigo transition-colors rounded-sm" placeholder="0.00" />
                   </div>
                   <div className="pt-4 flex gap-3">
                     <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 h-12 border border-surface-border text-content-tertiary text-sm font-sans font-medium hover:bg-surface-elevated transition-colors rounded-sm">Cancel</button>

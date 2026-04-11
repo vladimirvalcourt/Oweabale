@@ -112,7 +112,7 @@ export default function Taxes() {
           <select 
             value={taxState} 
             onChange={(e) => setTaxSettings(e.target.value, STATE_TAX_MAP[e.target.value].rate)}
-            className="bg-surface-raised border border-surface-border text-sm font-sans text-content-primary px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-indigo rounded-sm"
+            className="bg-surface-raised border border-surface-border text-sm font-sans text-content-primary px-3 py-1.5 focus-app-field rounded-sm"
           >
             {Object.keys(STATE_TAX_MAP).map(k => (
               <option key={k} value={k}>{STATE_TAX_MAP[k].name} ({STATE_TAX_MAP[k].rate}%)</option>
@@ -188,11 +188,11 @@ export default function Taxes() {
                  <div className="p-6 bg-surface-elevated border-b border-surface-border flex gap-3 items-end">
                     <div className="flex-1">
                       <p className="text-xs text-content-tertiary mb-1">Expense label</p>
-                      <input type="text" placeholder="e.g. Adobe Suite" value={newDeduction.name} onChange={e => setNewDeduction({...newDeduction, name: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-sm h-10 px-3 text-sm text-white outline-none focus:border-brand-indigo transition-colors" />
+                      <input type="text" placeholder="e.g. Adobe Suite" value={newDeduction.name} onChange={e => setNewDeduction({...newDeduction, name: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-sm h-10 px-3 text-sm text-white focus-app-field-brand-indigo transition-colors" />
                     </div>
                     <div className="w-24">
                       <p className="text-xs text-content-tertiary mb-1">Amount</p>
-                      <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-sm h-10 px-3 text-sm font-mono tabular-nums text-white outline-none focus:border-brand-indigo transition-colors" />
+                      <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-sm h-10 px-3 text-sm font-mono tabular-nums text-white focus-app-field-brand-indigo transition-colors" />
                     </div>
                     <button type="button" onClick={async () => {
                       if (!newDeduction.name.trim()) { toast.error('Enter an expense label'); return; }

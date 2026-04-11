@@ -100,7 +100,7 @@ export default function Budgets() {
         <button 
           onClick={openAddModal}
           type="button"
-          className="px-4 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-white"
+          className="px-4 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus-app"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           Create budget
@@ -165,7 +165,7 @@ export default function Budgets() {
                     </div>
                     
                     <Menu as="div" className="relative inline-block text-left">
-                      <Menu.Button className="text-content-tertiary hover:text-content-secondary transition-colors p-1 rounded-md focus:outline-none">
+                      <Menu.Button className="text-content-tertiary hover:text-content-secondary transition-colors p-1 rounded-md focus-app">
                         <MoreHorizontal className="w-5 h-5" />
                       </Menu.Button>
                       <Transition
@@ -177,7 +177,7 @@ export default function Budgets() {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                       >
-                        <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-surface-raised border border-surface-border shadow-xl focus:outline-none z-10 py-1">
+                        <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-surface-raised border border-surface-border shadow-xl focus-app z-10 py-1">
                           <div className="py-1">
                             <Menu.Item>
                               {({ active }) => (
@@ -262,7 +262,7 @@ export default function Budgets() {
                   required
                   value={formData.category}
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
                 >
                   <option value="" disabled>Select category</option>
                   {expenseCategories.map(c => (
@@ -285,7 +285,7 @@ export default function Budgets() {
                     min="0"
                     value={formData.amount}
                     onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-sm pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
                     placeholder="0.00"
                   />
                 </div>
@@ -296,7 +296,7 @@ export default function Budgets() {
                 <select 
                   value={formData.period}
                   onChange={(e) => setFormData({...formData, period: e.target.value as 'Monthly' | 'Yearly'})}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
                 >
                   <option value="Monthly">Monthly</option>
                   <option value="Yearly">Yearly</option>
