@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Shield, Vault, Receipt, Activity, Flame, Wallet, TrendingUp, FileSearch, Target } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
+import { PrivacyScreenWhenHidden } from '../components/PrivacyScreenWhenHidden';
 
 type Step = {
   id: string;
@@ -128,6 +129,8 @@ export default function Onboarding() {
 
   if (showWelcome) {
     return (
+      <>
+      <PrivacyScreenWhenHidden />
       <div className="fixed inset-0 bg-[#08090A] flex flex-col items-center justify-center p-6 overflow-hidden selection:bg-brand-violet/20 font-sans">
         {/* Background HUD Grid */}
         <div className="absolute inset-0 pointer-events-none">
@@ -229,10 +232,13 @@ export default function Onboarding() {
           <div className="w-12 h-[1px] bg-white" />
         </div>
       </div>
+      </>
     );
   }
 
   return (
+    <>
+    <PrivacyScreenWhenHidden />
     <div className="fixed inset-0 bg-[#08090A] flex flex-col items-center justify-center p-6 overflow-hidden selection:bg-brand-violet/20 font-sans">
       {/* Background HUD Grid */}
       <div className="absolute inset-0 pointer-events-none">
@@ -444,5 +450,6 @@ export default function Onboarding() {
          <div className="w-12 h-[1px] bg-white"></div>
       </div>
     </div>
+    </>
   );
 }

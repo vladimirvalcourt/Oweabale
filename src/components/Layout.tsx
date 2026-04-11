@@ -13,6 +13,7 @@ import { AlertTriangle } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import QuickAddModal from './QuickAddModal';
+import { PrivacyScreenWhenHidden } from './PrivacyScreenWhenHidden';
 import { TactileIcon, MorphingMenuIcon } from './ui/TactileIcon';
 import type { Notification } from '../store/useStore';
 
@@ -296,6 +297,7 @@ export default function Layout() {
 
   return (
     <div className="min-h-[100dvh] bg-surface-base font-sans text-content-primary flex">
+      <PrivacyScreenWhenHidden />
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div

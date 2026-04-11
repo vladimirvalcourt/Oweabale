@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { supabase } from '../lib/supabase';
+import { PrivacyScreenWhenHidden } from '../components/PrivacyScreenWhenHidden';
 import { toast } from 'sonner';
 
 interface EnrichedUser {
@@ -423,6 +424,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-zinc-300 font-mono flex flex-col p-4 sm:p-8">
+      <PrivacyScreenWhenHidden />
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-white/10 pb-6">
