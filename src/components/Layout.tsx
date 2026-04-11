@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, startTransition } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo, startTransition } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Bell, Search, Home, Receipt, Target, Activity,
@@ -7,15 +7,21 @@ import {
   Tags, LifeBuoy, ScrollText, Wand2, Wallet, Clock
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
-import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { AlertTriangle } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
+import { useShallow } from 'zustand/react/shallow';
 import QuickAddModal from './QuickAddModal';
 import { PrivacyScreenWhenHidden } from './PrivacyScreenWhenHidden';
 import { TactileIcon, MorphingMenuIcon } from './ui/TactileIcon';
 import type { Notification } from '../store/useStore';
+
+/** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
+const NAV_ROUTE_HASHES: Record<string, string[]> = {
+  '/dashboard': ['cash-flow'],
+  '/bills': ['due-soon'],
+};
 
 export default function Layout() {
   const location = useLocation();
@@ -39,20 +45,61 @@ export default function Layout() {
     'More': false,
   });
 
-  const toggleGroup = (label: string) => {
-    setExpandedGroups(prev => ({
-      ...prev,
-      [label]: !prev[label]
-    }));
-  };
+  const toggleGroup = useCallback((label: string) => {
+    startTransition(() => {
+      setExpandedGroups((prev) => ({
+        ...prev,
+        [label]: !prev[label],
+      }));
+    });
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const gChordAtRef = useRef<number | null>(null);
 
-  const { bills, debts, transactions, subscriptions, goals, incomes, budgets, user, isQuickAddOpen, openQuickAdd, closeQuickAdd, resetData, pendingIngestions, notifications, markNotificationsRead, clearNotifications, citations } = useStore();
+  const {
+    bills,
+    debts,
+    transactions,
+    subscriptions,
+    goals,
+    incomes,
+    budgets,
+    user,
+    isQuickAddOpen,
+    openQuickAdd,
+    closeQuickAdd,
+    resetData,
+    pendingIngestions,
+    notifications,
+    markNotificationsRead,
+    clearNotifications,
+    citations,
+  } = useStore(
+    useShallow((s) => ({
+      bills: s.bills,
+      debts: s.debts,
+      transactions: s.transactions,
+      subscriptions: s.subscriptions,
+      goals: s.goals,
+      incomes: s.incomes,
+      budgets: s.budgets,
+      user: s.user,
+      isQuickAddOpen: s.isQuickAddOpen,
+      openQuickAdd: s.openQuickAdd,
+      closeQuickAdd: s.closeQuickAdd,
+      resetData: s.resetData,
+      pendingIngestions: s.pendingIngestions,
+      notifications: s.notifications,
+      markNotificationsRead: s.markNotificationsRead,
+      clearNotifications: s.clearNotifications,
+      citations: s.citations,
+    }))
+  );
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -105,17 +152,17 @@ export default function Layout() {
 
         if (gChordAtRef.current !== null && now - gChordAtRef.current < CHORD_MS) {
           if (lower === 'd') {
-            navigate('/dashboard');
             e.preventDefault();
+            startTransition(() => navigate('/dashboard'));
           } else if (lower === 't') {
-            navigate('/transactions');
             e.preventDefault();
+            startTransition(() => navigate('/transactions'));
           } else if (lower === 'b') {
-            navigate('/bills');
             e.preventDefault();
+            startTransition(() => navigate('/bills'));
           } else if (lower === 's') {
-            navigate('/settings');
             e.preventDefault();
+            startTransition(() => navigate('/settings'));
           }
           gChordAtRef.current = null;
           return;
@@ -242,71 +289,91 @@ export default function Layout() {
     return n;
   }, [bills, citations, subscriptions]);
 
-  const handleSearchSelect = (path: string) => {
-    navigate(path);
+  const handleSearchSelect = useCallback((path: string) => {
     startTransition(() => {
+      navigate(path);
       setIsSearchOpen(false);
       setIsMobileSearchOpen(false);
       setSearchQuery('');
     });
-  };
+  }, [navigate]);
 
-  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const navGroups = useMemo(
+    (): {
+      label: string;
+      items: { name: string; path: string; icon: typeof Home; count?: number; hash?: string }[];
+    }[] => [
+      {
+        label: 'Overview',
+        items: [
+          { name: 'Dashboard', path: '/dashboard', icon: Home },
+          { name: 'Cash flow', path: '/dashboard', icon: Wallet, hash: 'cash-flow' },
+          { name: 'Income', path: '/income', icon: Vault },
+          { name: 'Freelance Vault', path: '/freelance', icon: Briefcase },
+          { name: 'Regular Bills', path: '/bills', icon: Receipt },
+          { name: 'Due soon', path: '/bills', icon: Clock, hash: 'due-soon', count: dueSoonCount },
+          { name: 'Tickets & Fines', path: '/bills?tab=ambush', icon: AlertTriangle },
+          { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },
+          { name: 'Review Inbox', path: '/ingestion', icon: Inbox, count: pendingIngestions.length },
+        ],
+      },
+      {
+        label: 'Activity',
+        items: [
+          { name: 'Trends', path: '/analytics', icon: LineChart },
+          { name: 'Reports', path: '/reports', icon: BarChart3 },
+          { name: 'Transactions', path: '/transactions', icon: Activity },
+        ],
+      },
+      {
+        label: 'Planning & Growth',
+        items: [
+          { name: 'Net Worth', path: '/net-worth', icon: TrendingUp },
+          { name: 'Budgets', path: '/budgets', icon: PieChart },
+          { name: 'Academy', path: '/education', icon: GraduationCap },
+          { name: 'Calendar', path: '/calendar', icon: CalendarIcon },
+          { name: 'Goals', path: '/goals', icon: Target },
+          { name: 'Credit Workshop', path: '/credit', icon: ShieldCheck },
+          { name: 'Taxes', path: '/taxes', icon: Calculator },
+        ],
+      },
+      {
+        label: 'More',
+        items: [
+          { name: 'Categories', path: '/categories', icon: Tags },
+          { name: 'Help & Support', path: '/support', icon: LifeBuoy },
+          { name: 'Changelog', path: '/changelog', icon: ScrollText },
+          { name: 'Auto-rules', path: '/settings?tab=rules', icon: Wand2 },
+        ],
+      },
+    ],
+    [dueSoonCount, pendingIngestions.length]
+  );
 
-  /** Hash fragments used by sidebar deep links — default route link stays inactive when one of these is set. */
-  const NAV_ROUTE_HASHES: Record<string, string[]> = {
-    '/dashboard': ['cash-flow'],
-    '/bills': ['due-soon'],
-  };
-
-  const navGroups: {
-    label: string;
-    items: { name: string; path: string; icon: typeof Home; count?: number; hash?: string }[];
-  }[] = [
-    {
-      label: 'Overview',
-      items: [
-        { name: 'Dashboard', path: '/dashboard', icon: Home },
-        { name: 'Cash flow', path: '/dashboard', icon: Wallet, hash: 'cash-flow' },
-        { name: 'Income', path: '/income', icon: Vault },
-        { name: 'Freelance Vault', path: '/freelance', icon: Briefcase },
-        { name: 'Regular Bills', path: '/bills', icon: Receipt },
-        { name: 'Due soon', path: '/bills', icon: Clock, hash: 'due-soon', count: dueSoonCount },
-        { name: 'Tickets & Fines', path: '/bills?tab=ambush', icon: AlertTriangle },
-        { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },
-        { name: 'Review Inbox', path: '/ingestion', icon: Inbox, count: pendingIngestions.length },
-      ]
-    },
-    {
-      label: 'Activity',
-      items: [
-        { name: 'Trends', path: '/analytics', icon: LineChart },
-        { name: 'Reports', path: '/reports', icon: BarChart3 },
-        { name: 'Transactions', path: '/transactions', icon: Activity },
-      ]
-    },
-    {
-      label: 'Planning & Growth',
-      items: [
-        { name: 'Net Worth', path: '/net-worth', icon: TrendingUp },
-        { name: 'Budgets', path: '/budgets', icon: PieChart },
-        { name: 'Academy', path: '/education', icon: GraduationCap },
-        { name: 'Calendar', path: '/calendar', icon: CalendarIcon },
-        { name: 'Goals', path: '/goals', icon: Target },
-        { name: 'Credit Workshop', path: '/credit', icon: ShieldCheck },
-        { name: 'Taxes', path: '/taxes', icon: Calculator },
-      ]
-    },
-    {
-      label: 'More',
-      items: [
-        { name: 'Categories', path: '/categories', icon: Tags },
-        { name: 'Help & Support', path: '/support', icon: LifeBuoy },
-        { name: 'Changelog', path: '/changelog', icon: ScrollText },
-        { name: 'Auto-rules', path: '/settings?tab=rules', icon: Wand2 },
-      ]
-    },
-  ];
+  const processedSidebarNav = useMemo(() => {
+    const currentTabParam = new URLSearchParams(location.search).get('tab');
+    const hashSlug = location.hash.replace(/^#/, '');
+    return navGroups.map((group) => ({
+      label: group.label,
+      items: group.items.map((item) => {
+        const queryPart = item.path.includes('?') ? item.path.split('?')[1] : '';
+        const itemBasePath = item.path.split('?')[0];
+        const itemTabParam = queryPart ? new URLSearchParams(queryPart).get('tab') : null;
+        const tabMatches =
+          itemTabParam !== null
+            ? currentTabParam === itemTabParam
+            : itemBasePath === '/bills'
+              ? currentTabParam === null || !['ambush', 'recurring', 'debt'].includes(currentTabParam ?? '')
+              : currentTabParam === null;
+        const hashMatches = item.hash
+          ? location.hash === `#${item.hash}`
+          : !hashSlug || !(NAV_ROUTE_HASHES[itemBasePath] ?? []).includes(hashSlug);
+        const isActive = location.pathname === itemBasePath && tabMatches && hashMatches;
+        const linkTo = item.hash ? `${itemBasePath}${queryPart ? `?${queryPart}` : ''}#${item.hash}` : item.path;
+        return { ...item, isActive, linkTo };
+      }),
+    }));
+  }, [navGroups, location.pathname, location.search, location.hash]);
 
   return (
     <div className="min-h-[100dvh] bg-surface-base font-sans text-content-primary flex">
@@ -353,7 +420,7 @@ export default function Layout() {
         </div>
 
         <nav className="flex-1 px-3 py-6 overflow-y-auto scrollbar-hide space-y-4">
-          {navGroups.map((group) => {
+          {processedSidebarNav.map((group) => {
             const isExpanded = expandedGroups[group.label];
             return (
               <div key={group.label} className="space-y-1">
@@ -380,27 +447,12 @@ export default function Layout() {
                   <div className="min-h-0 overflow-hidden">
                     <div className="space-y-1">
                       {group.items.map((item) => {
-                        const queryPart = item.path.includes('?') ? item.path.split('?')[1] : '';
-                        const itemBasePath = item.path.split('?')[0];
-                        const itemTabParam = queryPart ? new URLSearchParams(queryPart).get('tab') : null;
-                        const currentTabParam = new URLSearchParams(location.search).get('tab');
-                        const tabMatches =
-                          itemTabParam !== null
-                            ? currentTabParam === itemTabParam
-                            : itemBasePath === '/bills'
-                              ? currentTabParam === null || !['ambush', 'recurring', 'debt'].includes(currentTabParam ?? '')
-                              : currentTabParam === null;
-                        const hashSlug = location.hash.replace(/^#/, '');
-                        const hashMatches = item.hash
-                          ? location.hash === `#${item.hash}`
-                          : !hashSlug || !(NAV_ROUTE_HASHES[itemBasePath] ?? []).includes(hashSlug);
-                        const isActive = location.pathname === itemBasePath && tabMatches && hashMatches;
-                        const linkTo = item.hash ? `${itemBasePath}${queryPart ? `?${queryPart}` : ''}#${item.hash}` : item.path;
                         const Icon = item.icon;
+                        const isActive = item.isActive;
                         return (
                           <Link
                             key={item.name}
-                            to={linkTo}
+                            to={item.linkTo}
                             className={cn(
                               "flex items-center gap-3 px-4 py-2 transition-all group relative rounded-sm mx-1",
                               isActive 
@@ -416,6 +468,7 @@ export default function Layout() {
                               icon={Icon} 
                               size={16} 
                               active={isActive}
+                              variant="static"
                               className={cn(
                                 "shrink-0",
                                 !isActive && "group-hover:translate-x-0.5"
@@ -423,12 +476,12 @@ export default function Layout() {
                             />
                             {!sidebarCollapsed && (
                               <>
-                                <span className="text-[13px] font-sans font-medium tracking-normal flex-1">
+                                <span className="pointer-events-none text-[13px] font-sans font-medium tracking-normal flex-1">
                                   {item.name}
                                 </span>
-                                {(item as any).count !== undefined && (item as any).count > 0 && (
+                                {(item as { count?: number }).count !== undefined && (item as { count?: number }).count! > 0 && (
                                   <span className="text-[10px] font-mono font-bold bg-indigo-500 text-white px-1.5 py-0.5 rounded-full shadow-lg shadow-indigo-500/20">
-                                    {(item as any).count}
+                                    {(item as { count?: number }).count}
                                   </span>
                                 )}
                               </>
@@ -788,21 +841,9 @@ export default function Layout() {
 
         {/* Main Content Area */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full relative">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 4, scale: 0.995 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -4, scale: 0.995 }}
-              transition={{ 
-                duration: 0.25, 
-                ease: [0.19, 1.0, 0.22, 1.0] 
-              }}
-              className="w-full h-full"
-            >
-              <Outlet />
-            </motion.div>
-          </AnimatePresence>
+          {/* Plain Outlet: motion/AnimatePresence here ran in the same interaction window as
+              route commits and hurt INP; lazy route JS + page paint are already the heavy work. */}
+          <Outlet />
         </main>
 
         {/* Footer */}

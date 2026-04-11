@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { LucideIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
@@ -9,6 +9,8 @@ interface TactileIconProps {
   iconClassName?: string;
   size?: number;
   active?: boolean;
+  /** Skip motion springs / whileTap — use in dense lists (e.g. sidebar) to protect INP. */
+  variant?: 'interactive' | 'static';
 }
 
 /**
@@ -20,8 +22,24 @@ export const TactileIcon: React.FC<TactileIconProps> = ({
   className, 
   iconClassName,
   size = 18,
-  active = false
+  active = false,
+  variant = 'interactive',
 }) => {
+  if (variant === 'static') {
+    return (
+      <span className={cn('relative inline-flex shrink-0 items-center justify-center', className)} aria-hidden>
+        <Icon
+          size={size}
+          className={cn(
+            'transition-colors duration-300',
+            active ? 'text-brand-violet' : 'text-content-tertiary group-hover:text-content-primary',
+            iconClassName
+          )}
+        />
+      </span>
+    );
+  }
+
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
