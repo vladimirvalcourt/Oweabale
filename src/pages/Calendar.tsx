@@ -2,7 +2,7 @@
  * Calendar — Financial Events Calendar
  * Full monthly grid showing bills, income, subscriptions, and goals from the store.
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ChevronLeft, ChevronRight, Receipt, TrendingUp, Repeat, Target, CalendarDays
 } from 'lucide-react';
@@ -34,6 +34,15 @@ export default function Calendar() {
   const [popover, setPopover] = useState<PopoverState | null>(null);
 
   const { bills, incomes, subscriptions, goals } = useStore();
+
+  useEffect(() => {
+    if (!popover) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPopover(null);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [popover]);
 
   const prevMonth = () => {
     if (month === 0) { setYear(y => y - 1); setMonth(11); }

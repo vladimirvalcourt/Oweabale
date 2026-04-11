@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import Layout from './components/Layout';
 import DeviceGuard from './components/DeviceGuard';
@@ -44,26 +44,31 @@ const Analytics      = lazy(() => import('./pages/Analytics'));
 const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
 import AuthCallback from './pages/AuthCallback';
 const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
+const NotFound         = lazy(() => import('./pages/NotFound'));
 
 import { useDataSync } from './hooks/useDataSync';
 import { ThemedToaster } from './components/ThemedToaster';
 
 function AppRoutes() {
   const { user: authUser, showWarning, timeLeft, extendSession, authLoading } = useAuth();
-  const { user } = useStore();
-  
+  const user = useStore((s) => s.user);
+  const isLoading = useStore((s) => s.isLoading);
+  const location = useLocation();
+
   useDataSync({ authUserId: authUser?.id ?? null, authLoading });
 
-  // Only block the entire app on authentication resolution. 
-  // Individual pages (like Dashboard) handle their own 'isLoading' states for data sync.
+  // Only block the entire app on authentication resolution.
   if (authLoading) return <AppLoader />;
-  
-  // If user is logged in but hasn't completed onboarding, redirect to onboarding 
-  // (unless already on that page)
-  const isNewUser = authUser && user.id && !user.hasCompletedOnboarding;
-  const isNotOnOnboarding = window.location.pathname !== '/onboarding';
-  
-  if (isNewUser && isNotOnOnboarding) {
+
+  // Avoid onboarding redirect before profile row is merged (prevents dashboard flash for new users).
+  if (authUser && isLoading && !user.id) return <AppLoader />;
+
+  if (
+    authUser &&
+    user.id &&
+    !user.hasCompletedOnboarding &&
+    location.pathname !== '/onboarding'
+  ) {
     return <Navigate to="/onboarding" replace />;
   }
 
@@ -117,6 +122,8 @@ function AppRoutes() {
           <Route path="settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
         </Route>
       </Route>
+
+      <Route path="*" element={<NotFound />} />
     </Routes>
     <SessionWarningModal 
       isOpen={showWarning}

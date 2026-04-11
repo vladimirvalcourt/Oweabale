@@ -17,6 +17,10 @@ export interface AuthState {
 const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
 const WARNING_THRESHOLD_MS = 2 * 60 * 1000;
 
+function authDevLog(...args: unknown[]) {
+  if (import.meta.env.DEV) console.log(...args);
+}
+
 /**
  * Auth state is driven by `onAuthStateChange` (INITIAL_SESSION, SIGNED_IN,
  * TOKEN_REFRESHED, SIGNED_OUT). A delayed `getSession()` fallback covers edge
@@ -39,9 +43,9 @@ export function useAuth(): AuthState {
       setUser(s?.user ?? null);
       setAuthLoading(false);
       if (source === 'INITIAL_SESSION' || source === 'getSession-fallback') {
-        console.log('[useAuth] session resolved, user:', s?.user?.id ?? 'none');
+        authDevLog('[useAuth] session resolved, user:', s?.user?.id ?? 'none');
         if (source === 'getSession-fallback') {
-          console.log('[useAuth] (via getSession fallback — INITIAL_SESSION was slow)');
+          authDevLog('[useAuth] (via getSession fallback — INITIAL_SESSION was slow)');
         }
       }
     };
@@ -57,7 +61,7 @@ export function useAuth(): AuthState {
         }
 
         if (event === 'SIGNED_OUT') {
-          console.log('[useAuth] SIGNED_OUT');
+          authDevLog('[useAuth] SIGNED_OUT');
           setSession(null);
           setUser(null);
           setAuthLoading(false);
@@ -66,11 +70,11 @@ export function useAuth(): AuthState {
         }
 
         if (event === 'TOKEN_REFRESHED') {
-          console.log('[useAuth] TOKEN_REFRESHED');
+          authDevLog('[useAuth] TOKEN_REFRESHED');
         }
 
         if (event === 'SIGNED_IN') {
-          console.log('[useAuth] SIGNED_IN, user:', newSession?.user?.id ?? 'none');
+          authDevLog('[useAuth] SIGNED_IN, user:', newSession?.user?.id ?? 'none');
         }
 
         setSession(newSession);

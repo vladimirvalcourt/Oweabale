@@ -35,7 +35,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="min-h-[400px] flex items-center justify-center p-8">
-          <div className="max-w-md w-full border border-red-900/50 bg-[#0C0D0E] p-8 text-center">
+          <div className="relative max-w-md w-full border border-red-900/50 bg-[#0C0D0E] p-8 text-center">
             {/* Corner markers */}
             <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-red-500" />
             <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-red-500" />

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { useStore } from '../store/useStore';
+import { useStore, type Subscription } from '../store/useStore';
+import { normalizeToMonthly } from '../lib/finance';
 import { Repeat, Plus, Edit2, Trash2, Calendar, Hash, TrendingUp, AlertTriangle, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 import { motion } from 'motion/react';
+
+type SubFrequency = 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Yearly';
 
 export default function Subscriptions() {
   const { subscriptions, addSubscription, editSubscription, deleteSubscription } = useStore();
@@ -13,7 +16,7 @@ export default function Subscriptions() {
   const [formData, setFormData] = useState({
     name: '',
     amount: '',
-    frequency: 'Monthly' as 'Monthly' | 'Yearly' | 'Weekly',
+    frequency: 'Monthly' as SubFrequency,
     nextBillingDate: '',
     status: 'active' as 'active' | 'paused' | 'cancelled',
   });
@@ -57,7 +60,7 @@ export default function Subscriptions() {
     setFormData({ name: '', amount: '', frequency: 'Monthly', nextBillingDate: '', status: 'active' });
   };
 
-  const startEdit = (sub: any) => {
+  const startEdit = (sub: Subscription) => {
     setEditingId(sub.id);
     setFormData({
       name: sub.name,
@@ -81,9 +84,10 @@ export default function Subscriptions() {
   };
 
   const activeSubscriptions = subscriptions.filter(s => s.status === 'active');
-  const monthlyCost = activeSubscriptions.reduce((acc, sub) => {
-    return acc + (sub.frequency === 'Monthly' ? sub.amount : sub.frequency === 'Yearly' ? sub.amount / 12 : sub.amount * 4.33);
-  }, 0);
+  const monthlyCost = activeSubscriptions.reduce(
+    (acc, sub) => acc + normalizeToMonthly(sub.amount, sub.frequency),
+    0
+  );
 
   // Price hike detector
   const hikedSubs = subscriptions.filter(sub => {
@@ -199,10 +203,11 @@ export default function Subscriptions() {
                 <label className="block text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1.5">Frequency</label>
                 <select
                   value={formData.frequency}
-                  onChange={(e) => setFormData({ ...formData, frequency: e.target.value as 'Weekly' | 'Monthly' | 'Yearly' })}
+                  onChange={(e) => setFormData({ ...formData, frequency: e.target.value as SubFrequency })}
                   className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
                 >
                   <option value="Weekly">Weekly</option>
+                  <option value="Bi-weekly">Bi-weekly</option>
                   <option value="Monthly">Monthly</option>
                   <option value="Yearly">Yearly</option>
                 </select>

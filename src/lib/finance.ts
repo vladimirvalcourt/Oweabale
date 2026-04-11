@@ -115,10 +115,11 @@ export interface SurplusAllocation {
 // Private helpers
 // ---------------------------------------------------------------------------
 
-function normalizeToMonthly(amount: number, frequency: string): number {
+/** Normalize recurring amount to a monthly equivalent (bills, subscriptions, income). */
+export function normalizeToMonthly(amount: number, frequency: string): number {
   const f = (frequency || '').toLowerCase();
   if (f === 'weekly') return (amount || 0) * 4.33;
-  if (f === 'bi-weekly') return (amount || 0) * 2.165;
+  if (f === 'bi-weekly' || f === 'biweekly') return (amount || 0) * 2.165;
   if (f === 'yearly' || f === 'annual' || f === 'annually') return (amount || 0) / 12;
   if (f === 'quarterly') return (amount || 0) / 3;
   // Monthly (default)

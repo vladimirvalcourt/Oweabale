@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Terminal, AlertCircle, Loader2, Camera, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { toast } from 'sonner';
-import { useStore } from '../store/useStore';
+import { useStore, type IncomeSource } from '../store/useStore';
 import { guessCategory } from '../lib/categorizer';
 import { validateIngestionFile } from '../lib/security';
 
@@ -29,6 +29,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [dueDate, setDueDate] = useState('');
   const [vendor, setVendor] = useState('');
   const [source, setSource] = useState('salary');
+  const [incomeFrequency, setIncomeFrequency] = useState<IncomeSource['frequency']>('Monthly');
   // Citation-specific states
   const [citationType, setCitationType] = useState('Toll Violation');
   const [jurisdiction, setJurisdiction] = useState('');
@@ -229,6 +230,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       setObligationKind('bill-monthly');
       setDueDate('');
       setSource('salary');
+      setIncomeFrequency('Monthly');
       setNlpText('');
       setIsScanning(false);
       setErrors({});
@@ -370,7 +372,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         const ok = await addIncome({
           name: description.trim() || source,
           amount: numAmount,
-          frequency: 'Monthly',
+          frequency: incomeFrequency,
           category: 'Income',
           nextDate: date,
           status: 'active',
@@ -914,16 +916,29 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             </select>
                           </div>
                           <div>
-                            <label htmlFor="incDate" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Date</label>
-                            <input
-                              id="incDate"
-                              type="date"
-                              value={date}
-                              onChange={(e) => { setDate(e.target.value); if(errors.date) setErrors({...errors, date: ''}); }}
-                              className={`input-date-dark w-full bg-surface-base border ${errors.date ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans outline-none`}
-                            />
-                            {errors.date && <p className="text-xs text-red-400 mt-1.5">{errors.date}</p>}
+                            <label className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Frequency</label>
+                            <select
+                              value={incomeFrequency}
+                              onChange={(e) => setIncomeFrequency(e.target.value as IncomeSource['frequency'])}
+                              className="w-full bg-surface-base border border-surface-border rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans text-white outline-none cursor-pointer"
+                            >
+                              <option value="Weekly">Weekly</option>
+                              <option value="Bi-weekly">Bi-weekly</option>
+                              <option value="Monthly">Monthly</option>
+                              <option value="Yearly">Yearly</option>
+                            </select>
                           </div>
+                        </div>
+                        <div>
+                          <label htmlFor="incDate" className="block text-xs font-sans font-medium text-zinc-400 mb-1.5">Next pay date</label>
+                          <input
+                            id="incDate"
+                            type="date"
+                            value={date}
+                            onChange={(e) => { setDate(e.target.value); if(errors.date) setErrors({...errors, date: ''}); }}
+                            className={`input-date-dark w-full bg-surface-base border ${errors.date ? 'border-red-500/50' : 'border-surface-border'} rounded focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 px-3 py-2 text-sm font-sans outline-none`}
+                          />
+                          {errors.date && <p className="text-xs text-red-400 mt-1.5">{errors.date}</p>}
                         </div>
                       </>
                     )}

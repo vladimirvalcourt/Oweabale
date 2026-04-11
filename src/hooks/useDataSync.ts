@@ -4,6 +4,10 @@ import { useStore } from '../store/useStore';
 
 const VISIBILITY_REFETCH_MS = 45_000;
 
+function dataSyncDevLog(...args: unknown[]) {
+  if (import.meta.env.DEV) console.log(...args);
+}
+
 /**
  * Loads server data only after auth has settled (`authLoading === false` and `userId` exists).
  * Uses a ref to avoid calling `fetchData` twice for the same user in one mount cycle when
@@ -28,7 +32,7 @@ export function useDataSync({
       hadSessionRef.current = true;
       if (lastFetchedUserIdRef.current === authUserId) return;
       lastFetchedUserIdRef.current = authUserId;
-      console.log('[useDataSync] triggering fetchData for user:', authUserId);
+      dataSyncDevLog('[useDataSync] triggering fetchData for user:', authUserId);
       void fetchData(authUserId);
       return;
     }
@@ -59,7 +63,7 @@ export function useDataSync({
       const now = Date.now();
       if (now - lastVisibilityFetchRef.current < VISIBILITY_REFETCH_MS) return;
       lastVisibilityFetchRef.current = now;
-      console.log('[useDataSync] visibility refetch for user:', authUserId);
+      dataSyncDevLog('[useDataSync] visibility refetch for user:', authUserId);
       void fetchData(authUserId);
     };
 
