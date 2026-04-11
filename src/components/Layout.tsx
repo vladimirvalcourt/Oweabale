@@ -203,20 +203,33 @@ export default function Layout() {
   const dueSoonCount = React.useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const weekMs = 7 * 86400000;
+    const msDay = 86400000;
+
+    const calendarDaysUntil = (isoLike: string): number | null => {
+      if (!isoLike) return null;
+      const raw = isoLike.includes('T') ? isoLike : `${isoLike}T12:00:00`;
+      const d = new Date(raw);
+      if (Number.isNaN(d.getTime())) return null;
+      d.setHours(0, 0, 0, 0);
+      return Math.round((d.getTime() - today.getTime()) / msDay);
+    };
+
     let n = 0;
     for (const b of bills) {
-      if (!b?.dueDate) continue;
-      const raw = b.dueDate.includes('T') ? b.dueDate : `${b.dueDate}T12:00:00`;
-      const due = new Date(raw);
-      due.setHours(0, 0, 0, 0);
-      if (due.getTime() - today.getTime() <= weekMs) n++;
+      const days = calendarDaysUntil(b?.dueDate ?? '');
+      // Upcoming only: today through +7 days (excludes overdue bills)
+      if (days !== null && days >= 0 && days <= 7) n++;
+    }
+    for (const s of subscriptions) {
+      if (s?.status !== 'active' || !s?.nextBillingDate) continue;
+      const days = calendarDaysUntil(s.nextBillingDate);
+      if (days !== null && days >= 0 && days <= 7) n++;
     }
     for (const c of citations) {
       if (c.status === 'open' && c.daysLeft <= 7) n++;
     }
     return n;
-  }, [bills, citations]);
+  }, [bills, citations, subscriptions]);
 
   const handleSearchSelect = (path: string) => {
     navigate(path);

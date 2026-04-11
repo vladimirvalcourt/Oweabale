@@ -7,7 +7,8 @@ const ENTRIES: { date: string; title: string; bullets: string[] }[] = [
     title: 'Navigation & focus',
     bullets: [
       'Sidebar: Cash flow anchor on Dashboard, Due soon badge on Bills, More section for Categories, Support, Changelog, and Auto-rules.',
-      'Settings deep links via ?tab= (e.g. Auto-rules).',
+      'Settings: tab changes sync to the URL (?tab=); Profile clears the query.',
+      'Due soon count: bills and active subscriptions in the next 7 days (overdue bills excluded); citations still use the 7-day urgency window.',
     ],
   },
 ];

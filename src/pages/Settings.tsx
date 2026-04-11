@@ -32,7 +32,7 @@ interface UserFeedback {
 const SETTINGS_TAB_IDS: Tab[] = ['profile', 'notifications', 'security', 'billing', 'financial', 'privacy', 'integrations', 'rules', 'support', 'feedback'];
 
 export default function Settings() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const user = useStore((state) => state.user);
   const updateUser = useStore((state) => state.updateUser);
   const resetData = useStore((state) => state.resetData);
@@ -60,8 +60,21 @@ export default function Settings() {
 
   useEffect(() => {
     const t = searchParams.get('tab');
-    if (t && SETTINGS_TAB_IDS.includes(t as Tab)) setActiveTab(t as Tab);
+    if (t && SETTINGS_TAB_IDS.includes(t as Tab)) {
+      setActiveTab(t as Tab);
+    } else if (!t) {
+      setActiveTab('profile');
+    }
   }, [searchParams]);
+
+  const selectTab = (tabId: Tab) => {
+    setActiveTab(tabId);
+    if (tabId === 'profile') {
+      setSearchParams({}, { replace: true });
+    } else {
+      setSearchParams({ tab: tabId }, { replace: true });
+    }
+  };
 
   // Support tab state
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
@@ -326,7 +339,7 @@ export default function Settings() {
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => selectTab(tab.id)}
                 className={cn(
                   "w-full flex items-center px-4 py-2.5 text-[10px] font-mono uppercase tracking-[0.2em] rounded-sm transition-all border border-transparent",
                   activeTab === tab.id
