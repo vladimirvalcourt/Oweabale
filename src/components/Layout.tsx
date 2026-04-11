@@ -26,6 +26,12 @@ export default function Layout() {
   const closeSidebarMobile = useCallback(() => {
     startTransition(() => setSidebarOpen(false));
   }, []);
+
+  /** Close drawer after route change — avoids running setState in the same tick as Link/navigation (INP). */
+  useEffect(() => {
+    startTransition(() => setSidebarOpen(false));
+  }, [location.pathname, location.search, location.hash]);
+
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     'Overview': true,
     'Activity': false,
@@ -395,7 +401,6 @@ export default function Layout() {
                           <Link
                             key={item.name}
                             to={linkTo}
-                            onClick={closeSidebarMobile}
                             className={cn(
                               "flex items-center gap-3 px-4 py-2 transition-all group relative rounded-sm mx-1",
                               isActive 
