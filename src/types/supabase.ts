@@ -531,6 +531,8 @@ export interface Database {
           original_file: Json | null
           storage_path: string | null
           storage_url: string | null
+          /** Mobile capture secret; required for anon INSERT via RLS. */
+          token: string | null
           created_at: string
         }
         Insert: {
@@ -543,6 +545,7 @@ export interface Database {
           original_file?: Json | null
           storage_path?: string | null
           storage_url?: string | null
+          token?: string | null
           created_at?: string
         }
         Update: {
@@ -555,6 +558,7 @@ export interface Database {
           original_file?: Json | null
           storage_path?: string | null
           storage_url?: string | null
+          token?: string | null
           created_at?: string
         }
       }
@@ -804,8 +808,9 @@ export interface Database {
           id: string
           user_id: string
           token: string
-          status: 'idle' | 'active' | 'completed' | 'error'
+          status: 'idle' | 'pending' | 'active' | 'completed' | 'error'
           uploaded_file_url: string | null
+          expires_at: string | null
           created_at: string
           updated_at: string
         }
@@ -813,8 +818,9 @@ export interface Database {
           id?: string
           user_id: string
           token?: string
-          status?: 'idle' | 'active' | 'completed' | 'error'
+          status?: 'idle' | 'pending' | 'active' | 'completed' | 'error'
           uploaded_file_url?: string | null
+          expires_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -822,8 +828,9 @@ export interface Database {
           id?: string
           user_id?: string
           token?: string
-          status?: 'idle' | 'active' | 'completed' | 'error'
+          status?: 'idle' | 'pending' | 'active' | 'completed' | 'error'
           uploaded_file_url?: string | null
+          expires_at?: string | null
           created_at?: string
           updated_at?: string
         }

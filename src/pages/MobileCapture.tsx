@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Camera, CheckCircle2, AlertCircle, Loader2,
@@ -6,6 +6,7 @@ import {
   Sun, Maximize, MousePointer2, Smartphone, FolderOpen
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { createCaptureSupabaseClient } from '../lib/supabaseCaptureClient';
 import { toast } from 'sonner';
 import { validateIngestionFile, safeExtFromMime } from '../lib/security';
 
@@ -14,6 +15,12 @@ export default function MobileCapture() {
   const navigate = useNavigate();
   const sessionId = searchParams.get('id');
   const token = searchParams.get('t');
+
+  /** Anon client + `x-session-token` header so RLS can authorize capture rows without USING(true). */
+  const captureDb = useMemo(
+    () => (token ? createCaptureSupabaseClient(token) : null),
+    [token]
+  );
   
   const [status, setStatus] = useState<'idle' | 'capturing' | 'uploading' | 'completed' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -36,17 +43,16 @@ export default function MobileCapture() {
   }, [sessionId]);
 
   useEffect(() => {
-    if (!sessionId || !token) {
+    if (!sessionId || !token || !captureDb) {
        setStatus('error');
        setError('Invalid or missing capture session.');
        return;
     }
 
     // Validate token against the DB before doing anything.
-    // The query includes .eq('token', token) so if the token in the URL
-    // doesn't match what's stored, the row returns null and we abort.
+    // RLS matches `x-session-token` header to row token; .eq filters are defense in depth.
     const signalActiveScan = async () => {
-      const { data: sessionRow, error: tokenErr } = await supabase
+      const { data: sessionRow, error: tokenErr } = await captureDb
         .from('document_capture_sessions')
         .select('id')
         .eq('id', sessionId)
@@ -59,7 +65,7 @@ export default function MobileCapture() {
         return;
       }
 
-      await supabase
+      await captureDb
         .from('document_capture_sessions')
         .update({ status: 'active' })
         .eq('id', sessionId)
@@ -82,7 +88,7 @@ export default function MobileCapture() {
       }, 3000);
       return () => clearInterval(interval);
     }
-  }, [sessionId, token, status, previewUrl]);
+  }, [sessionId, token, captureDb, status, previewUrl]);
 
   const handleCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -109,12 +115,12 @@ export default function MobileCapture() {
 
   const handleUpload = async () => {
     const activeImage = capturedImage || (previewUrl ? dataURLtoFile(previewUrl) : null);
-    if (!activeImage || !sessionId || !token) return;
+    if (!activeImage || !sessionId || !token || !captureDb) return;
 
     setStatus('uploading');
     try {
       // Re-validate token on upload — prevents forged requests
-      const { data: session, error: sessionErr } = await supabase
+      const { data: session, error: sessionErr } = await captureDb
         .from('document_capture_sessions')
         .select('user_id')
         .eq('id', sessionId)
@@ -137,7 +143,7 @@ export default function MobileCapture() {
 
       if (uploadErr) throw uploadErr;
 
-      const { error: updateErr } = await supabase
+      const { error: updateErr } = await captureDb
         .from('document_capture_sessions')
         .update({ 
           status: 'completed',
@@ -147,8 +153,9 @@ export default function MobileCapture() {
 
       if (updateErr) throw updateErr;
 
-      await supabase.from('pending_ingestions').insert({
+      await captureDb.from('pending_ingestions').insert({
         user_id: userId,
+        token,
         status: 'uploading',
         source: 'mobile',
         storage_path: filePath,
