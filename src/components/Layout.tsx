@@ -503,11 +503,12 @@ export default function Layout() {
             </button>
             
             {/* Global Search (Desktop) */}
-            <div className="hidden md:flex items-center max-w-md w-full relative" ref={searchRef}>
+            <div className="hidden md:flex flex-col max-w-md w-full" ref={searchRef}>
               <label htmlFor="layout-global-search" className="sr-only">
                 Search bills, transactions, subscriptions, and budgets
               </label>
-              <Search className="w-4 h-4 text-content-tertiary absolute left-3 pointer-events-none" aria-hidden />
+              <div className="relative w-full">
+              <Search className="w-4 h-4 text-content-tertiary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden />
               <input 
                 id="layout-global-search"
                 ref={searchInputRef}
@@ -550,6 +551,14 @@ export default function Layout() {
                   )}
                 </div>
               )}
+              </div>
+              <p className="mt-1.5 pl-1 text-[10px] font-sans text-content-muted leading-none hidden lg:block">
+                <kbd className="px-1 py-0.5 rounded bg-surface-elevated border border-surface-border font-mono text-[9px]">⌘K</kbd>
+                <span className="mx-1.5">search</span>
+                <span className="text-content-tertiary">·</span>
+                <kbd className="px-1 py-0.5 rounded bg-surface-elevated border border-surface-border font-mono text-[9px] ml-1.5">Q</kbd>
+                <span className="ml-1">quick add</span>
+              </p>
             </div>
           </div>
 
@@ -567,12 +576,13 @@ export default function Layout() {
             {/* Quick Add Button */}
             <button
               type="button"
-              aria-label="Quick add transaction or bill"
+              aria-label="Quick add income, bill, or transaction"
+              title="Quick add (keyboard Q)"
               onClick={() => openQuickAdd()}
-              className="hidden sm:flex items-center gap-2 bg-brand-cta hover:bg-brand-cta-hover text-white text-[12px] font-mono font-bold uppercase tracking-wider transition-all btn-tactile px-5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base focus-visible:ring-white"
+              className="hidden sm:inline-flex items-center gap-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-all btn-tactile px-5 py-2.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base focus-visible:ring-white"
             >
-              <Plus className="w-3.5 h-3.5" />
-              Quick Add
+              <Plus className="w-4 h-4 shrink-0" aria-hidden />
+              Add entry
             </button>
             <button
               type="button"
@@ -636,7 +646,7 @@ export default function Layout() {
                   <img src={user.avatar} alt="Profile" className="h-full w-full object-cover" data-no-invert />
                 ) : (
                   <div className="h-full w-full flex items-center justify-center bg-brand-indigo/10">
-                    <span className="text-[10px] font-mono font-bold text-brand-violet">{user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}</span>
+                    <span className="text-xs font-sans font-semibold text-brand-indigo">{user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}</span>
                   </div>
                 )}
               </HeadlessMenu.Button>

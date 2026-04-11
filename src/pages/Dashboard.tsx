@@ -12,7 +12,7 @@ import { animate } from 'motion/react';
 import { useStore } from '../store/useStore';
 import { sanitizeUrl } from '../lib/security';
 import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting } from '../lib/finance';
-import { BorderRotate } from '../components/ui/animated-gradient-border';
+import { AppPageShell } from '../components/AppPageShell';
 
 import type { Citation } from '../store/useStore';
 
@@ -312,18 +312,7 @@ export default function Dashboard() {
   const hasActionableAlerts = pendingIngestions.length > 0 || isOverdraftRisk || showLowTaxReserveAlert;
 
   return (
-    <BorderRotate
-      animationSpeed={15}
-      borderRadius={0}
-      borderWidth={1}
-      backgroundColor="#050607"
-      gradientColors={{
-        primary: "#6366f1", // Indigo
-        secondary: "#a855f7", // Purple
-        accent: "#ec4899" // Pink
-      }}
-      className="min-h-[100dvh]"
-    >
+    <AppPageShell>
       <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-6">
       
       {/* 1. Dashboard Header */}
@@ -333,7 +322,7 @@ export default function Dashboard() {
             {user?.avatar ? (
               <img src={user.avatar} alt="Profile" className="h-full w-full object-cover" />
             ) : (
-              <div className="h-full w-full flex items-center justify-center bg-indigo-500/10 text-brand-violet font-mono text-xl font-bold">
+              <div className="h-full w-full flex items-center justify-center bg-indigo-500/10 text-brand-indigo text-xl font-sans font-semibold">
                 {(user?.firstName?.charAt(0) || '')}{(user?.lastName?.charAt(0) || '')}
               </div>
             )}
@@ -351,7 +340,7 @@ export default function Dashboard() {
       {/* 2. Action Center (Grouped Urgent Alerts) */}
       {hasActionableAlerts && (
         <div className="space-y-3">
-          <h2 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400 pl-1">Action Center</h2>
+          <h2 className="section-label pl-1">Action Center</h2>
           
           <div className="grid grid-cols-1 gap-3">
             {/* Ingestion Action */}
@@ -427,7 +416,7 @@ export default function Dashboard() {
                     type="button"
                     onClick={dismissLowTaxReserveAlert}
                     aria-label="Dismiss low tax reserve alert"
-                    className="w-full sm:w-auto px-5 py-3 sm:py-0 text-xs font-mono font-bold uppercase tracking-widest text-amber-200/90 hover:bg-amber-500/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-inset"
+                    className="w-full sm:w-auto px-5 py-3 sm:py-0 text-xs font-sans font-semibold uppercase tracking-wide text-amber-200/90 hover:bg-amber-500/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-inset"
                   >
                     Got it
                   </button>
@@ -440,15 +429,15 @@ export default function Dashboard() {
 
       {/* 3. Primary Metrics Panel — anchor for sidebar "Cash flow" */}
       <section id="cash-flow" className="scroll-mt-24">
-      <h2 className="text-xs font-mono font-semibold uppercase tracking-widest text-zinc-400 pl-1 mt-8 mb-3">Core Financials</h2>
+      <h2 className="section-label pl-1 mt-8 mb-3">Core Financials</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Runway Metric Card */}
         <div className="bg-surface-raised border border-surface-border p-6 rounded-sm shadow-sm md:flex md:flex-col md:justify-between">
           <div className="flex justify-between items-start mb-8">
             <div className="text-left w-full">
-              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3">Operating Runway</p>
-              <h2 className="text-5xl sm:text-6xl font-mono font-bold text-white tracking-tighter tabular-nums leading-none">
+              <p className="metric-label mb-3">Operating Runway</p>
+              <h2 className="text-5xl sm:text-6xl font-mono font-bold text-white tracking-tighter tabular-nums leading-none data-numeric">
                 <AnimatedValue value={survivalMonths} decimals={1} />
                 <span className="text-2xl font-sans text-content-tertiary font-medium ml-3 uppercase tracking-wide">Months</span>
               </h2>
@@ -457,12 +446,12 @@ export default function Dashboard() {
           
           <div className="grid grid-cols-2 gap-8 border-t border-surface-border pt-6 mt-4">
             <div className="text-left">
-              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-2">Liquid Cash</p>
-              <p className="text-2xl font-mono text-brand-profit font-bold">${liquidCash.toLocaleString()}</p>
+              <p className="metric-label mb-2">Liquid Cash</p>
+              <p className="text-2xl font-mono text-brand-profit font-bold tabular-nums">${liquidCash.toLocaleString()}</p>
             </div>
             <div className="text-left">
-              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-2">Monthly Expenses</p>
-              <p className="text-2xl font-mono text-white font-bold">${Math.round(monthlyBurn).toLocaleString()}</p>
+              <p className="metric-label mb-2">Monthly Expenses</p>
+              <p className="text-2xl font-mono text-white font-bold tabular-nums">${Math.round(monthlyBurn).toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -470,22 +459,22 @@ export default function Dashboard() {
         {/* Distributed 4-grid for standard numbers */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-sm shadow-sm text-left">
-              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3">Net Worth</p>
-              <p className="text-2xl sm:text-4xl font-mono text-white font-bold tabular-nums">$<AnimatedValue value={netWorth} /></p>
+              <p className="metric-label mb-3">Net Worth</p>
+              <p className="text-2xl sm:text-4xl font-mono text-white font-bold tabular-nums data-numeric">$<AnimatedValue value={netWorth} /></p>
             </div>
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-sm shadow-sm text-left">
-              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3">Total Assets</p>
-              <p className="text-2xl sm:text-4xl font-mono text-white font-bold tabular-nums">$<AnimatedValue value={totalAssets} /></p>
+              <p className="metric-label mb-3">Total Assets</p>
+              <p className="text-2xl sm:text-4xl font-mono text-white font-bold tabular-nums data-numeric">$<AnimatedValue value={totalAssets} /></p>
             </div>
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-sm shadow-sm text-left">
-              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3 flex items-center gap-2">
+              <p className="metric-label mb-3 flex items-center gap-2">
                 Tax Savings <ShieldCheck className="w-3.5 h-3.5 text-brand-tax" />
               </p>
-              <p className="text-2xl sm:text-4xl font-mono text-brand-tax font-bold tabular-nums">-$<AnimatedValue value={cashFlow.taxReserve} /></p>
+              <p className="text-2xl sm:text-4xl font-mono text-brand-tax font-bold tabular-nums data-numeric">-$<AnimatedValue value={cashFlow.taxReserve} /></p>
             </div>
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-sm shadow-sm text-left">
-              <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-3">Monthly Surplus</p>
-              <p className="text-2xl sm:text-4xl font-mono text-brand-profit font-bold tabular-nums">+$<AnimatedValue value={cashFlow.surplus} /></p>
+              <p className="metric-label mb-3">Monthly Surplus</p>
+              <p className="text-2xl sm:text-4xl font-mono text-brand-profit font-bold tabular-nums data-numeric">+$<AnimatedValue value={cashFlow.surplus} /></p>
             </div>
         </div>
       </div>
@@ -494,9 +483,7 @@ export default function Dashboard() {
       {/* 4. Active Intelligence Grid — only modules that have underlying data */}
       {smartAlertsVisibleCount > 0 && (
         <>
-          <h2 className="text-[12px] font-mono font-bold uppercase tracking-[0.1em] text-content-tertiary pl-1 mt-12 mb-4">
-            Smart Alerts & Active Monitoring
-          </h2>
+          <h2 className="section-label pl-1 mt-12 mb-4">Smart Alerts & Active Monitoring</h2>
           <div
             className={
               smartAlertsVisibleCount === 1
@@ -818,6 +805,6 @@ export default function Dashboard() {
       </Dialog>
 
       </div>
-    </BorderRotate>
+    </AppPageShell>
   );
 }

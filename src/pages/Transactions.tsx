@@ -6,7 +6,7 @@ import { BrandLogo } from '../components/BrandLogo';
 import { motion } from 'motion/react';
 
 export default function Transactions() {
-  const { transactions, subscriptions } = useStore();
+  const { transactions, subscriptions, openQuickAdd } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -48,7 +48,9 @@ export default function Transactions() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-content-primary">Transaction History</h1>
-          <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mt-1">{filteredTransactions.length} of {transactions.length} records detected</p>
+          <p className="text-xs font-sans text-content-tertiary mt-1">
+          {filteredTransactions.length} of {transactions.length} transactions
+        </p>
         </div>
         <button
           onClick={() => {
@@ -193,8 +195,25 @@ export default function Transactions() {
                 ? "We couldn't find any transactions matching your current filters."
                 : "You don't have any transaction history yet. Pay a bill or record a debt payment to see it here."}
             </p>
+            {transactions.length === 0 &&
+              !searchTerm &&
+              filterType === 'all' &&
+              filterCategory === 'all' &&
+              !dateRange.start &&
+              !dateRange.end &&
+              !amountRange.min &&
+              !amountRange.max && (
+                <button
+                  type="button"
+                  onClick={() => openQuickAdd()}
+                  className="mt-6 inline-flex items-center justify-center gap-2 rounded-sm bg-brand-cta px-5 py-2.5 text-sm font-sans font-semibold text-white shadow-sm transition-colors hover:bg-brand-cta-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+                >
+                  Add your first transaction
+                </button>
+              )}
             {(searchTerm || filterType !== 'all' || filterCategory !== 'all' || dateRange.start || dateRange.end || amountRange.min || amountRange.max) && (
               <button
+                type="button"
                 onClick={() => { 
                   setSearchTerm(''); 
                   setFilterType('all'); 

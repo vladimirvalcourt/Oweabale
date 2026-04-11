@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
-import { BorderRotate } from '../components/ui/animated-gradient-border';
+import { AppPageShell } from '../components/AppPageShell';
 
 export default function CreditCenter() {
   const { credit, updateCreditScore, addCreditFix, updateCreditFix, deleteCreditFix, debts, user } = useStore();
@@ -125,18 +125,7 @@ ${user.firstName} ${user.lastName}
   };
 
   return (
-    <BorderRotate
-      animationSpeed={20}
-      borderRadius={0}
-      borderWidth={1}
-      backgroundColor="#050607"
-      gradientColors={{
-        primary: "#6366f1",
-        secondary: "#a855f7",
-        accent: "#ec4899"
-      }}
-      className="min-h-screen"
-    >
+    <AppPageShell className="min-h-screen">
       <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 pt-8">
         
         {/* Header & Score Gauge */}
@@ -485,6 +474,6 @@ ${user.firstName} ${user.lastName}
           )}
         </AnimatePresence>
       </div>
-    </BorderRotate>
+    </AppPageShell>
   );
 }
