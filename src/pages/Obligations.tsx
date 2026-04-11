@@ -3,7 +3,7 @@
  * Avalanche/Snowball payoff algorithm with projected payoff dates and interest savings.
  */
 import React, { useState, useMemo, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import {
   Receipt, CreditCard, AlertTriangle, ShieldAlert,
   FileText, CheckCircle2, Flame,
@@ -98,11 +98,28 @@ function monthsToDate(months: number): string {
 
 export default function Obligations() {
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { bills, debts, citations, resolveCitation, openQuickAdd } = useStore();
   const [activeTab, setActiveTab] = useState<FilterTab>(() => {
     const param = new URLSearchParams(window.location.search).get('tab');
     return (param === 'ambush' || param === 'recurring' || param === 'debt') ? param : 'all';
   });
+
+  useEffect(() => {
+    const param = searchParams.get('tab');
+    const next: FilterTab =
+      param === 'ambush' || param === 'recurring' || param === 'debt' ? param : 'all';
+    setActiveTab(next);
+  }, [searchParams]);
+
+  const selectTab = (key: FilterTab) => {
+    setActiveTab(key);
+    if (key === 'all') {
+      setSearchParams({}, { replace: true });
+    } else {
+      setSearchParams({ tab: key }, { replace: true });
+    }
+  };
   const [strategy, setStrategy] = useState<Strategy>('avalanche');
   const [extraPayment, setExtraPayment] = useState(0);
   const [showDetonator, setShowDetonator] = useState(true);
@@ -363,7 +380,7 @@ export default function Obligations() {
           {tabs.map(tab => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => selectTab(tab.key)}
               className={`pb-3 text-sm font-medium transition-colors relative flex items-center gap-1.5 ${
                 activeTab === tab.key ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'
               }`}
