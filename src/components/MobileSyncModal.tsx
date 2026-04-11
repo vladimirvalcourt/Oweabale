@@ -192,7 +192,6 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                           {status === 'waiting' && <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest leading-relaxed">Scan to upload document.</p>}
                           {status === 'active' && <p className="text-[10px] font-mono text-emerald-400 animate-pulse uppercase tracking-[0.2em] leading-relaxed">📱 Phone connected... waiting for photo.</p>}
                           {status === 'completed' && <p className="text-[10px] font-mono text-brand-violet animate-pulse uppercase tracking-[0.2em] leading-relaxed">Receiving document...</p>}
-                          {status === 'waiting' && <p className="text-[8px] text-zinc-700 font-mono mt-2 uppercase tracking-widest leading-relaxed">Expires in 10:00 — CHANNEL 044</p>}
                        </div>
                     </motion.div>
                   )}

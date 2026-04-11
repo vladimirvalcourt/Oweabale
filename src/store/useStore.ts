@@ -6,6 +6,13 @@ import { type CategorizationRule, applyCategorizationRules } from '../lib/catego
 import { disconnectPlaid, syncPlaidTransactions as invokePlaidSync } from '../lib/plaid';
 export type { CategorizationRule };
 
+/** Mobile capture stores under `incoming/` in `scans`; desktop uploads use `ingestion-files`. */
+async function removeIngestionStoragePath(storagePath: string) {
+  const bucket = storagePath.startsWith('incoming/') ? 'scans' : 'ingestion-files';
+  const { error } = await supabase.storage.from(bucket).remove([storagePath]);
+  if (error) console.warn(`[useStore] storage remove (${bucket}):`, error.message);
+}
+
 export interface Bill {
   id: string;
   biller: string;
@@ -137,6 +144,7 @@ export interface PendingIngestion {
     date?: string;
     dueDate?: string;
     category?: string;
+    /** Income label (Review Inbox) */
     source?: string;
     /** Tickets, tolls, fines (when type === 'citation') */
     citationType?: string;
@@ -145,6 +153,9 @@ export interface PendingIngestion {
     penaltyFee?: number;
     paymentUrl?: string;
     daysLeft?: number;
+    /** Loan / card from document (Review Inbox debt) */
+    debtApr?: number;
+    debtMinPayment?: number;
   };
   originalFile?: {
     name: string;
@@ -313,7 +324,7 @@ interface AppState {
   addPendingIngestion: (ingestion: Omit<PendingIngestion, 'id'>) => string;
   updatePendingIngestion: (id: string, updates: Partial<PendingIngestion>) => void;
   removePendingIngestion: (id: string) => void;
-  commitIngestion: (id: string) => Promise<void>;
+  commitIngestion: (id: string) => Promise<boolean>;
   
   // Supabase Syncing
   fetchData: (userId?: string, options?: { background?: boolean }) => Promise<void>;
@@ -1477,9 +1488,7 @@ export const useStore = create<AppState>()(
       await supabase.from('pending_ingestions').delete().eq('id', id).eq('user_id', userId);
       // Delete the raw file from storage — best-effort, never blocks UI
       if (item?.storagePath) {
-        supabase.storage.from('ingestion-files').remove([item.storagePath]).catch((err) => {
-          console.warn('[useStore] Failed to delete storage file:', item.storagePath, err.message);
-        });
+        void removeIngestionStoragePath(item.storagePath);
       }
     }
     set((state) => ({
@@ -1488,13 +1497,13 @@ export const useStore = create<AppState>()(
   },
   commitIngestion: async (id) => {
     const item = get().pendingIngestions.find(pi => pi.id === id);
-    if (!item || (item.status !== 'ready' && !item.status.includes('scanning'))) return;
-    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!item || item.status !== 'ready') return false;
 
+    const userId = (await supabase.auth.getUser()).data.user?.id;
     const data = item.extractedData;
     const commonId = crypto.randomUUID();
-    
-    // Deterministic Mapping (No AI Slop)
+    const amt = typeof data.amount === 'number' && !isNaN(data.amount) ? data.amount : 0;
+
     const getCategoryFromMerchant = (name: string): string => {
       const lowerName = name.toLowerCase();
       if (lowerName.includes('food') || lowerName.includes('grocery') || lowerName.includes('market') || lowerName.includes('wholefoods') || lowerName.includes('trader joes') || lowerName.includes('walmart')) return 'food';
@@ -1505,14 +1514,25 @@ export const useStore = create<AppState>()(
       return 'other';
     };
 
-    const merchantName = data.name || data.biller || 'New Entry';
+    const merchantName = (data.name || data.biller || 'New Entry').trim();
     const autoCategory = getCategoryFromMerchant(merchantName);
 
+    const requirePositiveAmount = () => {
+      if (amt <= 0) {
+        toast.error('Amount must be greater than zero. Edit the row or re-scan a clearer document.');
+        return false;
+      }
+      return true;
+    };
+
+    let saved = false;
+
     if (item.type === 'transaction') {
+      if (!requirePositiveAmount()) return false;
       const newTransaction: Transaction = {
         id: commonId,
         name: merchantName,
-        amount: data.amount || 0,
+        amount: amt,
         category: data.category || autoCategory,
         date: data.date || new Date().toISOString().split('T')[0],
         type: 'expense'
@@ -1523,17 +1543,19 @@ export const useStore = create<AppState>()(
           date: newTransaction.date, amount: newTransaction.amount,
           type: newTransaction.type, user_id: userId,
         });
-        if (error) { toast.error('Failed to save transaction. Please try again.'); return; }
+        if (error) { toast.error('Failed to save transaction. Please try again.'); return false; }
       }
       set((s) => ({
         transactions: [newTransaction, ...s.transactions].slice(0, 50),
         pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
       }));
+      saved = true;
     } else if (item.type === 'bill') {
+      if (!requirePositiveAmount()) return false;
       const newBill: Bill = {
         id: commonId,
         biller: merchantName,
-        amount: data.amount || 0,
+        amount: amt,
         category: data.category || autoCategory,
         dueDate: data.dueDate || data.date || new Date().toISOString().split('T')[0],
         frequency: 'Monthly',
@@ -1546,20 +1568,23 @@ export const useStore = create<AppState>()(
           due_date: newBill.dueDate, frequency: newBill.frequency,
           status: newBill.status, auto_pay: newBill.autoPay, user_id: userId,
         });
-        if (error) { toast.error('Failed to save bill. Please try again.'); return; }
+        if (error) { toast.error('Failed to save bill. Please try again.'); return false; }
       }
       set((s) => ({
         bills: [...s.bills, newBill],
         pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
       }));
+      saved = true;
     } else if (item.type === 'income') {
+      if (!requirePositiveAmount()) return false;
+      const incomeName = (data.source || data.name || data.biller || merchantName || 'Income').trim();
       const newIncome: IncomeSource = {
         id: commonId,
-        name: data.source || 'New Income',
-        amount: data.amount || 0,
+        name: incomeName,
+        amount: amt,
         frequency: 'Monthly',
-        category: 'Salary',
-        nextDate: data.date || new Date().toISOString().split('T')[0],
+        category: (data.category as string) || 'Salary',
+        nextDate: data.date || data.dueDate || new Date().toISOString().split('T')[0],
         status: 'active',
         isTaxWithheld: false,
       };
@@ -1569,18 +1594,33 @@ export const useStore = create<AppState>()(
           category: newIncome.category, next_date: newIncome.nextDate,
           status: newIncome.status, is_tax_withheld: newIncome.isTaxWithheld, user_id: userId,
         });
-        if (error) { toast.error('Failed to save income. Please try again.'); return; }
+        if (error) { toast.error('Failed to save income. Please try again.'); return false; }
       }
       set((s) => ({
         incomes: [...s.incomes, newIncome],
         pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
       }));
+      saved = true;
+    } else if (item.type === 'debt') {
+      if (!requirePositiveAmount()) return false;
+      const ok = await get().addDebt({
+        name: merchantName || 'Debt',
+        type: 'Loan',
+        apr: typeof data.debtApr === 'number' && !isNaN(data.debtApr) ? data.debtApr : 0,
+        remaining: amt,
+        minPayment: typeof data.debtMinPayment === 'number' && !isNaN(data.debtMinPayment) && data.debtMinPayment > 0
+          ? data.debtMinPayment
+          : Math.max(25, Math.round(amt * 0.02 * 100) / 100),
+        paid: 0,
+      });
+      if (!ok) return false;
+      set((s) => ({
+        pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
+      }));
+      saved = true;
     } else if (item.type === 'citation') {
-      const jurisdiction = (data.jurisdiction || data.biller || '').trim();
-      if (!jurisdiction) {
-        toast.error('Enter issuing jurisdiction before saving this ticket or fine.');
-        return;
-      }
+      if (!requirePositiveAmount()) return false;
+      const jurisdiction = (data.jurisdiction || data.biller || merchantName || 'Issuing authority (verify)').trim();
       const daysLeft =
         typeof data.daysLeft === 'number' && !isNaN(data.daysLeft)
           ? Math.max(0, Math.floor(data.daysLeft))
@@ -1591,7 +1631,7 @@ export const useStore = create<AppState>()(
         type: data.citationType || 'Toll Violation',
         jurisdiction,
         daysLeft,
-        amount: data.amount || 0,
+        amount: amt,
         penaltyFee,
         date: data.date || data.dueDate || new Date().toISOString().split('T')[0],
         citationNumber: (data.citationNumber || '').trim(),
@@ -1607,23 +1647,23 @@ export const useStore = create<AppState>()(
         })(),
         status: 'open',
       });
-      if (!ok) return;
+      if (!ok) return false;
       set((s) => ({
         pendingIngestions: s.pendingIngestions.filter(pi => pi.id !== id),
       }));
+      saved = true;
+    } else {
+      toast.error('Unsupported document type for this inbox row.');
+      return false;
     }
 
-    // ── Always clean up: delete DB row + raw file from storage ──
-    if (userId) {
+    if (saved && userId) {
       await supabase.from('pending_ingestions').delete().eq('id', id).eq('user_id', userId);
-      if (item.storagePath) {
-        supabase.storage.from('ingestion-files').remove([item.storagePath]).catch((err) => {
-          console.warn('[useStore] Failed to delete storage file after commit:', item.storagePath, err.message);
-        });
-      }
+      if (item.storagePath) await removeIngestionStoragePath(item.storagePath);
     }
 
-    toast.success(`Saved ${item.type} to history`);
+    if (saved) toast.success(`Saved ${item.type} to history`);
+    return saved;
   },
 
   // Supabase Implementation

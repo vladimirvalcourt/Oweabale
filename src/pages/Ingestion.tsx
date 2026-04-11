@@ -24,76 +24,9 @@ import Tesseract from 'tesseract.js';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { validateIngestionFile } from '../lib/security';
-import { extractCitationFieldsFromText, looksLikeCitationDocument } from '../lib/citationFromDocument';
+import { buildScanExtraction } from '../lib/ingestionExtraction';
 import type { PendingIngestion } from '../store/useStore';
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
-
-/** Shared OCR → bill vs ticket/fine routing for desktop upload and mobile sync. */
-function buildScanExtraction(fullText: string): Pick<PendingIngestion, 'type' | 'extractedData'> {
-  const lines = fullText.split('\n').filter((line) => line.trim().length > 0);
-  const biller =
-    lines.length > 0
-      ? lines[0].trim().length > 3
-        ? lines[0].trim()
-        : lines[1]?.trim() || 'Unknown Payee'
-      : 'Unknown Payee';
-
-  const amountMatches = fullText.match(/\$?\s*\d+\.\d{2}/g);
-  let maxAmount = 0;
-  if (amountMatches) {
-    const amounts = amountMatches
-      .map((m) => parseFloat(m.replace(/[^0-9.]/g, '')))
-      .filter((n) => !isNaN(n) && isFinite(n));
-    if (amounts.length > 0) maxAmount = Math.max(...amounts);
-  }
-
-  const dateMatch = fullText.match(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/);
-  let dueDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-  let incidentDate = dueDate;
-  if (dateMatch) {
-    try {
-      const parsed = new Date(dateMatch[0]);
-      if (!isNaN(parsed.getTime())) {
-        incidentDate = parsed.toISOString().split('T')[0];
-        dueDate = incidentDate;
-      }
-    } catch {
-      /* ignore */
-    }
-  }
-
-  if (looksLikeCitationDocument(fullText)) {
-    const cit = extractCitationFieldsFromText(fullText);
-    const penaltyParsed = cit.penaltyFee ? parseFloat(cit.penaltyFee) : 0;
-    const daysParsed = parseInt(cit.daysLeft, 10);
-    return {
-      type: 'citation',
-      extractedData: {
-        biller: (cit.jurisdiction || biller).substring(0, 50),
-        jurisdiction: cit.jurisdiction,
-        citationType: cit.citationType,
-        citationNumber: cit.citationNumber,
-        penaltyFee: Number.isFinite(penaltyParsed) ? penaltyParsed : 0,
-        daysLeft: Number.isFinite(daysParsed) ? daysParsed : 30,
-        amount: maxAmount,
-        dueDate: cit.citationDueDate || dueDate,
-        date: incidentDate,
-        category: 'Transportation',
-        paymentUrl: '',
-      },
-    };
-  }
-
-  return {
-    type: 'bill',
-    extractedData: {
-      biller: biller.substring(0, 50),
-      amount: maxAmount,
-      dueDate,
-      category: 'Utilities',
-    },
-  };
-}
 
 // Upload rate limiter — max 5 files per 60 seconds
 const uploadTimestamps: number[] = [];
@@ -111,7 +44,7 @@ function isRateLimited(): boolean {
 }
 
 export default function Ingestion() {
-  const { pendingIngestions, commitIngestion, removePendingIngestion, updatePendingIngestion, addPendingIngestion } = useStore();
+  const { pendingIngestions, removePendingIngestion, updatePendingIngestion, addPendingIngestion } = useStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -206,7 +139,7 @@ export default function Ingestion() {
         }
       }
 
-      // ── Step 3: Entity extraction (bills vs tickets / tolls) ──
+      // ── Step 3: Entity extraction + auto-save when valid ──
       const { type: ingestionType, extractedData } = buildScanExtraction(fullText);
       updatePendingIngestion(ingestionId, {
         status: 'ready',
@@ -214,7 +147,13 @@ export default function Ingestion() {
         extractedData,
       });
 
-      toast.success(`${uploadedFile.name.substring(0, 20)}... scanned`);
+      const committed = await useStore.getState().commitIngestion(ingestionId);
+      if (!committed) {
+        toast.success(`${uploadedFile.name.substring(0, 20)}... scanned`);
+        if (useStore.getState().pendingIngestions.some((p) => p.id === ingestionId)) {
+          toast.info('Confirm amount and details, then save — or delete the row.');
+        }
+      }
     } catch (error) {
       updatePendingIngestion(ingestionId, { status: 'error' });
       toast.error(`Scan failed: ${uploadedFile.name}`);
@@ -268,8 +207,8 @@ export default function Ingestion() {
        if (file.type === 'application/pdf') {
          const arrayBuffer = await file.arrayBuffer();
          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-         const pages = Math.min(pdf.numPages, 3);
-         for (let i = 1; i <= pages; i++) {
+         for (let i = 1; i <= pdf.numPages; i++) {
+           updatePendingIngestion(id, { status: `scanning [P${i}/${pdf.numPages}]` });
            const page = await pdf.getPage(i);
            const textContent = await page.getTextContent();
            fullText += textContent.items.map((item: any) => item.str).join(' ') + '\n';
@@ -285,6 +224,10 @@ export default function Ingestion() {
          type: ingestionType,
          extractedData,
        });
+       const committed = await useStore.getState().commitIngestion(id);
+       if (!committed && useStore.getState().pendingIngestions.some((p) => p.id === id)) {
+         toast.info('Confirm amount and details, then save — or delete the row.');
+       }
      } catch (err) {
        updatePendingIngestion(id, { status: 'error' });
      }
@@ -315,15 +258,19 @@ export default function Ingestion() {
     }
   };
 
-  const handleCommit = (id: string) => {
-    commitIngestion(id);
-    if (selectedId === id) setSelectedId(null);
+  const handleCommit = async (id: string) => {
+    const ok = await useStore.getState().commitIngestion(id);
+    if (ok && selectedId === id) setSelectedId(null);
   };
 
-  const handleBulkCommit = () => {
+  const handleBulkCommit = async () => {
     const readyItems = pendingIngestions.filter(pi => pi.status === 'ready');
-    readyItems.forEach(item => commitIngestion(item.id));
-    toast.success(`Saved ${readyItems.length} items to history`);
+    let n = 0;
+    for (const item of readyItems) {
+      if (await useStore.getState().commitIngestion(item.id)) n++;
+    }
+    if (n > 0) toast.success(`Saved ${n} item${n === 1 ? '' : 's'} to history`);
+    else if (readyItems.length > 0) toast.error('Nothing saved — check amounts and fields.');
   };
 
   const [recentlyAddedId, setRecentlyAddedId] = React.useState<string | null>(null);
@@ -340,25 +287,21 @@ export default function Ingestion() {
           table: 'pending_ingestions'
         },
         (payload) => {
-          if (payload.new.source === 'mobile') {
-            const newId = payload.new.id;
-            setRecentlyAddedId(newId);
-            
-            toast.success('Document Received Successfully', {
-               description: `Mobile scan processed. Added to Review Inbox.`,
-               action: {
-                 label: 'View Now',
-                 onClick: () => {
-                   setSelectedId(newId);
-                   const element = document.getElementById(`ingestion-${newId}`);
-                   element?.scrollIntoView({ behavior: 'smooth' });
-                 }
-               }
+          const row = payload.new as { id?: string; source?: string };
+          if (!row?.id) return;
+          useStore.getState().fetchData(undefined, { background: true });
+          if (row.source === 'mobile') {
+            setRecentlyAddedId(row.id);
+            toast.success('Document received', {
+              description: 'Refreshing Review Inbox.',
+              action: {
+                label: 'View',
+                onClick: () => {
+                  setSelectedId(row.id!);
+                  document.getElementById(`ingestion-${row.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                },
+              },
             });
-            
-            useStore.getState().fetchData(undefined, { background: true });
-            
-            // Clear highlight after 5 seconds
             setTimeout(() => setRecentlyAddedId(null), 5000);
           }
         }
@@ -378,7 +321,7 @@ export default function Ingestion() {
             Review <span className="text-indigo-500">Inbox</span>
           </h1>
           <p className="text-[14px] font-sans text-content-tertiary mt-2">
-            Review and confirm pending documents to save them to your permanent history.
+            Uploads are read automatically and saved when amount and required fields are detected. Anything left in the list needs a quick confirm.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -443,7 +386,7 @@ export default function Ingestion() {
           >
             <UploadCloud className={`w-12 h-12 mx-auto mb-6 transition-colors ${dragActive ? 'text-indigo-500' : 'text-zinc-700'}`} />
             <h3 className="text-lg font-mono font-bold text-zinc-500 uppercase tracking-widest">Empty Inbox</h3>
-            <p className="text-xs font-mono text-zinc-600 mt-2 uppercase tracking-widest">Drag and drop receipts or bills to start reading them</p>
+            <p className="text-xs font-mono text-zinc-600 mt-2 uppercase tracking-widest">Drop a PDF or photo — we extract amounts and save when possible</p>
             <div className="mt-8 inline-block px-10 py-3 bg-indigo-600 text-white text-[10px] font-mono font-bold uppercase tracking-[0.3em] shadow-lg shadow-indigo-500/20 btn-tactile">
               IMPORT FILES
             </div>
@@ -499,6 +442,7 @@ export default function Ingestion() {
                           <option value="transaction">Transaction</option>
                           <option value="bill">Bill</option>
                           <option value="income">Income</option>
+                          <option value="debt">Debt</option>
                           <option value="citation">Ticket / Fine</option>
                         </select>
                       </div>
@@ -559,6 +503,7 @@ export default function Ingestion() {
                       <option value="transaction">Transaction</option>
                       <option value="bill">Bill</option>
                       <option value="income">Income</option>
+                      <option value="debt">Debt</option>
                       <option value="citation">Ticket / Fine</option>
                     </select>
                   </div>
@@ -770,6 +715,135 @@ export default function Ingestion() {
                                   </div>
                                 </div>
                               </>
+                            ) : item.type === 'transaction' ? (
+                              <div className="grid grid-cols-2 gap-8">
+                                <div>
+                                  <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Description</label>
+                                  <input
+                                    value={item.extractedData.biller || item.extractedData.name || ''}
+                                    onChange={(e) =>
+                                      updatePendingIngestion(item.id, {
+                                        extractedData: { ...item.extractedData, biller: e.target.value, name: e.target.value },
+                                      })
+                                    }
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Category</label>
+                                  <select
+                                    value={item.extractedData.category || 'other'}
+                                    onChange={(e) =>
+                                      updatePendingIngestion(item.id, {
+                                        extractedData: { ...item.extractedData, category: e.target.value },
+                                      })
+                                    }
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-zinc-400 focus:outline-none focus:border-indigo-500 transition-colors"
+                                  >
+                                    <option value="utilities">Utilities</option>
+                                    <option value="housing">Housing</option>
+                                    <option value="food">Food</option>
+                                    <option value="transport">Transport</option>
+                                    <option value="shopping">Shopping</option>
+                                    <option value="entertainment">Entertainment</option>
+                                    <option value="health">Health</option>
+                                    <option value="subscriptions">Subscriptions</option>
+                                    <option value="insurance">Insurance</option>
+                                    <option value="auto">Auto</option>
+                                    <option value="business">Business</option>
+                                    <option value="taxes">Taxes</option>
+                                    <option value="debt">Debt</option>
+                                    <option value="other">Other</option>
+                                  </select>
+                                </div>
+                              </div>
+                            ) : item.type === 'income' ? (
+                              <div className="grid grid-cols-2 gap-8">
+                                <div>
+                                  <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Income source / label</label>
+                                  <input
+                                    value={item.extractedData.source || item.extractedData.biller || ''}
+                                    onChange={(e) =>
+                                      updatePendingIngestion(item.id, {
+                                        extractedData: {
+                                          ...item.extractedData,
+                                          source: e.target.value,
+                                          name: e.target.value,
+                                          biller: e.target.value,
+                                        },
+                                      })
+                                    }
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Category</label>
+                                  <select
+                                    value={item.extractedData.category || 'Salary'}
+                                    onChange={(e) =>
+                                      updatePendingIngestion(item.id, {
+                                        extractedData: { ...item.extractedData, category: e.target.value },
+                                      })
+                                    }
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-zinc-400 focus:outline-none focus:border-indigo-500 transition-colors"
+                                  >
+                                    <option value="Salary">Salary</option>
+                                    <option value="Freelance">Freelance</option>
+                                    <option value="Bonus">Bonus</option>
+                                    <option value="Other">Other</option>
+                                  </select>
+                                </div>
+                              </div>
+                            ) : item.type === 'debt' ? (
+                              <div className="grid grid-cols-2 gap-8">
+                                <div>
+                                  <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Lender / account</label>
+                                  <input
+                                    value={item.extractedData.biller || ''}
+                                    onChange={(e) =>
+                                      updatePendingIngestion(item.id, {
+                                        extractedData: { ...item.extractedData, biller: e.target.value, name: e.target.value },
+                                      })
+                                    }
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">APR (%)</label>
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    value={item.extractedData.debtApr ?? ''}
+                                    onChange={(e) =>
+                                      updatePendingIngestion(item.id, {
+                                        extractedData: {
+                                          ...item.extractedData,
+                                          debtApr: parseFloat(e.target.value) || 0,
+                                        },
+                                      })
+                                    }
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                                  />
+                                </div>
+                                <div className="col-span-2">
+                                  <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Minimum payment ($)</label>
+                                  <input
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={item.extractedData.debtMinPayment ?? ''}
+                                    onChange={(e) =>
+                                      updatePendingIngestion(item.id, {
+                                        extractedData: {
+                                          ...item.extractedData,
+                                          debtMinPayment: parseFloat(e.target.value) || 0,
+                                        },
+                                      })
+                                    }
+                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus:outline-none focus:border-indigo-500 transition-colors"
+                                  />
+                                </div>
+                              </div>
                             ) : (
                               <div className="grid grid-cols-2 gap-8">
                                 <div>
@@ -783,17 +857,22 @@ export default function Ingestion() {
                                 <div>
                                   <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">Category</label>
                                   <select 
-                                    value={item.extractedData.category || ''}
+                                    value={item.extractedData.category || 'utilities'}
                                     onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, category: e.target.value } })}
                                     className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-zinc-400 focus:outline-none focus:border-indigo-500 transition-colors uppercase tracking-widest"
                                   >
-                                    <option value="Utilities">Utilities</option>
-                                    <option value="Food & Dining">Food & Dining</option>
-                                    <option value="Housing">Housing</option>
-                                    <option value="Transportation">Transportation</option>
-                                    <option value="Subscriptions">Subscriptions</option>
-                                    <option value="Health">Health</option>
-                                    <option value="Shopping">Shopping</option>
+                                    <option value="utilities">Utilities</option>
+                                    <option value="housing">Housing</option>
+                                    <option value="food">Food</option>
+                                    <option value="transport">Transport</option>
+                                    <option value="shopping">Shopping</option>
+                                    <option value="subscriptions">Subscriptions</option>
+                                    <option value="insurance">Insurance</option>
+                                    <option value="health">Health</option>
+                                    <option value="auto">Auto</option>
+                                    <option value="business">Business</option>
+                                    <option value="taxes">Taxes</option>
+                                    <option value="other">Other</option>
                                   </select>
                                 </div>
                               </div>
@@ -811,7 +890,13 @@ export default function Ingestion() {
                               </div>
                               <div>
                                 <label className="text-[9px] font-mono text-zinc-500 uppercase tracking-[0.2em] block mb-3 font-black">
-                                  {item.type === 'citation' ? 'Payment due date' : 'Due Date'}
+                                  {item.type === 'citation'
+                                    ? 'Payment due date'
+                                    : item.type === 'transaction'
+                                      ? 'Date'
+                                      : item.type === 'income' || item.type === 'debt'
+                                        ? 'Date'
+                                        : 'Due date'}
                                 </label>
                                 <input 
                                   type="date"
