@@ -168,12 +168,12 @@ export default function Freelance() {
           <div>
             <div className="flex items-center gap-3 mb-6">
               <div className={`w-2.5 h-2.5 ${totalUnreserved > 1000 ? 'bg-rose-500 shadow-glow-rose' : 'bg-emerald-500 shadow-glow-emerald'}`} />
-              <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em] font-bold">Weekly Income Tracker // {taxState} Rules</p>
+              <p className="text-xs font-sans text-content-tertiary">Weekly income tracker · {taxState}</p>
             </div>
             
             <div className="flex flex-col">
-              <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Tax Still Owed</span>
-              <h2 className="text-7xl md:text-8xl font-mono font-bold text-white tracking-tighter tabular-nums leading-none">
+              <span className="text-xs text-content-tertiary mb-1">Tax still owed (unreserved)</span>
+              <h2 className="text-7xl md:text-8xl font-mono font-bold text-white tracking-tighter tabular-nums leading-none data-numeric">
                 ${totalUnreserved.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </h2>
             </div>
@@ -181,8 +181,8 @@ export default function Freelance() {
 
           <div className="flex flex-col md:items-end gap-6 md:text-right border-l md:border-l-0 md:border-r border-surface-border pl-8 md:pl-0 md:pr-8">
             <div>
-              <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Tax Money Saved</p>
-              <p className="text-3xl font-mono text-emerald-400 font-bold">${totalVaulted.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+              <p className="text-xs text-content-tertiary mb-1">Moved to tax reserve</p>
+              <p className="text-3xl font-mono tabular-nums text-emerald-400 font-bold data-numeric">${totalVaulted.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
             </div>
             
             <div className="flex items-center gap-3">
@@ -194,18 +194,20 @@ export default function Freelance() {
                 className="hidden" 
               />
               <button 
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isScanning}
-                className="border border-surface-border hover:bg-surface-elevated text-zinc-400 text-[10px] font-mono px-6 py-3 rounded-none uppercase font-black tracking-tighter transition-all flex items-center gap-2 group"
+                className="border border-surface-border hover:bg-surface-elevated text-content-secondary text-sm font-sans font-medium px-6 py-3 rounded-sm transition-all flex items-center gap-2 group"
               >
-                {isScanning ? <Loader2 className="w-4 h-4 animate-spin text-brand-indigo" /> : <UploadCloud className="w-4 h-4 group-hover:text-brand-indigo" />}
-                Scan Weekly Statement
+                {isScanning ? <Loader2 className="w-4 h-4 animate-spin text-brand-indigo" /> : <UploadCloud className="w-4 h-4 group-hover:text-brand-indigo shrink-0" aria-hidden />}
+                Scan statement (PDF)
               </button>
               <button 
+                type="button"
                 onClick={() => setIsAddModalOpen(true)}
-                className="bg-brand-cta hover:bg-brand-cta-hover text-white text-[10px] font-mono px-6 py-3 rounded-none uppercase font-black tracking-tighter transition-all flex items-center gap-2"
+                className="bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold px-6 py-3 rounded-sm shadow-sm transition-all flex items-center gap-2"
               >
-                <Plus className="w-4 h-4" /> Add Payment
+                <Plus className="w-4 h-4 shrink-0" aria-hidden /> Add payment
               </button>
             </div>
           </div>
@@ -220,8 +222,8 @@ export default function Freelance() {
                   {entriesWithMath.length === 0 ? (
                     <div className="px-6 py-20 text-center flex flex-col items-center">
                        <Zap className="w-12 h-12 text-zinc-700 mb-4" />
-                       <p className="text-zinc-500 font-mono text-xs uppercase tracking-widest leading-relaxed max-w-xs">
-                         NO PAYMENTS LOGGED YET. START ADDING YOUR EARNINGS TO SEE HOW MUCH TO SET ASIDE FOR TAXES.
+                       <p className="text-content-tertiary text-sm leading-relaxed max-w-xs">
+                         No payments yet. Add earnings to see estimated tax set-aside.
                        </p>
                     </div>
                   ) : (
@@ -232,16 +234,16 @@ export default function Freelance() {
                              {entry.isVaulted ? <ShieldCheck className="w-6 h-6 text-emerald-500" /> : <ShieldAlert className="w-6 h-6 text-zinc-600" />}
                            </div>
                            <div className="space-y-1">
-                              <h3 className="font-mono font-black text-white text-sm uppercase tracking-tighter">{entry.client}</h3>
-                              <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">
-                                {new Date(entry.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · Gross: <span className="text-white">${entry.amount.toFixed(0)}</span>
+                              <h3 className="font-sans font-semibold text-white text-sm">{entry.client}</h3>
+                              <p className="text-xs text-content-tertiary">
+                                {new Date(entry.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · Gross <span className="text-white font-mono tabular-nums">${entry.amount.toFixed(0)}</span>
                               </p>
                               <div className="pt-2 flex flex-wrap gap-2">
-                                 <span className="text-[9px] font-mono text-rose-500 border border-rose-500/20 px-1.5 py-0.5 rounded-sm">TAX: -${entry.totalLiability.toFixed(0)}</span>
-                                 <span className="text-[9px] font-mono text-emerald-400 border border-emerald-400/20 px-1.5 py-0.5 rounded-sm">YOU KEEP: +${entry.profit.toFixed(0)}</span>
+                                 <span className="text-[10px] font-mono tabular-nums text-rose-500 border border-rose-500/20 px-1.5 py-0.5 rounded-sm">Tax −${entry.totalLiability.toFixed(0)}</span>
+                                 <span className="text-[10px] font-mono tabular-nums text-emerald-400 border border-emerald-400/20 px-1.5 py-0.5 rounded-sm">You keep +${entry.profit.toFixed(0)}</span>
                                  {entry.scouredWriteOffs && entry.scouredWriteOffs > 0 && (
-                                   <span className="text-[9px] font-mono bg-brand-indigo/20 text-brand-indigo border border-brand-indigo/30 px-1.5 py-0.5 rounded-sm flex items-center gap-1">
-                                     <ShieldCheck className="w-3 h-3" /> DEDUCTIONS: ${entry.scouredWriteOffs.toFixed(0)} SAVED
+                                   <span className="text-[10px] font-sans bg-brand-indigo/20 text-brand-indigo border border-brand-indigo/30 px-1.5 py-0.5 rounded-sm flex items-center gap-1">
+                                     <ShieldCheck className="w-3 h-3 shrink-0" aria-hidden /> Deductions ${entry.scouredWriteOffs.toFixed(0)}
                                    </span>
                                  )}
                               </div>
@@ -250,16 +252,16 @@ export default function Freelance() {
 
                         <div className="flex items-center gap-4">
                            <div className="text-right">
-                              <p className="text-[9px] font-mono text-zinc-600 uppercase mb-1">% You Keep</p>
+                              <p className="text-xs text-content-tertiary mb-1">% you keep</p>
                               <div className="w-24 bg-surface-base h-1 rounded-none overflow-hidden">
                                  <div className="bg-brand-violet h-full" style={{ width: `${(entry.profit / entry.amount) * 100}%` }} />
                               </div>
                            </div>
                            <button 
                              onClick={() => toggleFreelanceVault(entry.id)}
-                             className={`px-4 py-2 border font-mono font-black text-[9px] uppercase tracking-tighter transition-all ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-brand-cta bg-brand-cta text-white hover:bg-brand-cta-hover'}`}
+                             className={`px-4 py-2 border text-xs font-sans font-semibold transition-all rounded-sm ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-brand-cta bg-brand-cta text-white hover:bg-brand-cta-hover'}`}
                            >
-                             {entry.isVaulted ? 'Saved' : 'Move to Tax Reserve'}
+                             {entry.isVaulted ? 'Saved' : 'Move to tax reserve'}
                            </button>
                            <button onClick={() => deleteFreelanceEntry(entry.id)} className="text-zinc-700 hover:text-rose-500 transition-colors p-2"><Trash2 className="w-4 h-4"/></button>
                         </div>
@@ -275,19 +277,19 @@ export default function Freelance() {
            <div className="bg-surface-raised border border-surface-border p-6 rounded-none">
               <div className="flex items-center gap-2 text-content-tertiary mb-4">
                  <Zap className="w-4 h-4 text-brand-violet" />
-                 <h3 className="text-xs font-mono font-black uppercase tracking-[0.2em]">Freelance Tips</h3>
+                 <h3 className="text-sm font-sans font-semibold text-content-primary">Freelance tips</h3>
               </div>
               <div className="space-y-6">
                  <div className="border-l-2 border-brand-violet pl-4">
-                    <p className="text-[10px] font-mono font-bold text-white uppercase mb-1">Self-Employment Tax (15.3%)</p>
-                    <p className="text-[10px] font-mono text-zinc-500 uppercase leading-relaxed tracking-tighter">
-                      Oweable sets aside 15.3% from each payment for your self-employment tax bill — so you're never caught off guard.
+                    <p className="text-sm font-sans font-medium text-white mb-1">Self-employment tax (15.3%)</p>
+                    <p className="text-xs text-content-tertiary leading-relaxed">
+                      We set aside 15.3% from each payment toward self-employment tax.
                     </p>
                  </div>
                  <div className="border-l-2 border-brand-violet pl-4">
-                    <p className="text-[10px] font-mono font-bold text-white uppercase mb-1">State Tax: {taxState}</p>
-                    <p className="text-[10px] font-mono text-zinc-500 uppercase leading-relaxed tracking-tighter">
-                      In your state, an additional {stateRate}% should be saved. Your total suggested savings rate is {(stateRate + 15.3 + 12).toFixed(1)}%.
+                    <p className="text-sm font-sans font-medium text-white mb-1">State tax · {taxState}</p>
+                    <p className="text-xs text-content-tertiary leading-relaxed">
+                      Save an extra {stateRate}% for state. Suggested total rate about {(stateRate + 15.3 + 12).toFixed(1)}%.
                     </p>
                  </div>
               </div>
@@ -296,24 +298,24 @@ export default function Freelance() {
            <div className="bg-surface-raised border border-surface-border p-6 rounded-none">
               <div className="flex items-center gap-2 mb-5">
                  <div className="w-1.5 h-1.5 bg-emerald-500" />
-                 <h3 className="text-xs font-mono font-black text-content-primary uppercase tracking-[0.2em]">Weekly Summary</h3>
+                 <h3 className="text-sm font-sans font-semibold text-content-primary">Weekly summary</h3>
               </div>
               <div className="space-y-2">
                  <div className="flex justify-between items-center bg-surface-elevated border border-surface-border p-3">
-                    <span className="text-[9px] font-mono text-content-tertiary uppercase tracking-widest">Take-Home Pay</span>
-                    <span className="text-sm font-mono text-emerald-400 font-bold">${entriesWithMath.reduce((s, e) => s + e.profit, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                    <span className="text-xs text-content-tertiary">Take-home</span>
+                    <span className="text-sm font-mono tabular-nums text-emerald-400 font-bold data-numeric">${entriesWithMath.reduce((s, e) => s + e.profit, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                  </div>
                  <div className="flex justify-between items-center bg-surface-elevated border border-surface-border p-3">
-                    <span className="text-[9px] font-mono text-content-tertiary uppercase tracking-widest">Taxes Owed</span>
-                    <span className="text-sm font-mono text-rose-400 font-bold">${entriesWithMath.reduce((s, e) => s + e.totalLiability, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                    <span className="text-xs text-content-tertiary">Taxes owed</span>
+                    <span className="text-sm font-mono tabular-nums text-rose-400 font-bold data-numeric">${entriesWithMath.reduce((s, e) => s + e.totalLiability, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                  </div>
                  <div className="flex justify-between items-center bg-surface-elevated border border-surface-border p-3">
-                    <span className="text-[9px] font-mono text-content-tertiary uppercase tracking-widest">Total Earned</span>
-                    <span className="text-sm font-mono text-content-primary font-bold">${entriesWithMath.reduce((s, e) => s + e.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                    <span className="text-xs text-content-tertiary">Total earned</span>
+                    <span className="text-sm font-mono tabular-nums text-content-primary font-bold data-numeric">${entriesWithMath.reduce((s, e) => s + e.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                  </div>
               </div>
-              <p className="text-[9px] font-mono text-content-muted mt-4 uppercase leading-relaxed border-t border-surface-border pt-4">
-                'Saved' means you've moved this money to a separate account for taxes.
+              <p className="text-xs text-content-tertiary mt-4 leading-relaxed border-t border-surface-border pt-4">
+                “Saved” means you moved this amount to a separate account for taxes.
               </p>
            </div>
         </div>
@@ -336,19 +338,19 @@ export default function Freelance() {
               exit={{ scale: 0.95, opacity: 0 }}
               className="relative bg-surface-raised border border-surface-border p-8 w-full max-w-md shadow-3xl"
             >
-               <h2 className="text-xl font-mono font-black text-white uppercase tracking-widest mb-6">Add New Payment</h2>
+               <h2 className="text-xl font-sans font-semibold text-white mb-6">Add payment</h2>
                <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <label className="block text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">Who paid you?</label>
-                    <input autoFocus type="text" value={formData.client} onChange={e => setFormData({...formData, client: e.target.value})} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white font-mono outline-none focus:border-brand-indigo transition-colors" placeholder="e.g. Acme Studio" />
+                    <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Who paid you?</label>
+                    <input autoFocus type="text" value={formData.client} onChange={e => setFormData({...formData, client: e.target.value})} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white outline-none focus:border-brand-indigo transition-colors rounded-sm" placeholder="e.g. Acme Studio" />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">Payment Amount ($)</label>
-                    <input type="number" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white font-mono outline-none focus:border-brand-indigo transition-colors" placeholder="0.00" />
+                    <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Payment amount</label>
+                    <input type="number" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white font-mono tabular-nums outline-none focus:border-brand-indigo transition-colors rounded-sm" placeholder="0.00" />
                   </div>
                   <div className="pt-4 flex gap-3">
-                    <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 h-12 border border-surface-border text-zinc-500 font-mono text-[10px] uppercase font-black tracking-widest hover:bg-surface-elevated transition-colors">Cancel</button>
-                    <button type="submit" className="flex-2 bg-brand-cta hover:bg-brand-cta-hover text-white h-12 px-8 font-mono text-[10px] uppercase font-black tracking-widest transition-all">Add Payment</button>
+                    <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 h-12 border border-surface-border text-content-tertiary text-sm font-sans font-medium hover:bg-surface-elevated transition-colors rounded-sm">Cancel</button>
+                    <button type="submit" className="flex-[2] bg-brand-cta hover:bg-brand-cta-hover text-white h-12 px-8 text-sm font-sans font-semibold transition-all rounded-sm">Add payment</button>
                   </div>
                </form>
             </motion.div>

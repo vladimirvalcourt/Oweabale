@@ -11,7 +11,7 @@ export default function MaintenancePage() {
   return (
     <div className="min-h-screen bg-surface-base flex flex-col items-center justify-center px-6 py-16">
       <Construction className="w-12 h-12 text-amber-500/90 mb-6" aria-hidden />
-      <p className="text-[10px] font-mono uppercase tracking-[0.35em] text-zinc-500 mb-4">Maintenance</p>
+      <p className="text-xs font-sans font-medium text-content-tertiary mb-4">Maintenance</p>
       <h1 className="text-2xl font-semibold text-content-primary tracking-tight mb-2 text-center">
         We&apos;re upgrading Oweable
       </h1>
@@ -30,7 +30,7 @@ export default function MaintenancePage() {
         </button>
         <Link
           to="/"
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors rounded-sm"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors rounded-sm"
         >
           Home
         </Link>

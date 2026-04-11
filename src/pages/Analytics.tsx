@@ -191,14 +191,14 @@ export default function Analytics() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Trends</h1>
-          <p className="text-sm font-mono text-zinc-400 mt-1 uppercase tracking-widest">Historical performance & spending patterns.</p>
+          <p className="text-sm text-content-tertiary mt-1">Historical performance and spending patterns.</p>
         </div>
         <div className="flex bg-surface-raised border border-surface-border rounded-sm p-1">
           {(['1M', '3M', '6M', '1Y', 'ALL'] as Period[]).map(p => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
-              className={`px-3 py-1 text-[10px] font-mono rounded-sm transition-colors ${
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${
                 period === p ? 'bg-surface-border text-white' : 'text-zinc-500 hover:text-zinc-300'
               }`}
             >
@@ -237,9 +237,9 @@ export default function Analytics() {
           },
         ].map(card => (
           <div key={card.label} className="bg-surface-elevated border border-surface-border rounded-sm p-5">
-            <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">{card.label}</p>
-            <p className={`text-2xl font-mono font-bold tabular-nums ${card.color}`}>{card.value}</p>
-            <p className="text-[10px] font-mono text-zinc-600 mt-1 truncate">{card.sub}</p>
+            <p className="metric-label normal-case text-zinc-500 mb-2">{card.label}</p>
+            <p className={`text-2xl font-mono font-bold tabular-nums data-numeric ${card.color}`}>{card.value}</p>
+            <p className="text-xs text-content-tertiary mt-1 truncate">{card.sub}</p>
           </div>
         ))}
       </div>
@@ -248,13 +248,13 @@ export default function Analytics() {
       <CollapsibleModule title="Net Worth Timeline" icon={TrendingUp}>
         {loading ? (
           <div className="h-64 flex items-center justify-center">
-            <p className="text-xs font-mono text-zinc-600 uppercase tracking-widest animate-pulse">Loading history...</p>
+            <p className="text-sm text-content-tertiary animate-pulse">Loading history…</p>
           </div>
         ) : chartSnapshots.length < 2 ? (
           <div className="h-64 flex flex-col items-center justify-center gap-3">
             <Activity className="w-8 h-8 text-zinc-700" />
-            <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest text-center">
-              History builds automatically each day you log in.<br />Check back tomorrow for your first trend line.
+            <p className="text-sm text-content-tertiary text-center max-w-sm">
+              History builds automatically each day you log in. Check back tomorrow for your first trend line.
             </p>
           </div>
         ) : (
@@ -280,8 +280,8 @@ export default function Analytics() {
           </ResponsiveContainer>
         )}
         <div className="flex gap-5 mt-3">
-          <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-500"><span className="w-2 h-2 bg-indigo-400 inline-block" /> Net Worth</div>
-          <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-500"><span className="w-2 h-2 bg-emerald-400 inline-block" /> Assets</div>
+          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-indigo-400 inline-block shrink-0" aria-hidden /> Net worth</div>
+          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-emerald-400 inline-block shrink-0" aria-hidden /> Assets</div>
         </div>
       </CollapsibleModule>
 
@@ -289,7 +289,7 @@ export default function Analytics() {
       <CollapsibleModule title="Spending by Category" icon={PieChart}>
         {monthlySpend.every(m => topCategories.every(c => m[c] === 0)) ? (
           <div className="h-64 flex items-center justify-center">
-            <p className="text-xs font-mono text-zinc-600 uppercase tracking-widest">No expense transactions yet.</p>
+            <p className="text-sm text-content-tertiary">No expense transactions yet.</p>
           </div>
         ) : (
           <>
@@ -306,8 +306,8 @@ export default function Analytics() {
             </ResponsiveContainer>
             <div className="flex flex-wrap gap-4 mt-3">
               {topCategories.map((cat, i) => (
-                <div key={cat} className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-500">
-                  <span className="w-2 h-2 inline-block" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
+                <div key={cat} className="flex items-center gap-1.5 text-xs text-content-tertiary">
+                  <span className="w-2 h-2 inline-block shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} aria-hidden />
                   {cat}
                 </div>
               ))}
@@ -329,8 +329,8 @@ export default function Analytics() {
           </LineChart>
         </ResponsiveContainer>
         <div className="flex gap-5 mt-3">
-          <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-500"><span className="w-2 h-2 bg-indigo-400 inline-block" /> Savings Rate</div>
-          <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-500"><span className="w-4 h-px bg-zinc-700 inline-block" style={{ borderTop: '1px dashed #3f3f46' }} /> 20% Target</div>
+          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-indigo-400 inline-block shrink-0" aria-hidden /> Savings rate</div>
+          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-4 h-px bg-zinc-700 inline-block shrink-0" style={{ borderTop: '1px dashed #3f3f46' }} aria-hidden /> 20% target</div>
         </div>
       </CollapsibleModule>
     </div>

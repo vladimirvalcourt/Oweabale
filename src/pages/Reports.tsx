@@ -141,7 +141,7 @@ export default function Reports() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Reports & Analytics</h1>
-          <p className="text-sm text-zinc-400 mt-1">Full financial picture across time.</p>
+          <p className="text-sm text-content-tertiary mt-1">Full financial picture across time.</p>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex bg-surface-raised border border-surface-border rounded-sm p-1">
@@ -149,7 +149,7 @@ export default function Reports() {
               <button
                 key={r}
                 onClick={() => setDateRange(r)}
-                className={`px-3 py-1 text-xs font-mono rounded-sm transition-colors ${
+                className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${
                   dateRange === r ? 'bg-surface-border text-white' : 'text-zinc-500 hover:text-zinc-300'
                 }`}
               >
@@ -180,8 +180,8 @@ export default function Reports() {
             { label: 'Transactions', value: filteredTx.length.toString(), color: 'text-amber-400' },
           ].map(card => (
             <div key={card.label} className="bg-surface-elevated border border-surface-border rounded-sm p-5">
-              <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">{card.label}</p>
-              <p className={`text-2xl font-mono font-bold tabular-nums ${card.color}`}>{card.value}</p>
+              <p className="metric-label normal-case text-zinc-500 mb-2">{card.label}</p>
+              <p className={`text-2xl font-mono font-bold tabular-nums data-numeric ${card.color}`}>{card.value}</p>
             </div>
           ))}
         </div>
@@ -205,8 +205,8 @@ export default function Reports() {
               </BarChart>
             </ResponsiveContainer>
             <div className="flex gap-4 mt-3">
-              <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-500"><span className="w-2 h-2 bg-emerald-400 rounded-none inline-block" /> Income</div>
-              <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-500"><span className="w-2 h-2 bg-red-400 rounded-none inline-block" /> Expenses</div>
+              <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-emerald-400 rounded-none inline-block shrink-0" aria-hidden /> Income</div>
+              <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-red-400 rounded-none inline-block shrink-0" aria-hidden /> Expenses</div>
             </div>
           </div>
         </CollapsibleModule>
@@ -217,7 +217,7 @@ export default function Reports() {
           icon={PieChart}
         >
           {categoryData.length === 0 ? (
-            <div className="h-[220px] flex items-center justify-center text-zinc-600 text-sm font-mono">No expense data in range</div>
+            <div className="h-[220px] flex items-center justify-center text-content-tertiary text-sm">No expense data in this range</div>
           ) : (
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <ResponsiveContainer width={160} height={160}>
@@ -235,9 +235,9 @@ export default function Reports() {
                   <div key={cat.name} className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="w-2 h-2 shrink-0 rounded-none" style={{ backgroundColor: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }} />
-                      <span className="text-[11px] font-mono text-zinc-400 truncate">{cat.name}</span>
+                      <span className="text-xs text-content-secondary truncate">{cat.name}</span>
                     </div>
-                    <span className="text-[11px] font-mono text-zinc-300 shrink-0">${cat.value.toLocaleString()}</span>
+                    <span className="text-xs font-mono tabular-nums text-content-primary data-numeric shrink-0">${cat.value.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
@@ -272,22 +272,22 @@ export default function Reports() {
       <CollapsibleModule 
         title="Debt Payoff Progress"
         icon={CreditCard}
-        extraHeader={<span className="text-xs font-mono text-content-primary font-bold">{debtProgress.length} Accounts</span>}
+        extraHeader={<span className="text-sm font-sans font-semibold text-content-primary">{debtProgress.length} accounts</span>}
       >
         <div className="space-y-5">
           {debtProgress.length === 0 ? (
-            <p className="text-sm font-mono text-zinc-500 text-center py-4">No debts tracked.</p>
+            <p className="text-sm text-content-tertiary text-center py-4">No debts tracked yet.</p>
           ) : (
             debtProgress.map(d => (
               <div key={d.name}>
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <span className="text-sm font-medium text-content-primary">{d.name}</span>
-                    <span className="ml-2 text-[10px] font-mono text-zinc-500">{d.apr}% APR</span>
+                    <span className="ml-2 text-xs text-content-tertiary">{d.apr}% APR</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs font-mono text-zinc-400">${d.remaining.toLocaleString()} left</span>
-                    <span className="ml-2 text-xs font-mono text-indigo-400">{d.pct}%</span>
+                    <span className="text-xs font-mono tabular-nums text-zinc-400 data-numeric">${d.remaining.toLocaleString()} left</span>
+                    <span className="ml-2 text-xs font-mono tabular-nums text-indigo-400 data-numeric">{d.pct}%</span>
                   </div>
                 </div>
                 <div className="w-full h-2 bg-surface-border rounded-none overflow-hidden">
@@ -296,9 +296,9 @@ export default function Reports() {
                     style={{ width: `${d.pct}%` }}
                   />
                 </div>
-                <div className="flex justify-between text-[10px] font-mono text-zinc-600 mt-1">
-                  <span>Paid: ${d.paid.toLocaleString()}</span>
-                  <span>Total: ${d.total.toLocaleString()}</span>
+                <div className="flex justify-between text-xs font-mono tabular-nums text-content-tertiary mt-1 data-numeric">
+                  <span>Paid ${d.paid.toLocaleString()}</span>
+                  <span>Total ${d.total.toLocaleString()}</span>
                 </div>
               </div>
             ))

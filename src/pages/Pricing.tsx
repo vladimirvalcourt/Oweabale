@@ -77,8 +77,8 @@ export default function Pricing() {
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-surface-base/90 backdrop-blur-md border-b border-surface-border py-4' : 'bg-transparent py-6'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <Link to="/" className="font-black text-xl tracking-[0.2em] text-content-primary transition-colors duration-200">
-            OWEABLE
+          <Link to="/" className="brand-header-text text-xl text-content-primary transition-colors duration-200">
+            Oweable
           </Link>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
             <Link to="/#features" className="hover:text-white transition-colors duration-200">Features</Link>
@@ -87,9 +87,9 @@ export default function Pricing() {
           </div>
           <Link 
             to="/dashboard" 
-            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-sm font-bold transition-colors duration-200"
+            className="px-5 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors duration-200"
           >
-            Get Started
+            Get started
           </Link>
         </div>
       </nav>
@@ -100,8 +100,8 @@ export default function Pricing() {
         <div className="max-w-4xl mx-auto px-6 lg:px-8 mb-12">
           <div className="bg-amber-400/5 border border-amber-400/20 p-4 rounded-sm flex items-center gap-4">
             <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
-            <p className="font-mono text-[10px] text-amber-200/80 uppercase tracking-[0.1em] leading-relaxed">
-              <span className="text-amber-400 font-bold">BETA STATUS:</span> Oweable is currently free for testing. We may start charging at any time with advance notification to all active users.
+            <p className="text-sm text-amber-200/90 leading-relaxed">
+              <span className="text-amber-400 font-semibold">Beta:</span> Oweable is free for testing. We may start charging with advance notice to active users.
             </p>
           </div>
         </div>
@@ -115,7 +115,7 @@ export default function Pricing() {
         >
           <div className="flex items-center gap-4 mb-8">
             <div className="h-[1px] w-8 bg-[#F59E0B]"></div>
-            <span className="text-[#F59E0B] text-xs tracking-widest uppercase">RUTHLESS ROI</span>
+            <span className="text-[#F59E0B] text-xs font-sans font-medium">Simple pricing</span>
             <div className="h-[1px] w-8 bg-[#F59E0B]"></div>
           </div>
           
@@ -143,21 +143,23 @@ export default function Pricing() {
                   className={`absolute top-1 bottom-1 w-[100px] bg-surface-border shadow-sm rounded-sm transition-all duration-300 ease-in-out ${isYearly ? 'left-[104px]' : 'left-1'}`}
                 ></div>
                 <button 
+                  type="button"
                   onClick={() => setIsYearly(false)}
-                  className={`relative z-10 w-[100px] py-1.5 text-[10px] font-mono uppercase tracking-widest transition-colors duration-300 ${!isYearly ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                  className={`relative z-10 w-[100px] py-1.5 text-xs font-sans font-medium transition-colors duration-300 ${!isYearly ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
                 >
                   Monthly
                 </button>
                 <button 
+                  type="button"
                   onClick={() => setIsYearly(true)}
-                  className={`relative z-10 w-[100px] py-1.5 text-[10px] font-mono uppercase tracking-widest transition-colors duration-300 ${isYearly ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+                  className={`relative z-10 w-[100px] py-1.5 text-xs font-sans font-medium transition-colors duration-300 ${isYearly ? 'text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
                 >
                   Yearly
                 </button>
               </div>
               <div className="flex items-center">
-                <span className="text-[9px] font-mono font-extrabold text-emerald-400 bg-emerald-400/5 border border-emerald-400/20 px-2 py-0.5 rounded-sm uppercase tracking-[0.2em]">
-                  -25% Yield
+                <span className="text-xs font-sans font-semibold text-emerald-400 bg-emerald-400/5 border border-emerald-400/20 px-2 py-0.5 rounded-sm">
+                  Save ~25% yearly
                 </span>
               </div>
             </div>
@@ -167,33 +169,33 @@ export default function Pricing() {
             
             {/* Card 1: The Tracker */}
             <div className={`bg-surface-raised border border-surface-border rounded-sm p-10 flex flex-col transition-all duration-700 ease-out delay-[100ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-              <h3 className="text-sm font-mono font-bold uppercase tracking-[0.3em] text-content-primary mb-2">The Tracker</h3>
-              <p className="text-zinc-500 text-xs font-mono uppercase tracking-widest mb-8 h-10 leading-relaxed">For those who just need to see the bleeding.</p>
+              <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Tracker</h3>
+              <p className="text-zinc-500 text-sm mb-8 h-10 leading-relaxed">Core balances and bills without the full suite.</p>
               
               <div className="mb-10 p-6 bg-surface-base border border-surface-border rounded-sm">
-                <span className="text-4xl font-mono font-bold text-content-primary">$0</span>
-                <span className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest ml-3">/ Perpetual Free</span>
+                <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">$0</span>
+                <span className="text-zinc-600 text-sm ml-3">forever free</span>
               </div>
               
               <Link 
                 to="/dashboard" 
-                className="w-full py-4 px-6 bg-transparent border border-surface-border hover:border-zinc-300 hover:bg-white/5 text-content-primary rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-center transition-all duration-200 mb-10"
+                className="w-full py-4 px-6 bg-transparent border border-surface-border hover:border-zinc-300 hover:bg-white/5 text-content-primary rounded-sm text-sm font-sans font-semibold text-center transition-all duration-200 mb-10"
               >
-                Deploy Free Tracker
+                Use free tracker
               </Link>
               
               <div className="flex flex-col gap-5 mt-auto">
                 <div className="flex items-start gap-3">
                   <Check className="w-3.5 h-3.5 text-zinc-500 shrink-0 mt-0.5" />
-                  <span className="text-zinc-400 text-[10px] font-mono uppercase tracking-widest">3 Basic accounts</span>
+                  <span className="text-zinc-400 text-sm">3 basic accounts</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <Check className="w-3.5 h-3.5 text-zinc-500 shrink-0 mt-0.5" />
-                  <span className="text-zinc-400 text-[10px] font-mono uppercase tracking-widest">Manual bill entry</span>
+                  <span className="text-zinc-400 text-sm">Manual bill entry</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <Check className="w-3.5 h-3.5 text-zinc-500 shrink-0 mt-0.5" />
-                  <span className="text-zinc-400 text-[10px] font-mono uppercase tracking-widest">Standard net worth chart</span>
+                  <span className="text-zinc-400 text-sm">Standard net worth chart</span>
                 </div>
               </div>
             </div>
@@ -205,42 +207,42 @@ export default function Pricing() {
               
               <div className="bg-surface-raised border border-indigo-500/30 rounded-sm p-10 flex flex-col relative z-10 h-full shadow-[0_0_50px_rgba(99,102,241,0.05)]">
                 <div className="absolute top-0 right-10 transform -translate-y-1/2">
-                  <span className="bg-emerald-600 text-white text-[9px] font-mono font-bold px-3 py-1 rounded-sm uppercase tracking-[0.2em]">Open Beta</span>
+                  <span className="bg-emerald-600 text-white text-xs font-sans font-semibold px-3 py-1 rounded-sm">Open beta</span>
                 </div>
                 
-                <h3 className="text-sm font-mono font-bold uppercase tracking-[0.3em] text-content-primary mb-2">The Arsenal</h3>
-                <p className="text-zinc-500 text-xs font-mono uppercase tracking-widest mb-8 h-10 leading-relaxed">Full tactical suite unlocked for the Oweable Beta Trial.</p>
+                <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Full suite</h3>
+                <p className="text-zinc-500 text-sm mb-8 h-10 leading-relaxed">Everything in the app during open beta.</p>
                 
                 <div className="mb-10 p-6 bg-surface-base border border-indigo-500/20 rounded-sm relative h-[100px] flex items-center shadow-[inset_0_0_20px_rgba(99,102,241,0.02)]">
                   <div className={`absolute inset-0 px-6 flex items-center transition-all duration-300 ease-in-out`}>
-                    <span className="text-4xl font-mono font-bold text-content-primary">$0</span>
-                    <span className="text-zinc-600 font-mono text-[10px] uppercase tracking-widest ml-3">/ Complimentary Access</span>
+                    <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">$0</span>
+                    <span className="text-zinc-600 text-sm ml-3">complimentary beta</span>
                   </div>
                 </div>
                 
                 <Link 
                   to="/dashboard" 
-                  className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-center transition-all duration-200 mb-10 shadow-[0_0_25px_rgba(99,102,241,0.2)]"
+                  className="w-full py-4 px-6 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold text-center transition-all duration-200 mb-10 shadow-sm"
                 >
-                  Start Free Beta Trial
+                  Start free beta
                 </Link>
                 
                 <div className="flex flex-col gap-5 mt-auto">
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                    <span className="text-zinc-400 text-[10px] font-mono uppercase tracking-widest">Unlimited account sync</span>
+                    <span className="text-zinc-400 text-sm">Unlimited account sync</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                    <span className="text-zinc-400 text-[10px] font-mono uppercase tracking-widest">The "Debt Detonator" algorithm</span>
+                    <span className="text-zinc-400 text-sm">Debt payoff planner (avalanche & snowball)</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                    <span className="text-zinc-400 text-[10px] font-mono uppercase tracking-widest">"Subscription Sniper" alerts</span>
+                    <span className="text-zinc-400 text-sm">Subscription price-change alerts</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
-                    <span className="text-zinc-400 text-[10px] font-mono uppercase tracking-widest">Automated Tax Fortress</span>
+                    <span className="text-zinc-400 text-sm">Tax tools for freelancers</span>
                   </div>
                 </div>
               </div>

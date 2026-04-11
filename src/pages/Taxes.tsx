@@ -105,27 +105,27 @@ export default function Taxes() {
           <h1 className="text-2xl font-bold tracking-tight text-content-primary flex items-center gap-3">
             <ShieldAlert className="w-7 h-7 text-brand-violet" /> Freelance Tax Guide
           </h1>
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-zinc-500 mt-1">Automated Tax Savings</p>
+          <p className="text-sm text-content-tertiary mt-1">Estimates and quarterly reminders based on your ledger.</p>
         </div>
         
         <div className="flex flex-wrap gap-2">
           <select 
             value={taxState} 
             onChange={(e) => setTaxSettings(e.target.value, STATE_TAX_MAP[e.target.value].rate)}
-            className="bg-surface-raised border border-surface-border text-[10px] font-mono text-content-primary px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-indigo rounded-sm"
+            className="bg-surface-raised border border-surface-border text-sm font-sans text-content-primary px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-brand-indigo rounded-sm"
           >
             {Object.keys(STATE_TAX_MAP).map(k => (
-              <option key={k} value={k}>{STATE_TAX_MAP[k].name.toUpperCase()} ({STATE_TAX_MAP[k].rate}%)</option>
+              <option key={k} value={k}>{STATE_TAX_MAP[k].name} ({STATE_TAX_MAP[k].rate}%)</option>
             ))}
           </select>
           <div className="flex bg-surface-raised border border-surface-border rounded-sm p-1">
             <button
               onClick={() => setFilingStatus('single')}
-              className={`px-3 py-1 text-[10px] font-mono uppercase rounded-sm transition-colors ${filingStatus === 'single' ? 'bg-indigo-600 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${filingStatus === 'single' ? 'bg-brand-cta text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
             >Single</button>
             <button
               onClick={() => setFilingStatus('married')}
-              className={`px-3 py-1 text-[10px] font-mono uppercase rounded-sm transition-colors ${filingStatus === 'married' ? 'bg-indigo-600 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${filingStatus === 'married' ? 'bg-brand-cta text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
             >Married</button>
           </div>
         </div>
@@ -135,7 +135,7 @@ export default function Taxes() {
       <div className="bg-amber-500/10 border border-amber-500/40 rounded-sm p-4 flex items-start gap-3 shadow-[0_0_20px_rgba(245,158,11,0.05)]">
         <Zap className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
         <div>
-          <p className="text-xs font-mono font-bold text-amber-400 uppercase tracking-widest mb-1">Freelancer Tip: The Savings Rule</p>
+          <p className="text-sm font-sans font-semibold text-amber-400 mb-1">Freelancer tip: the savings rule</p>
           <p className="text-sm text-zinc-300 leading-relaxed font-sans">
             As a freelancer in <strong>{STATE_TAX_MAP[taxState].name}</strong>, you pay both sides of Social Security & Medicare. This is an extra <strong>15.3%</strong> cost that regular employees don't see. Oweable has factored this into your current <strong>${(stateRate + 15.3 + (incomeStats.total > 0 ? fedTax/incomeStats.total*100 : 0)).toFixed(1)}%</strong> estimated savings rate.
           </p>
@@ -146,34 +146,34 @@ export default function Taxes() {
         <div className="lg:col-span-2 space-y-6">
           <CollapsibleModule title="Yearly Tax Estimates" icon={Calculator}>
             <div className="flex flex-col items-center justify-center py-10">
-              <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">Estimated Total Liability</p>
-              <h2 className="text-6xl font-bold font-mono text-white tabular-nums tracking-tighter">
+              <p className="metric-label normal-case text-zinc-500 mb-2">Estimated total liability</p>
+              <h2 className="text-6xl font-bold font-mono text-white tabular-nums tracking-tighter data-numeric">
                 ${totalLiability.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </h2>
               <div className="mt-6 flex items-center gap-4">
                 <div className="flex flex-col items-center px-6 border-r border-surface-border">
-                  <span className="text-[10px] font-mono text-zinc-600 uppercase">Effective Rate</span>
-                  <span className="text-lg font-mono text-content-primary">{(totalLiability / (incomeStats.total || 1) * 100).toFixed(1)}%</span>
+                  <span className="text-xs text-content-tertiary">Effective rate</span>
+                  <span className="text-lg font-mono tabular-nums text-content-primary data-numeric">{(totalLiability / (incomeStats.total || 1) * 100).toFixed(1)}%</span>
                 </div>
                 <div className="flex flex-col items-center px-6">
-                  <span className="text-[10px] font-mono text-zinc-600 uppercase">Monthly Savings Target</span>
-                  <span className="text-lg font-mono text-brand-indigo">${(totalLiability / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                  <span className="text-xs text-content-tertiary">Monthly set-aside</span>
+                  <span className="text-lg font-mono tabular-nums text-brand-indigo data-numeric">${(totalLiability / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-surface-border border-t border-surface-border">
               <div className="bg-surface-elevated p-4">
-                <p className="text-[9px] font-mono text-zinc-500 uppercase mb-1">Self-Employment (FICA)</p>
-                <p className="text-sm font-mono text-content-primary font-bold">${seTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                <p className="metric-label normal-case text-zinc-500 mb-1">Self-employment (FICA)</p>
+                <p className="text-sm font-mono tabular-nums text-content-primary font-bold data-numeric">${seTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
               </div>
               <div className="bg-surface-elevated p-4">
-                <p className="text-[9px] font-mono text-zinc-500 uppercase mb-1">Federal Income Tax</p>
-                <p className="text-sm font-mono text-content-primary font-bold">${fedTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                <p className="metric-label normal-case text-zinc-500 mb-1">Federal income tax</p>
+                <p className="text-sm font-mono tabular-nums text-content-primary font-bold data-numeric">${fedTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
               </div>
               <div className="bg-surface-elevated p-4">
-                <p className="text-[9px] font-mono text-zinc-500 uppercase mb-1">State Tax ({taxState})</p>
-                <p className="text-sm font-mono text-content-primary font-bold">${stateTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                <p className="metric-label normal-case text-zinc-500 mb-1">State tax ({taxState})</p>
+                <p className="text-sm font-mono tabular-nums text-content-primary font-bold data-numeric">${stateTax.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
               </div>
             </div>
           </CollapsibleModule>
@@ -181,20 +181,20 @@ export default function Taxes() {
           <CollapsibleModule title="Tax Write-offs Tracker" icon={Plus}>
             <div className="p-0">
                <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-elevated/50">
-                  <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest font-bold">Write-offs detected in Ledger</p>
-                  <button onClick={() => setShowAddForm(!showAddForm)} className="bg-brand-cta hover:bg-brand-cta-hover text-white text-[10px] font-mono px-3 py-1.5 rounded-sm uppercase font-bold transition-all">Add Manual Deduction</button>
+                  <p className="text-sm font-sans font-medium text-content-secondary">Write-offs from your ledger</p>
+                  <button type="button" onClick={() => setShowAddForm(!showAddForm)} className="bg-brand-cta hover:bg-brand-cta-hover text-white text-xs font-sans font-semibold px-3 py-1.5 rounded-sm transition-all">Add deduction</button>
                </div>
                {showAddForm && (
                  <div className="p-6 bg-surface-elevated border-b border-surface-border flex gap-3 items-end">
                     <div className="flex-1">
-                      <p className="text-[9px] font-mono text-zinc-500 uppercase mb-1">Expense Label</p>
-                      <input type="text" placeholder="e.g. Adobe Suite" value={newDeduction.name} onChange={e => setNewDeduction({...newDeduction, name: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-sm h-10 px-3 text-sm font-mono text-white outline-none focus:border-brand-indigo transition-colors" />
+                      <p className="text-xs text-content-tertiary mb-1">Expense label</p>
+                      <input type="text" placeholder="e.g. Adobe Suite" value={newDeduction.name} onChange={e => setNewDeduction({...newDeduction, name: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-sm h-10 px-3 text-sm text-white outline-none focus:border-brand-indigo transition-colors" />
                     </div>
                     <div className="w-24">
-                      <p className="text-[9px] font-mono text-zinc-500 uppercase mb-1">Amount</p>
-                      <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-sm h-10 px-3 text-sm font-mono text-white outline-none focus:border-brand-indigo transition-colors" />
+                      <p className="text-xs text-content-tertiary mb-1">Amount</p>
+                      <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-sm h-10 px-3 text-sm font-mono tabular-nums text-white outline-none focus:border-brand-indigo transition-colors" />
                     </div>
-                    <button onClick={async () => {
+                    <button type="button" onClick={async () => {
                       if (!newDeduction.name.trim()) { toast.error('Enter an expense label'); return; }
                       const amt = parseFloat(newDeduction.amount);
                       if (isNaN(amt) || amt <= 0) { toast.error('Enter a valid amount'); return; }
@@ -202,7 +202,7 @@ export default function Taxes() {
                       if (!ok) return;
                       toast.success('Deduction added');
                       setNewDeduction({name: '', amount: '', category: ''}); setShowAddForm(false);
-                    }} className="bg-emerald-500 text-black h-10 px-4 text-xs font-mono font-bold uppercase rounded-sm hover:bg-emerald-400 transition-colors">Add</button>
+                    }} className="bg-emerald-500 text-black h-10 px-4 text-sm font-sans font-semibold rounded-sm hover:bg-emerald-400 transition-colors">Add</button>
                  </div>
                )}
                <div className="divide-y divide-surface-border">
@@ -213,7 +213,7 @@ export default function Taxes() {
                         <span className="text-sm font-medium text-content-primary font-sans">{d.name}</span>
                       </div>
                       <div className="flex items-center gap-4">
-                        <span className="text-sm font-mono text-emerald-400">-${d.amount.toFixed(2)}</span>
+                        <span className="text-sm font-mono tabular-nums text-emerald-400 data-numeric">-${d.amount.toFixed(2)}</span>
                         <button onClick={async () => { await deleteDeduction(d.id); }} className="text-zinc-600 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 className="w-4 h-4"/></button>
                       </div>
                     </div>
@@ -229,14 +229,14 @@ export default function Taxes() {
               {quarterlyDates.map(q => (
                 <div key={q.label} className={`p-4 rounded-sm border ${q.overdue ? 'bg-surface-raised border-surface-border opacity-50' : q.daysLeft < 15 ? 'bg-rose-500/5 border-rose-500/30 shadow-[inset_0_0_15px_rgba(244,63,94,0.05)]' : 'bg-surface-elevated border-surface-border'}`}>
                   <div className="flex justify-between items-center mb-3">
-                    <span className="text-xs font-mono font-bold text-zinc-400 uppercase">{q.label} Est. Payment</span>
-                    {q.overdue ? <span className="bg-zinc-800 text-zinc-500 text-[9px] px-2 py-0.5 rounded-sm">COMPLETED</span> : <span className="text-emerald-400 text-[10px] font-mono font-bold">{q.daysLeft}d REMAINING</span>}
+                    <span className="text-xs font-sans font-semibold text-zinc-400">{q.label} estimated payment</span>
+                    {q.overdue ? <span className="bg-zinc-800 text-zinc-500 text-xs px-2 py-0.5 rounded-sm">Completed</span> : <span className="text-emerald-400 text-xs font-sans font-medium">{q.daysLeft}d left</span>}
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <p className="text-[10px] font-mono text-zinc-500 uppercase">Deadline: {q.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                    <p className="text-xs text-content-tertiary">Due {q.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                     {!q.overdue && (
-                      <a href={q.portal} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-brand-indigo hover:text-brand-violet text-[10px] font-mono font-bold transition-colors uppercase">
-                        DIRECT PAY <ExternalLink className="w-3 h-3" />
+                      <a href={q.portal} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-brand-indigo hover:text-brand-violet text-xs font-sans font-semibold transition-colors">
+                        IRS Direct Pay <ExternalLink className="w-3 h-3 shrink-0" aria-hidden />
                       </a>
                     )}
                   </div>
@@ -247,13 +247,13 @@ export default function Taxes() {
 
           <div className="bg-surface-raised border border-surface-border p-6 rounded-sm space-y-6">
              <div>
-               <h3 className="text-xs font-mono font-black text-brand-indigo uppercase tracking-[0.2em] mb-4">Smart Freelance Tips</h3>
+               <h3 className="text-sm font-sans font-semibold text-brand-indigo mb-4">Smart freelance tips</h3>
                <div className="space-y-4">
                  <div className="flex gap-3">
                    <div className="w-1.5 h-1.5 bg-brand-violet mt-1.5 shrink-0" />
                    <div>
-                     <p className="text-[10px] font-mono font-bold text-content-primary uppercase tracking-widest">Check Your Real Pay</p>
-                     <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-tight mt-1 leading-normal">
+                     <p className="text-sm font-sans font-medium text-content-primary">Check your real pay</p>
+                     <p className="text-xs text-content-tertiary mt-1 leading-normal">
                        Don't spend all your income — set aside at least 30% for taxes.
                      </p>
                    </div>
@@ -261,8 +261,8 @@ export default function Taxes() {
                  <div className="flex gap-3">
                    <div className="w-1.5 h-1.5 bg-brand-violet mt-1.5 shrink-0" />
                    <div>
-                     <p className="text-[10px] font-mono font-bold text-content-primary uppercase tracking-widest">Audit for Deductions</p>
-                     <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-tight mt-1 leading-normal">
+                     <p className="text-sm font-sans font-medium text-content-primary">Audit for deductions</p>
+                     <p className="text-xs text-content-tertiary mt-1 leading-normal">
                        Every software subscription, home office expense, and professional meal can reduce your taxable income.
                      </p>
                    </div>
@@ -270,8 +270,8 @@ export default function Taxes() {
                  <div className="flex gap-3">
                    <div className="w-1.5 h-1.5 bg-brand-violet mt-1.5 shrink-0" />
                    <div>
-                     <p className="text-[10px] font-mono font-bold text-content-primary uppercase tracking-widest">Quarterly Discipline</p>
-                     <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-tight mt-1 leading-normal">
+                     <p className="text-sm font-sans font-medium text-content-primary">Quarterly discipline</p>
+                     <p className="text-xs text-content-tertiary mt-1 leading-normal">
                        Pay quarterly to avoid a large tax bill at year end.
                      </p>
                    </div>
@@ -280,8 +280,8 @@ export default function Taxes() {
              </div>
              
              <div className="pt-4 border-t border-surface-border">
-               <h3 className="text-[10px] font-mono font-black text-rose-500 uppercase tracking-[0.2em] mb-3">Important Reminder</h3>
-               <p className="text-[9px] font-mono text-zinc-500 leading-relaxed uppercase tracking-tight">
+               <h3 className="text-xs font-sans font-semibold text-rose-500 mb-3">Important</h3>
+               <p className="text-xs text-content-tertiary leading-relaxed">
                  This is an estimate based on current tax rates. Consult a tax professional for your final return.
                </p>
              </div>

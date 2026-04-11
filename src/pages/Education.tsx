@@ -186,7 +186,7 @@ export default function Education() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Financial Academy</h1>
-          <p className="text-sm font-mono text-zinc-400 mt-1 uppercase tracking-widest">Knowledge is leverage.</p>
+          <p className="text-sm text-content-tertiary mt-1">Short lessons you can finish in one sitting.</p>
         </div>
       </div>
 
@@ -197,7 +197,7 @@ export default function Education() {
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="w-full flex items-center justify-between px-2 pb-2 group"
           >
-            <h2 className="text-[10px] font-mono text-zinc-500 group-hover:text-white transition-colors uppercase tracking-widest">Available Courses</h2>
+            <h2 className="text-xs font-sans font-medium text-zinc-500 group-hover:text-white transition-colors">Available courses</h2>
             <ChevronDown className={`w-4 h-4 text-zinc-500 group-hover:text-white transition-all duration-300 ${isSidebarOpen ? 'rotate-180' : ''}`} />
           </button>
 
@@ -230,7 +230,7 @@ export default function Education() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <h3 className={`text-sm font-bold truncate ${isSelected ? 'text-white' : 'text-content-primary'}`}>{mod.title}</h3>
-                          {!isSelected && <span className="text-[9px] font-mono text-zinc-500 shrink-0 ml-2">{mod.duration}</span>}
+                          {!isSelected && <span className="text-xs text-content-tertiary shrink-0 ml-2">{mod.duration}</span>}
                         </div>
 
                         <AnimatePresence initial={false}>
@@ -243,15 +243,15 @@ export default function Education() {
                               className="overflow-hidden"
                             >
                               <div className="flex items-center justify-between gap-2 mt-2">
-                                <span className="text-[9px] font-mono font-bold uppercase tracking-widest text-zinc-500">{mod.category}</span>
-                                <span className="text-[9px] font-mono text-zinc-500">{mod.duration}</span>
+                                <span className="text-xs font-sans font-medium text-content-tertiary">{mod.category}</span>
+                                <span className="text-xs text-content-tertiary">{mod.duration}</span>
                               </div>
 
                               {/* Progress Bar */}
                               <div className="mt-4">
-                                <div className="flex justify-between text-[10px] font-mono text-zinc-500 mb-1">
-                                  <span>PROGRESS</span>
-                                  <span>{progress}%</span>
+                                <div className="flex justify-between text-xs text-content-tertiary mb-1">
+                                  <span>Progress</span>
+                                  <span className="font-mono tabular-nums">{progress}%</span>
                                 </div>
                                 <div className="h-1 w-full bg-surface-base overflow-hidden rounded-full">
                                   <div
@@ -280,11 +280,11 @@ export default function Education() {
               <CollapsibleModule
                 title={activeModule.title}
                 icon={GraduationCap}
-                extraHeader={<span className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500 px-2 py-0.5 border border-surface-border rounded-sm">{activeModule.category}</span>}
+                extraHeader={<span className="text-xs font-sans font-medium text-content-tertiary px-2 py-0.5 border border-surface-border rounded-sm">{activeModule.category}</span>}
               >
                 <div className="p-6">
                   <div className="space-y-4">
-                    <h3 className="text-xs font-mono font-bold uppercase tracking-widest text-zinc-500 mb-4">Curriculum</h3>
+                    <h3 className="text-sm font-sans font-semibold text-content-secondary mb-4">Curriculum</h3>
                     <div className="space-y-3">
                       {activeModule.lessons.map((lesson, idx) => {
                         const isDone = completedLessons.includes(lesson.id);
@@ -299,12 +299,12 @@ export default function Education() {
                                 {isDone ? <CheckCircle2 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
                               </div>
                               <div>
-                                <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">CHAPTER {idx + 1}</p>
+                                <p className="text-xs text-content-tertiary">Chapter {idx + 1}</p>
                                 <p className="text-sm font-semibold text-content-primary mt-0.5">{lesson.title}</p>
                               </div>
                             </div>
                             <div className="flex items-center gap-4">
-                              <span className="text-[10px] font-mono text-zinc-500 px-2 py-1 bg-surface-elevated border border-surface-border hidden sm:block">
+                              <span className="text-xs text-content-tertiary px-2 py-1 bg-surface-elevated border border-surface-border hidden sm:block">
                                 {lesson.readTime}
                               </span>
                               <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-white transition-colors" />
@@ -316,11 +316,12 @@ export default function Education() {
 
                     <div className="mt-8 pt-6 border-t border-surface-border flex justify-end">
                       <button
+                        type="button"
                         onClick={() => openLesson(activeModule.lessons[0])}
-                        className="px-6 py-2.5 bg-content-primary hover:bg-zinc-200 text-surface-base rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2"
+                        className="px-6 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2"
                       >
-                        <PlayCircle className="w-4 h-4" />
-                        {progress === 0 ? 'START COURSE' : progress === 100 ? 'REVIEW COURSE' : 'RESUME COURSE'}
+                        <PlayCircle className="w-4 h-4 shrink-0" aria-hidden />
+                        {progress === 0 ? 'Start course' : progress === 100 ? 'Review course' : 'Resume course'}
                       </button>
                     </div>
                   </div>

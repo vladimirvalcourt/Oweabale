@@ -141,13 +141,15 @@ export default function Income() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Income</h1>
+          <p className="text-sm text-content-tertiary mt-1">Expected pay, deposits, and tax handling in one view.</p>
         </div>
         <button 
+          type="button"
           onClick={openAddModal}
-          className="px-4 py-2 bg-content-primary hover:bg-zinc-200 text-surface-base transition-colors flex items-center gap-2 self-start sm:self-auto focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-zinc-500 rounded-sm text-xs font-mono font-bold uppercase tracking-widest"
+          className="px-4 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-surface-base focus:ring-indigo-600 text-sm font-sans font-semibold"
         >
-          <Plus className="w-3.5 h-3.5" />
-          Add Income
+          <Plus className="w-3.5 h-3.5 shrink-0" aria-hidden />
+          Add income
         </button>
       </div>
 
@@ -156,14 +158,16 @@ export default function Income() {
           <div className="w-12 h-12 border border-surface-border bg-surface-elevated rounded-none flex items-center justify-center mb-4">
             <Vault className="w-5 h-5 text-zinc-500" />
           </div>
-          <h2 className="text-sm font-mono font-bold tracking-widest uppercase text-content-primary mb-2">No income added yet</h2>
+          <h2 className="text-lg font-sans font-semibold text-content-primary mb-2">No income yet</h2>
+          <p className="text-sm text-content-tertiary max-w-md">Add salary or freelance sources to forecast cash flow and tax set-aside.</p>
           <motion.button 
+            type="button"
             whileTap={{ scale: 0.95 }}
             onClick={openAddModal}
-            className="mt-4 px-6 py-3 bg-content-primary hover:bg-zinc-200 text-surface-base rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 focus:outline-none"
+            className="mt-6 px-6 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 focus:outline-none"
           >
-            <Plus className="w-4 h-4" />
-            Add Income Source
+            <Plus className="w-4 h-4 shrink-0" aria-hidden />
+            Add income source
           </motion.button>
         </div>
       ) : (
@@ -172,25 +176,29 @@ export default function Income() {
           <CollapsibleModule 
             title="Income Overview" 
             icon={TrendingUp}
-            extraHeader={<span className="text-xs font-mono text-content-primary font-bold">${totalMonthlyIncome.toLocaleString()} /mo</span>}
+            extraHeader={
+              <span className="text-sm font-mono tabular-nums font-semibold text-content-primary data-numeric">
+                ${totalMonthlyIncome.toLocaleString()} /mo
+              </span>
+            }
           >
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 -mx-6 -my-6 p-6">
               <div className="bg-surface-elevated rounded-sm border border-surface-border p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <TrendingUp className="w-3.5 h-3.5 text-zinc-500" />
-                  <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">Expected Monthly</p>
+                  <p className="metric-label normal-case text-zinc-500">Expected monthly</p>
                 </div>
-                <p className="mt-2 text-2xl font-bold font-mono tabular-nums text-content-primary">
+                <p className="mt-2 text-2xl font-bold font-mono tabular-nums text-content-primary data-numeric">
                   ${totalMonthlyIncome.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                 </p>
               </div>
               <div className="bg-surface-elevated rounded-sm border border-surface-border p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <Vault className="w-3.5 h-3.5 text-zinc-500" />
-                  <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-zinc-500">Active Sources</p>
+                  <p className="metric-label normal-case text-zinc-500">Active sources</p>
                 </div>
-                <p className="mt-2 text-2xl font-bold font-mono tabular-nums text-content-primary">
-                  {activeSourcesCount} <span className="text-sm text-zinc-500 font-normal">/ {incomes.length}</span>
+                <p className="mt-2 text-2xl font-bold font-mono tabular-nums text-content-primary data-numeric">
+                  {activeSourcesCount} <span className="text-sm text-zinc-500 font-normal font-sans">/ {incomes.length}</span>
                 </p>
               </div>
             </div>
@@ -214,8 +222,8 @@ export default function Income() {
                   }}
                 >
                   {income.status === 'paused' && (
-                    <div className="absolute top-0 right-0 bg-surface-border text-zinc-400 text-[9px] font-mono font-bold px-2 py-1 uppercase tracking-widest border-b border-l border-surface-border">
-                      PAUSED
+                    <div className="absolute top-0 right-0 bg-surface-border text-zinc-400 text-xs font-sans font-medium px-2 py-1 border-b border-l border-surface-border">
+                      Paused
                     </div>
                   )}
                   <div className="flex justify-between items-start mb-4">
@@ -223,8 +231,8 @@ export default function Income() {
                       <BrandLogo name={income.name} />
                       <div>
                         <h3 className="text-sm font-medium text-content-primary">{income.name}</h3>
-                        <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mt-1 flex items-center gap-1.5">
-                          {income.category} {income.isTaxWithheld ? '· W-2 (Taxes Withheld)' : '· Self-Employed'}
+                        <p className="text-xs text-content-tertiary mt-1 flex items-center gap-1.5">
+                          {income.category}{income.isTaxWithheld ? ' · W-2 (taxes withheld)' : ' · Self-employed'}
                         </p>
                       </div>
                     </div>
@@ -250,10 +258,10 @@ export default function Income() {
                                   onClick={() => openDepositModal(income)}
                                   className={`${
                                     active ? 'bg-surface-border text-content-primary' : 'text-zinc-300'
-                                  } group flex w-full items-center px-4 py-2 text-xs font-mono uppercase tracking-widest`}
+                                  } group flex w-full items-center px-4 py-2 text-sm font-sans`}
                                 >
                                   <ArrowDownCircle className="mr-3 h-3.5 w-3.5 text-zinc-400" />
-                                  Log Deposit
+                                  Log deposit
                                 </button>
                               )}
                             </Menu.Item>
@@ -263,7 +271,7 @@ export default function Income() {
                                   onClick={() => openEditModal(income)}
                                   className={`${
                                     active ? 'bg-surface-border text-content-primary' : 'text-zinc-300'
-                                  } group flex w-full items-center px-4 py-2 text-xs font-mono uppercase tracking-widest`}
+                                  } group flex w-full items-center px-4 py-2 text-sm font-sans`}
                                 >
                                   <Edit2 className="mr-3 h-3.5 w-3.5 text-zinc-400" />
                                   Edit
@@ -276,7 +284,7 @@ export default function Income() {
                                   onClick={() => handleDelete(income.id)}
                                   className={`${
                                     active ? 'bg-surface-border text-red-400' : 'text-red-500'
-                                  } group flex w-full items-center px-4 py-2 text-xs font-mono uppercase tracking-widest`}
+                                  } group flex w-full items-center px-4 py-2 text-sm font-sans`}
                                 >
                                   <Trash2 className="mr-3 h-3.5 w-3.5 text-current" />
                                   Delete
@@ -290,15 +298,15 @@ export default function Income() {
                   </div>
                   
                   <div className="mb-6">
-                    <p className="text-2xl font-bold font-mono tabular-nums text-content-primary flex items-baseline gap-1">
+                    <p className="text-2xl font-bold font-mono tabular-nums text-content-primary data-numeric flex items-baseline gap-1">
                       ${income.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                      <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">/ {income.frequency}</span>
+                      <span className="text-xs text-content-tertiary font-sans font-normal normal-case">/ {income.frequency}</span>
                     </p>
                   </div>
 
                   <div className="mt-auto pt-3 border-t border-surface-border flex justify-between items-center">
-                    <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Next Deposit</span>
-                    <span className="text-xs font-mono text-content-primary">{new Date(income.nextDate).toLocaleDateString()}</span>
+                    <span className="text-xs text-content-tertiary">Next deposit</span>
+                    <span className="text-sm font-mono tabular-nums text-content-primary">{new Date(income.nextDate).toLocaleDateString()}</span>
                   </div>
                 </motion.div>
               ))}
@@ -313,8 +321,8 @@ export default function Income() {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-md w-full rounded-sm bg-surface-raised border border-surface-border shadow-2xl">
             <div className="flex items-center justify-between p-4 border-b border-surface-border bg-surface-elevated">
-              <Dialog.Title className="text-xs font-mono font-bold text-content-primary uppercase tracking-widest">
-                {isEditModalOpen ? 'EDIT SOURCE' : 'NEW SOURCE'}
+              <Dialog.Title className="text-base font-sans font-semibold text-content-primary">
+                {isEditModalOpen ? 'Edit income source' : 'New income source'}
               </Dialog.Title>
               <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-zinc-500 hover:text-white transition-colors">
                 <X className="w-4 h-4" />
@@ -323,20 +331,20 @@ export default function Income() {
             
             <form onSubmit={isEditModalOpen ? handleEditSubmit : handleAddSubmit} className="p-6 space-y-4">
               <div>
-                <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Source Name</label>
+                <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Source name</label>
                 <input 
                   type="text" 
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm font-mono text-content-primary focus:outline-none focus:border-zinc-500"
-                  placeholder="ACME CORP"
+                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-zinc-500"
+                  placeholder="e.g. Acme Corp"
                 />
               </div>
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Amount</label>
+                  <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Amount</label>
                   <div className="relative">
                     <span className="absolute left-3 top-2 text-zinc-500 font-mono">$</span>
                     <input 
@@ -352,34 +360,34 @@ export default function Income() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Frequency</label>
+                  <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Frequency</label>
                   <select 
                     value={formData.frequency}
                     onChange={(e) => setFormData({...formData, frequency: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm font-mono text-content-primary focus:outline-none focus:border-zinc-500"
+                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-zinc-500"
                   >
-                    <option value="Weekly">WEEKLY</option>
-                    <option value="Bi-weekly">BI-WEEKLY</option>
-                    <option value="Monthly">MONTHLY</option>
-                    <option value="Yearly">YEARLY</option>
+                    <option value="Weekly">Weekly</option>
+                    <option value="Bi-weekly">Bi-weekly</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Yearly">Yearly</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Category</label>
+                  <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Category</label>
                   <input 
                     type="text" 
                     required
                     value={formData.category}
                     onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm font-mono text-content-primary focus:outline-none focus:border-zinc-500"
-                    placeholder="SALARY"
+                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-zinc-500"
+                    placeholder="Salary"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Next Date</label>
+                  <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Next date</label>
                   <input 
                     type="date" 
                     required
@@ -392,19 +400,19 @@ export default function Income() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Status</label>
+                <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Status</label>
                 <select 
                   value={formData.status}
                   onChange={(e) => setFormData({...formData, status: e.target.value as 'active' | 'paused'})}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm font-mono text-content-primary focus:outline-none focus:border-zinc-500"
+                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:border-zinc-500"
                 >
-                  <option value="active">ACTIVE</option>
-                  <option value="paused">PAUSED</option>
+                  <option value="active">Active</option>
+                  <option value="paused">Paused</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Tax Handling</label>
+                <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Tax handling</label>
                 <div className="flex items-center gap-4 bg-surface-base border border-surface-border p-3 rounded-sm">
                   <input 
                     type="checkbox"
@@ -413,8 +421,8 @@ export default function Income() {
                     className="w-4 h-4 rounded-sm border-surface-border text-brand-indigo focus:ring-brand-indigo bg-surface-raised cursor-pointer"
                   />
                   <div className="flex-1">
-                    <p className="text-[10px] font-mono font-bold text-content-primary uppercase tracking-widest">Taxes Already Withheld</p>
-                    <p className="text-[10px] font-mono text-zinc-500 mt-1 uppercase tracking-tight">IF UNCHECKED, OWEABLE WILL AUTOMATICALLY SET ASIDE 25% FOR TAXES.</p>
+                    <p className="text-sm font-sans font-medium text-content-primary">Taxes already withheld</p>
+                    <p className="text-xs text-content-tertiary mt-1">If unchecked, we set aside 25% for estimated taxes.</p>
                   </div>
                 </div>
               </div>
@@ -422,9 +430,9 @@ export default function Income() {
               <div className="pt-6">
                 <button
                   type="submit"
-                  className="w-full bg-content-primary hover:bg-zinc-200 text-surface-base rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-colors py-3 focus:outline-none"
+                  className="w-full rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors py-3 focus:outline-none"
                 >
-                  {isEditModalOpen ? 'SAVE CHANGES' : 'ADD INCOME'}
+                  {isEditModalOpen ? 'Save changes' : 'Add income'}
                 </button>
               </div>
             </form>
@@ -438,7 +446,7 @@ export default function Income() {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-sm w-full rounded-sm bg-surface-raised border border-surface-border shadow-2xl">
             <div className="flex items-center justify-between p-4 border-b border-surface-border bg-surface-elevated">
-              <Dialog.Title className="text-xs font-mono font-bold text-content-primary uppercase tracking-widest">LOG DEPOSIT</Dialog.Title>
+              <Dialog.Title className="text-base font-sans font-semibold text-content-primary">Log deposit</Dialog.Title>
               <button onClick={() => setIsDepositModalOpen(false)} className="text-zinc-500 hover:text-white transition-colors">
                 <X className="w-4 h-4" />
               </button>
@@ -446,12 +454,12 @@ export default function Income() {
             
             <form onSubmit={handleDepositSubmit} className="p-6 space-y-4">
               <div className="bg-surface-elevated rounded-sm p-4 border border-surface-border">
-                <p className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-1">Income Source</p>
-                <p className="text-sm font-mono font-bold text-content-primary">{selectedIncome?.name}</p>
+                <p className="text-xs text-content-tertiary mb-1">Income source</p>
+                <p className="text-sm font-sans font-semibold text-content-primary">{selectedIncome?.name}</p>
               </div>
 
               <div>
-                <label className="block text-[10px] font-mono text-zinc-500 mb-2 uppercase tracking-widest">Amount Received ($)</label>
+                <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Amount received</label>
                 <div className="relative">
                   <span className="absolute left-3 top-2 text-zinc-500 font-mono">$</span>
                   <input 
@@ -469,9 +477,9 @@ export default function Income() {
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full bg-content-primary hover:bg-zinc-200 text-surface-base rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-colors py-3 focus:outline-none block shadow-[0_0_15px_rgba(250,250,250,0.1)]"
+                  className="w-full rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors py-3 focus:outline-none block"
                 >
-                  Confirm Deposit
+                  Confirm deposit
                 </button>
               </div>
             </form>

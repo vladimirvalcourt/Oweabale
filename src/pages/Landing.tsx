@@ -185,7 +185,7 @@ export default function Landing() {
             <div className="w-2 h-2 bg-brand-violet shadow-glow-indigo"></div>
             Oweable
           </Link>
-          <div className="hidden md:flex items-center gap-8 text-xs font-mono uppercase tracking-widest text-content-tertiary">
+          <div className="hidden md:flex items-center gap-8 text-sm text-content-tertiary">
             <a href="#features" className="hover:text-content-primary transition-colors">Features</a>
             <a href="#stories" className="hover:text-content-primary transition-colors">Stories</a>
             <Link to="/pricing" className="hover:text-content-primary transition-colors">Pricing</Link>
@@ -197,16 +197,16 @@ export default function Landing() {
                   useStore.getState().signOut();
                   toast.success('Session Terminated');
                 }}
-                className="hidden sm:block px-6 py-2 bg-transparent border border-surface-border hover:border-zinc-500 text-zinc-400 hover:text-zinc-200 text-[11px] font-mono font-bold uppercase tracking-widest transition-all btn-tactile"
+                className="hidden sm:block px-6 py-2 bg-transparent border border-surface-border hover:border-zinc-500 text-zinc-400 hover:text-zinc-200 text-sm font-sans font-medium transition-all btn-tactile"
               >
-                Sign Out
+                Sign out
               </button>
             )}
             <Link 
               to={user?.id ? "/dashboard" : "/auth"} 
-              className="px-6 py-2 bg-content-primary text-surface-base hover:bg-zinc-200 text-[11px] font-mono font-bold uppercase tracking-widest transition-all btn-tactile"
+              className="px-6 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-all btn-tactile"
             >
-              {user?.id ? "Enter Dashboard" : "Sign In"}
+              {user?.id ? "Open dashboard" : "Sign in"}
             </Link>
           </div>
         </div>
@@ -217,7 +217,7 @@ export default function Landing() {
         <div ref={heroRef} className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-32 items-center">
           
           <div className="lg:col-span-7 flex flex-col items-start pr-0 lg:pr-12">
-            <div className="inline-flex items-center gap-3 border border-brand-violet/30 bg-brand-violet/5 px-3 py-1.5 mb-8 text-xs font-mono text-brand-violet uppercase tracking-widest">
+            <div className="inline-flex items-center gap-3 border border-brand-violet/30 bg-brand-violet/5 px-3 py-1.5 mb-8 text-xs font-sans font-medium text-brand-violet">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full bg-brand-violet opacity-75"></span>
                 <span className="relative inline-flex bg-brand-violet h-2 w-2"></span>
@@ -238,9 +238,9 @@ export default function Landing() {
             
             <Link 
               to={user?.id ? "/dashboard" : "/auth"} 
-              className="group flex items-center gap-4 bg-brand-cta hover:bg-brand-cta-hover text-white px-8 py-4 text-[13px] font-mono font-bold uppercase tracking-wider transition-all btn-tactile"
+              className="group flex items-center gap-4 bg-brand-cta hover:bg-brand-cta-hover text-white px-8 py-4 text-sm font-sans font-semibold shadow-sm rounded-sm transition-all btn-tactile"
             >
-              {user?.id ? "Enter Dashboard" : "Get started for free"}
+              {user?.id ? "Open dashboard" : "Get started for free"}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
@@ -249,7 +249,7 @@ export default function Landing() {
             <div className="bg-surface-raised border border-surface-border shadow-stripe-dark p-1">
               <div className="bg-surface-elevated border border-surface-border p-6 flex flex-col gap-6">
                 <div className="flex justify-between items-center border-b border-surface-border pb-4">
-                  <span className="font-mono text-xs uppercase tracking-widest text-content-tertiary">Account Balances</span>
+                  <span className="text-xs font-sans font-medium text-content-tertiary">Account balances</span>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-brand-violet shadow-glow-indigo">
                     <path d="M17 3a2 2 0 0 1 1.492 0.668l0.108 0.132 3.704 4.939a2 2 0 0 1 -0.012 2.416l-0.108 0.13 -9.259 10.184a1.25 1.25 0 0 1 -1.753 0.096l-0.097 -0.096 -9.259 -10.185a2 2 0 0 1 -0.215 -2.407l0.095 -0.138L5.4 3.8a2 2 0 0 1 1.43 -0.793L7 3zm-2.477 8H9.477L12 17.307zm5.217 0h-3.063l-2.406 6.015zM7.323 11H4.261l5.468 6.015zm5.059 -6h-0.764l-2 4h4.764zM17 5h-2.382l2 4H20zM9.382 5H7L4 9h3.382z"></path>
                   </svg>
@@ -258,14 +258,14 @@ export default function Landing() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
                     <thead>
-                      <tr className="text-xs font-mono uppercase tracking-widest text-content-tertiary border-b border-surface-border child:pb-3">
+                      <tr className="text-xs section-label normal-case text-content-tertiary border-b border-surface-border child:pb-3">
                         <th className="font-normal w-1/3">Account</th>
                         <th className="font-normal text-right">Trend / Status</th>
                         <th className="font-normal text-right">Tax Est.</th>
                         <th className="font-normal text-right">Balance</th>
                       </tr>
                     </thead>
-                    <tbody className="text-content-primary child:border-b child:border-surface-border child:last:border-0 child:child:py-3 font-mono">
+                    <tbody className="text-content-primary child:border-b child:border-surface-border child:last:border-0 child:child:py-3 text-sm font-mono tabular-nums">
                       <tr className="hover:bg-surface-highlight transition-colors">
                         <td>Uber / Lyft Inflow</td>
                         <td className="text-right text-emerald-400">+12%</td>
@@ -296,8 +296,8 @@ export default function Landing() {
 
                 <div className="flex justify-between items-end pt-4 border-t border-surface-border mt-2">
                   <div className="flex flex-col">
-                    <span className="text-[10px] uppercase font-mono tracking-widest text-content-tertiary mb-1">Total Net Worth</span>
-                    <span className="text-2xl font-bold font-sans tracking-tight tnum">$181,838</span>
+                    <span className="text-xs text-content-tertiary mb-1">Total net worth</span>
+                    <span className="text-2xl font-bold font-mono tabular-nums tracking-tight text-content-primary data-numeric">$181,838</span>
                   </div>
                   <div className="flex gap-1 h-8 items-end w-32">
                     {[40, 70, 45, 90, 65, 80, 100].map((h, i) => (
@@ -398,7 +398,7 @@ export default function Landing() {
           <div
             className={`mb-12 transition-all duration-1000 ease-out ${testimonialsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
           >
-            <span className="font-mono text-xs uppercase tracking-[0.3em] text-brand-violet">Stories</span>
+            <span className="text-xs font-sans font-medium text-brand-violet">Stories</span>
             <h2 className="text-3xl font-sans font-medium tracking-tight text-content-primary mt-4 mb-3">
               What people use Oweable for
             </h2>
@@ -418,12 +418,12 @@ export default function Landing() {
                   <span className="text-content-primary/90">&ldquo;{t.quote}&rdquo;</span>
                 </blockquote>
                 <figcaption className="mt-auto pt-4 border-t border-surface-border">
-                  <span className="inline-block font-mono text-[10px] uppercase tracking-widest text-brand-violet mb-2 px-2 py-0.5 border border-brand-violet/25 bg-brand-violet/5">
+                  <span className="inline-block text-xs font-sans font-medium text-brand-violet mb-2 px-2 py-0.5 border border-brand-violet/25 bg-brand-violet/5">
                     {t.tag}
                   </span>
                   <p className="text-sm font-medium text-content-primary">{t.name}</p>
                   <p className="text-xs text-content-tertiary mt-1 leading-relaxed">{t.role}</p>
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-content-tertiary mt-2">{t.region}</p>
+                  <p className="text-xs text-content-tertiary mt-2">{t.region}</p>
                 </figcaption>
                 <div className="absolute bottom-0 left-0 w-full h-[1px] bg-brand-violet scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
               </figure>
@@ -437,7 +437,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <div className="lg:col-span-4">
-              <span className="font-mono text-xs uppercase tracking-[0.3em] text-brand-violet">Overview</span>
+              <span className="text-xs font-sans font-medium text-brand-violet">Overview</span>
               <h2 className="text-3xl font-medium tracking-tight text-content-primary mt-4">What is Oweable?</h2>
             </div>
             <div className="lg:col-span-8 flex flex-col gap-4 lg:pt-10">
@@ -459,7 +459,7 @@ export default function Landing() {
       <section id="faq" className="py-24 border-t border-surface-border bg-surface-raised">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="mb-16">
-            <span className="font-mono text-xs uppercase tracking-[0.3em] text-brand-violet">FAQ</span>
+            <span className="text-xs font-sans font-medium text-brand-violet">FAQ</span>
             <h2 className="text-3xl font-medium tracking-tight text-content-primary mt-4">Frequently asked questions</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-l border-t border-surface-border">
