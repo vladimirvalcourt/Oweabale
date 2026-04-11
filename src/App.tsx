@@ -49,7 +49,7 @@ import { useDataSync } from './hooks/useDataSync';
 import { ThemedToaster } from './components/ThemedToaster';
 
 function AppRoutes() {
-  const { user: authUser, showWarning, timeLeft, extendSession, loading: authLoading } = useAuth();
+  const { user: authUser, showWarning, timeLeft, extendSession, authLoading } = useAuth();
   const { user } = useStore();
   
   useDataSync({ authUserId: authUser?.id ?? null, authLoading });

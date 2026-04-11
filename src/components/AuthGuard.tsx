@@ -8,9 +8,9 @@ import { AppLoader } from './PageSkeleton';
  * Shows a loader while the session is being resolved.
  */
 export default function AuthGuard() {
-  const { user, loading } = useAuth();
+  const { user, authLoading } = useAuth();
 
-  if (loading) return <AppLoader />;
+  if (authLoading) return <AppLoader />;
   if (!user) return <Navigate to="/auth" replace />;
 
   return <Outlet />;

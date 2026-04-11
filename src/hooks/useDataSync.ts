@@ -5,15 +5,9 @@ import { useStore } from '../store/useStore';
 const VISIBILITY_REFETCH_MS = 45_000;
 
 /**
- * Keeps Zustand in sync with Supabase for the signed-in user.
- *
- * - **On load / refresh:** When `authLoading` becomes false and we have a user id,
- *   we call `fetchData(userId)` so bills and all financial rows load from the DB.
- *   Financial data is not persisted in localStorage (see store `partialize`); the
- *   server is the source of truth.
- * - **After sign-out:** Clears local UI state only (not the database).
- * - **Tab focus:** Optionally refetches (throttled) when the tab becomes visible so
- *   long-lived sessions see updates made elsewhere.
+ * Loads server data only after auth has settled (`authLoading === false` and `userId` exists).
+ * Uses a ref to avoid calling `fetchData` twice for the same user in one mount cycle when
+ * React re-runs effects with stable deps.
  */
 export function useDataSync({
   authUserId,
@@ -24,39 +18,39 @@ export function useDataSync({
 }) {
   const { fetchData, clearLocalData } = useStore();
   const hadSessionRef = useRef(false);
+  const lastFetchedUserIdRef = useRef<string | null>(null);
   const lastVisibilityFetchRef = useRef(0);
 
-  // Primary path: refetch whenever auth finishes and we know the user id
-  // (matches the pattern: useEffect(() => { if (user) fetch(); }, [user])).
   useEffect(() => {
     if (authLoading) return;
 
     if (authUserId) {
       hadSessionRef.current = true;
+      if (lastFetchedUserIdRef.current === authUserId) return;
+      lastFetchedUserIdRef.current = authUserId;
+      console.log('[useDataSync] triggering fetchData for user:', authUserId);
       void fetchData(authUserId);
       return;
     }
 
-    // Only clear when transitioning from signed-in → signed-out (not on every
-    // landing-page visit for anonymous users).
+    lastFetchedUserIdRef.current = null;
     if (hadSessionRef.current) {
       hadSessionRef.current = false;
       clearLocalData();
     }
   }, [authLoading, authUserId, fetchData, clearLocalData]);
 
-  // Secondary path: explicit sign-out from other tabs / Supabase client
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
         hadSessionRef.current = false;
+        lastFetchedUserIdRef.current = null;
         clearLocalData();
       }
     });
     return () => subscription.unsubscribe();
   }, [clearLocalData]);
 
-  // Refetch when returning to the tab (throttled) — helps long sessions without full reload.
   useEffect(() => {
     if (authLoading || !authUserId) return;
 
@@ -65,6 +59,7 @@ export function useDataSync({
       const now = Date.now();
       if (now - lastVisibilityFetchRef.current < VISIBILITY_REFETCH_MS) return;
       lastVisibilityFetchRef.current = now;
+      console.log('[useDataSync] visibility refetch for user:', authUserId);
       void fetchData(authUserId);
     };
 

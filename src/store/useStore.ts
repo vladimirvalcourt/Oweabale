@@ -1530,10 +1530,12 @@ export const useStore = create<AppState>()(
   fetchData: async (userId?: string) => {
     const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
     if (!resolvedUserId) {
-      console.warn('[fetchData] No user ID available');
+      console.warn('[fetchData] No user ID available — skipping load');
+      set({ isLoading: false });
       return;
     }
 
+    console.log('[fetchData] starting fetch...');
     set({ isLoading: true });
 
     // Fire non-critical RPC in background
@@ -1567,7 +1569,7 @@ export const useStore = create<AppState>()(
         { data: transactions, error: transactionsError },
         { data: assets, error: assetsError },
         { data: incomes, error: incomesError },
-        { data: subscriptions },
+        { data: subscriptions, error: subscriptionsError },
       ] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', resolvedUserId).maybeSingle(),
         supabase.from('bills').select('*').eq('user_id', resolvedUserId),
@@ -1588,14 +1590,13 @@ export const useStore = create<AppState>()(
       if (transactionsError) console.error('[fetchData] Transactions fetch error:', transactionsError);
       if (assetsError) console.error('[fetchData] Assets fetch error:', assetsError);
       if (incomesError) console.error('[fetchData] Incomes fetch error:', incomesError);
+      if (subscriptionsError) console.error('[fetchData] Subscriptions fetch error:', subscriptionsError);
 
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('[fetchData] Profile fetch error:', profileError);
       }
 
-      // Release the loader as soon as critical data is ready
       set({
-        isLoading: false,
         bills: (bills || []).map((b: Record<string, unknown>) => ({
           id: b.id as string,
           biller: b.biller as string,
@@ -1827,7 +1828,31 @@ export const useStore = create<AppState>()(
             { onConflict: 'user_id,date' }
           );
       } catch { /* non-critical — silently skip */ }
-    } catch {
+
+      const recordCount =
+        (bills?.length ?? 0) +
+        (debts?.length ?? 0) +
+        (transactions?.length ?? 0) +
+        (assets?.length ?? 0) +
+        (incomes?.length ?? 0) +
+        (subscriptions?.length ?? 0) +
+        (goals?.length ?? 0) +
+        (budgets?.length ?? 0) +
+        (categories?.length ?? 0) +
+        (citations?.length ?? 0) +
+        (deductions?.length ?? 0) +
+        (freelanceEntries?.length ?? 0) +
+        (pendingIngestions?.length ?? 0) +
+        (categorizationRules?.length ?? 0) +
+        (creditFixes?.length ?? 0) +
+        (netWorthSnapshots?.length ?? 0) +
+        (creditFactors?.length ?? 0) +
+        (adminBroadcasts?.length ?? 0);
+
+      console.log(`[fetchData] done, loaded ${recordCount} records`);
+    } catch (err) {
+      console.error('[fetchData] failed:', err);
+    } finally {
       set({ isLoading: false });
     }
   },

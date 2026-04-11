@@ -53,7 +53,8 @@ export default function Dashboard() {
   const citations = useStore(state => state.citations);
   const resolveCitation = useStore(state => state.resolveCitation);
   
-  const isLoading = useStore(state => state.isLoading);
+  /** Global fetch flag from Zustand — true while `fetchData` runs after login/refresh. */
+  const isLoading = useStore((state) => state.isLoading);
   const [isCitationModalOpen, setIsCitationModalOpen] = useState(false);
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
 
@@ -205,6 +206,7 @@ export default function Dashboard() {
   }, [freelanceEntries]);
 
 
+  // Full-page skeleton until Supabase data has been merged into the store.
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse p-6">
