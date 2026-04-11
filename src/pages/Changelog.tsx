@@ -25,18 +25,18 @@ export default function Changelog() {
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-content-primary mb-1 uppercase flex items-center gap-2">
-          <ScrollText className="w-7 h-7 text-brand-indigo" />
+        <h1 className="text-2xl font-semibold tracking-tight text-content-primary mb-1 flex items-center gap-2">
+          <ScrollText className="w-7 h-7 text-brand-indigo shrink-0" aria-hidden />
           Changelog
         </h1>
-        <p className="text-zinc-400 text-sm">Product updates and notable changes.</p>
+        <p className="text-sm text-content-tertiary">Product updates and notable changes.</p>
       </div>
       <ul className="space-y-8">
         {ENTRIES.map((entry) => (
           <li key={`${entry.date}-${entry.title}`} className="border border-surface-border rounded-sm bg-surface-raised p-6">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-1">{entry.date}</p>
-            <h2 className="text-lg font-semibold text-content-primary mb-3">{entry.title}</h2>
-            <ul className="list-disc pl-5 space-y-2 text-sm text-zinc-300 leading-relaxed">
+            <p className="text-xs font-sans text-content-tertiary mb-1">{entry.date}</p>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-3">{entry.title}</h2>
+            <ul className="list-disc pl-5 space-y-2 text-sm text-content-secondary leading-relaxed">
               {entry.bullets.map((b) => (
                 <li key={b}>{b}</li>
               ))}
