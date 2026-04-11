@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, startTransition } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
   Bell, Search, Home, Receipt, Target, Activity,
@@ -22,6 +22,10 @@ export default function Layout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const closeSidebarMobile = useCallback(() => {
+    startTransition(() => setSidebarOpen(false));
+  }, []);
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     'Overview': true,
     'Activity': false,
@@ -303,7 +307,7 @@ export default function Layout() {
         <div
           className="fixed inset-0 z-40 bg-black/80 lg:hidden"
           aria-hidden="true"
-          onClick={() => setSidebarOpen(false)}
+          onClick={closeSidebarMobile}
         />
       )}
 
@@ -333,7 +337,7 @@ export default function Layout() {
             type="button"
             aria-label="Close navigation menu"
             className="lg:hidden text-content-tertiary hover:text-content-secondary p-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo rounded-sm"
-            onClick={() => setSidebarOpen(false)}
+            onClick={closeSidebarMobile}
           >
             <MorphingMenuIcon isOpen={sidebarOpen} className="text-content-primary" />
           </button>
@@ -388,7 +392,7 @@ export default function Layout() {
                           <Link
                             key={item.name}
                             to={linkTo}
-                            onClick={() => setSidebarOpen(false)}
+                            onClick={closeSidebarMobile}
                             className={cn(
                               "flex items-center gap-3 px-4 py-2 transition-all group relative rounded-sm mx-1",
                               isActive 
