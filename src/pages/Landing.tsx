@@ -429,10 +429,6 @@ export default function Landing() {
               </figure>
             ))}
           </div>
-
-          <p className="mt-8 text-[11px] font-mono text-content-tertiary uppercase tracking-widest max-w-3xl leading-relaxed">
-            Representative experiences based on common use cases and early feedback. Individual results vary. Replace with verified customer quotes when available.
-          </p>
         </div>
       </section>
 
