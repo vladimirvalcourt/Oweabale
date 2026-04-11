@@ -139,9 +139,12 @@ supabase link --project-ref <your-project-ref>
 supabase db push
 ```
 
-### MCP (Supabase MCP server)
+### MCP (Cursor)
 
-Cursor reads `.cursor/mcp.json` for MCP servers. This repo includes a Supabase MCP configuration there; if tools don’t show up, you likely need to authenticate in Cursor.
+Cursor reads [`.cursor/mcp.json`](.cursor/mcp.json):
+
+- **Supabase** — URL-based MCP; authenticate in Cursor if tools are missing.
+- **Plaid Dashboard (production)** — `plaid-dashboard` runs [`scripts/plaid-dashboard-mcp.sh`](scripts/plaid-dashboard-mcp.sh): OAuth `mcp:dashboard` + [`mcp-remote`](https://www.npmjs.com/package/mcp-remote) to `https://api.dashboard.plaid.com/mcp`. Requires [production Plaid access](https://plaid.com/docs/resources/mcp/) and production keys in `.env.local` (or `PLAID_DASHBOARD_*` if Edge secrets use another environment). Restart the MCP server if tools fail after ~15 minutes (token expiry).
 
 ---
 
