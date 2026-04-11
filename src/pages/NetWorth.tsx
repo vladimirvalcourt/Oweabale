@@ -41,7 +41,11 @@ export default function NetWorth() {
   // 12-month forward projection
   const projectionData = useMemo(() => {
     const rows = projectNetWorth(assets, debts, incomes, bills, subscriptions, 12, extraMonthly);
-    return rows.map(r => ({ name: r.label, value: r.netWorth }));
+    const mapped = rows.map((r) => ({
+      name: r.label,
+      value: Number.isFinite(r.netWorth) ? r.netWorth : 0,
+    }));
+    return mapped.length > 0 ? mapped : [{ name: '—', value: 0 }];
   }, [assets, debts, incomes, bills, subscriptions, extraMonthly]);
 
   // Asset allocation by type
@@ -123,7 +127,7 @@ export default function NetWorth() {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" vertical={false} />
               <XAxis dataKey="name" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} dy={10} fontFamily="monospace" />
-              <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} dx={-10} fontFamily="monospace" />
+              <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${(Number(v ?? 0) / 1000).toFixed(0)}k`} dx={-10} fontFamily="monospace" />
               <Tooltip
                 contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', color: '#FAFAFA', fontFamily: 'monospace', fontSize: '12px' }}
                 formatter={(value) => [`$${Number(value ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`, 'Net Worth']}

@@ -6,7 +6,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { TrendingUp, TrendingDown, Activity, PieChart, Minus } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine,
 } from 'recharts';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../store/useStore';
@@ -324,8 +324,7 @@ export default function Analytics() {
             <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval={1} />
             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `${v}%`} width={42} />
             <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`${Number(v).toFixed(1)}%`, 'Savings Rate']} />
-            {/* 20% target line */}
-            <Line type="monotone" dataKey={() => 20} stroke="#262626" strokeWidth={1} strokeDasharray="4 4" dot={false} legendType="none" />
+            <ReferenceLine y={20} stroke="#3f3f46" strokeWidth={1} strokeDasharray="4 4" />
             <Line type="monotone" dataKey="rate" stroke="#6366F1" strokeWidth={2} dot={{ r: 3, fill: '#6366F1' }} />
           </LineChart>
         </ResponsiveContainer>

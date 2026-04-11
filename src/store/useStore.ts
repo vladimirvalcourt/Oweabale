@@ -1538,10 +1538,12 @@ export const useStore = create<AppState>()(
     console.log('[fetchData] starting fetch...');
     set({ isLoading: true });
 
-    // Fire non-critical RPC in background
-    void (supabase.rpc('flip_overdue_bills') as unknown as Promise<unknown>).catch((err) => {
-      console.warn('[fetchData] flip_overdue_bills RPC failed:', err);
-    });
+    // Fire non-critical RPC in background (Supabase v2 builders are thenable but not
+    // full Promises — do not chain .catch(); use async/await or .then(onErr)).
+    void (async () => {
+      const { error } = await supabase.rpc('flip_overdue_bills');
+      if (error) console.warn('[fetchData] flip_overdue_bills RPC failed:', error.message);
+    })();
 
     // Start Phase 2 queries immediately — runs in parallel with Phase 1
     // so total load time = max(phase1, phase2) instead of phase1 + phase2.
