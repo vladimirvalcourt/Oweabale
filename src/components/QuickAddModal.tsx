@@ -423,8 +423,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                 <div className="overflow-y-auto w-full">
                   {/* Scan Document Strip */}
                   <div className="bg-surface-base border-b border-surface-border">
-                    <div className="px-6 py-3 flex items-center justify-between gap-3">
-                      <div>
+                    <div className="px-6 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="min-w-0">
                         <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">
                           Scan receipt, image or PDF
                         </p>
@@ -432,59 +432,61 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           JPG · PNG · WEBP · PDF
                         </p>
                       </div>
-                      <div className="flex flex-wrap items-center justify-end gap-2">
+                      <div className="flex flex-wrap items-center gap-2 sm:justify-end min-w-0 w-full sm:w-auto">
                         {scannedPreviewUrl && (
                           <button
                             type="button"
                             onClick={() => setShowPreview(p => !p)}
-                            className={`p-2 rounded-sm border transition-all ${showPreview ? 'border-indigo-500/50 text-indigo-400 bg-indigo-500/10' : 'border-surface-border text-content-tertiary hover:text-white hover:bg-surface-elevated'}`}
+                            className={`shrink-0 p-2 rounded-sm border transition-all ${showPreview ? 'border-indigo-500/50 text-indigo-400 bg-indigo-500/10' : 'border-surface-border text-content-tertiary hover:text-white hover:bg-surface-elevated'}`}
                             title={showPreview ? 'Hide document' : 'Show document'}
                           >
                             {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                           </button>
                         )}
-                        <label className={`relative flex items-center gap-2 px-3 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none shrink-0
-                          ${isScanning
-                            ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
-                            : 'border-surface-border bg-surface-raised text-content-secondary hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
-                          }`}>
-                          <input
-                            ref={scanCameraInputRef}
-                            type="file"
-                            accept="image/*"
-                            capture="environment"
-                            className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full"
-                            onChange={handleScanFile}
-                            disabled={isScanning}
-                          />
-                          <Camera className="w-3.5 h-3.5" />
-                          Camera
-                        </label>
-                        <label className={`relative flex items-center gap-2 px-3 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none shrink-0
-                          ${isScanning
-                            ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
-                            : 'border-surface-border bg-surface-raised text-content-secondary hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
-                          }`}>
-                          <input
-                            ref={scanFileInputRef}
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
-                            className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full"
-                            onChange={handleScanFile}
-                            disabled={isScanning}
-                          />
-                          {isScanning ? (
-                            <>
-                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                              Scanning...
-                            </>
-                          ) : (
-                            <>
-                              <UploadCloud className="w-3.5 h-3.5" />
-                              {scannedPreviewUrl ? 'Rescan file' : 'Upload file'}
-                            </>
-                          )}
-                        </label>
+                        <div className="grid grid-cols-2 gap-2 flex-1 min-w-0 sm:min-w-[260px]">
+                          <label className={`relative flex min-h-[2.5rem] w-full items-center justify-center gap-2 px-3 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none text-center leading-tight
+                            ${isScanning
+                              ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
+                              : 'border-surface-border bg-surface-raised text-content-secondary hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
+                            }`}>
+                            <input
+                              ref={scanCameraInputRef}
+                              type="file"
+                              accept="image/*"
+                              capture="environment"
+                              className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full"
+                              onChange={handleScanFile}
+                              disabled={isScanning}
+                            />
+                            <Camera className="w-3.5 h-3.5 shrink-0" aria-hidden />
+                            <span>Camera</span>
+                          </label>
+                          <label className={`relative flex min-h-[2.5rem] w-full items-center justify-center gap-2 px-3 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none text-center leading-tight
+                            ${isScanning
+                              ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
+                              : 'border-surface-border bg-surface-raised text-content-secondary hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
+                            }`}>
+                            <input
+                              ref={scanFileInputRef}
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                              className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full"
+                              onChange={handleScanFile}
+                              disabled={isScanning}
+                            />
+                            {isScanning ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin" aria-hidden />
+                                <span>Scanning...</span>
+                              </>
+                            ) : (
+                              <>
+                                <UploadCloud className="w-3.5 h-3.5 shrink-0" aria-hidden />
+                                <span>{scannedPreviewUrl ? 'Rescan file' : 'Upload file'}</span>
+                              </>
+                            )}
+                          </label>
+                        </div>
                       </div>
                     </div>
 

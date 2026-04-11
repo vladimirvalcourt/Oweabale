@@ -326,7 +326,7 @@ export default function Ingestion() {
             Uploads are read automatically and saved when amount and required fields are detected. Anything left in the list needs a quick confirm.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex w-full flex-col gap-3 md:max-w-2xl md:items-end">
           <input 
             type="file" 
             ref={fileInputRef} 
@@ -343,32 +343,41 @@ export default function Ingestion() {
             capture="environment"
             onChange={handleFileSelect}
           />
-          <button 
-            type="button"
-            onClick={() => cameraInputRef.current?.click()}
-            className="px-6 py-2.5 bg-surface-raised border border-surface-border hover:bg-surface-elevated text-content-secondary rounded-sm text-xs font-sans font-semibold transition-colors flex items-center gap-2 btn-tactile shrink-0"
-          >
-            <Camera className="w-4 h-4" /> Camera
-          </button>
-          <button 
-            onClick={() => setIsSyncOpen(true)}
-            className="px-6 py-2.5 bg-brand-violet/10 border border-brand-violet/30 hover:bg-brand-violet/20 text-brand-violet rounded-sm text-xs font-sans font-semibold transition-colors flex items-center gap-2 btn-tactile"
-          >
-            <Smartphone className="w-4 h-4" /> Scan via phone
-          </button>
-          <button 
-            onClick={() => fileInputRef.current?.click()}
-            className="px-6 py-2.5 bg-surface-raised border border-surface-border hover:bg-surface-elevated text-content-secondary rounded-sm text-xs font-sans font-semibold transition-colors flex items-center gap-2 btn-tactile"
-          >
-            <UploadCloud className="w-4 h-4" /> Upload documents
-          </button>
+          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
+            <button 
+              type="button"
+              onClick={() => cameraInputRef.current?.click()}
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-sm border border-surface-border bg-surface-raised px-4 py-2.5 text-xs font-sans font-semibold text-content-secondary transition-colors hover:bg-surface-elevated btn-tactile"
+            >
+              <Camera className="h-4 w-4 shrink-0" aria-hidden />
+              <span className="text-center leading-tight">Camera</span>
+            </button>
+            <button 
+              type="button"
+              onClick={() => setIsSyncOpen(true)}
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-sm border border-brand-violet/30 bg-brand-violet/10 px-4 py-2.5 text-xs font-sans font-semibold text-brand-violet transition-colors hover:bg-brand-violet/20 btn-tactile"
+            >
+              <Smartphone className="h-4 w-4 shrink-0" aria-hidden />
+              <span className="text-center leading-tight">Scan via phone</span>
+            </button>
+            <button 
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-sm border border-surface-border bg-surface-raised px-4 py-2.5 text-xs font-sans font-semibold text-content-secondary transition-colors hover:bg-surface-elevated btn-tactile"
+            >
+              <UploadCloud className="h-4 w-4 shrink-0" aria-hidden />
+              <span className="text-center leading-tight">Upload documents</span>
+            </button>
+          </div>
 
           {pendingIngestions.some(pi => pi.status === 'ready') && (
             <button 
+              type="button"
               onClick={handleBulkCommit}
-              className="px-6 py-2.5 bg-brand-cta hover:bg-brand-cta-hover text-white rounded-sm text-xs font-sans font-semibold transition-colors flex items-center gap-2 shadow-sm btn-tactile"
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-sm bg-brand-cta px-4 py-2.5 text-xs font-sans font-semibold text-white shadow-sm transition-colors hover:bg-brand-cta-hover btn-tactile sm:ml-auto sm:w-auto sm:min-w-[12rem]"
             >
-              <FileCheck className="w-4 h-4" /> Save all ready
+              <FileCheck className="h-4 w-4 shrink-0" aria-hidden />
+              Save all ready
             </button>
           )}
         </div>
