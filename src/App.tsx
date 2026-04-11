@@ -61,12 +61,13 @@ function AppRoutes() {
   // Only block the entire app on authentication resolution.
   if (authLoading) return <AppLoader />;
 
-  // Avoid onboarding redirect before profile row is merged (prevents dashboard flash for new users).
-  if (authUser && isLoading && !user.id) return <AppLoader />;
+  // Wait for the first Supabase sync after sign-in so we do not use stale persisted
+  // `hasCompletedOnboarding` from Zustand before `fetchData` finishes.
+  if (authUser && isLoading) return <AppLoader />;
 
   if (
     authUser &&
-    user.id &&
+    user.id === authUser.id &&
     !user.hasCompletedOnboarding &&
     location.pathname !== '/onboarding'
   ) {

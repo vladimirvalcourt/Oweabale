@@ -61,21 +61,23 @@ export default function Onboarding() {
   const { addAsset, addBudget, updateUser, addNotification, user } = useStore();
   const currentStep = STEPS[currentStepIndex];
 
-  const persistOnboardingData = () => {
+  const persistOnboardingData = async (): Promise<boolean> => {
     // Step 1 — cash becomes a "Checking Account" asset
+    const assetPromises: Promise<boolean>[] = [];
     if (formData.cash && parseFloat(formData.cash) > 0) {
-      addAsset({ name: 'Primary Checking', value: parseFloat(formData.cash), type: 'Cash' });
+      assetPromises.push(addAsset({ name: 'Primary Checking', value: parseFloat(formData.cash), type: 'Cash' }));
     }
     // Step 2 — monthly bills total becomes a General budget ceiling
     if (formData.bills && parseFloat(formData.bills) > 0) {
-      addBudget({ category: 'General', amount: parseFloat(formData.bills), period: 'Monthly' });
+      assetPromises.push(addBudget({ category: 'General', amount: parseFloat(formData.bills), period: 'Monthly' }));
     }
-    // Step 3/4/5 — strategy + freelance mode stored to user profile metadata
-    updateUser({
+    await Promise.all(assetPromises);
+    // Step 3/4/5 — strategy stored on profile; must finish before navigation or the next load will re-show onboarding.
+    const saved = await updateUser({
       theme: formData.focus === 'detonation' ? 'Detonation' : 'Dark',
       hasCompletedOnboarding: true,
     });
-    // Notify user of active mode
+    if (!saved) return false;
     addNotification({
       title: formData.freelance ? 'Independent Contractor Mode Active' : 'Standard Mode Active',
       message: formData.focus === 'detonation'
@@ -83,16 +85,18 @@ export default function Onboarding() {
         : 'Wealth Stacking strategy selected. Growth trajectory enabled.',
       type: 'info',
     });
+    return true;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStepIndex < STEPS.length - 1) {
       setDirection(1);
       setCurrentStepIndex(prev => prev + 1);
     } else {
-      persistOnboardingData();
+      const ok = await persistOnboardingData();
+      if (!ok) return;
       toast.success('Setup complete. Welcome to Oweable.');
-      setTimeout(() => navigate('/dashboard'), 800);
+      navigate('/dashboard');
     }
   };
 
@@ -139,7 +143,12 @@ export default function Onboarding() {
           <div className="text-[10px] font-mono text-white tracking-[0.2em] font-bold uppercase">Oweable</div>
           <div className="flex items-center gap-4">
             <button
-              onClick={() => { updateUser({ hasCompletedOnboarding: true }); toast.success('Setup skipped.'); navigate('/dashboard'); }}
+              onClick={async () => {
+                const ok = await updateUser({ hasCompletedOnboarding: true });
+                if (!ok) return;
+                toast.success('Setup skipped.');
+                navigate('/dashboard');
+              }}
               className="text-[11px] font-mono text-zinc-400 hover:text-zinc-200 uppercase tracking-widest transition-colors border border-surface-border px-3 py-1.5 rounded-sm hover:bg-surface-elevated"
             >
               Skip Setup
@@ -249,8 +258,9 @@ export default function Onboarding() {
         </div>
         <div className="flex items-center gap-4">
           <button 
-            onClick={() => {
-              updateUser({ hasCompletedOnboarding: true });
+            onClick={async () => {
+              const ok = await updateUser({ hasCompletedOnboarding: true });
+              if (!ok) return;
               toast.success('Setup skipped. Welcome to your dashboard.');
               navigate('/dashboard');
             }}

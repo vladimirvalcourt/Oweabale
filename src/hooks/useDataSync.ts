@@ -64,7 +64,7 @@ export function useDataSync({
       if (now - lastVisibilityFetchRef.current < VISIBILITY_REFETCH_MS) return;
       lastVisibilityFetchRef.current = now;
       dataSyncDevLog('[useDataSync] visibility refetch for user:', authUserId);
-      void fetchData(authUserId);
+      void fetchData(authUserId, { background: true });
     };
 
     document.addEventListener('visibilitychange', onVisibility);

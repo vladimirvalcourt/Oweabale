@@ -267,10 +267,9 @@ export default function Settings() {
     }
     setIsSaving(true);
     try {
-      await updateUser(formData);
-      toast.success('Profile updated successfully');
-    } catch {
-      toast.error('Failed to save profile');
+      const ok = await updateUser(formData);
+      if (ok) toast.success('Profile updated successfully');
+      else toast.error('Failed to save profile');
     } finally {
       setIsSaving(false);
     }
@@ -397,8 +396,9 @@ export default function Settings() {
                               return;
                             }
                             const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(path);
-                            await updateUser({ avatar: publicUrl });
-                            toast.success('Profile picture updated');
+                            const ok = await updateUser({ avatar: publicUrl });
+                            if (ok) toast.success('Profile picture updated');
+                            else toast.error('Failed to save profile picture');
                             e.target.value = '';
                           }} />
                         </label>

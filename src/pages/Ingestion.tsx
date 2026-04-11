@@ -328,7 +328,7 @@ export default function Ingestion() {
                }
             });
             
-            useStore.getState().fetchData();
+            useStore.getState().fetchData(undefined, { background: true });
             
             // Clear highlight after 5 seconds
             setTimeout(() => setRecentlyAddedId(null), 5000);
@@ -662,7 +662,7 @@ export default function Ingestion() {
            // Mobile upload already inserted the record, 
            // but we might need to refresh local state if store doesn't auto-poll
            // In Oweable, fetchData() usually handles this.
-           useStore.getState().fetchData();
+           useStore.getState().fetchData(undefined, { background: true });
         }}
       />
     </div>

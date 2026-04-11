@@ -282,7 +282,7 @@ interface AppState {
   addFreelanceEntry: (entry: Omit<FreelanceEntry, 'id'>) => Promise<boolean>;
   toggleFreelanceVault: (id: string) => Promise<void>;
   deleteFreelanceEntry: (id: string) => Promise<void>;
-  updateUser: (user: Partial<AppState['user']>) => Promise<void>;
+  updateUser: (user: Partial<AppState['user']>) => Promise<boolean>;
   signOut: () => Promise<void>;
   clearLocalData: () => void;
   resetData: () => Promise<void>;
@@ -304,7 +304,7 @@ interface AppState {
   commitIngestion: (id: string) => Promise<void>;
   
   // Supabase Syncing
-  fetchData: (userId?: string) => Promise<void>;
+  fetchData: (userId?: string, options?: { background?: boolean }) => Promise<void>;
   isLoading: boolean;
   
   // Modal State
@@ -1137,10 +1137,16 @@ export const useStore = create<AppState>()(
       if (user.taxRate !== undefined)  patch.tax_rate = user.taxRate;
       if (user.hasCompletedOnboarding !== undefined) patch.has_completed_onboarding = user.hasCompletedOnboarding;
       if (Object.keys(patch).length > 0) {
-        await supabase.from('profiles').upsert({ id: userId, ...patch });
+        const { error } = await supabase.from('profiles').update(patch).eq('id', userId);
+        if (error) {
+          console.error('[updateUser] profile update failed:', error.message);
+          toast.error('Could not save profile. Please try again.');
+          return false;
+        }
       }
     }
     set((state) => ({ user: { ...state.user, ...user } }));
+    return true;
   },
   addFreelanceEntry: async (entry) => {
     try {
@@ -1535,16 +1541,17 @@ export const useStore = create<AppState>()(
 
   // Supabase Implementation
   isLoading: false,
-  fetchData: async (userId?: string) => {
+  fetchData: async (userId?: string, options?: { background?: boolean }) => {
     const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
     if (!resolvedUserId) {
       console.warn('[fetchData] No user ID available — skipping load');
-      set({ isLoading: false });
+      if (!options?.background) set({ isLoading: false });
       return;
     }
 
+    const background = options?.background === true;
     console.log('[fetchData] starting fetch...');
-    set({ isLoading: true });
+    if (!background) set({ isLoading: true });
 
     // Fire non-critical RPC in background (Supabase v2 builders are thenable but not
     // full Promises — do not chain .catch(); use async/await or .then(onErr)).
@@ -1684,7 +1691,7 @@ export const useStore = create<AppState>()(
           phone: profile.phone ?? '',
           timezone: profile.timezone ?? 'Eastern Time (ET)',
           language: profile.language || 'English (US)',
-          hasCompletedOnboarding: profile.has_completed_onboarding || false,
+          hasCompletedOnboarding: profile.has_completed_onboarding === true,
           taxState: profile.tax_state ?? '',
           taxRate: profile.tax_rate ?? 0,
           isAdmin: profile.is_admin === true,
@@ -1867,7 +1874,7 @@ export const useStore = create<AppState>()(
     } catch (err) {
       console.error('[fetchData] failed:', err);
     } finally {
-      set({ isLoading: false });
+      if (!background) set({ isLoading: false });
     }
   },
 
