@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   ArrowRight, Activity, ShieldCheck, Calendar, Flame, Inbox, ShieldAlert,
@@ -15,6 +15,36 @@ import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting } from '../lib
 import { BorderRotate } from '../components/ui/animated-gradient-border';
 
 import type { Citation } from '../store/useStore';
+
+/** v2: JSON { liquid, liability } — re-show when fingerprint changes (cash or est. quarterly tax moves). */
+const LOW_TAX_RESERVE_DISMISS_KEY = 'oweable_dismiss_dashboard_low_tax_reserve_v2';
+
+type LowTaxFingerprint = { liquid: number; liability: number };
+
+function roundMoneyFingerprint(n: number): number {
+  if (!Number.isFinite(n)) return 0;
+  return Math.round(n / 25) * 25;
+}
+
+function parseStoredLowTaxFingerprint(): LowTaxFingerprint | null {
+  try {
+    const raw = sessionStorage.getItem(LOW_TAX_RESERVE_DISMISS_KEY);
+    if (!raw) return null;
+    const j = JSON.parse(raw) as unknown;
+    if (!j || typeof j !== 'object') return null;
+    const o = j as Record<string, unknown>;
+    const liquid = Number(o.liquid);
+    const liability = Number(o.liability);
+    if (Number.isFinite(liquid) && Number.isFinite(liability)) return { liquid, liability };
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function lowTaxFingerprintsEqual(a: LowTaxFingerprint, b: LowTaxFingerprint): boolean {
+  return a.liquid === b.liquid && a.liability === b.liability;
+}
 
 // Helper for animated numbers
 function AnimatedValue({ value, prefix = "", suffix = "" , decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
@@ -58,6 +88,9 @@ export default function Dashboard() {
   const isLoading = useStore((state) => state.isLoading);
   const [isCitationModalOpen, setIsCitationModalOpen] = useState(false);
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
+  const [dismissedLowTaxFingerprint, setDismissedLowTaxFingerprint] = useState<LowTaxFingerprint | null>(
+    () => parseStoredLowTaxFingerprint()
+  );
 
   useEffect(() => {
     if (location.hash === '#cash-flow') {
@@ -132,6 +165,29 @@ export default function Dashboard() {
     const currentTaxLiability = (cashFlow?.taxReserve || 0) * 3; // Est quarterly
     return liquidCash < currentTaxLiability;
   }, [cashFlow.taxReserve, liquidCash]);
+
+  const lowTaxFingerprint = useMemo(
+    (): LowTaxFingerprint => ({
+      liquid: roundMoneyFingerprint(liquidCash),
+      liability: roundMoneyFingerprint((cashFlow?.taxReserve ?? 0) * 3),
+    }),
+    [liquidCash, cashFlow.taxReserve]
+  );
+
+  const showLowTaxReserveAlert = useMemo(() => {
+    if (!taxInsolvencyRisk) return false;
+    if (!dismissedLowTaxFingerprint) return true;
+    return !lowTaxFingerprintsEqual(dismissedLowTaxFingerprint, lowTaxFingerprint);
+  }, [taxInsolvencyRisk, dismissedLowTaxFingerprint, lowTaxFingerprint]);
+
+  const dismissLowTaxReserveAlert = useCallback(() => {
+    try {
+      sessionStorage.setItem(LOW_TAX_RESERVE_DISMISS_KEY, JSON.stringify(lowTaxFingerprint));
+    } catch {
+      /* ignore quota / private mode */
+    }
+    setDismissedLowTaxFingerprint(lowTaxFingerprint);
+  }, [lowTaxFingerprint]);
 
   const subscriptionSpend = useMemo(() => activeSubscriptions.reduce((acc, sub) => {
     const toMonthly = (amount: number, freq: string) => freq === 'Yearly' ? (amount / 12) : (amount || 0);
@@ -237,8 +293,7 @@ export default function Dashboard() {
     );
   }
 
-  // Active actionable alerts
-  const hasActionableAlerts = pendingIngestions.length > 0 || isOverdraftRisk || taxInsolvencyRisk;
+  const hasActionableAlerts = pendingIngestions.length > 0 || isOverdraftRisk || showLowTaxReserveAlert;
 
   return (
     <BorderRotate
@@ -328,26 +383,40 @@ export default function Dashboard() {
             )}
 
             {/* Tax Insolvency Action */}
-            {taxInsolvencyRisk && (
-              <Link to="/taxes" className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-sm">
-                <motion.div 
-                  initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                  className="bg-amber-500/10 border border-amber-500/30 p-5 rounded-sm flex items-center justify-between hover:bg-amber-500/15 transition-all shadow-sm group"
+            {showLowTaxReserveAlert && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-amber-500/10 border border-amber-500/30 rounded-sm shadow-sm flex flex-col sm:flex-row sm:items-stretch overflow-hidden"
+              >
+                <Link
+                  to="/taxes"
+                  className="flex flex-1 items-center justify-between gap-4 p-5 min-w-0 hover:bg-amber-500/15 transition-all group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-inset rounded-sm sm:rounded-none"
                 >
-                  <div className="flex items-center gap-5">
+                  <div className="flex items-center gap-5 min-w-0">
                     <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center shrink-0">
-                      <ShieldAlert className="w-5 h-5 text-amber-400" />
+                      <ShieldAlert className="w-5 h-5 text-amber-400" aria-hidden />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-sans font-medium text-amber-400">Low Tax Reserve</p>
                       <p className="text-xs font-sans text-amber-300/80 mt-0.5">
                         Cash is below the estimated quarterly liability of ${Math.round(cashFlow.taxReserve * 3).toLocaleString()}.
                       </p>
                     </div>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-amber-400 group-hover:translate-x-1 transition-transform" />
-                </motion.div>
-              </Link>
+                  <ArrowRight className="w-5 h-5 text-amber-400 shrink-0 group-hover:translate-x-1 transition-transform" aria-hidden />
+                </Link>
+                <div className="flex border-t border-amber-500/30 sm:border-t-0 sm:border-l sm:border-amber-500/30">
+                  <button
+                    type="button"
+                    onClick={dismissLowTaxReserveAlert}
+                    aria-label="Dismiss low tax reserve alert"
+                    className="w-full sm:w-auto px-5 py-3 sm:py-0 text-xs font-mono font-bold uppercase tracking-widest text-amber-200/90 hover:bg-amber-500/15 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-inset"
+                  >
+                    Got it
+                  </button>
+                </div>
+              </motion.div>
             )}
           </div>
         </div>

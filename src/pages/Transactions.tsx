@@ -309,14 +309,14 @@ export default function Transactions() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Prev
               </button>
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-zinc-500 hover:text-white hover:bg-surface-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>

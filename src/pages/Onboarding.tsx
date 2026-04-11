@@ -182,7 +182,7 @@ export default function Onboarding() {
           {/* Status badge */}
           <div className="flex items-center gap-2 mb-8">
             <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em]">Secure Connection Established</span>
+            <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-[0.3em]">Secure Connection Established</span>
           </div>
 
           {/* Headline */}
@@ -193,7 +193,7 @@ export default function Onboarding() {
           <p className="text-zinc-400 font-mono text-[12px] normal-case tracking-normal mb-4 max-w-md leading-relaxed">
             In a couple of minutes you will have a working dashboard: cash, bills, and a default strategy. Everything you enter here is optional — add or edit the rest anytime.
           </p>
-          <p className="text-zinc-500 font-mono text-[11px] uppercase tracking-[0.2em] mb-10">
+          <p className="text-content-tertiary font-mono text-[11px] uppercase tracking-[0.2em] mb-10">
             Your financial command center is ready to be configured.
           </p>
 
@@ -211,7 +211,7 @@ export default function Onboarding() {
                 </div>
                 <div>
                   <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-white mb-0.5">{label}</p>
-                  <p className="text-[9px] font-mono text-zinc-500 uppercase leading-relaxed">{desc}</p>
+                  <p className="text-[9px] font-mono text-content-tertiary uppercase leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -232,7 +232,7 @@ export default function Onboarding() {
               </div>
               <button
                 onClick={() => setShowWelcome(false)}
-                className="bg-brand-indigo hover:bg-brand-violet text-white px-8 py-2.5 text-[10px] font-mono font-bold uppercase tracking-[0.1em] transition-all btn-tactile flex items-center gap-2"
+                className="bg-brand-cta hover:bg-brand-cta-hover text-white px-8 py-2.5 text-[10px] font-mono font-bold uppercase tracking-[0.1em] transition-all btn-tactile flex items-center gap-2"
               >
                 Get Started
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -268,7 +268,7 @@ export default function Onboarding() {
         <div className="absolute top-0 left-0 right-0 flex justify-between items-center h-12 px-4 sm:px-6 border-b border-surface-border bg-surface-base/50 backdrop-blur-md z-20 gap-2">
         <div className="flex items-center gap-3 sm:gap-6 min-w-0">
           <div className="text-[10px] font-mono text-white tracking-[0.2em] font-bold uppercase shrink-0">Getting Started</div>
-          <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest md:hidden shrink-0">
+          <div className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest md:hidden shrink-0">
             {currentStepIndex + 1}/{STEPS.length}
           </div>
           <div className="hidden md:flex gap-1 h-2 items-end">
@@ -401,7 +401,7 @@ export default function Onboarding() {
                       className={`p-5 border transition-all text-left group ${formData.focus === 'stacking' ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
                     >
                       <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Save & Grow</h3>
-                      <p className="text-[9px] font-mono uppercase leading-relaxed opacity-60">Focus on growth trajectory and asset accumulation.</p>
+                      <p className="text-[9px] font-mono uppercase leading-relaxed text-content-tertiary">Focus on growth trajectory and asset accumulation.</p>
                     </button>
 
                     <button 
@@ -409,7 +409,7 @@ export default function Onboarding() {
                       className={`p-5 border transition-all text-left group ${formData.focus === 'detonation' ? 'bg-surface-elevated text-white border-rose-500' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
                     >
                       <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Pay Off Debt Fast</h3>
-                      <p className="text-[9px] font-mono uppercase leading-relaxed opacity-60">Focus on highest APR targets and accelerated repayment.</p>
+                      <p className="text-[9px] font-mono uppercase leading-relaxed text-content-tertiary">Focus on highest APR targets and accelerated repayment.</p>
                     </button>
                   </div>
                 )}
@@ -422,9 +422,9 @@ export default function Onboarding() {
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest">Independent Contractor</h3>
-                        <Shield className="w-3 h-3 opacity-50" />
+                        <Shield className="w-3 h-3 text-content-tertiary" />
                       </div>
-                      <p className="text-[9px] font-mono uppercase leading-relaxed opacity-60 text-current">Activates tax tracking for freelancers, automatically sets aside your tax amount, and lets you scan income statements.</p>
+                      <p className="text-[9px] font-mono uppercase leading-relaxed text-content-tertiary">Activates tax tracking for freelancers, automatically sets aside your tax amount, and lets you scan income statements.</p>
                     </button>
 
                     <button 
@@ -432,11 +432,11 @@ export default function Onboarding() {
                       className={`p-5 border transition-all text-left group ${formData.freelance === false ? 'bg-zinc-800 text-white border-zinc-700' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-zinc-500'}`}
                     >
                       <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Traditional (W2)</h3>
-                      <p className="text-[9px] font-mono uppercase leading-relaxed opacity-60">Standard household budgeting and debt elimination.</p>
+                      <p className="text-[9px] font-mono uppercase leading-relaxed text-content-tertiary">Standard household budgeting and debt elimination.</p>
                     </button>
                     <div className="sm:col-span-2 border border-surface-border p-3 bg-black/40 mt-2">
                        <span className="text-[9px] font-mono text-emerald-500 uppercase tracking-widest block mb-1 font-bold">Intelligence Advisory:</span>
-                       <p className="text-[9px] font-mono text-zinc-500 uppercase leading-relaxed">Gig workers are subject to 15.3% Self-Employment tax. Oweable will automatically reserve this from every payout.</p>
+                       <p className="text-[9px] font-mono text-content-tertiary uppercase leading-relaxed">Gig workers are subject to 15.3% Self-Employment tax. Oweable will automatically reserve this from every payout.</p>
                     </div>
                   </div>
                 )}
@@ -456,12 +456,12 @@ export default function Onboarding() {
           </button>
           
           <div className="flex items-center gap-4">
-             <div className="hidden sm:block text-[10px] font-mono text-zinc-600 uppercase tracking-widest font-medium opacity-50">
+             <div className="hidden sm:block text-[10px] font-mono text-content-tertiary uppercase tracking-widest font-medium">
                Secure Setup
              </div>
             <button 
               onClick={handleNext}
-              className="bg-brand-indigo hover:bg-brand-violet text-white px-8 py-2.5 text-[10px] font-mono font-bold uppercase tracking-[0.1em] transition-all btn-tactile flex items-center gap-2"
+              className="bg-brand-cta hover:bg-brand-cta-hover text-white px-8 py-2.5 text-[10px] font-mono font-bold uppercase tracking-[0.1em] transition-all btn-tactile flex items-center gap-2"
             >
               {currentStepIndex === STEPS.length - 1 ? 'Go to Dashboard' : 'Continue'}
               <ArrowRight className="w-3.5 h-3.5" />
@@ -471,7 +471,7 @@ export default function Onboarding() {
       </div>
 
       {/* Decorative Corner Label */}
-      <div className="fixed bottom-6 right-6 opacity-20 flex flex-col items-end">
+      <div className="fixed bottom-6 right-6 opacity-20 flex flex-col items-end pointer-events-none" aria-hidden>
          <div className="font-mono text-[8px] uppercase tracking-[0.5em] mb-1">Oweable Collective</div>
          <div className="w-12 h-[1px] bg-white"></div>
       </div>

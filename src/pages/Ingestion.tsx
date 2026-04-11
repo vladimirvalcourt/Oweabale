@@ -507,7 +507,7 @@ export default function Ingestion() {
                     <button 
                       onClick={() => handleCommit(item.id)}
                       disabled={item.status !== 'ready'}
-                      className={`p-2 rounded-sm transition-all ${item.status === 'ready' ? 'text-emerald-500 hover:bg-emerald-500/10 cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 'text-zinc-800 cursor-not-allowed opacity-30'}`}
+                      className={`p-2 rounded-sm transition-all ${item.status === 'ready' ? 'text-emerald-500 hover:bg-emerald-500/10 cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 'text-zinc-600 cursor-not-allowed opacity-60'}`}
                     >
                       <Check className="w-4 h-4" />
                     </button>

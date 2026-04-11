@@ -568,7 +568,7 @@ export default function Layout() {
               type="button"
               aria-label="Quick add transaction or bill"
               onClick={() => openQuickAdd()}
-              className="hidden sm:flex items-center gap-2 bg-brand-indigo hover:bg-brand-violet text-white text-[12px] font-mono font-bold uppercase tracking-wider transition-all btn-tactile px-5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base focus-visible:ring-white"
+              className="hidden sm:flex items-center gap-2 bg-brand-cta hover:bg-brand-cta-hover text-white text-[12px] font-mono font-bold uppercase tracking-wider transition-all btn-tactile px-5 py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base focus-visible:ring-white"
             >
               <Plus className="w-3.5 h-3.5" />
               Quick Add
@@ -577,7 +577,7 @@ export default function Layout() {
               type="button"
               aria-label="Quick add transaction or bill"
               onClick={() => openQuickAdd()}
-              className="sm:hidden flex items-center justify-center w-11 h-11 bg-brand-indigo hover:bg-brand-violet text-white transition-all btn-tactile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              className="sm:hidden flex items-center justify-center w-11 h-11 bg-brand-cta hover:bg-brand-cta-hover text-white transition-all btn-tactile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
             >
               <Plus className="w-3.5 h-3.5" />
             </button>

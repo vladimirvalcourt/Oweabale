@@ -20,7 +20,8 @@ export function useDataSync({
   authUserId: string | null;
   authLoading: boolean;
 }) {
-  const { fetchData, clearLocalData } = useStore();
+  const fetchData = useStore((s) => s.fetchData);
+  const clearLocalData = useStore((s) => s.clearLocalData);
   const hadSessionRef = useRef(false);
   const lastFetchedUserIdRef = useRef<string | null>(null);
   const lastVisibilityFetchRef = useRef(0);
@@ -33,6 +34,8 @@ export function useDataSync({
       if (lastFetchedUserIdRef.current === authUserId) return;
       lastFetchedUserIdRef.current = authUserId;
       dataSyncDevLog('[useDataSync] triggering fetchData for user:', authUserId);
+      // Same-frame loading gate as fetchData (effect runs after paint; this minimizes the onboarding flash).
+      useStore.setState({ isLoading: true });
       void fetchData(authUserId);
       return;
     }

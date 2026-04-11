@@ -238,7 +238,7 @@ export default function Landing() {
             
             <Link 
               to={user?.id ? "/dashboard" : "/auth"} 
-              className="group flex items-center gap-4 bg-brand-indigo hover:bg-brand-violet text-white px-8 py-4 text-[13px] font-mono font-bold uppercase tracking-wider transition-all btn-tactile"
+              className="group flex items-center gap-4 bg-brand-cta hover:bg-brand-cta-hover text-white px-8 py-4 text-[13px] font-mono font-bold uppercase tracking-wider transition-all btn-tactile"
             >
               {user?.id ? "Enter Dashboard" : "Get started for free"}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

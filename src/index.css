@@ -14,11 +14,15 @@
 
   --color-content-primary: #F7F8F8;
   --color-content-secondary: #B1B6C0;
-  --color-content-tertiary: #808080;
-  --color-content-muted: #404040;
+  /* WCAG AA on surface-base / surface-raised (≥4.5:1 body text) */
+  --color-content-tertiary: #9CA3AF;
+  --color-content-muted: #8B919C;
 
   --color-brand-indigo: #60A5FA;
   --color-brand-violet: #818CF8;
+  /* Filled buttons + white label text — #60A5FA fails WCAG AA (~2.5:1); indigo-700/600 passes. */
+  --color-brand-cta: #4338ca;
+  --color-brand-cta-hover: #4f46e5;
   --color-brand-profit: #4ADE80;
   --color-brand-expense: #F87171;
   --color-brand-tax: #60A5FA;
@@ -290,15 +294,28 @@ body {
   --color-content-primary: #111827;
   --color-content-secondary: #4b5563;
   --color-content-tertiary: #6b7280;
-  --color-content-muted: #9ca3af;
+  /* Muted on white/light surfaces — #9ca3af fails AA on #fff */
+  --color-content-muted: #5f6670;
 
   --shadow-tactile: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(0, 0, 0, 0.06);
   --shadow-tactile-hover: inset 0 1px 0 rgba(255, 255, 255, 1), 0 2px 6px rgba(0, 0, 0, 0.08);
   --shadow-glow-indigo: 0 0 12px rgba(37, 99, 235, 0.2);
+  --color-brand-cta: #4338ca;
+  --color-brand-cta-hover: #4f46e5;
 }
 
 :root.theme-light .brand-header-text {
   text-shadow: none;
+}
+
+/*
+ * WCAG AA: default Tailwind zinc-400/500/600 are below 4.5:1 on dark surfaces.
+ * Lift only when not in theme-light (gray text on light backgrounds must stay darker).
+ */
+:root:not(.theme-light) {
+  --color-zinc-400: #c4c6d0;
+  --color-zinc-500: #aeb4bf;
+  --color-zinc-600: #969ca8;
 }
 
 /* Sonner — map to app surface tokens */

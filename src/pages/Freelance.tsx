@@ -203,7 +203,7 @@ export default function Freelance() {
               </button>
               <button 
                 onClick={() => setIsAddModalOpen(true)}
-                className="bg-brand-indigo hover:bg-brand-violet text-white text-[10px] font-mono px-6 py-3 rounded-none uppercase font-black tracking-tighter transition-all flex items-center gap-2"
+                className="bg-brand-cta hover:bg-brand-cta-hover text-white text-[10px] font-mono px-6 py-3 rounded-none uppercase font-black tracking-tighter transition-all flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" /> Add Payment
               </button>
@@ -257,7 +257,7 @@ export default function Freelance() {
                            </div>
                            <button 
                              onClick={() => toggleFreelanceVault(entry.id)}
-                             className={`px-4 py-2 border font-mono font-black text-[9px] uppercase tracking-tighter transition-all ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-brand-indigo bg-brand-indigo text-white hover:bg-brand-violet'}`}
+                             className={`px-4 py-2 border font-mono font-black text-[9px] uppercase tracking-tighter transition-all ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-brand-cta bg-brand-cta text-white hover:bg-brand-cta-hover'}`}
                            >
                              {entry.isVaulted ? 'Saved' : 'Move to Tax Reserve'}
                            </button>
@@ -348,7 +348,7 @@ export default function Freelance() {
                   </div>
                   <div className="pt-4 flex gap-3">
                     <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 h-12 border border-surface-border text-zinc-500 font-mono text-[10px] uppercase font-black tracking-widest hover:bg-surface-elevated transition-colors">Cancel</button>
-                    <button type="submit" className="flex-2 bg-brand-indigo hover:bg-brand-violet text-white h-12 px-8 font-mono text-[10px] uppercase font-black tracking-widest transition-all">Add Payment</button>
+                    <button type="submit" className="flex-2 bg-brand-cta hover:bg-brand-cta-hover text-white h-12 px-8 font-mono text-[10px] uppercase font-black tracking-widest transition-all">Add Payment</button>
                   </div>
                </form>
             </motion.div>

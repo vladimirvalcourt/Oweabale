@@ -182,7 +182,7 @@ export default function Taxes() {
             <div className="p-0">
                <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-elevated/50">
                   <p className="text-xs font-mono text-zinc-500 uppercase tracking-widest font-bold">Write-offs detected in Ledger</p>
-                  <button onClick={() => setShowAddForm(!showAddForm)} className="bg-brand-indigo hover:bg-brand-violet text-white text-[10px] font-mono px-3 py-1.5 rounded-sm uppercase font-bold transition-all">Add Manual Deduction</button>
+                  <button onClick={() => setShowAddForm(!showAddForm)} className="bg-brand-cta hover:bg-brand-cta-hover text-white text-[10px] font-mono px-3 py-1.5 rounded-sm uppercase font-bold transition-all">Add Manual Deduction</button>
                </div>
                {showAddForm && (
                  <div className="p-6 bg-surface-elevated border-b border-surface-border flex gap-3 items-end">

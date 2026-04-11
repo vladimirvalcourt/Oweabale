@@ -1586,16 +1586,18 @@ export const useStore = create<AppState>()(
   // Supabase Implementation
   isLoading: false,
   fetchData: async (userId?: string, options?: { background?: boolean }) => {
+    const background = options?.background === true;
+    // Set immediately so App never redirects to onboarding on a frame where auth is ready but this async fn has not yet reached the old loading gate.
+    if (!background) set({ isLoading: true });
+
     const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
     if (!resolvedUserId) {
       console.warn('[fetchData] No user ID available — skipping load');
-      if (!options?.background) set({ isLoading: false });
+      if (!background) set({ isLoading: false });
       return;
     }
 
-    const background = options?.background === true;
     console.log('[fetchData] starting fetch...');
-    if (!background) set({ isLoading: true });
 
     // Fire non-critical RPC in background (Supabase v2 builders are thenable but not
     // full Promises — do not chain .catch(); use async/await or .then(onErr)).
@@ -1962,10 +1964,28 @@ export const useStore = create<AppState>()(
           email: state.user.email,
           avatar: state.user.avatar,
           theme: state.user.theme,
-          hasCompletedOnboarding: state.user.hasCompletedOnboarding,
           isAdmin: state.user.isAdmin,
         },
       }),
+      merge: (persisted, current) => {
+        const c = current as AppState;
+        if (!persisted || typeof persisted !== 'object') return c;
+        const p = persisted as Partial<AppState>;
+        const pu = p.user;
+        if (!pu) return { ...c, ...p } as AppState;
+        const { hasCompletedOnboarding: _ignored, ...userRest } = pu as typeof c.user & {
+          hasCompletedOnboarding?: boolean;
+        };
+        return {
+          ...c,
+          ...p,
+          user: {
+            ...c.user,
+            ...userRest,
+            hasCompletedOnboarding: c.user.hasCompletedOnboarding,
+          },
+        };
+      },
     }
   )
 );

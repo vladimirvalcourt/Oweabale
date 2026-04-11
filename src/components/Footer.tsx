@@ -50,7 +50,7 @@ export default function Footer() {
         <div className="pt-8 border-t border-surface-border flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-6 text-[10px] font-mono text-content-muted uppercase tracking-widest">
             <span>OWEABLE INC. NYC</span>
-            <span className="opacity-30">/</span>
+            <span className="mx-1 h-3 w-px bg-surface-border shrink-0 inline-block align-middle" aria-hidden />
             <span>© {new Date().getFullYear()} All Rights Reserved</span>
           </div>
           <Link

@@ -69,6 +69,7 @@ function AppRoutes() {
     authUser &&
     user.id === authUser.id &&
     !user.hasCompletedOnboarding &&
+    !isLoading &&
     location.pathname !== '/onboarding'
   ) {
     return <Navigate to="/onboarding" replace />;
