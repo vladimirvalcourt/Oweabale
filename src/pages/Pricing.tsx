@@ -101,7 +101,7 @@ export default function Pricing() {
           <div className="bg-amber-400/5 border border-amber-400/20 p-4 rounded-sm flex items-center gap-4">
             <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
             <p className="text-sm text-amber-200/90 leading-relaxed">
-              <span className="text-amber-400 font-semibold">Beta:</span> Oweable is free for testing. We may start charging with advance notice to active users.
+              <span className="text-amber-400 font-semibold">Closed beta:</span> Access is by invitation. Pricing below reflects the public roadmap; your cohort may use the app at no charge during the beta.
             </p>
           </div>
         </div>
@@ -207,11 +207,11 @@ export default function Pricing() {
               
               <div className="bg-surface-raised border border-indigo-500/30 rounded-sm p-10 flex flex-col relative z-10 h-full shadow-[0_0_50px_rgba(99,102,241,0.05)]">
                 <div className="absolute top-0 right-10 transform -translate-y-1/2">
-                  <span className="bg-emerald-600 text-white text-xs font-sans font-semibold px-3 py-1 rounded-sm">Open beta</span>
+                  <span className="bg-emerald-600 text-white text-xs font-sans font-semibold px-3 py-1 rounded-sm">Closed beta</span>
                 </div>
                 
                 <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Full suite</h3>
-                <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Everything in the app during open beta.</p>
+                <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Everything in the app during the closed beta.</p>
                 
                 <div className="mb-10 p-6 bg-surface-base border border-indigo-500/20 rounded-sm relative h-[100px] flex items-center shadow-[inset_0_0_20px_rgba(99,102,241,0.02)]">
                   <div className={`absolute inset-0 px-6 flex items-center transition-all duration-300 ease-in-out`}>

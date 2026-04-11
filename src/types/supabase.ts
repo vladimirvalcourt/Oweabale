@@ -893,6 +893,10 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
+      get_closed_beta_public: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       delete_user: {
         Args: Record<PropertyKey, never>
         Returns: void

@@ -139,6 +139,30 @@ supabase link --project-ref <your-project-ref>
 supabase db push
 ```
 
+### Closed beta (invitation-only signups)
+
+Migrations add `public.app_config` / `public.beta_allowlist` and a **before-insert** trigger on `auth.users`. While `closed_beta` is `true`, **only** Google accounts whose email appears in `beta_allowlist` (lowercase) can complete registration.
+
+1. Seed allowlisted emails (SQL Editor or `supabase db`):
+
+```sql
+INSERT INTO public.beta_allowlist (email, note)
+VALUES ('teammate@yourdomain.com', 'Beta cohort')
+ON CONFLICT (email) DO NOTHING;
+```
+
+2. Turn enforcement on:
+
+```sql
+UPDATE public.app_config
+SET value = 'true'::jsonb, updated_at = now()
+WHERE key = 'closed_beta';
+```
+
+3. The sign-in page calls `get_closed_beta_public()` so invited users see the closed-beta notice. Default after migration is **`closed_beta` = false** (no restriction) until you run step 2.
+
+4. To pause enforcement (e.g. wider testing): set `closed_beta` back to `false`.
+
 ### MCP (Cursor)
 
 Cursor reads [`.cursor/mcp.json`](.cursor/mcp.json):
