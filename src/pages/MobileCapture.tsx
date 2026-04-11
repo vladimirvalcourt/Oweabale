@@ -5,7 +5,6 @@ import {
   ShieldCheck, Zap, RefreshCw, X, ArrowRight,
   Sun, Maximize, MousePointer2, Smartphone, FolderOpen
 } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 import { createCaptureSupabaseClient } from '../lib/supabaseCaptureClient';
 import { toast } from 'sonner';
 import { validateIngestionFile, safeExtFromMime } from '../lib/security';
@@ -134,7 +133,8 @@ export default function MobileCapture() {
       const fileName = `mobile_scan_${Date.now()}.${ext}`;
       const filePath = `incoming/${sessionId}/${fileName}`;
 
-      const { error: uploadErr } = await supabase.storage
+      // Use capture-scoped client so `x-session-token` is sent; storage RLS can match the QR session.
+      const { error: uploadErr } = await captureDb.storage
         .from('scans')
         .upload(filePath, activeImage, {
           contentType: activeImage.type,
@@ -143,17 +143,9 @@ export default function MobileCapture() {
 
       if (uploadErr) throw uploadErr;
 
-      const { error: updateErr } = await captureDb
-        .from('document_capture_sessions')
-        .update({ 
-          status: 'completed',
-          uploaded_file_url: filePath 
-        })
-        .eq('id', sessionId);
-
-      if (updateErr) throw updateErr;
-
-      await captureDb.from('pending_ingestions').insert({
+      // MUST insert before marking the session `completed`. Anon RLS on `pending_ingestions`
+      // requires `document_capture_sessions.status IN ('idle','pending','active')`.
+      const { error: insertErr } = await captureDb.from('pending_ingestions').insert({
         user_id: userId,
         token,
         status: 'uploading',
@@ -161,6 +153,18 @@ export default function MobileCapture() {
         storage_path: filePath,
         type: 'bill'
       });
+
+      if (insertErr) throw insertErr;
+
+      const { error: updateErr } = await captureDb
+        .from('document_capture_sessions')
+        .update({
+          status: 'completed',
+          uploaded_file_url: filePath
+        })
+        .eq('id', sessionId);
+
+      if (updateErr) throw updateErr;
 
       sessionStorage.removeItem(`pending_upload_${sessionId}`);
       setStatus('completed');
