@@ -12,6 +12,11 @@
 - Always push to `main`
 - Never push to a different branch without explicit permission
 
+## Backend (Supabase / Postgres)
+
+- If a task touches the database, RLS, RPCs, Edge Functions, storage policies, or webhooks, **ship the backend change**, not only app code or a local migration file.
+- Apply migrations to the linked project (e.g. Supabase MCP `apply_migration` for DDL, or `supabase db push` when local migration history matches remote).
+
 ## Code Standards
 
 - Fix bugs proactively as you build — do not leave known issues for later
