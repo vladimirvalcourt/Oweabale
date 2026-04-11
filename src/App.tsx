@@ -10,6 +10,7 @@ import DeviceGuard from './components/DeviceGuard';
 import ErrorBoundary from './components/ErrorBoundary';
 import AuthGuard from './components/AuthGuard';
 import AdminGuard from './components/AdminGuard';
+import MaintenanceGuard from './components/MaintenanceGuard';
 import { AppLoader } from './components/PageSkeleton';
 import SessionWarningModal from './components/SessionWarningModal';
 import { useStore } from './store/useStore';
@@ -95,6 +96,7 @@ function AppRoutes() {
 
       {/* ── Protected routes — require authentication ── */}
       <Route element={<AuthGuard />}>
+        <Route element={<MaintenanceGuard />}>
         {/* Admin — requires both authentication AND is_admin = true on profile */}
         <Route element={<AdminGuard />}>
           <Route path="/admin" element={<ErrorBoundary><AdminDashboard /></ErrorBoundary>} />
@@ -124,6 +126,7 @@ function AppRoutes() {
           <Route path="support" element={<ErrorBoundary><HelpDesk /></ErrorBoundary>} />
           <Route path="changelog" element={<ErrorBoundary><Changelog /></ErrorBoundary>} />
           <Route path="settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
+        </Route>
         </Route>
       </Route>
 

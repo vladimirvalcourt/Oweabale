@@ -1,14 +1,15 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { corsHeaders } from '../_shared/cors.ts'
 
 Deno.serve(async (req: Request) => {
+  const origin = req.headers.get('origin')
+  const c = corsHeaders(origin)
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { headers: c })
   }
+
+  const jsonHeaders = { ...c, 'Content-Type': 'application/json' as const }
 
   try {
     const supabaseAdmin = createClient(
@@ -48,7 +49,7 @@ Deno.serve(async (req: Request) => {
         banned_until: (u as any).banned_until ?? null,
       }))
       return new Response(JSON.stringify({ users: enriched }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: jsonHeaders,
       })
     }
 
@@ -82,7 +83,7 @@ Deno.serve(async (req: Request) => {
             items_stale_24h: stale,
           },
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+        { headers: jsonHeaders },
       )
     }
 
@@ -97,7 +98,7 @@ Deno.serve(async (req: Request) => {
       if (error) throw error
       await supabaseAdmin.from('profiles').update({ is_banned: true }).eq('id', targetUserId)
       return new Response(JSON.stringify({ message: 'User banned.' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: jsonHeaders,
       })
     }
 
@@ -108,7 +109,7 @@ Deno.serve(async (req: Request) => {
       if (error) throw error
       await supabaseAdmin.from('profiles').update({ is_banned: false }).eq('id', targetUserId)
       return new Response(JSON.stringify({ message: 'User unbanned.' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: jsonHeaders,
       })
     }
 
@@ -116,7 +117,7 @@ Deno.serve(async (req: Request) => {
       const { error } = await supabaseAdmin.auth.admin.deleteUser(targetUserId)
       if (error) throw error
       return new Response(JSON.stringify({ message: 'User permanently deleted.' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: jsonHeaders,
       })
     }
 
@@ -125,7 +126,7 @@ Deno.serve(async (req: Request) => {
   } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message }), {
       status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      headers: jsonHeaders,
     })
   }
 })

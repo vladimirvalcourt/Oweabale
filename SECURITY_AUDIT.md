@@ -11,7 +11,7 @@
 |---|---|---|
 | Critical | 2 | 2 ✅ |
 | High | 2 | 2 ✅ |
-| Medium | 3 | 1 ✅ (2 need DB migration) |
+| Medium | 3 | 3 ✅ (constraints + admin gate + profiles DELETE; see migrations) |
 | Low | 2 | — (acceptable) |
 
 Overall posture is **good**. The Supabase RLS layer is correctly configured, auth tokens use `sessionStorage` (not `localStorage`), file uploads are validated, and URLs are sanitized in the security library. Four bugs were found and fixed in this audit.
@@ -25,7 +25,7 @@ Overall posture is **good**. The Supabase RLS layer is correctly configured, aut
 - **Before:** `<Route path="/admin" ...>` was placed outside the `<Route element={<AuthGuard />}>` wrapper — anyone could visit `/admin` without being logged in.
 - **Impact:** Unauthenticated access to admin controls (`platform_settings`, maintenance mode toggle, user list query).
 - **Fix:** Moved `/admin` inside the `AuthGuard` block. **Committed.**
-- **Remaining gap:** No admin role check — any authenticated user can access `/admin`. A role-based guard (checking a `is_admin` column on `profiles`) should be added before production launch.
+- **Follow-up:** `AdminGuard` (`src/components/AdminGuard.tsx`) loads `profiles.is_admin` from Supabase (RLS-backed); `/admin` is wrapped with `AdminGuard`. **`is_admin`** column and admin RLS policies are in migrations (e.g. `20260407000002_amount_check_constraints_and_profile_fixes.sql`, `20260411144758_fix_rls_profiles_select_recursion.sql`).
 
 ### C-2: `paymentUrl` Rendered as Raw `href` (Stored XSS)
 - **File:** `src/pages/Dashboard.tsx:601`  
@@ -54,22 +54,29 @@ Overall posture is **good**. The Supabase RLS layer is correctly configured, aut
 ## Medium Findings
 
 ### M-1: `AdminDashboard` Queries All User Profiles
-- **File:** `src/pages/AdminDashboard.tsx:46`  
-- **Code:** `supabase.from('profiles').select('*').limit(50)` — attempts to read all user profiles.
-- **Impact:** RLS correctly blocks this (returns empty data for a normal authenticated user), but the intent is wrong. A future admin bypass (service role key leak, misconfigured RLS) would expose all user PII.
-- **Recommendation:** Add an `is_admin` column to `profiles` and a corresponding RLS policy that allows `SELECT *` only when `is_admin = true`. Gate the admin dashboard on this check. **Not fixed — requires design decision.**
+- **File:** `src/pages/AdminDashboard.tsx`  
+- **Code:** Selects multiple columns from `profiles` for the user table (admin tooling).
+- **Impact:** Only users with **`is_admin`** on their profile can read other profiles (RLS + `_internal.is_admin()`); the route is additionally gated by **`AdminGuard`**. Service-role operations (e.g. `admin-actions` Edge Function) require a valid JWT and `is_admin` on the caller’s profile.
+- **Status:** Addressed via `is_admin`, RLS, `AdminGuard`, and server-side checks.
 
 ### M-2: `amount > 0` Constraints Absent from Schema
-- **File:** `src/lib/supabase_schema.sql`  
-- **Referenced in:** `BACKEND.md` ("extensive `CHECK` constraints are configured including `amount > 0`")
-- **Reality:** The schema has no `CHECK (amount > 0)` on any financial table (`bills`, `debts`, `assets`, etc.).
-- **Impact:** Negative balances and zero-amount records can be inserted via API calls that bypass frontend validation.
-- **Recommendation:** Add `CHECK (amount > 0)` to `bills.amount`, `debts.remaining`, `assets.value`, `subscriptions.amount`, `goals.target_amount`, `incomes.amount`, `budgets.amount`, `deductions.amount`, `citations.amount`. **Needs a schema migration.**
+- **Migrations:** `20260407000002_amount_check_constraints_and_profile_fixes.sql` adds `CHECK` constraints for `bills`, `debts` (including `remaining >= 0`), `assets`, `subscriptions`, `goals`, `incomes`, `budgets`, `citations`, `deductions`. **`20260411200000_transactions_amount_positive_check.sql`** adds `transactions.amount > 0` (aligned with Plaid sync using absolute amounts).
+- **Impact:** Invalid amounts are rejected at the database layer once migrations are applied.
+- **Note:** Regenerate or update `src/lib/supabase_schema.sql` from the live schema when convenient so docs match reality.
 
 ### M-3: `profiles` Table Missing `DELETE` Policy
-- **File:** `src/lib/supabase_schema.sql:26`  
-- **Impact:** Users cannot delete their own profile row via the client SDK. The `ON DELETE CASCADE` from `auth.users` handles cleanup when the auth record is deleted (now fixed by H-2), but an explicit policy is cleaner and allows profile self-deletion independently.
-- **Recommendation:** Add `CREATE POLICY "Users can delete their own profile" ON profiles FOR DELETE USING (auth.uid() = id);`
+- **Migration:** `20260407000002_amount_check_constraints_and_profile_fixes.sql` — policy **`Users can delete their own profile`** on `profiles` for `DELETE` where `auth.uid() = id`.
+- **Status:** Implemented in migration (apply via `supabase db push`).
+
+---
+
+## Follow-up (2026-04-11)
+
+| Item | Change |
+|------|--------|
+| Maintenance mode | `MaintenanceGuard` + `MaintenancePage` — when `platform_settings.maintenance_mode` is true, signed-in **non-admin** users see maintenance (admins retain access). |
+| `admin-actions` CORS | Uses `../_shared/cors.ts` (same allowlist as Plaid functions; override with `PLAID_ALLOWED_ORIGINS`). |
+| Ingestion preview URLs | `sanitizeUrl()` for signed storage URLs in `href` / `iframe` / `img`; blob previews for local files unchanged. |
 
 ---
 
@@ -106,7 +113,7 @@ Overall posture is **good**. The Supabase RLS layer is correctly configured, aut
 
 Before production:
 
-- [ ] Apply `20260407000001_add_delete_user_rpc.sql` via `supabase db push`
-- [ ] Add `CHECK (amount > 0)` constraints to financial tables (new migration needed)
-- [ ] Add `DELETE` policy on `profiles` (new migration needed)
-- [ ] Implement admin role check on `/admin` route (`is_admin` column + RLS policy)
+- [ ] Apply pending migrations via `supabase db push` (including `20260407000001_add_delete_user_rpc.sql`, `20260407000002_amount_check_constraints_and_profile_fixes.sql`, `20260411200000_transactions_amount_positive_check.sql`, and later RLS recursion fixes as required by your branch)
+- [x] `CHECK` constraints on core financial tables — see `20260407000002_*` + `20260411200000_*`
+- [x] `DELETE` policy on `profiles` — `20260407000002_*`
+- [x] Admin role check on `/admin` — `AdminGuard` + `is_admin` + RLS

@@ -23,7 +23,7 @@ import { toast } from 'sonner';
 import Tesseract from 'tesseract.js';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-import { validateIngestionFile } from '../lib/security';
+import { validateIngestionFile, sanitizeUrl } from '../lib/security';
 import { buildScanExtraction } from '../lib/ingestionExtraction';
 import type { PendingIngestion } from '../store/useStore';
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
@@ -180,6 +180,8 @@ export default function Ingestion() {
     // 2. Trigger OCR for new mobile syncs
     const pendingMobile = pendingIngestions.find(pi => pi.source === 'mobile' && pi.status === 'uploading');
     if (pendingMobile && pendingMobile.storageUrl) {
+       const signedUrl = sanitizeUrl(pendingMobile.storageUrl);
+       if (!signedUrl) return;
        // Derive the MIME type from the storage path extension so PDFs are handled correctly
        const extMatch = pendingMobile.storagePath?.split('.').pop()?.toLowerCase() ?? 'jpg';
        const mimeMap: Record<string, string> = {
@@ -191,7 +193,7 @@ export default function Ingestion() {
          gif: 'image/gif',
        };
        const mimeType = mimeMap[extMatch] ?? 'image/jpeg';
-       fetch(pendingMobile.storageUrl)
+       fetch(signedUrl)
          .then(res => res.blob())
          .then(blob => {
            const file = new File([blob], `mobile_scan.${extMatch}`, { type: mimeType });
@@ -402,7 +404,12 @@ export default function Ingestion() {
               <div className="col-span-2 text-right text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em]">Action</div>
             </div>
 
-            {pendingIngestions.map((item) => (
+            {pendingIngestions.map((item) => {
+              const safeStorage = sanitizeUrl(item.storageUrl);
+              const preview =
+                safeStorage ||
+                (item.originalFile?.url?.startsWith('blob:') ? item.originalFile.url : null);
+              return (
               <div key={item.id} className="bg-surface-base">
                 <motion.div 
                   layout
@@ -552,9 +559,9 @@ export default function Ingestion() {
                               </span>
                               )}
                             </span>
-                            {item.storageUrl && (
+                            {safeStorage && (
                               <a
-                                href={item.storageUrl}
+                                href={safeStorage}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-[9px] font-mono text-zinc-600 hover:text-white uppercase tracking-widest flex items-center gap-1 transition-colors"
@@ -564,16 +571,16 @@ export default function Ingestion() {
                             )}
                           </div>
                           <div className="flex-1 flex items-center justify-center p-4">
-                            {item.storageUrl && item.originalFile?.type === 'application/pdf' ? (
+                            {preview && item.originalFile?.type === 'application/pdf' ? (
                               <iframe
-                                src={item.storageUrl}
+                                src={preview}
                                 className="w-full h-[380px] border-0"
                                 title={item.originalFile?.name}
                                 sandbox="allow-same-origin"
                               />
-                            ) : item.storageUrl || item.originalFile?.url ? (
+                            ) : preview ? (
                               <img
-                                src={item.storageUrl || item.originalFile?.url}
+                                src={preview}
                                 className="max-w-full max-h-[380px] object-contain opacity-70 hover:opacity-100 transition-opacity"
                                 alt="Asset Preview"
                               />
@@ -942,7 +949,8 @@ export default function Ingestion() {
                   )}
                 </AnimatePresence>
               </div>
-            ))}
+            );
+            })}
           </div>
         )}
       </div>

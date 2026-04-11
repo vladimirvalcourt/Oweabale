@@ -1,4 +1,4 @@
-/** CORS for browser-invoked Plaid Edge Functions. */
+/** CORS for browser-invoked Edge Functions (Plaid, `admin-actions`, etc.). */
 
 const DEFAULT_ORIGINS = [
   'https://oweable.com',
