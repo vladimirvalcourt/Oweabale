@@ -5,7 +5,7 @@ import {
   Bell, Search, Home, Receipt, Target, Activity,
   Settings, Repeat, BarChart3, Plus, X, ChevronDown, Inbox,
   Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LineChart, ShieldCheck,
-  Tags, LifeBuoy, ScrollText, Wand2, Wallet, Clock
+  Tags, LifeBuoy, ScrollText, Wand2, Wallet, Clock, CreditCard
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
@@ -312,6 +312,7 @@ export default function Layout() {
           { name: 'Income', path: '/income', icon: Vault },
           { name: 'Freelance Vault', path: '/freelance', icon: Briefcase },
           { name: 'Regular Bills', path: '/bills', icon: Receipt },
+          { name: 'Debts & loans', path: '/bills?tab=debt', icon: CreditCard },
           { name: 'Due soon', path: '/bills', icon: Clock, hash: 'due-soon', count: dueSoonCount },
           { name: 'Tickets & Fines', path: '/bills?tab=ambush', icon: AlertTriangle },
           { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },

@@ -27,6 +27,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [category, setCategory] = useState('food');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [obligationKind, setObligationKind] = useState<ObligationKind>('bill-monthly');
+  /** Closed card / no statement cycle — omit payment due date on debt. */
+  const [debtNoPaymentDue, setDebtNoPaymentDue] = useState(false);
   const [dueDate, setDueDate] = useState('');
   const [vendor, setVendor] = useState('');
   const [source, setSource] = useState('salary');
@@ -211,6 +213,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       setPenaltyFee('');
       setApr('19.99');
       setMinPayment('');
+      setDebtNoPaymentDue(false);
       setDaysLeft('30');
       setCitationDueDate('');
       setPaymentUrl('');
@@ -236,7 +239,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       if (!description.trim()) newErrors.description = "Please describe the transaction.";
     } else if (activeTab === 'obligation') {
       if (!vendor.trim()) newErrors.vendor = "Please specify who is being paid.";
-      if (!dueDate) newErrors.dueDate = "Please select a due date.";
+      const needDue =
+        obligationKind.startsWith('bill-') ||
+        (obligationKind.startsWith('debt-') && !debtNoPaymentDue);
+      if (needDue && !dueDate) newErrors.dueDate = "Please select a due date.";
     } else if (activeTab === 'income') {
       if (!date) newErrors.date = "Please select a date.";
     } else if (activeTab === 'citation') {
@@ -331,7 +337,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
             apr: parseFloat(apr) || 0,
             remaining: numAmount,
             minPayment: parseFloat(minPayment) || 0,
-            paid: 0
+            paid: 0,
+            paymentDueDate: debtNoPaymentDue ? null : dueDate || null,
           });
           if (!ok) return;
           toast.success(`Debt recorded`);
@@ -665,7 +672,11 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Type</label>
                             <select 
                               value={obligationKind}
-                              onChange={(e) => setObligationKind(e.target.value as ObligationKind)}
+                              onChange={(e) => {
+                                const v = e.target.value as ObligationKind;
+                                setObligationKind(v);
+                                if (v.startsWith('bill-')) setDebtNoPaymentDue(false);
+                              }}
                               className="w-full bg-surface-base border border-surface-border rounded focus-app-field-indigo px-3 py-2 text-sm font-sans text-white cursor-pointer"
                             >
                               <option value="bill-weekly">Weekly bill</option>
@@ -681,15 +692,32 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             </p>
                           </div>
                           <div>
-                            <label htmlFor="dueDate" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Due Date</label>
+                            <label htmlFor="dueDate" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
+                              {obligationKind.startsWith('debt-') ? 'Payment due date' : 'Due Date'}
+                            </label>
                             <input
                               id="dueDate"
                               type="date"
                               value={dueDate}
+                              disabled={obligationKind.startsWith('debt-') && debtNoPaymentDue}
                               onChange={(e) => { setDueDate(e.target.value); if(errors.dueDate) setErrors({...errors, dueDate: ''}); }}
-                              className={`input-date-dark w-full bg-surface-base border ${errors.dueDate ? 'border-red-500/50' : 'border-surface-border'} rounded focus-app-field-indigo px-3 py-2 text-sm font-sans`}
+                              className={`input-date-dark w-full bg-surface-base border ${errors.dueDate ? 'border-red-500/50' : 'border-surface-border'} rounded focus-app-field-indigo px-3 py-2 text-sm font-sans disabled:opacity-40`}
                             />
                             {errors.dueDate && <p className="text-xs text-red-400 mt-1.5">{errors.dueDate}</p>}
+                            {obligationKind.startsWith('debt-') && (
+                              <label className="mt-2 flex items-center gap-2 text-[11px] text-content-tertiary cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={debtNoPaymentDue}
+                                  onChange={(e) => {
+                                    setDebtNoPaymentDue(e.target.checked);
+                                    if (e.target.checked && errors.dueDate) setErrors({ ...errors, dueDate: '' });
+                                  }}
+                                  className="rounded border-surface-border focus-app"
+                                />
+                                No payment due date (closed card, charge-off, etc.)
+                              </label>
+                            )}
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">

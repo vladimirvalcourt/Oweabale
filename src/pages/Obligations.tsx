@@ -7,7 +7,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import {
   Receipt, CreditCard, AlertTriangle, ShieldAlert,
   FileText, CheckCircle2, Flame,
-  Calculator, ChevronDown, ChevronUp, Plus, Minus
+  Calculator, ChevronDown, ChevronUp, Plus, Minus, Pencil
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
@@ -15,7 +15,9 @@ import { useStore } from '../store/useStore';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 import { motion } from 'motion/react';
+import { Dialog } from '@headlessui/react';
 import { generateAmortizationSchedule } from '../lib/finance';
+import type { Bill, Debt } from '../store/useStore';
 
 type ObligationType = 'recurring' | 'debt' | 'ambush';
 type Strategy = 'avalanche' | 'snowball';
@@ -25,7 +27,10 @@ interface Obligation {
   name: string;
   type: ObligationType;
   subType: string;
+  /** ISO date for sorting; far-future sentinel when no payment due (debts). */
   dueDate: string;
+  /** Human-readable due column (date or "No due date"). */
+  dueLabel: string;
   amount: number;
   icon: React.ElementType;
   status?: 'active' | 'resolved';
@@ -99,7 +104,7 @@ function monthsToDate(months: number): string {
 export default function Obligations() {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { bills, debts, citations, resolveCitation, openQuickAdd } = useStore();
+  const { bills, debts, citations, resolveCitation, openQuickAdd, editBill, editDebt } = useStore();
   const [activeTab, setActiveTab] = useState<FilterTab>(() => {
     const param = new URLSearchParams(window.location.search).get('tab');
     return (param === 'ambush' || param === 'recurring' || param === 'debt') ? param : 'all';
@@ -124,6 +129,8 @@ export default function Obligations() {
   const [extraPayment, setExtraPayment] = useState(0);
   const [showDetonator, setShowDetonator] = useState(true);
   const [expandedDebtId, setExpandedDebtId] = useState<string | null>(null);
+  const [editBillRow, setEditBillRow] = useState<Bill | null>(null);
+  const [editDebtRow, setEditDebtRow] = useState<Debt | null>(null);
 
   useEffect(() => {
     if (location.hash === '#due-soon') {
@@ -143,26 +150,33 @@ export default function Obligations() {
       type: 'recurring' as ObligationType,
       subType: b.frequency === 'Monthly' ? 'Fixed Bill' : `${b.frequency} Bill`,
       dueDate: b.dueDate,
+      dueLabel: b.dueDate,
       amount: b.amount,
       icon: Receipt,
     }));
     return [
       ...recurringObligations,
-      ...debts.map(d => ({
-        id: d.id,
-        name: d.name,
-        type: 'debt' as ObligationType,
-        subType: d.type,
-        dueDate: new Date(scheduleBaseMs + 20 * 86400000).toISOString().split('T')[0],
-        amount: d.remaining,
-        icon: CreditCard,
-      })),
+      ...debts.map(d => {
+        const pdd = d.paymentDueDate?.trim() || null;
+        const sortDue = pdd || '9999-12-31';
+        return {
+          id: d.id,
+          name: d.name,
+          type: 'debt' as ObligationType,
+          subType: d.type,
+          dueDate: sortDue,
+          dueLabel: pdd ?? 'No due date',
+          amount: d.remaining,
+          icon: CreditCard,
+        };
+      }),
       ...citations.filter(c => c.status === 'open').map(c => ({
         id: c.id,
         name: `${c.type} — ${c.jurisdiction}`,
         type: 'ambush' as ObligationType,
         subType: 'Citation',
         dueDate: new Date(scheduleBaseMs + c.daysLeft * 86400000).toISOString().split('T')[0],
+        dueLabel: new Date(scheduleBaseMs + c.daysLeft * 86400000).toISOString().split('T')[0],
         amount: c.amount,
         icon: ShieldAlert,
       })),
@@ -209,7 +223,7 @@ export default function Obligations() {
           className="px-4 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
-          {activeTab === 'ambush' ? 'Add ticket or fine' : 'Add bill'}
+          {activeTab === 'ambush' ? 'Add ticket or fine' : activeTab === 'debt' ? 'Add debt' : 'Add bill'}
         </button>
       </div>
       {/* Stats */}
@@ -416,7 +430,8 @@ export default function Obligations() {
             >
               {filteredObligations.map(ob => {
                 const Icon = ob.icon;
-                const isPastDue = new Date(ob.dueDate) < today;
+                const isDebtNoDue = ob.type === 'debt' && ob.dueLabel === 'No due date';
+                const isPastDue = !isDebtNoDue && new Date(ob.dueDate) < today;
                 return (
                   <motion.tr 
                     key={ob.id} 
@@ -440,8 +455,12 @@ export default function Obligations() {
                       }`}>{ob.subType}</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`text-sm font-mono ${isPastDue ? 'text-rose-400' : 'text-content-secondary'}`}>
-                        {ob.dueDate}
+                      <span
+                        className={`text-sm font-mono ${
+                          isPastDue ? 'text-rose-400' : isDebtNoDue ? 'text-content-muted' : 'text-content-secondary'
+                        }`}
+                      >
+                        {ob.dueLabel}
                         {isPastDue && <span className="ml-2 text-[10px] font-bold">OVERDUE</span>}
                       </span>
                     </td>
@@ -452,10 +471,34 @@ export default function Obligations() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       {ob.type === 'debt' && (
-                        <motion.button whileTap={{ scale: 0.95 }} onClick={() => toast.success(`Targeting ${ob.name} for payoff`)} className="px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-mono font-bold rounded-sm transition-colors">TARGET</motion.button>
+                        <motion.button
+                          type="button"
+                          whileTap={{ scale: 0.95 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const d = debts.find((x) => x.id === ob.id);
+                            if (d) setEditDebtRow(d);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-indigo-500/40 hover:bg-indigo-500/10 text-indigo-300 text-xs font-mono font-semibold rounded-sm transition-colors"
+                        >
+                          <Pencil className="w-3 h-3" aria-hidden />
+                          Edit
+                        </motion.button>
                       )}
                       {ob.type === 'recurring' && (
-                        <motion.button whileTap={{ scale: 0.95 }} onClick={() => toast.success(`Reviewing ${ob.name}`)} className="px-3 py-1 border border-surface-border hover:border-content-muted text-content-secondary text-xs font-mono rounded-sm transition-colors">REVIEW</motion.button>
+                        <motion.button
+                          type="button"
+                          whileTap={{ scale: 0.95 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const b = bills.find((x) => x.id === ob.id);
+                            if (b) setEditBillRow(b);
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-surface-border hover:border-content-muted text-content-secondary text-xs font-mono rounded-sm transition-colors"
+                        >
+                          <Pencil className="w-3 h-3" aria-hidden />
+                          Edit
+                        </motion.button>
                       )}
                       {ob.type === 'ambush' && (
                         <motion.button
@@ -489,6 +532,243 @@ export default function Obligations() {
         </div>
       </CollapsibleModule>
       </div>
+
+      <EditBillDialog bill={editBillRow} onClose={() => setEditBillRow(null)} editBill={editBill} />
+      <EditDebtDialog debt={editDebtRow} onClose={() => setEditDebtRow(null)} editDebt={editDebt} />
     </div>
+  );
+}
+
+function EditBillDialog({
+  bill,
+  onClose,
+  editBill,
+}: {
+  bill: Bill | null;
+  onClose: () => void;
+  editBill: (id: string, u: Partial<Bill>) => void | Promise<void>;
+}) {
+  const [biller, setBiller] = React.useState('');
+  const [amount, setAmount] = React.useState('');
+  const [category, setCategory] = React.useState('');
+  const [dueDate, setDueDate] = React.useState('');
+  const [frequency, setFrequency] = React.useState<Bill['frequency']>('Monthly');
+
+  React.useEffect(() => {
+    if (!bill) return;
+    setBiller(bill.biller);
+    setAmount(String(bill.amount));
+    setCategory(bill.category);
+    setDueDate(bill.dueDate);
+    setFrequency(bill.frequency);
+  }, [bill]);
+
+  if (!bill) return null;
+
+  const save = async () => {
+    const n = parseFloat(amount);
+    if (!biller.trim() || isNaN(n) || n <= 0) {
+      toast.error('Enter a payee and a valid amount.');
+      return;
+    }
+    await editBill(bill.id, {
+      biller: biller.trim(),
+      amount: n,
+      category: category || bill.category,
+      dueDate,
+      frequency,
+    });
+    toast.success('Bill updated');
+    onClose();
+  };
+
+  return (
+    <Dialog open className="relative z-[100]" onClose={onClose}>
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" aria-hidden />
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        <Dialog.Panel className="w-full max-w-md rounded-sm border border-surface-border bg-surface-elevated p-6 shadow-2xl">
+          <Dialog.Title className="text-lg font-semibold text-content-primary mb-4">Edit bill</Dialog.Title>
+          <div className="space-y-3">
+            <label className="block text-xs text-content-tertiary">Payee</label>
+            <input
+              value={biller}
+              onChange={(e) => setBiller(e.target.value)}
+              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+            />
+            <label className="block text-xs text-content-tertiary">Amount ($)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+            />
+            <label className="block text-xs text-content-tertiary">Category</label>
+            <input
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+            />
+            <label className="block text-xs text-content-tertiary">Due date</label>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              className="input-date-dark w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm"
+            />
+            <label className="block text-xs text-content-tertiary">Frequency</label>
+            <select
+              value={frequency}
+              onChange={(e) => setFrequency(e.target.value as Bill['frequency'])}
+              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
+            >
+              <option value="Weekly">Weekly</option>
+              <option value="Bi-weekly">Bi-weekly</option>
+              <option value="Monthly">Monthly</option>
+              <option value="Yearly">Yearly</option>
+            </select>
+          </div>
+          <div className="mt-6 flex justify-end gap-2">
+            <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-content-tertiary hover:text-content-primary">
+              Cancel
+            </button>
+            <button type="button" onClick={() => void save()} className="rounded-sm bg-brand-cta px-4 py-2 text-sm font-semibold text-white hover:bg-brand-cta-hover">
+              Save
+            </button>
+          </div>
+        </Dialog.Panel>
+      </div>
+    </Dialog>
+  );
+}
+
+function EditDebtDialog({
+  debt,
+  onClose,
+  editDebt,
+}: {
+  debt: Debt | null;
+  onClose: () => void;
+  editDebt: (id: string, u: Partial<Debt>) => void | Promise<void>;
+}) {
+  const [name, setName] = React.useState('');
+  const [type, setType] = React.useState('');
+  const [remaining, setRemaining] = React.useState('');
+  const [apr, setApr] = React.useState('');
+  const [minPayment, setMinPayment] = React.useState('');
+  const [paymentDue, setPaymentDue] = React.useState('');
+  const [noPaymentDue, setNoPaymentDue] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!debt) return;
+    setName(debt.name);
+    setType(debt.type);
+    setRemaining(String(debt.remaining));
+    setApr(String(debt.apr));
+    setMinPayment(String(debt.minPayment));
+    const pdd = debt.paymentDueDate?.trim();
+    setNoPaymentDue(!pdd);
+    setPaymentDue(pdd || '');
+  }, [debt]);
+
+  if (!debt) return null;
+
+  const save = async () => {
+    const rem = parseFloat(remaining);
+    const ap = parseFloat(apr);
+    const min = parseFloat(minPayment);
+    if (!name.trim() || isNaN(rem) || rem < 0) {
+      toast.error('Enter account name and a valid balance.');
+      return;
+    }
+    await editDebt(debt.id, {
+      name: name.trim(),
+      type: type.trim() || debt.type,
+      remaining: rem,
+      apr: isNaN(ap) ? 0 : ap,
+      minPayment: isNaN(min) ? 0 : Math.max(0, min),
+      paymentDueDate: noPaymentDue ? null : paymentDue || null,
+    });
+    toast.success('Debt updated');
+    onClose();
+  };
+
+  return (
+    <Dialog open className="relative z-[100]" onClose={onClose}>
+      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" aria-hidden />
+      <div className="fixed inset-0 flex items-center justify-center p-4">
+        <Dialog.Panel className="w-full max-w-md rounded-sm border border-surface-border bg-surface-elevated p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+          <Dialog.Title className="text-lg font-semibold text-content-primary mb-1">Edit debt</Dialog.Title>
+          <p className="text-xs text-content-tertiary mb-4">Update balance, APR, minimum payment, or payment due date.</p>
+          <div className="space-y-3">
+            <label className="block text-xs text-content-tertiary">Account / loan name</label>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+            />
+            <label className="block text-xs text-content-tertiary">Type</label>
+            <input
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              placeholder="Credit Card, Loan, …"
+              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+            />
+            <label className="block text-xs text-content-tertiary">Balance owed ($)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={remaining}
+              onChange={(e) => setRemaining(e.target.value)}
+              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+            />
+            <label className="block text-xs text-content-tertiary">APR (%)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={apr}
+              onChange={(e) => setApr(e.target.value)}
+              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+            />
+            <label className="block text-xs text-content-tertiary">Minimum payment ($/mo)</label>
+            <input
+              type="number"
+              step="0.01"
+              value={minPayment}
+              onChange={(e) => setMinPayment(e.target.value)}
+              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+            />
+            <label className="flex items-center gap-2 text-sm text-content-secondary cursor-pointer">
+              <input
+                type="checkbox"
+                checked={noPaymentDue}
+                onChange={(e) => setNoPaymentDue(e.target.checked)}
+                className="rounded border-surface-border focus-app"
+              />
+              No payment due date (e.g. closed card with balance)
+            </label>
+            {!noPaymentDue && (
+              <>
+                <label className="block text-xs text-content-tertiary">Next payment due</label>
+                <input
+                  type="date"
+                  value={paymentDue}
+                  onChange={(e) => setPaymentDue(e.target.value)}
+                  className="input-date-dark w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm"
+                />
+              </>
+            )}
+          </div>
+          <div className="mt-6 flex justify-end gap-2">
+            <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-content-tertiary hover:text-content-primary">
+              Cancel
+            </button>
+            <button type="button" onClick={() => void save()} className="rounded-sm bg-brand-cta px-4 py-2 text-sm font-semibold text-white hover:bg-brand-cta-hover">
+              Save
+            </button>
+          </div>
+        </Dialog.Panel>
+      </div>
+    </Dialog>
   );
 }

@@ -32,6 +32,8 @@ export interface Debt {
   remaining: number;
   minPayment: number;
   paid: number;
+  /** Next payment due; undefined/null = no due date (e.g. closed card with balance). */
+  paymentDueDate?: string | null;
   // Optional amortization fields
   originalAmount?: number;
   originationDate?: string;
@@ -621,6 +623,7 @@ export const useStore = create<AppState>()(
           remaining: debt.remaining,
           min_payment: debt.minPayment, 
           paid: debt.paid,
+          payment_due_date: debt.paymentDueDate ?? null,
           original_amount: debt.originalAmount ?? null,
           origination_date: debt.originationDate ?? null,
           term_months: debt.termMonths ?? null,
@@ -652,6 +655,7 @@ export const useStore = create<AppState>()(
       if (updatedDebt.originalAmount !== undefined) snakeCased.original_amount = updatedDebt.originalAmount;
       if (updatedDebt.originationDate !== undefined) snakeCased.origination_date = updatedDebt.originationDate;
       if (updatedDebt.termMonths !== undefined) snakeCased.term_months = updatedDebt.termMonths;
+      if (updatedDebt.paymentDueDate !== undefined) snakeCased.payment_due_date = updatedDebt.paymentDueDate;
       const { error } = await supabase.from('debts').update(snakeCased).eq('id', id).eq('user_id', userId);
       if (error) { toast.error('Failed to update debt'); return; }
     }
@@ -1761,6 +1765,7 @@ export const useStore = create<AppState>()(
           remaining: d.remaining as number,
           minPayment: (d.min_payment ?? d.minPayment) as number,
           paid: d.paid as number,
+          paymentDueDate: (d.payment_due_date ?? d.paymentDueDate ?? null) as string | null | undefined,
           originalAmount: (d.original_amount ?? undefined) as number | undefined,
           originationDate: (d.origination_date ?? undefined) as string | undefined,
           termMonths: (d.term_months ?? undefined) as number | undefined,
