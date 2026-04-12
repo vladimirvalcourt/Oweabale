@@ -5,8 +5,6 @@ import { CollapsibleModule } from '../components/CollapsibleModule';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { toast } from 'sonner';
-import { motion } from 'motion/react';
-
 export default function Budgets() {
   const { budgets, transactions, addBudget, editBudget, deleteBudget, categories } = useStore();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -114,15 +112,14 @@ export default function Budgets() {
           </div>
           <h3 className="text-lg font-semibold text-content-primary mb-2">No budgets yet</h3>
           <p className="text-sm text-content-tertiary mb-8 max-w-sm mx-auto">Add a limit per category so you can see spending against it each month.</p>
-          <motion.button 
-            whileTap={{ scale: 0.95 }}
+          <button 
             type="button"
             onClick={openAddModal}
-            className="px-6 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold transition-colors inline-flex items-center gap-2 shadow-sm"
+            className="px-6 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-white text-sm font-sans font-semibold transition-colors inline-flex items-center gap-2 shadow-sm"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Create your first budget
-          </motion.button>
+          </button>
         </div>
       ) : (
         <CollapsibleModule 
@@ -130,12 +127,7 @@ export default function Budgets() {
           icon={PieChart}
           extraHeader={<span className="text-xs font-sans text-content-tertiary">{budgets.length} active</span>}
         >
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 -mx-6 -my-6 p-6"
-            initial="hidden"
-            animate="visible"
-            variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 -mx-6 -my-6 p-6">
             {budgets.map((budget) => {
               const spendRecord = currentMonthSpending[budget.category];
               const spent = budget.period === 'Yearly'
@@ -150,13 +142,9 @@ export default function Budgets() {
               else if (isNearLimit) progressColor = 'bg-amber-500';
 
               return (
-                <motion.div 
+                <div 
                   key={budget.id} 
                   className="bg-surface-elevated rounded-sm border border-surface-border p-5 flex flex-col relative group hover:border-zinc-700 transition-colors"
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.95 },
-                    visible: { opacity: 1, scale: 1, transition: { type: 'spring', damping: 25, stiffness: 300 } }
-                  }}
                 >
                   <div className="flex justify-between items-start mb-6">
                     <div>
@@ -234,10 +222,10 @@ export default function Budgets() {
                     )}
                     <span className="text-content-tertiary">{percentage.toFixed(0)}% used</span>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
-          </motion.div>
+          </div>
         </CollapsibleModule>
       )}
 

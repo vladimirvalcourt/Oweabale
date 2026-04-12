@@ -4,7 +4,7 @@ import { projectNetWorth } from '../lib/finance';
 import { TrendingUp, TrendingDown, Hash, Building2, CreditCard, Vault, PieChart, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPie, Pie, Cell } from 'recharts';
 import { toast } from 'sonner';
-import { motion, animate } from 'motion/react';
+import { animate } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 

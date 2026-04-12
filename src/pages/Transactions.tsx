@@ -1,12 +1,17 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useDeferredValue } from 'react';
 import { useStore } from '../store/useStore';
+import { useShallow } from 'zustand/react/shallow';
 import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, Hash, Tag, Download, TrendingUp } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
-import { motion } from 'motion/react';
-
 export default function Transactions() {
-  const { transactions, subscriptions, openQuickAdd } = useStore();
+  const { transactions, subscriptions, openQuickAdd } = useStore(
+    useShallow((s) => ({
+      transactions: s.transactions,
+      subscriptions: s.subscriptions,
+      openQuickAdd: s.openQuickAdd,
+    }))
+  );
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
@@ -16,9 +21,12 @@ export default function Transactions() {
   const [page, setPage] = useState(1);
   const PAGE_SIZE = 25;
 
+  const deferredSearchTerm = useDeferredValue(searchTerm);
+
   const filteredTransactions = useMemo(() => {
+    const q = deferredSearchTerm.toLowerCase();
     return transactions.filter((transaction) => {
-      const matchesSearch = transaction.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = transaction.name.toLowerCase().includes(q);
       const matchesType = filterType === 'all' || transaction.type === filterType;
       const matchesCategory = filterCategory === 'all' || transaction.category === filterCategory;
       
@@ -32,7 +40,7 @@ export default function Transactions() {
 
       return matchesSearch && matchesType && matchesCategory && matchesDate && matchesAmount;
     });
-  }, [transactions, searchTerm, filterType, filterCategory, dateRange, amountRange]);
+  }, [transactions, deferredSearchTerm, filterType, filterCategory, dateRange, amountRange]);
 
   const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -42,6 +50,12 @@ export default function Transactions() {
     const cats = new Set(transactions.map(t => t.category));
     return Array.from(cats).sort();
   }, [transactions]);
+
+  const subscriptionByNameLower = useMemo(() => {
+    const m = new Map<string, (typeof subscriptions)[0]>();
+    for (const s of subscriptions) m.set(s.name.toLowerCase(), s);
+    return m;
+  }, [subscriptions]);
 
   return (
     <div className="space-y-6">
@@ -54,14 +68,19 @@ export default function Transactions() {
         </div>
         <button
           onClick={() => {
-            const headers = ['Date', 'Name', 'Category', 'Type', 'Amount'];
-            const rows = filteredTransactions.map(t => [t.date, `"${t.name}"`, t.category, t.type, t.amount.toFixed(2)]);
-            const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = 'oweable-transactions.csv'; a.click();
-            URL.revokeObjectURL(url);
+            const rowsSource = filteredTransactions;
+            requestAnimationFrame(() => {
+              const headers = ['Date', 'Name', 'Category', 'Type', 'Amount'];
+              const rows = rowsSource.map((t) => [t.date, `"${t.name}"`, t.category, t.type, t.amount.toFixed(2)]);
+              const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+              const blob = new Blob([csv], { type: 'text/csv' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'oweable-transactions.csv';
+              a.click();
+              URL.revokeObjectURL(url);
+            });
           }}
           className="flex items-center gap-2 px-4 py-2 border border-surface-border text-content-secondary text-sm font-medium hover:bg-surface-elevated rounded-sm transition-colors"
         >
@@ -248,28 +267,15 @@ export default function Transactions() {
                   </th>
                 </tr>
               </thead>
-              <motion.tbody 
-                className="bg-surface-raised divide-y divide-surface-highlight"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  visible: {
-                    transition: { staggerChildren: 0.05 }
-                  }
-                }}
-              >
+              <tbody className="bg-surface-raised divide-y divide-surface-highlight">
                   {pagedTransactions.map((transaction) => {
-                    const subData = subscriptions.find(s => s.name.toLowerCase() === transaction.name.toLowerCase());
+                    const subData = subscriptionByNameLower.get(transaction.name.toLowerCase());
                     const isPriceHike = subData && transaction.type === 'expense' && transaction.amount > subData.amount;
                     
                     return (
-                      <motion.tr 
+                      <tr 
                         key={transaction.id} 
                         className="group hover:bg-surface-elevated transition-colors border-l-2 border-transparent hover:border-indigo-600"
-                        variants={{
-                          hidden: { opacity: 0, y: 15 },
-                          visible: { opacity: 1, y: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } }
-                        }}
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
@@ -310,10 +316,10 @@ export default function Transactions() {
                         }`}>
                           {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
-                      </motion.tr>
+                      </tr>
                     );
                   })}
-              </motion.tbody>
+              </tbody>
             </table>
           </div>
         </CollapsibleModule>

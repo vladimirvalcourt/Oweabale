@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Plus, MoreHorizontal, X, Vault, Edit2, Trash2, ArrowDownCircle, TrendingUp } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
-import { motion } from 'motion/react';
 import { useStore, IncomeSource } from '../store/useStore';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import { Fragment, useEffect } from 'react';
@@ -160,15 +159,14 @@ export default function Income() {
           </div>
           <h2 className="text-lg font-sans font-semibold text-content-primary mb-2">No income yet</h2>
           <p className="text-sm text-content-tertiary max-w-md">Add salary or freelance sources to forecast cash flow and tax set-aside.</p>
-          <motion.button 
+          <button 
             type="button"
-            whileTap={{ scale: 0.95 }}
             onClick={openAddModal}
-            className="mt-6 px-6 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 focus-app"
+            className="mt-6 px-6 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 focus-app"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Add income source
-          </motion.button>
+          </button>
         </div>
       ) : (
         <>
@@ -206,20 +204,11 @@ export default function Income() {
 
           {/* Income Sources List */}
           <CollapsibleModule title="Your Income Sources" icon={Vault}>
-            <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 -mx-6 -my-6 p-6"
-              initial="hidden"
-              animate="visible"
-              variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
-            >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 -mx-6 -my-6 p-6">
               {incomes.map((income) => (
-                <motion.div 
+                <div 
                   key={income.id} 
                   className="bg-surface-elevated rounded-sm border border-surface-border p-5 flex flex-col relative group hover:border-zinc-700 transition-colors"
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.95 },
-                    visible: { opacity: 1, scale: 1, transition: { type: 'spring', damping: 25, stiffness: 300 } }
-                  }}
                 >
                   {income.status === 'paused' && (
                     <div className="absolute top-0 right-0 bg-surface-border text-content-tertiary text-xs font-sans font-medium px-2 py-1 border-b border-l border-surface-border">
@@ -308,9 +297,9 @@ export default function Income() {
                     <span className="text-xs text-content-tertiary">Next deposit</span>
                     <span className="text-sm font-mono tabular-nums text-content-primary">{new Date(income.nextDate).toLocaleDateString()}</span>
                   </div>
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           </CollapsibleModule>
         </>
       )}

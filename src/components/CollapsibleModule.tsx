@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, startTransition } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { cn } from '../lib/utils';
 
@@ -29,7 +29,7 @@ export function CollapsibleModule({
         id={`${panelId}-trigger`}
         aria-expanded={isOpen}
         aria-controls={panelId}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => startTransition(() => setIsOpen((o) => !o))}
         className="w-full text-left px-6 py-3 bg-surface-elevated/80 border-b border-surface-border flex items-center justify-between cursor-pointer group active:translate-y-[1px] hover:bg-surface-highlight transition-all border-t border-t-white/5 focus-app"
       >
         <div className="flex items-center gap-3">

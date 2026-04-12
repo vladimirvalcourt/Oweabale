@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo, startTransition } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo, startTransition, useDeferredValue } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { TransitionLink } from './TransitionLink';
 import { 
@@ -198,10 +198,12 @@ export default function Layout() {
     }
   }, [user?.theme]);
 
-  const searchResults = React.useMemo(() => {
-    if (!searchQuery.trim()) return [];
+  const deferredSearchQuery = useDeferredValue(searchQuery.trim());
 
-    const query = searchQuery.toLowerCase();
+  const searchResults = React.useMemo(() => {
+    if (!deferredSearchQuery) return [];
+
+    const query = deferredSearchQuery.toLowerCase();
     const results: { type: string; name: string; detail: string; path: string }[] = [];
 
     bills.forEach(bill => {
@@ -257,7 +259,7 @@ export default function Layout() {
     pushNavShortcut(['auto-rule', 'automation', 'categorization rule'], 'Navigation', 'Auto-Rules', 'Transaction rules in Settings', '/settings?tab=rules');
 
     return results.slice(0, 8); // Limit to 8 results
-  }, [searchQuery, bills, debts, transactions, subscriptions, goals, incomes, budgets]);
+  }, [deferredSearchQuery, bills, debts, transactions, subscriptions, goals, incomes, budgets]);
 
   const dueSoonCount = React.useMemo(() => {
     const today = new Date();
@@ -515,7 +517,7 @@ export default function Layout() {
             )}
             <button
               type="button"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              onClick={() => startTransition(() => setSidebarCollapsed((c) => !c))}
               className={cn(
                 "flex items-center w-full py-2 text-[12px] font-sans font-medium text-content-tertiary bg-surface-raised border border-surface-border rounded-sm hover:text-content-primary hover:bg-surface-highlight transition-all group",
                 sidebarCollapsed ? "justify-center px-0" : "justify-start px-3 gap-3"

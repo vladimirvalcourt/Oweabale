@@ -9,6 +9,8 @@ interface Props {
 interface State {
   hasError: boolean;
   error?: Error;
+  /** React component stack from componentDidCatch (helps debug intermittent crashes). */
+  errorInfo?: string;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -18,15 +20,16 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    return { hasError: true, error, errorInfo: undefined };
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    console.error('[ErrorBoundary]', error, info.componentStack);
+    console.error('[ErrorBoundary]', error.message, error, info.componentStack);
+    this.setState({ errorInfo: info.componentStack ?? undefined });
   }
 
   handleReset = () => {
-    this.setState({ hasError: false, error: undefined });
+    this.setState({ hasError: false, error: undefined, errorInfo: undefined });
   };
 
   render() {
@@ -49,14 +52,37 @@ export class ErrorBoundary extends Component<Props, State> {
             <h2 className="text-[11px] font-mono font-bold text-red-400 uppercase tracking-[0.3em] mb-2">
               Render Fault Detected
             </h2>
-            <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest mb-6">
-              This component encountered an unrecoverable error.
+            <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest mb-3">
+              A screen crashed while rendering. Details below also appear in the browser console as{' '}
+              <span className="text-content-muted">[ErrorBoundary]</span>.
             </p>
 
-            {import.meta.env.DEV && this.state.error && (
-              <pre className="text-left text-[9px] font-mono text-content-muted bg-black/50 border border-surface-border p-3 mb-6 overflow-auto max-h-32 text-wrap">
+            {this.state.error && (
+              <pre className="text-left text-[9px] font-mono text-amber-200/90 bg-black/50 border border-surface-border p-3 mb-3 overflow-auto max-h-28 text-wrap break-words">
                 {this.state.error.message}
               </pre>
+            )}
+
+            {import.meta.env.DEV && this.state.errorInfo && (
+              <pre className="text-left text-[8px] font-mono text-content-muted bg-black/30 border border-surface-border/80 p-3 mb-4 overflow-auto max-h-24 text-wrap opacity-90">
+                {this.state.errorInfo}
+              </pre>
+            )}
+
+            {this.state.error && (
+              <button
+                type="button"
+                onClick={() => {
+                  const lines = [
+                    this.state.error?.message,
+                    this.state.errorInfo,
+                  ].filter(Boolean);
+                  void navigator.clipboard.writeText(lines.join('\n\n'));
+                }}
+                className="px-4 py-2 border border-zinc-600 text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated hover:text-white transition-all mb-4"
+              >
+                Copy error details
+              </button>
             )}
 
             <button

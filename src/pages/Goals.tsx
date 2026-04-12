@@ -4,8 +4,6 @@ import type { Goal } from '../store/useStore';
 import { Target, Plus, TrendingUp, TrendingDown, CheckCircle2, AlertCircle, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
-import { motion } from 'motion/react';
-
 export default function Goals() {
   const { goals, addGoal, addGoalProgress, deleteGoal } = useStore();
   const [isAddingGoal, setIsAddingGoal] = useState(false);
@@ -173,15 +171,14 @@ export default function Goals() {
           </div>
           <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No goals yet</h3>
           <p className="text-sm text-content-tertiary max-w-sm mx-auto mb-8">Set a target amount and date—progress updates as you add money.</p>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
+          <button
             type="button"
             onClick={() => setIsAddingGoal(true)}
-            className="px-8 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold transition-colors flex items-center gap-2 mx-auto shadow-sm"
+            className="px-8 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-white text-sm font-sans font-semibold transition-colors flex items-center gap-2 mx-auto shadow-sm"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Create your first goal
-          </motion.button>
+          </button>
         </div>
       ) : (
         <CollapsibleModule 
@@ -189,25 +186,16 @@ export default function Goals() {
           icon={Target}
           extraHeader={<span className="text-xs font-sans text-content-tertiary">{goals.length} active</span>}
         >
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 -mx-6 -my-6 p-6"
-            initial="hidden"
-            animate="visible"
-            variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 -mx-6 -my-6 p-6">
             {goals.map((goal) => {
               const progress = (goal.currentAmount / goal.targetAmount) * 100;
               const isCompleted = progress >= 100;
               const isSavings = goal.type === 'savings';
 
               return (
-                <motion.div 
+                <div 
                   key={goal.id} 
                   className="bg-surface-elevated rounded-sm border border-surface-border overflow-hidden group hover:border-zinc-700 transition-colors"
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.95 },
-                    visible: { opacity: 1, scale: 1, transition: { type: 'spring', damping: 25, stiffness: 300 } }
-                  }}
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-6">
@@ -289,10 +277,10 @@ export default function Goals() {
                       </button>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
-          </motion.div>
+          </div>
         </CollapsibleModule>
       )}
     </div>

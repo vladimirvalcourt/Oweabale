@@ -12,9 +12,9 @@ import {
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
+import { useShallow } from 'zustand/react/shallow';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
-import { motion } from 'motion/react';
 import { Dialog } from '@headlessui/react';
 import { generateAmortizationSchedule } from '../lib/finance';
 import type { Bill, Debt } from '../store/useStore';
@@ -104,7 +104,17 @@ function monthsToDate(months: number): string {
 export default function Obligations() {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { bills, debts, citations, resolveCitation, openQuickAdd, editBill, editDebt } = useStore();
+  const { bills, debts, citations, resolveCitation, openQuickAdd, editBill, editDebt } = useStore(
+    useShallow((s) => ({
+      bills: s.bills,
+      debts: s.debts,
+      citations: s.citations,
+      resolveCitation: s.resolveCitation,
+      openQuickAdd: s.openQuickAdd,
+      editBill: s.editBill,
+      editDebt: s.editDebt,
+    }))
+  );
   const [activeTab, setActiveTab] = useState<FilterTab>(() => {
     const param = new URLSearchParams(window.location.search).get('tab');
     return (param === 'ambush' || param === 'recurring' || param === 'debt') ? param : 'all';
@@ -315,7 +325,10 @@ export default function Obligations() {
               {[...debts]
                 .sort((a, b) => strategy === 'avalanche' ? b.apr - a.apr : a.remaining - b.remaining)
                 .map((d, i) => {
-                  const pct = Math.round((d.paid / (d.paid + d.remaining)) * 100);
+                  const paid = d.paid ?? 0;
+                  const rem = d.remaining ?? 0;
+                  const denom = paid + rem;
+                  const pct = denom > 0 ? Math.round((paid / denom) * 100) : 0;
                   const isExpanded = expandedDebtId === d.id;
                   return (
                     <div key={d.id}>
@@ -422,24 +435,15 @@ export default function Obligations() {
                 <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider text-right">Action</th>
               </tr>
             </thead>
-            <motion.tbody 
-              className="divide-y divide-surface-border"
-              initial="hidden"
-              animate="visible"
-              variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
-            >
+            <tbody className="divide-y divide-surface-border">
               {filteredObligations.map(ob => {
                 const Icon = ob.icon;
                 const isDebtNoDue = ob.type === 'debt' && ob.dueLabel === 'No due date';
                 const isPastDue = !isDebtNoDue && new Date(ob.dueDate) < today;
                 return (
-                  <motion.tr 
+                  <tr 
                     key={ob.id} 
                     className="hover:bg-surface-highlight transition-colors"
-                    variants={{
-                      hidden: { opacity: 0, y: 15 },
-                      visible: { opacity: 1, y: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } }
-                    }}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
@@ -471,38 +475,36 @@ export default function Obligations() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       {ob.type === 'debt' && (
-                        <motion.button
+                        <button
                           type="button"
-                          whileTap={{ scale: 0.95 }}
                           onClick={(e) => {
                             e.stopPropagation();
                             const d = debts.find((x) => x.id === ob.id);
                             if (d) setEditDebtRow(d);
                           }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-indigo-500/40 hover:bg-indigo-500/10 text-indigo-300 text-xs font-mono font-semibold rounded-sm transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-indigo-500/40 hover:bg-indigo-500/10 active:scale-[0.98] text-indigo-300 text-xs font-mono font-semibold rounded-sm transition-colors"
                         >
                           <Pencil className="w-3 h-3" aria-hidden />
                           Edit
-                        </motion.button>
+                        </button>
                       )}
                       {ob.type === 'recurring' && (
-                        <motion.button
+                        <button
                           type="button"
-                          whileTap={{ scale: 0.95 }}
                           onClick={(e) => {
                             e.stopPropagation();
                             const b = bills.find((x) => x.id === ob.id);
                             if (b) setEditBillRow(b);
                           }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-surface-border hover:border-content-muted text-content-secondary text-xs font-mono rounded-sm transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-surface-border hover:border-content-muted active:scale-[0.98] text-content-secondary text-xs font-mono rounded-sm transition-colors"
                         >
                           <Pencil className="w-3 h-3" aria-hidden />
                           Edit
-                        </motion.button>
+                        </button>
                       )}
                       {ob.type === 'ambush' && (
-                        <motion.button
-                          whileTap={{ scale: 0.95 }}
+                        <button
+                          type="button"
                           onClick={async () => {
                             const cit = citations.find(c => c.id === ob.id);
                             if (cit) {
@@ -510,11 +512,11 @@ export default function Obligations() {
                               if (ok) toast.success(`${ob.name} resolved`);
                             } else toast.error('Citation not found');
                           }}
-                          className="px-3 py-1 border border-rose-500/50 hover:bg-rose-500/10 text-rose-400 text-xs font-mono font-bold rounded-sm transition-colors"
-                        >PAY</motion.button>
+                          className="px-3 py-1 border border-rose-500/50 hover:bg-rose-500/10 active:scale-[0.98] text-rose-400 text-xs font-mono font-bold rounded-sm transition-colors"
+                        >PAY</button>
                       )}
                     </td>
-                  </motion.tr>
+                  </tr>
                 );
               })}
               {filteredObligations.length === 0 && (
@@ -527,7 +529,7 @@ export default function Obligations() {
                   </td>
                 </tr>
               )}
-            </motion.tbody>
+            </tbody>
           </table>
         </div>
       </CollapsibleModule>

@@ -3,8 +3,6 @@ import { useStore } from '../store/useStore';
 import { Tags, Plus, Edit2, Trash2, Tag } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { toast } from 'sonner';
-import { motion } from 'motion/react';
-
 export default function Categories() {
   const { categories, addCategory, editCategory, deleteCategory } = useStore();
   const [isAdding, setIsAdding] = useState(false);
@@ -166,14 +164,14 @@ export default function Categories() {
           <p className="text-sm text-content-tertiary max-w-sm mx-auto mb-6">
             Categories help you organize your transactions and understand your spending habits.
           </p>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
+          <button
+            type="button"
             onClick={() => setIsAdding(true)}
-            className="inline-flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-sm text-sm font-medium transition-colors focus-app"
+            className="inline-flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 active:scale-[0.98] text-white rounded-sm text-sm font-medium transition-colors focus-app"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create Category
-          </motion.button>
+          </button>
         </div>
       ) : (
         <CollapsibleModule 
@@ -182,20 +180,11 @@ export default function Categories() {
           extraHeader={<span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{categories.length} Categories Saved</span>}
         >
           <div className="bg-surface-raised rounded-sm border border-surface-border overflow-hidden -mx-6 -my-6">
-            <motion.ul 
-              className="divide-y divide-surface-highlight"
-              initial="hidden"
-              animate="visible"
-              variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
-            >
+            <ul className="divide-y divide-surface-highlight">
               {categories.map((category) => (
-                <motion.li 
+                <li 
                   key={category.id} 
                   className="p-4 sm:px-6 hover:bg-surface-elevated transition-colors flex items-center justify-between group"
-                  variants={{
-                    hidden: { opacity: 0, x: -10 },
-                    visible: { opacity: 1, x: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } }
-                  }}
                 >
                   <div className="flex items-center gap-4">
                     <div
@@ -210,26 +199,26 @@ export default function Categories() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <motion.button
-                      whileTap={{ scale: 0.9 }}
+                    <button
+                      type="button"
                       onClick={() => startEdit(category)}
-                      className="p-2 text-content-tertiary hover:text-indigo-400 rounded-sm hover:bg-surface-border transition-colors"
+                      className="p-2 text-content-tertiary hover:text-indigo-400 active:scale-95 rounded-sm hover:bg-surface-border transition-colors"
                       title="Edit"
                     >
                       <Edit2 className="w-4 h-4" />
-                    </motion.button>
-                    <motion.button
-                      whileTap={{ scale: 0.9 }}
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleDelete(category.id)}
-                      className="p-2 text-content-tertiary hover:text-red-400 rounded-sm hover:bg-surface-border transition-colors"
+                      className="p-2 text-content-tertiary hover:text-red-400 active:scale-95 rounded-sm hover:bg-surface-border transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
-                    </motion.button>
+                    </button>
                   </div>
-                </motion.li>
+                </li>
               ))}
-            </motion.ul>
+            </ul>
           </div>
         </CollapsibleModule>
       )}

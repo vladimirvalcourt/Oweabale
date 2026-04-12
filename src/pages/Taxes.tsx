@@ -3,7 +3,6 @@ import { useStore } from '../store/useStore';
 import { Calculator, Hash, AlertCircle, Info, Clock, Plus, Trash2, ChevronRight, Map, ShieldAlert, Zap, ExternalLink } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { toast } from 'sonner';
-import { motion } from 'motion/react';
 
 // Common State Tax Rates for Gig Workers (Estimates)
 const STATE_TAX_MAP: Record<string, { name: string, rate: number }> = {

@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useStore, type Subscription } from '../store/useStore';
 import { normalizeToMonthly } from '../lib/finance';
-import { Repeat, Plus, Edit2, Trash2, Calendar, Hash, TrendingUp, AlertTriangle, X } from 'lucide-react';
+import { Repeat, Plus, Edit2, Trash2, TrendingUp, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
-import { motion } from 'motion/react';
-
 type SubFrequency = 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Yearly';
 
 const SUB_FREQUENCIES: SubFrequency[] = ['Weekly', 'Bi-weekly', 'Monthly', 'Yearly'];
@@ -275,20 +273,11 @@ export default function Subscriptions() {
         </div>
       ) : (
         <CollapsibleModule title="Your subscriptions" icon={Repeat}>
-          <motion.ul 
-            className="divide-y divide-surface-highlight -mx-6 -my-6"
-            initial="hidden"
-            animate="visible"
-            variants={{ visible: { transition: { staggerChildren: 0.05 } } }}
-          >
+          <ul className="divide-y divide-surface-highlight -mx-6 -my-6">
             {subscriptions.map((sub) => (
-              <motion.li 
+              <li 
                 key={sub.id} 
                 className="p-4 sm:px-6 hover:bg-surface-elevated transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                variants={{
-                  hidden: { opacity: 0, y: 15 },
-                  visible: { opacity: 1, y: 0, transition: { type: 'spring', damping: 25, stiffness: 300 } }
-                }}
               >
                 <div className="flex items-center gap-4">
                   <BrandLogo size="lg" name={sub.name} fallbackIcon={<Repeat className="w-5 h-5 text-content-muted" />} />
@@ -345,9 +334,9 @@ export default function Subscriptions() {
                     </button>
                   </div>
                 </div>
-              </motion.li>
+              </li>
             ))}
-          </motion.ul>
+          </ul>
         </CollapsibleModule>
       )}
     </div>

@@ -13,33 +13,35 @@ interface TactileIconProps {
   variant?: 'interactive' | 'static';
 }
 
-/**
- * A high-end icon wrapper that provides an organic 3D tilt effect 
- * and fluid scaling on hover.
- */
-export const TactileIcon: React.FC<TactileIconProps> = ({ 
-  icon: Icon, 
-  className, 
+function TactileIconStatic({
+  icon: Icon,
+  className,
   iconClassName,
   size = 18,
   active = false,
-  variant = 'interactive',
-}) => {
-  if (variant === 'static') {
-    return (
-      <span className={cn('relative inline-flex shrink-0 items-center justify-center', className)} aria-hidden>
-        <Icon
-          size={size}
-          className={cn(
-            'transition-colors duration-300',
-            active ? 'text-brand-violet' : 'text-content-tertiary group-hover:text-content-primary',
-            iconClassName
-          )}
-        />
-      </span>
-    );
-  }
+}: Omit<TactileIconProps, 'variant'>) {
+  return (
+    <span className={cn('relative inline-flex shrink-0 items-center justify-center', className)} aria-hidden>
+      <Icon
+        size={size}
+        className={cn(
+          'transition-colors duration-300',
+          active ? 'text-brand-violet' : 'text-content-tertiary group-hover:text-content-primary',
+          iconClassName
+        )}
+      />
+    </span>
+  );
+}
 
+/** Interactive variant only — hooks run unconditionally in this subtree. */
+function TactileIconInteractive({
+  icon: Icon,
+  className,
+  iconClassName,
+  size = 18,
+  active = false,
+}: Omit<TactileIconProps, 'variant'>) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
 
@@ -55,7 +57,7 @@ export const TactileIcon: React.FC<TactileIconProps> = ({
     const height = rect.height;
     const mouseXPos = e.clientX - rect.left;
     const mouseYPos = e.clientY - rect.top;
-    
+
     x.set(mouseXPos / width - 0.5);
     y.set(mouseYPos / height - 0.5);
   };
@@ -72,38 +74,48 @@ export const TactileIcon: React.FC<TactileIconProps> = ({
       style={{
         rotateX,
         rotateY,
-        transformStyle: "preserve-3d",
+        transformStyle: 'preserve-3d',
       }}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
-      className={cn(
-        "relative flex items-center justify-center transition-colors duration-300",
-        className
-      )}
+      className={cn('relative flex items-center justify-center transition-colors duration-300', className)}
     >
       <motion.div
         style={{
-          transformStyle: "preserve-3d",
+          transformStyle: 'preserve-3d',
           translateZ: 10,
         }}
       >
-        <Icon 
-          size={size} 
+        <Icon
+          size={size}
           className={cn(
-            "transition-colors duration-300",
-            active ? "text-brand-violet" : "text-content-tertiary group-hover:text-content-primary",
+            'transition-colors duration-300',
+            active ? 'text-brand-violet' : 'text-content-tertiary group-hover:text-content-primary',
             iconClassName
-          )} 
+          )}
         />
       </motion.div>
-      
-      {/* Subtle organic glow/shadow on hover */}
+
       <motion.div
         className="absolute inset-0 rounded-full bg-brand-violet/10 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100"
         style={{ translateZ: -5 }}
       />
     </motion.div>
   );
+}
+
+/**
+ * A high-end icon wrapper that provides an organic 3D tilt effect
+ * and fluid scaling on hover.
+ */
+export const TactileIcon: React.FC<TactileIconProps> = ({
+  variant = 'interactive',
+  ...rest
+}) => {
+  if (variant === 'static') {
+    return <TactileIconStatic {...rest} />;
+  }
+  return <TactileIconInteractive {...rest} />;
 };
 
 interface MorphingMenuIconProps {
@@ -113,23 +125,16 @@ interface MorphingMenuIconProps {
 }
 
 /**
- * A custom SVG component that morphs between a 3-line menu 
+ * A custom SVG component that morphs between a 3-line menu
  * and an 'X' close button using Framer Motion.
  */
-export const MorphingMenuIcon: React.FC<MorphingMenuIconProps> = ({ 
-  isOpen, 
+export const MorphingMenuIcon: React.FC<MorphingMenuIconProps> = ({
+  isOpen,
   className,
-  color = "currentColor" 
+  color = 'currentColor',
 }) => {
   return (
-    <svg 
-      width="20" 
-      height="20" 
-      viewBox="0 0 20 20" 
-      fill="none" 
-      className={cn("overflow-visible", className)}
-    >
-      {/* Top line to diagonal 1 */}
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className={cn('overflow-visible', className)}>
       <motion.line
         x1="2"
         y1="5"
@@ -144,10 +149,9 @@ export const MorphingMenuIcon: React.FC<MorphingMenuIconProps> = ({
           x2: isOpen ? 16 : 18,
           y2: isOpen ? 16 : 5,
         }}
-        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       />
-      
-      {/* Middle line to fade out */}
+
       <motion.line
         x1="2"
         y1="10"
@@ -163,8 +167,7 @@ export const MorphingMenuIcon: React.FC<MorphingMenuIconProps> = ({
         }}
         transition={{ duration: 0.2 }}
       />
-      
-      {/* Bottom line to diagonal 2 */}
+
       <motion.line
         x1="2"
         y1="15"
@@ -179,7 +182,7 @@ export const MorphingMenuIcon: React.FC<MorphingMenuIconProps> = ({
           x2: isOpen ? 16 : 4,
           y2: isOpen ? 4 : 15,
         }}
-        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        transition={{ type: 'spring', stiffness: 260, damping: 20 }}
       />
     </svg>
   );
