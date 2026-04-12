@@ -416,7 +416,6 @@ export default function Dashboard() {
                   <button
                     type="button"
                     onClick={dismissLowTaxReserveAlert}
-                    aria-label="Dismiss low tax reserve alert"
                     className="w-full sm:w-auto px-5 py-3 sm:py-0 text-xs font-sans font-semibold uppercase tracking-wide text-amber-200/90 hover:bg-amber-500/15 transition-colors focus-app"
                   >
                     Got it

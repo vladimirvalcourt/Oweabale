@@ -642,10 +642,9 @@ export default function Layout() {
               <Search className="w-4 h-4" />
             </button>
 
-            {/* Quick Add Button */}
+            {/* Quick Add Button — visible text is the accessible name (no aria-label mismatch) */}
             <button
               type="button"
-              aria-label="Quick add income, bill, or transaction"
               title="Quick add (keyboard Q)"
               onClick={() => openQuickAdd()}
               className="hidden sm:inline-flex items-center gap-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-all btn-tactile px-5 py-2.5 focus-app"
@@ -655,11 +654,12 @@ export default function Layout() {
             </button>
             <button
               type="button"
-              aria-label="Quick add transaction or bill"
+              aria-label="Add entry"
+              title="Quick add (keyboard Q)"
               onClick={() => openQuickAdd()}
               className="sm:hidden flex items-center justify-center w-11 h-11 bg-brand-cta hover:bg-brand-cta-hover text-white transition-all btn-tactile focus-app"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5" aria-hidden />
             </button>
 
             {/* Notifications */}
@@ -708,21 +708,22 @@ export default function Layout() {
             {/* Profile Dropdown */}
             <HeadlessMenu as="div" className="relative">
               <HeadlessMenu.Button
-                aria-label="Account menu"
                 className="h-11 w-11 rounded-full bg-surface-raised border border-surface-border flex items-center justify-center overflow-hidden cursor-pointer hover:bg-surface-elevated transition-colors focus-app"
               >
+                <span className="sr-only">Open account menu</span>
                 {user?.avatar ? (
                   <img
                     src={user.avatar}
-                    alt="Profile"
+                    alt=""
                     width={44}
                     height={44}
                     decoding="async"
                     className="h-full w-full object-cover"
                     data-no-invert
+                    aria-hidden
                   />
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center bg-brand-indigo/10">
+                  <div className="h-full w-full flex items-center justify-center bg-brand-indigo/10" aria-hidden>
                     <span className="text-xs font-sans font-semibold text-brand-indigo">{user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}</span>
                   </div>
                 )}
