@@ -20,13 +20,10 @@ import { useStore } from '../store/useStore';
 import { supabase } from '../lib/supabase';
 import MobileSyncModal from '../components/MobileSyncModal';
 import { toast } from 'sonner';
-import Tesseract from 'tesseract.js';
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { validateIngestionFile, sanitizeUrl } from '../lib/security';
 import { buildScanExtraction } from '../lib/ingestionExtraction';
+import { extractDocumentText } from '../lib/ingestionScan';
 import type { PendingIngestion } from '../store/useStore';
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
 // Upload rate limiter — max 5 files per 60 seconds
 const uploadTimestamps: number[] = [];
@@ -115,41 +112,40 @@ export default function Ingestion() {
       console.warn('[Ingestion] Auth/upload check failed silently:', uploadErr);
     }
 
-    // ── Step 2: OCR / PDF text extraction ──
+    // ── Step 2: OCR / PDF text (+ raster fallback for scanned PDFs) ──
     try {
-      let fullText = '';
-
-      if (uploadedFile.type.startsWith('image/')) {
-        updatePendingIngestion(ingestionId, { status: 'scanning' });
-        const result = await Tesseract.recognize(uploadedFile, 'eng');
-        fullText = result.data.text;
-      } else if (uploadedFile.type === 'application/pdf') {
-        try {
-          const arrayBuffer = await uploadedFile.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
-          for (let i = 1; i <= pdf.numPages; i++) {
-            updatePendingIngestion(ingestionId, { status: `scanning [P${i}/${pdf.numPages}]` });
-            const page = await pdf.getPage(i);
-            const textContent = await page.getTextContent();
-            fullText += textContent.items.map((item: any) => item.str).join(' ') + '\n';
-          }
-        } catch {
-          throw new Error('Failed to scan document binary.');
-        }
-      }
+      const { text: fullText, usedRasterPdfOcr } = await extractDocumentText(uploadedFile, {
+        onStatus: (label) => updatePendingIngestion(ingestionId, { status: label }),
+      });
 
       // ── Step 3: Entity extraction + auto-save when valid ──
       const { type: ingestionType, extractedData } = buildScanExtraction(fullText);
+      const trimmed = fullText.trim();
+      const noAmount = !extractedData.amount || extractedData.amount <= 0;
+
       updatePendingIngestion(ingestionId, {
         status: 'ready',
         type: ingestionType,
         extractedData,
       });
 
+      if (trimmed.length < 35 && noAmount) {
+        toast.warning(
+          'Could not read amounts or text from this file. It may be a scanned PDF, very dark, or low resolution — enter details manually, or retake as a brighter photo.',
+          { duration: 8000 }
+        );
+      } else if (usedRasterPdfOcr) {
+        toast.info('This PDF had no selectable text, so we read it page-by-page. Confirm amounts before saving.', {
+          duration: 5000,
+        });
+      }
+
       const committed = await useStore.getState().commitIngestion(ingestionId);
       if (!committed) {
-        toast.success(`${uploadedFile.name.substring(0, 20)}... scanned`);
+        const stillNeedConfirm = trimmed.length < 35 && noAmount;
+        if (!stillNeedConfirm) {
+          toast.success(`${uploadedFile.name.substring(0, 20)}... scanned`);
+        }
         if (useStore.getState().pendingIngestions.some((p) => p.id === ingestionId)) {
           toast.info('Confirm amount and details, then save — or delete the row.');
         }
@@ -205,27 +201,25 @@ export default function Ingestion() {
   const triggerManualScan = async (id: string, file: File) => {
      updatePendingIngestion(id, { status: 'scanning' });
      try {
-       let fullText = '';
-       if (file.type === 'application/pdf') {
-         const arrayBuffer = await file.arrayBuffer();
-         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-         for (let i = 1; i <= pdf.numPages; i++) {
-           updatePendingIngestion(id, { status: `scanning [P${i}/${pdf.numPages}]` });
-           const page = await pdf.getPage(i);
-           const textContent = await page.getTextContent();
-           fullText += textContent.items.map((item: any) => item.str).join(' ') + '\n';
-         }
-       } else {
-         const result = await Tesseract.recognize(file, 'eng');
-         fullText = result.data.text;
-       }
-       
+       const { text: fullText, usedRasterPdfOcr } = await extractDocumentText(file, {
+         onStatus: (label) => updatePendingIngestion(id, { status: label }),
+       });
        const { type: ingestionType, extractedData } = buildScanExtraction(fullText);
+       const trimmed = fullText.trim();
+       const noAmount = !extractedData.amount || extractedData.amount <= 0;
        updatePendingIngestion(id, {
          status: 'ready',
          type: ingestionType,
          extractedData,
        });
+       if (trimmed.length < 35 && noAmount) {
+         toast.warning(
+           'Could not read much from this document — you may need to enter details manually.',
+           { duration: 7000 }
+         );
+       } else if (usedRasterPdfOcr) {
+         toast.info('PDF read from page images — confirm amounts before saving.', { duration: 4000 });
+       }
        const committed = await useStore.getState().commitIngestion(id);
        if (!committed && useStore.getState().pendingIngestions.some((p) => p.id === id)) {
          toast.info('Confirm amount and details, then save — or delete the row.');
@@ -323,7 +317,7 @@ export default function Ingestion() {
             Review <span className="text-indigo-500">Inbox</span>
           </h1>
           <p className="text-[14px] font-sans text-content-tertiary mt-2">
-            Uploads are read automatically and saved when amount and required fields are detected. Anything left in the list needs a quick confirm.
+            Uploads are read automatically and saved when amounts are detected. Scanned PDFs (photos of paper) are OCR&apos;d page-by-page; if nothing is found, fill fields manually.
           </p>
         </div>
         <div className="flex w-full flex-col gap-3 md:max-w-2xl md:items-end">
@@ -397,7 +391,7 @@ export default function Ingestion() {
           >
             <UploadCloud className={`w-12 h-12 mx-auto mb-6 transition-colors ${dragActive ? 'text-indigo-500' : 'text-content-muted'}`} />
             <h3 className="text-lg font-sans font-semibold text-content-primary">Inbox is empty</h3>
-            <p className="text-sm text-content-tertiary mt-2 max-w-md mx-auto">Drop a PDF or photo, or upload from your computer. We read amounts and line items when possible.</p>
+            <p className="text-sm text-content-tertiary mt-2 max-w-md mx-auto">Drop a PDF or photo, or upload from your computer. Scanned PDFs are read page-by-page when needed; very blurry shots may still need manual entry.</p>
             <div className="mt-8 inline-block px-8 py-3 rounded-sm bg-brand-cta text-white text-sm font-sans font-semibold shadow-sm btn-tactile">
               Choose files
             </div>

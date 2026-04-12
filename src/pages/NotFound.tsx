@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { TransitionLink } from '../components/TransitionLink';
 import { Home, ArrowLeft } from 'lucide-react';
 
 /**
@@ -13,20 +13,20 @@ export default function NotFound() {
         That URL does not exist in Oweable. Check the address or return to your dashboard.
       </p>
       <div className="flex flex-col sm:flex-row gap-3">
-        <Link
+        <TransitionLink
           to="/"
           className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-surface-border bg-surface-raised text-sm font-medium text-content-primary hover:bg-surface-elevated transition-colors rounded-sm"
         >
           <Home className="w-4 h-4 shrink-0" aria-hidden />
           Home
-        </Link>
-        <Link
+        </TransitionLink>
+        <TransitionLink
           to="/dashboard"
           className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors"
         >
           <ArrowLeft className="w-4 h-4 rotate-180 shrink-0" aria-hidden />
           Dashboard
-        </Link>
+        </TransitionLink>
       </div>
     </div>
   );

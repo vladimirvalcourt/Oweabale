@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { TransitionLink } from '../components/TransitionLink';
 import { 
   ArrowRight, Activity, ShieldCheck, Flame, Inbox, ShieldAlert,
   X, Copy, ExternalLink
@@ -345,7 +346,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 gap-3">
             {/* Ingestion Action */}
             {pendingIngestions.length > 0 && (
-              <Link to="/ingestion" className="block focus-app rounded-sm">
+              <TransitionLink to="/ingestion" className="block focus-app rounded-sm">
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
                   className="bg-indigo-500/10 border border-indigo-500/20 p-5 rounded-sm flex items-center justify-between hover:bg-indigo-500/15 transition-all shadow-sm group"
@@ -361,12 +362,12 @@ export default function Dashboard() {
                   </div>
                   <ArrowRight className="w-5 h-5 text-indigo-400 group-hover:translate-x-1 transition-transform" />
                 </motion.div>
-              </Link>
+              </TransitionLink>
             )}
 
             {/* Overdraft Risk Action */}
             {isOverdraftRisk && (
-              <Link to="/bills" className="block focus-app rounded-sm">
+              <TransitionLink to="/bills" className="block focus-app rounded-sm">
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
                   className="bg-rose-500/10 border border-rose-500/30 p-5 rounded-sm flex items-center justify-between hover:bg-rose-500/15 transition-all shadow-sm group"
@@ -384,7 +385,7 @@ export default function Dashboard() {
                   </div>
                   <ArrowRight className="w-5 h-5 text-rose-400 group-hover:translate-x-1 transition-transform" />
                 </motion.div>
-              </Link>
+              </TransitionLink>
             )}
 
             {/* Tax Insolvency Action */}
@@ -394,7 +395,7 @@ export default function Dashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-amber-500/10 border border-amber-500/30 rounded-sm shadow-sm flex flex-col sm:flex-row sm:items-stretch overflow-hidden"
               >
-                <Link
+                <TransitionLink
                   to="/taxes"
                   className="flex flex-1 items-center justify-between gap-4 p-5 min-w-0 hover:bg-amber-500/15 transition-all group focus-app rounded-sm sm:rounded-none"
                 >
@@ -410,7 +411,7 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <ArrowRight className="w-5 h-5 text-amber-400 shrink-0 group-hover:translate-x-1 transition-transform" aria-hidden />
-                </Link>
+                </TransitionLink>
                 <div className="flex border-t border-amber-500/30 sm:border-t-0 sm:border-l sm:border-amber-500/30">
                   <button
                     type="button"
@@ -646,9 +647,9 @@ export default function Dashboard() {
               <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit max-h-[350px]">
                 <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
                   <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-content-secondary">Upcoming Bills</h3>
-                  <Link to="/bills" className="text-xs font-sans text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
+                  <TransitionLink to="/bills" className="text-xs font-sans text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
                     See all
-                  </Link>
+                  </TransitionLink>
                 </div>
 
                 <div className="overflow-y-auto focus-app">

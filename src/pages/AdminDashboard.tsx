@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { TransitionLink } from '../components/TransitionLink';
 import {
   Terminal, Users, Database, Activity, ShieldCheck, ShieldAlert, Cpu, Network,
   ArrowLeft, Key, Zap, CheckCircle2, TrendingUp, Radio, LifeBuoy, Bot,
@@ -482,9 +482,9 @@ export default function AdminDashboard() {
           >
             <RefreshCw className="w-3 h-3" /> Refresh All
           </button>
-          <Link to="/" className="text-xs text-content-tertiary hover:text-white flex items-center gap-1 transition-colors">
+          <TransitionLink to="/" className="text-xs text-content-tertiary hover:text-white flex items-center gap-1 transition-colors">
             <ArrowLeft className="w-3 h-3" /> Back to Main Site
-          </Link>
+          </TransitionLink>
         </div>
       </div>
 

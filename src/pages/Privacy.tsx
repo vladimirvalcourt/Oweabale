@@ -1,6 +1,6 @@
 import React from 'react';
 import { Eye, ChevronLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { TransitionLink } from '../components/TransitionLink';
 import Footer from '../components/Footer';
 import { useSEO } from '../hooks/useSEO';
 
@@ -16,9 +16,9 @@ export default function Privacy() {
     <>
     <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-brand-violet/30">
       <div className="max-w-3xl mx-auto">
-        <Link to="/" className="inline-flex items-center gap-2 text-sm text-content-tertiary hover:text-brand-violet transition-colors mb-12 font-sans">
+        <TransitionLink to="/" className="inline-flex items-center gap-2 text-sm text-content-tertiary hover:text-brand-violet transition-colors mb-12 font-sans">
           <ChevronLeft className="w-4 h-4 shrink-0" aria-hidden /> Back to home
-        </Link>
+        </TransitionLink>
         
         <header className="mb-16 border-l-4 border-brand-violet pl-8">
           <div className="flex items-center gap-3 text-brand-violet mb-4">

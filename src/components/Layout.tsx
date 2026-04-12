@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo, startTransition } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { TransitionLink } from './TransitionLink';
 import { 
   Bell, Search, Home, Receipt, Target, Activity,
   Settings, Repeat, BarChart3, Plus, X, ChevronDown, Inbox,
@@ -450,11 +451,11 @@ export default function Layout() {
                         const Icon = item.icon;
                         const isActive = item.isActive;
                         return (
-                          <Link
+                          <TransitionLink
                             key={item.name}
                             to={item.linkTo}
                             className={cn(
-                              "flex items-center gap-3 px-4 py-2 transition-all group relative rounded-sm mx-1",
+                              "flex items-center gap-3 px-4 py-2 transition-colors duration-200 group relative rounded-sm mx-1",
                               isActive 
                                 ? "text-content-primary bg-surface-highlight nav-pressed" 
                                 : "text-content-secondary hover:text-content-primary hover:bg-surface-highlight"
@@ -486,7 +487,7 @@ export default function Layout() {
                                 )}
                               </>
                             )}
-                          </Link>
+                          </TransitionLink>
                         );
                       })}
                     </div>
@@ -530,7 +531,7 @@ export default function Layout() {
               onClick={() => {
                 useStore.getState().signOut();
                 toast.success('Session Terminated');
-                navigate('/auth');
+                startTransition(() => navigate('/auth'));
               }}
               className={cn(
                 "flex items-center w-full py-2 mt-2 text-[12px] font-sans font-bold uppercase tracking-widest text-rose-500/80 bg-rose-500/5 border border-rose-500/10 rounded-sm hover:text-rose-400 hover:bg-rose-500/10 transition-all group",
@@ -736,7 +737,7 @@ export default function Layout() {
                   <div className="py-1">
                     <HeadlessMenu.Item>
                       {({ active }) => (
-                        <Link
+                        <TransitionLink
                           to="/settings"
                           className={cn(
                             'flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
@@ -747,7 +748,7 @@ export default function Layout() {
                             <Settings className="w-4 h-4" />
                           </div>
                           <span>Settings</span>
-                        </Link>
+                        </TransitionLink>
                       )}
                     </HeadlessMenu.Item>
 
@@ -759,7 +760,7 @@ export default function Layout() {
                   <div className="py-1">
                     <HeadlessMenu.Item>
                       {({ active }) => (
-                        <Link
+                        <TransitionLink
                           to="/"
                           className={cn(
                             'flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
@@ -770,7 +771,7 @@ export default function Layout() {
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
                           </div>
                           <span>Homepage</span>
-                        </Link>
+                        </TransitionLink>
                       )}
                     </HeadlessMenu.Item>
 
@@ -793,7 +794,7 @@ export default function Layout() {
 
                     <HeadlessMenu.Item>
                       {({ active }) => (
-                        <Link
+                        <TransitionLink
                           to="/onboarding"
                           className={cn(
                             'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
@@ -804,7 +805,7 @@ export default function Layout() {
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 14 4-4-4-4"></path><path d="M3 3.412C3 3.185 3.184 3 3.412 3H16.48c0.04 0 0.16 0.04 0.16 0.16V10a1 1 0 0 1-1 1h-12a1 1 0 0 1-1-1V3.412Z"></path><path d="M3 21v-8a1 1 0 1 1 2 0v8a1 1 0 1 1-2 0Z"></path></svg>
                           </div>
                           <span>Onboarding</span>
-                        </Link>
+                        </TransitionLink>
                       )}
                     </HeadlessMenu.Item>
                   </div>
@@ -818,7 +819,7 @@ export default function Layout() {
                           onClick={() => {
                             useStore.getState().signOut();
                             toast.success('Logged out');
-                            navigate('/auth');
+                            startTransition(() => navigate('/auth'));
                           }}
                           className={cn(
                             'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
@@ -853,9 +854,9 @@ export default function Layout() {
               &copy; {new Date().getFullYear()} Oweable Inc. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-sm text-content-tertiary">
-              <Link to="/privacy" className="hover:text-content-secondary transition-colors">Privacy Policy</Link>
-              <Link to="/terms" className="hover:text-content-secondary transition-colors">Terms of Service</Link>
-              <Link to="/security" className="hover:text-content-secondary transition-colors">Security</Link>
+              <TransitionLink to="/privacy" className="hover:text-content-secondary transition-colors">Privacy Policy</TransitionLink>
+              <TransitionLink to="/terms" className="hover:text-content-secondary transition-colors">Terms of Service</TransitionLink>
+              <TransitionLink to="/security" className="hover:text-content-secondary transition-colors">Security</TransitionLink>
             </div>
           </div>
         </footer>

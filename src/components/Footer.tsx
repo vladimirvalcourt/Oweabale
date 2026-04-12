@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { TransitionLink } from './TransitionLink';
 
 export default function Footer() {
   return (
@@ -8,19 +8,19 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <Link to="/" className="brand-header-text flex items-center gap-2 mb-5">
+            <TransitionLink to="/" className="brand-header-text flex items-center gap-2 mb-5">
               <div className="w-2 h-2 bg-brand-violet shadow-glow-indigo" />
               Oweable
-            </Link>
+            </TransitionLink>
             <p className="text-sm text-content-tertiary max-w-sm leading-relaxed mb-8">
               Autonomous financial infrastructure for the modern worker. Track, save, and protect your profit with bank-grade precision.
             </p>
-            <Link
+            <TransitionLink
               to="/onboarding"
               className="inline-block bg-content-primary text-surface-base px-6 py-3 text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-zinc-200 transition-all"
             >
               Get Started Free
-            </Link>
+            </TransitionLink>
           </div>
 
           {/* Platform */}
@@ -28,9 +28,9 @@ export default function Footer() {
             <h4 className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-primary mb-6">Platform</h4>
             <ul className="flex flex-col gap-3 text-xs font-mono text-content-tertiary uppercase tracking-widest">
               <li><a href="/#features" className="hover:text-brand-violet transition-colors">Features</a></li>
-              <li><Link to="/pricing" className="hover:text-brand-violet transition-colors">Pricing</Link></li>
-              <li><Link to="/dashboard" className="hover:text-brand-violet transition-colors">Sign In</Link></li>
-              <li><Link to="/support" className="hover:text-brand-violet transition-colors">Support</Link></li>
+              <li><TransitionLink to="/pricing" className="hover:text-brand-violet transition-colors">Pricing</TransitionLink></li>
+              <li><TransitionLink to="/dashboard" className="hover:text-brand-violet transition-colors">Sign In</TransitionLink></li>
+              <li><TransitionLink to="/support" className="hover:text-brand-violet transition-colors">Support</TransitionLink></li>
             </ul>
           </div>
 
@@ -38,9 +38,9 @@ export default function Footer() {
           <div>
             <h4 className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-primary mb-6">Legal</h4>
             <ul className="flex flex-col gap-3 text-xs font-mono text-content-tertiary uppercase tracking-widest">
-              <li><Link to="/privacy" className="hover:text-brand-violet transition-colors">Privacy</Link></li>
-              <li><Link to="/terms" className="hover:text-brand-violet transition-colors">Terms</Link></li>
-              <li><Link to="/security" className="hover:text-brand-violet transition-colors">Security</Link></li>
+              <li><TransitionLink to="/privacy" className="hover:text-brand-violet transition-colors">Privacy</TransitionLink></li>
+              <li><TransitionLink to="/terms" className="hover:text-brand-violet transition-colors">Terms</TransitionLink></li>
+              <li><TransitionLink to="/security" className="hover:text-brand-violet transition-colors">Security</TransitionLink></li>
             </ul>
           </div>
 
@@ -53,12 +53,12 @@ export default function Footer() {
             <span className="mx-1 h-3 w-px bg-surface-border shrink-0 inline-block align-middle" aria-hidden />
             <span>© {new Date().getFullYear()} All Rights Reserved</span>
           </div>
-          <Link
+          <TransitionLink
             to="/support"
             className="text-[10px] font-mono uppercase tracking-widest text-content-muted hover:text-brand-violet transition-colors"
           >
             Contact support
-          </Link>
+          </TransitionLink>
         </div>
       </div>
     </footer>

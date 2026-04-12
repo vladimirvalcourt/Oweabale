@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { TransitionLink } from '../components/TransitionLink';
 import Footer from '../components/Footer';
 import { Check, Plus, Minus } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
@@ -77,20 +77,20 @@ export default function Pricing() {
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-surface-base/90 backdrop-blur-md border-surface-border' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <Link to="/" className="brand-header-text text-xl text-content-primary transition-colors duration-200">
+          <TransitionLink to="/" className="brand-header-text text-xl text-content-primary transition-colors duration-200">
             Oweable
-          </Link>
+          </TransitionLink>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-content-tertiary">
-            <Link to="/#features" className="hover:text-white transition-colors duration-200">Features</Link>
-            <Link to="/pricing" className="text-white transition-colors duration-200">Pricing</Link>
-            <Link to="/dashboard" className="hover:text-white transition-colors duration-200">Sign In</Link>
+            <TransitionLink to="/#features" className="hover:text-white transition-colors duration-200">Features</TransitionLink>
+            <TransitionLink to="/pricing" className="text-white transition-colors duration-200">Pricing</TransitionLink>
+            <TransitionLink to="/dashboard" className="hover:text-white transition-colors duration-200">Sign In</TransitionLink>
           </div>
-          <Link 
+          <TransitionLink 
             to="/dashboard" 
             className="px-5 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors duration-200"
           >
             Get started
-          </Link>
+          </TransitionLink>
         </div>
       </nav>
 
@@ -177,12 +177,12 @@ export default function Pricing() {
                 <span className="text-content-muted text-sm ml-3">forever free</span>
               </div>
               
-              <Link 
+              <TransitionLink 
                 to="/dashboard" 
                 className="w-full py-4 px-6 bg-transparent border border-surface-border hover:border-zinc-300 hover:bg-white/5 text-content-primary rounded-sm text-sm font-sans font-semibold text-center transition-all duration-200 mb-10"
               >
                 Use free tracker
-              </Link>
+              </TransitionLink>
               
               <div className="flex flex-col gap-5 mt-auto">
                 <div className="flex items-start gap-3">
@@ -220,12 +220,12 @@ export default function Pricing() {
                   </div>
                 </div>
                 
-                <Link 
+                <TransitionLink 
                   to="/dashboard" 
                   className="w-full py-4 px-6 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold text-center transition-all duration-200 mb-10 shadow-sm"
                 >
                   Start free beta
-                </Link>
+                </TransitionLink>
                 
                 <div className="flex flex-col gap-5 mt-auto">
                   <div className="flex items-start gap-3">

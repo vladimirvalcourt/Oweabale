@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, startTransition } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Shield, Vault, Receipt, Activity, Flame, Wallet, TrendingUp, FileSearch, Target } from 'lucide-react';
@@ -109,7 +109,7 @@ export default function Onboarding() {
       const ok = await persistOnboardingData();
       if (!ok) return;
       toast.success('Setup complete. Welcome to Oweable.');
-      navigate('/dashboard');
+      startTransition(() => navigate('/dashboard'));
     }
   };
 
@@ -162,7 +162,7 @@ export default function Onboarding() {
                 const ok = await updateUser({ hasCompletedOnboarding: true });
                 if (!ok) return;
                 toast.success('Setup skipped.');
-                navigate('/dashboard');
+                startTransition(() => navigate('/dashboard'));
               }}
               className="text-[11px] font-mono text-content-tertiary hover:text-content-primary uppercase tracking-widest transition-colors border border-surface-border px-3 py-1.5 rounded-sm hover:bg-surface-elevated"
             >
@@ -286,7 +286,7 @@ export default function Onboarding() {
               const ok = await updateUser({ hasCompletedOnboarding: true });
               if (!ok) return;
               toast.success('Setup skipped. Welcome to your dashboard.');
-              navigate('/dashboard');
+              startTransition(() => navigate('/dashboard'));
             }}
             className="text-[11px] font-mono text-content-tertiary hover:text-content-primary uppercase tracking-widest transition-colors border border-surface-border px-3 py-1.5 rounded-sm hover:bg-surface-elevated"
           >

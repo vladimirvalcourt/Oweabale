@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { TransitionLink } from '../components/TransitionLink';
 import { Construction, LogOut } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
@@ -28,12 +28,12 @@ export default function MaintenancePage() {
           <LogOut className="w-4 h-4" />
           Sign out
         </button>
-        <Link
+        <TransitionLink
           to="/"
           className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors rounded-sm"
         >
           Home
-        </Link>
+        </TransitionLink>
       </div>
     </div>
   );

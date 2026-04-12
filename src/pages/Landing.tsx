@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { TransitionLink } from '../components/TransitionLink';
 import Footer from '../components/Footer';
 import { ArrowRight, UploadCloud, Target, BarChart2, TrendingUp, BookOpen, CalendarClock, Quote } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -181,14 +181,14 @@ export default function Landing() {
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-surface-base/90 backdrop-blur-sm border-surface-border' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <Link to="/" className="brand-header-text flex items-center gap-2">
+          <TransitionLink to="/" className="brand-header-text flex items-center gap-2">
             <div className="w-2 h-2 bg-brand-violet shadow-glow-indigo"></div>
             Oweable
-          </Link>
+          </TransitionLink>
           <div className="hidden md:flex items-center gap-8 text-sm text-content-tertiary">
             <a href="#features" className="hover:text-content-primary transition-colors">Features</a>
             <a href="#stories" className="hover:text-content-primary transition-colors">Stories</a>
-            <Link to="/pricing" className="hover:text-content-primary transition-colors">Pricing</Link>
+            <TransitionLink to="/pricing" className="hover:text-content-primary transition-colors">Pricing</TransitionLink>
           </div>
           <div className="flex items-center gap-3">
             {user?.id && (
@@ -202,12 +202,12 @@ export default function Landing() {
                 Sign out
               </button>
             )}
-            <Link 
+            <TransitionLink 
               to={user?.id ? "/dashboard" : "/auth"} 
               className="px-6 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-all btn-tactile"
             >
               {user?.id ? "Open dashboard" : "Sign in"}
-            </Link>
+            </TransitionLink>
           </div>
         </div>
       </nav>
@@ -236,13 +236,13 @@ export default function Landing() {
               A precision command center to tame your bills, eliminate debt, track your income, and build financial clarity — no matter where you're starting from.
             </p>
             
-            <Link 
+            <TransitionLink 
               to={user?.id ? "/dashboard" : "/auth"} 
               className="group flex items-center gap-4 bg-brand-cta hover:bg-brand-cta-hover text-white px-8 py-4 text-sm font-sans font-semibold shadow-sm rounded-sm transition-all btn-tactile"
             >
               {user?.id ? "Open dashboard" : "Get started for free"}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            </TransitionLink>
           </div>
 
           <div className="lg:col-span-5 relative">

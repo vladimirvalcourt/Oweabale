@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, startTransition } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Camera, CheckCircle2, AlertCircle, Loader2,
@@ -227,7 +227,7 @@ export default function MobileCapture() {
             Capture Another
           </button>
           <button 
-            onClick={() => navigate('/')}
+            onClick={() => startTransition(() => navigate('/'))}
             className="w-full py-4 text-content-tertiary hover:text-white font-mono text-[9px] font-bold uppercase tracking-[0.4em] transition-colors"
           >
             Done
