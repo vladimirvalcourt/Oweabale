@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { useStore } from '../store/useStore';
 import { CollapsibleModule } from '../components/CollapsibleModule';
+import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 
 type DateRange = '30d' | '90d' | '1y';
 
@@ -199,7 +200,7 @@ export default function Reports() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v, name) => [`$${Number(v ?? 0).toLocaleString()}`, name === 'income' ? 'Income' : 'Expenses']} />
+                <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v, name) => [`$${Number(v ?? 0).toLocaleString()}`, name === 'income' ? 'Income' : 'Expenses']} />
                 <Bar dataKey="income" fill="#34D399" radius={0} />
                 <Bar dataKey="expenses" fill="#EF4444" radius={0} />
               </BarChart>
@@ -227,7 +228,7 @@ export default function Reports() {
                       <Cell key={i} fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Spent']} />
+                  <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Spent']} />
                 </RechartsPie>
               </ResponsiveContainer>
               <div className="flex-1 space-y-2 min-w-0">
@@ -262,7 +263,7 @@ export default function Reports() {
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
             <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} />
             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
-            <Tooltip contentStyle={tooltipStyle} formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Net Worth']} />
+            <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Net Worth']} />
             <Area type="monotone" dataKey="netWorth" stroke="#6366F1" strokeWidth={2} fillOpacity={1} fill="url(#nwGradient)" dot={{ fill: '#6366F1', strokeWidth: 0, r: 3 }} />
           </AreaChart>
         </ResponsiveContainer>

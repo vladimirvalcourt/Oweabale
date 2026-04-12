@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useStore } from '../store/useStore';
 import { projectNetWorth } from '../lib/finance';
+import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { TrendingUp, TrendingDown, Hash, Building2, CreditCard, Vault, PieChart, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPie, Pie, Cell } from 'recharts';
 import { toast } from 'sonner';
@@ -131,6 +132,7 @@ export default function NetWorth() {
               <XAxis dataKey="name" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} dy={10} fontFamily="monospace" />
               <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${(Number(v ?? 0) / 1000).toFixed(0)}k`} dx={-10} fontFamily="monospace" />
               <Tooltip
+                {...rechartsTooltipStableProps}
                 contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', color: '#FAFAFA', fontFamily: 'monospace', fontSize: '12px' }}
                 formatter={(value) => [`$${Number(value ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`, 'Net Worth']}
               />
@@ -156,6 +158,7 @@ export default function NetWorth() {
                     ))}
                   </Pie>
                   <Tooltip
+                    {...rechartsTooltipStableProps}
                     contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', fontFamily: 'monospace', fontSize: '11px' }}
                     formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Value']}
                   />

@@ -440,4 +440,25 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
+/* Recharts v3: tooltip is portaled inside `.recharts-wrapper`; keep it from affecting sibling layout / CLS */
+.recharts-wrapper {
+  isolation: isolate;
+}
+
+.recharts-tooltip-wrapper {
+  contain: layout;
+  z-index: 50;
+}
+
+.recharts-default-tooltip {
+  min-width: 0;
+  max-width: min(18rem, calc(100vw - 2rem));
+}
+
+ul.recharts-tooltip-item-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 

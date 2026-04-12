@@ -17,6 +17,7 @@ import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 import { Dialog } from '@headlessui/react';
 import { generateAmortizationSchedule } from '../lib/finance';
+import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import type { Bill, Debt } from '../store/useStore';
 
 type ObligationType = 'recurring' | 'debt' | 'ambush';
@@ -369,12 +370,13 @@ export default function Obligations() {
                             <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest mb-2">
                               Principal vs. Interest — First 12 Months
                             </p>
-                            <div className="h-[120px] w-full">
+                            <div className="h-[120px] w-full min-h-0 overflow-visible relative isolate">
                               <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={chartData} margin={{ top: 0, right: 0, left: -30, bottom: 0 }} barSize={8}>
                                   <XAxis dataKey="name" tick={{ fill: '#52525B', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} />
                                   <YAxis tick={{ fill: '#52525B', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}`} />
                                   <Tooltip
+                                    {...rechartsTooltipStableProps}
                                     contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', fontFamily: 'monospace', fontSize: '11px' }}
                                     formatter={(value, name) => [`$${Number(value ?? 0).toFixed(2)}`, name === 'principal' ? 'Principal' : 'Interest']}
                                   />

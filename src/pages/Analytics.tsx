@@ -11,6 +11,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { useStore } from '../store/useStore';
 import { CollapsibleModule } from '../components/CollapsibleModule';
+import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 
 type Period = '1M' | '3M' | '6M' | '1Y' | 'ALL';
 
@@ -273,7 +274,7 @@ export default function Analytics() {
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
               <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval="preserveStartEnd" />
               <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={fmt} width={58} />
-              <Tooltip contentStyle={tooltipStyle} formatter={(v: any, name: any) => [fmt(Number(v)), name === 'net_worth' ? 'Net Worth' : name === 'assets' ? 'Assets' : 'Debts']} labelFormatter={(l) => l} />
+              <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v: any, name: any) => [fmt(Number(v)), name === 'net_worth' ? 'Net Worth' : name === 'assets' ? 'Assets' : 'Debts']} labelFormatter={(l) => l} />
               <Area type="monotone" dataKey="assets"    stroke="#34D399" strokeWidth={1.5} fill="url(#assetsGrad)" dot={false} />
               <Area type="monotone" dataKey="net_worth" stroke="#6366F1" strokeWidth={2}   fill="url(#nwGrad)"     dot={false} />
             </AreaChart>
@@ -298,7 +299,7 @@ export default function Analytics() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
                 <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval={1} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={fmt} width={52} />
-                <Tooltip contentStyle={tooltipStyle} formatter={(v: any, name: any) => [`$${Number(v).toLocaleString()}`, name]} />
+                <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v: any, name: any) => [`$${Number(v).toLocaleString()}`, name]} />
                 {topCategories.map((cat, i) => (
                   <Bar key={cat} dataKey={cat} stackId="stack" fill={CHART_COLORS[i % CHART_COLORS.length]} radius={0} />
                 ))}
@@ -323,7 +324,7 @@ export default function Analytics() {
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
             <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval={1} />
             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `${v}%`} width={42} />
-            <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => [`${Number(v).toFixed(1)}%`, 'Savings Rate']} />
+            <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v: any) => [`${Number(v).toFixed(1)}%`, 'Savings Rate']} />
             <ReferenceLine y={20} stroke="#3f3f46" strokeWidth={1} strokeDasharray="4 4" />
             <Line type="monotone" dataKey="rate" stroke="#6366F1" strokeWidth={2} dot={{ r: 3, fill: '#6366F1' }} />
           </LineChart>

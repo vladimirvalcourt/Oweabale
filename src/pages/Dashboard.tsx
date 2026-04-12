@@ -13,6 +13,7 @@ import { animate } from 'motion/react';
 import { useStore } from '../store/useStore';
 import { sanitizeUrl } from '../lib/security';
 import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting } from '../lib/finance';
+import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { AppPageShell } from '../components/AppPageShell';
 
 import type { Citation } from '../store/useStore';
@@ -628,6 +629,7 @@ export default function Dashboard() {
                   <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#A1A1AA', fontSize: 11, fontFamily: 'sans-serif' }} dy={10} />
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A1A1AA', fontSize: 11, fontFamily: 'sans-serif' }} tickFormatter={(val) => `$${Number(val ?? 0) / 1000}k`} />
                   <Tooltip 
+                    {...rechartsTooltipStableProps}
                     contentStyle={{ backgroundColor: '#18181B', borderRadius: '6px', border: '1px solid #3F3F46', color: '#FAFAFA', fontFamily: 'sans-serif', fontSize: '13px' }}
                     itemStyle={{ color: '#818CF8' }}
                     formatter={(val) => [`$${Number(val ?? 0).toLocaleString()}`, 'Projected Balance']}
