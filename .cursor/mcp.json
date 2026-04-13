@@ -6,6 +6,9 @@
     "plaid-dashboard": {
       "command": "bash",
       "args": ["${workspaceFolder}/scripts/plaid-dashboard-mcp.sh"]
+    },
+    "hf-mcp-server": {
+      "url": "https://huggingface.co/mcp?login"
     }
   }
 }
