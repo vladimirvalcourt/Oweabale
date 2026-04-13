@@ -9,6 +9,12 @@ export default function OweAi() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  /** Must match `messages` — used so invoke runs with the real thread (setState updaters are not synchronous). */
+  const messagesRef = useRef<OweAiChatMessage[]>([]);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -16,16 +22,13 @@ export default function OweAi() {
 
   const runSend = useCallback(async (text: string) => {
     const userMsg: OweAiChatMessage = { role: 'user', content: text };
-    let thread: OweAiChatMessage[] = [];
-    setMessages((prev) => {
-      thread = [...prev, userMsg];
-      return thread;
-    });
+    const nextThread = [...messagesRef.current, userMsg];
+    setMessages(nextThread);
     setInput('');
     setLoading(true);
 
     try {
-      const result = await invokeOweAi(thread);
+      const result = await invokeOweAi(nextThread);
       if (result.type === 'reply') {
         setMessages((m) => [...m, { role: 'assistant', content: result.text }]);
       } else if (result.type === 'blocked') {
