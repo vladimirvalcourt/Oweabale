@@ -207,7 +207,6 @@ Deno.serve(async (req: Request) => {
           narrative: fallbackNarrative(verdict, purchaseAmount, reasons, safe, liquidCash),
           model: null,
           aiEnabled: false,
-          message: 'HF_TOKEN not set; returned rule-based summary only.',
         }),
         { status: 200, headers: { ...ch, 'Content-Type': 'application/json' } },
       );
@@ -264,8 +263,15 @@ Deno.serve(async (req: Request) => {
       { status: 200, headers: { ...ch, 'Content-Type': 'application/json' } },
     );
   } catch (e) {
-    const msg = e instanceof Error ? e.message : 'Unknown error';
-    const status = msg === 'Unauthorized' || msg === 'Missing Authorization header' ? 401 : 500;
+    console.error('[finance-insights]', e);
+    const msg =
+      e instanceof Error
+        ? e.message
+        : typeof e === 'object' && e !== null && 'message' in e
+          ? String((e as { message: unknown }).message)
+          : String(e);
+    const status =
+      msg === 'Unauthorized' || msg === 'Missing Authorization header' ? 401 : 500;
     return new Response(JSON.stringify({ error: msg }), {
       status,
       headers: { ...corsHeaders(req.headers.get('origin')), 'Content-Type': 'application/json' },

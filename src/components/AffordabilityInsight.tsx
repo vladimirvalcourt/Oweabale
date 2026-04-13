@@ -45,15 +45,10 @@ export function AffordabilityInsight() {
 
   return (
     <div className="rounded-sm border border-indigo-500/25 bg-indigo-500/5 p-6 shadow-sm">
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-4">
         <Sparkles className="h-4 w-4 shrink-0 text-indigo-400" aria-hidden />
         <p className="metric-label normal-case text-indigo-200/90">Can I afford this?</p>
       </div>
-      <p className="text-xs text-content-tertiary leading-relaxed mb-4">
-        Uses your bills, debts, subscriptions, citations, and liquid cash from the database (same logic as safe to spend).
-        Optional text uses Hugging Face Inference when <code className="text-content-secondary">HF_TOKEN</code> is set on
-        the Edge Function—otherwise you still get the rule-based verdict and summary.
-      </p>
 
       <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
         <div className="flex-1 min-w-0">
