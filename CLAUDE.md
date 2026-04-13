@@ -12,6 +12,11 @@
 - Always push to `main`
 - Never push to a different branch without explicit permission
 
+## Cursor — Hugging Face MCP (developer only)
+
+- **End users of Oweable never sign in to Hugging Face.** Owe-AI uses a server-side `HF_TOKEN` in Supabase Edge Function secrets only. Do not add in-app Hugging Face login, token, or “connect HF” flows for customers.
+- When a task needs the **Hugging Face MCP** (`hf-mcp-server` in `.cursor/mcp.json`), **ask the repo owner to authenticate in Cursor** (e.g. **Settings → MCP**, complete login for `hf-mcp-server`, or follow Cursor’s browser prompt / open `https://huggingface.co/mcp?login` if the IDE asks). That auth is for **you**, not for app users.
+
 ## Backend (Supabase / Postgres)
 
 - If a task touches the database, RLS, RPCs, Edge Functions, storage policies, or webhooks, **ship the backend change**, not only app code or a local migration file.
