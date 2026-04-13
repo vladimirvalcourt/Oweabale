@@ -5,7 +5,7 @@ import {
   Bell, Search, Home, Receipt, Target, Activity,
   Settings, Repeat, BarChart3, Plus, X, ChevronDown, Inbox,
   Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LineChart, ShieldCheck,
-  Tags, LifeBuoy, ScrollText, Wand2, Wallet, Clock, CreditCard
+  Tags, LifeBuoy, ScrollText, Wand2, Wallet, Clock, CreditCard, Sparkles
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
@@ -253,6 +253,7 @@ export default function Layout() {
         results.push({ type, name, detail, path });
       }
     };
+    pushNavShortcut(['owe-ai', 'owe ai', 'oweable ai', 'assistant', 'chat about my money'], 'Navigation', 'Owe-AI', 'Your data only', '/owe-ai');
     pushNavShortcut(['categor', 'tags', 'labels'], 'Navigation', 'Categories', 'Spending categories', '/categories');
     pushNavShortcut(['support', 'help desk', 'help', 'ticket'], 'Navigation', 'Help & Support', 'Tickets & broadcasts', '/support');
     pushNavShortcut(['changelog', 'what\'s new', 'release'], 'Navigation', 'Changelog', 'Product updates', '/changelog');
@@ -310,6 +311,7 @@ export default function Layout() {
         label: 'Overview',
         items: [
           { name: 'Dashboard', path: '/dashboard', icon: Home },
+          { name: 'Owe-AI', path: '/owe-ai', icon: Sparkles },
           { name: 'Cash flow', path: '/dashboard', icon: Wallet, hash: 'cash-flow' },
           { name: 'Income', path: '/income', icon: Vault },
           { name: 'Freelance Vault', path: '/freelance', icon: Briefcase },

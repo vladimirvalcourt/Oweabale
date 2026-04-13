@@ -43,6 +43,7 @@ const Education      = lazy(() => import('./pages/Education'));
 const HelpDesk       = lazy(() => import('./pages/HelpDesk'));
 const Changelog      = lazy(() => import('./pages/Changelog'));
 const Analytics      = lazy(() => import('./pages/Analytics'));
+const OweAi          = lazy(() => import('./pages/OweAi'));
 const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
 import AuthCallback from './pages/AuthCallback';
 const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
@@ -107,6 +108,7 @@ function AppRoutes() {
         
         <Route element={<DeviceGuard><Layout /></DeviceGuard>}>
           <Route path="dashboard" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
+          <Route path="owe-ai" element={<ErrorBoundary><OweAi /></ErrorBoundary>} />
           <Route path="bills" element={<ErrorBoundary><Obligations /></ErrorBoundary>} />
           <Route path="income" element={<ErrorBoundary><Income /></ErrorBoundary>} />
           <Route path="freelance" element={<ErrorBoundary><Freelance /></ErrorBoundary>} />
