@@ -76,23 +76,19 @@ export async function invokeFinanceInsights(
   purchaseAmount: number,
   category?: string,
 ): Promise<FinanceInsightsResponse> {
-  // Validate with the auth server and refresh tokens if needed — getSession() alone can return an expired access_token, which Edge Functions reject as "Invalid JWT".
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError || !userData.user) {
-    throw new Error('Sign in again to use this check. Your session may have expired.');
-  }
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  const accessToken = session?.access_token?.trim();
-  if (!accessToken) {
-    throw new Error('Sign in to use “Can I afford this?”');
+  // Refresh access JWT before calling Edge Functions (avoids "Invalid JWT" from expired tokens).
+  // Do not pass a manual Authorization header — the client fetch layer must attach the same token it
+  // gets from getAccessToken() after refresh, or we can race and send a stale Bearer token.
+  const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+  if (refreshError || !refreshed.session?.access_token) {
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError || !userData.user) {
+      throw new Error('Sign in again to use this check. Your session may have expired.');
+    }
   }
 
   const { data, error } = await supabase.functions.invoke('finance-insights', {
     body: { purchaseAmount, category: category?.trim() || undefined },
-    headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   if (error) {

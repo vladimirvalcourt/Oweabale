@@ -136,7 +136,18 @@ export function useAuth(): AuthState {
       }
     };
 
-    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'] as const;
+    // Include pointerdown/click/wheel/focusin so typing, tapping, wheel-scrolling, and focusing fields
+    // count as activity (avoids surprise sign-out while using forms like “Can I afford this?”).
+    const events = [
+      'mousedown',
+      'pointerdown',
+      'click',
+      'keydown',
+      'scroll',
+      'touchstart',
+      'wheel',
+      'focusin',
+    ] as const;
     events.forEach((e) => window.addEventListener(e, resetIdleTimer));
 
     const interval = setInterval(checkTimeout, 1000);
