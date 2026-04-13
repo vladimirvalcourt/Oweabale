@@ -251,6 +251,13 @@ function huggingFaceToken(): string | undefined {
   return a || b || undefined;
 }
 
+/** Model id for router — matches common Supabase secret name HF_INFERENCE_MODEL. */
+function oweAiModelId(): string {
+  const fromEnv =
+    Deno.env.get('OWE_AI_MODEL')?.trim() || Deno.env.get('HF_INFERENCE_MODEL')?.trim();
+  return fromEnv || DEFAULT_OWE_AI_MODEL;
+}
+
 /**
  * Hugging Face Inference Providers — OpenAI-compatible chat completions.
  * @see https://huggingface.co/docs/api-inference/en/tasks/chat-completion
@@ -375,7 +382,7 @@ Deno.serve(async (req: Request) => {
         JSON.stringify({
           error: 'AI_DISABLED',
           message:
-            'Owe-AI uses an open-weight model via Hugging Face Inference. Set the Edge Function secret HF_TOKEN (or HUGGING_FACE_HUB_TOKEN) with a token that has Inference Providers access. Optional: OWE_AI_MODEL (default ' +
+            'Owe-AI uses Hugging Face Inference. Set Edge Function secret HF_TOKEN (fine-grained token with Inference Providers). Optional model: OWE_AI_MODEL or HF_INFERENCE_MODEL (default ' +
             DEFAULT_OWE_AI_MODEL +
             ').',
           blocked: false,
@@ -384,7 +391,7 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const modelId = Deno.env.get('OWE_AI_MODEL')?.trim() || DEFAULT_OWE_AI_MODEL;
+    const modelId = oweAiModelId();
     const contextJson = await buildUserContextJson(supabaseAdmin, user.id);
     const reply = await callHuggingFaceChat(hfToken, modelId, contextJson, messages);
 
