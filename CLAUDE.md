@@ -16,6 +16,7 @@
 
 - If a task touches the database, RLS, RPCs, Edge Functions, storage policies, or webhooks, **ship the backend change**, not only app code or a local migration file.
 - Apply migrations to the linked project (e.g. Supabase MCP `apply_migration` for DDL, or `supabase db push` when local migration history matches remote).
+- After changing any Edge Function under `supabase/functions/`, **deploy it** to the linked project (e.g. `supabase functions deploy <name> --project-ref <ref>`). Resolve the project ref from the Supabase dashboard, `get_project_url` (MCP), or `VITE_SUPABASE_URL` (`https://<ref>.supabase.co`). Do not leave function-only fixes un-deployed.
 
 ## Code Standards
 
