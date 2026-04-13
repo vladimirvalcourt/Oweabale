@@ -26,4 +26,5 @@ Ship **one high-trust, read-only feature** before any broad “chat with your fi
 
 - `src/lib/finance.ts` — `computeSafeToSpend`, `calcMonthlyCashFlow`, `groupOutflowsByHorizon`.
 - Dashboard safe-to-spend card — pattern for disclosures.
-- **Shipped:** `supabase/functions/finance-insights` loads the user’s rows from Postgres, recomputes the same math (`_shared/finance_safe_to_spend.ts`), classifies yes/caution/no, and returns a fixed rule-based narrative (no external LLM). UI: Dashboard **Can I afford this?** (`src/components/AffordabilityInsight.tsx`).
+- **Shipped:** `supabase/functions/finance-insights` loads the user’s rows from Postgres, recomputes the same math (`_shared/finance_safe_to_spend.ts`), classifies yes/caution/no, and returns a fixed rule-based narrative (no server LLM). UI: Dashboard **Can I afford this?** (`src/components/AffordabilityInsight.tsx`).
+- **Optional (client-only):** users may run **Gemma 4 E2B** ONNX via Transformers.js in the browser (WebGPU when available); see `src/lib/gemma4WebGpuNarrative.ts`. This downloads weights from Hugging Face and never sends prompts to Oweable’s backend.

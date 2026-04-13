@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
         "style-src 'self' 'unsafe-inline'", // Tailwind injects styles at runtime
         "img-src 'self' data: https:",
         "font-src 'self' data:",
-        "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://huggingface.co https://*.huggingface.co",
         "worker-src 'self' blob:",
         "frame-src https://*.supabase.co",
         "object-src 'none'",
@@ -32,7 +32,7 @@ export default defineConfig(({ mode }) => {
         "style-src 'self' 'unsafe-inline'",
         "img-src 'self' data: https:",
         "font-src 'self' data:",
-        "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:*",
+        "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* https://huggingface.co https://*.huggingface.co",
         "worker-src 'self' blob:",
         "frame-src https://*.supabase.co",
         "object-src 'none'",
