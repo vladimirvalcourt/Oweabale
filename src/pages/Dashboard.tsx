@@ -15,6 +15,7 @@ import { sanitizeUrl } from '../lib/security';
 import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting, computeSafeToSpend } from '../lib/finance';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { AppPageShell } from '../components/AppPageShell';
+import { AffordabilityInsight } from '../components/AffordabilityInsight';
 
 import type { Citation } from '../store/useStore';
 
@@ -499,6 +500,10 @@ export default function Dashboard() {
             full formula and edge cases.
           </p>
         </details>
+      </div>
+
+      <div className="mb-6">
+        <AffordabilityInsight />
       </div>
 
       <h2 className="section-label pl-1 mb-3">Core Financials</h2>

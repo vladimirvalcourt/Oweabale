@@ -26,3 +26,4 @@ Ship **one high-trust, read-only feature** before any broad “chat with your fi
 
 - `src/lib/finance.ts` — `computeSafeToSpend`, `calcMonthlyCashFlow`, `groupOutflowsByHorizon`.
 - Dashboard safe-to-spend card — pattern for disclosures.
+- **Shipped:** `supabase/functions/finance-insights` loads the user’s rows from Postgres, recomputes the same math (`_shared/finance_safe_to_spend.ts`), classifies yes/caution/no, then optionally calls Hugging Face Inference (`HF_TOKEN`, `HF_INFERENCE_MODEL`) to narrate—without changing numbers. UI: Dashboard **Can I afford this?** (`src/components/AffordabilityInsight.tsx`).
