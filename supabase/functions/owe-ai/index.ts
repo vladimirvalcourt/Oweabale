@@ -242,13 +242,27 @@ Rules (must follow):
 - No legal, tax, or investment advice; you may summarize what the numbers imply in plain language with that caveat.
 - Keep replies short (roughly 2–6 sentences) unless the user explicitly asks for detail.`;
 
-async function callOpenAI(
-  apiKey: string,
+/** Open-weight instruct model on Hugging Face Inference (router). Override with OWE_AI_MODEL. */
+const DEFAULT_OWE_AI_MODEL = 'Qwen/Qwen2.5-7B-Instruct';
+
+function huggingFaceToken(): string | undefined {
+  const a = Deno.env.get('HF_TOKEN')?.trim();
+  const b = Deno.env.get('HUGGING_FACE_HUB_TOKEN')?.trim();
+  return a || b || undefined;
+}
+
+/**
+ * Hugging Face Inference Providers — OpenAI-compatible chat completions.
+ * @see https://huggingface.co/docs/api-inference/en/tasks/chat-completion
+ */
+async function callHuggingFaceChat(
+  hfToken: string,
+  modelId: string,
   userContextJson: string,
   messages: ChatMessage[],
 ): Promise<string> {
   const body = {
-    model: Deno.env.get('OWE_AI_MODEL')?.trim() || 'gpt-4o-mini',
+    model: modelId,
     temperature: 0.35,
     max_tokens: 900,
     messages: [
@@ -260,10 +274,10 @@ async function callOpenAI(
     ],
   };
 
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+  const res = await fetch('https://router.huggingface.co/v1/chat/completions', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${hfToken}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
@@ -271,12 +285,16 @@ async function callOpenAI(
 
   if (!res.ok) {
     const t = await res.text().catch(() => '');
-    throw new Error(`OpenAI error ${res.status}: ${t.slice(0, 400)}`);
+    throw new Error(`Hugging Face inference error ${res.status}: ${t.slice(0, 400)}`);
   }
 
   const json = (await res.json()) as {
     choices?: Array<{ message?: { content?: string } }>;
+    error?: { message?: string };
   };
+  if (json.error?.message) {
+    throw new Error(json.error.message.slice(0, 400));
+  }
   const text = json.choices?.[0]?.message?.content?.trim();
   if (!text) throw new Error('Empty model response');
   return text;
@@ -351,21 +369,24 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const openaiKey = Deno.env.get('OPENAI_API_KEY')?.trim();
-    if (!openaiKey) {
+    const hfToken = huggingFaceToken();
+    if (!hfToken) {
       return new Response(
         JSON.stringify({
           error: 'AI_DISABLED',
           message:
-            'Owe-AI is not configured yet (missing OPENAI_API_KEY on the project). Ask your admin to add the secret for this Edge Function.',
+            'Owe-AI uses an open-weight model via Hugging Face Inference. Set the Edge Function secret HF_TOKEN (or HUGGING_FACE_HUB_TOKEN) with a token that has Inference Providers access. Optional: OWE_AI_MODEL (default ' +
+            DEFAULT_OWE_AI_MODEL +
+            ').',
           blocked: false,
         }),
         { status: 503, headers: { ...ch, 'Content-Type': 'application/json' } },
       );
     }
 
+    const modelId = Deno.env.get('OWE_AI_MODEL')?.trim() || DEFAULT_OWE_AI_MODEL;
     const contextJson = await buildUserContextJson(supabaseAdmin, user.id);
-    const reply = await callOpenAI(openaiKey, contextJson, messages);
+    const reply = await callHuggingFaceChat(hfToken, modelId, contextJson, messages);
 
     return new Response(JSON.stringify({ reply }), {
       status: 200,

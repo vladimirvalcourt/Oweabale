@@ -38,8 +38,8 @@ export default function OweAi() {
           ...m,
           {
             role: 'assistant',
-            content:
-              'Owe-AI is not available right now because the assistant is not configured on the server. Your data was not sent to any model.',
+              content:
+                'Owe-AI is not available right now: the server is missing a Hugging Face token (HF_TOKEN) or the model could not be reached. Your data was not sent to a model.',
           },
         ]);
       }
