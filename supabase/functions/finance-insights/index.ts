@@ -207,6 +207,8 @@ Deno.serve(async (req: Request) => {
           narrative: fallbackNarrative(verdict, purchaseAmount, reasons, safe, liquidCash),
           model: null,
           aiEnabled: false,
+          /** Which HF model id would be used when HF_TOKEN is set (same as HF_INFERENCE_MODEL or default). */
+          narrationModelId: hfModel,
         }),
         { status: 200, headers: { ...ch, 'Content-Type': 'application/json' } },
       );
@@ -259,6 +261,7 @@ Deno.serve(async (req: Request) => {
         narrative,
         model: hfModel,
         aiEnabled: true,
+        narrationModelId: hfModel,
       }),
       { status: 200, headers: { ...ch, 'Content-Type': 'application/json' } },
     );

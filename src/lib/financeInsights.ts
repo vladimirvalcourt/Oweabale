@@ -69,27 +69,34 @@ export interface FinanceInsightsResponse {
   narrative: string;
   model: string | null;
   aiEnabled?: boolean;
+  /** HF model id used or configured for narration (Router API). Present when Edge Function is updated. */
+  narrationModelId?: string;
   message?: string;
 }
+
+/** Default HF model if `HF_INFERENCE_MODEL` is unset — keep in sync with `finance-insights` Edge Function. */
+export const FINANCE_INSIGHTS_DEFAULT_HF_MODEL = 'meta-llama/Meta-Llama-3.1-8B-Instruct';
 
 export async function invokeFinanceInsights(
   purchaseAmount: number,
   category?: string,
 ): Promise<FinanceInsightsResponse> {
-  // Refresh access JWT before calling Edge Functions (avoids "Invalid JWT" from expired tokens).
-  // Do not pass a manual Authorization header — the client fetch layer must attach the same token it
-  // gets from getAccessToken() after refresh, or we can race and send a stale Bearer token.
-  const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
-  if (refreshError || !refreshed.session?.access_token) {
-    const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError || !userData.user) {
-      throw new Error('Sign in again to use this check. Your session may have expired.');
+  const body = { purchaseAmount, category: category?.trim() || undefined };
+  const doInvoke = () => supabase.functions.invoke('finance-insights', { body });
+
+  // Invoke first; only refresh + retry on 401/403. Proactive refreshSession() can fail spuriously and
+  // block users who still have a valid access token.
+  let { data, error } = await doInvoke();
+
+  if (error instanceof FunctionsHttpError) {
+    const st = error.context.status;
+    if (st === 401 || st === 403) {
+      const { error: refreshErr } = await supabase.auth.refreshSession();
+      if (!refreshErr) {
+        ({ data, error } = await doInvoke());
+      }
     }
   }
-
-  const { data, error } = await supabase.functions.invoke('finance-insights', {
-    body: { purchaseAmount, category: category?.trim() || undefined },
-  });
 
   if (error) {
     if (error instanceof FunctionsHttpError) {
