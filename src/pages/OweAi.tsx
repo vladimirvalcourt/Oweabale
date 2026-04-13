@@ -72,37 +72,9 @@ export default function OweAi() {
           <div>
             <h1 className="text-xl font-semibold tracking-tight text-content-primary">Owe-AI</h1>
             <p className="text-sm text-content-tertiary mt-1 max-w-xl">
-              Ask follow-up questions about <strong className="text-content-secondary">your</strong> bills, cash flow,
-              debts, budgets, and goals. Answers use only your Oweable data—not general web knowledge.
+              Ask about <strong className="text-content-secondary">your</strong> bills, cash flow, debts, budgets, and
+              goals. Replies are based on what you&apos;ve saved in Oweable.
             </p>
-            <details className="mt-3 max-w-xl text-xs text-content-tertiary border border-surface-border rounded-lg px-3 py-2 bg-surface-raised/30 [&_summary]:cursor-pointer [&_summary]:font-medium [&_summary]:text-content-secondary">
-              <summary className="select-none">How Owe-AI works &amp; guardrails</summary>
-              <div className="mt-2 space-y-2 text-content-tertiary leading-relaxed border-t border-surface-border pt-2">
-                <p>
-                  <span className="text-content-secondary">Who can ask:</span> Anyone signed in to your Oweable account
-                  can use this page. Each request uses only data tied to <em>your</em> login.
-                </p>
-                <p>
-                  <span className="text-content-secondary">Where answers come from:</span> Our server loads a fresh
-                  snapshot of your Oweable records (for example bills, debts, income, subscriptions, goals, budgets,
-                  recent transactions, and cash-flow summaries) as JSON. That snapshot and your chat messages are sent
-                  to an <strong className="text-content-secondary">open-weight language model</strong> hosted on{' '}
-                  <strong className="text-content-secondary">Hugging Face Inference</strong> (not a live web search).
-                  The model writes a short reply based on that snapshot. It does not read the public internet or other
-                  users&apos; data.
-                </p>
-                <p>
-                  <span className="text-content-secondary">Guardrails:</span> (1){' '}
-                  <strong className="text-content-secondary">Input check</strong> — we reject empty or overly long
-                  messages, obvious off-topic asks (e.g. weather, coding, recipes), jailbreak-style phrases, and
-                  finance questions that aren&apos;t clearly about <em>your</em> Oweable data unless it&apos;s a short
-                  follow-up after our last reply. (2){' '}
-                  <strong className="text-content-secondary">Model rules</strong> — the model is instructed to answer
-                  only from your snapshot, admit when something isn&apos;t in the data, stay on your money topics, and
-                  avoid legal, tax, or investment advice.
-                </p>
-              </div>
-            </details>
           </div>
         </div>
         {messages.length > 0 && (

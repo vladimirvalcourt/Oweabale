@@ -506,8 +506,8 @@ export default function Dashboard() {
             className="text-emerald-200/90 hover:text-emerald-100 underline underline-offset-2 font-medium focus-app rounded-sm"
           >
             Ask Owe-AI
-          </TransitionLink>{' '}
-          — it answers from your saved Oweable data, not a web search.
+          </TransitionLink>
+          .
         </p>
       </div>
 
