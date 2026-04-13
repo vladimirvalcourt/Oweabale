@@ -6,12 +6,29 @@ async function messageFromFunctionsHttpError(err: FunctionsHttpError): Promise<s
   try {
     const clone = res.clone();
     const body = (await clone.json()) as { error?: string; message?: string };
-    if (typeof body.error === 'string' && body.error.trim()) return body.error.trim();
-    if (typeof body.message === 'string' && body.message.trim()) return body.message.trim();
+    if (typeof body.error === 'string' && body.error.trim()) {
+      const e = body.error.trim();
+      if (/invalid\s*jwt/i.test(e)) {
+        return 'Sign in again to use this check. Your session may have expired.';
+      }
+      return e;
+    }
+    if (typeof body.message === 'string' && body.message.trim()) {
+      const m = body.message.trim();
+      if (/invalid\s*jwt/i.test(m)) {
+        return 'Sign in again to use this check. Your session may have expired.';
+      }
+      return m;
+    }
   } catch {
     try {
       const text = (await res.text()).trim();
-      if (text) return text.slice(0, 500);
+      if (text) {
+        if (/invalid\s*jwt/i.test(text)) {
+          return 'Sign in again to use this check. Your session may have expired.';
+        }
+        return text.slice(0, 500);
+      }
     } catch {
       /* ignore */
     }
@@ -59,16 +76,23 @@ export async function invokeFinanceInsights(
   purchaseAmount: number,
   category?: string,
 ): Promise<FinanceInsightsResponse> {
+  // Validate with the auth server and refresh tokens if needed — getSession() alone can return an expired access_token, which Edge Functions reject as "Invalid JWT".
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError || !userData.user) {
+    throw new Error('Sign in again to use this check. Your session may have expired.');
+  }
+
   const {
     data: { session },
   } = await supabase.auth.getSession();
-  if (!session?.access_token) {
+  const accessToken = session?.access_token?.trim();
+  if (!accessToken) {
     throw new Error('Sign in to use “Can I afford this?”');
   }
 
   const { data, error } = await supabase.functions.invoke('finance-insights', {
     body: { purchaseAmount, category: category?.trim() || undefined },
-    headers: { Authorization: `Bearer ${session.access_token}` },
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   if (error) {
