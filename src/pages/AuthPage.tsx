@@ -36,7 +36,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-base flex items-center justify-center px-4">
+    <div className="min-h-screen bg-surface-base flex items-center justify-center px-4 relative overflow-hidden">
       {/* Background grid */}
       <div
         className="absolute inset-0 opacity-[0.03]"
@@ -46,8 +46,21 @@ export default function AuthPage() {
           backgroundSize: '40px 40px',
         }}
       />
+      {/* Cold radial charge — subtle atmosphere */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-90"
+        style={{
+          background:
+            'radial-gradient(ellipse 85% 55% at 50% 42%, rgba(34, 211, 238, 0.07) 0%, transparent 52%), radial-gradient(ellipse 60% 40% at 50% 100%, rgba(124, 138, 232, 0.06) 0%, transparent 45%)',
+        }}
+        aria-hidden
+      />
 
-      <div className="relative w-full max-w-sm">
+      <div className="relative w-full max-w-sm auth-login-electric-wrap">
+        <div className="auth-login-electric-inner px-6 py-10 sm:px-8 sm:py-12">
+          <span className="auth-login-conduit auth-login-conduit--left" aria-hidden />
+          <span className="auth-login-conduit auth-login-conduit--right" aria-hidden />
+          <div className="relative z-10">
         {/* Logo / wordmark */}
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-1">
@@ -58,7 +71,13 @@ export default function AuthPage() {
               Oweable
             </span>
           </div>
-          <h1 className="font-mono text-2xl text-white font-bold tracking-tight">
+          <h1
+            className="font-mono text-2xl text-white font-bold tracking-tight"
+            style={{
+              textShadow:
+                '0 0 18px rgba(34, 211, 238, 0.15), 0 0 36px rgba(124, 138, 232, 0.08)',
+            }}
+          >
             Sign in to Oweable
           </h1>
           <p className="font-mono text-xs text-content-tertiary uppercase tracking-[0.2em] mt-2">
@@ -119,6 +138,8 @@ export default function AuthPage() {
           {' '}and{' '}
           <a href="/privacy" className="text-content-tertiary hover:text-white underline underline-offset-2">Privacy Policy</a>.
         </p>
+          </div>
+        </div>
       </div>
     </div>
   );
