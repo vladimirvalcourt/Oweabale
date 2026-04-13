@@ -4,6 +4,12 @@ import ReactMarkdown from 'react-markdown';
 import { invokeOweAi, type OweAiChatMessage } from '../lib/oweAi';
 import { cn } from '../lib/utils';
 
+const QUICK_PROMPTS = [
+  'What can I safely buy this week?',
+  'Explain APR in simple words.',
+  'How should I budget based on my spending?',
+] as const;
+
 export default function OweAi() {
   const [messages, setMessages] = useState<OweAiChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -65,6 +71,15 @@ export default function OweAi() {
     setMessages([]);
   }, []);
 
+  const useQuickPrompt = useCallback(
+    (prompt: string) => {
+      if (loading) return;
+      setInput(prompt);
+      void runSend(prompt);
+    },
+    [loading, runSend],
+  );
+
   return (
     <div className="flex flex-col gap-4 min-h-[calc(100dvh-12rem)] max-w-3xl mx-auto w-full">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -78,6 +93,19 @@ export default function OweAi() {
               Ask about <strong className="text-content-secondary">your</strong> bills, cash flow, debts, budgets, and
               goals. Replies are based on what you&apos;ve saved in Oweable.
             </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {QUICK_PROMPTS.map((prompt) => (
+                <button
+                  key={prompt}
+                  type="button"
+                  onClick={() => useQuickPrompt(prompt)}
+                  disabled={loading}
+                  className="text-xs border border-surface-border bg-surface-raised/70 text-content-secondary px-2.5 py-1.5 rounded-md hover:bg-surface-elevated hover:text-content-primary transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         {messages.length > 0 && (
@@ -98,8 +126,8 @@ export default function OweAi() {
       >
         {messages.length === 0 && !loading && (
           <p className="text-sm text-content-tertiary text-center py-12 px-4">
-            Example: “What are my biggest fixed costs this month?” or “How does my liquid cash compare to what’s due
-            soon?”
+            Try: “What can I safely buy this week?”, “Explain APR in simple words,” or “How should I budget based on my
+            spending?”
           </p>
         )}
         {messages.map((m, i) => (

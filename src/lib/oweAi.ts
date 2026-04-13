@@ -8,6 +8,9 @@ export type OweAiResult =
   | { type: 'blocked'; message: string; code: string }
   | { type: 'disabled'; message: string };
 
+const EXAMPLE_ALLOWED_PROMPTS =
+  'Try: "What can I safely buy this week?" or "Explain APR in simple words."';
+
 /** Supabase sets `error.context` to the fetch Response for HTTP errors. */
 function responseFromFunctionsError(e: unknown): Response | null {
   if (e instanceof FunctionsHttpError) {
@@ -143,9 +146,18 @@ export async function invokeOweAi(messages: OweAiChatMessage[]): Promise<OweAiRe
         if (/jwt|invalid.*token|session/i.test(serverMsg)) {
           throw new Error('Your session expired. Please refresh the page or sign in again.');
         }
+        if (/send at least one message|last message must be from the user/i.test(serverMsg)) {
+          throw new Error(`Please enter a finance question before sending. ${EXAMPLE_ALLOWED_PROMPTS}`);
+        }
+        if (/model_not_found|does not exist/i.test(serverMsg)) {
+          throw new Error('Owe-AI model setup is being updated. Please try again in a moment.');
+        }
         throw new Error(serverMsg);
       }
-      throw new Error(`Owe-AI is temporarily unavailable (${status}). Please try again.`);
+      if (status >= 500) {
+        throw new Error('Owe-AI is temporarily unavailable. Please try again in a moment.');
+      }
+      throw new Error(`Couldn’t process that request. ${EXAMPLE_ALLOWED_PROMPTS}`);
     }
     if (/jwt/i.test(error.message)) {
       throw new Error('Your session expired. Please refresh the page or sign in again.');

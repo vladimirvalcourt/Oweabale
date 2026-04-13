@@ -28,6 +28,10 @@ const PERSONAL_OR_APP =
 const DATA_QUERY =
   /\b(what|which|when|where|how\s+much|how\s+many|list|show|summarize|summary|explain|break\s*down|compare|prioritize|remind|upcoming|overdue|next|due)\b/i;
 
+/** General finance education intent (allowed when clearly financial). */
+const EDUCATION_QUERY =
+  /\b(what\s+is|what'?s|how\s+does|how\s+do|explain|teach\s+me|help\s+me\s+understand|difference\s+between|pros?\s+and\s+cons?|best\s+way\s+to|tips?\s+for)\b/i;
+
 export type GuardFail = { ok: false; code: 'EMPTY' | 'TOO_LONG' | 'OFF_TOPIC' | 'NOT_USER_DATA'; userMessage: string };
 export type GuardOk = { ok: true };
 export type GuardResult = GuardOk | GuardFail;
@@ -72,15 +76,17 @@ export function guardOweAiMessage(
   const finance = FINANCE_DOMAIN.test(text);
   const personal = PERSONAL_OR_APP.test(text);
   const dataAsk = DATA_QUERY.test(text) && finance;
+  const educationAsk = EDUCATION_QUERY.test(text) && finance;
 
   if (finance && (personal || dataAsk)) return { ok: true };
+  if (educationAsk) return { ok: true };
 
   if (finance && !personal && !dataAsk) {
     return {
       ok: false,
       code: 'NOT_USER_DATA',
       userMessage:
-        'Owe-AI only discusses **your** situation using data in Oweable. Ask how something applies to *your* bills, income, debts, budgets, or goals.',
+        'Ask this in a finance context tied to your money, or ask a finance education question (for example: “What is APR?” or “How should I budget?”).',
     };
   }
 
@@ -88,6 +94,6 @@ export function guardOweAiMessage(
     ok: false,
     code: 'OFF_TOPIC',
     userMessage:
-      'That does not look like a personal finance question about your Oweable data. Ask about your bills, cash flow, debts, subscriptions, budgets, or goals.',
+      'That does not look like a finance question. Ask about your money (bills, cash flow, debts, subscriptions, budgets, goals) or ask a finance education question.',
   };
 }

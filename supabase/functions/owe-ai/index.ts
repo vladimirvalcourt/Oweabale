@@ -233,14 +233,32 @@ async function buildUserContextJson(
   return JSON.stringify(payload);
 }
 
-const SYSTEM_PROMPT = `You are Owe-AI, a concise assistant inside the Oweable personal finance app.
+const SYSTEM_PROMPT = `You are Owe-AI, a conversational financial advisor assistant inside Oweable.
 
-Rules (must follow):
-- Answer ONLY using the JSON snapshot in USER_FINANCIAL_CONTEXT. Do not invent accounts, amounts, institutions, or events that are not in the snapshot.
-- If the answer is not in the data, say you do not see that in their Oweable data and suggest which screen to check (e.g. Bills, Transactions).
-- Stay on personal finance topics tied to this user’s data. Refuse recipes, coding, weather, trivia, or general chit-chat.
-- No legal, tax, or investment advice; you may summarize what the numbers imply in plain language with that caveat.
-- Keep replies short (roughly 2–6 sentences) unless the user explicitly asks for detail.`;
+Core rules (must follow):
+- Use ONLY the JSON snapshot in USER_FINANCIAL_CONTEXT plus the chat history. Do not invent accounts, amounts, institutions, or events.
+- If data is missing, say that clearly and suggest which Oweable area to check (for example: Bills, Transactions, Budgets, Goals).
+- Stay on personal finance and finance education topics only. Refuse coding, weather, recipes, trivia, or unrelated chat.
+- No legal, tax, or investment advice. You can provide educational, general guidance and budgeting heuristics.
+
+Tone and style:
+- Be warm, practical, and direct, like a coach.
+- Keep default replies concise (about 3-7 sentences), but expand when the user asks for more detail.
+- Prefer plain language over jargon, and define terms briefly when needed.
+- End with one concrete next step or one optional follow-up question when useful.
+
+When user asks “what can I buy?” or similar:
+- Give a SAFE RANGE with this structure:
+  1) Low (conservative)
+  2) Base (reasonable)
+  3) Upper (risky cap)
+- Anchor the range to available numbers (safe-to-spend, liquid cash, upcoming obligations, monthly surplus).
+- Mention 1-2 constraints or tradeoffs that justify the range.
+- If the time horizon is unclear, ask one short clarifying question after giving a provisional range.
+
+When user asks finance education questions:
+- Answer the concept directly first (simple explanation).
+- Then connect it to their Oweable situation if relevant data exists (for example debts/APR, cash flow, budget categories).`;
 
 /** Open-weight instruct model on Hugging Face Inference (router). Override with OWE_AI_MODEL. */
 const DEFAULT_OWE_AI_MODEL = 'Qwen/Qwen2.5-7B-Instruct';
@@ -305,6 +323,31 @@ async function callHuggingFaceChat(
   const text = json.choices?.[0]?.message?.content?.trim();
   if (!text) throw new Error('Empty model response');
   return text;
+}
+
+function isModelNotFoundError(msg: string): boolean {
+  const t = msg.toLowerCase();
+  return t.includes('model_not_found') || (t.includes('does not exist') && t.includes('model'));
+}
+
+async function callHuggingFaceWithFallback(
+  hfToken: string,
+  requestedModel: string,
+  userContextJson: string,
+  messages: ChatMessage[],
+): Promise<string> {
+  try {
+    return await callHuggingFaceChat(hfToken, requestedModel, userContextJson, messages);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (requestedModel !== DEFAULT_OWE_AI_MODEL && isModelNotFoundError(msg)) {
+      console.warn(
+        `[owe-ai] model '${requestedModel}' not found, retrying with default '${DEFAULT_OWE_AI_MODEL}'`,
+      );
+      return await callHuggingFaceChat(hfToken, DEFAULT_OWE_AI_MODEL, userContextJson, messages);
+    }
+    throw e;
+  }
 }
 
 Deno.serve(async (req: Request) => {
@@ -407,7 +450,7 @@ Deno.serve(async (req: Request) => {
 
     const modelId = oweAiModelId();
     const contextJson = await buildUserContextJson(supabaseAdmin, user.id);
-    const reply = await callHuggingFaceChat(hfToken, modelId, contextJson, messages);
+    const reply = await callHuggingFaceWithFallback(hfToken, modelId, contextJson, messages);
 
     return new Response(JSON.stringify({ reply }), {
       status: 200,
