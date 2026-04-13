@@ -3,6 +3,7 @@
  * Full monthly grid showing bills, income, subscriptions, and goals from the store.
  */
 import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   ChevronLeft, ChevronRight, Receipt, TrendingUp, Repeat, Target, CalendarDays
 } from 'lucide-react';
@@ -28,6 +29,7 @@ interface PopoverState {
 } 
 
 export default function Calendar() {
+  const location = useLocation();
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
@@ -43,6 +45,14 @@ export default function Calendar() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [popover]);
+
+  useEffect(() => {
+    if (location.hash === '#calendar-view') {
+      requestAnimationFrame(() => {
+        document.getElementById('calendar-view')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, [location.hash]);
 
   const prevMonth = () => {
     if (month === 0) { setYear(y => y - 1); setMonth(11); }
@@ -120,11 +130,16 @@ export default function Calendar() {
 
   return (
     <div className="space-y-6" onClick={(e) => { if (!(e.target as HTMLElement).closest('[data-day]')) setPopover(null); }}>
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Header — anchor for Bills & debts → Month view */}
+      <div
+        id="calendar-view"
+        className="scroll-mt-24 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+      >
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Financial Calendar</h1>
-          <p className="text-sm text-content-tertiary mt-1">All financial events plotted in time.</p>
+          <p className="text-sm text-content-tertiary mt-1">
+            All financial events plotted in time. Pairs with the 30 / 60 / 90 outlook on Bills & debts.
+          </p>
         </div>
         {/* Legend */}
         <div className="flex flex-wrap items-center gap-4">

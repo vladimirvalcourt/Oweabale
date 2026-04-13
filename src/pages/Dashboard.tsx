@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { TransitionLink } from '../components/TransitionLink';
 import { 
   ArrowRight, Activity, ShieldCheck, Flame, Inbox, ShieldAlert,
-  X, Copy, ExternalLink
+  X, Copy, ExternalLink, Wallet
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
@@ -12,7 +12,7 @@ import { motion } from 'motion/react';
 import { animate } from 'motion/react';
 import { useStore } from '../store/useStore';
 import { sanitizeUrl } from '../lib/security';
-import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting } from '../lib/finance';
+import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting, computeSafeToSpend } from '../lib/finance';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { AppPageShell } from '../components/AppPageShell';
 
@@ -93,6 +93,8 @@ export default function Dashboard() {
   const [dismissedLowTaxFingerprint, setDismissedLowTaxFingerprint] = useState<LowTaxFingerprint | null>(
     () => parseStoredLowTaxFingerprint()
   );
+  /** Stable anchor for citation due dates (matches Obligations / safe-to-spend math). */
+  const [scheduleBaseMs] = useState(() => Date.now());
 
   useEffect(() => {
     if (location.hash === '#cash-flow') {
@@ -152,6 +154,21 @@ export default function Dashboard() {
   const surplusRouting = useMemo(
     () => calcSurplusRouting(cashFlow.surplus || 0, goals || [], debts || []),
     [cashFlow.surplus, goals, debts]
+  );
+
+  const safeToSpend = useMemo(
+    () =>
+      computeSafeToSpend({
+        liquidCash,
+        monthlySurplus: cashFlow.surplus ?? 0,
+        bills: bills || [],
+        incomes: incomes || [],
+        subscriptions: subscriptions || [],
+        debts: debts || [],
+        citations: citations || [],
+        scheduleBaseMs,
+      }),
+    [liquidCash, cashFlow.surplus, bills, incomes, subscriptions, debts, citations, scheduleBaseMs],
   );
 
   const survivalMonths = isFinite(liquidCash / (monthlyBurn || 1)) ? Math.max(0, liquidCash / (monthlyBurn || 1)) : 0;
@@ -430,7 +447,61 @@ export default function Dashboard() {
 
       {/* 3. Primary Metrics Panel — anchor for sidebar "Cash flow" */}
       <section id="cash-flow" className="scroll-mt-24">
-      <h2 className="section-label pl-1 mt-8 mb-3">Core Financials</h2>
+      <div className="mt-8 mb-6 rounded-sm border border-emerald-500/25 bg-emerald-500/5 p-6 shadow-sm">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              <Wallet className="h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
+              <p className="metric-label normal-case text-emerald-300/90">Safe to spend (estimate)</p>
+            </div>
+            <p className="text-4xl sm:text-5xl font-mono font-bold text-white tabular-nums tracking-tight">
+              $<AnimatedValue value={safeToSpend.dailySafeToSpend} decimals={2} />
+              <span className="text-lg sm:text-xl font-sans font-medium text-content-tertiary ml-2">/ day</span>
+            </p>
+            <p className="mt-2 text-sm text-content-secondary">
+              Through{' '}
+              <span className="text-content-primary font-medium">{safeToSpend.windowEndLabel}</span>
+              {safeToSpend.windowMode === 'to_next_payday'
+                ? ' (until your next income date)'
+                : ' (rest of this month — add an income with a next date for payday-based windows)'}
+              . Monthly surplus (modeled):{' '}
+              <span className="font-mono text-brand-profit">${safeToSpend.monthlySurplus.toLocaleString()}</span>.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:shrink-0 lg:max-w-xl w-full text-left">
+            <div className="rounded-sm border border-surface-border bg-surface-base/80 px-4 py-3">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">Reserved in window</p>
+              <p className="text-lg font-mono text-content-primary tabular-nums">
+                ${safeToSpend.scheduledOutflowsTotal.toLocaleString()}
+              </p>
+            </div>
+            <div className="rounded-sm border border-surface-border bg-surface-base/80 px-4 py-3">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">Cash after reservations</p>
+              <p className="text-lg font-mono text-content-primary tabular-nums">
+                ${safeToSpend.liquidAfterScheduled.toLocaleString()}
+              </p>
+            </div>
+            <div className="rounded-sm border border-surface-border bg-surface-base/80 px-4 py-3">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">Days in window</p>
+              <p className="text-lg font-mono text-content-primary tabular-nums">{safeToSpend.daysInWindow}</p>
+            </div>
+          </div>
+        </div>
+        <details className="mt-5 border-t border-emerald-500/20 pt-4 text-left">
+          <summary className="cursor-pointer text-xs font-sans font-medium text-emerald-200/90 hover:text-emerald-100 focus-app rounded-sm">
+            How this is calculated
+          </summary>
+          <p className="mt-3 text-xs text-content-tertiary leading-relaxed">
+            We take liquid cash (cash-type assets), subtract bills, subscriptions, minimum debt payments, and open fines with a due
+            in this window (today through your next paycheck, or month-end if no income date), then divide by the number of days in
+            that window for a rough daily amount. This is not financial advice — it does not include pending holds, investments, or
+            unplanned spending. See <code className="text-content-secondary">docs/SAFE_TO_SPEND.md</code> in the repository for the
+            full formula and edge cases.
+          </p>
+        </details>
+      </div>
+
+      <h2 className="section-label pl-1 mb-3">Core Financials</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Runway Metric Card */}

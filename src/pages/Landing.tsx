@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 import { useSEO } from '../hooks/useSEO';
+import { isPlaidLinkUiEnabled } from '../lib/featureFlags';
 
 function useInView(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
@@ -75,7 +76,7 @@ function WordCycler() {
   );
 }
 
-const FAQ_ITEMS = [
+const FAQ_ITEMS_BASE = [
   {
     q: 'Who is Oweable for?',
     a: 'Anyone dealing with debt, bills, or financial pressure. That includes people paying off credit cards or medical debt, single parents juggling bills, recent grads with student loans, gig workers, salaried employees on tight budgets, and anyone who wants a clear picture of where they stand — and a real plan to get ahead.',
@@ -101,6 +102,23 @@ const FAQ_ITEMS = [
     a: 'Yes. Oweable uses Google OAuth (no passwords stored), encrypts all data at rest and in transit via TLS 1.2+, and enforces row-level security on every database table — so your data is never accessible to anyone else.',
   },
 ];
+
+function buildFaqItems(plaidUiEnabled: boolean) {
+  const bankAnswer = plaidUiEnabled
+    ? 'No. You can run your whole plan with manual bills, CSV imports, and document uploads. Optional bank connection (Plaid) is available in-app when enabled for your environment to sync transactions — use it if you want automatic feeds.'
+    : 'No. You can run your whole plan with manual bills, CSV imports, and document uploads. Optional automatic bank connection may be offered later; we do not require it to get value from Oweable.';
+
+  return [
+    FAQ_ITEMS_BASE[0],
+    FAQ_ITEMS_BASE[1],
+    FAQ_ITEMS_BASE[2],
+    {
+      q: 'Do I need to connect my bank?',
+      a: bankAnswer,
+    },
+    ...FAQ_ITEMS_BASE.slice(3),
+  ];
+}
 
 const TESTIMONIALS = [
   {
@@ -351,7 +369,7 @@ export default function Landing() {
               {
                 icon: CalendarClock,
                 title: "Bill Command Center",
-                desc: "Track every recurring bill — rent, utilities, insurance, subscriptions — with due dates and auto-overdue detection. See your full monthly burn rate and never miss a payment again."
+                desc: "Track every recurring bill — rent, utilities, insurance, subscriptions — with due dates and auto-overdue detection. See your full monthly burn rate, a 30 / 60 / 90-day cash-out outlook, and a calendar so nothing slips through the cracks."
               },
               {
                 icon: TrendingUp,
@@ -463,7 +481,7 @@ export default function Landing() {
             <h2 className="text-3xl font-medium tracking-tight text-content-primary mt-4">Frequently asked questions</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-l border-t border-surface-border">
-            {FAQ_ITEMS.map((item, i) => (
+            {buildFaqItems(isPlaidLinkUiEnabled()).map((item, i) => (
               <div key={i} className="border-r border-b border-surface-border p-8 bg-surface-base hover:bg-surface-raised transition-colors">
                 <h3 className="text-sm font-medium text-content-primary mb-3">{item.q}</h3>
                 <p className="text-sm text-content-secondary leading-relaxed">{item.a}</p>

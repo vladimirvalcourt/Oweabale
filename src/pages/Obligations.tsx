@@ -7,7 +7,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import {
   Receipt, CreditCard, AlertTriangle, ShieldAlert,
   FileText, CheckCircle2, Flame,
-  Calculator, ChevronDown, ChevronUp, Plus, Minus, Pencil
+  Calculator, ChevronDown, ChevronUp, Plus, Minus, Pencil, CalendarDays
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
@@ -16,7 +16,8 @@ import { useShallow } from 'zustand/react/shallow';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 import { Dialog } from '@headlessui/react';
-import { generateAmortizationSchedule } from '../lib/finance';
+import { generateAmortizationSchedule, groupOutflowsByHorizon } from '../lib/finance';
+import { TransitionLink } from '../components/TransitionLink';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import type { Bill, Debt } from '../store/useStore';
 
@@ -105,11 +106,12 @@ function monthsToDate(months: number): string {
 export default function Obligations() {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { bills, debts, citations, resolveCitation, openQuickAdd, editBill, editDebt } = useStore(
+  const { bills, debts, citations, subscriptions, resolveCitation, openQuickAdd, editBill, editDebt } = useStore(
     useShallow((s) => ({
       bills: s.bills,
       debts: s.debts,
       citations: s.citations,
+      subscriptions: s.subscriptions,
       resolveCitation: s.resolveCitation,
       openQuickAdd: s.openQuickAdd,
       editBill: s.editBill,
@@ -194,6 +196,27 @@ export default function Obligations() {
     ];
   }, [bills, debts, citations, scheduleBaseMs]);
 
+  const horizonBuckets = useMemo(
+    () =>
+      groupOutflowsByHorizon({
+        bills: bills || [],
+        subscriptions: subscriptions || [],
+        debts: debts || [],
+        citations: citations || [],
+        scheduleBaseMs,
+      }),
+    [bills, subscriptions, debts, citations, scheduleBaseMs],
+  );
+
+  const horizonTotals = useMemo(() => {
+    const sum = (items: { amount: number }[]) => items.reduce((s, i) => s + (i.amount || 0), 0);
+    return {
+      '0-30': sum(horizonBuckets['0-30']),
+      '31-60': sum(horizonBuckets['31-60']),
+      '61-90': sum(horizonBuckets['61-90']),
+    };
+  }, [horizonBuckets]);
+
   const filteredObligations = allObligations
     .filter(ob => activeTab === 'all' || ob.type === activeTab)
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
@@ -265,6 +288,48 @@ export default function Obligations() {
           </p>
         </div>
       </div>
+
+      <CollapsibleModule
+        title="Upcoming cash out (30 / 60 / 90 days)"
+        icon={CalendarDays}
+        defaultOpen={false}
+        extraHeader={
+          <TransitionLink
+            to="/calendar#calendar-view"
+            className="text-[10px] font-sans font-medium text-brand-violet hover:text-brand-violet/90 border border-brand-violet/30 rounded-sm px-2 py-0.5"
+          >
+            Month view →
+          </TransitionLink>
+        }
+      >
+        <div className="p-0 space-y-4">
+          <p className="text-xs text-content-tertiary leading-relaxed">
+            Totals include unpaid bills, active subscriptions, minimum debt payments with a due date, and open fines — same buckets as
+            the list below, grouped by days from today. The{' '}
+            <TransitionLink to="/calendar#calendar-view" className="text-brand-violet hover:underline">
+              Calendar
+            </TransitionLink>{' '}
+            shows the same items on specific dates.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {(
+              [
+                { key: '0-30' as const, label: 'Next 30 days' },
+                { key: '31-60' as const, label: '31–60 days' },
+                { key: '61-90' as const, label: '61–90 days' },
+              ] as const
+            ).map(({ key, label }) => (
+              <div key={key} className="rounded-sm border border-surface-border bg-surface-base p-4">
+                <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-2">{label}</p>
+                <p className="text-xl font-mono font-bold text-content-primary tabular-nums">
+                  ${horizonTotals[key].toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                </p>
+                <p className="text-[10px] font-mono text-content-muted mt-1">{horizonBuckets[key].length} line items</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </CollapsibleModule>
 
       {/* Debt Detonator Panel */}
       {debts.length > 0 && (

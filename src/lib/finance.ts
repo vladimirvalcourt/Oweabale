@@ -272,6 +272,236 @@ export function calcSurplusRouting(
 }
 
 // ---------------------------------------------------------------------------
+// Safe to spend (forward-looking, Reddit-aligned “what can I spend today?”)
+// ---------------------------------------------------------------------------
+
+function startOfDayUtc(d: Date): number {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x.getTime();
+}
+
+function parseDueMs(iso: string): number | null {
+  if (!iso?.trim()) return null;
+  const raw = iso.includes('T') ? iso : `${iso}T12:00:00`;
+  const t = new Date(raw).getTime();
+  return Number.isNaN(t) ? null : t;
+}
+
+export type SafeToSpendWindowMode = 'to_next_payday' | 'rest_of_month';
+
+export interface SafeToSpendResult {
+  /** Rough average per day you could spend after reserving known outflows in the window (not advice). */
+  dailySafeToSpend: number;
+  /** Liquid cash minus summed scheduled outflows with due dates inside the window. */
+  liquidAfterScheduled: number;
+  /** Sum of those scheduled outflows. */
+  scheduledOutflowsTotal: number;
+  /** Days used as denominator (min 1). */
+  daysInWindow: number;
+  /** Human label for the window end. */
+  windowEndLabel: string;
+  windowMode: SafeToSpendWindowMode;
+  /** Monthly surplus from {@link calcMonthlyCashFlow} (same month, modeled). */
+  monthlySurplus: number;
+}
+
+/**
+ * “Safe to spend / day” heuristic: (liquid cash − bills/subs/citations due before next payday) ÷ days until payday.
+ * If no active income with a next date, uses rest-of-calendar-month and bills due by month-end.
+ * Does not model investments, irregular gig income, or bank holds — show assumptions in UI.
+ */
+export function computeSafeToSpend(args: {
+  liquidCash: number;
+  monthlySurplus: number;
+  bills: Array<{ dueDate: string; amount: number; status?: string }>;
+  incomes: Array<{ nextDate: string; status: string }>;
+  subscriptions: Array<{ nextBillingDate: string; amount: number; status: string }>;
+  debts: Array<{ minPayment: number; remaining: number; paymentDueDate?: string | null }>;
+  citations: Array<{ status: string; daysLeft: number; amount: number }>;
+  scheduleBaseMs?: number;
+  now?: Date;
+}): SafeToSpendResult {
+  const now = args.now ?? new Date();
+  const todayMs = startOfDayUtc(now);
+
+  const activeIncomes = args.incomes.filter((i) => i.status === 'active' && i.nextDate?.trim());
+  const futurePaydays = activeIncomes
+    .map((i) => ({ ms: parseDueMs(i.nextDate)!, raw: i.nextDate }))
+    .filter((x) => x.ms >= todayMs)
+    .sort((a, b) => a.ms - b.ms);
+
+  let windowEndMs: number;
+  let windowMode: SafeToSpendWindowMode;
+  let windowEndLabel: string;
+
+  if (futurePaydays.length > 0) {
+    windowEndMs = futurePaydays[0].ms;
+    windowMode = 'to_next_payday';
+    windowEndLabel = new Date(windowEndMs).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  } else {
+    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+    windowEndMs = endOfMonth.getTime();
+    windowMode = 'rest_of_month';
+    windowEndLabel = endOfMonth.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+
+  const daysInWindow = Math.max(
+    1,
+    Math.ceil((windowEndMs - todayMs) / 86400000)
+  );
+
+  let scheduled = 0;
+
+  for (const b of args.bills) {
+    if (b.status === 'paid') continue;
+    const ms = parseDueMs(b.dueDate);
+    if (ms === null) continue;
+    if (ms >= todayMs && ms <= windowEndMs) {
+      scheduled += b.amount || 0;
+    }
+  }
+
+  for (const s of args.subscriptions) {
+    if (s.status !== 'active') continue;
+    const ms = parseDueMs(s.nextBillingDate);
+    if (ms === null) continue;
+    if (ms >= todayMs && ms <= windowEndMs) {
+      scheduled += s.amount || 0;
+    }
+  }
+
+  for (const d of args.debts) {
+    if ((d.remaining || 0) <= 0) continue;
+    const pdd = d.paymentDueDate?.trim();
+    if (!pdd) continue;
+    const ms = parseDueMs(pdd);
+    if (ms === null) continue;
+    if (ms >= todayMs && ms <= windowEndMs) {
+      scheduled += d.minPayment || 0;
+    }
+  }
+
+  const baseMs = args.scheduleBaseMs ?? Date.now();
+  for (const c of args.citations) {
+    if (c.status !== 'open') continue;
+    const ms = baseMs + c.daysLeft * 86400000;
+    if (ms >= todayMs && ms <= windowEndMs) {
+      scheduled += c.amount || 0;
+    }
+  }
+
+  const liquidAfter = (args.liquidCash || 0) - scheduled;
+  const daily = Math.max(0, liquidAfter) / daysInWindow;
+
+  return {
+    dailySafeToSpend: parseFloat(daily.toFixed(2)),
+    liquidAfterScheduled: parseFloat(liquidAfter.toFixed(2)),
+    scheduledOutflowsTotal: parseFloat(scheduled.toFixed(2)),
+    daysInWindow,
+    windowEndLabel,
+    windowMode,
+    monthlySurplus: parseFloat((args.monthlySurplus || 0).toFixed(2)),
+  };
+}
+
+export type HorizonBucket = '0-30' | '31-60' | '61-90';
+
+export interface HorizonLineItem {
+  id: string;
+  label: string;
+  amount: number;
+  dueMs: number;
+  kind: 'bill' | 'subscription' | 'debt' | 'citation';
+}
+
+/**
+ * Group cash outflows with a single known due date into 30 / 60 / 90 day buckets from today (start of day).
+ */
+export function groupOutflowsByHorizon(args: {
+  bills: Array<{ id: string; biller: string; dueDate: string; amount: number; status: string }>;
+  subscriptions: Array<{ id: string; name: string; nextBillingDate: string; amount: number; status: string }>;
+  debts: Array<{ id: string; name: string; minPayment: number; remaining: number; paymentDueDate?: string | null }>;
+  citations: Array<{ id: string; type: string; jurisdiction: string; daysLeft: number; amount: number; status: string }>;
+  scheduleBaseMs?: number;
+  now?: Date;
+}): Record<HorizonBucket, HorizonLineItem[]> {
+  const now = args.now ?? new Date();
+  const todayMs = startOfDayUtc(now);
+  const baseMs = args.scheduleBaseMs ?? Date.now();
+  const buckets: Record<HorizonBucket, HorizonLineItem[]> = { '0-30': [], '31-60': [], '61-90': [] };
+
+  const pushBucket = (item: HorizonLineItem) => {
+    const rel = item.dueMs - todayMs;
+    const day = rel / 86400000;
+    if (day < 0 || day > 90) return;
+    if (day <= 30) buckets['0-30'].push(item);
+    else if (day <= 60) buckets['31-60'].push(item);
+    else buckets['61-90'].push(item);
+  };
+
+  for (const b of args.bills) {
+    if (b.status === 'paid') continue;
+    const ms = parseDueMs(b.dueDate);
+    if (ms === null) continue;
+    pushBucket({
+      id: `bill-${b.id}`,
+      label: b.biller,
+      amount: b.amount || 0,
+      dueMs: ms,
+      kind: 'bill',
+    });
+  }
+
+  for (const s of args.subscriptions) {
+    if (s.status !== 'active') continue;
+    const ms = parseDueMs(s.nextBillingDate);
+    if (ms === null) continue;
+    pushBucket({
+      id: `sub-${s.id}`,
+      label: s.name,
+      amount: s.amount || 0,
+      dueMs: ms,
+      kind: 'subscription',
+    });
+  }
+
+  for (const d of args.debts) {
+    if ((d.remaining || 0) <= 0) continue;
+    const pdd = d.paymentDueDate?.trim();
+    if (!pdd) continue;
+    const ms = parseDueMs(pdd);
+    if (ms === null) continue;
+    pushBucket({
+      id: `debt-${d.id}`,
+      label: `${d.name} (min)`,
+      amount: d.minPayment || 0,
+      dueMs: ms,
+      kind: 'debt',
+    });
+  }
+
+  for (const c of args.citations) {
+    if (c.status !== 'open') continue;
+    const ms = baseMs + c.daysLeft * 86400000;
+    pushBucket({
+      id: `cit-${c.id}`,
+      label: `${c.type} — ${c.jurisdiction}`,
+      amount: c.amount || 0,
+      dueMs: ms,
+      kind: 'citation',
+    });
+  }
+
+  const sortByDue = (a: HorizonLineItem, b: HorizonLineItem) => a.dueMs - b.dueMs;
+  buckets['0-30'].sort(sortByDue);
+  buckets['31-60'].sort(sortByDue);
+  buckets['61-90'].sort(sortByDue);
+
+  return buckets;
+}
+
+// ---------------------------------------------------------------------------
 // projectNetWorth
 // ---------------------------------------------------------------------------
 

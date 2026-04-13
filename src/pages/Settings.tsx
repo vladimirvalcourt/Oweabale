@@ -12,6 +12,51 @@ import BankConnection from '../components/BankConnection';
 
 type Tab = 'profile' | 'notifications' | 'security' | 'billing' | 'financial' | 'privacy' | 'integrations' | 'rules' | 'support' | 'feedback';
 
+const NOTIF_PREFS_STORAGE_KEY = 'oweable_notification_prefs_v1';
+
+const DEFAULT_NOTIF_PREFS: Record<
+  | 'bill-reminders'
+  | 'weekly-summary'
+  | 'new-login'
+  | 'push-reminders'
+  | 'push-payments'
+  | 'sniper-increase'
+  | 'sniper-renewal'
+  | 'detonator-milestone'
+  | 'detonator-rate',
+  boolean
+> = {
+  'bill-reminders': true,
+  'weekly-summary': true,
+  'new-login': true,
+  'push-reminders': true,
+  'push-payments': false,
+  'sniper-increase': true,
+  'sniper-renewal': true,
+  'detonator-milestone': true,
+  'detonator-rate': true,
+};
+
+type NotifPrefKey = keyof typeof DEFAULT_NOTIF_PREFS;
+
+function loadNotifPrefs(): Record<NotifPrefKey, boolean> {
+  if (typeof window === 'undefined') {
+    return { ...DEFAULT_NOTIF_PREFS };
+  }
+  try {
+    const raw = localStorage.getItem(NOTIF_PREFS_STORAGE_KEY);
+    if (!raw) return { ...DEFAULT_NOTIF_PREFS };
+    const parsed = JSON.parse(raw) as Partial<Record<NotifPrefKey, boolean>>;
+    const next = { ...DEFAULT_NOTIF_PREFS };
+    for (const k of Object.keys(DEFAULT_NOTIF_PREFS) as NotifPrefKey[]) {
+      if (typeof parsed[k] === 'boolean') next[k] = parsed[k];
+    }
+    return next;
+  } catch {
+    return { ...DEFAULT_NOTIF_PREFS };
+  }
+}
+
 interface SupportTicket {
   id: string;
   subject: string;
@@ -93,18 +138,15 @@ export default function Settings() {
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
   const [feedbackForm, setFeedbackForm] = useState({ type: 'general', rating: 0, message: '' });
 
-  // Controlled state for preference checkboxes (persisted in-session)
-  const [notifPrefs, setNotifPrefs] = useState({
-    'bill-reminders': true,
-    'weekly-summary': true,
-    'new-login': true,
-    'push-reminders': true,
-    'push-payments': false,
-    'sniper-increase': true,
-    'sniper-renewal': true,
-    'detonator-milestone': true,
-    'detonator-rate': true,
-  });
+  const [notifPrefs, setNotifPrefs] = useState(loadNotifPrefs);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(NOTIF_PREFS_STORAGE_KEY, JSON.stringify(notifPrefs));
+    } catch {
+      /* quota / private mode */
+    }
+  }, [notifPrefs]);
   const [privacyMode, setPrivacyMode] = useState(false);
   const [biometrics, setBiometrics] = useState(false);
 
@@ -622,6 +664,11 @@ export default function Settings() {
 
           {activeTab === 'notifications' && (
             <div className="space-y-6">
+              <p className="text-xs text-content-tertiary leading-relaxed border border-surface-border rounded-sm bg-surface-base px-4 py-3">
+                Preferences are saved in this browser (<code className="text-content-secondary">localStorage</code>). Delivery
+                (email / push) is described in <code className="text-content-secondary">docs/ALERTS_PIPELINE.md</code> — server
+                jobs will read the same flags once synced to your profile.
+              </p>
               <CollapsibleModule title="Email Notifications" icon={Mail} defaultOpen={true}>
                 <p className="text-sm text-content-tertiary mb-6">Choose what updates you want to receive via email.</p>
                 <div className="space-y-6">
@@ -640,7 +687,7 @@ export default function Settings() {
                           id={item.id}
                           type="checkbox"
                           checked={notifPrefs[item.id]}
-                          onChange={(e) => { setNotifPrefs(p => ({ ...p, [item.id]: e.target.checked })); toast.success('Preference updated'); }}
+                          onChange={(e) => { setNotifPrefs(p => ({ ...p, [item.id]: e.target.checked })); }}
                           className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                         />
                       </div>
@@ -666,7 +713,7 @@ export default function Settings() {
                           id={item.id}
                           type="checkbox"
                           checked={notifPrefs[item.id]}
-                          onChange={(e) => { setNotifPrefs(p => ({ ...p, [item.id]: e.target.checked })); toast.success('Preference updated'); }}
+                          onChange={(e) => { setNotifPrefs(p => ({ ...p, [item.id]: e.target.checked })); }}
                           className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                         />
                       </div>
@@ -694,7 +741,7 @@ export default function Settings() {
                           id={item.id}
                           type="checkbox"
                           checked={notifPrefs[item.id]}
-                          onChange={(e) => { setNotifPrefs(p => ({ ...p, [item.id]: e.target.checked })); toast.success('Smart alert updated'); }}
+                          onChange={(e) => { setNotifPrefs(p => ({ ...p, [item.id]: e.target.checked })); }}
                           className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                         />
                       </div>

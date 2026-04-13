@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { createPlaidLinkToken, exchangePlaidPublicToken } from '../lib/plaid';
 import { isPlaidLinkUiEnabled } from '../lib/featureFlags';
 
-/** When Plaid UI is off, show coming-soon; still allow disconnect if a link exists from earlier testing. */
+/** When Plaid UI is off, manual-first copy; still allow disconnect if a link exists from earlier testing. */
 function BankConnectionGated() {
   const { bankConnected, plaidInstitutionName, disconnectBank } = useStore();
   const [isDisconnecting, setIsDisconnecting] = useState(false);
@@ -25,8 +25,10 @@ function BankConnectionGated() {
     <div className="bg-surface-elevated rounded-sm border border-surface-border p-6">
       <h3 className="text-sm font-sans font-semibold text-content-primary">Bank connections</h3>
       <p className="mt-2 text-sm text-content-tertiary leading-relaxed">
-        Automatic bank linking isn&apos;t available yet. We&apos;re finishing the integration and will enable it here when
-        it&apos;s ready.
+        Oweable works without linking a bank: add bills and debts manually, import transactions via CSV, and use document
+        uploads where you need them. Optional automatic sync via Plaid appears here when{' '}
+        <code className="text-xs text-content-secondary">VITE_PLAID_LINK_UI_ENABLED=true</code> is enabled for your
+        deployment — until then, treat bank linking as off by default.
       </p>
       {bankConnected && (
         <div className="mt-4 rounded-sm border border-surface-border bg-surface-base p-4">
