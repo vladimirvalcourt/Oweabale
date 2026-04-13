@@ -8,17 +8,33 @@ export type OweAiResult =
   | { type: 'blocked'; message: string; code: string }
   | { type: 'disabled'; message: string };
 
-async function parseFunctionsError(err: FunctionsHttpError): Promise<{
+/** Supabase sets `error.context` to the fetch Response for HTTP errors. */
+function responseFromFunctionsError(e: unknown): Response | null {
+  if (e instanceof FunctionsHttpError) {
+    return e.context instanceof Response ? e.context : null;
+  }
+  if (typeof e === 'object' && e !== null && 'context' in e) {
+    const c = (e as { context: unknown }).context;
+    return c instanceof Response ? c : null;
+  }
+  return null;
+}
+
+async function readErrorResponseBody(res: Response): Promise<{
   status: number;
   body: Record<string, unknown>;
 }> {
-  const res = err.context as Response;
+  const status = res.status;
   try {
-    const clone = res.clone();
-    const body = (await clone.json()) as Record<string, unknown>;
-    return { status: res.status, body };
+    const raw = await res.text();
+    if (!raw.trim()) return { status, body: {} };
+    try {
+      return { status, body: JSON.parse(raw) as Record<string, unknown> };
+    } catch {
+      return { status, body: { error: raw.slice(0, 500) } };
+    }
   } catch {
-    return { status: res.status, body: {} };
+    return { status, body: {} };
   }
 }
 
@@ -28,31 +44,38 @@ export async function invokeOweAi(messages: OweAiChatMessage[]): Promise<OweAiRe
 
   let { data, error } = await doInvoke();
 
-  if (error instanceof FunctionsHttpError) {
-    const st = error.context.status;
-    if (st === 401 || st === 403) {
-      const { error: refreshErr } = await supabase.auth.refreshSession();
-      if (!refreshErr) {
-        ({ data, error } = await doInvoke());
-      }
+  const httpRes = responseFromFunctionsError(error);
+  if (httpRes && (httpRes.status === 401 || httpRes.status === 403)) {
+    const { error: refreshErr } = await supabase.auth.refreshSession();
+    if (!refreshErr) {
+      ({ data, error } = await doInvoke());
     }
   }
 
   if (error) {
-    if (error instanceof FunctionsHttpError) {
-      const { status, body: b } = await parseFunctionsError(error);
-      if (status === 422 && typeof b.message === 'string') {
+    const res = responseFromFunctionsError(error);
+    if (res) {
+      const { status, body: b } = await readErrorResponseBody(res);
+      if (status === 422 && typeof b.message === 'string' && b.message.trim()) {
         return {
           type: 'blocked',
-          message: b.message,
+          message: b.message.trim(),
           code: typeof b.error === 'string' ? b.error : 'OFF_TOPIC',
         };
       }
       if (status === 503 && b.error === 'AI_DISABLED' && typeof b.message === 'string') {
         return { type: 'disabled', message: b.message };
       }
-      const errStr = typeof b.error === 'string' ? b.error : error.message;
-      throw new Error(errStr || error.message);
+      const serverMsg =
+        typeof b.message === 'string' && b.message.trim()
+          ? b.message.trim()
+          : typeof b.error === 'string' && b.error.trim()
+            ? b.error.trim()
+            : null;
+      if (serverMsg) {
+        throw new Error(serverMsg);
+      }
+      throw new Error(`Owe-AI is temporarily unavailable (${status}). Please try again.`);
     }
     throw new Error(error.message);
   }

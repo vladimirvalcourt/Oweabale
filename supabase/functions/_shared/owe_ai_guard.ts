@@ -19,10 +19,10 @@ const OFF_TOPIC_BLOCKLIST: RegExp[] = [
 
 /** Domain terms: money / obligations / app data. */
 const FINANCE_DOMAIN =
-  /\b(bill|bills|biller|debt|debts|loan|loans|budget|budgets|save|saving|spend|spending|expense|income|paycheck|salary|wage|subscription|subscriptions|cash|checking|savings|liquid|afford|due|payment|payments|min(imum)?\s+payment|apr|interest|credit\s*card|mortgage|rent|utility|utilities|electric|grocer|tax|taxes|1099|freelance|invoice|goal|goals|transaction|transactions|category|categories|net\s*worth|asset|assets|balance|surplus|deficit|overdraft|401k|ira|roth|invest|investment|portfolio|crypto|bitcoin|stock|stocks|ticker|cite|citation|fine|fines|ticket|owe|owed|obligation|cash\s*flow|safe\s*to\s*spend|disposable)\b/i;
+  /\b(bill|bills|biller|debt|debts|loan|loans|budget|budgets|save|saving|spend|spending|expense|income|paycheck|salary|wage|subscription|subscriptions|cash|checking|savings|liquid|afford|buy|buys|buying|bought|purchase|purchases|shopping|shop|splurge|due|payment|payments|min(imum)?\s+payment|apr|interest|credit\s*card|mortgage|rent|utility|utilities|electric|grocer|tax|taxes|1099|freelance|invoice|goal|goals|transaction|transactions|category|categories|net\s*worth|asset|assets|balance|surplus|deficit|overdraft|401k|ira|roth|invest|investment|portfolio|crypto|bitcoin|stock|stocks|ticker|cite|citation|fine|fines|ticket|owe|owed|obligation|cash\s*flow|safe\s*to\s*spend|disposable)\b/i;
 
 const PERSONAL_OR_APP =
-  /\b(i|i'?m|i'?ve|i'?d|my|me|mine|our|ours|myself|we|we'?re)\b|\b(oweable|my\s+data|my\s+account|this\s+app|in\s+oweable|on\s+my\s+dashboard|my\s+records|what\s+i\s+have|how\s+much\s+do\s+i|how\s+am\s+i\s+doing|can\s+i\s+afford)\b/i;
+  /\b(i|i'?m|i'?ve|i'?d|my|me|mine|our|ours|myself|we|we'?re)\b|\b(oweable|my\s+data|my\s+account|this\s+app|in\s+oweable|on\s+my\s+dashboard|my\s+records|what\s+i\s+have|how\s+much\s+do\s+i|how\s+am\s+i\s+doing|can\s+i\s+afford|what\s+can\s+i|should\s+i\s+buy|can\s+i\s+buy|can\s+i\s+get)\b/i;
 
 /** Questions about concrete records without always saying "my". */
 const DATA_QUERY =
