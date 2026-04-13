@@ -337,12 +337,26 @@ Deno.serve(async (req: Request) => {
     if (!authHeader?.startsWith('Bearer ')) {
       throw new Error('Missing Authorization header');
     }
-    const jwt = authHeader.replace('Bearer ', '');
+    const jwt = authHeader.replace('Bearer ', '').trim();
+    if (!jwt) {
+      return new Response(JSON.stringify({ error: 'Unauthorized', message: 'Missing session token.' }), {
+        status: 401,
+        headers: { ...ch, 'Content-Type': 'application/json' },
+      });
+    }
     const {
       data: { user },
       error: authError,
     } = await supabaseAdmin.auth.getUser(jwt);
-    if (authError || !user) throw new Error('Unauthorized');
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({
+          error: 'INVALID_SESSION',
+          message: 'Your session expired. Refresh the page or sign in again.',
+        }),
+        { status: 401, headers: { ...ch, 'Content-Type': 'application/json' } },
+      );
+    }
 
     const body = (await req.json().catch(() => ({}))) as { messages?: unknown };
     const messages = sanitizeMessages(body.messages);

@@ -378,6 +378,12 @@ verify_jwt = false
 [functions.plaid-sync]
 verify_jwt = false
 
+# Owe-AI validates the user JWT inside the function (getUser). Disabling gateway JWT
+# verification avoids stale/expired edge rejection ("Invalid JWT") while the browser
+# still has a refreshable session; Authorization is still required.
+[functions.owe-ai]
+verify_jwt = false
+
 [experimental]
 # Configures Postgres storage engine to use OrioleDB (S3)
 orioledb_version = ""

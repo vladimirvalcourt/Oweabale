@@ -38,24 +38,91 @@ async function readErrorResponseBody(res: Response): Promise<{
   }
 }
 
+/** Fresh access token for Edge Functions (gateway often rejects expired JWTs). */
+async function authHeadersForFunctions(): Promise<
+  { headers: Record<string, string> } | { error: string }
+> {
+  const refreshAndToken = async () => {
+    const { data, error } = await supabase.auth.refreshSession();
+    const t = data.session?.access_token;
+    if (error || !t) return null;
+    return t;
+  };
+
+  const { data: sessionData, error: sessionErr } = await supabase.auth.getSession();
+  let token = sessionData.session?.access_token ?? null;
+
+  if (sessionErr || !token) {
+    token = await refreshAndToken();
+    if (!token) return { error: 'Sign in to use Owe-AI.' };
+    return { headers: { Authorization: `Bearer ${token}` } };
+  }
+
+  const exp = sessionData.session?.expires_at;
+  const now = Math.floor(Date.now() / 1000);
+  if (exp != null && exp - now < 120) {
+    const t2 = await refreshAndToken();
+    if (t2) token = t2;
+  }
+
+  return { headers: { Authorization: `Bearer ${token}` } };
+}
+
+function bodyImpliesInvalidSession(b: Record<string, unknown>): boolean {
+  const e = typeof b.error === 'string' ? b.error.toLowerCase() : '';
+  const m = typeof b.message === 'string' ? b.message.toLowerCase() : '';
+  return (
+    e.includes('jwt') ||
+    m.includes('jwt') ||
+    e.includes('unauthorized') ||
+    (e.includes('invalid') && e.includes('token'))
+  );
+}
+
 export async function invokeOweAi(messages: OweAiChatMessage[]): Promise<OweAiResult> {
-  const body = { messages };
-  const doInvoke = () => supabase.functions.invoke('owe-ai', { body });
+  const payload = { messages };
 
-  let { data, error } = await doInvoke();
+  const invokeOnce = async () => {
+    const auth = await authHeadersForFunctions();
+    if ('error' in auth) {
+      return { data: null, error: new Error(auth.error) } as const;
+    }
+    return supabase.functions.invoke('owe-ai', { body: payload, headers: auth.headers });
+  };
 
-  const httpRes = responseFromFunctionsError(error);
-  if (httpRes && (httpRes.status === 401 || httpRes.status === 403)) {
-    const { error: refreshErr } = await supabase.auth.refreshSession();
-    if (!refreshErr) {
-      ({ data, error } = await doInvoke());
+  let { data, error } = await invokeOnce();
+  let parsed: { status: number; body: Record<string, unknown> } | null = null;
+
+  if (error) {
+    const res = responseFromFunctionsError(error);
+    if (res) parsed = await readErrorResponseBody(res);
+
+    const needRefresh =
+      parsed &&
+      (parsed.status === 401 ||
+        parsed.status === 403 ||
+        bodyImpliesInvalidSession(parsed.body));
+
+    if (needRefresh) {
+      const { error: refErr } = await supabase.auth.refreshSession();
+      if (!refErr) {
+        ({ data, error } = await invokeOnce());
+        parsed = null;
+        if (error) {
+          const res2 = responseFromFunctionsError(error);
+          if (res2) parsed = await readErrorResponseBody(res2);
+        }
+      }
     }
   }
 
   if (error) {
-    const res = responseFromFunctionsError(error);
-    if (res) {
-      const { status, body: b } = await readErrorResponseBody(res);
+    if (!parsed) {
+      const res = responseFromFunctionsError(error);
+      if (res) parsed = await readErrorResponseBody(res);
+    }
+    if (parsed) {
+      const { status, body: b } = parsed;
       if (status === 422 && typeof b.message === 'string' && b.message.trim()) {
         return {
           type: 'blocked',
@@ -73,9 +140,15 @@ export async function invokeOweAi(messages: OweAiChatMessage[]): Promise<OweAiRe
             ? b.error.trim()
             : null;
       if (serverMsg) {
+        if (/jwt|invalid.*token|session/i.test(serverMsg)) {
+          throw new Error('Your session expired. Please refresh the page or sign in again.');
+        }
         throw new Error(serverMsg);
       }
       throw new Error(`Owe-AI is temporarily unavailable (${status}). Please try again.`);
+    }
+    if (/jwt/i.test(error.message)) {
+      throw new Error('Your session expired. Please refresh the page or sign in again.');
     }
     throw new Error(error.message);
   }
@@ -91,6 +164,9 @@ export async function invokeOweAi(messages: OweAiChatMessage[]): Promise<OweAiRe
     return { type: 'reply', text: d.reply.trim() };
   }
   if (typeof d?.error === 'string') {
+    if (/jwt|invalid.*token/i.test(d.error)) {
+      throw new Error('Your session expired. Please refresh the page or sign in again.');
+    }
     throw new Error(d.error);
   }
   throw new Error('Unexpected response from Owe-AI.');
