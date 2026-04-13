@@ -81,38 +81,25 @@ export default function OweAi() {
   );
 
   return (
-    <div className="flex flex-col gap-4 min-h-[calc(100dvh-12rem)] max-w-3xl mx-auto w-full">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+    <div className="min-h-[calc(100dvh-12rem)] max-w-3xl mx-auto w-full flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 p-2 rounded-lg bg-violet-500/10 border border-violet-500/20">
-            <Sparkles className="w-5 h-5 text-violet-400" aria-hidden />
+          <div className="mt-0.5 h-9 w-9 rounded-full bg-violet-500/12 border border-violet-500/30 inline-flex items-center justify-center">
+            <Sparkles className="w-4.5 h-4.5 text-violet-400" aria-hidden />
           </div>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-content-primary">Owe-AI</h1>
-            <p className="text-sm text-content-tertiary mt-1 max-w-xl">
+            <h1 className="text-xl font-semibold tracking-tight text-content-primary leading-none">Owe-AI</h1>
+            <p className="text-sm text-content-tertiary mt-1.5 max-w-xl">
               Ask about <strong className="text-content-secondary">your</strong> bills, cash flow, debts, budgets, and
               goals. Replies are based on what you&apos;ve saved in Oweable.
             </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {QUICK_PROMPTS.map((prompt) => (
-                <button
-                  key={prompt}
-                  type="button"
-                  onClick={() => useQuickPrompt(prompt)}
-                  disabled={loading}
-                  className="text-xs border border-surface-border bg-surface-raised/70 text-content-secondary px-2.5 py-1.5 rounded-md hover:bg-surface-elevated hover:text-content-primary transition-colors disabled:opacity-40 disabled:pointer-events-none"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
           </div>
         </div>
         {messages.length > 0 && (
           <button
             type="button"
             onClick={clearChat}
-            className="shrink-0 inline-flex items-center gap-2 text-xs text-content-tertiary hover:text-content-secondary border border-surface-border rounded-md px-3 py-1.5 transition-colors"
+            className="shrink-0 inline-flex items-center gap-2 text-xs text-content-tertiary hover:text-content-secondary border border-surface-border rounded-full px-3 py-1.5 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" aria-hidden />
             Clear chat
@@ -121,26 +108,31 @@ export default function OweAi() {
       </div>
 
       <div
-        className="flex-1 min-h-[280px] max-h-[min(56dvh,520px)] overflow-y-auto rounded-xl border border-surface-border bg-surface-raised/40 p-4 space-y-4"
+        className="relative flex-1 min-h-[320px] max-h-[min(58dvh,560px)] overflow-y-auto rounded-3xl border border-surface-border bg-gradient-to-b from-surface-raised/70 to-surface-base/90 px-4 py-5 space-y-3"
         aria-live="polite"
       >
+        <div className="sticky top-0 z-10 -mx-4 -mt-5 mb-2 px-4 py-2 bg-gradient-to-b from-surface-base/90 to-transparent backdrop-blur-[1px]">
+          <p className="text-[11px] uppercase tracking-[0.14em] text-content-muted">Conversation</p>
+        </div>
         {messages.length === 0 && !loading && (
-          <p className="text-sm text-content-tertiary text-center py-12 px-4">
-            Try: “What can I safely buy this week?”, “Explain APR in simple words,” or “How should I budget based on my
-            spending?”
-          </p>
+          <div className="h-full min-h-[220px] flex items-center justify-center px-4">
+            <p className="text-sm text-content-tertiary text-center max-w-md leading-relaxed">
+              Start a chat like iMessage. Try asking what you can safely buy this week or ask for financial education in
+              plain language.
+            </p>
+          </div>
         )}
         {messages.map((m, i) => (
           <div
             key={`${m.role}-${i}-${m.content.slice(0, 24)}`}
-            className={cn('flex', m.role === 'user' ? 'justify-end' : 'justify-start')}
+            className={cn('flex w-full', m.role === 'user' ? 'justify-end' : 'justify-start')}
           >
             <div
               className={cn(
-                'max-w-[92%] rounded-lg px-3 py-2 text-sm',
+                'max-w-[84%] px-4 py-2.5 text-sm shadow-sm',
                 m.role === 'user'
-                  ? 'bg-violet-600/25 text-content-primary border border-violet-500/25'
-                  : 'bg-surface-base text-content-secondary border border-surface-border',
+                  ? 'rounded-[22px] rounded-br-md bg-brand-cta text-white border border-indigo-300/20'
+                  : 'rounded-[22px] rounded-bl-md bg-surface-elevated/95 text-content-secondary border border-surface-border',
               )}
             >
               {m.role === 'assistant' ? (
@@ -155,7 +147,7 @@ export default function OweAi() {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-tertiary">
+            <div className="inline-flex items-center gap-2 rounded-[18px] rounded-bl-md border border-surface-border bg-surface-elevated/95 px-3 py-2 text-sm text-content-tertiary">
               <Loader2 className="w-4 h-4 animate-spin" aria-hidden />
               Thinking…
             </div>
@@ -164,11 +156,25 @@ export default function OweAi() {
         <div ref={bottomRef} />
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        {QUICK_PROMPTS.map((prompt) => (
+          <button
+            key={prompt}
+            type="button"
+            onClick={() => useQuickPrompt(prompt)}
+            disabled={loading}
+            className="text-xs rounded-full border border-surface-border bg-surface-raised/70 text-content-secondary px-3 py-1.5 hover:bg-surface-elevated hover:text-content-primary transition-colors disabled:opacity-40 disabled:pointer-events-none"
+          >
+            {prompt}
+          </button>
+        ))}
+      </div>
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
         <label htmlFor="owe-ai-input" className="sr-only">
           Message to Owe-AI
         </label>
-        <div className="flex gap-2">
+        <div className="rounded-full border border-surface-border bg-surface-raised px-2 py-1.5 flex items-end gap-2">
           <textarea
             id="owe-ai-input"
             rows={2}
@@ -184,12 +190,12 @@ export default function OweAi() {
             }}
             placeholder="Ask about your finances in Oweable…"
             disabled={loading}
-            className="flex-1 resize-none rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary placeholder:text-content-muted focus-app disabled:opacity-50"
+            className="flex-1 resize-none bg-transparent px-3 py-2 text-sm text-content-primary placeholder:text-content-muted focus:outline-none disabled:opacity-50 max-h-28"
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="shrink-0 self-end h-10 w-10 inline-flex items-center justify-center rounded-lg bg-violet-600 text-white hover:bg-violet-500 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+            className="shrink-0 h-9 w-9 inline-flex items-center justify-center rounded-full bg-brand-cta text-white hover:bg-brand-cta-hover disabled:opacity-40 disabled:pointer-events-none transition-colors mb-1"
             aria-label="Send message"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
