@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
-    "@huggingface/transformers": "^4.0.1",
     "@supabase/supabase-js": "^2.101.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.14",

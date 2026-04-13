@@ -15,7 +15,6 @@ import { sanitizeUrl } from '../lib/security';
 import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting, computeSafeToSpend } from '../lib/finance';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { AppPageShell } from '../components/AppPageShell';
-import { AffordabilityInsight } from '../components/AffordabilityInsight';
 
 import type { Citation } from '../store/useStore';
 
@@ -500,10 +499,16 @@ export default function Dashboard() {
             full formula and edge cases.
           </p>
         </details>
-      </div>
-
-      <div className="mb-6">
-        <AffordabilityInsight />
+        <p className="mt-4 text-xs text-content-tertiary">
+          Wondering if you can afford a specific purchase?{' '}
+          <TransitionLink
+            to="/owe-ai"
+            className="text-emerald-200/90 hover:text-emerald-100 underline underline-offset-2 font-medium focus-app rounded-sm"
+          >
+            Ask Owe-AI
+          </TransitionLink>{' '}
+          — it answers from your saved Oweable data, not a web search.
+        </p>
       </div>
 
       <h2 className="section-label pl-1 mb-3">Core Financials</h2>

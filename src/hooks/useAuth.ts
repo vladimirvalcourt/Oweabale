@@ -137,7 +137,7 @@ export function useAuth(): AuthState {
     };
 
     // Include pointerdown/click/wheel/focusin so typing, tapping, wheel-scrolling, and focusing fields
-    // count as activity (avoids surprise sign-out while using forms like “Can I afford this?”).
+    // count as activity (avoids surprise sign-out while using forms or chat).
     const events = [
       'mousedown',
       'pointerdown',
