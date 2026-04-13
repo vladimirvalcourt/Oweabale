@@ -67,15 +67,8 @@ export interface FinanceInsightsResponse {
   verdict: AffordabilityVerdict;
   reasons: string[];
   narrative: string;
-  model: string | null;
-  aiEnabled?: boolean;
-  /** HF model id used or configured for narration (Router API). Present when Edge Function is updated. */
-  narrationModelId?: string;
   message?: string;
 }
-
-/** Default HF model if `HF_INFERENCE_MODEL` is unset — keep in sync with `finance-insights` Edge Function. */
-export const FINANCE_INSIGHTS_DEFAULT_HF_MODEL = 'meta-llama/Meta-Llama-3.1-8B-Instruct';
 
 export async function invokeFinanceInsights(
   purchaseAmount: number,

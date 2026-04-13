@@ -6,8 +6,6 @@ import {
   computeSafeToSpend,
 } from '../_shared/finance_safe_to_spend.ts';
 
-const HF_ROUTER = 'https://router.huggingface.co/v1/chat/completions';
-
 function num(v: unknown, fallback = 0): number {
   const n = typeof v === 'number' ? v : Number(v);
   return Number.isFinite(n) ? n : fallback;
@@ -29,7 +27,7 @@ function citationDaysLeft(row: Record<string, unknown>): number {
   return Math.round(num(row.days_left ?? row.daysLeft));
 }
 
-function fallbackNarrative(
+function buildNarrative(
   verdict: string,
   purchaseAmount: number,
   reasons: string[],
@@ -63,10 +61,6 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const hfToken = Deno.env.get('HF_TOKEN')?.trim();
-    const hfModel =
-      Deno.env.get('HF_INFERENCE_MODEL')?.trim() || 'meta-llama/Meta-Llama-3.1-8B-Instruct';
-
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     if (!supabaseUrl || !serviceKey) {
@@ -200,68 +194,10 @@ Deno.serve(async (req: Request) => {
       reasons,
     };
 
-    if (!hfToken) {
-      return new Response(
-        JSON.stringify({
-          ...facts,
-          narrative: fallbackNarrative(verdict, purchaseAmount, reasons, safe, liquidCash),
-          model: null,
-          aiEnabled: false,
-          /** Which HF model id would be used when HF_TOKEN is set (same as HF_INFERENCE_MODEL or default). */
-          narrationModelId: hfModel,
-        }),
-        { status: 200, headers: { ...ch, 'Content-Type': 'application/json' } },
-      );
-    }
-
-    const systemPrompt =
-      'You are a concise finance explainer for the app Oweable. Rules: (1) Do NOT invent or change any numbers—only use values in the JSON facts. (2) The verdict (yes/caution/no) is already decided by the app; explain it in plain language in 2–4 short paragraphs. (3) No investment, tax, or legal advice. (4) Say this is informational only, not professional advice. (5) Do not use Markdown headings; plain text or light emphasis only.';
-
-    const userPrompt = `FACTS (JSON, authoritative):\n${JSON.stringify(facts, null, 2)}\n\nExplain for the user.`;
-
-    let narrative = '';
-    try {
-      const hfRes = await fetch(HF_ROUTER, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${hfToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: hfModel,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt },
-          ],
-          max_tokens: 400,
-          temperature: 0.35,
-        }),
-      });
-
-      if (!hfRes.ok) {
-        const errText = await hfRes.text();
-        console.error('[finance-insights] HF error', hfRes.status, errText.slice(0, 500));
-        narrative = fallbackNarrative(verdict, purchaseAmount, reasons, safe, liquidCash);
-      } else {
-        const hfJson = (await hfRes.json()) as {
-          choices?: Array<{ message?: { content?: string } }>;
-        };
-        narrative =
-          hfJson.choices?.[0]?.message?.content?.trim() ||
-          fallbackNarrative(verdict, purchaseAmount, reasons, safe, liquidCash);
-      }
-    } catch (e) {
-      console.error('[finance-insights] HF fetch failed', e);
-      narrative = fallbackNarrative(verdict, purchaseAmount, reasons, safe, liquidCash);
-    }
-
     return new Response(
       JSON.stringify({
         ...facts,
-        narrative,
-        model: hfModel,
-        aiEnabled: true,
-        narrationModelId: hfModel,
+        narrative: buildNarrative(verdict, purchaseAmount, reasons, safe, liquidCash),
       }),
       { status: 200, headers: { ...ch, 'Content-Type': 'application/json' } },
     );

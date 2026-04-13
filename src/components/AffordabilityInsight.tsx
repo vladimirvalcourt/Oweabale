@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { Sparkles, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import {
-  invokeFinanceInsights,
-  FINANCE_INSIGHTS_DEFAULT_HF_MODEL,
-  type AffordabilityVerdict,
-} from '../lib/financeInsights';
+import { invokeFinanceInsights, type AffordabilityVerdict } from '../lib/financeInsights';
 
 function verdictStyles(v: AffordabilityVerdict): string {
   if (v === 'yes') return 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200';
@@ -53,12 +49,6 @@ export function AffordabilityInsight() {
         <Sparkles className="h-4 w-4 shrink-0 text-indigo-400" aria-hidden />
         <p className="metric-label normal-case text-indigo-200/90">Can I afford this?</p>
       </div>
-      <p className="text-[10px] text-content-muted leading-relaxed mb-4">
-        Optional wording may use Hugging Face Inference on the server when configured. Default model is{' '}
-        <span className="font-mono text-content-tertiary">{FINANCE_INSIGHTS_DEFAULT_HF_MODEL}</span> unless your project
-        sets another id.
-      </p>
-
       <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
         <div className="flex-1 min-w-0">
           <label htmlFor="afford-amount" className="block text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">
@@ -106,14 +96,6 @@ export function AffordabilityInsight() {
             >
               {verdictLabel(result.verdict)}
             </span>
-            {result.aiEnabled === false && (
-              <span className="text-[10px] text-content-muted">Summary from your numbers only (HF narration off)</span>
-            )}
-            {(result.narrationModelId ?? result.model) && (
-              <span className="text-[10px] font-mono text-content-muted">
-                HF model: {result.narrationModelId ?? result.model}
-              </span>
-            )}
           </div>
           <ul className="text-xs text-content-secondary list-disc pl-4 space-y-1">
             {result.reasons.map((r, i) => (
@@ -122,8 +104,8 @@ export function AffordabilityInsight() {
           </ul>
           <div className="text-sm text-content-primary whitespace-pre-wrap leading-relaxed">{result.narrative}</div>
           <p className="text-[10px] text-content-muted leading-relaxed">
-            Not financial, tax, or legal advice. Numbers come from your Oweable data and app rules; the model only
-            narrates when enabled.
+            Not financial, tax, or legal advice. Numbers come from your Oweable data and the same rules as safe to
+            spend.
           </p>
         </div>
       )}

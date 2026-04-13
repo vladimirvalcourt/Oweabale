@@ -9,7 +9,7 @@ Ship **one high-trust, read-only feature** before any broad “chat with your fi
 - **Input**: A single purchase amount (and optional category).
 - **Logic**: Deterministic + explainable — uses existing aggregates from the store (liquid cash, `computeSafeToSpend`, upcoming bills in window, optional monthly surplus from `calcMonthlyCashFlow`). No brokerage of trades, no executing payments.
 - **Output**: Yes / no / caution with **explicit assumptions** (same style as Dashboard safe-to-spend disclosure).
-- **Safety**: No open-ended tool calls; no sending user data to a model beyond the minimal structured summary you already show in the UI.
+- **Safety**: No open-ended tool calls; affordability copy is rule-based from your stored aggregates only.
 
 ### De-prioritize: **Open-ended finance chat**
 
@@ -26,4 +26,4 @@ Ship **one high-trust, read-only feature** before any broad “chat with your fi
 
 - `src/lib/finance.ts` — `computeSafeToSpend`, `calcMonthlyCashFlow`, `groupOutflowsByHorizon`.
 - Dashboard safe-to-spend card — pattern for disclosures.
-- **Shipped:** `supabase/functions/finance-insights` loads the user’s rows from Postgres, recomputes the same math (`_shared/finance_safe_to_spend.ts`), classifies yes/caution/no, then optionally calls Hugging Face Inference (`HF_TOKEN`, `HF_INFERENCE_MODEL`) to narrate—without changing numbers. UI: Dashboard **Can I afford this?** (`src/components/AffordabilityInsight.tsx`).
+- **Shipped:** `supabase/functions/finance-insights` loads the user’s rows from Postgres, recomputes the same math (`_shared/finance_safe_to_spend.ts`), classifies yes/caution/no, and returns a fixed rule-based narrative (no external LLM). UI: Dashboard **Can I afford this?** (`src/components/AffordabilityInsight.tsx`).
