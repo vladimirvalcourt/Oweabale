@@ -12,6 +12,26 @@ function str(v: unknown): string {
   return typeof v === 'string' ? v : '';
 }
 
+function cleanedNamePart(v: unknown): string {
+  const raw = str(v).trim();
+  if (!raw) return '';
+  return raw
+    .replace(/[^a-zA-Z\s'-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 40);
+}
+
+function inferredFirstName(profile: { first_name?: unknown; email?: unknown }): string {
+  const explicit = cleanedNamePart(profile.first_name);
+  if (explicit) return explicit.split(' ')[0];
+
+  const email = str(profile.email).trim();
+  const local = email.split('@')[0] || '';
+  const token = cleanedNamePart(local.replace(/[._-]+/g, ' ')).split(' ')[0] || '';
+  return token;
+}
+
 function citationDaysLeft(row: Record<string, unknown>): number {
   const dateStr = row.date as string | null | undefined;
   if (dateStr) {
@@ -48,7 +68,7 @@ async function buildUserContextJson(
 ): Promise<string> {
   const scheduleBaseMs = Date.now();
 
-  const [billsR, debtsR, assetsR, incomesR, subsR, citR, goalsR, budgetsR, txR] = await Promise.all([
+  const [billsR, debtsR, assetsR, incomesR, subsR, citR, goalsR, budgetsR, txR, profileR] = await Promise.all([
     supabaseAdmin.from('bills').select('*').eq('user_id', uid),
     supabaseAdmin.from('debts').select('*').eq('user_id', uid),
     supabaseAdmin.from('assets').select('*').eq('user_id', uid),
@@ -63,6 +83,7 @@ async function buildUserContextJson(
       .eq('user_id', uid)
       .order('date', { ascending: false })
       .limit(40),
+    supabaseAdmin.from('profiles').select('first_name,last_name,email').eq('id', uid).maybeSingle(),
   ]);
 
   if (billsR.error) throw billsR.error;
@@ -74,6 +95,7 @@ async function buildUserContextJson(
   if (goalsR.error) throw goalsR.error;
   if (budgetsR.error) throw budgetsR.error;
   if (txR.error) throw txR.error;
+  if (profileR.error) throw profileR.error;
 
   const bills = (billsR.data || []) as Record<string, unknown>[];
   const debts = (debtsR.data || []) as Record<string, unknown>[];
@@ -84,6 +106,8 @@ async function buildUserContextJson(
   const goals = (goalsR.data || []) as Record<string, unknown>[];
   const budgets = (budgetsR.data || []) as Record<string, unknown>[];
   const transactions = (txR.data || []) as Record<string, unknown>[];
+  const profile = (profileR.data || {}) as Record<string, unknown>;
+  const firstName = inferredFirstName({ first_name: profile.first_name, email: profile.email });
 
   const liquidCash = assets
     .filter((a) => str(a.type).toLowerCase() === 'cash')
@@ -147,6 +171,10 @@ async function buildUserContextJson(
 
   const payload = {
     generatedAt: new Date().toISOString(),
+    userProfile: {
+      firstName,
+      lastName: cleanedNamePart(profile.last_name),
+    },
     liquidCash: parseFloat(liquidCash.toFixed(2)),
     monthlyCashFlow: {
       monthlyIncome: cashFlow.monthlyIncome,
@@ -243,7 +271,8 @@ Core rules (must follow):
 
 Conversation style (must follow):
 - Write like a real conversation: short paragraphs (about 1–3 sentences each), separated by a blank line. No walls of text unless they explicitly ask you to go deep.
-- If this is your first reply in the thread (there is no earlier assistant message in the chat), open with one brief warm line before you answer — for example a simple hello and that you are glad to help. Keep it to one sentence.
+- If this is your first reply in the thread (there is no earlier assistant message in the chat), open with a warm greeting. If USER_FINANCIAL_CONTEXT.userProfile.firstName is present, greet them by first name naturally (for example "Hi John"). Keep this opener to 1 short sentence, then continue with help.
+- If the user sends a social opener like "hello" or "how are you", respond warmly in a human way first, then gently pivot to how you can help with their money today.
 - On every substantive answer, end with a single actionable line exactly in this form: **Next step:** followed by one clear sentence they can do today. If they only said thanks, okay, or a tiny acknowledgment, you may skip **Next step:** and reply warmly in one or two sentences.
 - Prefer “you” and plain English over jargon. If you use a finance term, add a quick plain-English gloss the first time.
 - Sound reassuring when money feels stressful; stay honest when the numbers are tight.

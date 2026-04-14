@@ -30,7 +30,12 @@ const DATA_QUERY =
 
 /** General finance education intent (allowed when clearly financial). */
 const EDUCATION_QUERY =
-  /\b(what\s+is|what'?s|how\s+does|how\s+do|explain|teach\s+me|help\s+me\s+understand|difference\s+between|pros?\s+and\s+cons?|best\s+way\s+to|tips?\s+for)\b/i;
+  /\b(what\s+is|what'?s|how\s+does|how\s+do|explain|teach\s+me|help\s+me\s+understand|difference\s+between|pros?\s+and\s+cons?|best\s+way\s+to|tips?\s+for|tell\s+me\s+about|tell\s+me\s+more|walk\s+me\s+through|overview|i\s+want\s+to\s+learn)\b/i;
+
+const SOCIAL_OPENER =
+  /^(hi|hello|hey|heya|howdy|good\s+(morning|afternoon|evening))(?:[!. ]+.*)?$|^(how\s+are\s+you|how'?s\s+it\s+going|what'?s\s+up)\b/i;
+
+const SHORT_GRATITUDE = /^(thanks|thank\s+you|appreciate\s+it|got\s+it|ok(?:ay)?|cool)\b/i;
 
 export type GuardFail = { ok: false; code: 'EMPTY' | 'TOO_LONG' | 'OFF_TOPIC' | 'NOT_USER_DATA'; userMessage: string };
 export type GuardOk = { ok: true };
@@ -62,10 +67,16 @@ export function guardOweAiMessage(
         ok: false,
         code: 'OFF_TOPIC',
         userMessage:
-          'Owe-AI only answers questions about **your personal finances** using your Oweable data. Try bills, income, debts, subscriptions, budgets, goals, or cash flow.',
+          'I can help with your money in Oweable. Ask about bills, income, debts, subscriptions, budgets, goals, or cash flow.',
       };
     }
   }
+
+  const socialOpener = text.length <= 160 && SOCIAL_OPENER.test(text);
+  if (socialOpener) return { ok: true };
+
+  const shortGratitude = text.length <= 80 && SHORT_GRATITUDE.test(text);
+  if (shortGratitude) return { ok: true };
 
   const shortFollowUp =
     opts.hasRecentAssistant &&
@@ -86,7 +97,7 @@ export function guardOweAiMessage(
       ok: false,
       code: 'NOT_USER_DATA',
       userMessage:
-        'Ask this in a finance context tied to your money, or ask a finance education question (for example: “What is APR?” or “How should I budget?”).',
+        'I can definitely help. Ask it in the context of your money, or ask a finance concept question (for example: “What is APR?” or “How should I budget?”).',
     };
   }
 
@@ -94,6 +105,6 @@ export function guardOweAiMessage(
     ok: false,
     code: 'OFF_TOPIC',
     userMessage:
-      'That does not look like a finance question. Ask about your money (bills, cash flow, debts, subscriptions, budgets, goals) or ask a finance education question.',
+      'I stay focused on personal finance here. Try bills, cash flow, debts, subscriptions, budgets, goals, or a finance education question.',
   };
 }
