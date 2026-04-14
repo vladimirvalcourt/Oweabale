@@ -6,12 +6,13 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { TrendingUp, TrendingDown, Activity, PieChart, Minus } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, ReferenceLine,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine,
 } from 'recharts';
 import { supabase } from '../lib/supabase';
 import { useStore } from '../store/useStore';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
+import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 
 type Period = '1M' | '3M' | '6M' | '1Y' | 'ALL';
 
@@ -259,7 +260,7 @@ export default function Analytics() {
             </p>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={260}>
+          <SafeResponsiveContainer width="100%" height={260} minWidth={0} minHeight={120}>
             <AreaChart data={chartSnapshots} margin={{ top: 5, right: 5, left: 5, bottom: 0 }}>
               <defs>
                 <linearGradient id="nwGrad" x1="0" y1="0" x2="0" y2="1">
@@ -278,7 +279,7 @@ export default function Analytics() {
               <Area type="monotone" dataKey="assets"    stroke="#34D399" strokeWidth={1.5} fill="url(#assetsGrad)" dot={false} />
               <Area type="monotone" dataKey="net_worth" stroke="#6366F1" strokeWidth={2}   fill="url(#nwGrad)"     dot={false} />
             </AreaChart>
-          </ResponsiveContainer>
+          </SafeResponsiveContainer>
         )}
         <div className="flex gap-5 mt-3">
           <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-indigo-400 inline-block shrink-0" aria-hidden /> Net worth</div>
@@ -294,7 +295,7 @@ export default function Analytics() {
           </div>
         ) : (
           <>
-            <ResponsiveContainer width="100%" height={260}>
+            <SafeResponsiveContainer width="100%" height={260} minWidth={0} minHeight={120}>
               <BarChart data={monthlySpend} margin={{ top: 5, right: 5, left: 5, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
                 <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval={1} />
@@ -304,7 +305,7 @@ export default function Analytics() {
                   <Bar key={cat} dataKey={cat} stackId="stack" fill={CHART_COLORS[i % CHART_COLORS.length]} radius={0} />
                 ))}
               </BarChart>
-            </ResponsiveContainer>
+            </SafeResponsiveContainer>
             <div className="flex flex-wrap gap-4 mt-3">
               {topCategories.map((cat, i) => (
                 <div key={cat} className="flex items-center gap-1.5 text-xs text-content-tertiary">
@@ -319,7 +320,7 @@ export default function Analytics() {
 
       {/* Savings Rate */}
       <CollapsibleModule title="Monthly Savings Rate" icon={Activity}>
-        <ResponsiveContainer width="100%" height={200}>
+        <SafeResponsiveContainer width="100%" height={200} minWidth={0} minHeight={120}>
           <LineChart data={cashFlowData} margin={{ top: 5, right: 5, left: 5, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
             <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval={1} />
@@ -328,7 +329,7 @@ export default function Analytics() {
             <ReferenceLine y={20} stroke="#3f3f46" strokeWidth={1} strokeDasharray="4 4" />
             <Line type="monotone" dataKey="rate" stroke="#6366F1" strokeWidth={2} dot={{ r: 3, fill: '#6366F1' }} />
           </LineChart>
-        </ResponsiveContainer>
+        </SafeResponsiveContainer>
         <div className="flex gap-5 mt-3">
           <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-indigo-400 inline-block shrink-0" aria-hidden /> Savings rate</div>
           <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-4 h-px bg-zinc-700 inline-block shrink-0" style={{ borderTop: '1px dashed #3f3f46' }} aria-hidden /> 20% target</div>

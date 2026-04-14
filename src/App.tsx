@@ -15,9 +15,9 @@ import { AppLoader } from './components/PageSkeleton';
 import SessionWarningModal from './components/SessionWarningModal';
 import { useStore } from './store/useStore';
 import { useAuth } from './hooks/useAuth';
+import Dashboard from './pages/Dashboard';
 
 const AuthPage       = lazy(() => import('./pages/AuthPage'));
-const Dashboard      = lazy(() => import('./pages/Dashboard'));
 const Obligations    = lazy(() => import('./pages/Obligations'));
 const Settings       = lazy(() => import('./pages/Settings'));
 const Ingestion      = lazy(() => import('./pages/Ingestion'));
@@ -46,6 +46,7 @@ const Analytics      = lazy(() => import('./pages/Analytics'));
 const OweAi          = lazy(() => import('./pages/OweAi'));
 const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
 import AuthCallback from './pages/AuthCallback';
+import PlaidCallback from './pages/PlaidCallback';
 const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
 const NotFound         = lazy(() => import('./pages/NotFound'));
 
@@ -93,6 +94,7 @@ function AppRoutes() {
         element={authUser ? <Navigate to="/dashboard" replace /> : <AuthPage />}
       />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/plaid/callback" element={<PlaidCallback />} />
       <Route path="/capture" element={<MobileCapture />} />
 
       {/* ── Protected routes — require authentication ── */}

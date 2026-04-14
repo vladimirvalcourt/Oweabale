@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { usePlaidLink, type PlaidLinkOnSuccess } from 'react-plaid-link';
+import React, { useState } from 'react';
 import { Lock, Loader2, RefreshCw, Unplug, AlertTriangle } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
-import { createPlaidLinkToken, exchangePlaidPublicToken } from '../lib/plaid';
 import { isPlaidLinkUiEnabled } from '../lib/featureFlags';
+import { usePlaidFlow } from '../hooks/usePlaidFlow';
 
 /** When Plaid UI is off, manual-first copy; still allow disconnect if a link exists from earlier testing. */
 function BankConnectionGated() {
@@ -63,98 +62,22 @@ function BankConnectionPlaid() {
     plaidNeedsRelink,
     platformSettings,
   } = useStore();
-  const [isConnecting, setIsConnecting] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
-  const [linkToken, setLinkToken] = useState<string | null>(null);
-  const linkIntentRef = useRef<'create' | 'update'>('create');
-  const [activeLinkFlow, setActiveLinkFlow] = useState<'idle' | 'create' | 'update'>('idle');
-  const openedRef = useRef(false);
 
   const plaidGloballyEnabled = platformSettings?.plaidEnabled !== false;
-
-  const onSuccess = useCallback<PlaidLinkOnSuccess>(
-    async (public_token, metadata) => {
-      setIsConnecting(true);
-      try {
-        const result = await exchangePlaidPublicToken(public_token, metadata);
-        if ('error' in result) {
-          toast.error(result.error);
-          return;
-        }
-        await connectBank();
-        const synced = await syncPlaidTransactions({ quiet: true });
-        const intent = linkIntentRef.current;
-        toast.success(intent === 'update' ? 'Bank connection updated.' : 'Bank connected successfully.');
-        if (!synced) {
-          toast.error('Connection saved, but initial sync failed — try Sync now in a moment.');
-        }
-      } finally {
-        setIsConnecting(false);
-        setLinkToken(null);
-        linkIntentRef.current = 'create';
-        setActiveLinkFlow('idle');
-        openedRef.current = false;
-      }
-    },
-    [connectBank, syncPlaidTransactions],
-  );
-
-  const { open, ready } = usePlaidLink({
-    token: linkToken,
-    onSuccess,
-    onExit: () => {
-      setLinkToken(null);
-      linkIntentRef.current = 'create';
-      setActiveLinkFlow('idle');
-      openedRef.current = false;
-    },
+  const plaidFlow = usePlaidFlow({
+    enabled: plaidGloballyEnabled,
+    onConnected: connectBank,
+    onInitialSync: () => syncPlaidTransactions({ quiet: true }),
   });
 
-  useEffect(() => {
-    if (linkToken && ready && !openedRef.current) {
-      openedRef.current = true;
-      open();
-    }
-    if (!linkToken) openedRef.current = false;
-  }, [linkToken, ready, open]);
-
   const handleConnectClick = async () => {
-    if (!plaidGloballyEnabled) {
-      toast.error('Bank linking is temporarily unavailable.');
-      return;
-    }
-    setIsConnecting(true);
-    setActiveLinkFlow('create');
-    linkIntentRef.current = 'create';
-    const res = await createPlaidLinkToken();
-    if ('error' in res) {
-      toast.error(res.error);
-      setIsConnecting(false);
-      return;
-    }
-    setLinkToken(res.link_token);
-    setIsConnecting(false);
+    await plaidFlow.startConnect();
   };
 
   const handleFixConnectionClick = async () => {
-    if (!plaidGloballyEnabled) {
-      toast.error('Bank linking is temporarily unavailable.');
-      return;
-    }
-    setIsConnecting(true);
-    setActiveLinkFlow('update');
-    linkIntentRef.current = 'update';
-    const res = await createPlaidLinkToken({ mode: 'update' });
-    if ('error' in res) {
-      toast.error(res.error);
-      setIsConnecting(false);
-      linkIntentRef.current = 'create';
-      setActiveLinkFlow('idle');
-      return;
-    }
-    setLinkToken(res.link_token);
-    setIsConnecting(false);
+    await plaidFlow.startReconnect();
   };
 
   const handleSyncClick = async () => {
@@ -193,13 +116,15 @@ function BankConnectionPlaid() {
           <button
             type="button"
             onClick={handleConnectClick}
-            disabled={isConnecting || !plaidGloballyEnabled}
+            disabled={plaidFlow.isBusy || !plaidGloballyEnabled}
             className="bg-content-primary text-black hover:bg-zinc-200 font-bold px-6 py-3 rounded-sm flex items-center gap-2 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {isConnecting ? (
+            {plaidFlow.isBusy ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="font-mono text-sm tracking-widest">PREPARING SECURE LINK…</span>
+                <span className="font-mono text-sm tracking-widest">
+                  {plaidFlow.stage === 'oauth_redirect' ? 'AWAITING BANK AUTH…' : 'PREPARING SECURE LINK…'}
+                </span>
               </>
             ) : (
               <>
@@ -210,6 +135,18 @@ function BankConnectionPlaid() {
           </button>
           {!plaidGloballyEnabled && (
             <p className="text-xs font-mono text-amber-500/90">Bank linking is disabled by the platform.</p>
+          )}
+          {plaidFlow.stage === 'error' && plaidFlow.errorMessage && (
+            <div className="rounded-sm border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+              {plaidFlow.errorMessage}
+              <button
+                type="button"
+                onClick={() => void plaidFlow.retryLastIntent()}
+                className="ml-3 underline underline-offset-2"
+              >
+                Retry
+              </button>
+            </div>
           )}
         </div>
       ) : (
@@ -225,10 +162,10 @@ function BankConnectionPlaid() {
                 <button
                   type="button"
                   onClick={handleFixConnectionClick}
-                  disabled={isConnecting || !plaidGloballyEnabled}
+                  disabled={plaidFlow.isBusy || !plaidGloballyEnabled}
                   className="mt-3 bg-amber-500/20 text-amber-200 hover:bg-amber-500/30 font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-sm border border-amber-500/30 disabled:opacity-60"
                 >
-                  {isConnecting && activeLinkFlow === 'update' ? 'Opening…' : 'Fix connection'}
+                  {plaidFlow.isBusy && plaidFlow.activeIntent === 'update' ? 'Opening…' : 'Fix connection'}
                 </button>
               </div>
             </div>
@@ -252,7 +189,7 @@ function BankConnectionPlaid() {
                 <button
                   type="button"
                   onClick={handleFixConnectionClick}
-                  disabled={isConnecting || !plaidGloballyEnabled}
+                  disabled={plaidFlow.isBusy || !plaidGloballyEnabled}
                   className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-surface-border text-content-secondary font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-sm disabled:opacity-60"
                 >
                   Reconnect
@@ -273,6 +210,18 @@ function BankConnectionPlaid() {
                 ? `Last transaction sync: ${lastSyncLabel}`
                 : 'No sync yet — use Sync now or wait for automatic updates.'}
             </div>
+            {plaidFlow.stage === 'error' && plaidFlow.errorMessage && (
+              <div className="mt-3 rounded-sm border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                {plaidFlow.errorMessage}
+                <button
+                  type="button"
+                  onClick={() => void plaidFlow.retryLastIntent()}
+                  className="ml-3 underline underline-offset-2"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

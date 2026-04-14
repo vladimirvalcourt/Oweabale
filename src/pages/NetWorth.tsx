@@ -3,11 +3,12 @@ import { useStore } from '../store/useStore';
 import { projectNetWorth } from '../lib/finance';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { TrendingUp, TrendingDown, Hash, Building2, CreditCard, Vault, PieChart, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart as RechartsPie, Pie, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart as RechartsPie, Pie, Cell } from 'recharts';
 import { toast } from 'sonner';
 import { animate } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
+import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 
 function AnimatedValue({ value, prefix = "", suffix = "", decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
   const [displayValue, setDisplayValue] = useState(0);
@@ -120,7 +121,7 @@ export default function NetWorth() {
           )}
         </div>
         <div className="h-[260px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+          <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={120}>
             <AreaChart data={projectionData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
@@ -138,7 +139,7 @@ export default function NetWorth() {
               />
               <Area type="monotone" dataKey="value" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" dot={{ fill: '#6366f1', strokeWidth: 0, r: 3 }} />
             </AreaChart>
-          </ResponsiveContainer>
+          </SafeResponsiveContainer>
         </div>
       </CollapsibleModule>
 
@@ -150,7 +151,7 @@ export default function NetWorth() {
             icon={PieChart}
           >
             <div className="flex flex-col items-center gap-4">
-              <ResponsiveContainer width="100%" height={140}>
+              <SafeResponsiveContainer width="100%" height={140} minWidth={0} minHeight={120}>
                 <RechartsPie>
                   <Pie data={assetAllocation} cx="50%" cy="50%" innerRadius={40} outerRadius={65} dataKey="value" paddingAngle={3}>
                     {assetAllocation.map((_, i) => (
@@ -163,7 +164,7 @@ export default function NetWorth() {
                     formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Value']}
                   />
                 </RechartsPie>
-              </ResponsiveContainer>
+              </SafeResponsiveContainer>
               <div className="w-full space-y-2">
                 {assetAllocation.map((item, i) => (
                   <div key={item.name} className="flex items-center justify-between">

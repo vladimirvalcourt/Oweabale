@@ -5,7 +5,7 @@ import {
   ArrowRight, Activity, ShieldCheck, Flame, Inbox, ShieldAlert,
   X, Copy, ExternalLink, Wallet
 } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { toast } from 'sonner';
 import { Dialog } from '@headlessui/react';
 import { motion } from 'motion/react';
@@ -15,6 +15,7 @@ import { sanitizeUrl } from '../lib/security';
 import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting, computeSafeToSpend } from '../lib/finance';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { AppPageShell } from '../components/AppPageShell';
+import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 
 import type { Citation } from '../store/useStore';
 
@@ -698,7 +699,7 @@ export default function Dashboard() {
             </div>
             
             <div className="h-[200px] sm:h-[280px] w-full min-h-[120px]">
-              <ResponsiveContainer width="100%" height="100%" minHeight={120}>
+              <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={120}>
                 <AreaChart data={cashFlowChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
@@ -717,7 +718,7 @@ export default function Dashboard() {
                   />
                   <Area type="monotone" dataKey="balance" stroke="#818CF8" strokeWidth={2} fillOpacity={1} fill="url(#colorBalance)" />
                 </AreaChart>
-              </ResponsiveContainer>
+              </SafeResponsiveContainer>
             </div>
           </div>
         </div>

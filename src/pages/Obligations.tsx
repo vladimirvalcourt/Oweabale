@@ -9,7 +9,7 @@ import {
   FileText, CheckCircle2, Flame,
   Calculator, ChevronDown, ChevronUp, Plus, Minus, Pencil, CalendarDays
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 import { useShallow } from 'zustand/react/shallow';
@@ -19,6 +19,7 @@ import { Dialog } from '@headlessui/react';
 import { generateAmortizationSchedule, groupOutflowsByHorizon } from '../lib/finance';
 import { TransitionLink } from '../components/TransitionLink';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
+import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 import type { Bill, Debt } from '../store/useStore';
 
 type ObligationType = 'recurring' | 'debt' | 'ambush';
@@ -436,7 +437,7 @@ export default function Obligations() {
                               Principal vs. Interest — First 12 Months
                             </p>
                             <div className="h-[120px] w-full min-h-0 overflow-visible relative isolate">
-                              <ResponsiveContainer width="100%" height="100%">
+                              <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={120}>
                                 <BarChart data={chartData} margin={{ top: 0, right: 0, left: -30, bottom: 0 }} barSize={8}>
                                   <XAxis dataKey="name" tick={{ fill: '#52525B', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} />
                                   <YAxis tick={{ fill: '#52525B', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}`} />
@@ -448,7 +449,7 @@ export default function Obligations() {
                                   <Bar dataKey="principal" fill="#6366f1" stackId="a" />
                                   <Bar dataKey="interest" fill="#EF4444" stackId="a" />
                                 </BarChart>
-                              </ResponsiveContainer>
+                              </SafeResponsiveContainer>
                             </div>
                             <div className="flex gap-4 mt-2">
                               <span className="text-[10px] font-mono text-indigo-400">■ Principal</span>

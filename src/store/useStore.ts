@@ -1838,138 +1838,162 @@ export const useStore = create<AppState>()(
         } : { ...get().user, id: resolvedUserId },
       });
 
+      // Release first paint as soon as the phase-1 shell is ready. Phase-2 datasets
+      // hydrate after this without blocking dashboard LCP.
+      if (!background) set({ isLoading: false });
+
+      let phase2RecordCount = 0;
+
       // ── PHASE 2: Awaiting the promise started before Phase 1 ─────────────
       // By now Phase 2 has been running in parallel — total cost is
       // max(phase1, phase2) not phase1 + phase2.
-      const [
-        { data: goals },
-        { data: budgets },
-        { data: categories },
-        { data: citations },
-        { data: deductions },
-        { data: freelanceEntries },
-        { data: pendingIngestions },
-        { data: categorizationRules },
-        { data: creditFixes },
-        { data: adminBroadcasts },
-        { data: platformSettings },
-        { data: netWorthSnapshots },
-        { data: creditFactors },
-      ] = await phase2Promise;
+      try {
+        const [
+          { data: goals },
+          { data: budgets },
+          { data: categories },
+          { data: citations },
+          { data: deductions },
+          { data: freelanceEntries },
+          { data: pendingIngestions },
+          { data: categorizationRules },
+          { data: creditFixes },
+          { data: adminBroadcasts },
+          { data: platformSettings },
+          { data: netWorthSnapshots },
+          { data: creditFactors },
+        ] = await phase2Promise;
 
-      set({
-        goals: (goals || []).map((g: Record<string, unknown>) => ({
-          id: g.id as string,
-          name: g.name as string,
-          targetAmount: (g.target_amount ?? g.targetAmount) as number,
-          currentAmount: (g.current_amount ?? g.currentAmount) as number,
-          deadline: g.deadline as string,
-          type: g.type as Goal['type'],
-          color: g.color as string,
-        })),
-        budgets: (budgets || []).map((b: Record<string, unknown>) => ({
-          id: b.id as string,
-          category: b.category as string,
-          amount: b.amount as number,
-          period: b.period as Budget['period'],
-        })),
-        categories: (categories || []).map((c: Record<string, unknown>) => ({
-          id: c.id as string,
-          name: c.name as string,
-          color: c.color as string,
-          type: c.type as Category['type'],
-        })),
-        citations: (citations || []).map((c: Record<string, unknown>) => {
-          const storedDate = c.date as string;
-          const computedDaysLeft = storedDate
-            ? Math.ceil((new Date(storedDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
-            : (c.days_left ?? c.daysLeft) as number;
-          return {
+        set({
+          goals: (goals || []).map((g: Record<string, unknown>) => ({
+            id: g.id as string,
+            name: g.name as string,
+            targetAmount: (g.target_amount ?? g.targetAmount) as number,
+            currentAmount: (g.current_amount ?? g.currentAmount) as number,
+            deadline: g.deadline as string,
+            type: g.type as Goal['type'],
+            color: g.color as string,
+          })),
+          budgets: (budgets || []).map((b: Record<string, unknown>) => ({
+            id: b.id as string,
+            category: b.category as string,
+            amount: b.amount as number,
+            period: b.period as Budget['period'],
+          })),
+          categories: (categories || []).map((c: Record<string, unknown>) => ({
             id: c.id as string,
-            type: c.type as string,
-            jurisdiction: c.jurisdiction as string,
-            daysLeft: computedDaysLeft,
-            amount: c.amount as number,
-            penaltyFee: (c.penalty_fee ?? c.penaltyFee) as number,
-            date: storedDate,
-            citationNumber: (c.citation_number ?? c.citationNumber) as string,
-            paymentUrl: (c.payment_url ?? c.paymentUrl) as string,
-            status: c.status as Citation['status'],
-          };
-        }),
-        deductions: (deductions || []).map((d: Record<string, unknown>) => ({
-          id: d.id as string,
-          name: d.name as string,
-          category: d.category as string,
-          amount: d.amount as number,
-          date: d.date as string,
-        })),
-        freelanceEntries: (freelanceEntries || []).map((f: Record<string, unknown>) => ({
-          id: f.id as string,
-          client: f.client as string,
-          amount: f.amount as number,
-          date: f.date as string,
-          isVaulted: (f.is_vaulted ?? f.isVaulted ?? false) as boolean,
-          scouredWriteOffs: (f.scoured_write_offs ?? f.scouredWriteOffs ?? 0) as number,
-        })),
-        pendingIngestions: (pendingIngestions || []).map((pi: Record<string, any>) => ({
-          id: pi.id,
-          type: pi.type,
-          status: pi.status,
-          source: pi.source,
-          extractedData: pi.extracted_data || {},
-          originalFile: pi.original_file || {},
-          storagePath: pi.storage_path,
-          storageUrl: pi.storage_url,
-        })),
-        categorizationRules: (categorizationRules || []).map((r: any) => ({
-          id:          r.id as string,
-          match_type:  r.match_type as CategorizationRule['match_type'],
-          match_value: r.match_value as string,
-          category:    r.category as string,
-          priority:    r.priority as number,
-        })),
-        credit: {
-          ...get().credit,
-          fixes: (creditFixes || []).map((f: Record<string, unknown>) => ({
+            name: c.name as string,
+            color: c.color as string,
+            type: c.type as Category['type'],
+          })),
+          citations: (citations || []).map((c: Record<string, unknown>) => {
+            const storedDate = c.date as string;
+            const computedDaysLeft = storedDate
+              ? Math.ceil((new Date(storedDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+              : (c.days_left ?? c.daysLeft) as number;
+            return {
+              id: c.id as string,
+              type: c.type as string,
+              jurisdiction: c.jurisdiction as string,
+              daysLeft: computedDaysLeft,
+              amount: c.amount as number,
+              penaltyFee: (c.penalty_fee ?? c.penaltyFee) as number,
+              date: storedDate,
+              citationNumber: (c.citation_number ?? c.citationNumber) as string,
+              paymentUrl: (c.payment_url ?? c.paymentUrl) as string,
+              status: c.status as Citation['status'],
+            };
+          }),
+          deductions: (deductions || []).map((d: Record<string, unknown>) => ({
+            id: d.id as string,
+            name: d.name as string,
+            category: d.category as string,
+            amount: d.amount as number,
+            date: d.date as string,
+          })),
+          freelanceEntries: (freelanceEntries || []).map((f: Record<string, unknown>) => ({
             id: f.id as string,
-            item: f.item as string,
+            client: f.client as string,
             amount: f.amount as number,
-            status: f.status as CreditFix['status'],
-            bureau: f.bureau as string,
-            notes: (f.notes ?? '') as string,
+            date: f.date as string,
+            isVaulted: (f.is_vaulted ?? f.isVaulted ?? false) as boolean,
+            scouredWriteOffs: (f.scoured_write_offs ?? f.scouredWriteOffs ?? 0) as number,
           })),
-          factors: (creditFactors || []).map((f: Record<string, unknown>) => ({
-            id: f.id as string,
-            name: f.name as string,
-            impact: f.impact as 'high' | 'medium' | 'low',
-            status: f.status as 'excellent' | 'good' | 'fair' | 'poor',
-            description: f.description as string,
+          pendingIngestions: (pendingIngestions || []).map((pi: Record<string, any>) => ({
+            id: pi.id,
+            type: pi.type,
+            status: pi.status,
+            source: pi.source,
+            extractedData: pi.extracted_data || {},
+            originalFile: pi.original_file || {},
+            storagePath: pi.storage_path,
+            storageUrl: pi.storage_url,
           })),
-        },
-        adminBroadcasts: (adminBroadcasts || []).map((b: Record<string, unknown>) => ({
-          id: b.id as string,
-          title: b.title as string,
-          content: b.content as string,
-          type: b.type as 'info' | 'warning' | 'error',
-          createdAt: b.created_at as string,
-        })),
-        platformSettings: platformSettings ? {
-          id: platformSettings.id as string,
-          maintenanceMode: platformSettings.maintenance_mode as boolean,
-          plaidEnabled: platformSettings.plaid_enabled as boolean,
-          broadcastMessage: platformSettings.broadcast_message as string,
-          taxStandardDeduction: platformSettings.tax_standard_deduction as number,
-          taxTopBracket: platformSettings.tax_top_bracket as number,
-        } : null,
-        netWorthSnapshots: (netWorthSnapshots || []).map((s: Record<string, unknown>) => ({
-          id: s.id as string,
-          date: s.date as string,
-          netWorth: s.net_worth as number,
-          assets: s.assets as number,
-          debts: s.debts as number,
-        })),
-      });
+          categorizationRules: (categorizationRules || []).map((r: any) => ({
+            id:          r.id as string,
+            match_type:  r.match_type as CategorizationRule['match_type'],
+            match_value: r.match_value as string,
+            category:    r.category as string,
+            priority:    r.priority as number,
+          })),
+          credit: {
+            ...get().credit,
+            fixes: (creditFixes || []).map((f: Record<string, unknown>) => ({
+              id: f.id as string,
+              item: f.item as string,
+              amount: f.amount as number,
+              status: f.status as CreditFix['status'],
+              bureau: f.bureau as string,
+              notes: (f.notes ?? '') as string,
+            })),
+            factors: (creditFactors || []).map((f: Record<string, unknown>) => ({
+              id: f.id as string,
+              name: f.name as string,
+              impact: f.impact as 'high' | 'medium' | 'low',
+              status: f.status as 'excellent' | 'good' | 'fair' | 'poor',
+              description: f.description as string,
+            })),
+          },
+          adminBroadcasts: (adminBroadcasts || []).map((b: Record<string, unknown>) => ({
+            id: b.id as string,
+            title: b.title as string,
+            content: b.content as string,
+            type: b.type as 'info' | 'warning' | 'error',
+            createdAt: b.created_at as string,
+          })),
+          platformSettings: platformSettings ? {
+            id: platformSettings.id as string,
+            maintenanceMode: platformSettings.maintenance_mode as boolean,
+            plaidEnabled: platformSettings.plaid_enabled as boolean,
+            broadcastMessage: platformSettings.broadcast_message as string,
+            taxStandardDeduction: platformSettings.tax_standard_deduction as number,
+            taxTopBracket: platformSettings.tax_top_bracket as number,
+          } : null,
+          netWorthSnapshots: (netWorthSnapshots || []).map((s: Record<string, unknown>) => ({
+            id: s.id as string,
+            date: s.date as string,
+            netWorth: s.net_worth as number,
+            assets: s.assets as number,
+            debts: s.debts as number,
+          })),
+        });
+
+        phase2RecordCount =
+          (goals?.length ?? 0) +
+          (budgets?.length ?? 0) +
+          (categories?.length ?? 0) +
+          (citations?.length ?? 0) +
+          (deductions?.length ?? 0) +
+          (freelanceEntries?.length ?? 0) +
+          (pendingIngestions?.length ?? 0) +
+          (categorizationRules?.length ?? 0) +
+          (creditFixes?.length ?? 0) +
+          (netWorthSnapshots?.length ?? 0) +
+          (creditFactors?.length ?? 0) +
+          (adminBroadcasts?.length ?? 0);
+      } catch (phase2Error) {
+        console.error('[fetchData] phase 2 hydration failed:', phase2Error);
+      }
 
       // Upsert today's net worth snapshot for historical trending.
       try {
@@ -1997,24 +2021,13 @@ export const useStore = create<AppState>()(
         (assets?.length ?? 0) +
         (incomes?.length ?? 0) +
         (subscriptions?.length ?? 0) +
-        (goals?.length ?? 0) +
-        (budgets?.length ?? 0) +
-        (categories?.length ?? 0) +
-        (citations?.length ?? 0) +
-        (deductions?.length ?? 0) +
-        (freelanceEntries?.length ?? 0) +
-        (pendingIngestions?.length ?? 0) +
-        (categorizationRules?.length ?? 0) +
-        (creditFixes?.length ?? 0) +
-        (netWorthSnapshots?.length ?? 0) +
-        (creditFactors?.length ?? 0) +
-        (adminBroadcasts?.length ?? 0);
+        phase2RecordCount;
 
       console.log(`[fetchData] done, loaded ${recordCount} records`);
     } catch (err) {
       console.error('[fetchData] failed:', err);
     } finally {
-      if (!background) set({ isLoading: false });
+      if (!background && get().isLoading) set({ isLoading: false });
     }
   },
 

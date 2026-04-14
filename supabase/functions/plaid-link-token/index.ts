@@ -50,6 +50,11 @@ Deno.serve(async (req: Request) => {
     const bodyJson = (await req.json().catch(() => ({}))) as { mode?: string };
     const isUpdate = bodyJson.mode === 'update';
     const clientName = Deno.env.get('PLAID_CLIENT_NAME') ?? 'Oweable';
+    const webhookUrl =
+      Deno.env.get('PLAID_WEBHOOK_URL') ??
+      `${new URL(supabaseUrl).origin}/functions/v1/plaid-webhook`;
+    const requestOrigin = origin && /^https?:\/\//.test(origin) ? origin : 'https://oweable.com';
+    const redirectUri = Deno.env.get('PLAID_REDIRECT_URI') ?? `${requestOrigin}/settings`;
 
     let out: { link_token?: string };
 
@@ -72,6 +77,8 @@ Deno.serve(async (req: Request) => {
         access_token: item.access_token,
         country_codes: ['US'],
         language: 'en',
+        webhook: webhookUrl,
+        redirect_uri: redirectUri,
       });
     } else {
       out = await plaidPost<{ link_token?: string }>('/link/token/create', {
@@ -80,6 +87,8 @@ Deno.serve(async (req: Request) => {
         products: ['transactions'],
         country_codes: ['US'],
         language: 'en',
+        webhook: webhookUrl,
+        redirect_uri: redirectUri,
       });
     }
 

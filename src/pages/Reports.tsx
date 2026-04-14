@@ -6,11 +6,12 @@ import React, { useState, useMemo } from 'react';
 import { Download, BarChart3, PieChart, TrendingUp, CreditCard, Calendar } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, PieChart as RechartsPie, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend
 } from 'recharts';
 import { useStore } from '../store/useStore';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
+import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 
 type DateRange = '30d' | '90d' | '1y';
 
@@ -195,7 +196,7 @@ export default function Reports() {
           icon={BarChart3}
         >
           <div className="flex flex-col">
-            <ResponsiveContainer width="100%" height={220}>
+            <SafeResponsiveContainer width="100%" height={220} minWidth={0} minHeight={120}>
               <BarChart data={monthlyData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} />
@@ -204,7 +205,7 @@ export default function Reports() {
                 <Bar dataKey="income" fill="#34D399" radius={0} />
                 <Bar dataKey="expenses" fill="#EF4444" radius={0} />
               </BarChart>
-            </ResponsiveContainer>
+            </SafeResponsiveContainer>
             <div className="flex gap-4 mt-3">
               <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-emerald-400 rounded-none inline-block shrink-0" aria-hidden /> Income</div>
               <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-red-400 rounded-none inline-block shrink-0" aria-hidden /> Expenses</div>
@@ -221,7 +222,7 @@ export default function Reports() {
             <div className="h-[220px] flex items-center justify-center text-content-tertiary text-sm">No expense data in this range</div>
           ) : (
             <div className="flex flex-col sm:flex-row items-center gap-4">
-              <ResponsiveContainer width={160} height={160}>
+              <SafeResponsiveContainer width={160} height={160} minWidth={120} minHeight={120}>
                 <RechartsPie>
                   <Pie data={categoryData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} dataKey="value" paddingAngle={2}>
                     {categoryData.map((_, i) => (
@@ -230,7 +231,7 @@ export default function Reports() {
                   </Pie>
                   <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Spent']} />
                 </RechartsPie>
-              </ResponsiveContainer>
+              </SafeResponsiveContainer>
               <div className="flex-1 space-y-2 min-w-0">
                 {categoryData.slice(0, 6).map((cat, i) => (
                   <div key={cat.name} className="flex items-center justify-between gap-2">
@@ -252,7 +253,7 @@ export default function Reports() {
         title="Net Worth Over Time"
         icon={TrendingUp}
       >
-        <ResponsiveContainer width="100%" height={200}>
+        <SafeResponsiveContainer width="100%" height={200} minWidth={0} minHeight={120}>
           <AreaChart data={netWorthHistory} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="nwGradient" x1="0" y1="0" x2="0" y2="1">
@@ -266,7 +267,7 @@ export default function Reports() {
             <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Net Worth']} />
             <Area type="monotone" dataKey="netWorth" stroke="#6366F1" strokeWidth={2} fillOpacity={1} fill="url(#nwGradient)" dot={{ fill: '#6366F1', strokeWidth: 0, r: 3 }} />
           </AreaChart>
-        </ResponsiveContainer>
+        </SafeResponsiveContainer>
       </CollapsibleModule>
 
       {/* Debt Payoff Progress */}

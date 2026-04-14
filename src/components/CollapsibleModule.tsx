@@ -55,7 +55,7 @@ export function CollapsibleModule({
         )}
       >
         <div id={panelId} role="region" aria-labelledby={`${panelId}-trigger`} className="min-h-0 overflow-hidden">
-          <div className="p-6">{children}</div>
+          <div className="p-6">{isOpen ? children : null}</div>
         </div>
       </div>
     </div>
