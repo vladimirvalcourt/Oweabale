@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Sparkles, Send, Loader2, Trash2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import rehypeSanitize from 'rehype-sanitize';
 import { invokeOweAi, type OweAiChatMessage } from '../lib/oweAi';
 import { cn } from '../lib/utils';
 
 const QUICK_PROMPTS = [
-  'What can I safely buy this week?',
-  'Explain APR in simple words.',
-  'How should I budget based on my spending?',
+  'What can I comfortably spend this week?',
+  'Walk me through APR like I’m new to this.',
+  'Given my numbers, how would you tighten my budget?',
 ] as const;
 
 export default function OweAi() {
@@ -71,7 +72,7 @@ export default function OweAi() {
     setMessages([]);
   }, []);
 
-  const useQuickPrompt = useCallback(
+  const sendQuickPrompt = useCallback(
     (prompt: string) => {
       if (loading) return;
       setInput(prompt);
@@ -90,8 +91,9 @@ export default function OweAi() {
           <div>
             <h1 className="text-xl font-semibold tracking-tight text-content-primary leading-none">Owe-AI</h1>
             <p className="text-sm text-content-tertiary mt-1.5 max-w-xl">
-              Ask about <strong className="text-content-secondary">your</strong> bills, cash flow, debts, budgets, and
-              goals. Replies are based on what you&apos;ve saved in Oweable.
+              Chat the way you would with an advisor at the branch—plain language, short answers, and a clear next step.
+              Owe-AI uses <strong className="text-content-secondary">your</strong> bills, income, debts, budgets, and goals
+              from Oweable.
             </p>
           </div>
         </div>
@@ -111,14 +113,14 @@ export default function OweAi() {
         className="relative flex-1 min-h-[320px] max-h-[min(58dvh,560px)] overflow-y-auto rounded-3xl border border-surface-border bg-gradient-to-b from-surface-raised/70 to-surface-base/90 px-4 py-5 space-y-3"
         aria-live="polite"
       >
-        <div className="sticky top-0 z-10 -mx-4 -mt-5 mb-2 px-4 py-2 bg-gradient-to-b from-surface-base/90 to-transparent backdrop-blur-[1px]">
-          <p className="text-[11px] uppercase tracking-[0.14em] text-content-muted">Conversation</p>
+        <div className="sticky top-0 z-10 -mx-4 -mt-5 mb-2 px-4 py-2 bg-gradient-to-b from-surface-base/90 to-transparent">
+          <p className="text-[11px] uppercase tracking-[0.14em] text-content-muted">Your conversation</p>
         </div>
         {messages.length === 0 && !loading && (
           <div className="h-full min-h-[220px] flex items-center justify-center px-4">
             <p className="text-sm text-content-tertiary text-center max-w-md leading-relaxed">
-              Start a chat like iMessage. Try asking what you can safely buy this week or ask for financial education in
-              plain language.
+              Say hi and ask anything about your money here—what you can afford this week, a bill coming up, or a term you
+              want explained without the jargon.
             </p>
           </div>
         )}
@@ -137,7 +139,7 @@ export default function OweAi() {
             >
               {m.role === 'assistant' ? (
                 <div className="prose prose-sm prose-invert max-w-none prose-p:my-1 prose-strong:text-content-primary">
-                  <ReactMarkdown>{m.content}</ReactMarkdown>
+                  <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{m.content}</ReactMarkdown>
                 </div>
               ) : (
                 <p className="whitespace-pre-wrap">{m.content}</p>
@@ -149,7 +151,7 @@ export default function OweAi() {
           <div className="flex justify-start">
             <div className="inline-flex items-center gap-2 rounded-[18px] rounded-bl-md border border-surface-border bg-surface-elevated/95 px-3 py-2 text-sm text-content-tertiary">
               <Loader2 className="w-4 h-4 animate-spin" aria-hidden />
-              Thinking…
+              One moment…
             </div>
           </div>
         )}
@@ -161,7 +163,7 @@ export default function OweAi() {
           <button
             key={prompt}
             type="button"
-            onClick={() => useQuickPrompt(prompt)}
+            onClick={() => sendQuickPrompt(prompt)}
             disabled={loading}
             className="text-xs rounded-full border border-surface-border bg-surface-raised/70 text-content-secondary px-3 py-1.5 hover:bg-surface-elevated hover:text-content-primary transition-colors disabled:opacity-40 disabled:pointer-events-none"
           >
@@ -188,9 +190,9 @@ export default function OweAi() {
                 void runSend(text);
               }
             }}
-            placeholder="Ask about your finances in Oweable…"
+            placeholder="Type your question like you would to an advisor…"
             disabled={loading}
-            className="flex-1 resize-none bg-transparent px-3 py-2 text-sm text-content-primary placeholder:text-content-muted focus:outline-none disabled:opacity-50 max-h-28"
+            className="flex-1 resize-none bg-transparent px-3 py-2 text-sm text-content-primary placeholder:text-content-muted focus-app-field rounded-md disabled:opacity-50 max-h-28"
           />
           <button
             type="submit"
@@ -202,7 +204,8 @@ export default function OweAi() {
           </button>
         </div>
         <p className="text-[11px] text-content-muted leading-relaxed">
-          Non‑finance topics (weather, code, trivia, etc.) are blocked. Not legal, tax, or investment advice.
+          Owe-AI stays on your finances. It isn&apos;t legal, tax, or personalized investment advice—think education and
+          planning with the data you&apos;ve saved.
         </p>
       </form>
     </div>
