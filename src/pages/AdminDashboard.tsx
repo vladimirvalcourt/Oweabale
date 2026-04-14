@@ -10,6 +10,7 @@ import { motion } from 'motion/react';
 import { supabase } from '../lib/supabase';
 import { PrivacyScreenWhenHidden } from '../components/PrivacyScreenWhenHidden';
 import { toast } from 'sonner';
+import { track } from '../lib/analytics';
 
 interface EnrichedUser {
   id: string;
@@ -272,8 +273,14 @@ export default function AdminDashboard() {
       toast.error('Both word and category are required.');
       return;
     }
+    const { data: { user: adminUser } } = await supabase.auth.getUser();
+    if (!adminUser) {
+      toast.error('Not signed in.');
+      return;
+    }
     setIsSavingCategoryFix(true);
     const { error } = await supabase.from('categorization_rules').insert({
+      user_id: adminUser.id,
       match_type: 'contains',
       match_value: categoryWord.trim().toLowerCase(),
       category: categoryName.trim(),
@@ -293,17 +300,23 @@ export default function AdminDashboard() {
 
   const handleToggleAdmin = async (userId: string, currentIsAdmin: boolean) => {
     const newValue = !currentIsAdmin;
-    const { error } = await supabase
-      .from('profiles')
-      .update({ is_admin: newValue })
-      .eq('id', userId);
+    const { data, error } = await supabase.functions.invoke('admin-actions', {
+      body: { action: 'set_admin', targetUserId: userId, isAdmin: newValue },
+    });
     if (error) {
       toast.error('Failed to update admin status.');
       addLog('ERROR', `Admin toggle failed for user ${userId.slice(0, 8)}`);
     } else {
       setProfiles(prev => prev.map(p => p.id === userId ? { ...p, is_admin: newValue } : p));
-      toast.success(newValue ? 'User promoted to admin.' : 'Admin access removed.');
+      toast.success(
+        typeof data?.message === 'string'
+          ? data.message
+          : newValue
+            ? 'User promoted to admin.'
+            : 'Admin access removed.',
+      );
       addLog('WARN', `User ${userId.slice(0, 8)} admin status → ${newValue}`);
+      track('admin_role_changed', { granted: newValue });
     }
   };
 
@@ -846,7 +859,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Pending Queue */}
-            <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-5 flex items-center justify-between lg:col-span-3 border-t-2 border-t-zinc-700">
+            <div className="bg-[#0A0A0A] border border-white/10 rounded-sm p-5 flex items-center justify-between lg:col-span-3 border-t-2 border-t-surface-border">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-white/5 rounded-full">
                   <Clock className="w-5 h-5 text-content-tertiary" />
@@ -933,7 +946,7 @@ export default function AdminDashboard() {
                       <td className="py-3 px-2 text-right space-x-1.5">
                         <button
                           onClick={() => handleToggleAdmin(user.id, user.is_admin)}
-                          className={`px-2 py-1 rounded-sm font-bold transition-colors text-[10px] ${user.is_admin ? 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/40' : 'bg-zinc-800 text-content-tertiary hover:bg-zinc-700 hover:text-white'}`}
+                          className={`px-2 py-1 rounded-sm font-bold transition-colors text-[10px] ${user.is_admin ? 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/40' : 'bg-surface-elevated text-content-tertiary hover:bg-surface-border hover:text-white'}`}
                           title={user.is_admin ? 'Remove admin access' : 'Promote to admin'}
                         >
                           {user.is_admin ? 'Demote' : 'Make Admin'}

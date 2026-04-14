@@ -53,6 +53,30 @@ Deno.serve(async (req: Request) => {
       })
     }
 
+    if (action === 'set_admin') {
+      const isAdminFlag = (body as { isAdmin?: unknown }).isAdmin
+      if (!targetUserId || typeof targetUserId !== 'string') {
+        throw new Error('Missing targetUserId')
+      }
+      if (typeof isAdminFlag !== 'boolean') {
+        throw new Error('isAdmin must be a boolean')
+      }
+      if (targetUserId === user.id && isAdminFlag) {
+        throw new Error('Cannot promote your own account')
+      }
+      const { error } = await supabaseAdmin
+        .from('profiles')
+        .update({ is_admin: isAdminFlag })
+        .eq('id', targetUserId)
+      if (error) throw error
+      return new Response(
+        JSON.stringify({
+          message: isAdminFlag ? 'User promoted to admin.' : 'Admin access removed.',
+        }),
+        { headers: jsonHeaders },
+      )
+    }
+
     if (action === 'plaid_stats') {
       const { data: items, error } = await supabaseAdmin
         .from('plaid_items')

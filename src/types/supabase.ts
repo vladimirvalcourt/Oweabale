@@ -31,6 +31,7 @@ export interface Database {
           timezone: string | null
           language: string | null
           is_admin: boolean
+          is_banned: boolean
           has_completed_onboarding: boolean | null
           credit_score: number | null
           credit_last_updated: string | null
@@ -55,6 +56,7 @@ export interface Database {
           timezone?: string | null
           language?: string | null
           is_admin?: boolean
+          is_banned?: boolean
           has_completed_onboarding?: boolean | null
           credit_score?: number | null
           credit_last_updated?: string | null
@@ -79,6 +81,7 @@ export interface Database {
           timezone?: string | null
           language?: string | null
           is_admin?: boolean
+          is_banned?: boolean
           has_completed_onboarding?: boolean | null
           credit_score?: number | null
           credit_last_updated?: string | null

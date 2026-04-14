@@ -589,7 +589,7 @@ export default function Ingestion() {
                               />
                             ) : (
                               <div className="text-center p-12">
-                                <FileText className="w-16 h-16 text-zinc-800 mx-auto mb-4" />
+                                <FileText className="w-16 h-16 text-content-muted mx-auto mb-4" />
                                 <p className="text-[10px] font-mono text-content-muted uppercase tracking-widest">No Preview Available</p>
                                 <p className="text-[9px] font-mono text-content-muted mt-2 select-none uppercase">ID: {item.id}</p>
                               </div>

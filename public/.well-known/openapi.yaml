@@ -1,0 +1,12 @@
+openapi: 3.0.3
+info:
+  title: Oweable — product metadata
+  version: "1.0.0"
+  description: |
+    Oweable does not publish a third-party REST API for customer integrations.
+    Authoritative product facts, features, positioning, and FAQ for AI systems are at:
+    https://www.oweable.com/llms.txt
+    Public marketing and legal pages: https://www.oweable.com/
+servers:
+  - url: https://www.oweable.com
+paths: {}

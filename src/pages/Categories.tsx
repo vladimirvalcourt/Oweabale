@@ -81,7 +81,7 @@ export default function Categories() {
             setEditingId(null);
             setFormData({ name: '', type: 'expense', color: '#6366F1' });
           }}
-          className="px-4 py-2 bg-content-primary hover:bg-zinc-200 text-surface-base rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 focus-app"
+          className="px-4 py-2 bg-content-primary hover:bg-content-tertiary/25 text-surface-base rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 focus-app"
         >
           <Plus className="w-3.5 h-3.5" />
           Add Category
@@ -188,7 +188,7 @@ export default function Categories() {
                 >
                   <div className="flex items-center gap-4">
                     <div
-                      className="w-10 h-10 rounded-sm flex items-center justify-center text-white border border-surface-border bg-surface-base group-hover:border-zinc-700 transition-colors"
+                      className="w-10 h-10 rounded-sm flex items-center justify-center text-white border border-surface-border bg-surface-base group-hover:border-white/15 transition-colors"
                       style={{ borderLeftColor: category.color || '#6366F1', borderLeftWidth: '3px' }}
                     >
                       <Tag className="w-5 h-5" style={{ color: category.color || '#6366F1' }} />

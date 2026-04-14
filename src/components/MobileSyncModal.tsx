@@ -111,7 +111,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
 
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-[60]">
-      <div className="fixed inset-0 bg-black/95 backdrop-blur-md" aria-hidden="true" />
+      <div className="fixed inset-0 bg-black/95" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <Dialog.Panel className="mx-auto max-w-xl w-full bg-surface-raised border border-surface-border rounded-sm shadow-2xl overflow-hidden relative group">
           <div className="flex h-full flex-col md:flex-row">
@@ -148,7 +148,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
               <div className="mt-8">
                  <div className="flex items-center gap-2 mb-2">
                     <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                    <span className="text-[9px] font-mono text-content-muted uppercase tracking-widest">TLS Encryption Active</span>
+                    <span className="text-[9px] font-mono text-content-muted uppercase tracking-widest">Secure connection</span>
                  </div>
                  <div className="w-full h-0.5 bg-surface-border rounded-full overflow-hidden">
                     <div className={cn("h-full bg-brand-violet transition-all duration-300", status === 'waiting' ? 'w-1/3' : status === 'active' ? 'w-2/3' : status === 'completed' ? 'w-full' : 'w-0')} />
@@ -166,18 +166,18 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                   {status === 'generating' ? (
                     <motion.div key="generating" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-4">
                       <Loader2 className="w-8 h-8 text-brand-violet animate-spin" />
-                      <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">Generating Token...</p>
+                      <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">Preparing secure link…</p>
                     </motion.div>
                   ) : (
                     <motion.div key="ready" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center max-w-[250px] w-full">
-                       <div className="relative group/qr p-3 bg-zinc-900 border border-surface-border shadow-2xl">
+                       <div className="relative group/qr p-3 bg-surface-raised border border-surface-border shadow-2xl">
                           {status === 'waiting' ? (
                              qrDataUrl
                                ? <img src={qrDataUrl} alt="QR Code" className="w-[200px] h-[200px] rounded-sm" />
                                : <div className="w-[200px] h-[200px] flex items-center justify-center"><Loader2 className="w-6 h-6 text-brand-violet animate-spin" /></div>
                           ) : (
                              <div className="w-[200px] h-[200px] flex flex-col items-center justify-center bg-brand-violet/5 gap-3 border-4 border-brand-violet/20 animate-pulse">
-                                <Zap className={`w-8 h-8 ${status === 'completed' ? 'text-brand-violet animate-bounce' : 'text-emerald-400'}`} />
+                                <Zap className={`w-8 h-8 ${status === 'completed' ? 'text-brand-violet' : 'text-emerald-400'}`} />
                                 <span className={`text-[9px] font-mono font-bold uppercase tracking-widest text-center ${status === 'completed' ? 'text-brand-violet' : 'text-emerald-400'}`}>
                                    {status === 'completed' ? 'RECEIVING DATA' : 'SESSION ACTIVE'}
                                 </span>

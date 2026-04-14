@@ -24,10 +24,8 @@ function BankConnectionGated() {
     <div className="bg-surface-elevated rounded-sm border border-surface-border p-6">
       <h3 className="text-sm font-sans font-semibold text-content-primary">Bank connections</h3>
       <p className="mt-2 text-sm text-content-tertiary leading-relaxed">
-        Oweable works without linking a bank: add bills and debts manually, import transactions via CSV, and use document
-        uploads where you need them. Optional automatic sync via Plaid appears here when{' '}
-        <code className="text-xs text-content-secondary">VITE_PLAID_LINK_UI_ENABLED=true</code> is enabled for your
-        deployment — until then, treat bank linking as off by default.
+        Oweable works without linking a bank: add bills and debts manually, import transactions via CSV, and use document uploads
+        where you need them. Automatic bank sync may appear here when it is available for your account.
       </p>
       {bankConnected && (
         <div className="mt-4 rounded-sm border border-surface-border bg-surface-base p-4">
@@ -106,8 +104,8 @@ function BankConnectionPlaid() {
       <div className="mb-6">
         <h3 className="text-xs font-mono uppercase tracking-widest text-content-primary">Data Sources</h3>
         <p className="mt-1 text-sm text-content-tertiary">
-          Connect your bank with Plaid. Credentials stay with Plaid; we store a secure access token on the server only.
-          Transactions sync automatically and you can refresh on demand.
+          Connect your bank through our partner Plaid. You sign in at your bank; we only keep what is needed to sync transactions.
+          Sync runs automatically and you can refresh on demand.
         </p>
       </div>
 
@@ -117,7 +115,7 @@ function BankConnectionPlaid() {
             type="button"
             onClick={handleConnectClick}
             disabled={plaidFlow.isBusy || !plaidGloballyEnabled}
-            className="bg-content-primary text-black hover:bg-zinc-200 font-bold px-6 py-3 rounded-sm flex items-center gap-2 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            className="bg-content-primary text-black hover:bg-content-tertiary/25 font-bold px-6 py-3 rounded-sm flex items-center gap-2 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {plaidFlow.isBusy ? (
               <>
@@ -157,7 +155,7 @@ function BankConnectionPlaid() {
               <div className="min-w-0">
                 <p className="text-sm font-mono text-amber-200">Bank needs attention</p>
                 <p className="mt-1 text-xs text-content-tertiary">
-                  Your institution requires you to sign in again. Use Fix connection to complete Plaid Link update mode.
+                  Your institution needs you to sign in again. Use Fix connection to reconnect securely.
                 </p>
                 <button
                   type="button"

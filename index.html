@@ -8,7 +8,7 @@
     <!-- Fonts: preconnect + early stylesheet (avoid @import in CSS blocking paint) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;510;590&amp;display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&amp;display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400..500&amp;display=swap" />
 
     <!-- Primary meta -->
@@ -81,12 +81,7 @@
         "@type": "Audience",
         "audienceType": "Anyone dealing with debt, bills, or financial pressure — including people paying off credit card or medical debt, single parents, gig workers, 1099 contractors, recent graduates, salaried employees on tight budgets, Uber and DoorDash drivers, consultants, and solo business owners"
       },
-      "screenshot": "https://www.oweable.com/og-image.svg",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "124"
-      }
+      "screenshot": "https://www.oweable.com/og-image.svg"
     }
     </script>
 
@@ -119,6 +114,14 @@
           "acceptedAnswer": {
             "@type": "Answer",
             "text": "Oweable is a financial operating system for anyone dealing with debt, bills, or financial pressure. It replaces spreadsheets and disconnected apps with a unified dashboard for managing bills, debt payoff, income, subscriptions, net worth, credit tools, and spending analytics. It also includes quarterly tax tools for gig and 1099 workers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the official website for Oweable?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The official website is https://www.oweable.com/."
           }
         },
         {
@@ -158,7 +161,7 @@
           "name": "Does Oweable connect to my bank account?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Oweable supports manual entry, document ingestion (upload receipts and statements), and optional bank linking via Plaid from Settings (Integrations). Plaid connection stores tokens securely on the server; automatic transaction import may be expanded in future updates."
+            "text": "You can add everything by hand or by uploading receipts and statements. Optional bank linking is available from Settings under Integrations when offered for your account, so transactions can stay up to date without retyping them."
           }
         },
         {
@@ -166,7 +169,7 @@
           "name": "How does Oweable track net worth?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Oweable computes your real-time net worth as total assets minus total liabilities (debts). It also stores a daily snapshot every time you log in, building a historical timeline so you can see your net worth trajectory over 1 month, 3 months, 6 months, 1 year, or all time."
+            "text": "Oweable shows net worth as what you own minus what you owe, and includes a history view so you can see how it changes over weeks and months."
           }
         },
         {
@@ -182,7 +185,7 @@
           "name": "Is Oweable secure?",
           "acceptedAnswer": {
             "@type": "Answer",
-            "text": "Yes. Oweable uses Google OAuth for authentication (no passwords stored), encrypts all data at rest and in transit via TLS 1.2+, and enforces row-level security (RLS) on every database table so users can only access their own financial data. Authentication sessions expire after 24 hours of inactivity."
+            "text": "Yes. You sign in with Google (Oweable does not store a separate password for that). Your information is protected in transit and organized so only your account can see it. For more detail, see the Security page at oweable.com/security."
           }
         },
         {

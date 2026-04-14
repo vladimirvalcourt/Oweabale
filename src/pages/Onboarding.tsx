@@ -154,7 +154,7 @@ export default function Onboarding() {
         </div>
 
         {/* Top bar */}
-        <div className="absolute top-0 left-0 right-0 flex justify-between items-center h-12 px-6 border-b border-surface-border bg-surface-base/50 backdrop-blur-md z-20">
+        <div className="absolute top-0 left-0 right-0 flex justify-between items-center h-12 px-6 border-b border-surface-border bg-surface-base/90 z-20">
           <div className="text-[10px] font-mono text-white tracking-[0.2em] font-bold uppercase">Oweable</div>
           <div className="flex items-center gap-4">
             <button
@@ -265,7 +265,7 @@ export default function Onboarding() {
       </div>
 
       {/* Header */}
-        <div className="absolute top-0 left-0 right-0 flex justify-between items-center h-12 px-4 sm:px-6 border-b border-surface-border bg-surface-base/50 backdrop-blur-md z-20 gap-2">
+        <div className="absolute top-0 left-0 right-0 flex justify-between items-center h-12 px-4 sm:px-6 border-b border-surface-border bg-surface-base/90 z-20 gap-2">
         <div className="flex items-center gap-3 sm:gap-6 min-w-0">
           <div className="text-[10px] font-mono text-white tracking-[0.2em] font-bold uppercase shrink-0">Getting Started</div>
           <div className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest md:hidden shrink-0">
@@ -398,7 +398,7 @@ export default function Onboarding() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button 
                       onClick={() => setFormData({...formData, focus: 'stacking'})}
-                      className={`p-5 border transition-all text-left group ${formData.focus === 'stacking' ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-content-tertiary'}`}
+                      className={`p-5 border transition-all text-left group ${formData.focus === 'stacking' ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-white/15 text-content-tertiary'}`}
                     >
                       <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Save & Grow</h3>
                       <p className="text-[9px] font-mono uppercase leading-relaxed text-content-tertiary">Focus on growth trajectory and asset accumulation.</p>
@@ -406,7 +406,7 @@ export default function Onboarding() {
 
                     <button 
                       onClick={() => setFormData({...formData, focus: 'detonation'})}
-                      className={`p-5 border transition-all text-left group ${formData.focus === 'detonation' ? 'bg-surface-elevated text-white border-rose-500' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-content-tertiary'}`}
+                      className={`p-5 border transition-all text-left group ${formData.focus === 'detonation' ? 'bg-surface-elevated text-white border-rose-500' : 'bg-surface-base border-surface-border hover:border-white/15 text-content-tertiary'}`}
                     >
                       <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Pay Off Debt Fast</h3>
                       <p className="text-[9px] font-mono uppercase leading-relaxed text-content-tertiary">Focus on highest APR targets and accelerated repayment.</p>
@@ -418,7 +418,7 @@ export default function Onboarding() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button 
                       onClick={() => setFormData({...formData, freelance: true})}
-                      className={`p-5 border transition-all text-left group ${formData.freelance === true ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-content-tertiary'}`}
+                      className={`p-5 border transition-all text-left group ${formData.freelance === true ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-white/15 text-content-tertiary'}`}
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest">Independent Contractor</h3>
@@ -429,7 +429,7 @@ export default function Onboarding() {
 
                     <button 
                       onClick={() => setFormData({...formData, freelance: false})}
-                      className={`p-5 border transition-all text-left group ${formData.freelance === false ? 'bg-zinc-800 text-white border-zinc-700' : 'bg-surface-base border-surface-border hover:border-zinc-700 text-content-tertiary'}`}
+                      className={`p-5 border transition-all text-left group ${formData.freelance === false ? 'bg-surface-elevated text-white border-surface-border' : 'bg-surface-base border-surface-border hover:border-white/15 text-content-tertiary'}`}
                     >
                       <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Traditional (W2)</h3>
                       <p className="text-[9px] font-mono uppercase leading-relaxed text-content-tertiary">Standard household budgeting and debt elimination.</p>

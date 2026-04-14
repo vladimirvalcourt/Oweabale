@@ -6,13 +6,11 @@ import {
   TrendingUp, TrendingDown, ArrowUpRight, Zap,
   FileText, UploadCloud, Loader2
 } from 'lucide-react';
+import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { IRS_MILEAGE_RATE } from '../lib/finance';
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
 
 /** Simplified average federal income rate used for freelance tax estimates. */
 const FED_INCOME_ESTIMATE_RATE = 0.12;
@@ -37,6 +35,9 @@ export default function Freelance() {
       let fullText = "";
       if (uploadedFile.type === 'application/pdf') {
         const arrayBuffer = await uploadedFile.arrayBuffer();
+        const pdfjsLib = await import('pdfjs-dist');
+        const pdfjsWorkerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+        pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         
         for (let i = 1; i <= pdf.numPages; i++) {
@@ -100,7 +101,14 @@ export default function Freelance() {
         scouredWriteOffs: capturedWriteOffs
       });
       setIsAddModalOpen(true);
-      toast.success('Information extracted from PDF');
+      if (uploadedFile.type === 'application/pdf') {
+        toast.success('PDF scanned', {
+          description: 'Confirm payer and amount before saving — text extraction can misread statements.',
+          duration: 6500,
+        });
+      } else {
+        toast.success('Information extracted');
+      }
     } catch (err) {
       console.error(err);
       toast.error('Failed to read PDF. Please enter manually.');
@@ -324,37 +332,42 @@ export default function Freelance() {
       {/* Add Entry Modal */}
       <AnimatePresence>
         {isAddModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <motion.div 
+          <Dialog open={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} className="relative z-50">
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/90 backdrop-blur-sm"
-              onClick={() => setIsAddModalOpen(false)}
+              className="fixed inset-0 bg-black/90"
+              aria-hidden="true"
             />
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="relative bg-surface-raised border border-surface-border p-8 w-full max-w-md shadow-3xl"
-            >
-               <h2 className="text-xl font-sans font-semibold text-white mb-6">Add payment</h2>
-               <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Who paid you?</label>
-                    <input autoFocus type="text" value={formData.client} onChange={e => setFormData({...formData, client: e.target.value})} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white focus-app-field-brand-indigo transition-colors rounded-sm" placeholder="e.g. Acme Studio" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Payment amount</label>
-                    <input type="number" value={formData.amount} onChange={e => setFormData({...formData, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white font-mono tabular-nums focus-app-field-brand-indigo transition-colors rounded-sm" placeholder="0.00" />
-                  </div>
-                  <div className="pt-4 flex gap-3">
-                    <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 h-12 border border-surface-border text-content-tertiary text-sm font-sans font-medium hover:bg-surface-elevated transition-colors rounded-sm">Cancel</button>
-                    <button type="submit" className="flex-[2] bg-brand-cta hover:bg-brand-cta-hover text-white h-12 px-8 text-sm font-sans font-semibold transition-all rounded-sm">Add payment</button>
-                  </div>
-               </form>
-            </motion.div>
-          </div>
+            <div className="fixed inset-0 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="w-full max-w-md"
+              >
+                <Dialog.Panel className="bg-surface-raised border border-surface-border p-8 shadow-2xl">
+                  <Dialog.Title className="text-xl font-sans font-semibold text-white mb-6">Add payment</Dialog.Title>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Who paid you?</label>
+                      <input autoFocus type="text" value={formData.client} onChange={e => setFormData({ ...formData, client: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white focus-app-field-brand-indigo transition-colors rounded-sm" placeholder="e.g. Acme Studio" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Payment amount</label>
+                      <input type="number" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white font-mono tabular-nums focus-app-field-brand-indigo transition-colors rounded-sm" placeholder="0.00" />
+                    </div>
+                    <p className="text-xs text-content-muted leading-relaxed">If this row came from a PDF scan, double-check the amount matches your statement.</p>
+                    <div className="pt-4 flex gap-3">
+                      <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 h-12 border border-surface-border text-content-tertiary text-sm font-sans font-medium hover:bg-surface-elevated transition-colors rounded-sm focus-app">Cancel</button>
+                      <button type="submit" className="flex-[2] bg-brand-cta hover:bg-brand-cta-hover text-white h-12 px-8 text-sm font-sans font-semibold transition-all rounded-sm focus-app">Add payment</button>
+                    </div>
+                  </form>
+                </Dialog.Panel>
+              </motion.div>
+            </div>
+          </Dialog>
         )}
       </AnimatePresence>
     </div>

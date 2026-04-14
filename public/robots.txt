@@ -120,6 +120,16 @@ Allow: /privacy
 Allow: /terms
 Allow: /llms.txt
 
+# ── ChatGPT user-triggered fetch (live page / research) ─────
+User-agent: ChatGPT-User
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+Allow: /llms.txt
+Allow: /.well-known/
+
 # ── Microsoft Bing ─────────────────────────────────────────────
 User-agent: Bingbot
 Allow: /

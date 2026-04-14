@@ -399,7 +399,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm" 
+            className="fixed inset-0 bg-black/60" 
             aria-hidden="true" 
           />
 
@@ -501,11 +501,11 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     <AnimatePresence>
                       {showPreview && scannedPreviewUrl && (
                         <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: 'auto', opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="overflow-hidden border-t border-surface-border"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.15 }}
+                          className="border-t border-surface-border"
                         >
                           <div className="relative max-h-56 overflow-hidden bg-black flex items-center justify-center">
                             <img

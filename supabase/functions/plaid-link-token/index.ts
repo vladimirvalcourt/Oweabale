@@ -54,7 +54,7 @@ Deno.serve(async (req: Request) => {
       Deno.env.get('PLAID_WEBHOOK_URL') ??
       `${new URL(supabaseUrl).origin}/functions/v1/plaid-webhook`;
     const requestOrigin = origin && /^https?:\/\//.test(origin) ? origin : 'https://oweable.com';
-    const redirectUri = Deno.env.get('PLAID_REDIRECT_URI') ?? `${requestOrigin}/settings`;
+    const redirectUri = Deno.env.get('PLAID_REDIRECT_URI') ?? `${requestOrigin}/plaid/callback`;
 
     let out: { link_token?: string };
 

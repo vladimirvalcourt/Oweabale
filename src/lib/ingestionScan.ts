@@ -3,12 +3,15 @@
  * Scanned PDFs have no text layer; we render pages to canvas and run Tesseract.
  */
 import Tesseract from 'tesseract.js';
-import * as pdfjsLib from 'pdfjs-dist';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
-import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 
-if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
+async function loadPdfJs() {
+  const pdfjsLib = await import('pdfjs-dist');
+  const pdfjsWorkerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+  if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
+  }
+  return pdfjsLib;
 }
 
 /** Below this trimmed length, PDF text layer is treated as unusable → raster OCR. */
@@ -88,6 +91,7 @@ export async function extractDocumentText(
 
   if (file.type === 'application/pdf') {
     const arrayBuffer = await file.arrayBuffer();
+    const pdfjsLib = await loadPdfJs();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     onStatus?.('scanning');
     let text = await extractPdfTextLayer(pdf);

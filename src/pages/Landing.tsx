@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { TransitionLink } from '../components/TransitionLink';
 import Footer from '../components/Footer';
 import { ArrowRight, UploadCloud, Target, BarChart2, TrendingUp, BookOpen, CalendarClock, Quote } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 import { useSEO } from '../hooks/useSEO';
@@ -43,6 +43,7 @@ const CYCLE_WORDS = [
 
 function WordCycler() {
   const [index, setIndex] = useState(0);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -60,18 +61,22 @@ function WordCycler() {
         {longestWord}.
       </span>
       
-      <AnimatePresence mode="wait">
-        <motion.span
-          key={CYCLE_WORDS[index]}
-          initial={{ y: '10%', opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: '-10%', opacity: 0 }}
-          transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-          className="text-brand-violet col-start-1 row-start-1 inline-block"
-        >
-          {CYCLE_WORDS[index]}.
-        </motion.span>
-      </AnimatePresence>
+      {reduceMotion ? (
+        <span className="text-brand-violet col-start-1 row-start-1 inline-block">{CYCLE_WORDS[index]}.</span>
+      ) : (
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={CYCLE_WORDS[index]}
+            initial={{ y: '10%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '-10%', opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+            className="text-brand-violet col-start-1 row-start-1 inline-block"
+          >
+            {CYCLE_WORDS[index]}.
+          </motion.span>
+        </AnimatePresence>
+      )}
     </span>
   );
 }
@@ -99,13 +104,13 @@ const FAQ_ITEMS_BASE = [
   },
   {
     q: 'Is my financial data secure?',
-    a: 'Yes. Oweable uses Google OAuth (no passwords stored), encrypts all data at rest and in transit via TLS 1.2+, and enforces row-level security on every database table — so your data is never accessible to anyone else.',
+    a: 'Yes. You sign in with Google (Oweable does not store a separate password for that). Your information is encrypted in transit, and you only see your own data in the app. More detail is on our Security page.',
   },
 ];
 
 function buildFaqItems(plaidUiEnabled: boolean) {
   const bankAnswer = plaidUiEnabled
-    ? 'No. You can run your whole plan with manual bills, CSV imports, and document uploads. Optional bank connection (Plaid) is available in-app when enabled for your environment to sync transactions — use it if you want automatic feeds.'
+    ? 'No. You can run your whole plan with manual bills, CSV imports, and document uploads. If you want automatic transaction sync, you can connect your bank in Settings → Integrations when that option is available.'
     : 'No. You can run your whole plan with manual bills, CSV imports, and document uploads. Optional automatic bank connection may be offered later; we do not require it to get value from Oweable.';
 
   return [
@@ -197,7 +202,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-brand-violet/30 flex flex-col">
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-surface-base/90 backdrop-blur-sm border-surface-border' : 'bg-transparent border-transparent'}`}>
+      <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-surface-base/95 border-surface-border' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <TransitionLink to="/" className="brand-header-text flex items-center gap-2">
             <div className="w-2 h-2 bg-brand-violet shadow-glow-indigo"></div>

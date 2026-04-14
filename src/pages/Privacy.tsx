@@ -43,17 +43,16 @@ export default function Privacy() {
           <section>
             <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">2. Encryption standards</h2>
             <p>
-              All sensitive identifiers are encrypted both at rest (AES-256) and in transit (TLS 1.3). Access to raw data is restricted to core system processes; Oweable employees cannot view your specific transaction history without explicit support authorization.
+              Sensitive information is protected with strong encryption when stored and when it moves between your device and our systems. Access is tightly controlled; Oweable staff cannot browse your transaction history without a support process you initiate.
             </p>
           </section>
 
           <section>
             <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">3. Third-party integrations</h2>
             <p>
-              We utilize select partners for banking connectivity (for example Plaid, when that integration is enabled for your
-              deployment) and document parsing. These partners are strictly vetted and are contractually prohibited from using
-              your data for any purpose other than facilitating Oweable&apos;s core functions. You can use Oweable without
-              linking a bank; connectivity is optional.
+              We work with vetted partners for optional bank linking and for document processing. Those partners may only use
+              your information to provide the service you asked for. You can use Oweable without linking a bank; connectivity is
+              optional.
             </p>
           </section>
 

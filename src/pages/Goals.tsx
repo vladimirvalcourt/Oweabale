@@ -195,7 +195,7 @@ export default function Goals() {
               return (
                 <div 
                   key={goal.id} 
-                  className="bg-surface-elevated rounded-sm border border-surface-border overflow-hidden group hover:border-zinc-700 transition-colors"
+                  className="bg-surface-elevated rounded-sm border border-surface-border overflow-hidden group hover:border-white/15 transition-colors"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-6">

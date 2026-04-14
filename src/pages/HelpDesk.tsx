@@ -258,7 +258,7 @@ export default function HelpDesk() {
 
       {/* New Ticket Modal */}
       <Dialog open={isNewTicketOpen} onClose={() => setIsNewTicketOpen(false)} className="relative z-50">
-        <div className="fixed inset-0 bg-surface-base/95 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 bg-surface-base/95" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto w-full max-w-lg bg-surface-elevated border border-surface-border shadow-2xl p-6 rounded-sm">
             <Dialog.Title className="text-sm font-mono font-bold text-white uppercase tracking-widest flex items-center gap-2 mb-6 pb-4 border-b border-surface-border">

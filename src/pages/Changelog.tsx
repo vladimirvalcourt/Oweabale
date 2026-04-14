@@ -4,10 +4,10 @@ import { ScrollText } from 'lucide-react';
 const ENTRIES: { date: string; title: string; bullets: string[] }[] = [
   {
     date: '2026-04',
-    title: 'Plaid bank linking',
+    title: 'Bank linking',
     bullets: [
-      'Settings → Integrations: real Plaid Link via Edge Functions (link token + public_token exchange). Access tokens stay in `plaid_items`; profile stores institution name and linked time.',
-      'Requires Supabase secrets: PLAID_CLIENT_ID, PLAID_SECRET, PLAID_ENV; deploy functions `plaid-link-token` and `plaid-exchange`.',
+      'Settings → Integrations: connect your bank for automatic transaction sync when available.',
+      'Your institution name and last linked time show on your profile after you connect.',
     ],
   },
   {
@@ -15,8 +15,8 @@ const ENTRIES: { date: string; title: string; bullets: string[] }[] = [
     title: 'Navigation & focus',
     bullets: [
       'Sidebar: Cash flow anchor on Dashboard, Due soon badge on Bills, More section for Categories, Support, Changelog, and Auto-rules.',
-      'Settings: tab changes sync to the URL (?tab=); Profile clears the query.',
-      'Due soon count: bills and active subscriptions in the next 7 days (overdue bills excluded); citations still use the 7-day urgency window.',
+      'Settings remembers which section you were in when you use the back button or share a link.',
+      'Due soon highlights bills and active subscriptions in the next seven days (overdue bills are handled separately).',
     ],
   },
 ];

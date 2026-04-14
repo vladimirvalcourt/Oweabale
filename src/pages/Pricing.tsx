@@ -75,7 +75,7 @@ export default function Pricing() {
   return (
     <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-indigo-500/30 overflow-x-hidden">
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-surface-base/90 backdrop-blur-md border-surface-border' : 'bg-transparent border-transparent'}`}>
+      <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-surface-base/95 border-surface-border' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <TransitionLink to="/" className="brand-header-text text-xl text-content-primary transition-colors duration-200">
             Oweable
@@ -179,7 +179,7 @@ export default function Pricing() {
               
               <TransitionLink 
                 to="/dashboard" 
-                className="w-full py-4 px-6 bg-transparent border border-surface-border hover:border-zinc-300 hover:bg-white/5 text-content-primary rounded-sm text-sm font-sans font-semibold text-center transition-all duration-200 mb-10"
+                className="w-full py-4 px-6 bg-transparent border border-surface-border hover:border-content-muted hover:bg-white/5 text-content-primary rounded-sm text-sm font-sans font-semibold text-center transition-all duration-200 mb-10"
               >
                 Use free tracker
               </TransitionLink>

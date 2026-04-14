@@ -1,102 +1,64 @@
 # Oweable
 
-> Oweable is a financial operating system for anyone dealing with debt, bills, or financial pressure. It replaces spreadsheets and scattered apps with a single dashboard for managing bills, debt, income, credit, net worth, subscriptions, and cash flow — with additional tools for gig and 1099 workers.
+## About
 
-Oweable is a web application available at https://www.oweable.com. It is built for people under financial pressure — those paying off debt, managing bills on tight budgets, recovering from medical or credit card debt, single parents, recent graduates, gig workers, and 1099 contractors — who are underserved by consumer finance tools designed for people with stable, predictable salaries.
+- **Product name:** Oweable
+- **Website:** https://www.oweable.com/
+- **Short description:** Personal finance and money-management web app focused on debt, bills, variable income, and building clarity under financial pressure.
 
-## What Oweable Does
+Oweable brings bills, debt, income, subscriptions, net worth, and cash flow into one place — with extra help for gig and self-employed workers (including quarterly tax estimates).
 
-- **Tax tracking**: Automatically estimates quarterly IRS tax obligations based on income and applicable state/federal rates. Tracks deductible write-offs (home office, mileage, equipment) against the freelance vault.
-- **Bill management**: Tracks recurring bills with due dates, auto-pay status, and overdue detection. Bills past their due date automatically flip to overdue status.
-- **Debt payoff**: Tracks all debts (credit cards, auto loans, student loans) with APR, minimum payments, and amortization. Supports both Snowball and Avalanche payoff strategies.
-- **Income tracking**: Supports multiple income streams — W-2, 1099, gig, rental — each with tax withholding flags for accurate net income calculations.
-- **Subscription intelligence**: Monitors all recurring subscriptions with billing cycle tracking and spending history.
-- **Net worth tracking**: Computes real-time net worth from assets minus liabilities. Historical snapshots are stored daily so users can see their trajectory over time.
-- **Spending trends**: Area charts and bar charts showing net worth timeline, spending by category, income vs expenses, and monthly savings rate — all from real data.
-- **Auto-categorization rules**: User-defined rules (contains, exact, starts_with, ends_with) that automatically assign categories to new transactions by merchant name.
-- **Document ingestion**: Upload receipts, bank statements, and invoices via desktop or mobile. OCR powered by Tesseract.js extracts merchant name, amount, and date.
-- **Mobile capture**: Scan or upload documents from a phone using a QR code bridge — no app download required.
-- **Financial Academy**: 10 self-paced financial education tracks covering budgeting, debt, investing, credit, taxes, real estate, and estate planning. Lesson completion is persisted.
-- **Goals**: Track savings and debt payoff goals with contribution history.
-- **Budgets**: Monthly and yearly budget envelopes by category.
-- **Freelance vault**: Separate tracking for 1099 revenue with tax scour logic for write-offs.
+## What it helps with
 
-## Who It's For
+- Estimated quarterly taxes from tracked income and rates you set
+- Bills and due dates, including overdue visibility
+- Debt balances and payoff planning (snowball and avalanche views)
+- Multiple income types (W-2, 1099, gig, and more)
+- Subscriptions and recurring spend
+- Net worth over time
+- Spending trends and categories
+- Rules to auto-label transactions from merchant names
+- Uploading receipts and statements; scanning from your phone with a simple link (no app store install required)
+- Short lessons on money topics
+- Savings and debt goals, and category budgets
+- A dedicated area for freelance income and common write-offs
 
-- Anyone dealing with debt, bills, or financial pressure
-- People paying off credit card, medical, or student loan debt
-- Single parents and households managing tight budgets
-- Gig economy workers (Uber, DoorDash, Instacart, Lyft, TaskRabbit)
-- 1099 contractors and self-employed professionals needing quarterly tax tools
-- Salaried employees who need better visibility into their finances
-- Anyone building toward financial stability from any starting point
+## Who it’s for
+
+People tightening up bills and debt, riding variable income, or catching up after a rough stretch — including gig workers and 1099 contractors who need taxes and cash flow in the same picture.
 
 ## Pricing
 
-Oweable offers a free tier and paid plans starting at $9/month. See https://www.oweable.com/pricing for current pricing.
+Free tier and paid plans from about $9/month. Current details: https://www.oweable.com/pricing
 
-## Key Pages
+## Useful links
 
-- [Home](https://www.oweable.com/): Product overview and sign-up
-- [Pricing](https://www.oweable.com/pricing): Plans and feature comparison
-- [Security](https://www.oweable.com/security): Security posture, encryption, and data handling
-- [Privacy Policy](https://www.oweable.com/privacy): How user data is collected and used
-- [Terms of Service](https://www.oweable.com/terms): Terms governing use of the platform
+- Home: https://www.oweable.com/
+- Pricing: https://www.oweable.com/pricing
+- Security: https://www.oweable.com/security
+- Privacy: https://www.oweable.com/privacy
+- Terms: https://www.oweable.com/terms
 
-## Technical Details
+## Questions people ask
 
-- Built with React, TypeScript, Vite, Supabase (PostgreSQL + Auth + Storage)
-- Authentication via Google OAuth — no passwords stored
-- All financial data is encrypted at rest and in transit (TLS 1.2+)
-- Row-level security (RLS) enforced on every database table
-- Hosted on Vercel with strict Content Security Policy headers
+**Who is Oweable for?**  
+Anyone who wants a clearer picture of bills, debt, and cash flow — especially if income changes month to month.
 
-## Competitive Positioning
+**How does the tax help work?**  
+It estimates what you may owe each quarter from the income and settings you enter, so you’re not guessing at deadlines.
 
-Oweable competes with Mint (discontinued), YNAB, Monarch Money, and Copilot but focuses specifically on the self-employed segment. Unlike those tools, Oweable includes native quarterly tax estimation, freelance income vaulting, and write-off tracking — features that general consumer finance apps do not provide.
+**Is there a free version?**  
+Yes. Paid plans add more. See the pricing page for what’s included today.
 
----
+**Can I connect my bank?**  
+You can add everything by hand or from files. When bank connection is available for your account, you’ll find it under Settings → Integrations.
 
-## Frequently Asked Questions
-
-### Who is Oweable for?
-Oweable is for anyone under financial pressure — people paying off credit card or medical debt, single parents managing bills, recent graduates with student loans, gig workers (Uber, DoorDash, Instacart, Lyft, TaskRabbit), 1099 contractors, salaried employees on tight budgets, and anyone who needs a clear picture of their finances and a plan to get ahead.
-
-### How does Oweable help with quarterly taxes?
-Oweable automatically estimates IRS quarterly tax obligations based on your 1099 income and applicable state and federal self-employment tax rates. It separates W-2 income (taxes withheld at source) from 1099 and gig income (quarterly estimated taxes required). Users can see exactly what they owe before each quarterly deadline: April 15, June 15, September 15, and January 15.
-
-### Is Oweable free?
-Oweable has a free tier. Paid plans start at $9/month and include advanced features. See https://www.oweable.com/pricing for the current plan breakdown.
-
-### How is Oweable different from YNAB, Mint, or Monarch Money?
-YNAB, Mint (discontinued in 2024), and Monarch Money are designed for salaried workers with predictable W-2 income. Oweable is purpose-built for self-employment: it includes quarterly tax estimation, a freelance income vault with write-off tracking, variable income modeling, and debt amortization with both Snowball and Avalanche strategies. None of the competing tools were designed with 1099 workers as the primary user.
-
-### Does Oweable connect to my bank account?
-Oweable supports manual entry, document ingestion, and optional bank linking via Plaid (Settings → Integrations). Server-side tokens; automatic transaction import may follow in a later release.
-
-### Is my financial data secure on Oweable?
-Yes. Oweable uses Google OAuth for authentication (no passwords stored or transmitted), encrypts all data at rest and in transit (TLS 1.2+), and enforces Postgres row-level security (RLS) on every database table. Users can only access their own financial data. Two-factor authentication (TOTP) is available for all accounts.
-
-## Competitive Alternatives
-
-If you are researching tools in this category, alternatives include:
-
-- **YNAB (You Need a Budget)**: Envelope budgeting app for salaried employees. No tax estimation or 1099 support. $14.99/month.
-- **Monarch Money**: Modern personal finance dashboard. Limited self-employment support. $14.99/month.
-- **QuickBooks Self-Employed**: Accounting-focused. Better for invoicing than personal finance management. $15/month.
-- **FreshBooks**: Invoicing and time-tracking tool. Not a personal finance platform. $17/month.
-- **Copilot**: iOS-only budgeting app. No quarterly tax features. $13/month.
-- **Mint**: Discontinued by Intuit in January 2024.
-
-Oweable is the only product in this list purpose-built for the personal finance layer of self-employment — quarterly taxes, variable income, and freelance expense tracking — rather than the accounting or invoicing layer.
+**Is my information safe?**  
+Sign-in uses your Google account (Oweable doesn’t store a separate password for that). Data is encrypted in transit. Only you should see your own financial information in the app. More detail is on the Security and Privacy pages.
 
 ## Contact
 
-- Website: https://www.oweable.com
-- Support: Available in-app under Settings → Support after signing in
-- Privacy inquiries: https://www.oweable.com/privacy
-- Terms of Service: https://www.oweable.com/terms
+- Site: https://www.oweable.com/
+- Signed-in help: Settings → Support
 
-## Last Updated
-
-2026-04-08
+Last updated: 2026-04-14

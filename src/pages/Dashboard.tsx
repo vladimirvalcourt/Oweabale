@@ -318,11 +318,11 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse p-6">
-        <div className="h-8 bg-zinc-800 rounded w-1/4"></div>
-        <div className="bg-zinc-900 rounded border border-zinc-800 p-8 h-40"></div>
+        <div className="h-8 bg-surface-border rounded w-1/4"></div>
+        <div className="bg-surface-raised rounded border border-surface-border p-8 h-40"></div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-zinc-900 rounded border border-zinc-800 p-6 h-32"></div>
+            <div key={i} className="bg-surface-raised rounded border border-surface-border p-6 h-32"></div>
           ))}
         </div>
       </div>
@@ -494,10 +494,10 @@ export default function Dashboard() {
           </summary>
           <p className="mt-3 text-xs text-content-tertiary leading-relaxed">
             We take liquid cash (cash-type assets), subtract bills, subscriptions, minimum debt payments, and open fines with a due
-            in this window (today through your next paycheck, or month-end if no income date), then divide by the number of days in
-            that window for a rough daily amount. This is not financial advice — it does not include pending holds, investments, or
-            unplanned spending. See <code className="text-content-secondary">docs/SAFE_TO_SPEND.md</code> in the repository for the
-            full formula and edge cases.
+            date in this window (today through your next paycheck, or month-end if no income date), then divide by the number of days
+            in that window for a rough daily amount. This is not financial advice — it does not include pending holds, investments,
+            or unplanned spending. Unusual pay schedules or one-off expenses can change what feels safe day to day; use this as a
+            directional guide, not a guarantee.
           </p>
         </details>
         <p className="mt-4 text-xs text-content-tertiary">
@@ -669,7 +669,7 @@ export default function Dashboard() {
                       <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{debtProgress.toFixed(0)}% Clear</span>
                     </div>
                   </div>
-                  <div className="w-full h-1.5 bg-zinc-900 border border-surface-border rounded-full overflow-hidden mt-4">
+                  <div className="w-full h-1.5 bg-surface-raised border border-surface-border rounded-full overflow-hidden mt-4">
                     <div
                       className="h-full bg-brand-expense transition-all duration-1000 shadow-[0_0_8px_rgba(248,113,113,0.3)]"
                       style={{ width: `${debtProgress}%` }}
@@ -728,7 +728,7 @@ export default function Dashboard() {
           <div className="space-y-6">
             {hasBillsSidebar && (
               <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit max-h-[350px]">
-                <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
+                <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-surface-raised/80">
                   <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-content-secondary">Upcoming Bills</h3>
                   <TransitionLink to="/bills" className="text-xs font-sans text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
                     See all
@@ -768,7 +768,7 @@ export default function Dashboard() {
 
             {hasCitationsSidebar && (
               <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit">
-                <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-zinc-900/50">
+                <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-surface-raised/80">
                   <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-content-secondary">Citations & Tickets</h3>
                 </div>
                 <div className="p-0 focus-app">
@@ -801,7 +801,7 @@ export default function Dashboard() {
                           className={`w-full text-xs font-sans font-medium py-2 rounded transition-colors focus-app ${
                             citation.daysLeft <= 7
                               ? 'bg-rose-500 hover:bg-rose-600 text-white'
-                              : 'bg-surface-border hover:bg-zinc-700 text-content-primary'
+                              : 'bg-surface-border hover:bg-surface-elevated text-content-primary'
                           }`}
                         >
                           Resolve Ticket
@@ -818,7 +818,7 @@ export default function Dashboard() {
 
        {/* Citation Resolution Modal */}
        <Dialog open={isCitationModalOpen} onClose={() => setIsCitationModalOpen(false)} className="relative z-50">
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 bg-black/60" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-sm w-full rounded shadow-xl bg-surface-elevated border border-surface-border overflow-hidden">
             <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-surface-raised">
@@ -857,7 +857,7 @@ export default function Dashboard() {
                       />
                       <button 
                         onClick={() => { navigator.clipboard.writeText(selectedCitation.citationNumber).then(() => toast.success('Copied to clipboard')).catch(() => toast.error('Failed to copy')); }} 
-                        className="bg-surface-border hover:bg-zinc-700 text-content-secondary px-3 border border-l-0 border-surface-border rounded-r transition-colors focus-app z-10"
+                        className="bg-surface-border hover:bg-surface-elevated text-content-secondary px-3 border border-l-0 border-surface-border rounded-r transition-colors focus-app z-10"
                         title="Copy"
                       >
                         <Copy className="w-4 h-4" />
@@ -876,7 +876,7 @@ export default function Dashboard() {
                         Open Payment Portal <ExternalLink className="w-4 h-4" />
                       </a>
                     ) : (
-                      <span className="flex items-center justify-center gap-2 w-full bg-zinc-800 text-content-tertiary rounded px-4 py-2.5 text-sm font-medium cursor-not-allowed">
+                      <span className="flex items-center justify-center gap-2 w-full bg-surface-elevated text-content-tertiary rounded px-4 py-2.5 text-sm font-medium cursor-not-allowed">
                         No Payment Link Available
                       </span>
                     )}

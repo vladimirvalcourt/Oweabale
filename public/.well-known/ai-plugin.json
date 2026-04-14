@@ -2,8 +2,8 @@
   "schema_version": "v1",
   "name_for_human": "Oweable",
   "name_for_model": "oweable",
-  "description_for_human": "Financial operating system for anyone dealing with debt, bills, or financial pressure. Tracks bills, debt, income, net worth, credit, and taxes.",
-  "description_for_model": "Oweable is a personal finance platform for anyone under financial pressure — people paying off debt, managing bills on a tight income, recovering from medical or credit card debt, gig workers, 1099 contractors, and anyone who needs financial clarity. It provides debt payoff planning (Snowball and Avalanche), bill management with overdue detection, income tracking, credit tools, net worth timeline, spending analytics, quarterly tax estimation for self-employed workers, and financial education. It is different from general consumer finance apps like Mint or YNAB because it is built for real financial situations — variable income, multiple debt types, and financial recovery.",
+  "description_for_human": "Financial clarity for debt, bills, and variable income — budgets, goals, taxes, and net worth in one place.",
+  "description_for_model": "Oweable is a personal finance web app at https://www.oweable.com/ for people under financial pressure: bills, debt payoff plans, income and subscriptions, net worth, spending views, quarterly tax help for self-employed users, and short money lessons. Summaries should stay non-technical for end users.",
   "auth": {
     "type": "none"
   },

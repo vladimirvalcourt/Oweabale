@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   timezone    TEXT,
   language    TEXT,
   is_admin    BOOLEAN NOT NULL DEFAULT FALSE,
+  is_banned   BOOLEAN NOT NULL DEFAULT FALSE,
   has_completed_onboarding BOOLEAN DEFAULT FALSE,
   credit_score INTEGER,
   credit_last_updated TIMESTAMPTZ,

@@ -95,7 +95,7 @@ export default function AuthPage() {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-3 bg-white text-black font-mono text-sm font-bold py-4 px-4 hover:bg-zinc-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-8 focus-app"
+          className="w-full flex items-center justify-center gap-3 bg-white text-black font-mono text-sm font-bold py-4 px-4 hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-8 focus-app"
         >
           {googleLoading ? (
             <span className="text-xs tracking-widest uppercase">Redirecting…</span>

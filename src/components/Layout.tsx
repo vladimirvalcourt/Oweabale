@@ -680,7 +680,7 @@ export default function Layout() {
                 )}
               </button>
               {isNotifOpen && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-[#0C0D0E]/98 backdrop-blur-xl border border-white/10 rounded-sm shadow-2xl z-50 overflow-hidden">
+                <div className="absolute right-0 top-full mt-2 w-80 bg-[#0C0D0E]/98 border border-white/10 rounded-sm shadow-2xl z-50 overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
                     <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-content-secondary">Notifications</span>
                     <button onClick={() => clearNotifications()} className="text-[10px] font-mono text-content-muted hover:text-content-tertiary uppercase tracking-widest transition-colors">Clear all</button>
@@ -739,7 +739,7 @@ export default function Layout() {
                 leaveFrom="opacity-100 scale-100 translate-y-0"
                 leaveTo="opacity-0 scale-[0.96] -translate-y-1"
               >
-                <HeadlessMenu.Items className="absolute right-0 mt-3 w-56 origin-top-right bg-[#0C0D0E]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] focus-app overflow-hidden z-50">
+                <HeadlessMenu.Items className="absolute right-0 mt-3 w-56 origin-top-right bg-[#0C0D0E]/95 border border-white/10 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] focus-app overflow-hidden z-50">
                   <div className="py-1">
                     <HeadlessMenu.Item>
                       {({ active }) => (
@@ -870,7 +870,7 @@ export default function Layout() {
 
       {/* Mobile Search Modal */}
       {isMobileSearchOpen && (
-        <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm md:hidden flex flex-col">
+        <div className="fixed inset-0 z-[60] bg-black/80 md:hidden flex flex-col">
           <div className="p-4 bg-surface-raised border-b border-surface-border flex items-center gap-3">
             <label htmlFor="layout-mobile-search" className="sr-only">
               Search bills, transactions, debts, and more
@@ -939,7 +939,7 @@ export default function Layout() {
 
       {/* Global Reset Confirmation */}
       <Dialog open={isResetOpen} onClose={() => setIsResetOpen(false)} className="relative z-[70]">
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 bg-black/90" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-sm rounded-sm bg-surface-raised border border-surface-border p-6 shadow-2xl">
             <div className="flex items-center gap-4 mb-4">

@@ -22,7 +22,7 @@ export function Menu({ trigger, children, align = "left", showChevron = true }: 
       >
         {trigger}
         {showChevron && (
-          <ChevronDown className="ml-2 -mr-1 h-4 w-4 text-gray-500" aria-hidden="true" />
+          <ChevronDown className="ml-2 -mr-1 h-4 w-4 text-content-muted" aria-hidden="true" />
         )}
       </div>
 

@@ -208,7 +208,7 @@ export default function Income() {
               {incomes.map((income) => (
                 <div 
                   key={income.id} 
-                  className="bg-surface-elevated rounded-sm border border-surface-border p-5 flex flex-col relative group hover:border-zinc-700 transition-colors"
+                  className="bg-surface-elevated rounded-sm border border-surface-border p-5 flex flex-col relative group hover:border-white/15 transition-colors"
                 >
                   {income.status === 'paused' && (
                     <div className="absolute top-0 right-0 bg-surface-border text-content-tertiary text-xs font-sans font-medium px-2 py-1 border-b border-l border-surface-border">
@@ -306,7 +306,7 @@ export default function Income() {
 
       {/* Add/Edit Modal */}
       <Dialog open={isAddModalOpen || isEditModalOpen} onClose={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="relative z-50">
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-md w-full rounded-sm bg-surface-raised border border-surface-border shadow-2xl">
             <div className="flex items-center justify-between p-4 border-b border-surface-border bg-surface-elevated">
@@ -431,7 +431,7 @@ export default function Income() {
 
       {/* Record Deposit Modal */}
       <Dialog open={isDepositModalOpen} onClose={() => setIsDepositModalOpen(false)} className="relative z-50">
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" aria-hidden="true" />
+        <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-sm w-full rounded-sm bg-surface-raised border border-surface-border shadow-2xl">
             <div className="flex items-center justify-between p-4 border-b border-surface-border bg-surface-elevated">

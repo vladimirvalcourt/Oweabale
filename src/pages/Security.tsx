@@ -7,7 +7,7 @@ import { useSEO } from '../hooks/useSEO';
 export default function Security() {
   useSEO({
     title: 'Security — Oweable',
-    description: 'How Oweable protects your financial data. TLS encryption, row-level security, Google OAuth, and regular penetration testing — built for the self-employed.',
+    description: 'How Oweable protects your financial data: encryption, strict access controls, secure sign-in, and regular security testing.',
     canonical: 'https://www.oweable.com/security',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });

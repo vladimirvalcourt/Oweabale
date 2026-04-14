@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ShieldCheck, AlertCircle, TrendingUp, HelpCircle, 
@@ -88,8 +89,8 @@ export default function CreditCenter() {
     switch (impact) {
       case 'high': return 'bg-rose-500/10 text-rose-500 border-rose-500/20';
       case 'medium': return 'bg-amber-500/10 text-amber-500 border-amber-500/20';
-      case 'low': return 'bg-zinc-500/10 text-content-tertiary border-zinc-500/20';
-      default: return 'bg-zinc-500/10 text-content-tertiary border-zinc-500/20';
+      case 'low': return 'bg-surface-border/40 text-content-tertiary border-surface-border';
+      default: return 'bg-surface-border/40 text-content-tertiary border-surface-border';
     }
   };
 
@@ -164,7 +165,7 @@ ${user.firstName} ${user.lastName}
             
             {/* Main Factors */}
             <section className="bg-surface-raised border border-surface-border rounded-sm overflow-hidden shadow-sm">
-              <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-zinc-900/50">
+              <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-raised/80">
                 <h2 className="text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest">Score Breakdown</h2>
                 <button className="text-[10px] font-mono text-indigo-400 hover:text-indigo-300 uppercase tracking-widest flex items-center gap-1">
                   Education <HelpCircle className="w-3 h-3" />
@@ -225,7 +226,7 @@ ${user.firstName} ${user.lastName}
             
             {/* Fix-it List */}
             <section className="bg-surface-raised border border-surface-border rounded-sm flex flex-col h-full shadow-lg">
-              <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-zinc-900/50">
+              <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-raised/80">
                 <h2 className="text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-500" /> Dispute Hub
                 </h2>
@@ -240,12 +241,14 @@ ${user.firstName} ${user.lastName}
               <div className="flex-1 divide-y divide-surface-border overflow-y-auto max-h-[500px] focus-app">
                 {(!credit?.fixes || credit.fixes.length === 0) ? (
                   <div className="p-12 text-center space-y-4">
-                    <div className="mx-auto w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center text-content-muted">
+                    <div className="mx-auto w-12 h-12 rounded-full border border-surface-border flex items-center justify-center text-content-muted">
                       <CheckCircle2 className="w-6 h-6" />
                     </div>
                     <div>
                       <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">Clear Record</p>
-                      <p className="text-[10px] text-content-muted mt-1 uppercase tracking-tight">System monitoring active</p>
+                      <p className="text-[10px] text-content-muted mt-1 uppercase tracking-tight max-w-xs mx-auto leading-relaxed">
+                      Add a dispute case to track letters and status. Annual review helps catch reporting errors early.
+                    </p>
                     </div>
                   </div>
                 ) : (
@@ -266,7 +269,7 @@ ${user.firstName} ${user.lastName}
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="text-xs font-mono text-white font-bold">${fix.amount.toLocaleString()}</span>
-                        <div className="h-px bg-zinc-800 flex-1" />
+                        <div className="h-px bg-surface-border flex-1" />
                       </div>
                       
                       <div className="flex items-center gap-2 pt-1 opacity-80 group-hover:opacity-100 transition-opacity">
@@ -281,7 +284,7 @@ ${user.firstName} ${user.lastName}
                         </button>
                         <button 
                           onClick={() => updateCreditFix(fix.id, { status: fix.status === 'resolved' ? 'todo' : 'resolved' })}
-                          className="flex-1 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-content-secondary border border-white/5 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-all"
+                          className="flex-1 py-1.5 bg-surface-elevated hover:bg-surface-border text-content-secondary border border-white/5 rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-all"
                         >
                           {fix.status === 'resolved' ? 'Undo' : 'Resolve'}
                         </button>
@@ -317,110 +320,122 @@ ${user.firstName} ${user.lastName}
         {/* Add Fix Modal */}
         <AnimatePresence>
           {isFixModalOpen && (
-            <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-              <motion.div 
+            <Dialog open={isFixModalOpen} onClose={() => setIsFixModalOpen(false)} className="relative z-[200]">
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-                onClick={() => setIsFixModalOpen(false)}
+                className="fixed inset-0 bg-black/80"
+                aria-hidden="true"
               />
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                className="relative w-full max-w-md bg-surface-elevated border border-surface-border rounded-sm shadow-2xl p-8"
-              >
-                <h2 className="text-sm font-mono font-bold text-white uppercase tracking-widest mb-6 border-b border-surface-border pb-4">Report Error</h2>
-                <form onSubmit={handleAddFix} className="space-y-4">
-                  <div>
-                    <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Description</label>
-                    <input 
-                      autoFocus
-                      type="text" 
-                      value={fixItem}
-                      onChange={e => setFixItem(e.target.value)}
-                      placeholder="e.g., Inaccurate Medical Collection"
-                      className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus-app-field-indigo placeholder:text-content-muted"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Amount ($)</label>
-                      <input 
-                        type="number" 
-                        value={fixAmount}
-                        onChange={e => setFixAmount(e.target.value)}
-                        placeholder="0.00"
-                        className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus-app-field-indigo"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Bureau</label>
-                      <select 
-                        value={fixBureau}
-                        onChange={e => setFixBureau(e.target.value)}
-                        className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus-app-field-indigo h-[46px]"
-                      >
-                        <option>Experian</option>
-                        <option>Equifax</option>
-                        <option>TransUnion</option>
-                        <option>All Three</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Evidence / Notes</label>
-                    <textarea 
-                      value={fixNotes}
-                      onChange={e => setFixNotes(e.target.value)}
-                      placeholder="Explain why this is incorrect..."
-                      className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus-app-field-indigo h-24 resize-none placeholder:text-content-muted"
-                    />
-                  </div>
-                  <div className="flex gap-3 pt-4">
-                    <button 
-                      type="button"
-                      onClick={() => setIsFixModalOpen(false)}
-                      className="flex-1 py-3 text-xs font-mono font-bold text-content-tertiary hover:text-white uppercase tracking-widest transition-colors"
-                    >
-                      Dismiss
-                    </button>
-                    <button 
-                      type="submit"
-                      className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-all shadow-lg shadow-indigo-500/10"
-                    >
-                      Add Case
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            </div>
+              <div className="fixed inset-0 flex items-center justify-center p-4">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                  className="w-full max-w-md"
+                >
+                  <Dialog.Panel className="bg-surface-elevated border border-surface-border rounded-sm shadow-2xl p-8">
+                    <Dialog.Title className="text-sm font-mono font-bold text-white uppercase tracking-widest mb-6 border-b border-surface-border pb-4">
+                      Report Error
+                    </Dialog.Title>
+                    <form onSubmit={handleAddFix} className="space-y-4">
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Description</label>
+                        <input 
+                          autoFocus
+                          type="text" 
+                          value={fixItem}
+                          onChange={e => setFixItem(e.target.value)}
+                          placeholder="e.g., Inaccurate Medical Collection"
+                          className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus-app-field-indigo placeholder:text-content-muted"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Amount ($)</label>
+                          <input 
+                            type="number" 
+                            value={fixAmount}
+                            onChange={e => setFixAmount(e.target.value)}
+                            placeholder="0.00"
+                            className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus-app-field-indigo"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Bureau</label>
+                          <select 
+                            value={fixBureau}
+                            onChange={e => setFixBureau(e.target.value)}
+                            className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus-app-field-indigo h-[46px]"
+                          >
+                            <option>Experian</option>
+                            <option>Equifax</option>
+                            <option>TransUnion</option>
+                            <option>All Three</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Evidence / Notes</label>
+                        <textarea 
+                          value={fixNotes}
+                          onChange={e => setFixNotes(e.target.value)}
+                          placeholder="Explain why this is incorrect..."
+                          className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-3 text-sm text-white focus-app-field-indigo h-24 resize-none placeholder:text-content-muted"
+                        />
+                      </div>
+                      <div className="flex gap-3 pt-4">
+                        <button 
+                          type="button"
+                          onClick={() => setIsFixModalOpen(false)}
+                          className="flex-1 py-3 text-xs font-mono font-bold text-content-tertiary hover:text-white uppercase tracking-widest transition-colors"
+                        >
+                          Dismiss
+                        </button>
+                        <button 
+                          type="submit"
+                          className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-all shadow-lg shadow-indigo-500/10"
+                        >
+                          Add Case
+                        </button>
+                      </div>
+                    </form>
+                  </Dialog.Panel>
+                </motion.div>
+              </div>
+            </Dialog>
           )}
         </AnimatePresence>
 
         {/* Generated Letter Modal */}
         <AnimatePresence>
           {isLetterModalOpen && selectedFix && (
-            <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
-              <motion.div 
+            <Dialog
+              open={isLetterModalOpen}
+              onClose={() => setIsLetterModalOpen(false)}
+              className="relative z-[300]"
+            >
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-black/90 backdrop-blur-md"
-                onClick={() => setIsLetterModalOpen(false)}
+                className="fixed inset-0 bg-black/90"
+                aria-hidden="true"
               />
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9, rotateX: -10 }}
-                animate={{ opacity: 1, scale: 1, rotateX: 0 }}
-                exit={{ opacity: 0, scale: 0.9, rotateX: 10 }}
-                className="relative w-full max-w-2xl bg-white text-zinc-900 rounded-sm shadow-2xl p-10 font-serif"
-              >
-                <div className="flex justify-between items-start mb-8 border-b border-zinc-200 pb-4 no-print">
+              <div className="fixed inset-0 flex items-center justify-center p-4">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, rotateX: -10 }}
+                  animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, rotateX: 10 }}
+                  className="w-full max-w-2xl"
+                >
+                  <Dialog.Panel className="bg-white text-surface-base rounded-sm shadow-2xl p-10 font-serif border border-black/10">
+                <div className="flex justify-between items-start mb-8 border-b border-black/10 pb-4 no-print">
                   <div className="space-y-1">
-                    <h2 className="text-xl font-sans font-black uppercase italic tracking-tighter text-zinc-900">
+                    <Dialog.Title className="text-xl font-sans font-black uppercase italic tracking-tighter text-surface-base">
                       Dispute <span className="text-indigo-600">Letter</span>
-                    </h2>
+                    </Dialog.Title>
                     <p className="text-xs font-sans text-content-tertiary uppercase tracking-widest">Formal Legal Correspondence</p>
                   </div>
                   <div className="flex gap-2">
@@ -429,32 +444,35 @@ ${user.firstName} ${user.lastName}
                         navigator.clipboard.writeText(generateLetter(selectedFix));
                         toast.success('Letter copied to clipboard');
                       }}
-                      className="p-2 bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors"
+                      className="p-2 bg-black/5 hover:bg-black/10 rounded-full transition-colors text-surface-base"
                       title="Copy text"
+                      type="button"
                     >
                       <Copy className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => window.print()}
-                      className="p-2 bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors"
+                      className="p-2 bg-black/5 hover:bg-black/10 rounded-full transition-colors text-surface-base"
                       title="Print"
+                      type="button"
                     >
                       <Download className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => setIsLetterModalOpen(false)}
-                      className="p-2 bg-zinc-100 hover:bg-rose-100 hover:text-rose-600 rounded-full transition-colors"
+                      className="p-2 bg-black/5 hover:bg-rose-100 hover:text-rose-600 rounded-full transition-colors"
+                      type="button"
                     >
                       <X className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
 
-                <div className="whitespace-pre-wrap text-[11pt] leading-relaxed max-h-[60vh] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-zinc-300">
+                <div className="whitespace-pre-wrap text-[11pt] leading-relaxed max-h-[60vh] overflow-y-auto pr-4 text-surface-base scrollbar-thin scrollbar-thumb-black/20">
                   {generateLetter(selectedFix)}
                 </div>
 
-                <div className="mt-8 pt-8 border-t border-zinc-100 flex items-center justify-between no-print">
+                <div className="mt-8 pt-8 border-t border-black/5 flex items-center justify-between no-print">
                   <p className="text-[10px] font-sans text-content-tertiary italic">
                     Certified Mail is recommended for all legal disputes.
                   </p>
@@ -464,13 +482,16 @@ ${user.firstName} ${user.lastName}
                       setIsLetterModalOpen(false);
                       toast.success('Status updated to SENT');
                     }}
-                    className="px-6 py-2 bg-zinc-900 text-white font-sans font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-indigo-600 transition-colors"
+                    className="px-6 py-2 bg-surface-base text-white font-sans font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-indigo-600 transition-colors"
+                    type="button"
                   >
                     Mark as Sent
                   </button>
                 </div>
-              </motion.div>
-            </div>
+                  </Dialog.Panel>
+                </motion.div>
+              </div>
+            </Dialog>
           )}
         </AnimatePresence>
       </div>

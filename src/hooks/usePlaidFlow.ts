@@ -8,6 +8,8 @@ import {
 } from 'react-plaid-link';
 import { toast } from 'sonner';
 import { createPlaidLinkToken, exchangePlaidPublicToken } from '../lib/plaid';
+import { normalizePlaidFlowErrorMessage } from '../lib/plaidErrors';
+import { track } from '../lib/analytics';
 
 export type PlaidFlowIntent = 'create' | 'update';
 export type PlaidFlowStage =
@@ -35,16 +37,6 @@ interface UsePlaidFlowResult {
   startConnect: () => Promise<void>;
   startReconnect: () => Promise<void>;
   retryLastIntent: () => Promise<void>;
-}
-
-function normalizeErrorMessage(message: string): string {
-  if (/non-2xx|status code/i.test(message)) {
-    return 'Bank linking service is temporarily unavailable. Please retry in a moment.';
-  }
-  if (/unauthorized|missing authorization/i.test(message)) {
-    return 'Your session expired. Refresh the page and sign in again.';
-  }
-  return message;
 }
 
 export function usePlaidFlow({
@@ -82,7 +74,7 @@ export function usePlaidFlow({
       try {
         const exchanged = await exchangePlaidPublicToken(publicToken, metadata);
         if ('error' in exchanged) {
-          throw new Error(normalizeErrorMessage(exchanged.error));
+          throw new Error(normalizePlaidFlowErrorMessage(exchanged.error));
         }
 
         await onConnected();
@@ -90,16 +82,19 @@ export function usePlaidFlow({
         const synced = await onInitialSync();
         if (!synced) {
           toast.error('Connection saved, but initial sync failed — try Sync now.');
+          track('plaid_initial_sync_failed', { intent: activeIntent });
         } else {
           toast.success(activeIntent === 'update' ? 'Bank connection updated.' : 'Bank connected successfully.');
+          track('plaid_link_success', { intent: activeIntent });
         }
 
         setStage('success');
       } catch (e) {
-        const message = normalizeErrorMessage(e instanceof Error ? e.message : 'Bank connection failed');
+        const message = normalizePlaidFlowErrorMessage(e instanceof Error ? e.message : 'Bank connection failed');
         setErrorMessage(message);
         setStage('error');
         toast.error(message);
+        track('plaid_link_error', { phase: 'exchange', intent: activeIntent });
       } finally {
         setLinkToken(null);
         openedRef.current = false;
@@ -116,16 +111,19 @@ export function usePlaidFlow({
 
       if (metadata.status === 'requires_oauth') {
         setStage('oauth_redirect');
+        track('plaid_oauth_redirect', {});
         return;
       }
 
       if (error) {
-        const message = normalizeErrorMessage(error.error_message || error.display_message || 'Bank link cancelled.');
+        const message = normalizePlaidFlowErrorMessage(error.error_message || error.display_message || 'Bank link cancelled.');
         setErrorMessage(message);
         setStage('error');
         toast.error(message);
+        track('plaid_link_exit_error', {});
       } else if (stage !== 'success') {
         setStage('idle');
+        track('plaid_link_dismiss', {});
       }
 
       clearOauthQuery();
@@ -139,8 +137,14 @@ export function usePlaidFlow({
     onSuccess,
     onExit,
     onEvent: (eventName) => {
-      if (eventName === 'OPEN') setStage('link_open');
-      if (eventName === 'HANDOFF') setStage('oauth_redirect');
+      if (eventName === 'OPEN') {
+        setStage('link_open');
+        track('plaid_link_open', {});
+      }
+      if (eventName === 'HANDOFF') {
+        setStage('oauth_redirect');
+        track('plaid_handoff', {});
+      }
     },
   });
 
@@ -158,15 +162,16 @@ export function usePlaidFlow({
       try {
         const tokenResult = await createPlaidLinkToken(intent === 'update' ? { mode: 'update' } : undefined);
         if ('error' in tokenResult) {
-          throw new Error(normalizeErrorMessage(tokenResult.error));
+          throw new Error(normalizePlaidFlowErrorMessage(tokenResult.error));
         }
         setLinkToken(tokenResult.link_token);
         setStage('link_ready');
       } catch (e) {
-        const message = normalizeErrorMessage(e instanceof Error ? e.message : 'Unable to start bank connection');
+        const message = normalizePlaidFlowErrorMessage(e instanceof Error ? e.message : 'Unable to start bank connection');
         setErrorMessage(message);
         setStage('error');
         toast.error(message);
+        track('plaid_link_error', { phase: 'link_token', intent });
       }
     },
     [enabled],
@@ -182,6 +187,7 @@ export function usePlaidFlow({
   useEffect(() => {
     if (!hasOauthState || oauthResumeAttemptedRef.current || stage !== 'idle') return;
     oauthResumeAttemptedRef.current = true;
+    track('plaid_oauth_resume', {});
     void startFlow('create');
   }, [hasOauthState, stage, startFlow]);
 

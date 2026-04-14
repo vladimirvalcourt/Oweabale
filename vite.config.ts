@@ -41,6 +41,11 @@ export default defineConfig(({ mode }) => {
       ];
 
   return {
+    test: {
+      globals: true,
+      environment: 'node',
+      include: ['src/**/*.test.ts'],
+    },
     plugins: [
       react(),
       tailwindcss(),

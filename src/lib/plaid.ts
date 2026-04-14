@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient';
+import { normalizePlaidFlowErrorMessage } from './plaidErrors';
 
 async function parseFunctionError(error: unknown): Promise<string> {
   const fallback = error instanceof Error ? error.message : 'Unexpected server error';
@@ -6,15 +7,12 @@ async function parseFunctionError(error: unknown): Promise<string> {
 
   try {
     const payload = await anyErr?.context?.json?.();
-    if (payload?.error) return payload.error;
+    if (payload?.error) return normalizePlaidFlowErrorMessage(payload.error);
   } catch {
     // noop: keep fallback message
   }
 
-  if (/non-2xx|status code/i.test(fallback)) {
-    return 'Bank linking service is temporarily unavailable. Please retry in a moment.';
-  }
-  return fallback;
+  return normalizePlaidFlowErrorMessage(fallback);
 }
 
 export async function createPlaidLinkToken(

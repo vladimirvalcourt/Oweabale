@@ -332,7 +332,7 @@ export default function Analytics() {
         </SafeResponsiveContainer>
         <div className="flex gap-5 mt-3">
           <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-indigo-400 inline-block shrink-0" aria-hidden /> Savings rate</div>
-          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-4 h-px bg-zinc-700 inline-block shrink-0" style={{ borderTop: '1px dashed #3f3f46' }} aria-hidden /> 20% target</div>
+          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-4 h-px bg-content-muted/50 inline-block shrink-0 border-t border-dashed border-content-muted/40" aria-hidden /> 20% target</div>
         </div>
       </CollapsibleModule>
     </div>

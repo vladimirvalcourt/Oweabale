@@ -27,7 +27,7 @@ function CustomColor() {
           <Zap className="w-8 h-8 text-blue-400" />
         </div>
         <h3 className="text-xl font-semibold mb-2 italic">Lightning Fast</h3>
-        <p className="text-gray-300 mb-4 text-xs font-mono">Blue gradient theme with high contrast</p>
+        <p className="text-content-tertiary mb-4 text-xs font-mono">Blue gradient theme with high contrast</p>
         <div className="flex gap-2 justify-center items-center">
           <Play className="w-5 h-5" />
           <button className="px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg transition-all transform hover:scale-105">
@@ -57,7 +57,7 @@ function FastAnimation() {
           <Shield className="w-8 h-8 text-red-400" />
         </div>
         <h3 className="text-xl font-semibold mb-2 italic">Security First</h3>
-        <p className="text-gray-300 mb-4 text-xs font-mono">1s rotation speed with vivid red theme</p>
+        <p className="text-content-tertiary mb-4 text-xs font-mono">1s rotation speed with vivid red theme</p>
         <div className="grid grid-cols-2 gap-3">
           <button className="px-3 py-2 bg-red-600 hover:bg-red-500 rounded-sm transition-colors text-[10px] font-bold uppercase tracking-widest">
             <Shield className="w-4 h-4 inline mr-1" />
@@ -90,7 +90,7 @@ function HoverToRotate() {
           <Heart className="w-8 h-8 text-green-400" />
         </div>
         <h3 className="text-xl font-semibold mb-2 italic">Eco Movement</h3>
-        <p className="text-gray-300 mb-4 text-xs font-mono">Animation starts on hover - green theme</p>
+        <p className="text-content-tertiary mb-4 text-xs font-mono">Animation starts on hover - green theme</p>
         <div className="flex flex-col gap-2">
           <button className="px-4 py-2 bg-green-600 hover:bg-green-500 rounded-sm transition-all text-[10px] font-bold uppercase tracking-widest">
             <Heart className="w-4 h-4 inline mr-2" />
@@ -124,7 +124,7 @@ function StopOnHover() {
           <User className="w-8 h-8 text-purple-400" />
         </div>
         <h3 className="text-xl font-semibold mb-2 italic">User Identity</h3>
-        <p className="text-gray-300 mb-4 text-xs font-mono">Animation pauses on hover - purple theme</p>
+        <p className="text-content-tertiary mb-4 text-xs font-mono">Animation pauses on hover - purple theme</p>
         <div className="space-y-3">
           <div className="flex gap-2 justify-center">
             <button className="px-3 py-2 bg-purple-600 hover:bg-purple-500 rounded-sm transition-colors text-[10px] font-bold uppercase tracking-widest">

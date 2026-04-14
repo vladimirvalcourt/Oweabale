@@ -654,7 +654,7 @@ function EditBillDialog({
 
   return (
     <Dialog open className="relative z-[100]" onClose={onClose}>
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" aria-hidden />
+      <div className="fixed inset-0 bg-black/70" aria-hidden />
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <Dialog.Panel className="w-full max-w-md rounded-sm border border-surface-border bg-surface-elevated p-6 shadow-2xl">
           <Dialog.Title className="text-lg font-semibold text-content-primary mb-4">Edit bill</Dialog.Title>
@@ -765,7 +765,7 @@ function EditDebtDialog({
 
   return (
     <Dialog open className="relative z-[100]" onClose={onClose}>
-      <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" aria-hidden />
+      <div className="fixed inset-0 bg-black/70" aria-hidden />
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <Dialog.Panel className="w-full max-w-md rounded-sm border border-surface-border bg-surface-elevated p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
           <Dialog.Title className="text-lg font-semibold text-content-primary mb-1">Edit debt</Dialog.Title>

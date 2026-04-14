@@ -292,7 +292,7 @@ export default function Education() {
                           <div
                             key={lesson.id}
                             onClick={() => openLesson(lesson)}
-                            className="group flex items-center justify-between p-4 bg-surface-base border border-surface-border rounded-sm hover:border-zinc-600 transition-colors cursor-pointer"
+                            className="group flex items-center justify-between p-4 bg-surface-base border border-surface-border rounded-sm hover:border-content-muted transition-colors cursor-pointer"
                           >
                             <div className="flex items-center gap-4">
                               <div className={`p-1.5 rounded-sm ${isDone ? 'text-emerald-500' : 'text-content-tertiary group-hover:text-white transition-colors'}`}>
@@ -344,7 +344,7 @@ export default function Education() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" />
+            <div className="fixed inset-0 bg-black/80" />
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">

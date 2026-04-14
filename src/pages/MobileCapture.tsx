@@ -60,7 +60,7 @@ export default function MobileCapture() {
 
       if (tokenErr || !sessionRow) {
         setStatus('error');
-        setError('Session not found or token is invalid. Please scan a new QR code.');
+        setError('This link is invalid or expired. Please scan a new QR code from your computer.');
         return;
       }
 
@@ -198,7 +198,7 @@ export default function MobileCapture() {
         </p>
         <button
           onClick={() => window.location.reload()}
-          className="w-full py-4 bg-zinc-900 border border-white/10 text-white font-mono text-[10px] font-bold uppercase tracking-[0.3em] flex items-center justify-center gap-2 active:scale-95 transition-all"
+          className="w-full py-4 bg-surface-raised border border-white/10 text-white font-mono text-[10px] font-bold uppercase tracking-[0.3em] flex items-center justify-center gap-2 active:scale-95 transition-all"
         >
           <RefreshCw className="w-4 h-4" /> Restart Session
         </button>
@@ -371,7 +371,7 @@ export default function MobileCapture() {
                   <button 
                     onClick={handleUpload}
                     disabled={status === 'uploading'}
-                    className="w-full bg-brand-violet hover:bg-indigo-500 disabled:bg-zinc-900 text-white py-5 rounded-none font-mono font-bold uppercase tracking-widest text-[11px] shadow-xl shadow-brand-violet/20 flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
+                    className="w-full bg-brand-violet hover:bg-indigo-500 disabled:bg-surface-raised text-white py-5 rounded-none font-mono font-bold uppercase tracking-widest text-[11px] shadow-xl shadow-brand-violet/20 flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
                   >
                     {status === 'uploading' ? (
                       <>

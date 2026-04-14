@@ -26,7 +26,7 @@
   --color-brand-expense: #F87171;
   --color-brand-tax: #60A5FA;
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   
   /* Tactical Elevations */
@@ -93,49 +93,60 @@
     @apply font-mono tabular-nums;
   }
 
-  /* Focus — no default ring/square. Use focus-app for controls; focus-app-field* for inputs (indigo default, rose/zinc/brand-indigo/Admin hues as needed). */
+  /* Focus — visible keyboard focus (WCAG 2.4.7) + border cues on fields. */
   .focus-app {
-    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0;
+    @apply outline-none focus:outline-none;
+    @apply focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field {
-    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0;
+    @apply outline-none focus:outline-none;
+    @apply focus-visible:ring-2 focus-visible:ring-brand-indigo/70 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-indigo {
-    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-indigo-500;
+    @apply outline-none focus:outline-none transition-colors focus:border-indigo-500;
+    @apply focus-visible:ring-2 focus-visible:ring-indigo-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-rose {
-    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-rose-500;
+    @apply outline-none focus:outline-none transition-colors focus:border-rose-500;
+    @apply focus-visible:ring-2 focus-visible:ring-rose-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-neutral {
-    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-content-secondary;
+    @apply outline-none focus:outline-none transition-colors focus:border-content-secondary;
+    @apply focus-visible:ring-2 focus-visible:ring-content-secondary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-indigo-600 {
-    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-indigo-600;
+    @apply outline-none focus:outline-none transition-colors focus:border-indigo-600;
+    @apply focus-visible:ring-2 focus-visible:ring-indigo-600/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-zinc {
-    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-zinc-500;
+    @apply outline-none focus:outline-none transition-colors focus:border-zinc-500;
+    @apply focus-visible:ring-2 focus-visible:ring-zinc-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-amber {
-    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-amber-500;
+    @apply outline-none focus:outline-none transition-colors focus:border-amber-500;
+    @apply focus-visible:ring-2 focus-visible:ring-amber-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-emerald {
-    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-emerald-500;
+    @apply outline-none focus:outline-none transition-colors focus:border-emerald-500;
+    @apply focus-visible:ring-2 focus-visible:ring-emerald-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-cyan {
-    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-cyan-500;
+    @apply outline-none focus:outline-none transition-colors focus:border-cyan-500;
+    @apply focus-visible:ring-2 focus-visible:ring-cyan-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-brand-indigo {
-    @apply outline-none focus:outline-none focus-visible:outline-none focus:ring-0 transition-colors focus:border-brand-indigo;
+    @apply outline-none focus:outline-none transition-colors focus:border-brand-indigo;
+    @apply focus-visible:ring-2 focus-visible:ring-brand-indigo/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   @keyframes float {

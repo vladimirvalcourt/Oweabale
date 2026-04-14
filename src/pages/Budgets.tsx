@@ -144,7 +144,7 @@ export default function Budgets() {
               return (
                 <div 
                   key={budget.id} 
-                  className="bg-surface-elevated rounded-sm border border-surface-border p-5 flex flex-col relative group hover:border-zinc-700 transition-colors"
+                  className="bg-surface-elevated rounded-sm border border-surface-border p-5 flex flex-col relative group hover:border-white/15 transition-colors"
                 >
                   <div className="flex justify-between items-start mb-6">
                     <div>
