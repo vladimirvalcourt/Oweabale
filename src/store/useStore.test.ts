@@ -26,7 +26,7 @@ describe('useStore ingestion persistence', () => {
   });
 
   it('persists pending ingestion with same generated id', async () => {
-    const generatedId = 'ingestion-test-id';
+    const generatedId = '11111111-2222-3333-4444-555555555555';
     const randomSpy = vi.spyOn(globalThis.crypto, 'randomUUID').mockReturnValue(generatedId);
     getUserMock.mockResolvedValue({ data: { user: { id: 'user-123' } } });
     insertMock.mockResolvedValue({ error: null });
