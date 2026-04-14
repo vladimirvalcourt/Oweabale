@@ -592,7 +592,7 @@ export default function Layout() {
                   setIsSearchOpen(true);
                 }}
                 onFocus={() => setIsSearchOpen(true)}
-                className="w-full pl-9 pr-4 py-2 bg-surface-highlight rounded-md text-[13px] font-sans text-content-primary placeholder-content-tertiary focus:bg-surface-border-subtle transition-all border border-surface-border focus-app-field-neutral"
+                className="w-full pl-9 pr-4 py-2 bg-surface-highlight rounded-md text-[13px] font-sans text-content-primary placeholder-content-tertiary focus:bg-surface-border-subtle transition-all border border-surface-border outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus:border-content-secondary"
               />
               
               {/* Search Dropdown */}
@@ -884,7 +884,7 @@ export default function Layout() {
               autoComplete="off"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none text-base text-content-primary placeholder:text-content-muted focus-app rounded-sm px-1"
+              className="flex-1 bg-transparent border-none text-base text-content-primary placeholder:text-content-muted rounded-sm px-1 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:bg-surface-base/35"
             />
             <button 
               type="button"

@@ -1,9 +1,33 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { memo, startTransition, useCallback, useEffect, useRef, useState } from 'react';
 import { Sparkles, Send, Loader2, Trash2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
 import { invokeOweAi, type OweAiChatMessage } from '../lib/oweAi';
 import { cn } from '../lib/utils';
+
+const OweAiMessageBubble = memo(function OweAiMessageBubble({ message }: { message: OweAiChatMessage }) {
+  const m = message;
+  return (
+    <div className={cn('flex w-full', m.role === 'user' ? 'justify-end' : 'justify-start')}>
+      <div
+        className={cn(
+          'max-w-[84%] px-4 py-2.5 text-sm shadow-sm',
+          m.role === 'user'
+            ? 'rounded-[22px] rounded-br-md bg-brand-cta text-white border border-indigo-300/20'
+            : 'rounded-[22px] rounded-bl-md bg-surface-elevated/95 text-content-secondary border border-surface-border',
+        )}
+      >
+        {m.role === 'assistant' ? (
+          <div className="prose prose-sm prose-invert max-w-none prose-p:my-1 prose-strong:text-content-primary">
+            <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{m.content}</ReactMarkdown>
+          </div>
+        ) : (
+          <p className="whitespace-pre-wrap">{m.content}</p>
+        )}
+      </div>
+    </div>
+  );
+});
 
 const QUICK_PROMPTS = [
   'What can I comfortably spend this week?',
@@ -30,29 +54,39 @@ export default function OweAi() {
   const runSend = useCallback(async (text: string) => {
     const userMsg: OweAiChatMessage = { role: 'user', content: text };
     const nextThread = [...messagesRef.current, userMsg];
-    setMessages(nextThread);
+
     setInput('');
     setLoading(true);
+    startTransition(() => {
+      setMessages(nextThread);
+    });
 
     try {
       const result = await invokeOweAi(nextThread);
       if (result.type === 'reply') {
-        setMessages((m) => [...m, { role: 'assistant', content: result.text }]);
+        startTransition(() => {
+          setMessages([...nextThread, { role: 'assistant', content: result.text }]);
+        });
       } else if (result.type === 'blocked') {
-        setMessages((m) => [...m, { role: 'assistant', content: result.message }]);
+        startTransition(() => {
+          setMessages([...nextThread, { role: 'assistant', content: result.message }]);
+        });
       } else {
-        setMessages((m) => [
-          ...m,
-          {
-            role: 'assistant',
-            content:
-              'Owe-AI is not available right now. Please try again later.',
-          },
-        ]);
+        startTransition(() => {
+          setMessages([
+            ...nextThread,
+            {
+              role: 'assistant',
+              content: 'Owe-AI is not available right now. Please try again later.',
+            },
+          ]);
+        });
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Something went wrong.';
-      setMessages((m) => [...m, { role: 'assistant', content: `Could not reach Owe-AI: ${msg}` }]);
+      startTransition(() => {
+        setMessages([...nextThread, { role: 'assistant', content: `Could not reach Owe-AI: ${msg}` }]);
+      });
     } finally {
       setLoading(false);
     }
@@ -75,7 +109,6 @@ export default function OweAi() {
   const sendQuickPrompt = useCallback(
     (prompt: string) => {
       if (loading) return;
-      setInput(prompt);
       void runSend(prompt);
     },
     [loading, runSend],
@@ -125,27 +158,7 @@ export default function OweAi() {
           </div>
         )}
         {messages.map((m, i) => (
-          <div
-            key={`${m.role}-${i}-${m.content.slice(0, 24)}`}
-            className={cn('flex w-full', m.role === 'user' ? 'justify-end' : 'justify-start')}
-          >
-            <div
-              className={cn(
-                'max-w-[84%] px-4 py-2.5 text-sm shadow-sm',
-                m.role === 'user'
-                  ? 'rounded-[22px] rounded-br-md bg-brand-cta text-white border border-indigo-300/20'
-                  : 'rounded-[22px] rounded-bl-md bg-surface-elevated/95 text-content-secondary border border-surface-border',
-              )}
-            >
-              {m.role === 'assistant' ? (
-                <div className="prose prose-sm prose-invert max-w-none prose-p:my-1 prose-strong:text-content-primary">
-                  <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{m.content}</ReactMarkdown>
-                </div>
-              ) : (
-                <p className="whitespace-pre-wrap">{m.content}</p>
-              )}
-            </div>
-          </div>
+          <OweAiMessageBubble key={`${m.role}-${i}-${m.content.slice(0, 24)}`} message={m} />
         ))}
         {loading && (
           <div className="flex justify-start">
@@ -176,7 +189,7 @@ export default function OweAi() {
         <label htmlFor="owe-ai-input" className="sr-only">
           Message to Owe-AI
         </label>
-        <div className="rounded-full border border-surface-border bg-surface-raised px-2 py-1.5 flex items-end gap-2">
+        <div className="rounded-full border border-surface-border bg-surface-raised px-2 py-1.5 flex items-end gap-2 transition-colors focus-within:border-brand-indigo/35 focus-within:ring-1 focus-within:ring-brand-indigo/25">
           <textarea
             id="owe-ai-input"
             rows={2}
@@ -192,7 +205,7 @@ export default function OweAi() {
             }}
             placeholder="Type your question like you would to an advisor…"
             disabled={loading}
-            className="flex-1 resize-none bg-transparent px-3 py-2 text-sm text-content-primary placeholder:text-content-muted focus-app-field rounded-md disabled:opacity-50 max-h-28"
+            className="flex-1 resize-none bg-transparent px-3 py-2 text-sm text-content-primary placeholder:text-content-muted rounded-md disabled:opacity-50 max-h-28 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0"
           />
           <button
             type="submit"
@@ -200,7 +213,11 @@ export default function OweAi() {
             className="shrink-0 h-9 w-9 inline-flex items-center justify-center rounded-full bg-brand-cta text-white hover:bg-brand-cta-hover disabled:opacity-40 disabled:pointer-events-none transition-colors mb-1"
             aria-label="Send message"
           >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+            {loading ? (
+              <Loader2 className="w-4 h-4 animate-spin pointer-events-none" aria-hidden />
+            ) : (
+              <Send className="w-4 h-4 pointer-events-none" aria-hidden />
+            )}
           </button>
         </div>
         <p className="text-[11px] text-content-muted leading-relaxed">
