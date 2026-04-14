@@ -3,6 +3,8 @@ import { TransitionLink } from '../components/TransitionLink';
 import Footer from '../components/Footer';
 import { Check, Plus, Minus } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
+import { toast } from 'sonner';
+import { createStripeCheckoutSession } from '../lib/stripe';
 
 function useInView(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
@@ -59,6 +61,7 @@ export default function Pricing() {
 
   const [scrolled, setScrolled] = useState(false);
   const [isYearly, setIsYearly] = useState(false);
+  const [isStartingCheckout, setIsStartingCheckout] = useState(false);
   
   const [headerRef, headerVisible] = useInView();
   const [cardsRef, cardsVisible] = useInView();
@@ -71,6 +74,18 @@ export default function Pricing() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const startCheckout = async (planKey: 'pro_monthly' | 'pro_yearly' | 'lifetime') => {
+    if (isStartingCheckout) return;
+    setIsStartingCheckout(true);
+    const response = await createStripeCheckoutSession(planKey);
+    if ('error' in response) {
+      toast.error(response.error);
+      setIsStartingCheckout(false);
+      return;
+    }
+    window.location.href = response.checkoutUrl;
+  };
 
   return (
     <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-indigo-500/30 overflow-x-hidden">
@@ -220,12 +235,22 @@ export default function Pricing() {
                   </div>
                 </div>
                 
-                <TransitionLink 
-                  to="/dashboard" 
-                  className="w-full py-4 px-6 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold text-center transition-all duration-200 mb-10 shadow-sm"
+                <button
+                  type="button"
+                  onClick={() => startCheckout(isYearly ? 'pro_yearly' : 'pro_monthly')}
+                  disabled={isStartingCheckout}
+                  className="w-full py-4 px-6 rounded-sm bg-brand-cta hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-sans font-semibold text-center transition-all duration-200 mb-3 shadow-sm"
                 >
-                  Start free beta
-                </TransitionLink>
+                  {isStartingCheckout ? 'Starting checkout...' : `Start ${isYearly ? 'yearly' : 'monthly'} plan`}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => startCheckout('lifetime')}
+                  disabled={isStartingCheckout}
+                  className="w-full py-3 px-6 rounded-sm border border-indigo-400/40 hover:border-indigo-300 disabled:opacity-60 disabled:cursor-not-allowed text-indigo-100 text-xs font-sans font-semibold text-center transition-all duration-200 mb-10"
+                >
+                  Buy one-time lifetime access
+                </button>
                 
                 <div className="flex flex-col gap-5 mt-auto">
                   <div className="flex items-start gap-3">
