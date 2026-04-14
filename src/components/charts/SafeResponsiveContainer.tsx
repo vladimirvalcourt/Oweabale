@@ -1,59 +1,90 @@
 import React from 'react';
-import { ResponsiveContainer } from 'recharts';
 
-type SafeResponsiveContainerProps = React.ComponentProps<typeof ResponsiveContainer>;
+type Size = { w: number; h: number };
+
+export type SafeResponsiveContainerProps = {
+  /** Host box width (CSS), e.g. `"100%"` or `160`. */
+  width?: React.CSSProperties['width'];
+  /** Host box height (CSS), e.g. `"100%"` or `260`. */
+  height?: React.CSSProperties['height'];
+  minWidth?: number;
+  minHeight?: number;
+  className?: string;
+  style?: React.CSSProperties;
+  children: React.ReactElement;
+};
 
 /**
- * Recharts can briefly measure hidden/transitioning containers as invalid sizes.
- * Provide sane minimums by default to prevent width/height=-1 runtime warnings.
+ * Recharts `ResponsiveContainer` can still compute width/height as -1 during nested
+ * `%` layout / transition frames. We measure the host in pixels and pass numeric
+ * `width` / `height` straight to the chart instead.
  */
 export function SafeResponsiveContainer({
   width = '100%',
   height = '100%',
-  minWidth,
-  minHeight,
-  ...props
+  minWidth = 0,
+  minHeight = 120,
+  className,
+  style,
+  children,
 }: SafeResponsiveContainerProps) {
   const hostRef = React.useRef<HTMLDivElement | null>(null);
-  const [isMeasurable, setIsMeasurable] = React.useState(false);
+  const [dims, setDims] = React.useState<Size>({ w: 0, h: 0 });
 
-  const resolvedMinWidth = minWidth ?? 0;
-  const resolvedMinHeight = minHeight ?? 120;
+  const updateDims = React.useCallback(() => {
+    const node = hostRef.current;
+    if (!node) return;
+    const rect = node.getBoundingClientRect();
+    const w = Math.max(0, Math.floor(rect.width));
+    const h = Math.max(0, Math.floor(rect.height));
+    setDims((prev) => (prev.w === w && prev.h === h ? prev : { w, h }));
+  }, []);
 
-  React.useEffect(() => {
+  React.useLayoutEffect(() => {
     const node = hostRef.current;
     if (!node) return;
 
-    const updateMeasuredState = () => {
-      const rect = node.getBoundingClientRect();
-      setIsMeasurable(rect.width > 0 && rect.height > 0);
+    updateDims();
+
+    let raf = 0;
+    const schedule = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => updateDims());
     };
 
-    updateMeasuredState();
+    const ro = new ResizeObserver(() => schedule());
+    ro.observe(node);
+    window.addEventListener('resize', schedule);
 
-    const observer = new ResizeObserver(() => {
-      updateMeasuredState();
-    });
-    observer.observe(node);
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      window.removeEventListener('resize', schedule);
+    };
+  }, [updateDims]);
 
-    return () => observer.disconnect();
-  }, []);
+  const child = React.Children.only(children);
 
   return (
     <div
       ref={hostRef}
-      style={{ width, height, minWidth: resolvedMinWidth, minHeight: resolvedMinHeight }}
+      className={className}
+      style={{
+        width,
+        height,
+        minWidth,
+        minHeight,
+        boxSizing: 'border-box',
+        position: 'relative',
+        ...style,
+      }}
     >
-      {isMeasurable ? (
-        <ResponsiveContainer
-          width="100%"
-          height="100%"
-          minWidth={resolvedMinWidth}
-          minHeight={resolvedMinHeight}
-          {...props}
-        />
-      ) : null}
+      {dims.w > 0 && dims.h > 0
+        ? React.cloneElement(child as React.ReactElement<{ width?: number; height?: number }>, {
+            width: dims.w,
+            height: dims.h,
+          })
+        : null}
     </div>
   );
 }
-
