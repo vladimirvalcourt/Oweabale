@@ -1448,6 +1448,7 @@ export const useStore = create<AppState>()(
       const userId = (await supabase.auth.getUser()).data.user?.id;
       if (userId) {
         const { error } = await supabase.from('pending_ingestions').insert({
+          id,
           user_id: userId,
           type: ingestion.type,
           status: ingestion.status,

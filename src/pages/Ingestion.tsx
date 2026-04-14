@@ -190,11 +190,21 @@ export default function Ingestion() {
        };
        const mimeType = mimeMap[extMatch] ?? 'image/jpeg';
        fetch(signedUrl)
-         .then(res => res.blob())
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`Signed URL fetch failed: ${res.status}`);
+          }
+          return res.blob();
+        })
          .then(blob => {
            const file = new File([blob], `mobile_scan.${extMatch}`, { type: mimeType });
            triggerManualScan(pendingMobile.id, file);
-         });
+        })
+        .catch((err) => {
+          console.warn('[Ingestion] Mobile scan fetch failed:', err);
+          updatePendingIngestion(pendingMobile.id, { status: 'error' });
+          toast.error('Failed to download mobile scan. Please retry from phone.');
+        });
     }
   }, [pendingIngestions]);
 
