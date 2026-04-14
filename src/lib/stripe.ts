@@ -19,9 +19,17 @@ type PlanKey = 'pro_monthly' | 'pro_yearly' | 'lifetime';
 export async function createStripeCheckoutSession(
   planKey: PlanKey
 ): Promise<{ checkoutUrl: string } | { error: string }> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    return { error: 'Please sign in to start checkout.' };
+  }
+
   const { data, error } = await supabase.functions.invoke('stripe-checkout-session', {
     method: 'POST',
     body: { planKey },
+    headers: { Authorization: `Bearer ${session.access_token}` },
   });
   if (error) return { error: await parseFunctionError(error) };
   const d = data as { checkoutUrl?: string; error?: string };
@@ -33,9 +41,17 @@ export async function createStripeCheckoutSession(
 export async function createStripePortalSession(
   returnUrl?: string
 ): Promise<{ url: string } | { error: string }> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    return { error: 'Please sign in to manage billing.' };
+  }
+
   const { data, error } = await supabase.functions.invoke('stripe-customer-portal', {
     method: 'POST',
     body: returnUrl ? { returnUrl } : {},
+    headers: { Authorization: `Bearer ${session.access_token}` },
   });
   if (error) return { error: await parseFunctionError(error) };
   const d = data as { url?: string; error?: string };
