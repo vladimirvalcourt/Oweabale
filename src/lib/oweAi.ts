@@ -2,9 +2,25 @@ import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
 export type OweAiChatMessage = { role: 'user' | 'assistant'; content: string };
+export type OweAiMode = 'advisor' | 'academy';
+export type OweAiFamiliarity = 'beginner' | 'intermediate' | 'advanced';
+export type OweAiLearningProfile = {
+  familiarityLevel: OweAiFamiliarity;
+  preferredStyle: 'plain_language' | 'step_by_step' | 'concise';
+  topicsCovered: string[];
+  recentFocus: string[];
+  lastLessonTopic: string | null;
+  totalLessons: number;
+  totalMessages: number;
+};
 
 export type OweAiResult =
-  | { type: 'reply'; text: string }
+  | {
+      type: 'reply';
+      text: string;
+      learningProfile?: OweAiLearningProfile;
+      nextLessonPrompt?: string;
+    }
   | { type: 'blocked'; message: string; code: string }
   | { type: 'disabled'; message: string };
 
@@ -82,8 +98,11 @@ function bodyImpliesInvalidSession(b: Record<string, unknown>): boolean {
   );
 }
 
-export async function invokeOweAi(messages: OweAiChatMessage[]): Promise<OweAiResult> {
-  const payload = { messages };
+export async function invokeOweAi(
+  messages: OweAiChatMessage[],
+  opts?: { mode?: OweAiMode; levelHint?: OweAiFamiliarity },
+): Promise<OweAiResult> {
+  const payload = { messages, mode: opts?.mode ?? 'advisor', levelHint: opts?.levelHint };
 
   const invokeOnce = async () => {
     const auth = await authHeadersForFunctions();
@@ -165,7 +184,14 @@ export async function invokeOweAi(messages: OweAiChatMessage[]): Promise<OweAiRe
     throw new Error(error.message);
   }
 
-  const d = data as { reply?: string; error?: string; message?: string; blocked?: boolean } | null;
+  const d = data as {
+    reply?: string;
+    error?: string;
+    message?: string;
+    blocked?: boolean;
+    learningProfile?: OweAiLearningProfile;
+    nextLessonPrompt?: string;
+  } | null;
   if (d?.error && typeof d.message === 'string' && d.blocked) {
     return { type: 'blocked', message: d.message, code: String(d.error) };
   }
@@ -173,7 +199,12 @@ export async function invokeOweAi(messages: OweAiChatMessage[]): Promise<OweAiRe
     return { type: 'disabled', message: d.message };
   }
   if (typeof d?.reply === 'string' && d.reply.trim()) {
-    return { type: 'reply', text: d.reply.trim() };
+    return {
+      type: 'reply',
+      text: d.reply.trim(),
+      learningProfile: d.learningProfile,
+      nextLessonPrompt: typeof d.nextLessonPrompt === 'string' ? d.nextLessonPrompt : undefined,
+    };
   }
   if (typeof d?.error === 'string') {
     if (/jwt|invalid.*token/i.test(d.error)) {

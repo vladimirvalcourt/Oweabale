@@ -19,7 +19,7 @@ const OFF_TOPIC_BLOCKLIST: RegExp[] = [
 
 /** Domain terms: money / obligations / app data. */
 const FINANCE_DOMAIN =
-  /\b(bill|bills|biller|debt|debts|loan|loans|budget|budgets|save|saving|spend|spending|expense|income|paycheck|salary|wage|subscription|subscriptions|cash|checking|savings|liquid|afford|buy|buys|buying|bought|purchase|purchases|shopping|shop|splurge|due|payment|payments|min(imum)?\s+payment|apr|interest|credit\s*card|mortgage|rent|utility|utilities|electric|grocer|tax|taxes|1099|freelance|invoice|goal|goals|transaction|transactions|category|categories|net\s*worth|asset|assets|balance|surplus|deficit|overdraft|401k|ira|roth|invest|investment|portfolio|crypto|bitcoin|stock|stocks|ticker|cite|citation|fine|fines|ticket|owe|owed|obligation|cash\s*flow|safe\s*to\s*spend|disposable)\b/i;
+  /\b(bill|bills|biller|debt|debts|loan|loans|budget|budgets|save|saving|spend|spending|expense|income|paycheck|salary|wage|subscription|subscriptions|cash|checking|savings|liquid|afford|buy|buys|buying|bought|purchase|purchases|shopping|shop|splurge|due|payment|payments|min(imum)?\s+payment|apr|interest|compound\s+interest|simple\s+interest|credit|credit\s*card|credit\s*score|fico|utilization|statement\s+balance|minimum\s+due|debt\s*to\s*income|dti|mortgage|rent|utility|utilities|electric|grocer|tax|taxes|1099|w2|freelance|invoice|goal|goals|transaction|transactions|category|categories|net\s*worth|asset|assets|liabilities|balance|surplus|deficit|overdraft|emergency\s+fund|sinking\s+fund|refinance|refinancing|collection|collections|delinquent|late\s+fee|grace\s+period|principal|amortization|401k|ira|roth|hsa|invest|investment|portfolio|crypto|bitcoin|stock|stocks|bond|bonds|etf|ticker|cite|citation|fine|fines|ticket|owe|owed|obligation|cash\s*flow|safe\s*to\s*spend|disposable)\b/i;
 
 const PERSONAL_OR_APP =
   /\b(i|i'?m|i'?ve|i'?d|my|me|mine|our|ours|myself|we|we'?re)\b|\b(oweable|my\s+data|my\s+account|this\s+app|in\s+oweable|on\s+my\s+dashboard|my\s+records|what\s+i\s+have|how\s+much\s+do\s+i|how\s+am\s+i\s+doing|can\s+i\s+afford|what\s+can\s+i|should\s+i\s+buy|can\s+i\s+buy|can\s+i\s+get)\b/i;
@@ -30,7 +30,7 @@ const DATA_QUERY =
 
 /** General finance education intent (allowed when clearly financial). */
 const EDUCATION_QUERY =
-  /\b(what\s+is|what'?s|how\s+does|how\s+do|explain|teach\s+me|help\s+me\s+understand|difference\s+between|pros?\s+and\s+cons?|best\s+way\s+to|tips?\s+for|tell\s+me\s+about|tell\s+me\s+more|walk\s+me\s+through|overview|i\s+want\s+to\s+learn)\b/i;
+  /\b(what\s+is|what'?s|how\s+does|how\s+do|explain|teach\s+me|help\s+me\s+understand|difference\s+between|pros?\s+and\s+cons?|best\s+way\s+to|tips?\s+for|tell\s+me\s+about|tell\s+me\s+more|walk\s+me\s+through|overview|i\s+want\s+to\s+learn|academy|course|lesson|curriculum|beginner|beginner-friendly|from\s+scratch|basics|fundamentals)\b/i;
 
 const SOCIAL_OPENER =
   /^(hi|hello|hey|heya|howdy|good\s+(morning|afternoon|evening))(?:[!. ]+.*)?$|^(how\s+are\s+you|how'?s\s+it\s+going|what'?s\s+up)\b/i;

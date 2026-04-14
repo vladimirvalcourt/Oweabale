@@ -2,7 +2,13 @@ import React, { memo, startTransition, useCallback, useEffect, useRef, useState 
 import { Sparkles, Send, Loader2, Trash2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import rehypeSanitize from 'rehype-sanitize';
-import { invokeOweAi, type OweAiChatMessage } from '../lib/oweAi';
+import {
+  invokeOweAi,
+  type OweAiChatMessage,
+  type OweAiFamiliarity,
+  type OweAiLearningProfile,
+  type OweAiMode,
+} from '../lib/oweAi';
 import { cn } from '../lib/utils';
 
 const OweAiMessageBubble = memo(function OweAiMessageBubble({ message }: { message: OweAiChatMessage }) {
@@ -35,10 +41,19 @@ const QUICK_PROMPTS = [
   'Given my numbers, how would you tighten my budget?',
 ] as const;
 
+const MODE_LABEL: Record<OweAiMode, string> = {
+  advisor: 'Advisor',
+  academy: 'Learn finance',
+};
+
 export default function OweAi() {
   const [messages, setMessages] = useState<OweAiChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState<OweAiMode>('advisor');
+  const [levelHint, setLevelHint] = useState<OweAiFamiliarity | null>(null);
+  const [learningProfile, setLearningProfile] = useState<OweAiLearningProfile | null>(null);
+  const [nextLessonPrompt, setNextLessonPrompt] = useState<string>('');
   const bottomRef = useRef<HTMLDivElement>(null);
   /** Must match `messages` — used so invoke runs with the real thread (setState updaters are not synchronous). */
   const messagesRef = useRef<OweAiChatMessage[]>([]);
@@ -62,8 +77,13 @@ export default function OweAi() {
     });
 
     try {
-      const result = await invokeOweAi(nextThread);
+      const result = await invokeOweAi(nextThread, {
+        mode,
+        levelHint: mode === 'academy' ? levelHint ?? undefined : undefined,
+      });
       if (result.type === 'reply') {
+        if (result.learningProfile) setLearningProfile(result.learningProfile);
+        setNextLessonPrompt(result.nextLessonPrompt ?? '');
         startTransition(() => {
           setMessages([...nextThread, { role: 'assistant', content: result.text }]);
         });
@@ -90,7 +110,7 @@ export default function OweAi() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [levelHint, mode]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -104,6 +124,7 @@ export default function OweAi() {
 
   const clearChat = useCallback(() => {
     setMessages([]);
+    setNextLessonPrompt('');
   }, []);
 
   const sendQuickPrompt = useCallback(
@@ -113,6 +134,11 @@ export default function OweAi() {
     },
     [loading, runSend],
   );
+
+  const sendNextLesson = useCallback(() => {
+    if (!nextLessonPrompt || loading || mode !== 'academy') return;
+    void runSend(nextLessonPrompt);
+  }, [loading, mode, nextLessonPrompt, runSend]);
 
   return (
     <div className="min-h-[calc(100dvh-12rem)] max-w-3xl mx-auto w-full flex flex-col gap-4">
@@ -139,6 +165,83 @@ export default function OweAi() {
             <Trash2 className="w-3.5 h-3.5" aria-hidden />
             Clear chat
           </button>
+        )}
+      </div>
+
+      <div className="rounded-2xl border border-surface-border bg-surface-raised/70 p-3 sm:p-4 flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <p className="text-xs text-content-tertiary">
+            Chat mode: <span className="text-content-secondary font-medium">{MODE_LABEL[mode]}</span>
+          </p>
+          {learningProfile && mode === 'academy' && (
+            <span className="text-[11px] rounded-full border border-violet-400/35 bg-violet-500/10 text-violet-200 px-2.5 py-1">
+              Level: {learningProfile.familiarityLevel}
+            </span>
+          )}
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {(['advisor', 'academy'] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setMode(m)}
+              className={cn(
+                'text-xs rounded-full border px-3 py-1.5 transition-colors',
+                mode === m
+                  ? 'border-brand-indigo/60 bg-brand-indigo/20 text-content-primary'
+                  : 'border-surface-border bg-surface-base text-content-secondary hover:bg-surface-elevated',
+              )}
+            >
+              {MODE_LABEL[m]}
+            </button>
+          ))}
+        </div>
+
+        {mode === 'academy' && (
+          <div className="flex flex-wrap gap-2">
+            {(
+              [
+                { label: 'Teach simpler', value: 'beginner' },
+                { label: 'Standard', value: 'intermediate' },
+                { label: 'Go deeper', value: 'advanced' },
+              ] as const
+            ).map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setLevelHint(option.value)}
+                className={cn(
+                  'text-[11px] rounded-full border px-3 py-1 transition-colors',
+                  levelHint === option.value
+                    ? 'border-violet-400/55 bg-violet-500/15 text-violet-100'
+                    : 'border-surface-border bg-surface-base text-content-tertiary hover:text-content-secondary',
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => setLevelHint(null)}
+              className={cn(
+                'text-[11px] rounded-full border px-3 py-1 transition-colors',
+                levelHint === null
+                  ? 'border-content-secondary/50 bg-surface-elevated text-content-secondary'
+                  : 'border-surface-border bg-surface-base text-content-tertiary hover:text-content-secondary',
+              )}
+            >
+              Auto level
+            </button>
+            <button
+              type="button"
+              onClick={sendNextLesson}
+              disabled={!nextLessonPrompt || loading}
+              className="text-[11px] rounded-full border border-emerald-400/40 bg-emerald-500/10 text-emerald-200 px-3 py-1 transition-colors hover:bg-emerald-500/20 disabled:opacity-40 disabled:pointer-events-none"
+            >
+              Next lesson
+            </button>
+          </div>
         )}
       </div>
 
@@ -203,7 +306,7 @@ export default function OweAi() {
                 void runSend(text);
               }
             }}
-            placeholder="Type your question like you would to an advisor…"
+            placeholder={mode === 'academy' ? 'Ask for a finance lesson or concept…' : 'Type your question like you would to an advisor…'}
             disabled={loading}
             className="flex-1 resize-none bg-transparent px-3 py-2 text-sm text-content-primary placeholder:text-content-muted rounded-md disabled:opacity-50 max-h-28 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0"
           />
@@ -221,8 +324,8 @@ export default function OweAi() {
           </button>
         </div>
         <p className="text-[11px] text-content-muted leading-relaxed">
-          Owe-AI stays on your finances. It isn&apos;t legal, tax, or personalized investment advice—think education and
-          planning with the data you&apos;ve saved.
+          Owe-AI stays on your finances. Use <span className="text-content-secondary">Learn finance</span> mode when you want guided lessons.
+          It isn&apos;t legal, tax, or personalized investment advice.
         </p>
       </form>
     </div>
