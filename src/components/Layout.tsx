@@ -5,7 +5,7 @@ import {
   Bell, Search, Home, Receipt, Target, Activity,
   Settings, Repeat, BarChart3, Plus, X, ChevronDown, Inbox,
   Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LineChart, ShieldCheck,
-  Tags, LifeBuoy, ScrollText, Wand2, Wallet, Clock, CreditCard, Sparkles
+  Wallet, Clock, CreditCard, Sparkles
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
@@ -254,10 +254,7 @@ export default function Layout() {
       }
     };
     pushNavShortcut(['owe-ai', 'owe ai', 'oweable ai', 'assistant', 'chat about my money'], 'Navigation', 'Owe-AI', 'Your data only', '/owe-ai');
-    pushNavShortcut(['categor', 'tags', 'labels'], 'Navigation', 'Categories', 'Spending categories', '/categories');
-    pushNavShortcut(['support', 'help desk', 'help', 'ticket'], 'Navigation', 'Help & Support', 'Tickets & broadcasts', '/support');
-    pushNavShortcut(['changelog', 'what\'s new', 'release'], 'Navigation', 'Changelog', 'Product updates', '/changelog');
-    pushNavShortcut(['auto-rule', 'automation', 'categorization rule'], 'Navigation', 'Auto-Rules', 'Transaction rules in Settings', '/settings?tab=rules');
+    pushNavShortcut(['support', 'help desk', 'help', 'ticket'], 'Navigation', 'Help & Support', 'Contact support', '/support');
 
     return results.slice(0, 8); // Limit to 8 results
   }, [deferredSearchQuery, bills, debts, transactions, subscriptions, goals, incomes, budgets]);
@@ -341,15 +338,6 @@ export default function Layout() {
           { name: 'Goals', path: '/goals', icon: Target },
           { name: 'Credit Workshop', path: '/credit', icon: ShieldCheck },
           { name: 'Taxes', path: '/taxes', icon: Calculator },
-        ],
-      },
-      {
-        label: 'More',
-        items: [
-          { name: 'Categories', path: '/categories', icon: Tags },
-          { name: 'Help & Support', path: '/support', icon: LifeBuoy },
-          { name: 'Changelog', path: '/changelog', icon: ScrollText },
-          { name: 'Auto-rules', path: '/settings?tab=rules', icon: Wand2 },
         ],
       },
     ],

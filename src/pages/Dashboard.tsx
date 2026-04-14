@@ -19,34 +19,15 @@ import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveCont
 
 import type { Citation } from '../store/useStore';
 
-/** v2: JSON { liquid, liability } — re-show when fingerprint changes (cash or est. quarterly tax moves). */
-const LOW_TAX_RESERVE_DISMISS_KEY = 'oweable_dismiss_dashboard_low_tax_reserve_v2';
+/** v3: one-time dismissal persisted across sessions/devices on this browser. */
+const LOW_TAX_RESERVE_DISMISS_KEY = 'oweable_dismiss_dashboard_low_tax_reserve_v3';
 
-type LowTaxFingerprint = { liquid: number; liability: number };
-
-function roundMoneyFingerprint(n: number): number {
-  if (!Number.isFinite(n)) return 0;
-  return Math.round(n / 25) * 25;
-}
-
-function parseStoredLowTaxFingerprint(): LowTaxFingerprint | null {
+function parseLowTaxDismissed(): boolean {
   try {
-    const raw = sessionStorage.getItem(LOW_TAX_RESERVE_DISMISS_KEY);
-    if (!raw) return null;
-    const j = JSON.parse(raw) as unknown;
-    if (!j || typeof j !== 'object') return null;
-    const o = j as Record<string, unknown>;
-    const liquid = Number(o.liquid);
-    const liability = Number(o.liability);
-    if (Number.isFinite(liquid) && Number.isFinite(liability)) return { liquid, liability };
+    return localStorage.getItem(LOW_TAX_RESERVE_DISMISS_KEY) === '1';
   } catch {
-    /* ignore */
+    return false;
   }
-  return null;
-}
-
-function lowTaxFingerprintsEqual(a: LowTaxFingerprint, b: LowTaxFingerprint): boolean {
-  return a.liquid === b.liquid && a.liability === b.liability;
 }
 
 // Helper for animated numbers
@@ -91,9 +72,7 @@ export default function Dashboard() {
   const isLoading = useStore((state) => state.isLoading);
   const [isCitationModalOpen, setIsCitationModalOpen] = useState(false);
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
-  const [dismissedLowTaxFingerprint, setDismissedLowTaxFingerprint] = useState<LowTaxFingerprint | null>(
-    () => parseStoredLowTaxFingerprint()
-  );
+  const [dismissedLowTaxReserve, setDismissedLowTaxReserve] = useState<boolean>(() => parseLowTaxDismissed());
   /** Stable anchor for citation due dates (matches Obligations / safe-to-spend math). */
   const [scheduleBaseMs] = useState(() => Date.now());
 
@@ -184,28 +163,18 @@ export default function Dashboard() {
     return liquidCash < currentTaxLiability;
   }, [cashFlow.taxReserve, liquidCash]);
 
-  const lowTaxFingerprint = useMemo(
-    (): LowTaxFingerprint => ({
-      liquid: roundMoneyFingerprint(liquidCash),
-      liability: roundMoneyFingerprint((cashFlow?.taxReserve ?? 0) * 3),
-    }),
-    [liquidCash, cashFlow.taxReserve]
-  );
-
   const showLowTaxReserveAlert = useMemo(() => {
-    if (!taxInsolvencyRisk) return false;
-    if (!dismissedLowTaxFingerprint) return true;
-    return !lowTaxFingerprintsEqual(dismissedLowTaxFingerprint, lowTaxFingerprint);
-  }, [taxInsolvencyRisk, dismissedLowTaxFingerprint, lowTaxFingerprint]);
+    return taxInsolvencyRisk && !dismissedLowTaxReserve;
+  }, [taxInsolvencyRisk, dismissedLowTaxReserve]);
 
   const dismissLowTaxReserveAlert = useCallback(() => {
     try {
-      sessionStorage.setItem(LOW_TAX_RESERVE_DISMISS_KEY, JSON.stringify(lowTaxFingerprint));
+      localStorage.setItem(LOW_TAX_RESERVE_DISMISS_KEY, '1');
     } catch {
       /* ignore quota / private mode */
     }
-    setDismissedLowTaxFingerprint(lowTaxFingerprint);
-  }, [lowTaxFingerprint]);
+    setDismissedLowTaxReserve(true);
+  }, []);
 
   // --- Intelligent Modules ---
 
