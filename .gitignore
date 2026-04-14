@@ -8,6 +8,8 @@ trae/
 brain/
 .gemini/
 .mcp.json
+# Cursor MCP (may contain project_ref); copy from .cursor/mcp.json.example
+.cursor/mcp.json
 skills-lock.json
 .claude/settings.json
 .claude/todos.md
@@ -33,6 +35,7 @@ coverage/
 npm-cache/
 .npm-cache/
 .npm_cache/
+server/.npm-cache/
 
 .vercel
 

@@ -98,7 +98,7 @@ Or manually run the schema from `src/lib/supabase_schema.sql` in Supabase SQL Ed
 ```
 **Fix**: Check your internet connection and Supabase credentials in `.env`:
 ```
-VITE_SUPABASE_URL=https://hjgrslcapdmmgxeppguu.supabase.co
+VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
 VITE_SUPABASE_ANON_KEY=your_key_here
 ```
 

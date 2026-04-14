@@ -1,7 +1,7 @@
 # BACKEND.md — Oweable Backend Reference
 
-> Supabase project: `hjgrslcapdmmgxeppguu`  
-> Region: `us-east-1`  
+> Supabase: use project ref from `VITE_SUPABASE_URL` / Dashboard (see `.env.example`).  
+> Region: set in Supabase Dashboard for your project.  
 > Schema file: `src/lib/supabase_schema.sql`  
 > Client: `src/lib/supabase.ts`
 
@@ -312,7 +312,7 @@ No store logic changes needed — `fetchData()` and all mutations are already au
 
 ```bash
 # .env (never commit to git)
-VITE_SUPABASE_URL=https://hjgrslcapdmmgxeppguu.supabase.co
+VITE_SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
 VITE_SUPABASE_ANON_KEY=<your-anon-key>
 ```
 

@@ -9,7 +9,10 @@
     "build:analyze": "ANALYZE=true vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit && eslint src"
+    "lint": "tsc --noEmit && eslint src",
+    "secrets:scan": "gitleaks detect --source . --config .gitleaks.toml --redact --verbose",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
@@ -32,6 +35,7 @@
     "react-plaid-link": "^4.1.1",
     "react-router-dom": "^7.13.2",
     "recharts": "^3.8.1",
+    "rehype-sanitize": "^6.0.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7",
@@ -55,6 +59,7 @@
     "typescript": "~5.8.2",
     "vite": "^8.0.8",
     "vite-plugin-checker": "^0.12.0",
-    "vite-plugin-remove-console": "^2.2.0"
+    "vite-plugin-remove-console": "^2.2.0",
+    "vitest": "^3.2.4"
   }
 }

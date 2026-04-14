@@ -1,0 +1,16 @@
+# Secret scanning for this repo. Install: https://github.com/gitleaks/gitleaks
+# Run: npm run secrets:scan
+title = "Oweable"
+
+[allowlist]
+description = "Non-secret strings and paths that should never have been committed"
+paths = [
+  '''server/\.npm-cache/''',
+]
+regexes = [
+  # Import names falsely matched by Plaid rules
+  '''exchangePlaidPublicToken''',
+  '''createPlaidLinkToken''',
+  # localStorage key (not a credential)
+  '''oweable_notification_prefs_v1''',
+]
