@@ -1,5 +1,7 @@
 import React, { Component, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { useStore } from '../store/useStore';
+import { isStaleDynamicImportError } from '../lib/dynamicImportErrors';
 
 interface Props {
   children: ReactNode;
@@ -11,6 +13,8 @@ interface State {
   error?: Error;
   /** React component stack from componentDidCatch (helps debug intermittent crashes). */
   errorInfo?: string;
+  /** Stale or missing JS chunk — sign out and hard-navigate instead of showing a crash UI. */
+  recoveringStaleAssets?: boolean;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -20,13 +24,37 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
+    if (isStaleDynamicImportError(error)) {
+      return { hasError: true, error, errorInfo: undefined, recoveringStaleAssets: true };
+    }
     return { hasError: true, error, errorInfo: undefined };
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     console.error('[ErrorBoundary]', error.message, error, info.componentStack);
+    if (isStaleDynamicImportError(error)) {
+      void this.recoverFromStaleAssets();
+      return;
+    }
     this.setState({ errorInfo: info.componentStack ?? undefined });
   }
+
+  /** Full navigation loads a fresh index + chunk URLs; sign-out clears session and local app state. */
+  private recoverFromStaleAssets = async () => {
+    try {
+      await Promise.race([
+        useStore.getState().signOut(),
+        new Promise<void>((resolve) => {
+          setTimeout(resolve, 4000);
+        }),
+      ]);
+    } catch (e) {
+      console.error('[ErrorBoundary] signOut during stale chunk recovery failed', e);
+    }
+    const url = new URL('/auth', window.location.origin);
+    url.searchParams.set('reason', 'stale');
+    window.location.assign(url.toString());
+  };
 
   handleReset = () => {
     this.setState({ hasError: false, error: undefined, errorInfo: undefined });
@@ -35,6 +63,16 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) return this.props.fallback;
+
+      if (this.state.recoveringStaleAssets) {
+        return (
+          <div className="min-h-screen flex items-center justify-center p-8 bg-[#09090b]">
+            <p className="text-sm font-mono text-content-secondary uppercase tracking-widest">
+              Refreshing session…
+            </p>
+          </div>
+        );
+      }
 
       return (
         <div className="min-h-[400px] flex items-center justify-center p-8">
@@ -50,14 +88,15 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
 
             <h2 className="text-[11px] font-mono font-bold text-red-400 uppercase tracking-[0.3em] mb-2">
-              Render Fault Detected
+              {import.meta.env.DEV ? 'Render fault detected' : 'Something went wrong'}
             </h2>
-            <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest mb-3">
-              A screen crashed while rendering. Details below also appear in the browser console as{' '}
-              <span className="text-content-muted">[ErrorBoundary]</span>.
+            <p className="text-sm text-content-tertiary mb-3 leading-relaxed">
+              {import.meta.env.DEV
+                ? 'This screen crashed while rendering. Technical details are below for debugging.'
+                : 'This screen hit an unexpected problem. Try again, or refresh the page. If it keeps happening, contact support.'}
             </p>
 
-            {this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <pre className="text-left text-[9px] font-mono text-amber-200/90 bg-black/50 border border-surface-border p-3 mb-3 overflow-auto max-h-28 text-wrap break-words">
                 {this.state.error.message}
               </pre>
@@ -69,7 +108,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </pre>
             )}
 
-            {this.state.error && (
+            {import.meta.env.DEV && this.state.error && (
               <button
                 type="button"
                 onClick={() => {
@@ -79,7 +118,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   ].filter(Boolean);
                   void navigator.clipboard.writeText(lines.join('\n\n'));
                 }}
-                className="px-4 py-2 border border-zinc-600 text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated hover:text-white transition-all mb-4"
+                className="px-4 py-2 border border-content-muted text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated hover:text-white transition-all mb-4"
               >
                 Copy error details
               </button>
@@ -87,7 +126,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
             <button
               onClick={this.handleReset}
-              className="px-6 py-2 border border-zinc-700 text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated hover:text-white transition-all flex items-center gap-2 mx-auto"
+              className="px-6 py-2 border border-surface-border text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated hover:text-white transition-all flex items-center gap-2 mx-auto"
             >
               <RefreshCw className="w-3 h-3" />
               Attempt Recovery
