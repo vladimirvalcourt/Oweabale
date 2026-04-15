@@ -52,6 +52,11 @@ function FaqItem({ question, answer }: { question: string, answer: string }) {
 }
 
 export default function Pricing() {
+  const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
+  const configuredYearly = Number(import.meta.env.VITE_PRICING_YEARLY_DISPLAY);
+  const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
+  const yearlyPrice = Number.isFinite(configuredYearly) && configuredYearly > 0 ? configuredYearly : 99.0;
+
   useSEO({
     title: 'Pricing — Oweable',
     description: 'Simple, transparent pricing for anyone dealing with debt, bills, or financial pressure. Start free. Upgrade when ready.',
@@ -62,6 +67,8 @@ export default function Pricing() {
   const [scrolled, setScrolled] = useState(false);
   const [isYearly, setIsYearly] = useState(false);
   const [isStartingCheckout, setIsStartingCheckout] = useState(false);
+  const yearlyMonthlyEquivalent = yearlyPrice / 12;
+  const displayedPrice = isYearly ? yearlyPrice : monthlyPrice;
   
   const [headerRef, headerVisible] = useInView();
   const [cardsRef, cardsVisible] = useInView();
@@ -116,7 +123,7 @@ export default function Pricing() {
           <div className="bg-amber-400/5 border border-amber-400/20 p-4 rounded-sm flex items-center gap-4">
             <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
             <p className="text-sm text-amber-200/90 leading-relaxed">
-              <span className="text-amber-400 font-semibold">Closed beta:</span> Access is by invitation. Pricing below reflects the public roadmap; your cohort may use the app at no charge during the beta.
+              <span className="text-amber-400 font-semibold">Closed beta:</span> Access is by invitation. Paid plans are active in beta unless your cohort has a separate promo.
             </p>
           </div>
         </div>
@@ -222,18 +229,25 @@ export default function Pricing() {
               
               <div className="bg-surface-raised border border-indigo-500/30 rounded-sm p-10 flex flex-col relative z-10 h-full shadow-[0_0_50px_rgba(99,102,241,0.05)]">
                 <div className="absolute top-0 right-10 transform -translate-y-1/2">
-                  <span className="bg-emerald-600 text-white text-xs font-sans font-semibold px-3 py-1 rounded-sm">Closed beta</span>
+                  <span className="bg-emerald-600 text-white text-xs font-sans font-semibold px-3 py-1 rounded-sm">Most popular</span>
                 </div>
                 
                 <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Full suite</h3>
-                <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Everything in the app during the closed beta.</p>
+                <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Everything in the app with monthly or yearly billing.</p>
                 
                 <div className="mb-10 p-6 bg-surface-base border border-indigo-500/20 rounded-sm relative h-[100px] flex items-center shadow-[inset_0_0_20px_rgba(99,102,241,0.02)]">
                   <div className={`absolute inset-0 px-6 flex items-center transition-all duration-300 ease-in-out`}>
-                    <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">$0</span>
-                    <span className="text-content-muted text-sm ml-3">complimentary beta</span>
+                    <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">
+                      ${displayedPrice.toFixed(2)}
+                    </span>
+                    <span className="text-content-muted text-sm ml-3">{isYearly ? 'per year' : 'per month'}</span>
                   </div>
                 </div>
+                {isYearly && (
+                  <p className="text-[11px] text-content-muted -mt-6 mb-8">
+                    Equivalent to ${yearlyMonthlyEquivalent.toFixed(2)}/mo billed annually.
+                  </p>
+                )}
                 
                 <button
                   type="button"
