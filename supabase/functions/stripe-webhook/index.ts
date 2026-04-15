@@ -27,8 +27,18 @@ async function upsertSubscriptionAndEntitlement(
     .select('id')
     .eq('stripe_customer_id', customerId)
     .maybeSingle();
-  const userId = profile?.id as string | undefined;
+  const metaUserId =
+    typeof subscription.metadata?.user_id === 'string'
+      ? subscription.metadata.user_id
+      : undefined;
+  const userId = (profile?.id as string | undefined) ?? metaUserId;
   if (!userId) return;
+
+  if (!profile?.id && metaUserId) {
+    await supabaseAdmin
+      .from('profiles')
+      .upsert({ id: metaUserId, stripe_customer_id: customerId }, { onConflict: 'id' });
+  }
 
   const firstItem = subscription.items.data[0];
   const status = subscription.status;
@@ -173,6 +183,17 @@ Deno.serve(async (req: Request) => {
 
         if (session.mode === 'payment' && session.payment_status === 'paid') {
           await upsertOneTimePaymentAndEntitlement(supabaseAdmin, session);
+        }
+
+        if (session.mode === 'subscription' && session.payment_status === 'paid') {
+          const subId =
+            typeof session.subscription === 'string'
+              ? session.subscription
+              : (session.subscription as { id?: string } | null)?.id;
+          if (subId) {
+            const sub = await stripe.subscriptions.retrieve(subId);
+            await upsertSubscriptionAndEntitlement(supabaseAdmin, sub);
+          }
         }
         break;
       }

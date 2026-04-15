@@ -1,68 +1,135 @@
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Building2, Download, CreditCard as CreditCardIcon } from 'lucide-react';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
 import { createStripeCheckoutSession, createStripePortalSession } from '../../lib/stripe';
 
+function isEntitlementActive(row: { status: string; ends_at: string | null } | undefined) {
+  if (!row || row.status !== 'active') return false;
+  if (row.ends_at) {
+    const end = new Date(row.ends_at).getTime();
+    if (!Number.isNaN(end) && end < Date.now()) return false;
+  }
+  return true;
+}
+
+function isSubscriptionLive(row: { status: string } | undefined) {
+  return row?.status === 'active' || row?.status === 'trialing';
+}
+
 function BillingPanelInner() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [tierLabel, setTierLabel] = useState('The Tracker');
   const [statusText, setStatusText] = useState('You are currently on the Free tier.');
+  const [hasPaidAccess, setHasPaidAccess] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState<
     Array<{ id: string; amount_total: number; currency: string; status: string; created_at: string }>
   >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isWorking, setIsWorking] = useState(false);
 
-  useEffect(() => {
-    const loadBillingState = async () => {
-      setIsLoading(true);
-      const [{ data: entitlements }, { data: subscriptions }, { data: payments }] = await Promise.all([
-        supabase
-          .from('entitlements')
-          .select('feature_key,status,ends_at')
-          .eq('feature_key', 'full_suite')
-          .order('updated_at', { ascending: false })
-          .limit(1),
-        supabase
-          .from('billing_subscriptions')
-          .select('status,current_period_end')
-          .order('updated_at', { ascending: false })
-          .limit(1),
-        supabase
-          .from('billing_payments')
-          .select('id,amount_total,currency,status,created_at')
-          .order('created_at', { ascending: false })
-          .limit(20),
-      ]);
-
-      const entitlement = entitlements?.[0];
-      const sub = subscriptions?.[0];
-      if (entitlement?.status === 'active') {
-        setTierLabel('Full Suite');
-        if (sub?.status) {
-          const endDate = sub.current_period_end
-            ? new Date(sub.current_period_end).toLocaleDateString()
-            : null;
-          setStatusText(
-            endDate
-              ? `Subscription ${sub.status}. Current period ends ${endDate}.`
-              : `Subscription ${sub.status}.`
-          );
-        } else {
-          setStatusText('Full Suite access is active.');
-        }
-      } else {
-        setTierLabel('The Tracker');
-        setStatusText('You are currently on the Free tier.');
-      }
-
-      setPaymentHistory((payments ?? []) as Array<{ id: string; amount_total: number; currency: string; status: string; created_at: string }>);
+  const loadBillingState = useCallback(async (): Promise<boolean> => {
+    setIsLoading(true);
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
       setIsLoading(false);
-    };
+      return false;
+    }
 
-    void loadBillingState();
+    const [{ data: entitlements }, { data: subscriptions }, { data: payments }] = await Promise.all([
+      supabase
+        .from('entitlements')
+        .select('feature_key,status,ends_at')
+        .eq('user_id', user.id)
+        .eq('feature_key', 'full_suite')
+        .order('updated_at', { ascending: false })
+        .limit(1),
+      supabase
+        .from('billing_subscriptions')
+        .select('status,current_period_end')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(1),
+      supabase
+        .from('billing_payments')
+        .select('id,amount_total,currency,status,created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20),
+    ]);
+
+    const entitlement = entitlements?.[0];
+    const sub = subscriptions?.[0];
+    const paid = isEntitlementActive(entitlement) || isSubscriptionLive(sub);
+    setHasPaidAccess(paid);
+
+    if (paid) {
+      setTierLabel('Full Suite');
+      if (sub?.status) {
+        const endDate = sub.current_period_end
+          ? new Date(sub.current_period_end).toLocaleDateString()
+          : null;
+        setStatusText(
+          endDate
+            ? `Subscription ${sub.status}. Current period ends ${endDate}.`
+            : `Subscription ${sub.status}.`,
+        );
+      } else {
+        setStatusText('Full Suite access is active.');
+      }
+    } else {
+      setTierLabel('The Tracker');
+      setStatusText('You are currently on the Free tier.');
+    }
+
+    setPaymentHistory(
+      (payments ?? []) as Array<{
+        id: string;
+        amount_total: number;
+        currency: string;
+        status: string;
+        created_at: string;
+      }>,
+    );
+    setIsLoading(false);
+    return paid;
   }, []);
+
+  const billingFlag = searchParams.get('billing');
+
+  useEffect(() => {
+    const run = async () => {
+      if (billingFlag === 'success') {
+        const maxAttempts = 4;
+        let paidNow = false;
+        for (let i = 0; i < maxAttempts; i++) {
+          paidNow = await loadBillingState();
+          if (paidNow) break;
+          if (i < maxAttempts - 1) {
+            await new Promise((r) => setTimeout(r, 1200));
+          }
+        }
+        if (paidNow) {
+          toast.success('Your subscription is active.');
+        }
+        setSearchParams(
+          (prev) => {
+            const next = new URLSearchParams(prev);
+            next.delete('billing');
+            return next;
+          },
+          { replace: true },
+        );
+      } else {
+        await loadBillingState();
+      }
+    };
+    void run();
+  }, [billingFlag, loadBillingState, setSearchParams]);
 
   const onUpgrade = async () => {
     if (isWorking) return;
@@ -79,7 +146,7 @@ function BillingPanelInner() {
   const onManageBilling = async () => {
     if (isWorking) return;
     setIsWorking(true);
-    const result = await createStripePortalSession(`${window.location.origin}/settings`);
+    const result = await createStripePortalSession(`${window.location.origin}/settings?tab=billing`);
     if ('error' in result) {
       toast.error(result.error);
       setIsWorking(false);
@@ -101,22 +168,41 @@ function BillingPanelInner() {
         }
       >
         <p className="text-sm text-content-tertiary mb-6">{isLoading ? 'Loading billing status...' : statusText}</p>
-        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-sm p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <h4 className="text-content-primary font-bold flex items-center gap-2">Upgrade to The Arsenal</h4>
-            <p className="text-sm text-indigo-200/70 mt-1 max-w-md">
-              Unlock the Debt Detonator, Subscription Sniper, and automatic account syncing.
-            </p>
+        {hasPaidAccess ? (
+          <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-sm p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h4 className="text-content-primary font-bold flex items-center gap-2">You&apos;re on The Arsenal</h4>
+              <p className="text-sm text-emerald-200/70 mt-1 max-w-md">
+                Full Suite is active. Update your plan, payment method, or invoices anytime in the billing portal.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onManageBilling}
+              disabled={isWorking}
+              className="shrink-0 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-bold transition-colors shadow-[0_0_15px_rgba(16,185,129,0.25)]"
+            >
+              {isWorking ? 'Working...' : 'Manage billing'}
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={onUpgrade}
-            disabled={isWorking}
-            className="shrink-0 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-bold transition-colors shadow-[0_0_15px_rgba(99,102,241,0.3)]"
-          >
-            {isWorking ? 'Working...' : 'Upgrade Now'}
-          </button>
-        </div>
+        ) : (
+          <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-sm p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h4 className="text-content-primary font-bold flex items-center gap-2">Upgrade to The Arsenal</h4>
+              <p className="text-sm text-indigo-200/70 mt-1 max-w-md">
+                Unlock the Debt Detonator, Subscription Sniper, and automatic account syncing.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onUpgrade}
+              disabled={isWorking}
+              className="shrink-0 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-bold transition-colors shadow-[0_0_15px_rgba(99,102,241,0.3)]"
+            >
+              {isWorking ? 'Working...' : 'Upgrade Now'}
+            </button>
+          </div>
+        )}
       </CollapsibleModule>
 
       <CollapsibleModule title="Billing History" icon={Download} defaultOpen={false}>
@@ -125,7 +211,11 @@ function BillingPanelInner() {
           <div className="border border-surface-border border-dashed rounded-sm p-8 flex flex-col items-center justify-center text-center bg-surface-base">
             <Download className="w-7 h-7 text-content-muted mb-3" />
             <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">No billing history</p>
-            <p className="text-[10px] font-mono text-content-muted mt-1">You are on the free tier — no charges have been made.</p>
+            <p className="text-[10px] font-mono text-content-muted mt-1">
+              {hasPaidAccess
+                ? 'Invoices from Stripe will appear here after your first charge.'
+                : 'You are on the free tier — no charges have been made.'}
+            </p>
           </div>
         ) : (
           <div className="border border-surface-border rounded-sm bg-surface-base divide-y divide-surface-border">
@@ -146,8 +236,14 @@ function BillingPanelInner() {
         <p className="text-sm text-content-tertiary mb-6">Manage payment methods used for your subscriptions.</p>
         <div className="border border-surface-border border-dashed rounded-sm p-6 flex flex-col items-center justify-center text-center mb-4 bg-surface-base">
           <CreditCardIcon className="w-8 h-8 text-content-muted mb-3" />
-          <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">No payment method on file</p>
-          <p className="text-[10px] font-mono text-content-muted mt-1">Free tier — no billing required</p>
+          <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">
+            {hasPaidAccess ? 'Cards on file' : 'No payment method on file'}
+          </p>
+          <p className="text-[10px] font-mono text-content-muted mt-1">
+            {hasPaidAccess
+              ? 'Add, remove, or replace cards in the Stripe Customer Portal.'
+              : 'Free tier — no billing required'}
+          </p>
         </div>
         <button
           type="button"
