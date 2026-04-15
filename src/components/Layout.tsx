@@ -344,9 +344,16 @@ export default function Layout() {
     [dueSoonCount, pendingIngestions.length]
   );
 
+  // Defer location values so active-state recalculation doesn't block the
+  // click-to-paint frame. The sidebar briefly keeps the previous active item
+  // highlighted (one frame), then updates — a fair trade for fast INP.
+  const deferredPathname = useDeferredValue(location.pathname);
+  const deferredSearch = useDeferredValue(location.search);
+  const deferredHash = useDeferredValue(location.hash);
+
   const processedSidebarNav = useMemo(() => {
-    const currentTabParam = new URLSearchParams(location.search).get('tab');
-    const hashSlug = location.hash.replace(/^#/, '');
+    const currentTabParam = new URLSearchParams(deferredSearch).get('tab');
+    const hashSlug = deferredHash.replace(/^#/, '');
     return navGroups.map((group) => ({
       label: group.label,
       items: group.items.map((item) => {
@@ -360,14 +367,14 @@ export default function Layout() {
               ? currentTabParam === null || !['ambush', 'recurring', 'debt'].includes(currentTabParam ?? '')
               : currentTabParam === null;
         const hashMatches = item.hash
-          ? location.hash === `#${item.hash}`
+          ? deferredHash === `#${item.hash}`
           : !hashSlug || !(NAV_ROUTE_HASHES[itemBasePath] ?? []).includes(hashSlug);
-        const isActive = location.pathname === itemBasePath && tabMatches && hashMatches;
+        const isActive = deferredPathname === itemBasePath && tabMatches && hashMatches;
         const linkTo = item.hash ? `${itemBasePath}${queryPart ? `?${queryPart}` : ''}#${item.hash}` : item.path;
         return { ...item, isActive, linkTo };
       }),
     }));
-  }, [navGroups, location.pathname, location.search, location.hash]);
+  }, [navGroups, deferredPathname, deferredSearch, deferredHash]);
 
   return (
     <div className="min-h-[100dvh] bg-surface-base font-sans text-content-primary flex">
