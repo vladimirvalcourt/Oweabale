@@ -237,7 +237,7 @@ function BillingPanelInner() {
               disabled={isWorking}
               className="shrink-0 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-bold transition-colors shadow-[0_0_15px_rgba(99,102,241,0.3)]"
             >
-              {isWorking ? 'Working...' : 'Upgrade Now'}
+              {isWorking ? 'Working...' : `Upgrade — $${monthlyPrice.toFixed(2)}/mo`}
             </button>
           </div>
         )}
