@@ -1,8 +1,9 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Building2, Download, CreditCard as CreditCardIcon } from 'lucide-react';
+import { Building2, Download, CreditCard as CreditCardIcon, RefreshCw } from 'lucide-react';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
+import { cn } from '../../lib/utils';
 import { supabase } from '../../lib/supabase';
 import { createStripeCheckoutSession, createStripePortalSession } from '../../lib/stripe';
 
@@ -175,7 +176,20 @@ function BillingPanelInner() {
           </span>
         }
       >
-        <p className="text-sm text-content-tertiary mb-6">{isLoading ? 'Loading billing status...' : statusText}</p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 mb-6">
+          <p className="text-sm text-content-tertiary flex-1 min-w-0">
+            {isLoading ? 'Loading billing status...' : statusText}
+          </p>
+          <button
+            type="button"
+            onClick={() => void loadBillingState()}
+            disabled={isLoading || isWorking}
+            className="inline-flex shrink-0 items-center justify-center gap-2 self-start px-3 py-2 text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:text-content-primary bg-surface-raised border border-surface-border rounded-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-app"
+          >
+            <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} aria-hidden />
+            Refresh status
+          </button>
+        </div>
         {hasPaidAccess ? (
           <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-sm p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
