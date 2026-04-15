@@ -216,6 +216,11 @@ Deno.serve(async (req: Request) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Webhook error';
+    const hint =
+      /signature|No signatures found|timestamp/i.test(message)
+        ? 'stripe_webhook_signature_mismatch'
+        : 'stripe_webhook_handler_error';
+    console.error(`[stripe-webhook] ${hint}:`, message);
     return new Response(JSON.stringify({ error: message }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
