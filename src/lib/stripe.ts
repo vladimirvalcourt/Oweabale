@@ -38,6 +38,28 @@ export async function createStripeCheckoutSession(
   return { checkoutUrl: d.checkoutUrl };
 }
 
+export async function syncStripeBilling(): Promise<
+  { ok: true; synced?: boolean } | { error: string }
+> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    return { error: 'Please sign in to refresh billing.' };
+  }
+
+  const { data, error } = await supabase.functions.invoke('stripe-sync-billing', {
+    method: 'POST',
+    body: {},
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  if (error) return { error: await parseFunctionError(error) };
+  const d = data as { ok?: boolean; synced?: boolean; error?: string };
+  if (d?.error) return { error: d.error };
+  if (d?.ok) return { ok: true as const, synced: d.synced };
+  return { error: 'Could not sync billing' };
+}
+
 export async function createStripePortalSession(
   returnUrl?: string
 ): Promise<{ url: string } | { error: string }> {

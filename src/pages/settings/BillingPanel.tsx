@@ -5,7 +5,11 @@ import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
 import { supabase } from '../../lib/supabase';
-import { createStripeCheckoutSession, createStripePortalSession } from '../../lib/stripe';
+import {
+  createStripeCheckoutSession,
+  createStripePortalSession,
+  syncStripeBilling,
+} from '../../lib/stripe';
 
 function isEntitlementActive(row: { status: string; ends_at: string | null } | undefined) {
   if (!row || row.status !== 'active') return false;
@@ -31,8 +35,15 @@ function BillingPanelInner() {
   const [isLoading, setIsLoading] = useState(true);
   const [isWorking, setIsWorking] = useState(false);
 
-  const loadBillingState = useCallback(async (): Promise<boolean> => {
+  const loadBillingState = useCallback(async (opts?: { stripeSyncFirst?: boolean }): Promise<boolean> => {
     setIsLoading(true);
+    if (opts?.stripeSyncFirst) {
+      const sync = await syncStripeBilling();
+      if ('error' in sync) {
+        const benign = sync.error.includes('No Stripe customer on file');
+        if (!benign) toast.error(sync.error);
+      }
+    }
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -108,7 +119,7 @@ function BillingPanelInner() {
         const maxAttempts = 4;
         let paidNow = false;
         for (let i = 0; i < maxAttempts; i++) {
-          paidNow = await loadBillingState();
+          paidNow = await loadBillingState({ stripeSyncFirst: true });
           if (paidNow) break;
           if (i < maxAttempts - 1) {
             await new Promise((r) => setTimeout(r, 1200));
@@ -126,7 +137,7 @@ function BillingPanelInner() {
           { replace: true },
         );
       } else {
-        await loadBillingState();
+        await loadBillingState({ stripeSyncFirst: true });
       }
     };
     void run();
@@ -182,7 +193,7 @@ function BillingPanelInner() {
           </p>
           <button
             type="button"
-            onClick={() => void loadBillingState()}
+            onClick={() => void loadBillingState({ stripeSyncFirst: true })}
             disabled={isLoading || isWorking}
             className="inline-flex shrink-0 items-center justify-center gap-2 self-start px-3 py-2 text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:text-content-primary bg-surface-raised border border-surface-border rounded-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-app"
           >
