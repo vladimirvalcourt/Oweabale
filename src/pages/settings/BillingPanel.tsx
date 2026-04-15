@@ -25,6 +25,10 @@ function isSubscriptionLive(row: { status: string } | undefined) {
 }
 
 function BillingPanelInner() {
+  const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
+  const configuredYearly = Number(import.meta.env.VITE_PRICING_YEARLY_DISPLAY);
+  const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
+  const yearlyPrice = Number.isFinite(configuredYearly) && configuredYearly > 0 ? configuredYearly : 99;
   const [searchParams, setSearchParams] = useSearchParams();
   const [tierLabel, setTierLabel] = useState('The Tracker');
   const [statusText, setStatusText] = useState('You are currently on the Free tier.');
@@ -223,7 +227,8 @@ function BillingPanelInner() {
             <div>
               <h4 className="text-content-primary font-bold flex items-center gap-2">Upgrade to The Arsenal</h4>
               <p className="text-sm text-indigo-200/70 mt-1 max-w-md">
-                Unlock the Debt Detonator, Subscription Sniper, and automatic account syncing.
+                Unlock the Debt Detonator, Subscription Sniper, and automatic account syncing for
+                ${monthlyPrice.toFixed(2)}/month or ${yearlyPrice.toFixed(2)}/year.
               </p>
             </div>
             <button
