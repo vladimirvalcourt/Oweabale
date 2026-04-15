@@ -185,7 +185,10 @@ Deno.serve(async (req: Request) => {
           await upsertOneTimePaymentAndEntitlement(supabaseAdmin, session);
         }
 
-        if (session.mode === 'subscription' && session.payment_status === 'paid') {
+        if (
+          session.mode === 'subscription' &&
+          (session.payment_status === 'paid' || session.payment_status === 'no_payment_required')
+        ) {
           const subId =
             typeof session.subscription === 'string'
               ? session.subscription
@@ -205,7 +208,16 @@ Deno.serve(async (req: Request) => {
         break;
       }
       case 'invoice.paid':
-      case 'invoice.payment_failed':
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const subRef = invoice.subscription;
+        const subId = typeof subRef === 'string' ? subRef : subRef?.id;
+        if (subId) {
+          const sub = await stripe.subscriptions.retrieve(subId);
+          await upsertSubscriptionAndEntitlement(supabaseAdmin, sub);
+        }
+        break;
+      }
       default:
         break;
     }

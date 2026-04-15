@@ -131,6 +131,14 @@ function BillingPanelInner() {
     void run();
   }, [billingFlag, loadBillingState, setSearchParams]);
 
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') void loadBillingState();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, [loadBillingState]);
+
   const onUpgrade = async () => {
     if (isWorking) return;
     setIsWorking(true);
