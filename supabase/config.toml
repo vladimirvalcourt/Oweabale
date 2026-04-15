@@ -372,6 +372,18 @@ port = 54327
 backend = "postgres"
 
 # Experimental features may be deprecated any time
+# Stripe: checkout and portal validate the user JWT inside the function (getUser).
+# Webhook uses Stripe signature verification, not JWT.
+# Disabling gateway JWT verification avoids stale/expired edge rejection ("Invalid JWT").
+[functions.stripe-checkout-session]
+verify_jwt = false
+
+[functions.stripe-customer-portal]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
 # Plaid: webhook has no Supabase JWT; plaid-sync validates user JWT or PLAID_CRON_SECRET in code.
 [functions.plaid-webhook]
 verify_jwt = false
