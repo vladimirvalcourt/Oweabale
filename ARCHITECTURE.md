@@ -162,10 +162,13 @@ openQuickAdd('income')       // opens on income tab
 Tab type must be one of: `'transaction' | 'obligation' | 'income'`
 
 ### DeviceGuard
+
 Wraps the entire authenticated app in `App.tsx`. Blocks viewport widths below 768px with a full-screen restriction message. This is intentional — the app is desktop-only while native mobile is in development. Do not remove or bypass it.
 
 ### Resilience Layer: Boundaries & Loaders
+
 To ensure perceived performance and error isolation:
+
 - All pages are wrapped in `<ErrorBoundary>` to catch component-level hydration crashes and provide a recovery screen without breaking the entire SPA.
 - Top-level suspenses use `<AppLoader/>` while route-level transitions use `<DashboardSkeleton/>` and `<ListSkeleton/>` to avoid UI "pops".
 
@@ -175,30 +178,32 @@ To ensure perceived performance and error isolation:
 
 All routes are defined in `src/App.tsx`. Authenticated routes are nested under the `Layout` component which provides the sidebar + header shell.
 
-| Path | Component | Auth Required |
-|---|---|---|
-| `/` | `Landing` | No |
-| `/pricing` | `Pricing` | No |
-| `/onboarding` | `Onboarding` | No |
-| `/privacy` | `Privacy` | No |
-| `/terms` | `Terms` | No |
-| `/security` | `Security` | No |
-| `/dashboard` | `Dashboard` | Yes |
-| `/income` | `Income` | Yes |
-| `/freelance` | `Freelance` | Yes |
-| `/taxes` | `Taxes` | Yes |
-| `/bills` | `Obligations` | Yes |
-| `/net-worth` | `NetWorth` | Yes |
-| `/transactions` | `Transactions` | Yes |
-| `/inbox` | `Ingestion` | Yes |
-| `/settings` | `Settings` | Yes |
-| `/goals` | `Goals` | Yes |
-| `/education` | `Education` | Yes |
-| `/subscriptions` | `Subscriptions` | Yes |
-| `/budgets` | `Budgets` | Yes |
-| `/calendar` | `Calendar` | Yes |
-| `/categories` | `Categories` | Yes |
-| `/reports` | `Reports` | Yes |
+
+| Path             | Component       | Auth Required |
+| ---------------- | --------------- | ------------- |
+| `/`              | `Landing`       | No            |
+| `/pricing`       | `Pricing`       | No            |
+| `/onboarding`    | `Onboarding`    | No            |
+| `/privacy`       | `Privacy`       | No            |
+| `/terms`         | `Terms`         | No            |
+| `/security`      | `Security`      | No            |
+| `/dashboard`     | `Dashboard`     | Yes           |
+| `/income`        | `Income`        | Yes           |
+| `/freelance`     | `Freelance`     | Yes           |
+| `/taxes`         | `Taxes`         | Yes           |
+| `/bills`         | `Obligations`   | Yes           |
+| `/net-worth`     | `NetWorth`      | Yes           |
+| `/transactions`  | `Transactions`  | Yes           |
+| `/inbox`         | `Ingestion`     | Yes           |
+| `/settings`      | `Settings`      | Yes           |
+| `/goals`         | `Goals`         | Yes           |
+| `/education`     | `Education`     | Yes           |
+| `/subscriptions` | `Subscriptions` | Yes           |
+| `/budgets`       | `Budgets`       | Yes           |
+| `/calendar`      | `Calendar`      | Yes           |
+| `/categories`    | `Categories`    | Yes           |
+| `/reports`       | `Reports`       | Yes           |
+
 
 **Debt search results** in Layout's global search link to `/bills` (not `/debts` — that route does not exist).
 
@@ -208,12 +213,14 @@ All routes are defined in `src/App.tsx`. Authenticated routes are nested under t
 
 Pure functions only. No side effects, no store access. Receives data as arguments, returns computed results.
 
-| Function | Purpose |
-|---|---|
-| `generateAmortizationSchedule(debt)` | Month-by-month principal/interest breakdown |
-| `calcMonthlyCashFlow(incomes, bills, subscriptions)` | Net monthly cash flow |
-| `calcSurplusRouting(surplus, debts, goals)` | How to allocate surplus cash |
-| `projectNetWorth(assets, debts, incomes, months)` | Forward-looking net worth projection |
+
+| Function                                             | Purpose                                     |
+| ---------------------------------------------------- | ------------------------------------------- |
+| `generateAmortizationSchedule(debt)`                 | Month-by-month principal/interest breakdown |
+| `calcMonthlyCashFlow(incomes, bills, subscriptions)` | Net monthly cash flow                       |
+| `calcSurplusRouting(surplus, debts, goals)`          | How to allocate surplus cash                |
+| `projectNetWorth(assets, debts, incomes, months)`    | Forward-looking net worth projection        |
+
 
 These are used in `Obligations.tsx`, `NetWorth.tsx`, and `Dashboard.tsx`. Do not inline this logic into components.
 
@@ -223,22 +230,24 @@ These are used in `Obligations.tsx`, `NetWorth.tsx`, and `Dashboard.tsx`. Do not
 
 ### Color Tokens (defined in `index.css` `@theme`)
 
-| Token | Value | Use |
-|---|---|---|
-| `surface-base` | `#0E0F11` | Page background |
-| `surface-raised` | `#151618` | Cards, panels |
-| `surface-elevated` | `#1C1D21` | Hover states, inputs |
-| `surface-border` | `rgba(255,255,255,0.08)` | All borders |
-| `brand-indigo` | `#5E6AD2` | Primary actions |
-| `brand-violet` | `#7170FF` | Hover states, accents |
-| `content-primary` | `#F7F8F8` | Primary text |
-| `content-secondary` | `#A0A5B0` | Labels |
-| `content-tertiary` | `#6E7381` | Placeholder text |
+
+| Token               | Value                    | Use                   |
+| ------------------- | ------------------------ | --------------------- |
+| `surface-base`      | `#0E0F11`                | Page background       |
+| `surface-raised`    | `#151618`                | Cards, panels         |
+| `surface-elevated`  | `#1C1D21`                | Hover states, inputs  |
+| `surface-border`    | `rgba(255,255,255,0.08)` | All borders           |
+| `brand-indigo`      | `#5E6AD2`                | Primary actions       |
+| `brand-violet`      | `#7170FF`                | Hover states, accents |
+| `content-primary`   | `#F7F8F8`                | Primary text          |
+| `content-secondary` | `#A0A5B0`                | Labels                |
+| `content-tertiary`  | `#6E7381`                | Placeholder text      |
+
 
 ### Typography
 
-- **`font-sans`** (Inter): Body text, paragraphs
-- **`font-mono`** (JetBrains Mono): All financial figures, labels, badges, buttons
+- `**font-sans`** (Inter): Body text, paragraphs
+- `**font-mono**` (JetBrains Mono): All financial figures, labels, badges, buttons
 
 ### Scrollbars
 
@@ -254,14 +263,10 @@ Three themes available: `default`, `cobalt`, `neon`. Toggled via `data-theme` at
 
 These are incomplete or missing features:
 
-1. **`deleteDebt` has no Supabase sync** — deletes locally but the record remains in the database. Needs an async implementation matching `deleteBill`.
-
-2. **`freelanceEntries` not synced to Supabase** — `addFreelanceEntry`, `toggleFreelanceVault`, `deleteFreelanceEntry` work in local state only. A `freelance_entries` table needs to be created and the `fetchData()` function updated.
-
+1. `**deleteDebt` has no Supabase sync** — deletes locally but the record remains in the database. Needs an async implementation matching `deleteBill`.
+2. `**freelanceEntries` not synced to Supabase** — `addFreelanceEntry`, `toggleFreelanceVault`, `deleteFreelanceEntry` work in local state only. A `freelance_entries` table needs to be created and the `fetchData()` function updated.
 3. **Settings form has ghost inputs** — phone, timezone, and language fields render but are not wired to `formData` state and are not submitted. These need to be added to the user profile.
-
-4. **`connectBank` (Plaid) not persisted** — `connectBank()` in the store updates local state but does not sync the resulting transactions/bills to Supabase. This requires edge functions.
-
+4. `**connectBank` (Plaid) not persisted** — `connectBank()` in the store updates local state but does not sync the resulting transactions/bills to Supabase. This requires edge functions.
 5. **Security Configuration** — "Compromised password protection" needs to be enabled in the Supabase Dashboard as per advisors.
 
 ---
@@ -270,26 +275,29 @@ These are incomplete or missing features:
 
 For traceability, here is a record of all bugs found and fixed:
 
-| File | Bug | Fix |
-|---|---|---|
-| `Dashboard.tsx` | `freelanceEntries` used but not destructured from store → ReferenceError | Added to `useStore()` destructuring |
-| `Dashboard.tsx` | `useStore.getState().freelanceEntries` in `useMemo` dependency array | Changed to `freelanceEntries` |
-| `Dashboard.tsx` | `mockCitations` used `penalty` / `id: number` — mismatched `Citation` interface | Updated to `penaltyFee`, `id: string`, `status: 'open'` |
-| `Freelance.tsx` | `addDeduction` called but not destructured | Added to `useStore()` destructuring |
-| `Freelance.tsx` | PDF parsing used `window.pdfjsLib` CDN global — cross-origin worker fails | Replaced with `pdfjs-dist` npm import |
-| `Freelance.tsx` | `Math.max` over unvalidated `parseFloat` array → potential `NaN` | Added `.filter()` guard |
-| `Freelance.tsx` | Form submit silent on empty fields | Added `toast.error` validation |
-| `Ingestion.tsx` | Same `window.pdfjsLib` CDN pattern | Replaced with `pdfjs-dist` npm import |
-| `Ingestion.tsx` | Same `Math.max` NaN bug | Added `.filter()` guard |
-| `Ingestion.tsx` | `as any` cast on ingestion type dropdown | Replaced with literal union type |
-| `Taxes.tsx` | `addDeduction` called with no validation — NaN amount stored silently | Added `parseFloat` + empty check validation |
-| `Taxes.tsx` | No toast on deduction added | Added `toast.success` |
-| `Obligations.tsx` | `toast.success` fired even when citation not found in store | Moved toast inside `if (cit)` block |
-| `Transactions.tsx` | `categories` destructured from store but never used | Removed |
-| `Layout.tsx` | `/debts` search result route — route does not exist | Changed to `/bills` |
-| `Layout.tsx` | `UploadIcon`, `ExternalLink` imported but never used | Removed |
-| `NetWorth.tsx` | `addAsset` destructured but never called | Removed |
-| `QuickAddModal.tsx` | `addIncome()` missing required `isTaxWithheld` field | Added `isTaxWithheld: false` |
-| `useStore.ts` | `isTaxWithheld` missing from Supabase incomes mapping in `fetchData` | Added to mapping |
-| `useStore.ts` | `commitIngestion` income object missing `isTaxWithheld` | Added `isTaxWithheld: false` |
-| `index.css` | Native browser scrollbar visible on page body | Added global `html, body` scrollbar-hide rules |
+
+| File                | Bug                                                                             | Fix                                                     |
+| ------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| `Dashboard.tsx`     | `freelanceEntries` used but not destructured from store → ReferenceError        | Added to `useStore()` destructuring                     |
+| `Dashboard.tsx`     | `useStore.getState().freelanceEntries` in `useMemo` dependency array            | Changed to `freelanceEntries`                           |
+| `Dashboard.tsx`     | `mockCitations` used `penalty` / `id: number` — mismatched `Citation` interface | Updated to `penaltyFee`, `id: string`, `status: 'open'` |
+| `Freelance.tsx`     | `addDeduction` called but not destructured                                      | Added to `useStore()` destructuring                     |
+| `Freelance.tsx`     | PDF parsing used `window.pdfjsLib` CDN global — cross-origin worker fails       | Replaced with `pdfjs-dist` npm import                   |
+| `Freelance.tsx`     | `Math.max` over unvalidated `parseFloat` array → potential `NaN`                | Added `.filter()` guard                                 |
+| `Freelance.tsx`     | Form submit silent on empty fields                                              | Added `toast.error` validation                          |
+| `Ingestion.tsx`     | Same `window.pdfjsLib` CDN pattern                                              | Replaced with `pdfjs-dist` npm import                   |
+| `Ingestion.tsx`     | Same `Math.max` NaN bug                                                         | Added `.filter()` guard                                 |
+| `Ingestion.tsx`     | `as any` cast on ingestion type dropdown                                        | Replaced with literal union type                        |
+| `Taxes.tsx`         | `addDeduction` called with no validation — NaN amount stored silently           | Added `parseFloat` + empty check validation             |
+| `Taxes.tsx`         | No toast on deduction added                                                     | Added `toast.success`                                   |
+| `Obligations.tsx`   | `toast.success` fired even when citation not found in store                     | Moved toast inside `if (cit)` block                     |
+| `Transactions.tsx`  | `categories` destructured from store but never used                             | Removed                                                 |
+| `Layout.tsx`        | `/debts` search result route — route does not exist                             | Changed to `/bills`                                     |
+| `Layout.tsx`        | `UploadIcon`, `ExternalLink` imported but never used                            | Removed                                                 |
+| `NetWorth.tsx`      | `addAsset` destructured but never called                                        | Removed                                                 |
+| `QuickAddModal.tsx` | `addIncome()` missing required `isTaxWithheld` field                            | Added `isTaxWithheld: false`                            |
+| `useStore.ts`       | `isTaxWithheld` missing from Supabase incomes mapping in `fetchData`            | Added to mapping                                        |
+| `useStore.ts`       | `commitIngestion` income object missing `isTaxWithheld`                         | Added `isTaxWithheld: false`                            |
+| `index.css`         | Native browser scrollbar visible on page body                                   | Added global `html, body` scrollbar-hide rules          |
+
+

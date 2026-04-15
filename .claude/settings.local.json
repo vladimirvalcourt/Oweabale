@@ -6,10 +6,22 @@
       "Bash(curl -s http://localhost:3000/)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" SUPABASE_ACCESS_TOKEN=\"sbp_d6a7051c1d6e6ab4f5f42441f6eed2a2bf6e48f1\" supabase db pull)",
+      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" supabase db pull)",
       "Bash(/opt/homebrew/bin/npm run:*)",
       "mcp__supabase__execute_sql",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "mcp__46d29a87-71b9-4bfe-ba92-e3709a647d4c__list_products",
+      "mcp__46d29a87-71b9-4bfe-ba92-e3709a647d4c__list_prices",
+      "mcp__supabase__list_edge_functions",
+      "mcp__supabase__get_logs",
+      "Bash(supabase functions:*)",
+      "Bash(supabase secrets:*)",
+      "mcp__46d29a87-71b9-4bfe-ba92-e3709a647d4c__stripe_api_execute",
+      "mcp__2a80b55e-af56-4cce-ad0e-eadac59698e2__get_project",
+      "mcp__46d29a87-71b9-4bfe-ba92-e3709a647d4c__stripe_api_search",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)"
     ]
   }
 }
