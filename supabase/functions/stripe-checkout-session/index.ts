@@ -101,7 +101,9 @@ Deno.serve(async (req: Request) => {
 
     const defaultOrigin =
       origin && /^https?:\/\//.test(origin) ? origin : 'https://oweable.com';
-    const successUrl = body.successUrl ?? `${defaultOrigin}/settings?billing=success`;
+    const successUrl =
+      body.successUrl ??
+      `${defaultOrigin}/settings?tab=billing&billing=success`;
     const cancelUrl = body.cancelUrl ?? `${defaultOrigin}/pricing?billing=cancelled`;
 
     const session = await stripe.checkout.sessions.create({
