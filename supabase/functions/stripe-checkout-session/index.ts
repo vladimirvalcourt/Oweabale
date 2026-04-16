@@ -16,6 +16,16 @@ function isNoSuchCustomerError(error: unknown): boolean {
   return error instanceof Error && error.message.includes('No such customer');
 }
 
+function safeRedirectUrl(supplied: string | undefined, fallback: string, trustedOrigin: string): string {
+  if (!supplied) return fallback;
+  // Accept relative paths — prefix with trusted origin
+  if (/^\/[^/]/.test(supplied) || supplied === '/') return `${trustedOrigin}${supplied}`;
+  // Accept full URLs only if they start with the trusted origin
+  if (supplied.startsWith(`${trustedOrigin}/`)) return supplied;
+  // Reject anything else (external URLs, protocol-relative, etc.)
+  return fallback;
+}
+
 function getPlanConfig(planKey: string): PlanConfig | null {
   const monthly = Deno.env.get('STRIPE_PRICE_PRO_MONTHLY');
 
@@ -103,10 +113,16 @@ Deno.serve(async (req: Request) => {
 
     const defaultOrigin =
       origin && /^https?:\/\//.test(origin) ? origin : 'https://oweable.com';
-    const successUrl =
-      body.successUrl ??
-      `${defaultOrigin}/settings?tab=billing&billing=success`;
-    const cancelUrl = body.cancelUrl ?? `${defaultOrigin}/pricing?billing=cancelled`;
+    const successUrl = safeRedirectUrl(
+      body.successUrl,
+      `${defaultOrigin}/settings?tab=billing&billing=success`,
+      defaultOrigin,
+    );
+    const cancelUrl = safeRedirectUrl(
+      body.cancelUrl,
+      `${defaultOrigin}/pricing?billing=cancelled`,
+      defaultOrigin,
+    );
 
     let session: Stripe.Checkout.Session;
     try {

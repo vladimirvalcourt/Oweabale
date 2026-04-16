@@ -100,12 +100,12 @@ Deno.serve(async (req: Request) => {
     const scheduleBaseMs = Date.now();
 
     const [billsR, debtsR, assetsR, incomesR, subsR, citR] = await Promise.all([
-      supabaseAdmin.from('bills').select('*').eq('user_id', uid),
-      supabaseAdmin.from('debts').select('*').eq('user_id', uid),
-      supabaseAdmin.from('assets').select('*').eq('user_id', uid),
-      supabaseAdmin.from('incomes').select('*').eq('user_id', uid),
-      supabaseAdmin.from('subscriptions').select('*').eq('user_id', uid),
-      supabaseAdmin.from('citations').select('*').eq('user_id', uid),
+      supabaseAdmin.from('bills').select('amount,frequency,status,due_date,biller,category').eq('user_id', uid),
+      supabaseAdmin.from('debts').select('remaining,min_payment,payment_due_date').eq('user_id', uid),
+      supabaseAdmin.from('assets').select('type,value').eq('user_id', uid),
+      supabaseAdmin.from('incomes').select('amount,frequency,status,is_tax_withheld,next_date').eq('user_id', uid),
+      supabaseAdmin.from('subscriptions').select('amount,frequency,status,next_billing_date').eq('user_id', uid),
+      supabaseAdmin.from('citations').select('status,amount,date').eq('user_id', uid),
     ]);
 
     if (billsR.error) throw billsR.error;

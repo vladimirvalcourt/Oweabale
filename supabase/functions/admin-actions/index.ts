@@ -91,10 +91,26 @@ Deno.serve(async (req: Request) => {
       throw new Error('Forbidden: primary admin only')
     }
 
-    const body = await req.json()
-    const { action, targetUserId } = body
+    const ALLOWED_ACTIONS = new Set([
+      'list', 'health', 'audit_feed', 'billing_stats', 'billing_by_user',
+      'plaid_items_list', 'set_admin', 'promote_admin', 'plaid_stats',
+      'ban', 'unban', 'delete',
+    ]);
+    const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-    if (!action) throw new Error('Missing action')
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      throw new Error('Invalid JSON body');
+    }
+    const { action, targetUserId } = body as { action?: unknown; targetUserId?: unknown };
+
+    if (typeof action !== 'string' || !action) throw new Error('Missing action');
+    if (!ALLOWED_ACTIONS.has(action)) throw new Error(`Unknown action: ${action}`);
+    if (targetUserId !== undefined && (typeof targetUserId !== 'string' || !UUID_RE.test(targetUserId))) {
+      throw new Error('Invalid targetUserId format');
+    }
 
     // list: return enriched user data with last_sign_in_at
     if (action === 'list') {

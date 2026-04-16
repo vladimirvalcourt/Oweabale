@@ -255,14 +255,14 @@ async function buildUserContextJson(
   const scheduleBaseMs = Date.now();
 
   const [billsR, debtsR, assetsR, incomesR, subsR, citR, goalsR, budgetsR, txR, profileR] = await Promise.all([
-    supabaseAdmin.from('bills').select('*').eq('user_id', uid),
-    supabaseAdmin.from('debts').select('*').eq('user_id', uid),
-    supabaseAdmin.from('assets').select('*').eq('user_id', uid),
-    supabaseAdmin.from('incomes').select('*').eq('user_id', uid),
-    supabaseAdmin.from('subscriptions').select('*').eq('user_id', uid),
-    supabaseAdmin.from('citations').select('*').eq('user_id', uid),
-    supabaseAdmin.from('goals').select('*').eq('user_id', uid),
-    supabaseAdmin.from('budgets').select('*').eq('user_id', uid),
+    supabaseAdmin.from('bills').select('amount,frequency,status,due_date,biller,category').eq('user_id', uid),
+    supabaseAdmin.from('debts').select('name,remaining,min_payment,apr,payment_due_date').eq('user_id', uid),
+    supabaseAdmin.from('assets').select('name,type,value').eq('user_id', uid),
+    supabaseAdmin.from('incomes').select('name,amount,frequency,status,is_tax_withheld,next_date').eq('user_id', uid),
+    supabaseAdmin.from('subscriptions').select('name,amount,frequency,status,next_billing_date').eq('user_id', uid),
+    supabaseAdmin.from('citations').select('status,amount,date,type').eq('user_id', uid),
+    supabaseAdmin.from('goals').select('name,target_amount,current_amount,deadline,type').eq('user_id', uid),
+    supabaseAdmin.from('budgets').select('category,amount,period').eq('user_id', uid),
     supabaseAdmin
       .from('transactions')
       .select('name, category, date, amount, type')
