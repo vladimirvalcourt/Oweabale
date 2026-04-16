@@ -388,6 +388,10 @@ verify_jwt = false
 [functions.stripe-sync-billing]
 verify_jwt = false
 
+# admin-actions validates JWT + is_admin + ADMIN_ALLOWED_EMAIL in code.
+[functions.admin-actions]
+verify_jwt = false
+
 # Plaid: webhook has no Supabase JWT; plaid-sync validates user JWT or PLAID_CRON_SECRET in code.
 [functions.plaid-webhook]
 verify_jwt = false

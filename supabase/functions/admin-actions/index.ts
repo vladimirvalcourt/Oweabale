@@ -32,6 +32,13 @@ Deno.serve(async (req: Request) => {
       .single()
     if (!profile?.is_admin) throw new Error('Forbidden: Admin access required')
 
+    const allowedEmail = Deno.env.get('ADMIN_ALLOWED_EMAIL')?.trim().toLowerCase()
+    if (!allowedEmail) throw new Error('Server misconfiguration: ADMIN_ALLOWED_EMAIL')
+    const callerEmail = user.email?.trim().toLowerCase()
+    if (!callerEmail || callerEmail !== allowedEmail) {
+      throw new Error('Forbidden: primary admin only')
+    }
+
     const body = await req.json()
     const { action, targetUserId } = body
 
@@ -61,17 +68,26 @@ Deno.serve(async (req: Request) => {
       if (typeof isAdminFlag !== 'boolean') {
         throw new Error('isAdmin must be a boolean')
       }
-      if (targetUserId === user.id && isAdminFlag) {
-        throw new Error('Cannot promote your own account')
+      if (isAdminFlag === true) {
+        throw new Error('Forbidden: granting admin is disabled')
+      }
+      const { data: targetRow } = await supabaseAdmin
+        .from('profiles')
+        .select('email')
+        .eq('id', targetUserId)
+        .maybeSingle()
+      const targetEmail = targetRow?.email?.trim().toLowerCase() ?? ''
+      if (targetEmail === allowedEmail) {
+        throw new Error('Forbidden: cannot remove primary admin')
       }
       const { error } = await supabaseAdmin
         .from('profiles')
-        .update({ is_admin: isAdminFlag })
+        .update({ is_admin: false })
         .eq('id', targetUserId)
       if (error) throw error
       return new Response(
         JSON.stringify({
-          message: isAdminFlag ? 'User promoted to admin.' : 'Admin access removed.',
+          message: 'Admin access removed.',
         }),
         { headers: jsonHeaders },
       )

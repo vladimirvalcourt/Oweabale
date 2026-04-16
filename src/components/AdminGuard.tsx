@@ -4,11 +4,8 @@ import { supabase } from '../lib/supabase';
 import { AppLoader } from './PageSkeleton';
 
 /**
- * AdminGuard — verifies is_admin directly from Supabase on every mount.
- * Does NOT rely on sessionStorage or the Zustand store — both are
- * client-controlled and can be tampered with. The Supabase query is
- * protected by RLS so a user can only read their own profile row.
- * Privilege escalation via sessionStorage manipulation is impossible.
+ * AdminGuard — verifies is_admin + primary admin email on every mount.
+ * Server-side admin-actions also enforces ADMIN_ALLOWED_EMAIL (defense in depth).
  */
 export default function AdminGuard() {
   const [status, setStatus] = useState<'checking' | 'allowed' | 'denied'>('checking');
@@ -19,6 +16,13 @@ export default function AdminGuard() {
     async function verify() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { if (!cancelled) setStatus('denied'); return; }
+
+      const allowed = import.meta.env.VITE_ADMIN_EMAIL?.trim().toLowerCase();
+      const sessionEmail = user.email?.trim().toLowerCase();
+      if (!allowed || !sessionEmail || sessionEmail !== allowed) {
+        if (!cancelled) setStatus('denied');
+        return;
+      }
 
       const { data, error } = await supabase
         .from('profiles')

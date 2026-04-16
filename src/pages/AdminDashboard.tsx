@@ -66,6 +66,8 @@ interface ActivityEntry {
   message: string;
 }
 
+const PRIMARY_ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL ?? '').trim().toLowerCase();
+
 export default function AdminDashboard() {
   const [systemTime, setSystemTime] = useState(new Date());
   const [taxDeduction, setTaxDeduction] = useState('14600');
@@ -106,6 +108,20 @@ export default function AdminDashboard() {
       message,
     };
     setActivityLog(prev => [...prev.slice(-99), entry]);
+  }, []);
+
+  const invokeAdminActions = useCallback(async (body: Record<string, unknown>) => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) {
+      return { data: null, error: { message: 'Not signed in' } as { message: string } };
+    }
+    return supabase.functions.invoke('admin-actions', {
+      body,
+      headers: { Authorization: `Bearer ${token}` },
+    });
   }, []);
 
   // Clock
@@ -182,9 +198,7 @@ export default function AdminDashboard() {
     }
 
     // Enriched users (last login, banned status from Auth)
-    const { data: enriched, error: enrichedErr } = await supabase.functions.invoke('admin-actions', {
-      body: { action: 'list' },
-    });
+    const { data: enriched, error: enrichedErr } = await invokeAdminActions({ action: 'list' });
     if (enrichedErr) {
       addLog('WARN', `Auth enrichment failed: ${enrichedErr.message}`);
     } else if (enriched?.users) {
@@ -192,9 +206,7 @@ export default function AdminDashboard() {
       addLog('INFO', 'Auth user data enriched.');
     }
 
-    const { data: plaidData, error: plaidStatsErr } = await supabase.functions.invoke('admin-actions', {
-      body: { action: 'plaid_stats' },
-    });
+    const { data: plaidData, error: plaidStatsErr } = await invokeAdminActions({ action: 'plaid_stats' });
     if (plaidStatsErr) {
       addLog('WARN', `Plaid stats failed: ${plaidStatsErr.message}`);
     } else if (plaidData?.plaid_stats) {
@@ -298,25 +310,20 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleToggleAdmin = async (userId: string, currentIsAdmin: boolean) => {
-    const newValue = !currentIsAdmin;
-    const { data, error } = await supabase.functions.invoke('admin-actions', {
-      body: { action: 'set_admin', targetUserId: userId, isAdmin: newValue },
+  const handleDemoteAdmin = async (userId: string) => {
+    const { data, error } = await invokeAdminActions({
+      action: 'set_admin',
+      targetUserId: userId,
+      isAdmin: false,
     });
     if (error) {
-      toast.error('Failed to update admin status.');
-      addLog('ERROR', `Admin toggle failed for user ${userId.slice(0, 8)}`);
+      toast.error('Failed to remove admin status.');
+      addLog('ERROR', `Admin demote failed for user ${userId.slice(0, 8)}`);
     } else {
-      setProfiles(prev => prev.map(p => p.id === userId ? { ...p, is_admin: newValue } : p));
-      toast.success(
-        typeof data?.message === 'string'
-          ? data.message
-          : newValue
-            ? 'User promoted to admin.'
-            : 'Admin access removed.',
-      );
-      addLog('WARN', `User ${userId.slice(0, 8)} admin status → ${newValue}`);
-      track('admin_role_changed', { granted: newValue });
+      setProfiles(prev => prev.map(p => (p.id === userId ? { ...p, is_admin: false } : p)));
+      toast.success(typeof data?.message === 'string' ? data.message : 'Admin access removed.');
+      addLog('WARN', `User ${userId.slice(0, 8)} admin status → false`);
+      track('admin_role_changed', { granted: false });
     }
   };
 
@@ -354,9 +361,7 @@ export default function AdminDashboard() {
 
   const refreshPlaidStats = useCallback(async () => {
     setPlaidStatsLoading(true);
-    const { data, error } = await supabase.functions.invoke('admin-actions', {
-      body: { action: 'plaid_stats' },
-    });
+    const { data, error } = await invokeAdminActions({ action: 'plaid_stats' });
     setPlaidStatsLoading(false);
     if (error) {
       toast.error(error.message);
@@ -368,7 +373,7 @@ export default function AdminDashboard() {
       addLog('INFO', 'Plaid metrics refreshed.');
       toast.success('Plaid metrics refreshed.');
     }
-  }, [addLog]);
+  }, [addLog, invokeAdminActions]);
 
   const toggleMaintenance = async () => {
     const newValue = !isMaintenance;
@@ -430,9 +435,7 @@ export default function AdminDashboard() {
 
   const handleAdminAction = async (action: 'ban' | 'unban' | 'delete', targetUserId: string) => {
     toast.loading(`Executing ${action}...`, { id: 'admin-action' });
-    const { data, error } = await supabase.functions.invoke('admin-actions', {
-      body: { action, targetUserId },
-    });
+    const { data, error } = await invokeAdminActions({ action, targetUserId });
     if (error) {
       toast.error(`Admin Action Failed: ${error.message}`, { id: 'admin-action' });
       addLog('ERROR', `Admin action '${action}' failed for ${targetUserId.slice(0, 8)}: ${error.message}`);
@@ -944,13 +947,26 @@ export default function AdminDashboard() {
                           : <span className="text-emerald-500">Active</span>}
                       </td>
                       <td className="py-3 px-2 text-right space-x-1.5">
-                        <button
-                          onClick={() => handleToggleAdmin(user.id, user.is_admin)}
-                          className={`px-2 py-1 rounded-sm font-bold transition-colors text-[10px] ${user.is_admin ? 'bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/40' : 'bg-surface-elevated text-content-tertiary hover:bg-surface-border hover:text-white'}`}
-                          title={user.is_admin ? 'Remove admin access' : 'Promote to admin'}
-                        >
-                          {user.is_admin ? 'Demote' : 'Make Admin'}
-                        </button>
+                        {user.is_admin ? (
+                          <button
+                            type="button"
+                            onClick={() => void handleDemoteAdmin(user.id)}
+                            disabled={
+                              !PRIMARY_ADMIN_EMAIL ||
+                              (user.email?.trim().toLowerCase() ?? '') === PRIMARY_ADMIN_EMAIL
+                            }
+                            className="px-2 py-1 rounded-sm font-bold transition-colors text-[10px] bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/40 disabled:opacity-40 disabled:cursor-not-allowed"
+                            title={
+                              (user.email?.trim().toLowerCase() ?? '') === PRIMARY_ADMIN_EMAIL
+                                ? 'Primary admin cannot be demoted here'
+                                : 'Remove admin access'
+                            }
+                          >
+                            Demote
+                          </button>
+                        ) : (
+                          <span className="text-[10px] text-content-muted px-2">—</span>
+                        )}
                         {user.is_banned ? (
                           <button
                             onClick={() => handleAdminAction('unban', user.id)}
