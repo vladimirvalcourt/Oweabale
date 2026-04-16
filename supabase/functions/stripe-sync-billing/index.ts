@@ -62,7 +62,7 @@ Deno.serve(async (req: Request) => {
     const list = await stripe.subscriptions.list({
       customer: customerId,
       status: 'all',
-      limit: 20,
+      limit: 100,
     });
 
     const preferred =

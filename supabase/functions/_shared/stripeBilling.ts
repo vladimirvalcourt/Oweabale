@@ -18,7 +18,10 @@ export async function upsertSubscriptionAndEntitlement(
       ? subscription.metadata.user_id
       : undefined;
   const userId = (profile?.id as string | undefined) ?? metaUserId;
-  if (!userId) return;
+  if (!userId) {
+    console.error('[stripeBilling] No userId found for subscription', subscription.id, 'customer', customerId);
+    return;
+  }
 
   if (!profile?.id && metaUserId) {
     await supabaseAdmin
