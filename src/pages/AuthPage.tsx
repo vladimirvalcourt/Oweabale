@@ -1,16 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 
 export default function AuthPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [closedBeta, setClosedBeta] = useState(false);
-
-  useEffect(() => {
-    supabase.rpc('get_closed_beta_public').then(({ data, error }) => {
-      if (!error && data === true) setClosedBeta(true);
-    });
-  }, []);
 
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
@@ -83,11 +76,6 @@ export default function AuthPage() {
           <p className="font-mono text-xs text-content-tertiary uppercase tracking-[0.2em] mt-2">
             Your financial OS — Secure access only.
           </p>
-          {closedBeta && (
-            <p className="font-mono text-[11px] text-amber-200/90 mt-4 leading-relaxed normal-case tracking-normal border border-amber-400/25 bg-amber-400/5 rounded-sm px-3 py-2">
-              Closed beta: only invited Google accounts on the allowlist can create an account. If you were invited, sign in with that email.
-            </p>
-          )}
         </div>
 
         {/* Google Sign-In */}
