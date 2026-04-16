@@ -57,6 +57,8 @@ export default function OweAi() {
   const bottomRef = useRef<HTMLDivElement>(null);
   /** Must match `messages` — used so invoke runs with the real thread (setState updaters are not synchronous). */
   const messagesRef = useRef<OweAiChatMessage[]>([]);
+  /** Mirrors `input` state so event handlers can read the current value without capturing it in closures. */
+  const inputRef = useRef('');
 
   useEffect(() => {
     messagesRef.current = messages;
@@ -112,14 +114,31 @@ export default function OweAi() {
     }
   }, [levelHint, mode]);
 
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    inputRef.current = e.target.value;
+    setInput(e.target.value);
+  }, []);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const text = inputRef.current.trim();
+        if (!text || loading) return;
+        void runSend(text);
+      }
+    },
+    [loading, runSend],
+  );
+
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      const text = input.trim();
+      const text = inputRef.current.trim();
       if (!text || loading) return;
       void runSend(text);
     },
-    [input, loading, runSend],
+    [loading, runSend],
   );
 
   const clearChat = useCallback(() => {
@@ -297,22 +316,15 @@ export default function OweAi() {
             id="owe-ai-input"
             rows={2}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                const text = input.trim();
-                if (!text || loading) return;
-                void runSend(text);
-              }
-            }}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
             placeholder={mode === 'academy' ? 'Ask for a finance lesson or concept…' : 'Type your question like you would to an advisor…'}
             disabled={loading}
             className="flex-1 resize-none bg-transparent px-3 py-2 text-sm text-content-primary placeholder:text-content-muted rounded-md disabled:opacity-50 max-h-28 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0"
           />
           <button
             type="submit"
-            disabled={loading || !input.trim()}
+            disabled={loading || !input}
             className="shrink-0 h-9 w-9 inline-flex items-center justify-center rounded-full bg-brand-cta text-white hover:bg-brand-cta-hover disabled:opacity-40 disabled:pointer-events-none transition-colors mb-1"
             aria-label="Send message"
           >

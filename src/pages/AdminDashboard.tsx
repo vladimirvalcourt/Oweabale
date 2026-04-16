@@ -9,7 +9,15 @@ import { AdminMetricsBar } from './admin/components/AdminMetricsBar';
 import { AdminUsersPanel } from './admin/components/AdminUsersPanel';
 import { AdminControlsPanel } from './admin/components/AdminControlsPanel';
 import { AdminSupportPanel } from './admin/components/AdminSupportPanel';
-import type { EnrichedUser, PlaidHealthStats, ProfileRow, SupportTicket } from './admin/components/types';
+import { AdminReliabilityPanel } from './admin/components/AdminReliabilityPanel';
+import type {
+  AdminAuditEntry,
+  EnrichedUser,
+  PlaidHealthStats,
+  ProfileRow,
+  StripeHealthStats,
+  SupportTicket,
+} from './admin/components/types';
 
 const PRIMARY_ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL ?? '').trim().toLowerCase();
 
@@ -29,6 +37,8 @@ export default function AdminDashboard() {
   const [resolvingTicketId, setResolvingTicketId] = useState<string | null>(null);
 
   const [plaidStats, setPlaidStats] = useState<PlaidHealthStats | null>(null);
+  const [stripeHealth, setStripeHealth] = useState<StripeHealthStats | null>(null);
+  const [auditFeed, setAuditFeed] = useState<AdminAuditEntry[]>([]);
 
   const invokeAdminActions = useCallback(async (body: Record<string, unknown>) => {
     const {
@@ -82,6 +92,20 @@ export default function AdminDashboard() {
       toast.error(`Plaid stats failed: ${plaidStatsErr.message}`);
     } else if (plaidData?.plaid_stats) {
       setPlaidStats(plaidData.plaid_stats as PlaidHealthStats);
+    }
+
+    const { data: healthData, error: healthErr } = await invokeAdminActions({ action: 'health' });
+    if (healthErr) {
+      toast.error(`Billing health failed: ${healthErr.message}`);
+    } else if (healthData?.stripe_health) {
+      setStripeHealth(healthData.stripe_health as StripeHealthStats);
+    }
+
+    const { data: auditData, error: auditErr } = await invokeAdminActions({ action: 'audit_feed' });
+    if (auditErr) {
+      toast.error(`Audit feed failed: ${auditErr.message}`);
+    } else if (Array.isArray(auditData?.audit_feed)) {
+      setAuditFeed(auditData.audit_feed as AdminAuditEntry[]);
     }
 
     setTicketsLoading(true);
@@ -274,6 +298,7 @@ export default function AdminDashboard() {
           />
 
           <div className="space-y-6">
+            <AdminReliabilityPanel stripeHealth={stripeHealth} auditFeed={auditFeed} />
             <AdminControlsPanel
               isMaintenance={isMaintenance}
               isPlaidEnabled={isPlaidEnabled}

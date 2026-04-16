@@ -33,3 +33,19 @@ export interface SupportTicket {
   user_id: string;
   userEmail?: string;
 }
+
+export interface StripeHealthStats {
+  stripe_events_24h: number;
+  webhook_errors_24h: number;
+  active_subscriptions: number;
+  last_webhook_event_type: string | null;
+  last_webhook_at: string | null;
+}
+
+export interface AdminAuditEntry {
+  id: string;
+  user_id: string | null;
+  action: string;
+  new_data: Record<string, unknown> | null;
+  created_at: string;
+}
