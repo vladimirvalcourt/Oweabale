@@ -1,54 +1,15 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { TransitionLink } from '../components/TransitionLink';
-import {
-  AlertTriangle,
-  ArrowLeft,
-  LifeBuoy,
-  RefreshCw,
-  Search,
-  Shield,
-  Users,
-} from 'lucide-react';
+import { ArrowLeft, RefreshCw } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { PrivacyScreenWhenHidden } from '../components/PrivacyScreenWhenHidden';
 import { toast } from 'sonner';
 import { track } from '../lib/analytics';
-
-interface EnrichedUser {
-  id: string;
-  email: string;
-  last_sign_in_at: string | null;
-}
-
-interface ProfileRow {
-  id: string;
-  email: string | null;
-  is_admin: boolean;
-  is_banned: boolean;
-  has_completed_onboarding: boolean;
-  created_at: string | null;
-}
-
-interface PlaidHealthStats {
-  total_items: number;
-  distinct_users: number;
-  items_with_sync_error: number;
-  items_needing_relink: number;
-  items_never_synced: number;
-  items_stale_24h: number;
-}
-
-interface SupportTicket {
-  id: string;
-  ticket_number: string;
-  subject: string;
-  description: string;
-  priority: 'Low' | 'Normal' | 'Urgent';
-  status: string;
-  created_at: string;
-  user_id: string;
-  userEmail?: string;
-}
+import { AdminMetricsBar } from './admin/components/AdminMetricsBar';
+import { AdminUsersPanel } from './admin/components/AdminUsersPanel';
+import { AdminControlsPanel } from './admin/components/AdminControlsPanel';
+import { AdminSupportPanel } from './admin/components/AdminSupportPanel';
+import type { EnrichedUser, PlaidHealthStats, ProfileRow, SupportTicket } from './admin/components/types';
 
 const PRIMARY_ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL ?? '').trim().toLowerCase();
 
@@ -274,12 +235,6 @@ export default function AdminDashboard() {
     toast.success(broadcastMsg.trim() ? 'Broadcast updated.' : 'Broadcast cleared.');
   };
 
-  const priorityClass = (priority: string) => {
-    if (priority === 'Urgent') return 'text-rose-400 bg-rose-500/10';
-    if (priority === 'Normal') return 'text-amber-400 bg-amber-500/10';
-    return 'text-content-tertiary bg-white/5';
-  };
-
   return (
     <div className="min-h-screen bg-surface-base text-content-secondary p-4 sm:p-8">
       <PrivacyScreenWhenHidden />
@@ -305,153 +260,37 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          <div className="border border-surface-border rounded-sm p-3 bg-surface-raised"><p className="text-[10px] text-content-tertiary uppercase">Users</p><p className="text-xl text-content-primary font-bold">{metricData.totalUsers}</p></div>
-          <div className="border border-surface-border rounded-sm p-3 bg-surface-raised"><p className="text-[10px] text-content-tertiary uppercase">Active</p><p className="text-xl text-emerald-400 font-bold">{metricData.activeUsers}</p></div>
-          <div className="border border-surface-border rounded-sm p-3 bg-surface-raised"><p className="text-[10px] text-content-tertiary uppercase">Admins</p><p className="text-xl text-indigo-400 font-bold">{metricData.admins}</p></div>
-          <div className="border border-surface-border rounded-sm p-3 bg-surface-raised"><p className="text-[10px] text-content-tertiary uppercase">Open Tickets</p><p className="text-xl text-amber-400 font-bold">{metricData.openTickets}</p></div>
-          <div className="border border-surface-border rounded-sm p-3 bg-surface-raised"><p className="text-[10px] text-content-tertiary uppercase">Plaid Items</p><p className="text-xl text-content-primary font-bold">{metricData.plaidItems ?? '—'}</p></div>
-          <div className="border border-surface-border rounded-sm p-3 bg-surface-raised"><p className="text-[10px] text-content-tertiary uppercase">Plaid Errors</p><p className={`text-xl font-bold ${(metricData.plaidErrors ?? 0) > 0 ? 'text-rose-400' : 'text-content-primary'}`}>{metricData.plaidErrors ?? '—'}</p></div>
-        </div>
+        <AdminMetricsBar metrics={metricData} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 border border-surface-border rounded-sm bg-surface-raised p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2"><Users className="w-4 h-4" /> Users</h2>
-              <div className="relative">
-                <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-content-muted" />
-                <input
-                  type="text"
-                  value={userSearch}
-                  onChange={(e) => setUserSearch(e.target.value)}
-                  placeholder="Search email or id"
-                  className="pl-7 pr-2 py-1.5 text-xs bg-surface-base border border-surface-border rounded-sm focus-app"
-                />
-              </div>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="text-content-tertiary border-b border-surface-border">
-                    <th className="py-2 text-left">Account</th>
-                    <th className="py-2 text-left">Joined</th>
-                    <th className="py-2 text-left">Last Login</th>
-                    <th className="py-2 text-left">Status</th>
-                    <th className="py-2 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredProfiles.map((user) => {
-                    const enriched = getEnrichedProfile(user);
-                    return (
-                      <tr key={user.id} className="border-b border-surface-border/60">
-                        <td className="py-2 pr-2">
-                          <span className={user.is_admin ? 'text-indigo-400 font-bold' : ''}>{user.email || user.id.slice(0, 12)}</span>
-                        </td>
-                        <td className="py-2 text-content-tertiary">{enriched.joinedAt}</td>
-                        <td className="py-2 text-content-tertiary">{enriched.lastLogin}</td>
-                        <td className="py-2">
-                          {user.is_banned ? <span className="text-rose-400">Banned</span> : <span className="text-emerald-400">Active</span>}
-                        </td>
-                        <td className="py-2 text-right space-x-1">
-                          {user.is_admin && (
-                            <button
-                              type="button"
-                              onClick={() => void handleDemoteAdmin(user.id)}
-                              disabled={!PRIMARY_ADMIN_EMAIL || (user.email?.trim().toLowerCase() ?? '') === PRIMARY_ADMIN_EMAIL}
-                              className="px-2 py-1 rounded-sm text-[11px] bg-indigo-500/15 text-indigo-300 disabled:opacity-40"
-                            >
-                              Demote
-                            </button>
-                          )}
-                          {user.is_banned ? (
-                            <button type="button" onClick={() => void handleAdminAction('unban', user.id)} className="px-2 py-1 rounded-sm text-[11px] bg-emerald-500/15 text-emerald-300">Unban</button>
-                          ) : (
-                            <button type="button" onClick={() => void handleAdminAction('ban', user.id)} className="px-2 py-1 rounded-sm text-[11px] bg-rose-500/15 text-rose-300">Ban</button>
-                          )}
-                          <button type="button" onClick={() => void handleAdminAction('delete', user.id)} className="px-2 py-1 rounded-sm text-[11px] bg-red-500/20 text-red-300">Delete</button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  {filteredProfiles.length === 0 && (
-                    <tr><td colSpan={5} className="py-6 text-center text-content-muted">No users found.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <AdminUsersPanel
+            users={filteredProfiles}
+            search={userSearch}
+            onSearchChange={setUserSearch}
+            getEnrichedProfile={getEnrichedProfile}
+            primaryAdminEmail={PRIMARY_ADMIN_EMAIL}
+            onDemoteAdmin={(userId) => void handleDemoteAdmin(userId)}
+            onAdminAction={(action, userId) => void handleAdminAction(action, userId)}
+          />
 
           <div className="space-y-6">
-            <div className="border border-surface-border rounded-sm bg-surface-raised p-5">
-              <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4"><Shield className="w-4 h-4" /> Platform Controls</h2>
-              <div className="space-y-3">
-                <button type="button" onClick={toggleMaintenance} className="w-full text-left px-3 py-2 rounded-sm bg-rose-500/10 text-rose-300 border border-rose-500/20">
-                  {isMaintenance ? 'Disable maintenance mode' : 'Enable maintenance mode'}
-                </button>
-                <button type="button" onClick={togglePlaid} className="w-full text-left px-3 py-2 rounded-sm bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                  {isPlaidEnabled ? 'Disable bank syncing' : 'Enable bank syncing'}
-                </button>
-                <textarea
-                  value={broadcastMsg}
-                  onChange={(e) => setBroadcastMsg(e.target.value)}
-                  rows={3}
-                  placeholder="Broadcast message shown in app"
-                  className="w-full bg-surface-base border border-surface-border rounded-sm p-2 text-xs focus-app"
-                />
-                <button
-                  type="button"
-                  onClick={handleSendBroadcast}
-                  disabled={isSavingBroadcast}
-                  className="w-full px-3 py-2 rounded-sm bg-amber-500/10 text-amber-300 border border-amber-500/20 disabled:opacity-50"
-                >
-                  {isSavingBroadcast ? 'Saving...' : 'Save broadcast'}
-                </button>
-              </div>
-            </div>
-
-            <div className="border border-surface-border rounded-sm bg-surface-raised p-5">
-              <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4"><LifeBuoy className="w-4 h-4" /> Open Support</h2>
-              <div className="space-y-2 max-h-72 overflow-y-auto">
-                {ticketsLoading && <p className="text-xs text-content-muted">Loading tickets...</p>}
-                {!ticketsLoading && openTickets.length === 0 && <p className="text-xs text-content-muted">No open tickets.</p>}
-                {openTickets.map((ticket) => (
-                  <div key={ticket.id} className="border border-surface-border rounded-sm p-2 bg-surface-base">
-                    <div className="flex justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="text-[11px] text-content-primary font-semibold truncate">{ticket.subject}</p>
-                        <p className="text-[10px] text-content-tertiary">{ticket.ticket_number} · {ticket.userEmail}</p>
-                      </div>
-                      <span className={`text-[10px] px-1.5 py-0.5 rounded-sm font-semibold ${priorityClass(ticket.priority)}`}>
-                        {ticket.priority}
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-content-tertiary mt-1 line-clamp-2">{ticket.description}</p>
-                    <div className="flex justify-between items-center mt-2">
-                      <span className="text-[10px] text-content-muted">{new Date(ticket.created_at).toLocaleDateString()}</span>
-                      <button
-                        type="button"
-                        onClick={() => void resolveTicket(ticket.id)}
-                        disabled={resolvingTicketId === ticket.id}
-                        className="text-[10px] px-2 py-1 rounded-sm bg-emerald-500/15 text-emerald-300 disabled:opacity-50"
-                      >
-                        {resolvingTicketId === ticket.id ? '...' : 'Resolve'}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {plaidStats && plaidStats.items_with_sync_error > 0 && (
-              <div className="border border-amber-500/20 rounded-sm bg-amber-500/5 p-4 text-xs text-amber-200 flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 mt-0.5" />
-                <p>
-                  Plaid currently has {plaidStats.items_with_sync_error} item(s) with sync errors and {plaidStats.items_needing_relink} needing relink.
-                </p>
-              </div>
-            )}
+            <AdminControlsPanel
+              isMaintenance={isMaintenance}
+              isPlaidEnabled={isPlaidEnabled}
+              broadcastMsg={broadcastMsg}
+              isSavingBroadcast={isSavingBroadcast}
+              onToggleMaintenance={() => void toggleMaintenance()}
+              onTogglePlaid={() => void togglePlaid()}
+              onBroadcastChange={setBroadcastMsg}
+              onSaveBroadcast={() => void handleSendBroadcast()}
+            />
+            <AdminSupportPanel
+              ticketsLoading={ticketsLoading}
+              tickets={openTickets}
+              resolvingTicketId={resolvingTicketId}
+              plaidStats={plaidStats}
+              onResolveTicket={(ticketId) => void resolveTicket(ticketId)}
+            />
           </div>
         </div>
       </div>
