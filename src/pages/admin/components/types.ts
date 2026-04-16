@@ -49,3 +49,38 @@ export interface AdminAuditEntry {
   new_data: Record<string, unknown> | null;
   created_at: string;
 }
+
+export interface BillingPaymentRow {
+  id: string;
+  user_id: string;
+  amount_total: number;
+  currency: string;
+  status: string;
+  product_key: string | null;
+  created_at: string;
+}
+
+export interface BillingStats {
+  subscription_counts: Record<string, number>;
+  total_revenue_cents: number;
+  revenue_30d_cents: number;
+  failed_payments_30d: number;
+  recent_payments: BillingPaymentRow[];
+}
+
+export interface UserSubscription {
+  plan: string;
+  status: string;
+}
+
+export interface PlaidItemRow {
+  id: string;
+  user_id: string;
+  userEmail: string;
+  institution_name: string | null;
+  last_sync_at: string | null;
+  last_sync_error: string | null;
+  item_login_required: boolean;
+  last_webhook_at: string | null;
+  created_at: string;
+}

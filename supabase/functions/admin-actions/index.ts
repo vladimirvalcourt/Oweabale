@@ -162,6 +162,109 @@ Deno.serve(async (req: Request) => {
       })
     }
 
+    if (action === 'billing_stats') {
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString()
+      const [
+        { data: subStatuses },
+        { data: recentPayments },
+        { count: failedCount },
+        { data: allPaidPayments },
+      ] = await Promise.all([
+        supabaseAdmin.from('billing_subscriptions').select('status'),
+        supabaseAdmin
+          .from('billing_payments')
+          .select('id, user_id, amount_total, currency, status, product_key, created_at')
+          .order('created_at', { ascending: false })
+          .limit(20),
+        supabaseAdmin
+          .from('billing_payments')
+          .select('id', { count: 'exact', head: true })
+          .neq('status', 'paid')
+          .gte('created_at', thirtyDaysAgo),
+        supabaseAdmin
+          .from('billing_payments')
+          .select('amount_total')
+          .eq('status', 'paid'),
+      ])
+
+      const statusCounts: Record<string, number> = {}
+      for (const s of subStatuses ?? []) {
+        statusCounts[s.status] = (statusCounts[s.status] ?? 0) + 1
+      }
+
+      const totalRevenueCents = (allPaidPayments ?? []).reduce(
+        (sum: number, p: { amount_total: number }) => sum + (p.amount_total ?? 0), 0
+      )
+      const revenue30dCents = (recentPayments ?? [])
+        .filter((p: { status: string; created_at: string }) => p.status === 'paid' && p.created_at >= thirtyDaysAgo)
+        .reduce((sum: number, p: { amount_total: number }) => sum + (p.amount_total ?? 0), 0)
+
+      return new Response(
+        JSON.stringify({
+          billing_stats: {
+            subscription_counts: statusCounts,
+            total_revenue_cents: totalRevenueCents,
+            revenue_30d_cents: revenue30dCents,
+            failed_payments_30d: failedCount ?? 0,
+            recent_payments: recentPayments ?? [],
+          },
+        }),
+        { headers: jsonHeaders },
+      )
+    }
+
+    if (action === 'billing_by_user') {
+      const [{ data: subs }, { data: oneTime }] = await Promise.all([
+        supabaseAdmin
+          .from('billing_subscriptions')
+          .select('user_id, status')
+          .not('status', 'eq', 'canceled'),
+        supabaseAdmin
+          .from('entitlements')
+          .select('user_id, source')
+          .eq('source', 'one_time')
+          .eq('status', 'active')
+          .eq('feature_key', 'full_suite'),
+      ])
+
+      const map: Record<string, { plan: string; status: string }> = {}
+      for (const sub of subs ?? []) {
+        if (!map[sub.user_id]) {
+          map[sub.user_id] = { plan: 'Pro', status: sub.status }
+        }
+      }
+      for (const ent of oneTime ?? []) {
+        map[ent.user_id] = { plan: 'Lifetime', status: 'active' }
+      }
+
+      return new Response(JSON.stringify({ billing_by_user: map }), { headers: jsonHeaders })
+    }
+
+    if (action === 'plaid_items_list') {
+      const { data: items, error } = await supabaseAdmin
+        .from('plaid_items')
+        .select(
+          'id, user_id, institution_name, last_sync_at, last_sync_error, item_login_required, last_webhook_at, created_at',
+        )
+        .order('last_sync_at', { ascending: true, nullsFirst: true })
+        .limit(200)
+      if (error) throw error
+
+      const userIds = [...new Set((items ?? []).map((i: { user_id: string }) => i.user_id))]
+      const { data: profiles } = await supabaseAdmin
+        .from('profiles')
+        .select('id, email')
+        .in('id', userIds)
+
+      const emailMap = Object.fromEntries((profiles ?? []).map((p: { id: string; email: string }) => [p.id, p.email]))
+      const enriched = (items ?? []).map((item: Record<string, unknown>) => ({
+        ...item,
+        userEmail: (emailMap[item.user_id as string] as string) ?? (item.user_id as string).slice(0, 8),
+      }))
+
+      return new Response(JSON.stringify({ plaid_items: enriched }), { headers: jsonHeaders })
+    }
+
     if (action === 'set_admin') {
       const isAdminFlag = (body as { isAdmin?: unknown }).isAdmin
       if (!targetUserId || typeof targetUserId !== 'string') {
@@ -171,7 +274,7 @@ Deno.serve(async (req: Request) => {
         throw new Error('isAdmin must be a boolean')
       }
       if (isAdminFlag === true) {
-        throw new Error('Forbidden: granting admin is disabled')
+        throw new Error('Forbidden: use promote_admin action instead')
       }
       const { data: targetRow } = await supabaseAdmin
         .from('profiles')
@@ -193,11 +296,31 @@ Deno.serve(async (req: Request) => {
         granted: false,
       })
       return new Response(
-        JSON.stringify({
-          message: 'Admin access removed.',
-        }),
+        JSON.stringify({ message: 'Admin access removed.' }),
         { headers: jsonHeaders },
       )
+    }
+
+    if (action === 'promote_admin') {
+      if (!targetUserId || typeof targetUserId !== 'string') throw new Error('Missing targetUserId')
+      if (targetUserId === user.id) throw new Error('Cannot modify your own account')
+      const { data: targetProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('email, is_admin')
+        .eq('id', targetUserId)
+        .maybeSingle()
+      if (targetProfile?.is_admin) throw new Error('User is already an admin')
+      await enforceRateLimit(supabaseAdmin, user.id, 'promote_admin')
+      const { error } = await supabaseAdmin
+        .from('profiles')
+        .update({ is_admin: true })
+        .eq('id', targetUserId)
+      if (error) throw error
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'promote_admin', {
+        targetUserId,
+        targetEmail: targetProfile?.email ?? null,
+      })
+      return new Response(JSON.stringify({ message: 'Admin access granted.' }), { headers: jsonHeaders })
     }
 
     if (action === 'plaid_stats') {

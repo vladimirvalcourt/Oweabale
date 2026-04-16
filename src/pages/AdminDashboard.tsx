@@ -10,13 +10,18 @@ import { AdminUsersPanel } from './admin/components/AdminUsersPanel';
 import { AdminControlsPanel } from './admin/components/AdminControlsPanel';
 import { AdminSupportPanel } from './admin/components/AdminSupportPanel';
 import { AdminReliabilityPanel } from './admin/components/AdminReliabilityPanel';
+import { AdminBillingPanel } from './admin/components/AdminBillingPanel';
+import { AdminPlaidDrilldown } from './admin/components/AdminPlaidDrilldown';
 import type {
   AdminAuditEntry,
+  BillingStats,
   EnrichedUser,
   PlaidHealthStats,
+  PlaidItemRow,
   ProfileRow,
   StripeHealthStats,
   SupportTicket,
+  UserSubscription,
 } from './admin/components/types';
 
 const PRIMARY_ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL ?? '').trim().toLowerCase();
@@ -31,14 +36,17 @@ export default function AdminDashboard() {
   const [profiles, setProfiles] = useState<ProfileRow[]>([]);
   const [enrichedUsers, setEnrichedUsers] = useState<EnrichedUser[]>([]);
   const [userSearch, setUserSearch] = useState('');
+  const [subMap, setSubMap] = useState<Record<string, UserSubscription>>({});
 
   const [openTickets, setOpenTickets] = useState<SupportTicket[]>([]);
   const [ticketsLoading, setTicketsLoading] = useState(false);
   const [resolvingTicketId, setResolvingTicketId] = useState<string | null>(null);
 
   const [plaidStats, setPlaidStats] = useState<PlaidHealthStats | null>(null);
+  const [plaidItems, setPlaidItems] = useState<PlaidItemRow[]>([]);
   const [stripeHealth, setStripeHealth] = useState<StripeHealthStats | null>(null);
   const [auditFeed, setAuditFeed] = useState<AdminAuditEntry[]>([]);
+  const [billingStats, setBillingStats] = useState<BillingStats | null>(null);
 
   const invokeAdminActions = useCallback(async (body: Record<string, unknown>) => {
     const {
@@ -80,33 +88,45 @@ export default function AdminDashboard() {
       setProfiles(profileData as ProfileRow[]);
     }
 
-    const { data: enriched, error: enrichedErr } = await invokeAdminActions({ action: 'list' });
-    if (enrichedErr) {
-      toast.error(`Auth enrichment failed: ${enrichedErr.message}`);
-    } else if (enriched?.users) {
-      setEnrichedUsers(enriched.users as EnrichedUser[]);
-    }
+    // Fire all admin-actions fetches in parallel
+    const [
+      enrichedRes,
+      plaidStatsRes,
+      healthRes,
+      auditRes,
+      billingStatsRes,
+      billingByUserRes,
+      plaidItemsRes,
+    ] = await Promise.all([
+      invokeAdminActions({ action: 'list' }),
+      invokeAdminActions({ action: 'plaid_stats' }),
+      invokeAdminActions({ action: 'health' }),
+      invokeAdminActions({ action: 'audit_feed' }),
+      invokeAdminActions({ action: 'billing_stats' }),
+      invokeAdminActions({ action: 'billing_by_user' }),
+      invokeAdminActions({ action: 'plaid_items_list' }),
+    ]);
 
-    const { data: plaidData, error: plaidStatsErr } = await invokeAdminActions({ action: 'plaid_stats' });
-    if (plaidStatsErr) {
-      toast.error(`Plaid stats failed: ${plaidStatsErr.message}`);
-    } else if (plaidData?.plaid_stats) {
-      setPlaidStats(plaidData.plaid_stats as PlaidHealthStats);
-    }
+    if (enrichedRes.error) toast.error(`Auth enrichment failed: ${enrichedRes.error.message}`);
+    else if (enrichedRes.data?.users) setEnrichedUsers(enrichedRes.data.users as EnrichedUser[]);
 
-    const { data: healthData, error: healthErr } = await invokeAdminActions({ action: 'health' });
-    if (healthErr) {
-      toast.error(`Billing health failed: ${healthErr.message}`);
-    } else if (healthData?.stripe_health) {
-      setStripeHealth(healthData.stripe_health as StripeHealthStats);
-    }
+    if (plaidStatsRes.error) toast.error(`Plaid stats failed: ${plaidStatsRes.error.message}`);
+    else if (plaidStatsRes.data?.plaid_stats) setPlaidStats(plaidStatsRes.data.plaid_stats as PlaidHealthStats);
 
-    const { data: auditData, error: auditErr } = await invokeAdminActions({ action: 'audit_feed' });
-    if (auditErr) {
-      toast.error(`Audit feed failed: ${auditErr.message}`);
-    } else if (Array.isArray(auditData?.audit_feed)) {
-      setAuditFeed(auditData.audit_feed as AdminAuditEntry[]);
-    }
+    if (healthRes.error) toast.error(`Billing health failed: ${healthRes.error.message}`);
+    else if (healthRes.data?.stripe_health) setStripeHealth(healthRes.data.stripe_health as StripeHealthStats);
+
+    if (auditRes.error) toast.error(`Audit feed failed: ${auditRes.error.message}`);
+    else if (Array.isArray(auditRes.data?.audit_feed)) setAuditFeed(auditRes.data.audit_feed as AdminAuditEntry[]);
+
+    if (billingStatsRes.error) toast.error(`Billing stats failed: ${billingStatsRes.error.message}`);
+    else if (billingStatsRes.data?.billing_stats) setBillingStats(billingStatsRes.data.billing_stats as BillingStats);
+
+    if (billingByUserRes.error) toast.error(`Billing by user failed: ${billingByUserRes.error.message}`);
+    else if (billingByUserRes.data?.billing_by_user) setSubMap(billingByUserRes.data.billing_by_user as Record<string, UserSubscription>);
+
+    if (plaidItemsRes.error) toast.error(`Plaid items failed: ${plaidItemsRes.error.message}`);
+    else if (Array.isArray(plaidItemsRes.data?.plaid_items)) setPlaidItems(plaidItemsRes.data.plaid_items as PlaidItemRow[]);
 
     setTicketsLoading(true);
     const { data: tickets, error: ticketErr } = await supabase
@@ -202,6 +222,18 @@ export default function AdminDashboard() {
     void loadAll();
   };
 
+  const handlePromoteAdmin = async (userId: string) => {
+    toast.loading('Granting admin access…', { id: 'promote-admin' });
+    const { data, error } = await invokeAdminActions({ action: 'promote_admin', targetUserId: userId });
+    if (error) {
+      toast.error(`Failed to grant admin: ${error.message}`, { id: 'promote-admin' });
+      return;
+    }
+    toast.success(typeof data?.message === 'string' ? data.message : 'Admin access granted.', { id: 'promote-admin' });
+    track('admin_role_changed', { granted: true });
+    void loadAll();
+  };
+
   const resolveTicket = async (ticketId: string) => {
     setResolvingTicketId(ticketId);
     const { error } = await supabase
@@ -293,11 +325,14 @@ export default function AdminDashboard() {
             onSearchChange={setUserSearch}
             getEnrichedProfile={getEnrichedProfile}
             primaryAdminEmail={PRIMARY_ADMIN_EMAIL}
+            subMap={subMap}
+            onPromoteAdmin={(userId) => void handlePromoteAdmin(userId)}
             onDemoteAdmin={(userId) => void handleDemoteAdmin(userId)}
             onAdminAction={(action, userId) => void handleAdminAction(action, userId)}
           />
 
           <div className="space-y-6">
+            <AdminBillingPanel stats={billingStats} />
             <AdminReliabilityPanel stripeHealth={stripeHealth} auditFeed={auditFeed} />
             <AdminControlsPanel
               isMaintenance={isMaintenance}
@@ -318,6 +353,8 @@ export default function AdminDashboard() {
             />
           </div>
         </div>
+
+        <AdminPlaidDrilldown items={plaidItems} />
       </div>
     </div>
   );
