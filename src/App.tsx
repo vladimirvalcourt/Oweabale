@@ -11,6 +11,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import AuthGuard from './components/AuthGuard';
 import AdminGuard from './components/AdminGuard';
 import MaintenanceGuard from './components/MaintenanceGuard';
+import { FullSuiteRouteGuard } from './components/FullSuiteGate';
 import { AppLoader } from './components/PageSkeleton';
 import SessionWarningModal from './components/SessionWarningModal';
 import { useStore } from './store/useStore';
@@ -110,18 +111,54 @@ function AppRoutes() {
         
         <Route element={<DeviceGuard><Layout /></DeviceGuard>}>
           <Route path="dashboard" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
-          <Route path="owe-ai" element={<ErrorBoundary><OweAi /></ErrorBoundary>} />
+          <Route
+            path="owe-ai"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Owe-AI">
+                  <OweAi />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
           <Route path="bills" element={<ErrorBoundary><Obligations /></ErrorBoundary>} />
           <Route path="income" element={<ErrorBoundary><Income /></ErrorBoundary>} />
-          <Route path="freelance" element={<ErrorBoundary><Freelance /></ErrorBoundary>} />
+          <Route
+            path="freelance"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Freelance Vault">
+                  <Freelance />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
           <Route path="ingestion" element={<ErrorBoundary><Ingestion /></ErrorBoundary>} />
           <Route path="transactions" element={<ErrorBoundary><Transactions /></ErrorBoundary>} />
           <Route path="budgets" element={<ErrorBoundary><Budgets /></ErrorBoundary>} />
           <Route path="net-worth" element={<ErrorBoundary><NetWorth /></ErrorBoundary>} />
           <Route path="calendar" element={<ErrorBoundary><Calendar /></ErrorBoundary>} />
-          <Route path="taxes" element={<ErrorBoundary><Taxes /></ErrorBoundary>} />
+          <Route
+            path="taxes"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Tax tools">
+                  <Taxes />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
           <Route path="goals" element={<ErrorBoundary><Goals /></ErrorBoundary>} />
-          <Route path="education" element={<ErrorBoundary><Education /></ErrorBoundary>} />
+          <Route
+            path="education"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Financial Academy">
+                  <Education />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
           <Route path="categories" element={<ErrorBoundary><Categories /></ErrorBoundary>} />
           <Route path="subscriptions" element={<ErrorBoundary><Subscriptions /></ErrorBoundary>} />
           <Route path="reports" element={<ErrorBoundary><Reports /></ErrorBoundary>} />

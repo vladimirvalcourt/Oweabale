@@ -6,7 +6,12 @@ export async function hasPaidFullSuiteAccess(
   supabaseAdmin: AdminClient,
   userId: string,
 ): Promise<boolean> {
-  const [entRes, subRes] = await Promise.all([
+  const [profileRes, entRes, subRes] = await Promise.all([
+    supabaseAdmin
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', userId)
+      .maybeSingle(),
     supabaseAdmin
       .from('entitlements')
       .select('status, ends_at')
@@ -23,6 +28,8 @@ export async function hasPaidFullSuiteAccess(
       .limit(1)
       .maybeSingle(),
   ]);
+
+  if (profileRes.data?.is_admin === true) return true;
 
   const ent = entRes.data;
   const sub = subRes.data;

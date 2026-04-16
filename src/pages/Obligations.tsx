@@ -21,6 +21,8 @@ import { TransitionLink } from '../components/TransitionLink';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 import type { Bill, Debt } from '../store/useStore';
+import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
+import { FullSuiteGateCard } from '../components/FullSuiteGate';
 
 type ObligationType = 'recurring' | 'debt' | 'ambush';
 type Strategy = 'avalanche' | 'snowball';
@@ -141,10 +143,10 @@ export default function Obligations() {
   };
   const [strategy, setStrategy] = useState<Strategy>('avalanche');
   const [extraPayment, setExtraPayment] = useState(0);
-  const [showDetonator, setShowDetonator] = useState(true);
   const [expandedDebtId, setExpandedDebtId] = useState<string | null>(null);
   const [editBillRow, setEditBillRow] = useState<Bill | null>(null);
   const [editDebtRow, setEditDebtRow] = useState<Debt | null>(null);
+  const { hasFullSuite } = useFullSuiteAccess();
 
   useEffect(() => {
     if (location.hash === '#due-soon') {
@@ -333,7 +335,7 @@ export default function Obligations() {
       </CollapsibleModule>
 
       {/* Debt Detonator Panel */}
-      {debts.length > 0 && (
+      {debts.length > 0 && hasFullSuite && (
         <CollapsibleModule 
           title="Debt Payoff Plan" 
           icon={Flame}
@@ -467,6 +469,13 @@ export default function Obligations() {
             </div>
           </div>
         </CollapsibleModule>
+      )}
+      {debts.length > 0 && !hasFullSuite && (
+        <FullSuiteGateCard
+          title="Debt Payoff Plan is available on Full Suite"
+          description="Unlock Avalanche/Snowball strategy modeling, debt-free projections, and interest-saved analytics."
+          compact
+        />
       )}
 
       {/* Tabs */}

@@ -3,6 +3,8 @@ import { Mail, BellRing, BrainCircuit } from 'lucide-react';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { NOTIF_PREFS_STORAGE_KEY, type NotifPrefKey, loadNotifPrefs } from './constants';
+import { useFullSuiteAccess } from '../../hooks/useFullSuiteAccess';
+import { FullSuiteGateCard } from '../../components/FullSuiteGate';
 
 function deferToast(fn: () => void) {
   requestAnimationFrame(() => {
@@ -13,6 +15,7 @@ function deferToast(fn: () => void) {
 function NotificationsPanelInner() {
   const [notifPrefs, setNotifPrefs] = useState(loadNotifPrefs);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { hasFullSuite, isAdmin } = useFullSuiteAccess();
 
   useEffect(() => {
     return () => {
@@ -108,34 +111,42 @@ function NotificationsPanelInner() {
 
       <CollapsibleModule title="Smart Alerts (Full Suite)" icon={BrainCircuit} defaultOpen={false}>
         <p className="text-sm text-content-tertiary mb-6">Advanced notifications powered by our algorithms.</p>
-        <div className="space-y-6">
-          {[
-            { id: 'sniper-increase' as const, label: 'Subscription Sniper: Price Hikes', desc: 'Alert me instantly if a subscription price increases.' },
-            { id: 'sniper-renewal' as const, label: 'Subscription Sniper: Auto-Renewals', desc: 'Alert me 7 days before an annual subscription renews.' },
-            { id: 'detonator-milestone' as const, label: 'Debt Detonator: Milestones', desc: 'Celebrate when I pay off 25%, 50%, 75%, and 100% of a debt.' },
-            { id: 'detonator-rate' as const, label: 'Debt Detonator: Rate Changes', desc: 'Alert me if a variable interest rate changes.' },
-          ].map((item) => (
-            <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
-              <div className="pr-4">
-                <label htmlFor={item.id} className="text-sm font-medium text-content-primary cursor-pointer">{item.label}</label>
-                <p className="text-xs text-content-tertiary mt-1">{item.desc}</p>
+        {hasFullSuite || isAdmin ? (
+          <div className="space-y-6">
+            {[
+              { id: 'sniper-increase' as const, label: 'Subscription Sniper: Price Hikes', desc: 'Alert me instantly if a subscription price increases.' },
+              { id: 'sniper-renewal' as const, label: 'Subscription Sniper: Auto-Renewals', desc: 'Alert me 7 days before an annual subscription renews.' },
+              { id: 'detonator-milestone' as const, label: 'Debt Detonator: Milestones', desc: 'Celebrate when I pay off 25%, 50%, 75%, and 100% of a debt.' },
+              { id: 'detonator-rate' as const, label: 'Debt Detonator: Rate Changes', desc: 'Alert me if a variable interest rate changes.' },
+            ].map((item) => (
+              <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
+                <div className="pr-4">
+                  <label htmlFor={item.id} className="text-sm font-medium text-content-primary cursor-pointer">{item.label}</label>
+                  <p className="text-xs text-content-tertiary mt-1">{item.desc}</p>
+                </div>
+                <div className="flex items-center h-5 mt-1">
+                  <input
+                    id={item.id}
+                    type="checkbox"
+                    checked={notifPrefs[item.id]}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setPref(item.id, checked);
+                      deferToast(() => toast.success(`${item.label} ${checked ? 'enabled' : 'disabled'}`));
+                    }}
+                    className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                  />
+                </div>
               </div>
-              <div className="flex items-center h-5 mt-1">
-                <input
-                  id={item.id}
-                  type="checkbox"
-                  checked={notifPrefs[item.id]}
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    setPref(item.id, checked);
-                    deferToast(() => toast.success(`${item.label} ${checked ? 'enabled' : 'disabled'}`));
-                  }}
-                  className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
-                />
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <FullSuiteGateCard
+            compact
+            title="Smart Alerts are on Full Suite"
+            description="Upgrade to enable Subscription Sniper and Debt Detonator alert automations."
+          />
+        )}
       </CollapsibleModule>
     </div>
   );
