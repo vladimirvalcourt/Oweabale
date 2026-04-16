@@ -10,6 +10,9 @@ import {
   type OweAiMode,
 } from '../lib/oweAi';
 import { cn } from '../lib/utils';
+import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
+import { FullSuiteGateCard } from '../components/FullSuiteGate';
+import { AppLoader } from '../components/PageSkeleton';
 
 const OweAiMessageBubble = memo(function OweAiMessageBubble({ message }: { message: OweAiChatMessage }) {
   const m = message;
@@ -47,6 +50,7 @@ const MODE_LABEL: Record<OweAiMode, string> = {
 };
 
 export default function OweAi() {
+  const { isLoading: accessLoading, hasFullSuite } = useFullSuiteAccess();
   const [messages, setMessages] = useState<OweAiChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -158,6 +162,18 @@ export default function OweAi() {
     if (!nextLessonPrompt || loading || mode !== 'academy') return;
     void runSend(nextLessonPrompt);
   }, [loading, mode, nextLessonPrompt, runSend]);
+
+  if (accessLoading) return <AppLoader />;
+  if (!hasFullSuite) {
+    return (
+      <div className="min-h-[60vh] w-full flex items-center justify-center px-4">
+        <FullSuiteGateCard
+          title="Owe-AI is available on Full Suite"
+          description="Upgrade to unlock personalized AI coaching based on your Oweable financial data."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[calc(100dvh-12rem)] max-w-3xl mx-auto w-full flex flex-col gap-4">

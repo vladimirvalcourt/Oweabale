@@ -5,6 +5,8 @@ import { Fragment } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { supabase } from '../lib/supabase';
+import { FullSuiteGateCard } from '../components/FullSuiteGate';
+import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 
 const MODULES = [
   {
@@ -124,6 +126,7 @@ const MODULES = [
 ];
 
 export default function Education() {
+  const { isLoading: isAccessLoading, hasFullSuite } = useFullSuiteAccess();
   const [selectedModule, setSelectedModule] = useState(MODULES[0].id);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [activeLesson, setActiveLesson] = useState<any>(null);
@@ -180,6 +183,25 @@ export default function Education() {
   };
 
   const activeModule = MODULES.find(m => m.id === selectedModule);
+
+  if (isAccessLoading) {
+    return (
+      <div className="min-h-[55vh] w-full flex items-center justify-center">
+        <p className="text-sm font-mono text-content-tertiary uppercase tracking-widest">Loading academy access…</p>
+      </div>
+    );
+  }
+
+  if (!hasFullSuite) {
+    return (
+      <div className="min-h-[65vh] w-full flex items-center justify-center px-4">
+        <FullSuiteGateCard
+          title="Financial Academy is available on Full Suite"
+          description="Upgrade to unlock guided finance tracks, saved lesson progress, and deeper curriculum content."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">

@@ -505,10 +505,10 @@ export default function Layout() {
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                  <span className="text-[11px] font-sans text-content-secondary font-semibold">Synced — Free Beta Trial</span>
+                  <span className="text-[11px] font-sans text-content-secondary font-semibold">Synced — Plan controls active</span>
                 </div>
                 <p className="text-[11px] font-sans text-content-tertiary leading-relaxed italic opacity-90 pl-3.5 border-l border-surface-border">
-                  Pricing may be introduced later with advance notice to testers.
+                  Tracker includes core workflows; upgrade to Full Suite for premium modules.
                 </p>
               </div>
             )}
