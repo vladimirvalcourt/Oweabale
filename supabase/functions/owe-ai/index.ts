@@ -2,6 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 import { calcMonthlyCashFlow, computeSafeToSpend } from '../_shared/finance_safe_to_spend.ts';
 import { guardOweAiMessage } from '../_shared/owe_ai_guard.ts';
+import { hasPaidFullSuiteAccess } from '../_shared/plaidAccess.ts';
 
 function num(v: unknown, fallback = 0): number {
   const n = typeof v === 'number' ? v : Number(v);
@@ -654,6 +655,16 @@ Deno.serve(async (req: Request) => {
           message: 'Your session expired. Refresh the page or sign in again.',
         }),
         { status: 401, headers: { ...ch, 'Content-Type': 'application/json' } },
+      );
+    }
+    const hasPaidAccess = await hasPaidFullSuiteAccess(supabaseAdmin, user.id);
+    if (!hasPaidAccess) {
+      return new Response(
+        JSON.stringify({
+          error: 'FULL_SUITE_REQUIRED',
+          message: 'Owe-AI is available on Full Suite only.',
+        }),
+        { status: 403, headers: { ...ch, 'Content-Type': 'application/json' } },
       );
     }
 
