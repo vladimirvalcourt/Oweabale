@@ -2,6 +2,7 @@ import Stripe from 'https://esm.sh/stripe@14.25.0?target=deno';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 import { upsertSubscriptionAndEntitlement } from '../_shared/stripeBilling.ts';
+import { getStripeSecretKey } from '../_shared/stripeEnv.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
@@ -21,10 +22,10 @@ Deno.serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const stripeSecret = Deno.env.get('STRIPE_SECRET_KEY');
-    if (!supabaseUrl || !serviceKey || !stripeSecret) {
+    if (!supabaseUrl || !serviceKey) {
       throw new Error('Server misconfiguration');
     }
+    const stripeSecret = getStripeSecretKey();
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {

@@ -4,6 +4,7 @@ import {
   upsertOneTimePaymentAndEntitlement,
   upsertSubscriptionAndEntitlement,
 } from '../_shared/stripeBilling.ts';
+import { getStripeSecretKey, getStripeWebhookSecret } from '../_shared/stripeEnv.ts';
 
 type AdminClient = ReturnType<typeof createClient>;
 
@@ -30,13 +31,13 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const stripeSecret = Deno.env.get('STRIPE_SECRET_KEY');
-    const webhookSecret = Deno.env.get('STRIPE_WEBHOOK_SECRET');
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    if (!stripeSecret || !webhookSecret || !supabaseUrl || !serviceKey) {
+    if (!supabaseUrl || !serviceKey) {
       throw new Error('Server misconfiguration');
     }
+    const stripeSecret = getStripeSecretKey();
+    const webhookSecret = getStripeWebhookSecret();
 
     const signature = req.headers.get('stripe-signature');
     if (!signature) throw new Error('Missing stripe-signature');

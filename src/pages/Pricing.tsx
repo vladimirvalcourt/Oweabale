@@ -53,9 +53,7 @@ function FaqItem({ question, answer }: { question: string, answer: string }) {
 
 export default function Pricing() {
   const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
-  const configuredYearly = Number(import.meta.env.VITE_PRICING_YEARLY_DISPLAY);
   const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
-  const yearlyPrice = Number.isFinite(configuredYearly) && configuredYearly > 0 ? configuredYearly : 99.0;
 
   useSEO({
     title: 'Pricing — Oweable',
@@ -65,10 +63,7 @@ export default function Pricing() {
   });
 
   const [scrolled, setScrolled] = useState(false);
-  const [isYearly, setIsYearly] = useState(false);
   const [isStartingCheckout, setIsStartingCheckout] = useState(false);
-  const yearlyMonthlyEquivalent = yearlyPrice / 12;
-  const displayedPrice = isYearly ? yearlyPrice : monthlyPrice;
   
   const [headerRef, headerVisible] = useInView();
   const [cardsRef, cardsVisible] = useInView();
@@ -82,7 +77,7 @@ export default function Pricing() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const startCheckout = async (planKey: 'pro_monthly' | 'pro_yearly' | 'lifetime') => {
+  const startCheckout = async (planKey: 'pro_monthly') => {
     if (isStartingCheckout) return;
     setIsStartingCheckout(true);
     const response = await createStripeCheckoutSession(planKey);
@@ -157,39 +152,9 @@ export default function Pricing() {
           ref={cardsRef}
           className="max-w-5xl mx-auto px-6 lg:px-8 relative z-10"
         >
-          {/* Billing Toggle */}
-          <div className={`flex justify-center mb-12 transition-all duration-700 ease-out ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <div className="flex items-center gap-4">
-              <div className="bg-surface-raised border border-surface-border rounded-sm p-1 flex items-center relative">
-                <div 
-                  className={`absolute top-1 bottom-1 w-[100px] bg-surface-border shadow-sm rounded-sm transition-all duration-300 ease-in-out ${isYearly ? 'left-[104px]' : 'left-1'}`}
-                ></div>
-                <button 
-                  type="button"
-                  onClick={() => setIsYearly(false)}
-                  className={`relative z-10 w-[100px] py-1.5 text-xs font-sans font-medium transition-colors duration-300 ${!isYearly ? 'text-white' : 'text-content-tertiary hover:text-content-secondary'}`}
-                >
-                  Monthly
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => setIsYearly(true)}
-                  className={`relative z-10 w-[100px] py-1.5 text-xs font-sans font-medium transition-colors duration-300 ${isYearly ? 'text-white' : 'text-content-tertiary hover:text-content-secondary'}`}
-                >
-                  Yearly
-                </button>
-              </div>
-              <div className="flex items-center">
-                <span className="text-xs font-sans font-semibold text-emerald-400 bg-emerald-400/5 border border-emerald-400/20 px-2 py-0.5 rounded-sm">
-                  Save ~25% yearly
-                </span>
-              </div>
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
-            {/* Card 1: The Tracker */}
+            {/* Card 1: Tracker (Free) */}
             <div className={`bg-surface-raised border border-surface-border rounded-sm p-10 flex flex-col transition-all duration-700 ease-out delay-[100ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
               <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Tracker</h3>
               <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Core balances and bills without the full suite.</p>
@@ -222,7 +187,7 @@ export default function Pricing() {
               </div>
             </div>
 
-            {/* Card 2: The Arsenal */}
+            {/* Card 2: Full Suite */}
             <div className={`relative transition-all duration-700 ease-out delay-[200ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
               {/* Indigo Glow Behind Card */}
               <div className="absolute -inset-1 bg-indigo-500/10 blur-3xl rounded-none z-0"></div>
@@ -233,39 +198,25 @@ export default function Pricing() {
                 </div>
                 
                 <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Full suite</h3>
-                <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Everything in the app with monthly or yearly billing.</p>
+                <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Everything in the app with one simple monthly plan.</p>
                 
                 <div className="mb-10 p-6 bg-surface-base border border-indigo-500/20 rounded-sm relative h-[100px] flex items-center shadow-[inset_0_0_20px_rgba(99,102,241,0.02)]">
                   <div className={`absolute inset-0 px-6 flex items-center transition-all duration-300 ease-in-out`}>
                     <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">
-                      ${displayedPrice.toFixed(2)}
+                      ${monthlyPrice.toFixed(2)}
                     </span>
-                    <span className="text-content-muted text-sm ml-3">{isYearly ? 'per year' : 'per month'}</span>
+                    <span className="text-content-muted text-sm ml-3">per month</span>
                   </div>
                 </div>
-                {isYearly && (
-                  <p className="text-[11px] text-content-muted -mt-6 mb-8">
-                    Equivalent to ${yearlyMonthlyEquivalent.toFixed(2)}/mo billed annually.
-                  </p>
-                )}
                 
                 <button
                   type="button"
-                  onClick={() => startCheckout(isYearly ? 'pro_yearly' : 'pro_monthly')}
+                  onClick={() => startCheckout('pro_monthly')}
                   disabled={isStartingCheckout}
                   className="w-full py-4 px-6 rounded-sm bg-brand-cta hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-sans font-semibold text-center transition-all duration-200 mb-3 shadow-sm"
                 >
-                  {isStartingCheckout ? 'Starting checkout...' : `Start ${isYearly ? 'yearly' : 'monthly'} plan`}
+                  {isStartingCheckout ? 'Starting checkout...' : 'Start monthly plan'}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => startCheckout('lifetime')}
-                  disabled={isStartingCheckout}
-                  className="w-full py-3 px-6 rounded-sm border border-indigo-400/40 hover:border-indigo-300 disabled:opacity-60 disabled:cursor-not-allowed text-indigo-100 text-xs font-sans font-semibold text-center transition-all duration-200 mb-10"
-                >
-                  Buy one-time lifetime access
-                </button>
-                
                 <div className="flex flex-col gap-5 mt-auto">
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
@@ -287,6 +238,29 @@ export default function Pricing() {
               </div>
             </div>
 
+          </div>
+
+          <div className="mt-16 border border-surface-border rounded-sm bg-surface-raised overflow-hidden">
+            <div className="grid grid-cols-3 border-b border-surface-border text-xs font-mono uppercase tracking-widest">
+              <div className="px-4 py-3 text-content-muted">Feature</div>
+              <div className="px-4 py-3 text-content-muted border-l border-surface-border">Tracker (Free)</div>
+              <div className="px-4 py-3 text-content-muted border-l border-surface-border">Full Suite ($10.99/mo)</div>
+            </div>
+
+            {[
+              ['Basic account tracking', 'Up to 3 accounts', 'Unlimited accounts'],
+              ['Bill workflow', 'Manual bill entry', 'Manual + synced workflows'],
+              ['Net worth view', 'Standard chart', 'Standard chart + advanced modules'],
+              ['Debt payoff planner', 'Not included', 'Avalanche + snowball planner'],
+              ['Subscription protection', 'Not included', 'Price-change alerts'],
+              ['Freelancer tax tools', 'Not included', 'Included'],
+            ].map(([feature, freeTier, paidTier]) => (
+              <div key={feature} className="grid grid-cols-3 text-sm border-b border-surface-border last:border-b-0">
+                <div className="px-4 py-3 text-content-secondary">{feature}</div>
+                <div className="px-4 py-3 text-content-tertiary border-l border-surface-border">{freeTier}</div>
+                <div className="px-4 py-3 text-content-tertiary border-l border-surface-border">{paidTier}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -315,7 +289,7 @@ export default function Pricing() {
               />
               <FaqItem 
                 question="Do I need to link my bank accounts?" 
-                answer="No. The Free Tracker allows for 100% manual entry if you prefer complete privacy. However, The Arsenal tier requires linking accounts to automate the Subscription Sniper and Tax Fortress features." 
+                answer="No. Tracker (Free) supports manual entry. Full Suite is designed for automated syncing and advanced workflows." 
               />
             </div>
           </div>

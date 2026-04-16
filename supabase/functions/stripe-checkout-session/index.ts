@@ -1,30 +1,23 @@
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=deno';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
+import { getStripeSecretKey } from '../_shared/stripeEnv.ts';
 
-type PlanKey = 'pro_monthly' | 'pro_yearly' | 'lifetime';
+type PlanKey = 'pro_monthly';
 
 type PlanConfig = {
   planKey: PlanKey;
-  mode: 'subscription' | 'payment';
+  mode: 'subscription';
   priceId: string;
   featureKey: string;
 };
 
 function getPlanConfig(planKey: string): PlanConfig | null {
   const monthly = Deno.env.get('STRIPE_PRICE_PRO_MONTHLY');
-  const yearly = Deno.env.get('STRIPE_PRICE_PRO_YEARLY');
-  const lifetime = Deno.env.get('STRIPE_PRICE_LIFETIME');
 
   const plans: Record<PlanKey, PlanConfig | null> = {
     pro_monthly: monthly
       ? { planKey: 'pro_monthly', mode: 'subscription', priceId: monthly, featureKey: 'full_suite' }
-      : null,
-    pro_yearly: yearly
-      ? { planKey: 'pro_yearly', mode: 'subscription', priceId: yearly, featureKey: 'full_suite' }
-      : null,
-    lifetime: lifetime
-      ? { planKey: 'lifetime', mode: 'payment', priceId: lifetime, featureKey: 'full_suite' }
       : null,
   };
 
@@ -49,10 +42,10 @@ Deno.serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    const stripeSecret = Deno.env.get('STRIPE_SECRET_KEY');
-    if (!supabaseUrl || !serviceKey || !stripeSecret) {
+    if (!supabaseUrl || !serviceKey) {
       throw new Error('Server misconfiguration');
     }
+    const stripeSecret = getStripeSecretKey();
 
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
@@ -117,25 +110,13 @@ Deno.serve(async (req: Request) => {
         plan_key: plan.planKey,
         feature_key: plan.featureKey,
       },
-      ...(plan.mode === 'subscription'
-        ? {
-            subscription_data: {
-              metadata: {
-                user_id: user.id,
-                plan_key: plan.planKey,
-                feature_key: plan.featureKey,
-              },
-            },
-          }
-        : {
-            payment_intent_data: {
-              metadata: {
-                user_id: user.id,
-                plan_key: plan.planKey,
-                feature_key: plan.featureKey,
-              },
-            },
-          }),
+      subscription_data: {
+        metadata: {
+          user_id: user.id,
+          plan_key: plan.planKey,
+          feature_key: plan.featureKey,
+        },
+      },
     });
 
     return new Response(

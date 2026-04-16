@@ -106,7 +106,7 @@ function NotificationsPanelInner() {
         </div>
       </CollapsibleModule>
 
-      <CollapsibleModule title="Smart Alerts (The Arsenal)" icon={BrainCircuit} defaultOpen={false}>
+      <CollapsibleModule title="Smart Alerts (Full Suite)" icon={BrainCircuit} defaultOpen={false}>
         <p className="text-sm text-content-tertiary mb-6">Advanced notifications powered by our algorithms.</p>
         <div className="space-y-6">
           {[

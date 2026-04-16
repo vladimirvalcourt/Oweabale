@@ -14,7 +14,7 @@ async function parseFunctionError(error: unknown): Promise<string> {
   return fallback;
 }
 
-type PlanKey = 'pro_monthly' | 'pro_yearly' | 'lifetime';
+type PlanKey = 'pro_monthly';
 
 export async function createStripeCheckoutSession(
   planKey: PlanKey

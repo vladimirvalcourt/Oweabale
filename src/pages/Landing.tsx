@@ -96,7 +96,7 @@ const FAQ_ITEMS_BASE = [
   },
   {
     q: 'Is Oweable free?',
-    a: 'Yes — Oweable has a free tier. Paid plans with advanced features start at $9/month. See the Pricing page for a full feature comparison.',
+    a: 'Yes — Oweable includes a free Tracker tier for core account and bill tracking. Full Suite unlocks advanced tools like the debt payoff planner, subscription alerts, and freelancer tax workflows for $10.99/month.',
   },
   {
     q: 'How is Oweable different from YNAB or Mint?',
@@ -369,32 +369,32 @@ export default function Landing() {
               {
                 icon: Target,
                 title: "Debt Detonator",
-                desc: "Choose Avalanche (highest interest first) or Snowball (smallest balance first). Get your exact debt-free date, total interest saved, and a month-by-month payoff schedule for every debt."
+                desc: "Full Suite feature. Choose Avalanche (highest interest first) or Snowball (smallest balance first). Get your exact debt-free date, total interest saved, and a month-by-month payoff schedule for every debt."
               },
               {
                 icon: CalendarClock,
                 title: "Bill Command Center",
-                desc: "Track every recurring bill — rent, utilities, insurance, subscriptions — with due dates and auto-overdue detection. See your full monthly burn rate, a 30 / 60 / 90-day cash-out outlook, and a calendar so nothing slips through the cracks."
+                desc: "Tracker + Full Suite. Track recurring bills with due dates and auto-overdue detection so nothing slips. Full Suite adds synced workflows and deeper automation."
               },
               {
                 icon: TrendingUp,
                 title: "Net Worth Engine",
-                desc: "Real-time net worth from assets minus liabilities. Tracks a daily historical snapshot every time you log in and projects your 12-month trajectory so you can see where you're headed."
+                desc: "Tracker + Full Suite. Real-time net worth from assets minus liabilities with trend visibility so you can see where you're headed."
               },
               {
                 icon: BarChart2,
                 title: "Spending Intelligence",
-                desc: "Area charts and bar charts showing spending by category, income vs. expenses, savings rate, and cash flow — all built from your real data. Export any view as CSV."
+                desc: "Tracker + Full Suite. Spending by category, income vs expenses, and cash-flow visibility built from your data."
               },
               {
                 icon: UploadCloud,
                 title: "Document Scanning",
-                desc: "Upload receipts, bank statements, and invoices from desktop or phone. OCR automatically extracts the biller, amount, and due date — no manual typing required."
+                desc: "Tracker + Full Suite. Upload receipts and statements, then review extracted biller, amount, and due date before saving."
               },
               {
                 icon: BookOpen,
                 title: "Financial Academy",
-                desc: "10 self-paced education tracks covering budgeting, debt payoff, credit repair, investing, taxes, real estate, and estate planning. Progress is saved so you can pick up where you left off."
+                desc: "Full Suite feature. Self-paced tracks covering budgeting, debt payoff, credit, and taxes with saved progress."
               }
             ].map((feat, i) => (
               <div

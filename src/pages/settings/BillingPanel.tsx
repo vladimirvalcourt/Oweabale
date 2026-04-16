@@ -26,12 +26,10 @@ function isSubscriptionLive(row: { status: string } | undefined) {
 
 function BillingPanelInner() {
   const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
-  const configuredYearly = Number(import.meta.env.VITE_PRICING_YEARLY_DISPLAY);
   const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
-  const yearlyPrice = Number.isFinite(configuredYearly) && configuredYearly > 0 ? configuredYearly : 99;
   const [searchParams, setSearchParams] = useSearchParams();
-  const [tierLabel, setTierLabel] = useState('The Tracker');
-  const [statusText, setStatusText] = useState('You are currently on the Free tier.');
+  const [tierLabel, setTierLabel] = useState('Tracker (Free)');
+  const [statusText, setStatusText] = useState('You are on the free Tracker tier with core account and bill tracking.');
   const [hasPaidAccess, setHasPaidAccess] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState<
     Array<{ id: string; amount_total: number; currency: string; status: string; created_at: string }>
@@ -98,8 +96,8 @@ function BillingPanelInner() {
         setStatusText('Full Suite access is active.');
       }
     } else {
-      setTierLabel('The Tracker');
-      setStatusText('You are currently on the Free tier.');
+      setTierLabel('Tracker (Free)');
+      setStatusText('You are on the free Tracker tier with core account and bill tracking.');
     }
 
     setPaymentHistory(
@@ -208,7 +206,7 @@ function BillingPanelInner() {
         {hasPaidAccess ? (
           <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-sm p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <h4 className="text-content-primary font-bold flex items-center gap-2">You&apos;re on The Arsenal</h4>
+              <h4 className="text-content-primary font-bold flex items-center gap-2">You&apos;re on Full Suite</h4>
               <p className="text-sm text-emerald-200/70 mt-1 max-w-md">
                 Full Suite is active. Update your plan, payment method, or invoices anytime in the billing portal.
               </p>
@@ -225,10 +223,10 @@ function BillingPanelInner() {
         ) : (
           <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-sm p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <h4 className="text-content-primary font-bold flex items-center gap-2">Upgrade to The Arsenal</h4>
+              <h4 className="text-content-primary font-bold flex items-center gap-2">Upgrade to Full Suite</h4>
               <p className="text-sm text-indigo-200/70 mt-1 max-w-md">
-                Unlock the Debt Detonator, Subscription Sniper, and automatic account syncing for
-                ${monthlyPrice.toFixed(2)}/month or ${yearlyPrice.toFixed(2)}/year.
+                Unlock Full Suite: unlimited account sync, debt payoff planner, subscription alerts,
+                and freelancer tax tools for ${monthlyPrice.toFixed(2)}/month.
               </p>
             </div>
             <button
