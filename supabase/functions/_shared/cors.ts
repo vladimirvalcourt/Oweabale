@@ -15,13 +15,26 @@ function parseAllowedOrigins(): string[] {
   return raw.split(',').map((s) => s.trim()).filter(Boolean);
 }
 
+/**
+ * Matches Vercel preview URLs scoped to the oweable project.
+ *
+ * Vercel generates hostnames in two shapes for preview deployments:
+ *   - <project>-<hash>-<team>.vercel.app   (team scope)
+ *   - <project>-<hash>.vercel.app          (personal scope)
+ *
+ * We only allow hostnames that start with "oweable" to prevent
+ * any other Vercel project (including attacker-controlled ones)
+ * from making credentialed CORS requests to our Edge Functions.
+ */
+const OWEABLE_VERCEL_RE = /^oweable[a-z0-9-]*\.vercel\.app$/i;
+
 function originAllowed(origin: string | null): string {
   if (!origin) return 'https://oweable.com';
   const list = parseAllowedOrigins();
   if (list.includes(origin)) return origin;
   try {
     const u = new URL(origin);
-    if (u.protocol === 'https:' && u.hostname.endsWith('.vercel.app')) return origin;
+    if (u.protocol === 'https:' && OWEABLE_VERCEL_RE.test(u.hostname)) return origin;
   } catch {
     /* ignore */
   }

@@ -68,7 +68,14 @@ Deno.serve(async (req: Request) => {
   const rawBody = await req.text();
   const jwtHeader = req.headers.get('plaid-verification') ?? req.headers.get('Plaid-Verification');
 
-  const skipVerify = Deno.env.get('PLAID_SKIP_WEBHOOK_VERIFY') === 'true';
+  // PLAID_SKIP_WEBHOOK_VERIFY is only honoured in sandbox/development.
+  // It is silently ignored when PLAID_ENV=production to prevent accidental bypass.
+  const plaidEnv = (Deno.env.get('PLAID_ENV') ?? 'sandbox').toLowerCase();
+  const skipVerify =
+    Deno.env.get('PLAID_SKIP_WEBHOOK_VERIFY') === 'true' && plaidEnv !== 'production';
+  if (skipVerify) {
+    console.warn('[plaid-webhook] WARNING: webhook signature verification is disabled (PLAID_SKIP_WEBHOOK_VERIFY=true). Never enable this in production.');
+  }
   if (!skipVerify) {
     const ok = await verifyPlaidWebhook(rawBody, jwtHeader);
     if (!ok) {

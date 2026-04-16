@@ -7,6 +7,30 @@ function isNoSuchCustomerError(error: unknown): boolean {
   return error instanceof Error && error.message.includes('No such customer');
 }
 
+/** Allowed origins for Stripe billing portal return URLs. */
+const ALLOWED_BILLING_ORIGINS = new Set([
+  'https://oweable.com',
+  'https://www.oweable.com',
+]);
+
+/**
+ * Validates a caller-supplied return URL against an explicit allowlist.
+ * Prevents open-redirect attacks via a crafted returnUrl after the portal session.
+ */
+function validateReturnUrl(url: unknown, fallback: string): string {
+  if (typeof url !== 'string' || !url.trim()) return fallback;
+  try {
+    const parsed = new URL(url.trim());
+    if (parsed.protocol !== 'https:') return fallback;
+    const origin = `${parsed.protocol}//${parsed.host}`;
+    if (ALLOWED_BILLING_ORIGINS.has(origin)) return url.trim();
+    if (/^oweable[a-z0-9-]*\.vercel\.app$/.test(parsed.hostname)) return url.trim();
+    return fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
   const ch = corsHeaders(origin);
@@ -73,19 +97,20 @@ Deno.serve(async (req: Request) => {
     const body = (await req.json().catch(() => ({}))) as { returnUrl?: string };
     const defaultOrigin =
       origin && /^https?:\/\//.test(origin) ? origin : 'https://oweable.com';
+    const returnUrl = validateReturnUrl(body.returnUrl, `${defaultOrigin}/settings`);
 
     let session: Stripe.BillingPortal.Session;
     try {
       session = await stripe.billingPortal.sessions.create({
         customer: customerId,
-        return_url: body.returnUrl ?? `${defaultOrigin}/settings`,
+        return_url: returnUrl,
       });
     } catch (error) {
       if (!isNoSuchCustomerError(error)) throw error;
       customerId = await createAndPersistCustomer();
       session = await stripe.billingPortal.sessions.create({
         customer: customerId,
-        return_url: body.returnUrl ?? `${defaultOrigin}/settings`,
+        return_url: returnUrl,
       });
     }
 

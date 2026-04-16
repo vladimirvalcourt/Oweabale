@@ -67,25 +67,23 @@ export async function upsertSubscriptionAndEntitlement(
     throw new Error(subErr.message);
   }
 
-  await supabaseAdmin
-    .from('entitlements')
-    .delete()
-    .eq('user_id', userId)
-    .eq('source', 'subscription')
-    .eq('feature_key', featureKey);
-
-  const { error: entErr } = await supabaseAdmin.from('entitlements').insert({
-    user_id: userId,
-    feature_key: featureKey,
-    source: 'subscription',
-    status: isActive ? 'active' : 'expired',
-    starts_at: periodStart ?? new Date().toISOString(),
-    ends_at: periodEnd,
-    stripe_subscription_id: subscription.id,
-    updated_at: new Date().toISOString(),
-  });
+  // Atomic upsert: the unique constraint on (user_id, feature_key, source)
+  // means this is a single idempotent write — no DELETE + INSERT race window.
+  const { error: entErr } = await supabaseAdmin.from('entitlements').upsert(
+    {
+      user_id: userId,
+      feature_key: featureKey,
+      source: 'subscription',
+      status: isActive ? 'active' : 'expired',
+      starts_at: periodStart ?? new Date().toISOString(),
+      ends_at: periodEnd,
+      stripe_subscription_id: subscription.id,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id,feature_key,source' }
+  );
   if (entErr) {
-    console.error('[stripeBilling] entitlements insert', entErr);
+    console.error('[stripeBilling] entitlements upsert', entErr);
     throw new Error(entErr.message);
   }
 }
@@ -122,25 +120,22 @@ export async function upsertOneTimePaymentAndEntitlement(
     throw new Error(payErr.message);
   }
 
-  await supabaseAdmin
-    .from('entitlements')
-    .delete()
-    .eq('user_id', userId)
-    .eq('source', 'one_time')
-    .eq('feature_key', featureKey);
-
-  const { error: entErr } = await supabaseAdmin.from('entitlements').insert({
-    user_id: userId,
-    feature_key: featureKey,
-    source: 'one_time',
-    status: 'active',
-    starts_at: new Date().toISOString(),
-    ends_at: null,
-    stripe_payment_intent_id: paymentIntentId,
-    updated_at: new Date().toISOString(),
-  });
+  // Atomic upsert: see subscription path above for rationale.
+  const { error: entErr } = await supabaseAdmin.from('entitlements').upsert(
+    {
+      user_id: userId,
+      feature_key: featureKey,
+      source: 'one_time',
+      status: 'active',
+      starts_at: new Date().toISOString(),
+      ends_at: null,
+      stripe_payment_intent_id: paymentIntentId,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id,feature_key,source' }
+  );
   if (entErr) {
-    console.error('[stripeBilling] entitlements insert (one_time)', entErr);
+    console.error('[stripeBilling] entitlements upsert (one_time)', entErr);
     throw new Error(entErr.message);
   }
 }

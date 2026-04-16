@@ -8,6 +8,14 @@ import { getStripeSecretKey, getStripeWebhookSecret } from '../_shared/stripeEnv
 
 type AdminClient = ReturnType<typeof createClient>;
 
+/**
+ * Inserts the event into stripe_events BEFORE any business logic is executed.
+ * Returns 'inserted' for a new event, 'duplicate' if already processed, or 'failed'.
+ *
+ * Idempotency design: the unique constraint on stripe_event_id is the source of
+ * truth. Inserting first means a duplicate Stripe delivery is detected before any
+ * DB mutations occur, preventing double-processing.
+ */
 async function recordStripeEventOrDuplicate(
   supabaseAdmin: AdminClient,
   event: Stripe.Event,
@@ -48,6 +56,26 @@ Deno.serve(async (req: Request) => {
     const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
+
+    // ── Idempotency gate ────────────────────────────────────────────────────
+    // Record the event BEFORE any business logic. The unique constraint on
+    // stripe_event_id ensures that a duplicate delivery is short-circuited
+    // here, not after state-mutating operations have already run.
+    const rec = await recordStripeEventOrDuplicate(supabaseAdmin, event, event.data.object);
+    if (rec === 'duplicate') {
+      console.log('[stripe-webhook] duplicate event id — skipping processing', event.id);
+      return new Response(JSON.stringify({ received: true, duplicate: true }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    if (rec === 'failed') {
+      return new Response(JSON.stringify({ error: 'Could not record event' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+    // ── End idempotency gate ────────────────────────────────────────────────
 
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -102,17 +130,6 @@ Deno.serve(async (req: Request) => {
         break;
     }
 
-    const rec = await recordStripeEventOrDuplicate(supabaseAdmin, event, event.data.object);
-    if (rec === 'failed') {
-      return new Response(JSON.stringify({ error: 'Could not record event' }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-    if (rec === 'duplicate') {
-      console.log('[stripe-webhook] duplicate event id (after handler)', event.id);
-    }
-
     return new Response(JSON.stringify({ received: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
@@ -124,7 +141,12 @@ Deno.serve(async (req: Request) => {
         ? 'stripe_webhook_signature_mismatch'
         : 'stripe_webhook_handler_error';
     console.error(`[stripe-webhook] ${hint}:`, message);
-    return new Response(JSON.stringify({ error: message }), {
+    // Return a generic error to avoid leaking internal details to callers.
+    const clientMessage =
+      hint === 'stripe_webhook_signature_mismatch'
+        ? 'Webhook signature verification failed'
+        : 'Webhook processing error';
+    return new Response(JSON.stringify({ error: clientMessage }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
     });
