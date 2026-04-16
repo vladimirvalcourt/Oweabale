@@ -12,6 +12,10 @@ type PlanConfig = {
   featureKey: string;
 };
 
+function isNoSuchCustomerError(error: unknown): boolean {
+  return error instanceof Error && error.message.includes('No such customer');
+}
+
 function getPlanConfig(planKey: string): PlanConfig | null {
   const monthly = Deno.env.get('STRIPE_PRICE_PRO_MONTHLY');
 
@@ -80,16 +84,21 @@ Deno.serve(async (req: Request) => {
       .eq('id', user.id)
       .maybeSingle();
 
-    let customerId = profile?.stripe_customer_id as string | null;
-    if (!customerId) {
+    const createAndPersistCustomer = async () => {
       const customer = await stripe.customers.create({
         email: user.email ?? (profile?.email as string | undefined),
         metadata: { user_id: user.id },
       });
-      customerId = customer.id;
+      const nextCustomerId = customer.id;
       await supabaseAdmin
         .from('profiles')
-        .upsert({ id: user.id, stripe_customer_id: customerId }, { onConflict: 'id' });
+        .upsert({ id: user.id, stripe_customer_id: nextCustomerId }, { onConflict: 'id' });
+      return nextCustomerId;
+    };
+
+    let customerId = profile?.stripe_customer_id as string | null;
+    if (!customerId) {
+      customerId = await createAndPersistCustomer();
     }
 
     const defaultOrigin =
@@ -99,25 +108,50 @@ Deno.serve(async (req: Request) => {
       `${defaultOrigin}/settings?tab=billing&billing=success`;
     const cancelUrl = body.cancelUrl ?? `${defaultOrigin}/pricing?billing=cancelled`;
 
-    const session = await stripe.checkout.sessions.create({
-      mode: plan.mode,
-      customer: customerId,
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      line_items: [{ price: plan.priceId, quantity: 1 }],
-      metadata: {
-        user_id: user.id,
-        plan_key: plan.planKey,
-        feature_key: plan.featureKey,
-      },
-      subscription_data: {
+    let session: Stripe.Checkout.Session;
+    try {
+      session = await stripe.checkout.sessions.create({
+        mode: plan.mode,
+        customer: customerId,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        line_items: [{ price: plan.priceId, quantity: 1 }],
         metadata: {
           user_id: user.id,
           plan_key: plan.planKey,
           feature_key: plan.featureKey,
         },
-      },
-    });
+        subscription_data: {
+          metadata: {
+            user_id: user.id,
+            plan_key: plan.planKey,
+            feature_key: plan.featureKey,
+          },
+        },
+      });
+    } catch (error) {
+      if (!isNoSuchCustomerError(error)) throw error;
+      customerId = await createAndPersistCustomer();
+      session = await stripe.checkout.sessions.create({
+        mode: plan.mode,
+        customer: customerId,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        line_items: [{ price: plan.priceId, quantity: 1 }],
+        metadata: {
+          user_id: user.id,
+          plan_key: plan.planKey,
+          feature_key: plan.featureKey,
+        },
+        subscription_data: {
+          metadata: {
+            user_id: user.id,
+            plan_key: plan.planKey,
+            feature_key: plan.featureKey,
+          },
+        },
+      });
+    }
 
     return new Response(
       JSON.stringify({
