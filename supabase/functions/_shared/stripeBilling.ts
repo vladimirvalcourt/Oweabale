@@ -88,6 +88,15 @@ export async function upsertSubscriptionAndEntitlement(
     console.error('[stripeBilling] entitlements insert', entErr);
     throw new Error(entErr.message);
   }
+
+  // Keep profiles.subscription_tier in sync so the frontend reads one column.
+  const { error: tierErr } = await supabaseAdmin
+    .from('profiles')
+    .update({ subscription_tier: isActive ? 'full_suite' : 'tracker' })
+    .eq('id', userId);
+  if (tierErr) {
+    console.error('[stripeBilling] profiles subscription_tier update', tierErr);
+  }
 }
 
 export async function upsertOneTimePaymentAndEntitlement(
@@ -142,5 +151,14 @@ export async function upsertOneTimePaymentAndEntitlement(
   if (entErr) {
     console.error('[stripeBilling] entitlements insert (one_time)', entErr);
     throw new Error(entErr.message);
+  }
+
+  // One-time purchase grants perpetual full_suite access.
+  const { error: tierErr } = await supabaseAdmin
+    .from('profiles')
+    .update({ subscription_tier: 'full_suite' })
+    .eq('id', userId);
+  if (tierErr) {
+    console.error('[stripeBilling] profiles subscription_tier update (one_time)', tierErr);
   }
 }

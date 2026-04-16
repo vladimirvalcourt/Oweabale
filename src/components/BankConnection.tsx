@@ -13,37 +13,14 @@ async function hasPaidPlaidAccess(): Promise<boolean> {
   } = await supabase.auth.getUser();
   if (!user?.id) return false;
 
-  const [profileRes, entitlementRes, subscriptionRes] = await Promise.all([
-    supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle(),
-    supabase
-      .from('entitlements')
-      .select('status, ends_at')
-      .eq('user_id', user.id)
-      .eq('feature_key', 'full_suite')
-      .order('updated_at', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    supabase
-      .from('billing_subscriptions')
-      .select('status')
-      .eq('user_id', user.id)
-      .order('updated_at', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ]);
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_admin, subscription_tier')
+    .eq('id', user.id)
+    .maybeSingle();
 
-  if (profileRes.data?.is_admin) return true;
-
-  const entitlement = entitlementRes.data;
-  const entitlementActive =
-    entitlement?.status === 'active' &&
-    (!entitlement.ends_at ||
-      Number.isNaN(new Date(entitlement.ends_at).getTime()) ||
-      new Date(entitlement.ends_at).getTime() >= Date.now());
-  const subStatus = subscriptionRes.data?.status;
-  const subscriptionActive = subStatus === 'active' || subStatus === 'trialing';
-
-  return entitlementActive || subscriptionActive;
+  if (profile?.is_admin === true) return true;
+  return profile?.subscription_tier === 'full_suite';
 }
 
 /** When Plaid UI is off, manual-first copy; still allow disconnect if a link exists from earlier testing. */
