@@ -432,7 +432,13 @@ export const useStore = create<AppState>()(
     await get().fetchData();
     if (!opts?.quiet) {
       if (r.errors > 0) {
-        toast.message(`Sync finished with ${r.errors} item error(s). Check bank status.`);
+        if (get().plaidNeedsRelink) {
+          const institution = get().plaidInstitutionName?.trim();
+          const bankLabel = institution && institution.length > 0 ? institution : 'your bank';
+          toast.error(`Sync found a bank login issue. Use Fix connection to reconnect ${bankLabel}.`);
+        } else {
+          toast.message(`Sync finished with ${r.errors} item error(s). Check bank status.`);
+        }
       } else {
         toast.success('Transactions synced.');
       }

@@ -2,6 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const insertMock = vi.fn();
 const getUserMock = vi.fn();
+const plaidDisconnectMock = vi.fn(async () => ({ ok: true }));
+const plaidSyncMock = vi.fn(async () => ({ added: 0, updated: 0, errors: 0 }));
+const toastErrorMock = vi.fn();
+const toastSuccessMock = vi.fn();
+const toastMessageMock = vi.fn();
 
 vi.mock('../lib/supabase', () => ({
   supabase: {
@@ -15,14 +20,28 @@ vi.mock('../lib/supabase', () => ({
 }));
 
 vi.mock('../lib/plaid', () => ({
-  disconnectPlaid: vi.fn(async () => ({ ok: true })),
-  syncPlaidTransactions: vi.fn(async () => ({ added: 0, updated: 0, errors: 0 })),
+  disconnectPlaid: plaidDisconnectMock,
+  syncPlaidTransactions: plaidSyncMock,
+}));
+
+vi.mock('sonner', () => ({
+  toast: {
+    error: toastErrorMock,
+    success: toastSuccessMock,
+    message: toastMessageMock,
+  },
 }));
 
 describe('useStore ingestion persistence', () => {
   beforeEach(() => {
     insertMock.mockReset();
     getUserMock.mockReset();
+    plaidDisconnectMock.mockClear();
+    plaidSyncMock.mockReset();
+    plaidSyncMock.mockResolvedValue({ added: 0, updated: 0, errors: 0 });
+    toastErrorMock.mockReset();
+    toastSuccessMock.mockReset();
+    toastMessageMock.mockReset();
   });
 
   it('persists pending ingestion with same generated id', async () => {
@@ -62,5 +81,35 @@ describe('useStore ingestion persistence', () => {
     );
 
     randomSpy.mockRestore();
+  });
+});
+
+describe('useStore plaid sync messaging', () => {
+  beforeEach(() => {
+    plaidSyncMock.mockReset();
+    toastErrorMock.mockReset();
+    toastSuccessMock.mockReset();
+    toastMessageMock.mockReset();
+  });
+
+  it('shows reconnect guidance when sync errors require relink', async () => {
+    plaidSyncMock.mockResolvedValue({ ok: true, processed: 0, errors: 1 });
+    const { useStore } = await import('./useStore');
+    useStore.setState({
+      plaidNeedsRelink: false,
+      plaidInstitutionName: 'Chase',
+      fetchData: vi.fn(async () => {
+        useStore.setState({ plaidNeedsRelink: true });
+        return true;
+      }),
+    });
+
+    const ok = await useStore.getState().syncPlaidTransactions();
+
+    expect(ok).toBe(true);
+    expect(toastErrorMock).toHaveBeenCalledWith(
+      'Sync found a bank login issue. Use Fix connection to reconnect Chase.',
+    );
+    expect(toastMessageMock).not.toHaveBeenCalled();
   });
 });
