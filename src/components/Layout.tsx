@@ -17,6 +17,7 @@ import QuickAddModal from './QuickAddModal';
 import { PrivacyScreenWhenHidden } from './PrivacyScreenWhenHidden';
 import { TactileIcon, MorphingMenuIcon } from './ui/TactileIcon';
 import type { Notification } from '../store/useStore';
+import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
 const NAV_ROUTE_HASHES: Record<string, string[]> = {
@@ -104,6 +105,7 @@ export default function Layout() {
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const { hasFullSuite, isLoading: checkingFullSuite } = useFullSuiteAccess();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -344,6 +346,17 @@ export default function Layout() {
     [dueSoonCount, pendingIngestions.length]
   );
 
+  const visibleNavGroups = useMemo(() => {
+    if (checkingFullSuite || hasFullSuite) return navGroups;
+    const freePaths = new Set(['/bills']);
+    return navGroups
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((item) => freePaths.has(item.path.split('?')[0])),
+      }))
+      .filter((group) => group.items.length > 0);
+  }, [checkingFullSuite, hasFullSuite, navGroups]);
+
   // Defer location values so active-state recalculation doesn't block the
   // click-to-paint frame. The sidebar briefly keeps the previous active item
   // highlighted (one frame), then updates — a fair trade for fast INP.
@@ -354,7 +367,7 @@ export default function Layout() {
   const processedSidebarNav = useMemo(() => {
     const currentTabParam = new URLSearchParams(deferredSearch).get('tab');
     const hashSlug = deferredHash.replace(/^#/, '');
-    return navGroups.map((group) => ({
+    return visibleNavGroups.map((group) => ({
       label: group.label,
       items: group.items.map((item) => {
         const queryPart = item.path.includes('?') ? item.path.split('?')[1] : '';
@@ -374,7 +387,7 @@ export default function Layout() {
         return { ...item, isActive, linkTo };
       }),
     }));
-  }, [navGroups, deferredPathname, deferredSearch, deferredHash]);
+  }, [visibleNavGroups, deferredPathname, deferredSearch, deferredHash]);
 
   return (
     <div className="min-h-[100dvh] bg-surface-base font-sans text-content-primary flex">

@@ -157,7 +157,7 @@ export default function Pricing() {
             {/* Card 1: Tracker (Free) */}
             <div className={`bg-surface-raised border border-surface-border rounded-sm p-10 flex flex-col transition-all duration-700 ease-out delay-[100ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
               <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Tracker</h3>
-              <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Core balances and bills without the full suite.</p>
+              <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Manual bills + settings access. Premium modules require Full Suite.</p>
               
               <div className="mb-10 p-6 bg-surface-base border border-surface-border rounded-sm">
                 <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">$0</span>
@@ -174,15 +174,15 @@ export default function Pricing() {
               <div className="flex flex-col gap-5 mt-auto">
                 <div className="flex items-start gap-3">
                   <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
-                  <span className="text-content-tertiary text-sm">3 basic accounts</span>
+                  <span className="text-content-tertiary text-sm">Bills workflow access</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
-                  <span className="text-content-tertiary text-sm">Manual bill entry</span>
+                  <span className="text-content-tertiary text-sm">Settings and account controls</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
-                  <span className="text-content-tertiary text-sm">Standard net worth chart</span>
+                  <span className="text-content-tertiary text-sm">No Plaid, no premium modules</span>
                 </div>
               </div>
             </div>
@@ -248,11 +248,11 @@ export default function Pricing() {
             </div>
 
             {[
-              ['Basic account tracking', 'Up to 3 accounts', 'Unlimited accounts'],
-              ['Bill workflow', 'Manual bill entry', 'Manual + synced workflows'],
-              ['Net worth view', 'Standard chart', 'Standard chart + advanced modules'],
+              ['App access', 'Bills + Settings only', 'All modules unlocked'],
+              ['Bank connection (Plaid)', 'Not included', 'Included'],
+              ['Transactions/analytics/reports', 'Not included', 'Included'],
               ['Debt payoff planner', 'Not included', 'Avalanche + snowball planner'],
-              ['Subscription protection', 'Not included', 'Price-change alerts'],
+              ['Owe-AI and advanced tools', 'Not included', 'Included'],
               ['Freelancer tax tools', 'Not included', 'Included'],
             ].map(([feature, freeTier, paidTier]) => (
               <div key={feature} className="grid grid-cols-3 text-sm border-b border-surface-border last:border-b-0">
@@ -289,7 +289,7 @@ export default function Pricing() {
               />
               <FaqItem 
                 question="Do I need to link my bank accounts?" 
-                answer="No. Tracker (Free) supports manual entry. Full Suite is designed for automated syncing and advanced workflows." 
+                answer="No. Free tier uses manual bills only. Plaid syncing and all advanced workflows are part of Full Suite." 
               />
             </div>
           </div>
