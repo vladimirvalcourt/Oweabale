@@ -110,7 +110,7 @@ function NotificationsPanelInner() {
       </CollapsibleModule>
 
       <CollapsibleModule title="Smart Alerts (Full Suite)" icon={BrainCircuit} defaultOpen={false}>
-        <p className="text-sm text-content-tertiary mb-6">Advanced notifications powered by our algorithms.</p>
+        <p className="text-sm text-content-tertiary mb-6">Optional premium alerts for subscriptions and debt progress.</p>
         {hasFullSuite || isAdmin ? (
           <div className="space-y-6">
             {[

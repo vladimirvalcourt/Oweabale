@@ -22,7 +22,7 @@ const tabs = [
   { id: 'security' as const, name: 'Security' },
   { id: 'notifications' as const, name: 'Notifications' },
   { id: 'financial' as const, name: 'Preferences' },
-  { id: 'rules' as const, name: 'Auto-Rules' },
+  { id: 'rules' as const, name: 'Smart Categories' },
   { id: 'billing' as const, name: 'Billing' },
   { id: 'integrations' as const, name: 'Integrations' },
   { id: 'privacy' as const, name: 'Data & Privacy' },

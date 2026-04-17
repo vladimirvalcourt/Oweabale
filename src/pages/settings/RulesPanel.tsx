@@ -22,7 +22,7 @@ function RulesPanelInner() {
   return (
     <div className="space-y-6">
       <CollapsibleModule
-        title="Categorization Rules"
+        title="Smart Categories"
         icon={Filter}
         extraHeader={
           <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">
@@ -33,7 +33,7 @@ function RulesPanelInner() {
         <div className="-mx-6 -my-6">
           <div className="p-6 border-b border-surface-border bg-surface-base">
             <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest mb-4">
-              New Rule — applied automatically when a transaction name matches
+              New Auto-Category — applied when a transaction name matches
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <select
@@ -93,7 +93,7 @@ function RulesPanelInner() {
           {categorizationRules.length === 0 ? (
             <div className="p-10 text-center">
               <Filter className="w-7 h-7 text-content-muted mx-auto mb-3" />
-              <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">No rules yet — add one above.</p>
+              <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">No auto-categories yet — add one above.</p>
               <p className="text-[10px] font-mono text-content-muted mt-2">Example: &quot;STARBUCKS&quot; → Coffee</p>
             </div>
           ) : (
@@ -126,7 +126,7 @@ function RulesPanelInner() {
         </div>
       </CollapsibleModule>
 
-      <CollapsibleModule title="Apply to Existing Transactions" icon={RefreshCw} defaultOpen={false}>
+      <CollapsibleModule title="Re-apply Smart Categories" icon={RefreshCw} defaultOpen={false}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <p className="text-sm text-content-tertiary leading-relaxed">
