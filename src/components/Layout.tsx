@@ -504,9 +504,6 @@ export default function Layout() {
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
                   <span className="text-[11px] font-sans text-content-secondary font-semibold">Synced — Plan controls active</span>
                 </div>
-                <p className="text-[11px] font-sans text-content-tertiary leading-relaxed italic opacity-90 pl-3.5 border-l border-surface-border">
-                  Tracker includes core workflows; upgrade to Full Suite for premium modules.
-                </p>
               </div>
             )}
             <button
