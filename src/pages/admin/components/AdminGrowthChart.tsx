@@ -52,7 +52,7 @@ export function AdminGrowthChart({ data }: Props) {
                 borderRadius: '4px',
                 fontSize: 11,
               }}
-              formatter={(v: number) => [v, 'Signups']}
+              formatter={(v: number | undefined) => [v ?? 0, 'Signups']}
             />
             <Bar dataKey="signups" fill="#34d399" radius={[2, 2, 0, 0]} />
           </BarChart>

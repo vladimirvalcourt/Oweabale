@@ -54,8 +54,8 @@ export function AdminRevenueChart({ data }: Props) {
                 borderRadius: '4px',
                 fontSize: 11,
               }}
-              formatter={(v: number) => [
-                `$${(v / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+              formatter={(v: number | undefined) => [
+                `$${((v ?? 0) / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
                 'Revenue',
               ]}
             />
