@@ -36,7 +36,7 @@ export async function hasPaidFullSuiteAccess(
 
   const entitlementActive =
     ent?.status === 'active' &&
-    (!ent.ends_at || Number.isNaN(new Date(ent.ends_at).getTime()) || new Date(ent.ends_at).getTime() >= Date.now());
+    (!ent.ends_at || new Date(ent.ends_at).getTime() >= Date.now());
   const subscriptionActive = sub?.status === 'active' || sub?.status === 'trialing';
 
   return entitlementActive || subscriptionActive;

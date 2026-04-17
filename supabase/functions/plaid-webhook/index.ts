@@ -151,7 +151,12 @@ Deno.serve(async (req: Request) => {
   ]);
 
   if (syncCodes.has(code)) {
-    await runSyncForItemId(supabaseAdmin, itemId);
+    // Respond 200 immediately — Plaid requires a fast acknowledgement.
+    // Run the sync in the background so a slow sync (30 pages) never causes
+    // Plaid to time out and re-deliver the same webhook.
+    void runSyncForItemId(supabaseAdmin, itemId).catch((e) =>
+      console.error('[plaid-webhook] sync error for item', itemId, e),
+    );
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },

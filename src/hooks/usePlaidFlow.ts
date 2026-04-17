@@ -110,6 +110,8 @@ export function usePlaidFlow({
       setLinkToken(null);
 
       if (metadata.status === 'requires_oauth') {
+        // Persist intent so the OAuth resume effect can use the right mode.
+        sessionStorage.setItem('plaid_oauth_intent', activeIntent);
         setStage('oauth_redirect');
         track('plaid_oauth_redirect', {});
         return;
@@ -128,7 +130,7 @@ export function usePlaidFlow({
 
       clearOauthQuery();
     },
-    [clearOauthQuery, stage],
+    [activeIntent, clearOauthQuery, stage],
   );
 
   const { open, ready } = usePlaidLink({
@@ -187,8 +189,10 @@ export function usePlaidFlow({
   useEffect(() => {
     if (!hasOauthState || oauthResumeAttemptedRef.current || stage !== 'idle') return;
     oauthResumeAttemptedRef.current = true;
-    track('plaid_oauth_resume', {});
-    void startFlow('create');
+    const savedIntent = (sessionStorage.getItem('plaid_oauth_intent') as PlaidFlowIntent) ?? 'create';
+    sessionStorage.removeItem('plaid_oauth_intent');
+    track('plaid_oauth_resume', { intent: savedIntent });
+    void startFlow(savedIntent);
   }, [hasOauthState, stage, startFlow]);
 
   const startConnect = useCallback(async () => startFlow('create'), [startFlow]);

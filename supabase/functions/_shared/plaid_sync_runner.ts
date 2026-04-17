@@ -206,6 +206,7 @@ export async function runSyncStaleItems(
   const { data: rows, error } = await supabase
     .from('plaid_items')
     .select('id, user_id, item_id, access_token, transactions_cursor')
+    .eq('item_login_required', false)
     .or(`last_sync_at.is.null,last_sync_at.lt."${cutoff}"`)
     .order('last_sync_at', { ascending: true, nullsFirst: true })
     .limit(opts.maxItems);
