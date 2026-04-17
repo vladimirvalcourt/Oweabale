@@ -408,6 +408,13 @@ verify_jwt = false
 [functions.owe-ai]
 verify_jwt = false
 
+# Web Push: validate JWT inside function.
+[functions.push-subscribe]
+verify_jwt = false
+
+[functions.send-web-push]
+verify_jwt = false
+
 [experimental]
 # Configures Postgres storage engine to use OrioleDB (S3)
 orioledb_version = ""

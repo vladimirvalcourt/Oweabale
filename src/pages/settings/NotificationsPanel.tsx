@@ -1,10 +1,18 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { Mail, BellRing, BrainCircuit } from 'lucide-react';
+import { Mail, BellRing, BrainCircuit, Loader2 } from 'lucide-react';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { NOTIF_PREFS_STORAGE_KEY, type NotifPrefKey, loadNotifPrefs } from './constants';
 import { useFullSuiteAccess } from '../../hooks/useFullSuiteAccess';
 import { FullSuiteGateCard } from '../../components/FullSuiteGate';
+import {
+  getVapidPublicKey,
+  hasActivePushSubscription,
+  isWebPushSupported,
+  sendTestWebPush,
+  subscribeWebPush,
+  unsubscribeWebPush,
+} from '../../lib/webPush';
 
 function deferToast(fn: () => void) {
   requestAnimationFrame(() => {
@@ -16,6 +24,24 @@ function NotificationsPanelInner() {
   const [notifPrefs, setNotifPrefs] = useState(loadNotifPrefs);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { hasFullSuite, isAdmin } = useFullSuiteAccess();
+  const [webPushReady, setWebPushReady] = useState<boolean | null>(null);
+  const [webPushBusy, setWebPushBusy] = useState(false);
+  const [vapidConfigured, setVapidConfigured] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const vapid = getVapidPublicKey();
+      if (cancelled) return;
+      setVapidConfigured(Boolean(vapid));
+      const supported = isWebPushSupported() && Boolean(vapid);
+      const active = supported ? await hasActivePushSubscription() : false;
+      if (!cancelled) setWebPushReady(supported && active);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -80,7 +106,91 @@ function NotificationsPanelInner() {
       </CollapsibleModule>
 
       <CollapsibleModule title="Push Notifications" icon={BellRing} defaultOpen={false}>
-        <p className="text-sm text-content-tertiary mb-6">Manage notifications delivered directly to your device.</p>
+        <p className="text-sm text-content-tertiary mb-6">
+          Browser push for this device. When you enable due-date and payment alerts below, we&apos;ll use this subscription to deliver
+          them once server scheduling is wired.
+        </p>
+
+        {!isWebPushSupported() && (
+          <p className="text-xs text-content-muted mb-4">Your browser does not support web push.</p>
+        )}
+        {isWebPushSupported() && !vapidConfigured && (
+          <p className="text-xs text-amber-500/90 mb-4">
+            Web push is not configured yet (add <span className="font-mono">VITE_VAPID_PUBLIC_KEY</span>).
+          </p>
+        )}
+
+        {isWebPushSupported() && vapidConfigured && (
+          <div className="mb-6 rounded-sm border border-surface-border bg-surface-base p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <p className="text-sm font-medium text-content-primary">This browser</p>
+              <p className="text-xs text-content-muted mt-0.5">
+                {webPushReady === null ? 'Checking…' : webPushReady ? 'Push enabled for this device.' : 'Push not enabled yet.'}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {!webPushReady && (
+                <button
+                  type="button"
+                  disabled={webPushBusy}
+                  onClick={async () => {
+                    setWebPushBusy(true);
+                    const r = await subscribeWebPush();
+                    setWebPushBusy(false);
+                    if ('error' in r) {
+                      toast.error(r.error);
+                      return;
+                    }
+                    setWebPushReady(true);
+                    toast.success('Browser notifications enabled');
+                  }}
+                  className="inline-flex items-center gap-2 rounded-sm bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
+                >
+                  {webPushBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                  Enable web push
+                </button>
+              )}
+              {webPushReady && (
+                <>
+                  <button
+                    type="button"
+                    disabled={webPushBusy}
+                    onClick={async () => {
+                      setWebPushBusy(true);
+                      const r = await sendTestWebPush();
+                      setWebPushBusy(false);
+                      if ('error' in r) toast.error(r.error);
+                      else toast.success('Test push sent');
+                    }}
+                    className="inline-flex items-center gap-2 rounded-sm border border-surface-border bg-surface-elevated px-4 py-2 text-xs font-medium text-content-secondary hover:text-content-primary disabled:opacity-60"
+                  >
+                    {webPushBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                    Send test
+                  </button>
+                  <button
+                    type="button"
+                    disabled={webPushBusy}
+                    onClick={async () => {
+                      setWebPushBusy(true);
+                      const r = await unsubscribeWebPush();
+                      setWebPushBusy(false);
+                      if ('error' in r) {
+                        toast.error(r.error);
+                        return;
+                      }
+                      setWebPushReady(false);
+                      toast.success('Browser push disabled on this device');
+                    }}
+                    className="inline-flex items-center gap-2 rounded-sm border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-xs font-medium text-rose-300 hover:bg-rose-500/20 disabled:opacity-60"
+                  >
+                    Turn off
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="space-y-6">
           {[
             { id: 'push-reminders' as const, label: 'Due Date Alerts', desc: 'Immediate alerts on the day a bill is due.' },
