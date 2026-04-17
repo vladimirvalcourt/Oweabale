@@ -164,6 +164,13 @@ export async function runSyncForPlaidItem(
   } catch (e) {
     const err = e as Error & { plaidCode?: string };
     const code = err.plaidCode ?? '';
+
+    // Plaid hasn't finished loading transaction history yet — not a real error.
+    // Webhooks (INITIAL_UPDATE / HISTORICAL_UPDATE) will trigger sync once ready.
+    if (code === 'PRODUCT_NOT_READY') {
+      return { ok: true };
+    }
+
     const loginRequired =
       code === 'ITEM_LOGIN_REQUIRED' ||
       code === 'PENDING_EXPIRATION' ||
