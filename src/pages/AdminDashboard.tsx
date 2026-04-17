@@ -12,6 +12,7 @@ import { AdminSupportPanel } from './admin/components/AdminSupportPanel';
 import { AdminReliabilityPanel } from './admin/components/AdminReliabilityPanel';
 import { AdminBillingPanel } from './admin/components/AdminBillingPanel';
 import { AdminPlaidDrilldown } from './admin/components/AdminPlaidDrilldown';
+import { AdminUserModal } from './admin/components/AdminUserModal';
 import type {
   AdminAuditEntry,
   BillingStats,
@@ -41,6 +42,8 @@ export default function AdminDashboard() {
   const [openTickets, setOpenTickets] = useState<SupportTicket[]>([]);
   const [ticketsLoading, setTicketsLoading] = useState(false);
   const [resolvingTicketId, setResolvingTicketId] = useState<string | null>(null);
+
+  const [viewingUserId, setViewingUserId] = useState<string | null>(null);
 
   const [plaidStats, setPlaidStats] = useState<PlaidHealthStats | null>(null);
   const [plaidItems, setPlaidItems] = useState<PlaidItemRow[]>([]);
@@ -234,6 +237,32 @@ export default function AdminDashboard() {
     void loadAll();
   };
 
+  const handleGrantRevoke = async (action: 'grant' | 'revoke', userId: string) => {
+    const adminAction = action === 'grant' ? 'grant_entitlement' : 'revoke_entitlement';
+    toast.loading(action === 'grant' ? 'Granting Full Suite…' : 'Revoking Full Suite…', { id: 'grant-revoke' });
+    const { data, error } = await invokeAdminActions({ action: adminAction, targetUserId: userId });
+    if (error) {
+      toast.error(`Failed: ${error.message}`, { id: 'grant-revoke' });
+      return;
+    }
+    toast.success(typeof data?.message === 'string' ? data.message : 'Done.', { id: 'grant-revoke' });
+    void loadAll();
+  };
+
+  const handleBulkAction = async (
+    action: 'ban' | 'unban' | 'grant_entitlement' | 'revoke_entitlement',
+    userIds: string[],
+  ) => {
+    toast.loading(`Applying bulk ${action} to ${userIds.length} user(s)…`, { id: 'bulk-action' });
+    const { data, error } = await invokeAdminActions({ action: 'bulk_action', bulkAction: action, targetUserIds: userIds });
+    if (error) {
+      toast.error(`Bulk action failed: ${error.message}`, { id: 'bulk-action' });
+      return;
+    }
+    toast.success(typeof data?.message === 'string' ? data.message : 'Bulk action completed.', { id: 'bulk-action' });
+    void loadAll();
+  };
+
   const resolveTicket = async (ticketId: string) => {
     setResolvingTicketId(ticketId);
     const { error } = await supabase
@@ -329,6 +358,9 @@ export default function AdminDashboard() {
             onPromoteAdmin={(userId) => void handlePromoteAdmin(userId)}
             onDemoteAdmin={(userId) => void handleDemoteAdmin(userId)}
             onAdminAction={(action, userId) => void handleAdminAction(action, userId)}
+            onViewUser={setViewingUserId}
+            onGrantRevoke={(action, userId) => void handleGrantRevoke(action, userId)}
+            onBulkAction={(action, userIds) => void handleBulkAction(action, userIds)}
           />
 
           <div className="space-y-6">
@@ -356,6 +388,13 @@ export default function AdminDashboard() {
 
         <AdminPlaidDrilldown items={plaidItems} />
       </div>
+
+      <AdminUserModal
+        userId={viewingUserId}
+        onClose={() => setViewingUserId(null)}
+        invokeAdminActions={invokeAdminActions}
+        primaryAdminEmail={PRIMARY_ADMIN_EMAIL}
+      />
     </div>
   );
 }

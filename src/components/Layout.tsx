@@ -511,14 +511,6 @@ export default function Layout() {
         {/* Collapse button (Desktop only) */}
         <div className="p-4 border-t border-surface-border bg-surface-base">
           <div className={cn("mb-4", sidebarCollapsed ? "px-0" : "px-2")}>
-            {!sidebarCollapsed && (
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                  <span className="text-[11px] font-sans text-content-secondary font-semibold">Synced — Plan controls active</span>
-                </div>
-              </div>
-            )}
             <button
               type="button"
               onClick={() => startTransition(() => setSidebarCollapsed((c) => !c))}
@@ -530,7 +522,7 @@ export default function Layout() {
               <div className="w-5 h-5 flex items-center justify-center shrink-0">
                 <MorphingMenuIcon isOpen={!sidebarCollapsed} className="scale-75 text-content-tertiary group-hover:text-content-primary transition-colors" />
               </div>
-              {!sidebarCollapsed && <span>Enforce Collapse</span>}
+              {!sidebarCollapsed && <span>Collapse</span>}
             </button>
 
             <button

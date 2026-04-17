@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Search, Users } from 'lucide-react';
 import type { ProfileRow, UserSubscription } from './types';
 
@@ -13,6 +14,9 @@ type Props = {
   onPromoteAdmin: (userId: string) => void;
   onDemoteAdmin: (userId: string) => void;
   onAdminAction: (action: 'ban' | 'unban' | 'delete', userId: string) => void;
+  onViewUser: (userId: string) => void;
+  onGrantRevoke: (action: 'grant' | 'revoke', userId: string) => void;
+  onBulkAction: (action: 'ban' | 'unban' | 'grant_entitlement' | 'revoke_entitlement', userIds: string[]) => void;
 };
 
 const PLAN_STYLES: Record<string, string> = {
@@ -35,7 +39,29 @@ export function AdminUsersPanel({
   onPromoteAdmin,
   onDemoteAdmin,
   onAdminAction,
+  onViewUser,
+  onGrantRevoke,
+  onBulkAction,
 }: Props) {
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const toggleOne = (id: string) => {
+    setSelected(prev => {
+      const n = new Set(prev);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    });
+  };
+
+  const allChecked = users.length > 0 && users.every(u => selected.has(u.id));
+  const toggleAll = () => {
+    if (allChecked) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(users.map(u => u.id)));
+    }
+  };
+
   return (
     <div className="lg:col-span-2 border border-surface-border rounded-sm bg-surface-raised p-5">
       <div className="flex items-center justify-between mb-4">
@@ -54,10 +80,59 @@ export function AdminUsersPanel({
         </div>
       </div>
 
+      {selected.size > 0 && (
+        <div className="flex items-center gap-2 mb-3 p-2 rounded-sm bg-surface-elevated border border-surface-border">
+          <span className="text-xs text-content-tertiary">{selected.size} selected</span>
+          <button
+            type="button"
+            onClick={() => onBulkAction('ban', [...selected])}
+            className="px-2 py-1 rounded-sm text-xs bg-rose-500/15 text-rose-300 hover:bg-rose-500/25"
+          >
+            Ban
+          </button>
+          <button
+            type="button"
+            onClick={() => onBulkAction('unban', [...selected])}
+            className="px-2 py-1 rounded-sm text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+          >
+            Unban
+          </button>
+          <button
+            type="button"
+            onClick={() => onBulkAction('grant_entitlement', [...selected])}
+            className="px-2 py-1 rounded-sm text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+          >
+            Grant Suite
+          </button>
+          <button
+            type="button"
+            onClick={() => onBulkAction('revoke_entitlement', [...selected])}
+            className="px-2 py-1 rounded-sm text-xs bg-amber-500/15 text-amber-300 hover:bg-amber-500/25"
+          >
+            Revoke Suite
+          </button>
+          <button
+            type="button"
+            onClick={() => setSelected(new Set())}
+            className="ml-auto px-2 py-1 rounded-sm text-xs bg-surface-base text-content-tertiary hover:text-content-secondary"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
             <tr className="text-content-tertiary border-b border-surface-border">
+              <th className="py-2 pr-2 w-6">
+                <input
+                  type="checkbox"
+                  checked={allChecked}
+                  onChange={toggleAll}
+                  className="accent-indigo-400"
+                />
+              </th>
               <th className="py-2 text-left">Account</th>
               <th className="py-2 text-left">Plan</th>
               <th className="py-2 text-left">Joined</th>
@@ -71,6 +146,12 @@ export function AdminUsersPanel({
               const enriched = getEnrichedProfile(user);
               const sub = subMap[user.id];
               const isPrimary = (user.email?.trim().toLowerCase() ?? '') === primaryAdminEmail;
+
+              const hasFullSuite =
+                sub?.plan === 'Pro' ||
+                sub?.plan === 'Lifetime' ||
+                sub?.status === 'active' ||
+                sub?.status === 'trialing';
 
               let planBadge: React.ReactNode = null;
               if (sub) {
@@ -87,6 +168,14 @@ export function AdminUsersPanel({
 
               return (
                 <tr key={user.id} className="border-b border-surface-border/60">
+                  <td className="py-2 pr-2">
+                    <input
+                      type="checkbox"
+                      checked={selected.has(user.id)}
+                      onChange={() => toggleOne(user.id)}
+                      className="accent-indigo-400"
+                    />
+                  </td>
                   <td className="py-2 pr-2">
                     <span className={user.is_admin ? 'text-indigo-400 font-bold' : ''}>
                       {user.email || user.id.slice(0, 12)}
@@ -106,6 +195,13 @@ export function AdminUsersPanel({
                     )}
                   </td>
                   <td className="py-2 text-right space-x-1">
+                    <button
+                      type="button"
+                      onClick={() => onViewUser(user.id)}
+                      className="px-2 py-1 rounded-sm text-[11px] bg-surface-elevated text-content-secondary hover:text-content-primary"
+                    >
+                      View
+                    </button>
                     {user.is_admin ? (
                       <button
                         type="button"
@@ -122,6 +218,24 @@ export function AdminUsersPanel({
                         className="px-2 py-1 rounded-sm text-[11px] bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"
                       >
                         Promote
+                      </button>
+                    )}
+                    {hasFullSuite ? (
+                      <button
+                        type="button"
+                        onClick={() => onGrantRevoke('revoke', user.id)}
+                        disabled={isPrimary}
+                        className="px-2 py-1 rounded-sm text-[11px] bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 disabled:opacity-40"
+                      >
+                        Revoke Suite
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onGrantRevoke('grant', user.id)}
+                        className="px-2 py-1 rounded-sm text-[11px] bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+                      >
+                        Grant Suite
                       </button>
                     )}
                     {user.is_banned ? (
@@ -156,7 +270,7 @@ export function AdminUsersPanel({
             })}
             {users.length === 0 && (
               <tr>
-                <td colSpan={6} className="py-6 text-center text-content-muted">
+                <td colSpan={7} className="py-6 text-center text-content-muted">
                   No users found.
                 </td>
               </tr>

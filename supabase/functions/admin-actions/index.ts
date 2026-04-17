@@ -1,6 +1,20 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
+async function stripePost(path: string, body: Record<string, string>): Promise<Record<string, unknown>> {
+  const key = Deno.env.get('STRIPE_SECRET_KEY')
+  if (!key) throw new Error('Missing STRIPE_SECRET_KEY')
+  const params = new URLSearchParams(body)
+  const res = await fetch(`https://api.stripe.com/v1${path}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: params.toString(),
+  })
+  const json = await res.json() as Record<string, unknown>
+  if (!res.ok) throw new Error((json.error as any)?.message ?? `Stripe error ${res.status}`)
+  return json
+}
+
 async function logAdminAction(
   supabaseAdmin: ReturnType<typeof createClient>,
   adminUserId: string,
@@ -95,6 +109,8 @@ Deno.serve(async (req: Request) => {
       'list', 'health', 'audit_feed', 'billing_stats', 'billing_by_user',
       'plaid_items_list', 'set_admin', 'promote_admin', 'plaid_stats',
       'ban', 'unban', 'delete',
+      'grant_entitlement', 'revoke_entitlement', 'user_detail', 'impersonate', 'bulk_action',
+      'revenue_chart', 'growth_chart', 'churn_stats', 'webhook_list', 'apply_coupon', 'extend_trial', 'set_feature_flag',
     ]);
     const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -373,6 +389,342 @@ Deno.serve(async (req: Request) => {
       )
     }
 
+    if (action === 'user_detail') {
+      if (!targetUserId || typeof targetUserId !== 'string') throw new Error('Missing targetUserId')
+      const [
+        { data: userProfile },
+        { data: entitlements },
+        { data: subscriptions },
+        { data: payments },
+        { data: plaidItems },
+        { data: tickets },
+      ] = await Promise.all([
+        supabaseAdmin
+          .from('profiles')
+          .select('id, email, is_admin, is_banned, has_completed_onboarding, created_at')
+          .eq('id', targetUserId)
+          .maybeSingle(),
+        supabaseAdmin
+          .from('entitlements')
+          .select('id, feature_key, status, source, starts_at, ends_at')
+          .eq('user_id', targetUserId),
+        supabaseAdmin
+          .from('billing_subscriptions')
+          .select('id, status, current_period_start, current_period_end, stripe_subscription_id, cancel_at_period_end, created_at')
+          .eq('user_id', targetUserId)
+          .order('created_at', { ascending: false })
+          .limit(5),
+        supabaseAdmin
+          .from('billing_payments')
+          .select('id, amount_total, currency, status, product_key, created_at')
+          .eq('user_id', targetUserId)
+          .order('created_at', { ascending: false })
+          .limit(10),
+        supabaseAdmin
+          .from('plaid_items')
+          .select('institution_name, last_sync_at, last_sync_error, item_login_required')
+          .eq('user_id', targetUserId),
+        supabaseAdmin
+          .from('support_tickets')
+          .select('id, ticket_number, subject, status, priority, created_at')
+          .eq('user_id', targetUserId)
+          .order('created_at', { ascending: false })
+          .limit(10),
+      ])
+      return new Response(
+        JSON.stringify({
+          user_detail: {
+            profile: userProfile,
+            entitlements: entitlements ?? [],
+            subscriptions: subscriptions ?? [],
+            payments: payments ?? [],
+            plaid_items: plaidItems ?? [],
+            tickets: tickets ?? [],
+          },
+        }),
+        { headers: jsonHeaders },
+      )
+    }
+
+    if (action === 'bulk_action') {
+      const { targetUserIds, bulkAction } = body as { targetUserIds?: unknown; bulkAction?: unknown }
+      if (!Array.isArray(targetUserIds) || targetUserIds.length === 0) {
+        throw new Error('targetUserIds must be a non-empty array')
+      }
+      if (targetUserIds.length > 50) {
+        throw new Error('targetUserIds cannot exceed 50 entries')
+      }
+      for (const id of targetUserIds) {
+        if (typeof id !== 'string' || !UUID_RE.test(id)) {
+          throw new Error(`Invalid UUID in targetUserIds: ${id}`)
+        }
+        if (id === user.id) {
+          throw new Error('Cannot target your own account in a bulk action')
+        }
+      }
+      const validBulkActions = new Set(['ban', 'unban', 'grant_entitlement', 'revoke_entitlement'])
+      if (typeof bulkAction !== 'string' || !validBulkActions.has(bulkAction)) {
+        throw new Error('bulkAction must be one of: ban, unban, grant_entitlement, revoke_entitlement')
+      }
+      await enforceRateLimit(supabaseAdmin, user.id, 'bulk_action')
+      const now = new Date().toISOString()
+      await Promise.all(
+        targetUserIds.map(async (uid: string) => {
+          if (bulkAction === 'ban') {
+            const { error } = await supabaseAdmin.auth.admin.updateUserById(uid, { ban_duration: '876000h' })
+            if (error) throw error
+            await supabaseAdmin.from('profiles').update({ is_banned: true }).eq('id', uid)
+          } else if (bulkAction === 'unban') {
+            const { error } = await supabaseAdmin.auth.admin.updateUserById(uid, { ban_duration: 'none' })
+            if (error) throw error
+            await supabaseAdmin.from('profiles').update({ is_banned: false }).eq('id', uid)
+          } else if (bulkAction === 'grant_entitlement') {
+            const { error } = await supabaseAdmin
+              .from('entitlements')
+              .upsert(
+                { user_id: uid, feature_key: 'full_suite', source: 'admin', status: 'active', ends_at: null, updated_at: now },
+                { onConflict: 'user_id,feature_key' },
+              )
+            if (error) throw error
+          } else if (bulkAction === 'revoke_entitlement') {
+            const { error } = await supabaseAdmin
+              .from('entitlements')
+              .update({ status: 'revoked', updated_at: now })
+              .eq('user_id', uid)
+              .eq('feature_key', 'full_suite')
+            if (error) throw error
+          }
+        })
+      )
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'bulk_action', {
+        bulkAction,
+        count: targetUserIds.length,
+      })
+      return new Response(
+        JSON.stringify({ message: 'Bulk action completed.', count: targetUserIds.length }),
+        { headers: jsonHeaders },
+      )
+    }
+
+    if (action === 'revenue_chart') {
+      const twelveMonthsAgo = new Date(Date.now() - 365 * 24 * 3600 * 1000).toISOString()
+      const { data: payments, error } = await supabaseAdmin
+        .from('billing_payments')
+        .select('id, amount_total, created_at')
+        .eq('status', 'paid')
+        .gte('created_at', twelveMonthsAgo)
+        .order('created_at', { ascending: true })
+      if (error) throw error
+
+      const totals: Record<string, number> = {}
+      for (const p of payments ?? []) {
+        const key = (p.created_at as string).slice(0, 7)
+        totals[key] = (totals[key] ?? 0) + (p.amount_total ?? 0)
+      }
+
+      const now = new Date()
+      const months: { month: string; revenue_cents: number }[] = []
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - i, 1))
+        const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`
+        months.push({ month: key, revenue_cents: totals[key] ?? 0 })
+      }
+
+      return new Response(JSON.stringify({ revenue_chart: months }), { headers: jsonHeaders })
+    }
+
+    if (action === 'growth_chart') {
+      const twelveWeeksAgo = new Date(Date.now() - 84 * 24 * 3600 * 1000).toISOString()
+      const { data: signups, error } = await supabaseAdmin
+        .from('profiles')
+        .select('created_at')
+        .gte('created_at', twelveWeeksAgo)
+        .order('created_at', { ascending: true })
+      if (error) throw error
+
+      function getWeekKey(date: Date): string {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
+        const dayNum = d.getUTCDay() || 7
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum)
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
+        const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7)
+        return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`
+      }
+
+      const totals: Record<string, number> = {}
+      for (const s of signups ?? []) {
+        const key = getWeekKey(new Date(s.created_at as string))
+        totals[key] = (totals[key] ?? 0) + 1
+      }
+
+      const now = new Date()
+      const weeks: { week: string; signups: number }[] = []
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - i * 7))
+        const key = getWeekKey(d)
+        weeks.push({ week: key, signups: totals[key] ?? 0 })
+      }
+
+      return new Response(JSON.stringify({ growth_chart: weeks }), { headers: jsonHeaders })
+    }
+
+    if (action === 'churn_stats') {
+      const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString()
+      const [
+        { data: canceledRows, count: totalCanceled },
+        { count: totalActive },
+        { count: canceled30d },
+      ] = await Promise.all([
+        supabaseAdmin
+          .from('billing_subscriptions')
+          .select('id, user_id, canceled_at, created_at', { count: 'exact' })
+          .eq('status', 'canceled')
+          .order('created_at', { ascending: false })
+          .limit(10),
+        supabaseAdmin
+          .from('billing_subscriptions')
+          .select('id', { count: 'exact', head: true })
+          .in('status', ['active', 'trialing']),
+        supabaseAdmin
+          .from('billing_subscriptions')
+          .select('id', { count: 'exact', head: true })
+          .eq('status', 'canceled')
+          .gte('created_at', thirtyDaysAgo),
+      ])
+
+      const userIds = [...new Set((canceledRows ?? []).map((r: { user_id: string }) => r.user_id))]
+      const { data: emailProfiles } = await supabaseAdmin
+        .from('profiles')
+        .select('id, email')
+        .in('id', userIds)
+      const emailMap = Object.fromEntries((emailProfiles ?? []).map((p: { id: string; email: string }) => [p.id, p.email]))
+
+      const recentChurns = (canceledRows ?? []).map((r: { user_id: string; canceled_at: string | null }) => ({
+        email: (emailMap[r.user_id] as string) ?? r.user_id,
+        canceled_at: r.canceled_at,
+      }))
+
+      const tc = totalCanceled ?? 0
+      const ta = totalActive ?? 0
+      const churn_rate = tc + ta > 0 ? Math.round((tc / (tc + ta)) * 100) / 100 : 0
+
+      return new Response(
+        JSON.stringify({
+          churn_stats: {
+            total_canceled: tc,
+            active_subscriptions: ta,
+            canceled_30d: canceled30d ?? 0,
+            churn_rate,
+            recent_churns: recentChurns,
+          },
+        }),
+        { headers: jsonHeaders },
+      )
+    }
+
+    if (action === 'webhook_list') {
+      const { data, error } = await supabaseAdmin
+        .from('stripe_events')
+        .select('id, stripe_event_id, event_type, processed_at')
+        .order('processed_at', { ascending: false })
+        .limit(50)
+      if (error) throw error
+      return new Response(JSON.stringify({ webhooks: data ?? [] }), { headers: jsonHeaders })
+    }
+
+    if (action === 'apply_coupon') {
+      if (!targetUserId || typeof targetUserId !== 'string') throw new Error('Missing targetUserId')
+      const coupon_id = (body as { coupon_id?: unknown }).coupon_id
+      if (typeof coupon_id !== 'string' || !coupon_id.trim()) throw new Error('coupon_id is required')
+      const { data: subRow } = await supabaseAdmin
+        .from('billing_subscriptions')
+        .select('stripe_customer_id')
+        .eq('user_id', targetUserId)
+        .neq('status', 'canceled')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (!subRow?.stripe_customer_id) throw new Error('No active subscription found for user')
+      await enforceRateLimit(supabaseAdmin, user.id, 'apply_coupon')
+      await stripePost(`/customers/${subRow.stripe_customer_id}`, { coupon: coupon_id })
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'apply_coupon', { targetUserId, coupon_id })
+      return new Response(JSON.stringify({ message: 'Coupon applied.' }), { headers: jsonHeaders })
+    }
+
+    if (action === 'extend_trial') {
+      if (!targetUserId || typeof targetUserId !== 'string') throw new Error('Missing targetUserId')
+      const trial_end = (body as { trial_end?: unknown }).trial_end
+      if (typeof trial_end !== 'string' || !trial_end.trim()) throw new Error('trial_end is required')
+      if (trial_end !== 'now' && !(Number(trial_end) > Date.now() / 1000)) {
+        throw new Error('trial_end must be "now" or a future Unix timestamp')
+      }
+      const { data: subRow } = await supabaseAdmin
+        .from('billing_subscriptions')
+        .select('stripe_subscription_id')
+        .eq('user_id', targetUserId)
+        .in('status', ['active', 'trialing'])
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      if (!subRow?.stripe_subscription_id) throw new Error('No active subscription found for user')
+      await enforceRateLimit(supabaseAdmin, user.id, 'extend_trial')
+      await stripePost(`/subscriptions/${subRow.stripe_subscription_id}`, { trial_end })
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'extend_trial', { targetUserId, trial_end })
+      return new Response(JSON.stringify({ message: 'Trial extended.' }), { headers: jsonHeaders })
+    }
+
+    if (action === 'set_feature_flag') {
+      const { flagScope, flagKey, flagValue, targetUserId: flagTargetUserId } = body as {
+        flagScope?: unknown
+        flagKey?: unknown
+        flagValue?: unknown
+        targetUserId?: unknown
+      }
+      if (flagScope !== 'global' && flagScope !== 'user') throw new Error('flagScope must be "global" or "user"')
+      if (typeof flagKey !== 'string' || !flagKey.trim()) throw new Error('flagKey is required')
+      if (typeof flagValue !== 'boolean') throw new Error('flagValue must be a boolean')
+      await enforceRateLimit(supabaseAdmin, user.id, 'set_feature_flag')
+      if (flagScope === 'global') {
+        const { data: settingsRow } = await supabaseAdmin
+          .from('platform_settings')
+          .select('feature_flags')
+          .limit(1)
+          .maybeSingle()
+        const current = (settingsRow?.feature_flags as Record<string, unknown>) ?? {}
+        const updated = { ...current, [flagKey as string]: flagValue }
+        const { error } = await supabaseAdmin
+          .from('platform_settings')
+          .update({ feature_flags: updated })
+          .limit(1)
+        if (error) throw error
+      } else {
+        if (typeof flagTargetUserId !== 'string' || !UUID_RE.test(flagTargetUserId as string)) {
+          throw new Error('targetUserId is required for scope="user"')
+        }
+        const now = new Date().toISOString()
+        const { error } = await supabaseAdmin
+          .from('entitlements')
+          .upsert(
+            {
+              user_id: flagTargetUserId,
+              feature_key: flagKey,
+              source: 'admin',
+              status: flagValue ? 'active' : 'revoked',
+              updated_at: now,
+            },
+            { onConflict: 'user_id,feature_key' },
+          )
+        if (error) throw error
+      }
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'set_feature_flag', {
+        flagScope,
+        flagKey,
+        flagValue,
+        targetUserId: typeof flagTargetUserId === 'string' ? flagTargetUserId : null,
+      })
+      return new Response(JSON.stringify({ message: 'Feature flag updated.' }), { headers: jsonHeaders })
+    }
+
     // All other actions require a targetUserId
     if (!targetUserId) throw new Error('Missing targetUserId')
     if (targetUserId === user.id) throw new Error('Cannot perform this action on your own account')
@@ -411,6 +763,46 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ message: 'User permanently deleted.' }), {
         headers: jsonHeaders,
       })
+    }
+
+    if (action === 'grant_entitlement') {
+      const endsAt = (body as { ends_at?: unknown }).ends_at ?? null
+      const now = new Date().toISOString()
+      await enforceRateLimit(supabaseAdmin, user.id, 'grant_entitlement')
+      const { error } = await supabaseAdmin
+        .from('entitlements')
+        .upsert(
+          { user_id: targetUserId, feature_key: 'full_suite', source: 'admin', status: 'active', ends_at: endsAt, updated_at: now },
+          { onConflict: 'user_id,feature_key' },
+        )
+      if (error) throw error
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'grant_entitlement', { targetUserId })
+      return new Response(JSON.stringify({ message: 'Full Suite granted.' }), { headers: jsonHeaders })
+    }
+
+    if (action === 'revoke_entitlement') {
+      const now = new Date().toISOString()
+      await enforceRateLimit(supabaseAdmin, user.id, 'revoke_entitlement')
+      const { error } = await supabaseAdmin
+        .from('entitlements')
+        .update({ status: 'revoked', updated_at: now })
+        .eq('user_id', targetUserId)
+        .eq('feature_key', 'full_suite')
+      if (error) throw error
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'revoke_entitlement', { targetUserId })
+      return new Response(JSON.stringify({ message: 'Full Suite revoked.' }), { headers: jsonHeaders })
+    }
+
+    if (action === 'impersonate') {
+      await enforceRateLimit(supabaseAdmin, user.id, 'impersonate')
+      const { data: targetUser, error: getUserError } = await supabaseAdmin.auth.admin.getUserById(targetUserId)
+      if (getUserError || !targetUser?.user) throw new Error('User not found')
+      const userEmail = targetUser.user.email
+      if (!userEmail) throw new Error('Target user has no email address')
+      const { data, error } = await supabaseAdmin.auth.admin.generateLink({ type: 'magiclink', email: userEmail })
+      if (error) throw error
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'impersonate', { targetUserId })
+      return new Response(JSON.stringify({ magic_link: data.properties.action_link }), { headers: jsonHeaders })
     }
 
     throw new Error(`Unknown action: ${action}`)

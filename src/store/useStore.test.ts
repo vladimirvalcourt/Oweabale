@@ -93,14 +93,13 @@ describe('useStore plaid sync messaging', () => {
   });
 
   it('shows reconnect guidance when sync errors require relink', async () => {
-    plaidSyncMock.mockResolvedValue({ ok: true, processed: 0, errors: 1 });
+    plaidSyncMock.mockResolvedValue({ added: 0, updated: 0, errors: 1 });
     const { useStore } = await import('./useStore');
     useStore.setState({
       plaidNeedsRelink: false,
       plaidInstitutionName: 'Chase',
       fetchData: vi.fn(async () => {
         useStore.setState({ plaidNeedsRelink: true });
-        return true;
       }),
     });
 
