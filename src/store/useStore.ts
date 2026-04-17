@@ -431,7 +431,9 @@ export const useStore = create<AppState>()(
     }
     await get().fetchData();
     if (!opts?.quiet) {
-      if (r.errors > 0) {
+      if (r.product_not_ready) {
+        toast.message('Bank connected. Plaid is loading your transaction history — check back in a few minutes or tap Sync now.');
+      } else if (r.errors > 0) {
         if (get().plaidNeedsRelink) {
           const institution = get().plaidInstitutionName?.trim();
           const bankLabel = institution && institution.length > 0 ? institution : 'your bank';

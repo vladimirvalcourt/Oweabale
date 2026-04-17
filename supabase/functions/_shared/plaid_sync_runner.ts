@@ -94,7 +94,7 @@ export async function runSyncForPlaidItem(
     access_token: string;
     transactions_cursor: string | null;
   },
-): Promise<{ ok: boolean; error?: string }> {
+): Promise<{ ok: boolean; product_not_ready?: boolean; error?: string }> {
   const rules = await loadRules(supabase, item.user_id);
   let cursor: string | null | undefined = item.transactions_cursor;
   let lastNextCursor = cursor;
@@ -168,7 +168,7 @@ export async function runSyncForPlaidItem(
     // Plaid hasn't finished loading transaction history yet — not a real error.
     // Webhooks (INITIAL_UPDATE / HISTORICAL_UPDATE) will trigger sync once ready.
     if (code === 'PRODUCT_NOT_READY') {
-      return { ok: true };
+      return { ok: true, product_not_ready: true };
     }
 
     const loginRequired =
@@ -228,7 +228,7 @@ export async function runSyncStaleItems(
 export async function runSyncAllForUser(
   supabase: SupabaseClient,
   userId: string,
-): Promise<{ processed: number; errors: number }> {
+): Promise<{ processed: number; errors: number; product_not_ready: boolean }> {
   const { data: rows, error } = await supabase
     .from('plaid_items')
     .select('id, user_id, item_id, access_token, transactions_cursor')
@@ -238,6 +238,7 @@ export async function runSyncAllForUser(
 
   let processed = 0;
   let errors = 0;
+  let product_not_ready = false;
   for (const row of rows ?? []) {
     const r = await runSyncForPlaidItem(
       supabase,
@@ -245,6 +246,7 @@ export async function runSyncAllForUser(
     );
     processed++;
     if (!r.ok) errors++;
+    if (r.product_not_ready) product_not_ready = true;
   }
-  return { processed, errors };
+  return { processed, errors, product_not_ready };
 }

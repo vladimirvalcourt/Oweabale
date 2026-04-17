@@ -54,12 +54,12 @@ export async function disconnectPlaid(): Promise<{ ok: true } | { error: string 
 }
 
 export async function syncPlaidTransactions(): Promise<
-  { ok: true; processed: number; errors: number } | { error: string }
+  { ok: true; processed: number; errors: number; product_not_ready: boolean } | { error: string }
 > {
   const { data, error } = await supabase.functions.invoke('plaid-sync', { method: 'POST' });
   if (error) return { error: await parseFunctionError(error) };
-  const d = data as { ok?: boolean; processed?: number; errors?: number; error?: string };
+  const d = data as { ok?: boolean; processed?: number; errors?: number; product_not_ready?: boolean; error?: string };
   if (d?.error) return { error: d.error };
   if (!d?.ok) return { error: 'Sync failed' };
-  return { ok: true, processed: d.processed ?? 0, errors: d.errors ?? 0 };
+  return { ok: true, processed: d.processed ?? 0, errors: d.errors ?? 0, product_not_ready: d.product_not_ready ?? false };
 }

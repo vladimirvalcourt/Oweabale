@@ -2,6 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 import { plaidPost } from '../_shared/plaid_client.ts';
 import { hasPaidFullSuiteAccess } from '../_shared/plaidAccess.ts';
+import { runSyncAllForUser } from '../_shared/plaid_sync_runner.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
@@ -107,6 +108,12 @@ Deno.serve(async (req: Request) => {
     );
 
     if (profileErr) throw profileErr;
+
+    // Kick off initial sync immediately so transactions are ready when the client
+    // calls fetchData(). PRODUCT_NOT_READY is handled gracefully inside the runner.
+    void runSyncAllForUser(supabaseAdmin, user.id).catch((e) =>
+      console.error('[plaid-exchange] initial sync error:', e),
+    );
 
     return new Response(JSON.stringify({ ok: true, item_id: exchange.item_id }), {
       headers: { ...ch, 'Content-Type': 'application/json' },

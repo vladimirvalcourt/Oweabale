@@ -71,7 +71,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const result = await runSyncAllForUser(supabaseAdmin, user.id);
-    return new Response(JSON.stringify({ ok: true, ...result }), {
+    return new Response(JSON.stringify({ ok: true, product_not_ready: result.product_not_ready, ...result }), {
       headers: { ...ch, 'Content-Type': 'application/json' },
     });
   } catch (e) {
