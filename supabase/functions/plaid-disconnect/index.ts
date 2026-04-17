@@ -65,6 +65,14 @@ Deno.serve(async (req: Request) => {
     const { error: delErr } = await supabaseAdmin.from('plaid_items').delete().eq('user_id', user.id);
     if (delErr) throw delErr;
 
+    // Remove all bank-sourced transactions so disconnecting fully clears imported data.
+    const { error: txDelErr } = await supabaseAdmin
+      .from('transactions')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('source', 'plaid');
+    if (txDelErr) throw txDelErr;
+
     const now = new Date().toISOString();
     const { error: profErr } = await supabaseAdmin
       .from('profiles')

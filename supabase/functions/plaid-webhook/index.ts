@@ -58,6 +58,7 @@ interface PlaidWebhookBody {
   webhook_type?: string;
   webhook_code?: string;
   item_id?: string;
+  error?: { error_code?: string };
 }
 
 Deno.serve(async (req: Request) => {
@@ -116,7 +117,12 @@ Deno.serve(async (req: Request) => {
   const code = body.webhook_code ?? '';
   const wtype = body.webhook_type ?? '';
 
-  if (wtype === 'ITEM' && code === 'ITEM_LOGIN_REQUIRED') {
+  // Plaid sends webhook_code='ERROR' for item errors (e.g. ITEM_LOGIN_REQUIRED).
+  // The specific error_code is nested inside body.error.error_code.
+  if (wtype === 'ITEM' && code === 'ERROR') {
+    const errorCode = body.error?.error_code ?? '';
+    const loginRequired =
+      errorCode === 'ITEM_LOGIN_REQUIRED' || errorCode === 'PENDING_EXPIRATION';
     const { data: row } = await supabaseAdmin
       .from('plaid_items')
       .select('user_id')
@@ -126,15 +132,17 @@ Deno.serve(async (req: Request) => {
       await supabaseAdmin
         .from('plaid_items')
         .update({
-          item_login_required: true,
-          last_sync_error: 'ITEM_LOGIN_REQUIRED',
+          item_login_required: loginRequired,
+          last_sync_error: errorCode || 'ITEM_ERROR',
           updated_at: now,
         })
         .eq('item_id', itemId);
-      await supabaseAdmin
-        .from('profiles')
-        .update({ plaid_needs_relink: true, updated_at: now })
-        .eq('id', row.user_id);
+      if (loginRequired) {
+        await supabaseAdmin
+          .from('profiles')
+          .update({ plaid_needs_relink: true, updated_at: now })
+          .eq('id', row.user_id);
+      }
     }
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
