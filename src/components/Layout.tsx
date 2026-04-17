@@ -404,9 +404,6 @@ export default function Layout() {
                 <span className="brand-header-text whitespace-nowrap">
                   Oweable
                 </span>
-                <span className="text-[9px] font-mono font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-1.5 py-0.5 rounded-sm uppercase tracking-widest">
-                  Beta
-                </span>
               </div>
             )}
           </div>
