@@ -6,6 +6,7 @@ import { isPlaidLinkUiEnabled } from '../lib/featureFlags';
 import { usePlaidFlow } from '../hooks/usePlaidFlow';
 import { supabase } from '../lib/supabaseClient';
 import { createStripeCheckoutSession } from '../lib/stripe';
+import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 
 /** When Plaid UI is off, manual-first copy; still allow disconnect if a link exists from earlier testing. */
 function BankConnectionGated() {
@@ -65,9 +66,10 @@ function BankConnectionPlaid() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const { hasFullSuite, isLoading: checkingAccess } = useFullSuiteAccess();
 
   const plaidGloballyEnabled = platformSettings?.plaidEnabled !== false;
-  const plaidEnabledForUser = plaidGloballyEnabled;
+  const plaidEnabledForUser = plaidGloballyEnabled && hasFullSuite;
   const plaidFlow = usePlaidFlow({
     enabled: plaidEnabledForUser,
     onConnected: connectBank,
@@ -149,6 +151,19 @@ function BankConnectionPlaid() {
           </button>
           {!plaidGloballyEnabled && (
             <p className="text-xs font-mono text-amber-500/90">Bank linking is disabled by the platform.</p>
+          )}
+          {plaidGloballyEnabled && !checkingAccess && !hasFullSuite && (
+            <div className="rounded-sm border border-indigo-500/30 bg-indigo-500/10 px-3 py-2 text-xs text-indigo-200">
+              Plaid bank linking is available on Full Suite.
+              <button
+                type="button"
+                onClick={() => void handleUpgradeClick()}
+                disabled={isUpgrading}
+                className="ml-3 underline underline-offset-2 disabled:opacity-60"
+              >
+                {isUpgrading ? 'Opening checkout…' : 'Upgrade'}
+              </button>
+            </div>
           )}
           {plaidFlow.stage === 'error' && plaidFlow.errorMessage && (
             <div className="rounded-sm border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">

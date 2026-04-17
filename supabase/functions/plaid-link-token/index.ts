@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 import { plaidPost } from '../_shared/plaid_client.ts';
+import { hasPaidFullSuiteAccess } from '../_shared/plaidAccess.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
@@ -38,6 +39,13 @@ Deno.serve(async (req: Request) => {
       error: authError,
     } = await supabaseAdmin.auth.getUser(jwt);
     if (authError || !user) throw new Error('Unauthorized');
+    const hasPaidAccess = await hasPaidFullSuiteAccess(supabaseAdmin, user.id);
+    if (!hasPaidAccess) {
+      return new Response(JSON.stringify({ error: 'Plaid is available on Full Suite only.' }), {
+        status: 403,
+        headers: { ...ch, 'Content-Type': 'application/json' },
+      });
+    }
 
     const { data: platform } = await supabaseAdmin.from('platform_settings').select('plaid_enabled').maybeSingle();
     if (platform && platform.plaid_enabled === false) {
