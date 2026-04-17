@@ -7,45 +7,6 @@ import { usePlaidFlow } from '../hooks/usePlaidFlow';
 import { supabase } from '../lib/supabaseClient';
 import { createStripeCheckoutSession } from '../lib/stripe';
 
-async function hasPaidPlaidAccess(): Promise<boolean> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user?.id) return false;
-
-  const [profileRes, entitlementRes, subscriptionRes] = await Promise.all([
-    supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle(),
-    supabase
-      .from('entitlements')
-      .select('status, ends_at')
-      .eq('user_id', user.id)
-      .eq('feature_key', 'full_suite')
-      .order('updated_at', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-    supabase
-      .from('billing_subscriptions')
-      .select('status')
-      .eq('user_id', user.id)
-      .order('updated_at', { ascending: false })
-      .limit(1)
-      .maybeSingle(),
-  ]);
-
-  if (profileRes.data?.is_admin) return true;
-
-  const entitlement = entitlementRes.data;
-  const entitlementActive =
-    entitlement?.status === 'active' &&
-    (!entitlement.ends_at ||
-      Number.isNaN(new Date(entitlement.ends_at).getTime()) ||
-      new Date(entitlement.ends_at).getTime() >= Date.now());
-  const subStatus = subscriptionRes.data?.status;
-  const subscriptionActive = subStatus === 'active' || subStatus === 'trialing';
-
-  return entitlementActive || subscriptionActive;
-}
-
 /** When Plaid UI is off, manual-first copy; still allow disconnect if a link exists from earlier testing. */
 function BankConnectionGated() {
   const { bankConnected, plaidInstitutionName, disconnectBank } = useStore();
@@ -104,35 +65,14 @@ function BankConnectionPlaid() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isUpgrading, setIsUpgrading] = useState(false);
-  const [hasPaidAccess, setHasPaidAccess] = useState(false);
-  const [checkingAccess, setCheckingAccess] = useState(true);
 
   const plaidGloballyEnabled = platformSettings?.plaidEnabled !== false;
-  const plaidEnabledForUser = plaidGloballyEnabled && hasPaidAccess;
+  const plaidEnabledForUser = plaidGloballyEnabled;
   const plaidFlow = usePlaidFlow({
     enabled: plaidEnabledForUser,
     onConnected: connectBank,
     onInitialSync: () => syncPlaidTransactions({ quiet: true }),
   });
-
-  useEffect(() => {
-    let cancelled = false;
-    const run = async () => {
-      setCheckingAccess(true);
-      try {
-        const allowed = await hasPaidPlaidAccess();
-        if (!cancelled) setHasPaidAccess(allowed);
-      } catch {
-        if (!cancelled) setHasPaidAccess(false);
-      } finally {
-        if (!cancelled) setCheckingAccess(false);
-      }
-    };
-    void run();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const handleConnectClick = async () => {
     await plaidFlow.startConnect();
@@ -190,7 +130,7 @@ function BankConnectionPlaid() {
           <button
             type="button"
             onClick={handleConnectClick}
-            disabled={plaidFlow.isBusy || !plaidEnabledForUser || checkingAccess}
+            disabled={plaidFlow.isBusy || !plaidEnabledForUser}
             className="bg-content-primary text-black hover:bg-content-tertiary/25 font-bold px-6 py-3 rounded-sm flex items-center gap-2 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {plaidFlow.isBusy ? (
@@ -209,20 +149,6 @@ function BankConnectionPlaid() {
           </button>
           {!plaidGloballyEnabled && (
             <p className="text-xs font-mono text-amber-500/90">Bank linking is disabled by the platform.</p>
-          )}
-          {plaidGloballyEnabled && !checkingAccess && !hasPaidAccess && (
-            <div className="rounded-sm border border-amber-500/30 bg-amber-500/10 px-3 py-3">
-              <p className="text-xs font-mono text-amber-500/90">Plaid requires Full Suite ($10.99/mo).</p>
-              <button
-                type="button"
-                onClick={handleUpgradeClick}
-                disabled={isUpgrading}
-                className="mt-2 inline-flex items-center gap-2 rounded-sm border border-emerald-500/40 bg-emerald-500/15 px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-emerald-200 hover:bg-emerald-500/25 disabled:opacity-60"
-              >
-                {isUpgrading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-                Upgrade to Full Suite
-              </button>
-            </div>
           )}
           {plaidFlow.stage === 'error' && plaidFlow.errorMessage && (
             <div className="rounded-sm border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
@@ -250,7 +176,7 @@ function BankConnectionPlaid() {
                 <button
                   type="button"
                   onClick={handleFixConnectionClick}
-                  disabled={plaidFlow.isBusy || !plaidEnabledForUser || checkingAccess}
+                  disabled={plaidFlow.isBusy || !plaidEnabledForUser}
                   className="mt-3 bg-amber-500/20 text-amber-200 hover:bg-amber-500/30 font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-sm border border-amber-500/30 disabled:opacity-60"
                 >
                   {plaidFlow.isBusy && plaidFlow.activeIntent === 'update' ? 'Opening…' : 'Fix connection'}
@@ -268,7 +194,7 @@ function BankConnectionPlaid() {
                 <button
                   type="button"
                   onClick={handleSyncClick}
-                  disabled={isSyncing || !plaidEnabledForUser || checkingAccess}
+                  disabled={isSyncing || !plaidEnabledForUser}
                   className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-surface-border text-content-primary font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-sm disabled:opacity-60"
                 >
                   {isSyncing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
@@ -277,7 +203,7 @@ function BankConnectionPlaid() {
                 <button
                   type="button"
                   onClick={handleFixConnectionClick}
-                  disabled={plaidFlow.isBusy || !plaidEnabledForUser || checkingAccess}
+                  disabled={plaidFlow.isBusy || !plaidEnabledForUser}
                   className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-surface-border text-content-secondary font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-sm disabled:opacity-60"
                 >
                   Reconnect
@@ -298,22 +224,6 @@ function BankConnectionPlaid() {
                 ? `Last transaction sync: ${lastSyncLabel}`
                 : 'No sync yet — use Sync now or wait for automatic updates.'}
             </div>
-            {plaidGloballyEnabled && !checkingAccess && !hasPaidAccess && (
-              <div className="mt-3 rounded-sm border border-amber-500/30 bg-amber-500/10 px-3 py-3">
-                <p className="text-xs font-mono text-amber-500/90">
-                  Sync and reconnect actions require Full Suite ($10.99/mo).
-                </p>
-                <button
-                  type="button"
-                  onClick={handleUpgradeClick}
-                  disabled={isUpgrading}
-                  className="mt-2 inline-flex items-center gap-2 rounded-sm border border-emerald-500/40 bg-emerald-500/15 px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-emerald-200 hover:bg-emerald-500/25 disabled:opacity-60"
-                >
-                  {isUpgrading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-                  Upgrade to Full Suite
-                </button>
-              </div>
-            )}
             {plaidFlow.stage === 'error' && plaidFlow.errorMessage && (
               <div className="mt-3 rounded-sm border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
                 {plaidFlow.errorMessage}

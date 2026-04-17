@@ -110,7 +110,16 @@ function AppRoutes() {
         <Route path="/onboarding" element={<Onboarding />} />
         
         <Route element={<DeviceGuard><Layout /></DeviceGuard>}>
-          <Route path="dashboard" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
+          <Route
+            path="dashboard"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Dashboard">
+                  <Dashboard />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
           <Route
             path="owe-ai"
             element={
@@ -122,7 +131,16 @@ function AppRoutes() {
             }
           />
           <Route path="bills" element={<ErrorBoundary><Obligations /></ErrorBoundary>} />
-          <Route path="income" element={<ErrorBoundary><Income /></ErrorBoundary>} />
+          <Route
+            path="income"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Income tracking">
+                  <Income />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
           <Route
             path="freelance"
             element={
@@ -133,11 +151,56 @@ function AppRoutes() {
               </ErrorBoundary>
             }
           />
-          <Route path="ingestion" element={<ErrorBoundary><Ingestion /></ErrorBoundary>} />
-          <Route path="transactions" element={<ErrorBoundary><Transactions /></ErrorBoundary>} />
-          <Route path="budgets" element={<ErrorBoundary><Budgets /></ErrorBoundary>} />
-          <Route path="net-worth" element={<ErrorBoundary><NetWorth /></ErrorBoundary>} />
-          <Route path="calendar" element={<ErrorBoundary><Calendar /></ErrorBoundary>} />
+          <Route
+            path="ingestion"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Document ingestion">
+                  <Ingestion />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="transactions"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Transaction history">
+                  <Transactions />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="budgets"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Budgeting">
+                  <Budgets />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="net-worth"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Net worth">
+                  <NetWorth />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="calendar"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Calendar planning">
+                  <Calendar />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
           <Route
             path="taxes"
             element={
@@ -148,7 +211,16 @@ function AppRoutes() {
               </ErrorBoundary>
             }
           />
-          <Route path="goals" element={<ErrorBoundary><Goals /></ErrorBoundary>} />
+          <Route
+            path="goals"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Goals">
+                  <Goals />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
           <Route
             path="education"
             element={
@@ -159,13 +231,76 @@ function AppRoutes() {
               </ErrorBoundary>
             }
           />
-          <Route path="categories" element={<ErrorBoundary><Categories /></ErrorBoundary>} />
-          <Route path="subscriptions" element={<ErrorBoundary><Subscriptions /></ErrorBoundary>} />
-          <Route path="reports" element={<ErrorBoundary><Reports /></ErrorBoundary>} />
-          <Route path="analytics" element={<ErrorBoundary><Analytics /></ErrorBoundary>} />
-          <Route path="credit" element={<ErrorBoundary><CreditCenter /></ErrorBoundary>} />
-          <Route path="support" element={<ErrorBoundary><HelpDesk /></ErrorBoundary>} />
-          <Route path="changelog" element={<ErrorBoundary><Changelog /></ErrorBoundary>} />
+          <Route
+            path="categories"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Categories">
+                  <Categories />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="subscriptions"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Subscriptions">
+                  <Subscriptions />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="reports"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Reports">
+                  <Reports />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="analytics"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Analytics">
+                  <Analytics />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="credit"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Credit Workshop">
+                  <CreditCenter />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="support"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Support tools">
+                  <HelpDesk />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="changelog"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Changelog">
+                  <Changelog />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
           <Route path="settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
         </Route>
         </Route>
