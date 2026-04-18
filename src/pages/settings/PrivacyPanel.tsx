@@ -2,6 +2,7 @@ import React, { memo, useState } from 'react';
 import { EyeOff, Download, AlertTriangle } from 'lucide-react';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
+import { useStore } from '../../store/useStore';
 
 function deferToast(fn: () => void) {
   requestAnimationFrame(() => {
@@ -16,6 +17,43 @@ type PrivacyPanelProps = {
 
 function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPanelProps) {
   const [privacyMode, setPrivacyMode] = useState(false);
+  const exportPayload = useStore((s) => ({
+    profile: s.user,
+    bills: s.bills,
+    debts: s.debts,
+    transactions: s.transactions,
+    assets: s.assets,
+    subscriptions: s.subscriptions,
+    goals: s.goals,
+    incomes: s.incomes,
+    budgets: s.budgets,
+    categories: s.categories,
+    categorizationRules: s.categorizationRules,
+    categorizationExclusions: s.categorizationExclusions,
+    citations: s.citations,
+    deductions: s.deductions,
+    freelanceEntries: s.freelanceEntries,
+  }));
+
+  const handleExportData = () => {
+    const exportedAt = new Date().toISOString();
+    const payload = {
+      exportedAt,
+      version: 1,
+      source: 'oweable-settings-export',
+      ...exportPayload,
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `oweable-export-${exportedAt.slice(0, 10)}.json`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    toast.success('Data export downloaded.');
+  };
 
   return (
     <div className="space-y-6">
@@ -56,7 +94,7 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
             </div>
             <button
               type="button"
-              onClick={() => deferToast(() => toast.success('Data export started.'))}
+              onClick={handleExportData}
               className="rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:text-content-primary focus-app"
             >
               Export data

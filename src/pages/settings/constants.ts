@@ -16,6 +16,7 @@ export const DEFAULT_NOTIF_PREFS: Record<
   | 'bill-reminders'
   | 'weekly-summary'
   | 'new-login'
+  | 'trial-charge-reminder'
   | 'push-reminders'
   | 'push-payments'
   | 'sniper-increase'
@@ -31,6 +32,7 @@ export const DEFAULT_NOTIF_PREFS: Record<
   'bill-reminders': true,
   'weekly-summary': true,
   'new-login': true,
+  'trial-charge-reminder': true,
   'push-reminders': true,
   'push-payments': false,
   'sniper-increase': true,

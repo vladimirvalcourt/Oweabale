@@ -68,6 +68,22 @@ export default function Settings() {
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isResettingData, setIsResettingData] = useState(false);
+  const [deletionReceipt, setDeletionReceipt] = useState<{
+    id: string;
+    deletedAt: string;
+    summary: Record<string, number>;
+  } | null>(null);
+  const exportSnapshot = useStore((state) => ({
+    bills: state.bills.length,
+    debts: state.debts.length,
+    transactions: state.transactions.length,
+    assets: state.assets.length,
+    subscriptions: state.subscriptions.length,
+    goals: state.goals.length,
+    incomes: state.incomes.length,
+    budgets: state.budgets.length,
+    categories: state.categories.length,
+  }));
 
   useEffect(() => {
     const t = searchParams.get('tab');
@@ -93,13 +109,33 @@ export default function Settings() {
     setIsDeleting(true);
     try {
       await deleteAccount();
-      setIsDeleteDialogOpen(false);
+      const receipt = {
+        id: crypto.randomUUID(),
+        deletedAt: new Date().toISOString(),
+        summary: exportSnapshot,
+      };
+      localStorage.setItem('oweable_last_deletion_receipt', JSON.stringify(receipt));
+      setDeletionReceipt(receipt);
+      setIsDeleting(false);
       toast.success('Account deleted successfully');
     } catch {
       toast.error('Failed to delete account. Please try again.');
       setIsDeleting(false);
     }
   };
+
+  const downloadDeletionReceipt = useCallback(() => {
+    if (!deletionReceipt) return;
+    const blob = new Blob([JSON.stringify(deletionReceipt, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `oweable-deletion-receipt-${deletionReceipt.deletedAt.slice(0, 10)}.json`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }, [deletionReceipt]);
 
   const handleResetData = async () => {
     setIsResettingData(true);
@@ -134,7 +170,14 @@ export default function Settings() {
           {activeTab === 'financial' && <FinancialPanel />}
           {activeTab === 'integrations' && <IntegrationsPanel />}
           {activeTab === 'privacy' && (
-            <PrivacyPanel onOpenResetDialog={() => setIsResetDialogOpen(true)} onOpenDeleteDialog={() => setIsDeleteDialogOpen(true)} />
+            <PrivacyPanel
+              onOpenResetDialog={() => setIsResetDialogOpen(true)}
+              onOpenDeleteDialog={() => {
+                setDeletionReceipt(null);
+                setIsDeleting(false);
+                setIsDeleteDialogOpen(true);
+              }}
+            />
           )}
           {activeTab === 'rules' && <RulesPanel />}
           {activeTab === 'support' && <SupportPanel />}
@@ -189,29 +232,58 @@ export default function Settings() {
               </div>
               <Dialog.Title className="text-lg font-semibold tracking-tight text-content-primary">Delete account</Dialog.Title>
             </div>
-            <Dialog.Description className="text-sm text-content-tertiary mb-6">
-              Are you sure you want to delete your account? All of your data will be permanently removed. This action cannot be
-              undone.
-            </Dialog.Description>
-
-            <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setIsDeleteDialogOpen(false)}
-                className="px-4 py-2 bg-transparent border border-surface-border rounded-lg text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDeleteAccount}
-                disabled={isDeleting}
-                className="flex items-center gap-2 px-4 py-2 bg-[#EF4444] hover:bg-[#DC2626] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors focus-app"
-              >
-                {isDeleting && <Loader2 className="w-3 h-3 animate-spin" />}
-                {isDeleting ? 'Deleting...' : 'Delete'}
-              </button>
-            </div>
+            {deletionReceipt ? (
+              <>
+                <Dialog.Description className="text-sm text-content-tertiary mb-3">
+                  Your account and data have been deleted. Keep this receipt as proof of deletion.
+                </Dialog.Description>
+                <div className="mb-5 rounded-lg border border-surface-border bg-surface-base p-3 text-xs text-content-secondary space-y-1">
+                  <p>Receipt ID: {deletionReceipt.id}</p>
+                  <p>Deleted at: {new Date(deletionReceipt.deletedAt).toLocaleString()}</p>
+                </div>
+                <div className="flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={downloadDeletionReceipt}
+                    className="px-4 py-2 bg-transparent border border-surface-border rounded-lg text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
+                  >
+                    Download receipt
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteDialogOpen(false)}
+                    className="px-4 py-2 bg-[#EF4444] hover:bg-[#DC2626] text-white rounded-lg text-sm font-medium transition-colors focus-app"
+                  >
+                    Close
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <Dialog.Description className="text-sm text-content-tertiary mb-6">
+                  Are you sure you want to delete your account? All of your data will be permanently removed. This action cannot be
+                  undone.
+                </Dialog.Description>
+                <div className="flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteDialogOpen(false)}
+                    className="px-4 py-2 bg-transparent border border-surface-border rounded-lg text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDeleteAccount}
+                    disabled={isDeleting}
+                    className="flex items-center gap-2 px-4 py-2 bg-[#EF4444] hover:bg-[#DC2626] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors focus-app"
+                  >
+                    {isDeleting && <Loader2 className="w-3 h-3 animate-spin" />}
+                    {isDeleting ? 'Deleting...' : 'Delete'}
+                  </button>
+                </div>
+              </>
+            )}
           </Dialog.Panel>
         </div>
       </Dialog>

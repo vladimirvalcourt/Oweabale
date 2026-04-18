@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
 import { supabase } from '../../lib/supabase';
 import {
+  cancelStripeSubscription,
   createStripeCheckoutSession,
   createStripePortalSession,
   syncStripeBilling,
@@ -36,6 +37,8 @@ function BillingPanelInner() {
   >([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isWorking, setIsWorking] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'trialing' | 'canceled' | 'incomplete' | null>(null);
+  const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
 
   const loadBillingState = useCallback(async (opts?: { stripeSyncFirst?: boolean }): Promise<boolean> => {
     setIsLoading(true);
@@ -78,6 +81,8 @@ function BillingPanelInner() {
 
     const entitlement = entitlements?.[0];
     const sub = subscriptions?.[0];
+    setSubscriptionStatus((sub?.status as typeof subscriptionStatus) ?? null);
+    setCurrentPeriodEnd(sub?.current_period_end ?? null);
     const paid = isEntitlementActive(entitlement) || isSubscriptionLive(sub);
     setHasPaidAccess(paid);
 
@@ -177,6 +182,31 @@ function BillingPanelInner() {
     window.location.href = result.url;
   };
 
+  const onCancelSubscription = async (immediate: boolean) => {
+    if (isWorking) return;
+    const confirmed = window.confirm(
+      immediate
+        ? 'Cancel now and end your paid access immediately? Proration will be handled by Stripe.'
+        : 'Cancel at the end of this billing period?',
+    );
+    if (!confirmed) return;
+    setIsWorking(true);
+    const result = await cancelStripeSubscription({ immediate });
+    if ('error' in result) {
+      toast.error(result.error);
+      setIsWorking(false);
+      return;
+    }
+    if (!result.cancelled) {
+      toast.info(result.message ?? 'No active subscription found.');
+      setIsWorking(false);
+      return;
+    }
+    await loadBillingState({ stripeSyncFirst: true });
+    toast.success(immediate ? 'Subscription canceled immediately.' : 'Cancellation scheduled for period end.');
+    setIsWorking(false);
+  };
+
   return (
     <div className="space-y-6">
       <CollapsibleModule
@@ -210,15 +240,38 @@ function BillingPanelInner() {
               <p className="text-sm text-emerald-200/70 mt-1 max-w-md">
                 Full Suite is active. Update your plan, payment method, or invoices anytime in the billing portal.
               </p>
+              {subscriptionStatus === 'trialing' && currentPeriodEnd && (
+                <p className="mt-2 text-xs text-emerald-100/80">
+                  Trial active until {new Date(currentPeriodEnd).toLocaleDateString()}. Enable pre-charge reminders in Notifications.
+                </p>
+              )}
             </div>
-            <button
-              type="button"
-              onClick={onManageBilling}
-              disabled={isWorking}
-              className="shrink-0 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white shadow-[0_0_15px_rgba(16,185,129,0.25)] transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isWorking ? 'Working...' : 'Manage billing'}
-            </button>
+            <div className="flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                onClick={onManageBilling}
+                disabled={isWorking}
+                className="shrink-0 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white shadow-[0_0_15px_rgba(16,185,129,0.25)] transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isWorking ? 'Working...' : 'Manage billing'}
+              </button>
+              <button
+                type="button"
+                onClick={() => void onCancelSubscription(false)}
+                disabled={isWorking}
+                className="shrink-0 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2.5 text-sm font-medium text-rose-200 transition-colors hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Cancel plan
+              </button>
+              <button
+                type="button"
+                onClick={() => void onCancelSubscription(true)}
+                disabled={isWorking}
+                className="shrink-0 rounded-lg border border-rose-400/60 bg-rose-500/20 px-4 py-2.5 text-sm font-medium text-rose-100 transition-colors hover:bg-rose-500/30 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Cancel now
+              </button>
+            </div>
           </div>
         ) : (
           <div className="bg-white/[0.05] border border-surface-border rounded-lg p-5 flex flex-col sm:flex-row items-center justify-between gap-4">

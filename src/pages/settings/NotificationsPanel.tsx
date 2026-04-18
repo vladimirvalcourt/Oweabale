@@ -81,6 +81,11 @@ function NotificationsPanelInner() {
             { id: 'bill-reminders' as const, label: 'Bill reminders', desc: 'Get notified 3 days before a bill is due.' },
             { id: 'weekly-summary' as const, label: 'Weekly summary', desc: 'Receive a weekly overview of your spending and upcoming bills.' },
             { id: 'new-login' as const, label: 'New device login', desc: 'Security alerts when your account is accessed from a new device.' },
+            {
+              id: 'trial-charge-reminder' as const,
+              label: 'Trial-to-paid reminder',
+              desc: 'Get a reminder before any free trial converts into a paid subscription.',
+            },
           ].map((item) => (
             <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
               <div className="pr-4">

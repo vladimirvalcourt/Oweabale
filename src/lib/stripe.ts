@@ -81,3 +81,25 @@ export async function createStripePortalSession(
   if (!d?.url) return { error: 'No portal URL returned' };
   return { url: d.url };
 }
+
+export async function cancelStripeSubscription(opts?: {
+  immediate?: boolean;
+}): Promise<{ ok: true; cancelled: boolean; message?: string } | { error: string }> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session?.access_token) {
+    return { error: 'Please sign in to manage your subscription.' };
+  }
+
+  const { data, error } = await supabase.functions.invoke('stripe-cancel-subscription', {
+    method: 'POST',
+    body: { immediate: opts?.immediate === true },
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  if (error) return { error: await parseFunctionError(error) };
+  const d = data as { ok?: boolean; cancelled?: boolean; message?: string; error?: string };
+  if (d?.error) return { error: d.error };
+  if (!d?.ok) return { error: 'Could not cancel subscription' };
+  return { ok: true as const, cancelled: Boolean(d.cancelled), message: d.message };
+}
