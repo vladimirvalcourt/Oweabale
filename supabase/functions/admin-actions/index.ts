@@ -111,6 +111,7 @@ Deno.serve(async (req: Request) => {
       'ban', 'unban', 'delete',
       'grant_entitlement', 'revoke_entitlement', 'user_detail', 'impersonate', 'bulk_action',
       'revenue_chart', 'growth_chart', 'churn_stats', 'webhook_list', 'apply_coupon', 'extend_trial', 'set_feature_flag',
+      'admin_roles_permissions', 'revoke_sessions',
     ]);
     const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -735,6 +736,24 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ message: 'Feature flag updated.' }), { headers: jsonHeaders })
     }
 
+    if (action === 'admin_roles_permissions') {
+      const [{ data: roles }, { data: permissions }, { data: rolePermissions }, { data: userRoles }] = await Promise.all([
+        supabaseAdmin.from('admin_roles').select('id, key, label'),
+        supabaseAdmin.from('admin_permissions').select('id, key, label'),
+        supabaseAdmin.from('admin_role_permissions').select('role_id, permission_id'),
+        supabaseAdmin.from('admin_user_roles').select('user_id, role_id'),
+      ])
+      return new Response(
+        JSON.stringify({
+          roles: roles ?? [],
+          permissions: permissions ?? [],
+          role_permissions: rolePermissions ?? [],
+          user_roles: userRoles ?? [],
+        }),
+        { headers: jsonHeaders },
+      )
+    }
+
     // All other actions require a targetUserId
     if (!targetUserId) throw new Error('Missing targetUserId')
     if (targetUserId === user.id) throw new Error('Cannot perform this action on your own account')
@@ -813,6 +832,19 @@ Deno.serve(async (req: Request) => {
       if (error) throw error
       await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'impersonate', { targetUserId })
       return new Response(JSON.stringify({ magic_link: data.properties.action_link }), { headers: jsonHeaders })
+    }
+
+    if (action === 'revoke_sessions') {
+      await enforceRateLimit(supabaseAdmin, user.id, 'revoke_sessions')
+      const scope = (body as { revokeScope?: unknown }).revokeScope
+      const sessionScope = scope === 'current' ? 'local' : 'global'
+      const { error } = await supabaseAdmin.auth.admin.signOut(targetUserId, sessionScope)
+      if (error) throw error
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'revoke_sessions', {
+        targetUserId,
+        revokeScope: sessionScope,
+      })
+      return new Response(JSON.stringify({ message: 'Sessions revoked.' }), { headers: jsonHeaders })
     }
 
     throw new Error(`Unknown action: ${action}`)

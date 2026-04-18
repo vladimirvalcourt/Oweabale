@@ -3,16 +3,20 @@ import { NavLink, Outlet } from 'react-router-dom';
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
+import { useAdminPermissions } from './shared/useAdminPermissions';
 
 const navItems = [
-  { to: '/admin', label: 'Overview', end: true },
-  { to: '/admin/data', label: 'Data' },
-  { to: '/admin/audit-logs', label: 'Audit Logs' },
-  { to: '/admin/moderation', label: 'Moderation' },
+  { to: '/admin', label: 'Overview', end: true, requiredPermission: 'dashboard.view' },
+  { to: '/admin/data', label: 'Data', requiredPermission: 'users.manage' },
+  { to: '/admin/audit-logs', label: 'Audit Logs', requiredPermission: 'audit.read' },
+  { to: '/admin/moderation', label: 'Moderation', requiredPermission: 'moderation.manage' },
+  { to: '/admin/sessions', label: 'Sessions', requiredPermission: 'users.manage' },
+  { to: '/admin/reports', label: 'Reports', requiredPermission: 'dashboard.view' },
 ];
 
 export function AdminLayout() {
   const envLabel = useMemo(() => (import.meta.env.PROD ? 'Production' : 'Staging'), []);
+  const { hasPermission } = useAdminPermissions();
 
   const { data: unreadCount = 0 } = useQuery({
     queryKey: ['admin', 'notifications', 'unread-count'],
@@ -50,7 +54,7 @@ export function AdminLayout() {
           </div>
         </div>
         <nav className="mx-auto flex max-w-7xl items-center gap-2 px-4 pb-3 sm:px-6 lg:px-8">
-          {navItems.map((item) => (
+          {navItems.filter((item) => hasPermission(item.requiredPermission)).map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
