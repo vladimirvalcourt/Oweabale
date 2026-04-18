@@ -109,12 +109,14 @@ function monthsToDate(months: number): string {
 export default function Obligations() {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { bills, debts, citations, subscriptions, resolveCitation, openQuickAdd, editBill, editDebt } = useStore(
+  const { bills, debts, citations, subscriptions, transactions, assets, resolveCitation, openQuickAdd, editBill, editDebt } = useStore(
     useShallow((s) => ({
       bills: s.bills,
       debts: s.debts,
       citations: s.citations,
       subscriptions: s.subscriptions,
+      transactions: s.transactions,
+      assets: s.assets,
       resolveCitation: s.resolveCitation,
       openQuickAdd: s.openQuickAdd,
       editBill: s.editBill,
@@ -158,6 +160,7 @@ export default function Obligations() {
 
   /** Stable anchor for synthetic due dates (set once per mount). */
   const [scheduleBaseMs] = useState(() => Date.now());
+  const [obligationNowMs] = useState(() => Date.now());
 
   const allObligations: Obligation[] = useMemo(() => {
     const recurringObligations: Obligation[] = bills.map(b => ({
@@ -226,6 +229,51 @@ export default function Obligations() {
 
   const totalMonthlyBurn = allObligations.filter(o => o.type === 'recurring').reduce((sum, o) => sum + o.amount, 0);
   const activePrincipal = debts.reduce((sum, d) => sum + d.remaining, 0);
+  const liquidCash = useMemo(
+    () =>
+      (assets || [])
+        .filter((a) => {
+          const t = (a.type || '').toLowerCase();
+          return t.includes('cash') || t.includes('checking');
+        })
+        .reduce((sum, a) => sum + (a.value || 0), 0),
+    [assets],
+  );
+
+  const weekAheadDueTotal = useMemo(() => {
+    const weekMs = 7 * 24 * 60 * 60 * 1000;
+    const dueBills = (bills || []).filter((b) => {
+      if (b.status === 'paid' || !b.dueDate) return false;
+      const dueMs = new Date(b.dueDate).getTime();
+      const delta = dueMs - obligationNowMs;
+      return delta >= 0 && delta <= weekMs;
+    });
+    return dueBills.reduce((sum, b) => sum + (b.amount || 0), 0);
+  }, [bills, obligationNowMs]);
+
+  const isLowBalanceWeekRisk = liquidCash < weekAheadDueTotal;
+
+  const billAmountChanges = useMemo(() => {
+    const changes = new Map<string, { previous: number; current: number; pct: number }>();
+    for (const bill of bills) {
+      const matches = (transactions || [])
+        .filter((tx) => tx.type === 'expense')
+        .filter((tx) => {
+          const txName = tx.name.toLowerCase();
+          const biller = bill.biller.toLowerCase();
+          return txName.includes(biller) || biller.includes(txName);
+        })
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      if (matches.length < 2) continue;
+      const current = matches[matches.length - 1]?.amount ?? 0;
+      const previous = matches[matches.length - 2]?.amount ?? 0;
+      if (previous <= 0) continue;
+      const pct = ((current - previous) / previous) * 100;
+      if (pct < 5 || current <= previous) continue;
+      changes.set(bill.id, { previous, current, pct });
+    }
+    return changes;
+  }, [bills, transactions]);
 
   const today = new Date();
   const urgentCitations = citations.filter(c => c.status === 'open' && c.daysLeft <= 7);
@@ -239,6 +287,33 @@ export default function Obligations() {
   ), [debts, extraPayment, strategy]);
 
   const interestSaved = Math.max(0, payoffResult.minOnlyInterest - payoffResult.totalInterest);
+  const overallDebtProgress = useMemo(() => {
+    const totalPaid = debts.reduce((sum, d) => sum + (d.paid || 0), 0);
+    const totalRemaining = debts.reduce((sum, d) => sum + (d.remaining || 0), 0);
+    const denom = totalPaid + totalRemaining;
+    return denom > 0 ? (totalPaid / denom) * 100 : 0;
+  }, [debts]);
+  const debtMilestones = [25, 50, 75, 100];
+  const unlockedMilestone = debtMilestones.filter((m) => overallDebtProgress >= m).at(-1) ?? 0;
+  const nextMilestone = debtMilestones.find((m) => m > overallDebtProgress) ?? null;
+  const paymentHistoryRows = useMemo(() => {
+    const knownNames = new Set([
+      ...bills.map((b) => b.biller.toLowerCase()),
+      ...subscriptions.map((s) => s.name.toLowerCase()),
+      ...debts.map((d) => d.name.toLowerCase()),
+    ]);
+    return (transactions || [])
+      .filter((tx) => tx.type === 'expense')
+      .filter((tx) => {
+        const name = tx.name.toLowerCase();
+        for (const known of knownNames) {
+          if (name.includes(known) || known.includes(name)) return true;
+        }
+        return false;
+      })
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 20);
+  }, [bills, subscriptions, debts, transactions]);
 
   const tabs: { key: FilterTab; label: string; count: number }[] = [
     { key: 'all', label: 'All', count: allObligations.length },
@@ -291,6 +366,33 @@ export default function Obligations() {
           </p>
         </div>
       </div>
+
+      {isLowBalanceWeekRisk && (
+        <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-4">
+          <p className="text-sm font-medium text-rose-200">
+            Low-balance warning: ${liquidCash.toFixed(0)} cash vs ${weekAheadDueTotal.toFixed(0)} due in the next 7 days.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-3 text-xs">
+            <TransitionLink to="/dashboard#cash-flow" className="text-content-primary hover:text-white underline underline-offset-2">
+              Open safe-to-spend
+            </TransitionLink>
+            <TransitionLink to="/calendar#calendar-view" className="text-content-primary hover:text-white underline underline-offset-2">
+              Open due-date calendar
+            </TransitionLink>
+          </div>
+        </div>
+      )}
+
+      {billAmountChanges.size > 0 && (
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
+          <p className="text-sm font-medium text-amber-200">
+            {billAmountChanges.size} bill {billAmountChanges.size === 1 ? 'has' : 'have'} increased based on recent charges.
+          </p>
+          <p className="mt-1 text-xs text-content-secondary">
+            Review these line items below before the next due date.
+          </p>
+        </div>
+      )}
 
       <CollapsibleModule
         title="Upcoming cash out (30 / 60 / 90 days)"
@@ -346,6 +448,17 @@ export default function Obligations() {
           }
         >
           <div className="p-0">
+            <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3">
+              <p className="text-sm font-medium text-emerald-200">
+                Debt progress milestone: {unlockedMilestone > 0 ? `${unlockedMilestone}% unlocked` : 'Starting strong'}.
+              </p>
+              <p className="mt-1 text-xs text-content-secondary">
+                {nextMilestone
+                  ? `${(nextMilestone - overallDebtProgress).toFixed(1)}% to your next milestone (${nextMilestone}%).`
+                  : 'You reached 100% — debt-free milestone complete. Great work.'}
+              </p>
+            </div>
+
             {/* Controls */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <div className="flex bg-surface-base border border-surface-border rounded-lg p-1">
@@ -478,6 +591,23 @@ export default function Obligations() {
         />
       )}
 
+      <CollapsibleModule title="Debt Learning Lab" icon={Calculator} defaultOpen={false}>
+        <div className="space-y-3 text-sm text-content-secondary">
+          <p>
+            <span className="font-medium text-content-primary">APR:</span> Annual Percentage Rate is the cost of borrowing. Higher APR
+            debts should usually be prioritized first to reduce total interest.
+          </p>
+          <p>
+            <span className="font-medium text-content-primary">Minimum payment trap:</span> Paying only the minimum can stretch payoff for
+            years and increase total interest paid.
+          </p>
+          <p>
+            <span className="font-medium text-content-primary">Action:</span> add a small extra monthly payment in the Debt Payoff Plan to
+            bring your debt-free date closer and reduce lifetime interest.
+          </p>
+        </div>
+      </CollapsibleModule>
+
       {/* Tabs */}
       <div className="border-b border-surface-border">
         <div className="flex space-x-6">
@@ -534,6 +664,11 @@ export default function Obligations() {
                         ob.type === 'ambush' ? 'border-rose-500/30 text-rose-400 bg-rose-500/10' :
                         'border-surface-border text-content-tertiary bg-surface-elevated'
                       }`}>{ob.subType}</span>
+                      {ob.type === 'recurring' && billAmountChanges.get(ob.id) && (
+                        <span className="ml-2 inline-flex items-center rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-mono text-amber-300">
+                          +{billAmountChanges.get(ob.id)?.pct.toFixed(0)}%
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
@@ -611,6 +746,35 @@ export default function Obligations() {
         </div>
       </CollapsibleModule>
       </div>
+
+      <CollapsibleModule title="Payment History Log" icon={FileText} defaultOpen={false}>
+        {paymentHistoryRows.length === 0 ? (
+          <p className="text-sm text-content-tertiary">No recent payment-like transactions yet.</p>
+        ) : (
+          <div className="overflow-x-auto -mx-6 -my-6 p-6">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-surface-border">
+                  <th className="px-2 py-2 text-[10px] font-mono uppercase tracking-wider text-content-tertiary">Date</th>
+                  <th className="px-2 py-2 text-[10px] font-mono uppercase tracking-wider text-content-tertiary">Description</th>
+                  <th className="px-2 py-2 text-[10px] font-mono uppercase tracking-wider text-content-tertiary">Category</th>
+                  <th className="px-2 py-2 text-[10px] font-mono uppercase tracking-wider text-content-tertiary text-right">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paymentHistoryRows.map((tx) => (
+                  <tr key={tx.id} className="border-b border-surface-highlight last:border-0">
+                    <td className="px-2 py-2 text-xs text-content-secondary">{tx.date}</td>
+                    <td className="px-2 py-2 text-xs text-content-primary">{tx.name}</td>
+                    <td className="px-2 py-2 text-xs text-content-tertiary">{tx.category}</td>
+                    <td className="px-2 py-2 text-xs font-mono text-content-primary text-right">${tx.amount.toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CollapsibleModule>
 
       <EditBillDialog bill={editBillRow} onClose={() => setEditBillRow(null)} editBill={editBill} />
       <EditDebtDialog debt={editDebtRow} onClose={() => setEditDebtRow(null)} editDebt={editDebt} />

@@ -22,13 +22,21 @@ export default function Transactions() {
   const [amountRange, setAmountRange] = useState<{min: string, max: string}>({min: '', max: ''});
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [page, setPage] = useState(1);
+  const [historyScope, setHistoryScope] = useState<'recent' | 'all'>('recent');
   const PAGE_SIZE = 25;
+  const RECENT_HISTORY_LIMIT = 1000;
 
   const deferredSearchTerm = useDeferredValue(searchTerm);
 
+  const scopedTransactions = useMemo(() => {
+    const sorted = [...transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    if (historyScope === 'all') return sorted;
+    return sorted.slice(0, RECENT_HISTORY_LIMIT);
+  }, [transactions, historyScope]);
+
   const filteredTransactions = useMemo(() => {
     const q = deferredSearchTerm.toLowerCase();
-    return transactions.filter((transaction) => {
+    return scopedTransactions.filter((transaction) => {
       const matchesSearch = transaction.name.toLowerCase().includes(q);
       const matchesType = filterType === 'all' || transaction.type === filterType;
       const matchesCategory = filterCategory === 'all' || transaction.category === filterCategory;
@@ -43,7 +51,7 @@ export default function Transactions() {
 
       return matchesSearch && matchesType && matchesCategory && matchesDate && matchesAmount;
     });
-  }, [transactions, deferredSearchTerm, filterType, filterCategory, dateRange, amountRange]);
+  }, [scopedTransactions, deferredSearchTerm, filterType, filterCategory, dateRange, amountRange]);
 
   const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -81,7 +89,7 @@ export default function Transactions() {
         <div>
           <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Transaction history</h1>
           <p className="mt-1 text-sm font-medium text-content-secondary">
-            {filteredTransactions.length} of {transactions.length} transactions
+            {filteredTransactions.length} of {historyScope === 'recent' ? Math.min(transactions.length, RECENT_HISTORY_LIMIT) : transactions.length} visible
           </p>
         </div>
         <button
@@ -124,6 +132,18 @@ export default function Transactions() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="block w-full pl-10 pr-3 py-2 border border-surface-border rounded-lg leading-5 bg-surface-base text-xs font-mono uppercase tracking-widest text-content-primary placeholder:text-content-muted focus-app-field transition-all"
               />
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setHistoryScope(historyScope === 'recent' ? 'all' : 'recent');
+                  setPage(1);
+                }}
+                className="px-3 py-2 border border-surface-border rounded-lg text-[10px] font-mono uppercase tracking-widest text-content-tertiary hover:text-content-primary hover:bg-surface-elevated transition-colors"
+              >
+                {historyScope === 'recent' ? `Load full history (${transactions.length})` : `Use fast mode (${RECENT_HISTORY_LIMIT})`}
+              </button>
             </div>
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <button

@@ -15,6 +15,7 @@ export default function Budgets() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
+  const [budgetNowMs] = useState(() => Date.now());
   
   const [formData, setFormData] = useState({
     category: '',
@@ -25,6 +26,27 @@ export default function Budgets() {
   });
 
   const expenseCategories = categories.filter(c => c.type === 'expense').map(c => c.name);
+
+  const sinkingFundRecommendations = useMemo(() => {
+    const annualizedByCategory = new Map<string, number>();
+    for (const tx of transactions) {
+      if (tx.type !== 'expense') continue;
+      const category = tx.category || 'Uncategorized';
+      annualizedByCategory.set(category, (annualizedByCategory.get(category) || 0) + tx.amount);
+    }
+    const recs = new Map<string, number>();
+    for (const [category, annualized] of annualizedByCategory.entries()) {
+      if (annualized <= 0) continue;
+      recs.set(category, annualized / 12);
+    }
+    return recs;
+  }, [transactions]);
+
+  const selectedSinkingFundSuggestion = useMemo(() => {
+    const n = sinkingFundRecommendations.get(formData.category);
+    if (!n || n <= 0) return null;
+    return n;
+  }, [formData.category, sinkingFundRecommendations]);
 
   const spendingAnomalies = useMemo(() =>
     detectSpendingAnomalies(transactions),
@@ -55,6 +77,64 @@ export default function Budgets() {
         return sum + tx.amount;
       }, 0);
   }, [parsedExpenses]);
+
+  const budgetSnapshots = useMemo(() => {
+    return budgets.map((budget) => {
+      const now = new Date(budgetNowMs);
+      const currentStart = startOfBudgetPeriod(now, budget.period);
+      const nextStart = shiftBudgetPeriod(currentStart, budget.period, 1);
+      const prevStart = shiftBudgetPeriod(currentStart, budget.period, -1);
+      const prevEnd = new Date(currentStart.getTime() - 1);
+
+      const spent = sumCategoryBetween(
+        budget.category,
+        currentStart.getTime(),
+        nextStart.getTime() - 1,
+      );
+      const prevSpent = sumCategoryBetween(
+        budget.category,
+        prevStart.getTime(),
+        prevEnd.getTime(),
+      );
+      const rolloverCredit = budget.rolloverEnabled ? Math.max(0, budget.amount - prevSpent) : 0;
+      const effectiveBudget = budget.amount + rolloverCredit;
+      const percentage = Math.min(100, effectiveBudget > 0 ? (spent / effectiveBudget) * 100 : 0);
+      const isOverBudget = spent > effectiveBudget;
+      const isNearLimit = percentage >= 80 && !isOverBudget;
+
+      const totalWindowMs = Math.max(1, nextStart.getTime() - currentStart.getTime());
+      const elapsedWindowMs = Math.min(totalWindowMs, Math.max(0, budgetNowMs - currentStart.getTime()));
+      const elapsedRatio = elapsedWindowMs / totalWindowMs;
+      const projectedEndSpend =
+        elapsedRatio > 0.15 && spent > 0 ? spent / Math.max(elapsedRatio, 0.0001) : spent;
+      const isProjectedToOverspend = !isOverBudget && projectedEndSpend > effectiveBudget * 1.02;
+
+      return {
+        budgetId: budget.id,
+        spent,
+        rolloverCredit,
+        effectiveBudget,
+        percentage,
+        isOverBudget,
+        isNearLimit,
+        isProjectedToOverspend,
+        projectedEndSpend,
+      };
+    });
+  }, [budgets, sumCategoryBetween, budgetNowMs]);
+
+  const snapshotByBudgetId = useMemo(
+    () => new Map(budgetSnapshots.map((snapshot) => [snapshot.budgetId, snapshot])),
+    [budgetSnapshots],
+  );
+
+  const projectedRiskBudgets = useMemo(
+    () =>
+      budgetSnapshots
+        .filter((snapshot) => snapshot.isProjectedToOverspend)
+        .sort((a, b) => b.projectedEndSpend - a.projectedEndSpend),
+    [budgetSnapshots],
+  );
 
 
   const openAddModal = () => {
@@ -150,34 +230,36 @@ export default function Budgets() {
           </button>
         </div>
       ) : (
-        <CollapsibleModule 
-          title="Budget Limits" 
-          icon={PieChart}
-          extraHeader={<span className="text-xs font-sans text-content-tertiary">{budgets.length} active</span>}
-        >
+        <>
+          {projectedRiskBudgets.length > 0 && (
+            <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
+              <p className="text-sm font-medium text-amber-300">
+                Heads up: {projectedRiskBudgets.length} {projectedRiskBudgets.length === 1 ? 'category is' : 'categories are'} on pace to overspend.
+              </p>
+              <p className="mt-1 text-xs text-content-secondary">
+                Slow spend in these categories now to avoid end-of-period surprises.
+              </p>
+            </div>
+          )}
+          <CollapsibleModule 
+            title="Budget Limits" 
+            icon={PieChart}
+            extraHeader={<span className="text-xs font-sans text-content-tertiary">{budgets.length} active</span>}
+          >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 -mx-6 -my-6 p-6">
             {budgets.map((budget) => {
-              const now = new Date();
-              const currentStart = startOfBudgetPeriod(now, budget.period);
-              const nextStart = shiftBudgetPeriod(currentStart, budget.period, 1);
-              const prevStart = shiftBudgetPeriod(currentStart, budget.period, -1);
-              const prevEnd = new Date(currentStart.getTime() - 1);
-
-              const spent = sumCategoryBetween(
-                budget.category,
-                currentStart.getTime(),
-                nextStart.getTime() - 1,
-              );
-              const prevSpent = sumCategoryBetween(
-                budget.category,
-                prevStart.getTime(),
-                prevEnd.getTime(),
-              );
-              const rolloverCredit = budget.rolloverEnabled ? Math.max(0, budget.amount - prevSpent) : 0;
-              const effectiveBudget = budget.amount + rolloverCredit;
-              const percentage = Math.min(100, effectiveBudget > 0 ? (spent / effectiveBudget) * 100 : 0);
-              const isOverBudget = spent > effectiveBudget;
-              const isNearLimit = percentage >= 80 && !isOverBudget;
+              const snapshot = snapshotByBudgetId.get(budget.id);
+              if (!snapshot) return null;
+              const {
+                spent,
+                rolloverCredit,
+                effectiveBudget,
+                percentage,
+                isOverBudget,
+                isNearLimit,
+                isProjectedToOverspend,
+                projectedEndSpend,
+              } = snapshot;
 
               let progressColor = 'bg-white';
               if (isOverBudget) progressColor = 'bg-red-500';
@@ -274,6 +356,10 @@ export default function Budgets() {
                   <div className="mt-auto pt-4 flex items-center justify-between text-xs font-sans text-content-tertiary">
                     {isOverBudget ? (
                       <span className="text-red-400 flex items-center gap-1.5"><AlertTriangle className="w-3 h-3" /> Over Budget</span>
+                    ) : isProjectedToOverspend ? (
+                      <span className="text-amber-300 flex items-center gap-1.5">
+                        <AlertTriangle className="w-3 h-3" /> Projected over (${projectedEndSpend.toFixed(0)})
+                      </span>
                     ) : isNearLimit ? (
                       <span className="text-amber-400 flex items-center gap-1.5"><AlertTriangle className="w-3 h-3" /> Near Limit</span>
                     ) : (
@@ -285,7 +371,8 @@ export default function Budgets() {
               );
             })}
           </div>
-        </CollapsibleModule>
+          </CollapsibleModule>
+        </>
       )}
 
       {/* Add/Edit Modal */}
@@ -336,6 +423,23 @@ export default function Budgets() {
                     placeholder="0.00"
                   />
                 </div>
+                {selectedSinkingFundSuggestion !== null && (
+                  <div className="mt-2 flex items-center justify-between rounded-lg border border-surface-border bg-surface-elevated px-3 py-2">
+                    <p className="text-[11px] text-content-secondary">
+                      Suggested sinking-fund target for this category:
+                      <span className="ml-1 font-mono text-content-primary">
+                        ${selectedSinkingFundSuggestion.toFixed(2)}/mo
+                      </span>
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, amount: selectedSinkingFundSuggestion.toFixed(2) })}
+                      className="text-[11px] font-medium text-content-primary hover:text-white focus-app rounded-lg px-2 py-1"
+                    >
+                      Use target
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div>

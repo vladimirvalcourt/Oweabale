@@ -4,6 +4,7 @@ import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import type { SupportTicket } from './types';
+import { useStore } from '../../store/useStore';
 
 function SupportPanelInner() {
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
@@ -15,6 +16,12 @@ function SupportPanelInner() {
     priority: 'Normal',
     description: '',
   });
+  const bankConnected = useStore((s) => s.bankConnected);
+  const plaidNeedsRelink = useStore((s) => s.plaidNeedsRelink);
+  const plaidLastSyncAt = useStore((s) => s.plaidLastSyncAt);
+  const [isOnline, setIsOnline] = useState<boolean>(() =>
+    typeof navigator !== 'undefined' ? navigator.onLine : true,
+  );
 
   useEffect(() => {
     setTicketsLoading(true);
@@ -47,6 +54,31 @@ function SupportPanelInner() {
     };
     load();
   }, []);
+
+  useEffect(() => {
+    const onOnline = () => setIsOnline(true);
+    const onOffline = () => setIsOnline(false);
+    window.addEventListener('online', onOnline);
+    window.addEventListener('offline', onOffline);
+    return () => {
+      window.removeEventListener('online', onOnline);
+      window.removeEventListener('offline', onOffline);
+    };
+  }, []);
+
+  const syncAgeHours =
+    plaidLastSyncAt && Number.isFinite(new Date(plaidLastSyncAt).getTime())
+      ? (Date.now() - new Date(plaidLastSyncAt).getTime()) / 3600000
+      : null;
+  const syncState = !bankConnected
+    ? 'not_connected'
+    : plaidNeedsRelink
+      ? 'needs_relink'
+      : syncAgeHours === null
+        ? 'warming'
+        : syncAgeHours <= 24
+          ? 'healthy'
+          : 'stale';
 
   const handleSubmitTicket = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,6 +126,37 @@ function SupportPanelInner() {
 
   return (
     <div className="space-y-6">
+      <CollapsibleModule title="Service Status" icon={LifeBuoy} defaultOpen={false}>
+        <div className="space-y-3">
+          <div className="rounded-lg border border-surface-border bg-surface-base p-3 text-sm">
+            <p className="font-medium text-content-primary">App connectivity: {isOnline ? 'Online' : 'Offline'}</p>
+            <p className="mt-1 text-xs text-content-tertiary">
+              {isOnline ? 'Network looks healthy from this browser.' : 'You appear offline. Sync and support actions may fail.'}
+            </p>
+          </div>
+          <div className="rounded-lg border border-surface-border bg-surface-base p-3 text-sm">
+            <p className="font-medium text-content-primary">
+              Bank sync status:{' '}
+              {syncState === 'healthy'
+                ? 'Healthy'
+                : syncState === 'needs_relink'
+                  ? 'Needs relink'
+                  : syncState === 'stale'
+                    ? 'Stale'
+                    : syncState === 'warming'
+                      ? 'Warming up'
+                      : 'Not connected'}
+            </p>
+            <p className="mt-1 text-xs text-content-tertiary">
+              {plaidLastSyncAt ? `Last sync: ${new Date(plaidLastSyncAt).toLocaleString()}` : 'No sync timestamp available yet.'}
+            </p>
+          </div>
+          <p className="text-xs text-content-tertiary">
+            If services appear degraded, include this panel state when opening a support ticket below.
+          </p>
+        </div>
+      </CollapsibleModule>
+
       <CollapsibleModule title="Submit a Support Request" icon={LifeBuoy}>
         <div className="-mx-6 -my-6 p-6 bg-surface-base">
           <form onSubmit={handleSubmitTicket} className="space-y-4">

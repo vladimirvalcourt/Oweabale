@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { createStripeCheckoutSession } from '../lib/stripe';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 import { AppLoader } from './PageSkeleton';
+import { TransitionLink } from './TransitionLink';
 
 type FullSuiteGateCardProps = {
   title: string;
@@ -52,6 +53,15 @@ export function FullSuiteGateCard({ title, description, compact = false }: FullS
             {isUpgrading ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : null}
             {isUpgrading ? 'Starting checkout...' : `Upgrade — $${monthlyPrice.toFixed(2)}/mo`}
           </button>
+          <p className="mt-2 text-xs text-content-tertiary">
+            No pressure: Tracker stays available with core workflows even if you do not upgrade.
+          </p>
+          <TransitionLink
+            to="/dashboard"
+            className="mt-2 inline-flex text-xs font-medium text-content-secondary underline underline-offset-2 hover:text-content-primary"
+          >
+            Keep using free tier
+          </TransitionLink>
         </div>
       </div>
     </div>

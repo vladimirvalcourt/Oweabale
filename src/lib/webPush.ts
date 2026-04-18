@@ -90,6 +90,20 @@ export async function sendTestWebPush(): Promise<{ ok: true } | { error: string 
   return { ok: true };
 }
 
+export async function sendWebPushMessage(
+  title: string,
+  body: string,
+): Promise<{ ok: true } | { error: string }> {
+  const { data, error } = await supabase.functions.invoke('send-web-push', {
+    method: 'POST',
+    body: { title, body },
+  });
+  if (error) return { error: error.message || 'Failed to send push notification' };
+  const payload = data as { error?: string } | null;
+  if (payload?.error) return { error: payload.error };
+  return { ok: true };
+}
+
 /** Convert VITE VAPID base64url key to Uint8Array for PushManager. */
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);

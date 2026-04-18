@@ -35,7 +35,7 @@ export default function Calendar() {
   const [month, setMonth] = useState(today.getMonth());
   const [popover, setPopover] = useState<PopoverState | null>(null);
 
-  const { bills, incomes, subscriptions, goals } = useStore();
+  const { bills, incomes, subscriptions, goals, transactions } = useStore();
 
   useEffect(() => {
     if (!popover) return;
@@ -114,6 +114,58 @@ export default function Calendar() {
     return map;
   }, [bills, incomes, subscriptions, goals, year, month]);
 
+  const monthCashPressure = useMemo(() => {
+    const monthlyIncome = incomes
+      .filter((i) => i.status === 'active' && i.nextDate)
+      .filter((i) => {
+        const d = new Date(i.nextDate);
+        return d.getFullYear() === year && d.getMonth() === month;
+      })
+      .reduce((sum, i) => sum + (i.amount || 0), 0);
+
+    const monthlyBills = bills
+      .filter((b) => b.dueDate)
+      .filter((b) => {
+        const d = new Date(b.dueDate);
+        return d.getFullYear() === year && d.getMonth() === month;
+      })
+      .reduce((sum, b) => sum + (b.amount || 0), 0);
+
+    const monthlySubscriptions = subscriptions
+      .filter((s) => s.status === 'active' && s.nextBillingDate)
+      .filter((s) => {
+        const d = new Date(s.nextBillingDate);
+        return d.getFullYear() === year && d.getMonth() === month;
+      })
+      .reduce((sum, s) => sum + (s.amount || 0), 0);
+
+    const dueTotal = monthlyBills + monthlySubscriptions;
+    const ratio = monthlyIncome > 0 ? (dueTotal / monthlyIncome) * 100 : null;
+    return { monthlyIncome, dueTotal, ratio };
+  }, [bills, incomes, subscriptions, year, month]);
+
+  const billIncreaseAlerts = useMemo(() => {
+    const alerts: Array<{ billId: string; biller: string; previous: number; current: number; pct: number }> = [];
+    for (const bill of bills) {
+      const matches = (transactions || [])
+        .filter((tx) => tx.type === 'expense')
+        .filter((tx) => {
+          const txName = tx.name.toLowerCase();
+          const biller = bill.biller.toLowerCase();
+          return txName.includes(biller) || biller.includes(txName);
+        })
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      if (matches.length < 2) continue;
+      const previous = matches[matches.length - 2]?.amount ?? 0;
+      const current = matches[matches.length - 1]?.amount ?? 0;
+      if (previous <= 0 || current <= previous) continue;
+      const pct = ((current - previous) / previous) * 100;
+      if (pct < 5) continue;
+      alerts.push({ billId: bill.id, biller: bill.biller, previous, current, pct });
+    }
+    return alerts.sort((a, b) => b.pct - a.pct);
+  }, [bills, transactions]);
+
   const EVENT_CONFIG = {
     bill: { color: 'bg-red-500', text: 'text-red-400', icon: Receipt },
     income: { color: 'bg-emerald-500', text: 'text-emerald-400', icon: TrendingUp },
@@ -149,7 +201,6 @@ export default function Calendar() {
         <div className="flex flex-wrap items-center gap-4">
           {(['bill', 'income', 'subscription', 'goal'] as const).map(type => {
             const cfg = EVENT_CONFIG[type];
-            const Icon = cfg.icon;
             return (
               <div key={type} className="flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-none ${cfg.color}`} />
@@ -165,6 +216,37 @@ export default function Calendar() {
         extraHeader={<span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{Array.from(eventsByDay.values()).flat().length} Events Detected</span>}
       >
         <div className="bg-surface-raised border border-surface-border rounded-lg overflow-hidden -mx-6 -my-6">
+          {billIncreaseAlerts.length > 0 && (
+            <div className="px-6 py-3 border-b border-amber-500/30 bg-amber-500/10">
+              <p className="text-xs text-amber-200 font-medium">
+                Bill amount changes detected: {billIncreaseAlerts.length} {billIncreaseAlerts.length === 1 ? 'service' : 'services'} increased recently.
+              </p>
+              <p className="mt-1 text-[11px] text-content-secondary">
+                {billIncreaseAlerts
+                  .slice(0, 2)
+                  .map((a) => `${a.biller} +${a.pct.toFixed(0)}%`)
+                  .join(' • ')}
+              </p>
+            </div>
+          )}
+          <div className="px-6 py-3 border-b border-surface-border bg-surface-base/80">
+            <p className="text-xs text-content-secondary">
+              Due this month: <span className="font-mono text-content-primary">${monthCashPressure.dueTotal.toFixed(0)}</span>
+              {monthCashPressure.monthlyIncome > 0 ? (
+                <>
+                  {' '}vs income{' '}
+                  <span className="font-mono text-content-primary">${monthCashPressure.monthlyIncome.toFixed(0)}</span>
+                  {' '}(
+                  <span className={monthCashPressure.ratio !== null && monthCashPressure.ratio >= 80 ? 'text-amber-300 font-medium' : 'text-content-primary'}>
+                    {monthCashPressure.ratio?.toFixed(0)}%
+                  </span>
+                  ).
+                </>
+              ) : (
+                ' (add income events for ratio context).'
+              )}
+            </p>
+          </div>
           <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border bg-surface-elevated">
             <button
               onClick={prevMonth}

@@ -5,6 +5,8 @@ import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
 import { supabase } from '../../lib/supabase';
+import { loadNotifPrefs } from './constants';
+import { sendWebPushMessage } from '../../lib/webPush';
 import {
   cancelStripeSubscription,
   createStripeCheckoutSession,
@@ -26,6 +28,7 @@ function isSubscriptionLive(row: { status: string } | undefined) {
 }
 
 function BillingPanelInner() {
+  const TRIAL_REMINDER_SENT_KEY = 'oweable_trial_charge_reminder_last_sent_v1';
   const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
   const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
   const [searchParams, setSearchParams] = useSearchParams();
@@ -157,6 +160,33 @@ function BillingPanelInner() {
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);
   }, [loadBillingState]);
+
+  useEffect(() => {
+    if (subscriptionStatus !== 'trialing' || !currentPeriodEnd) return;
+    const prefs = loadNotifPrefs();
+    if (!prefs['trial-charge-reminder']) return;
+
+    const now = Date.now();
+    const endMs = new Date(currentPeriodEnd).getTime();
+    if (!Number.isFinite(endMs)) return;
+    const daysLeft = Math.ceil((endMs - now) / (1000 * 60 * 60 * 24));
+    if (daysLeft < 0 || daysLeft > 7) return;
+
+    const reminderMarker = `${currentPeriodEnd.slice(0, 10)}:${daysLeft}`;
+    const lastSent = localStorage.getItem(TRIAL_REMINDER_SENT_KEY);
+    if (lastSent === reminderMarker) return;
+    localStorage.setItem(TRIAL_REMINDER_SENT_KEY, reminderMarker);
+
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+      new Notification('Trial ending soon', {
+        body: `Your trial ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. Review billing settings before your first charge.`,
+      });
+    }
+    void sendWebPushMessage(
+      'Trial ending soon',
+      `Your trial ends in ${daysLeft} day${daysLeft === 1 ? '' : 's'}. Review billing settings before your first charge.`,
+    );
+  }, [currentPeriodEnd, subscriptionStatus]);
 
   const onUpgrade = async () => {
     if (isWorking) return;
@@ -342,6 +372,23 @@ function BillingPanelInner() {
         >
           Manage in Stripe Portal
         </button>
+      </CollapsibleModule>
+
+      <CollapsibleModule title="Billing Transparency Center" icon={Building2} defaultOpen={false}>
+        <div className="space-y-3 text-sm text-content-secondary">
+          <p>
+            Cancel from this app in one step. You can choose period-end cancel or immediate cancel from the subscription card above.
+          </p>
+          <p>
+            Trial reminders are sent before first charge when enabled in Notifications (`Trial-to-paid reminder`).
+          </p>
+          <p>
+            You can export data anytime and delete your account immediately from `Data & Privacy`, with a downloadable deletion receipt.
+          </p>
+          <p className="text-xs text-content-tertiary">
+            No phone calls or support tickets are required for basic billing cancellation and account deletion flows.
+          </p>
+        </div>
       </CollapsibleModule>
     </div>
   );

@@ -20,10 +20,19 @@ import type { Citation } from '../store/useStore';
 
 /** v3: one-time dismissal persisted across sessions/devices on this browser. */
 const LOW_TAX_RESERVE_DISMISS_KEY = 'oweable_dismiss_dashboard_low_tax_reserve_v3';
+const DASHBOARD_CALM_MODE_KEY = 'oweable_dashboard_calm_mode_v1';
 
 function parseLowTaxDismissed(): boolean {
   try {
     return localStorage.getItem(LOW_TAX_RESERVE_DISMISS_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function parseCalmModeEnabled(): boolean {
+  try {
+    return localStorage.getItem(DASHBOARD_CALM_MODE_KEY) === '1';
   } catch {
     return false;
   }
@@ -68,6 +77,7 @@ export default function Dashboard() {
   const [isCitationModalOpen, setIsCitationModalOpen] = useState(false);
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
   const [dismissedLowTaxReserve, setDismissedLowTaxReserve] = useState<boolean>(() => parseLowTaxDismissed());
+  const [calmMode, setCalmMode] = useState<boolean>(() => parseCalmModeEnabled());
   /** Stable anchor for citation due dates (matches Obligations / safe-to-spend math). */
   const [scheduleBaseMs] = useState(() => Date.now());
 
@@ -125,6 +135,58 @@ export default function Dashboard() {
     () => calcMonthlyCashFlow(incomes || [], bills || [], debts || [], subscriptions || []),
     [incomes, bills, debts, subscriptions]
   );
+  const monthlyIncome = cashFlow.monthlyIncome || 0;
+
+  const spendingShareOfIncome = useMemo(() => {
+    if (monthlyIncome <= 0) return null;
+    const totalMonthlyCommitted = cashFlow.fixedExpenses + cashFlow.subscriptions;
+    return Math.max(0, (totalMonthlyCommitted / monthlyIncome) * 100);
+  }, [cashFlow.fixedExpenses, cashFlow.subscriptions, monthlyIncome]);
+
+  const weeklySpendingRecap = useMemo(() => {
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const lastWeekExpenses = (transactions || []).filter((tx) => {
+      if (tx?.type !== 'expense' || !tx?.date) return false;
+      const txDate = new Date(tx.date);
+      return txDate >= weekAgo && txDate <= now;
+    });
+    const total = lastWeekExpenses.reduce((sum, tx) => sum + (tx?.amount || 0), 0);
+    const categoryTotals = new Map<string, number>();
+    for (const tx of lastWeekExpenses) {
+      const category = tx?.category || 'Uncategorized';
+      categoryTotals.set(category, (categoryTotals.get(category) || 0) + (tx?.amount || 0));
+    }
+    let topCategory: { name: string; amount: number } | null = null;
+    for (const [name, amount] of categoryTotals.entries()) {
+      if (!topCategory || amount > topCategory.amount) topCategory = { name, amount };
+    }
+    return {
+      total,
+      txCount: lastWeekExpenses.length,
+      topCategory: topCategory?.name ?? null,
+    };
+  }, [transactions]);
+
+  const next30DayBills = useMemo(() => {
+    const now = new Date();
+    const inThirtyDays = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    return (bills || []).filter((bill) => {
+      if (!bill?.dueDate || bill.status === 'paid') return false;
+      const due = new Date(bill.dueDate);
+      return due >= now && due <= inThirtyDays;
+    });
+  }, [bills]);
+
+  const next30DayBillsTotal = useMemo(
+    () => next30DayBills.reduce((sum, bill) => sum + (bill?.amount || 0), 0),
+    [next30DayBills],
+  );
+
+  const next30DayBillsVsIncomePct = useMemo(() => {
+    if (monthlyIncome <= 0) return null;
+    return (next30DayBillsTotal / monthlyIncome) * 100;
+  }, [next30DayBillsTotal, monthlyIncome]);
 
   const surplusRouting = useMemo(
     () => calcSurplusRouting(cashFlow.surplus || 0, goals || [], debts || []),
@@ -169,6 +231,18 @@ export default function Dashboard() {
       /* ignore quota / private mode */
     }
     setDismissedLowTaxReserve(true);
+  }, []);
+
+  const toggleCalmMode = useCallback(() => {
+    setCalmMode((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(DASHBOARD_CALM_MODE_KEY, next ? '1' : '0');
+      } catch {
+        // ignore storage failures
+      }
+      return next;
+    });
   }, []);
 
   // --- Intelligent Modules ---
@@ -336,11 +410,18 @@ export default function Dashboard() {
             <p className="mt-1 text-sm font-medium text-content-secondary">Here is your financial overview for today.</p>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={toggleCalmMode}
+          className="rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-secondary hover:text-content-primary focus-app"
+        >
+          {calmMode ? 'Calm mode: on' : 'Calm mode: off'}
+        </button>
       </div>
 
 
       {/* 2. Action Center (Grouped Urgent Alerts) */}
-      {hasActionableAlerts && (
+      {!calmMode && hasActionableAlerts && (
         <div className="space-y-3">
           <h2 className="section-label pl-1">Action Center</h2>
           
@@ -498,7 +579,7 @@ export default function Dashboard() {
       </div>
 
       {/* Spending Anomaly Callout */}
-      {spendingAnomalies.length > 0 && (
+      {!calmMode && spendingAnomalies.length > 0 && (
         <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3">
           <p className="text-xs font-semibold text-amber-400 mb-1.5">Spending Anomalies Detected</p>
           <div className="flex flex-wrap gap-x-5 gap-y-1">
@@ -511,6 +592,39 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="rounded-lg border border-surface-border bg-surface-raised p-4 text-left">
+          <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary">This week recap</p>
+          <p className="mt-2 text-lg font-semibold text-content-primary">
+            You spent ${weeklySpendingRecap.total.toFixed(0)} in the last 7 days.
+          </p>
+          <p className="mt-1 text-xs text-content-secondary">
+            {weeklySpendingRecap.txCount} expense transactions
+            {weeklySpendingRecap.topCategory ? ` • Top category: ${weeklySpendingRecap.topCategory}` : ''}.
+          </p>
+        </div>
+
+        <div className="rounded-lg border border-surface-border bg-surface-raised p-4 text-left">
+          <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary">Spending vs income</p>
+          <p className="mt-2 text-lg font-semibold text-content-primary">
+            {spendingShareOfIncome === null ? 'Add income to unlock this' : `${spendingShareOfIncome.toFixed(0)}% of monthly income`}
+          </p>
+          <p className="mt-1 text-xs text-content-secondary">Fixed bills, debt minimums, and subscriptions as share of income.</p>
+        </div>
+
+        <div className="rounded-lg border border-surface-border bg-surface-raised p-4 text-left">
+          <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary">Bills due vs income</p>
+          <p className="mt-2 text-lg font-semibold text-content-primary">
+            ${next30DayBillsTotal.toFixed(0)} due in 30 days
+          </p>
+          <p className="mt-1 text-xs text-content-secondary">
+            {next30DayBillsVsIncomePct === null
+              ? 'Add income to compare this load.'
+              : `${next30DayBillsVsIncomePct.toFixed(0)}% of your monthly income.`}
+          </p>
+        </div>
+      </div>
 
       {/* 30-Day Cash Flow Forecast */}
       {cashFlowForecast.length > 0 && (
@@ -597,7 +711,7 @@ export default function Dashboard() {
       </section>
 
       {/* 4. Active Intelligence Grid — only modules that have underlying data */}
-      {smartAlertsVisibleCount > 0 && (
+      {!calmMode && smartAlertsVisibleCount > 0 && (
         <>
           <h2 className="section-label pl-1 mt-12 mb-4">Smart Alerts & Active Monitoring</h2>
           <div

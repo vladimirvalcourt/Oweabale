@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useStore } from '../store/useStore';
 import type { Goal } from '../store/useStore';
-import { Target, Plus, TrendingUp, TrendingDown, CheckCircle2, AlertCircle, X } from 'lucide-react';
+import { Target, Plus, TrendingUp, TrendingDown, CheckCircle2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
+
+const ACCOUNTABILITY_CHECKIN_KEY = 'oweable_accountability_checkins_v1';
 export default function Goals() {
   const { goals, addGoal, addGoalProgress, deleteGoal } = useStore();
   const [isAddingGoal, setIsAddingGoal] = useState(false);
@@ -15,6 +17,44 @@ export default function Goals() {
     deadline: '',
     type: 'savings' as Goal['type'],
   });
+  const [checkInText, setCheckInText] = useState('');
+  const [checkIns, setCheckIns] = useState<Array<{ at: string; note: string }>>(() => {
+    try {
+      const raw = localStorage.getItem(ACCOUNTABILITY_CHECKIN_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as Array<{ at: string; note: string }>;
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const persistCheckIns = (next: Array<{ at: string; note: string }>) => {
+    setCheckIns(next);
+    try {
+      localStorage.setItem(ACCOUNTABILITY_CHECKIN_KEY, JSON.stringify(next.slice(0, 20)));
+    } catch {
+      // ignore storage failures
+    }
+  };
+
+  const checkInStreakWeeks = useMemo(() => {
+    if (checkIns.length === 0) return 0;
+    const sorted = [...checkIns].sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime());
+    let streak = 0;
+    let cursor = new Date();
+    for (const entry of sorted) {
+      const entryDate = new Date(entry.at);
+      const weeksAgo = Math.floor((cursor.getTime() - entryDate.getTime()) / (7 * 24 * 60 * 60 * 1000));
+      if (weeksAgo <= 1) {
+        streak++;
+        cursor = entryDate;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }, [checkIns]);
 
   const handleAddGoal = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,10 +63,31 @@ export default function Goals() {
       return;
     }
 
+    const targetAmount = Number(newGoal.targetAmount);
+    const startingAmount = Number(newGoal.currentAmount) || 0;
+    const deadlineMs = new Date(newGoal.deadline).getTime();
+
+    if (!Number.isFinite(targetAmount) || targetAmount <= 0) {
+      toast.error('Target amount must be greater than $0.');
+      return;
+    }
+    if (startingAmount < 0) {
+      toast.error('Starting amount cannot be negative.');
+      return;
+    }
+    if (startingAmount > targetAmount) {
+      toast.error('Starting amount cannot be greater than target amount.');
+      return;
+    }
+    if (!Number.isFinite(deadlineMs) || deadlineMs < Date.now()) {
+      toast.error('Target date must be in the future.');
+      return;
+    }
+
     const ok = await addGoal({
       name: newGoal.name,
-      targetAmount: Number(newGoal.targetAmount),
-      currentAmount: Number(newGoal.currentAmount) || 0,
+      targetAmount,
+      currentAmount: startingAmount,
       deadline: newGoal.deadline,
       type: newGoal.type,
       color: newGoal.type === 'debt' ? '#dc3545' : newGoal.type === 'emergency' ? '#f59e0b' : '#d4d4d4',
@@ -49,6 +110,20 @@ export default function Goals() {
       toast.error('Enter a valid number');
       return;
     }
+    const goal = goals.find((g) => g.id === id);
+    if (!goal) {
+      toast.error('Goal not found.');
+      return;
+    }
+    const nextAmount = goal.currentAmount + numAmount;
+    if (nextAmount < 0) {
+      toast.error('Update would make progress negative.');
+      return;
+    }
+    if (nextAmount > goal.targetAmount) {
+      toast.error('Update exceeds target amount. Use a smaller value.');
+      return;
+    }
     const ok = await addGoalProgress(id, numAmount);
     if (!ok) return;
     toast.success('Progress updated');
@@ -57,6 +132,49 @@ export default function Goals() {
 
   return (
     <div className="space-y-6">
+      <CollapsibleModule title="Accountability Check-in" icon={Target} defaultOpen={false}>
+        <div className="space-y-3">
+          <p className="text-sm text-content-secondary">
+            Weekly commitment log to stay consistent. Current streak: <span className="font-medium text-content-primary">{checkInStreakWeeks} week(s)</span>.
+          </p>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <input
+              value={checkInText}
+              onChange={(e) => setCheckInText(e.target.value)}
+              placeholder="What is your next money move this week?"
+              className="flex-1 rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const note = checkInText.trim();
+                if (!note) {
+                  toast.error('Add a short check-in note first.');
+                  return;
+                }
+                const next = [{ at: new Date().toISOString(), note }, ...checkIns];
+                persistCheckIns(next);
+                setCheckInText('');
+                toast.success('Check-in saved. Keep going.');
+              }}
+              className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-neutral-200"
+            >
+              Save check-in
+            </button>
+          </div>
+          {checkIns.length > 0 && (
+            <ul className="space-y-2">
+              {checkIns.slice(0, 5).map((entry, idx) => (
+                <li key={`${entry.at}-${idx}`} className="rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-xs">
+                  <p className="text-content-primary">{entry.note}</p>
+                  <p className="mt-1 text-content-tertiary">{new Date(entry.at).toLocaleString()}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </CollapsibleModule>
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Goals overview</h1>

@@ -8,6 +8,7 @@ import { BrandLogo } from '../components/BrandLogo';
 type SubFrequency = 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Yearly';
 
 const SUB_FREQUENCIES: SubFrequency[] = ['Weekly', 'Bi-weekly', 'Monthly', 'Yearly'];
+const CANCELLATION_REVIEW_STORAGE_KEY = 'oweable_subscription_cancellation_review_v1';
 
 function toSubFrequency(value: string): SubFrequency {
   return SUB_FREQUENCIES.includes(value as SubFrequency) ? (value as SubFrequency) : 'Monthly';
@@ -24,6 +25,35 @@ export default function Subscriptions() {
     nextBillingDate: '',
     status: 'active' as 'active' | 'paused' | 'cancelled',
   });
+  const [cancellationReviewIds, setCancellationReviewIds] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem(CANCELLATION_REVIEW_STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw) as string[];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const persistCancellationReviewIds = (ids: string[]) => {
+    setCancellationReviewIds(ids);
+    try {
+      localStorage.setItem(CANCELLATION_REVIEW_STORAGE_KEY, JSON.stringify(ids));
+    } catch {
+      // ignore storage failures
+    }
+  };
+
+  const flagForCancellationReview = (id: string) => {
+    if (cancellationReviewIds.includes(id)) return;
+    persistCancellationReviewIds([id, ...cancellationReviewIds]);
+    toast.success('Added to cancellation review queue');
+  };
+
+  const removeFromCancellationReview = (id: string) => {
+    persistCancellationReviewIds(cancellationReviewIds.filter((subId) => subId !== id));
+  };
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,6 +145,46 @@ export default function Subscriptions() {
     if (curr <= prev) return null;
     return { prev, curr, pct: (((curr - prev) / prev) * 100).toFixed(0) };
   };
+  const cancellationQueue = subscriptions.filter((sub) => cancellationReviewIds.includes(sub.id));
+
+  const detectedAmountChanges = useMemo(() => {
+    const changes = new Map<string, { previous: number; detected: number; pct: number; txDate: string }>();
+    for (const sub of subscriptions) {
+      const matches = transactions
+        .filter((tx) => tx.type === 'expense')
+        .filter((tx) => tx.name.toLowerCase().includes(sub.name.toLowerCase()))
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      if (matches.length < 2) continue;
+      const latest = matches[matches.length - 1];
+      const previous = matches[matches.length - 2];
+      if (!latest || !previous) continue;
+      const delta = latest.amount - previous.amount;
+      if (Math.abs(delta) < 0.5) continue;
+      const pct = previous.amount > 0 ? (delta / previous.amount) * 100 : 0;
+      changes.set(sub.id, {
+        previous: previous.amount,
+        detected: latest.amount,
+        pct,
+        txDate: latest.date,
+      });
+    }
+    return changes;
+  }, [subscriptions, transactions]);
+
+  const applyDetectedPriceChange = async (sub: Subscription) => {
+    const detected = detectedAmountChanges.get(sub.id);
+    if (!detected) return;
+    const nextHistory = [
+      ...(sub.priceHistory ?? []),
+      { date: detected.txDate, amount: detected.detected },
+    ];
+    const ok = await editSubscription(sub.id, {
+      amount: detected.detected,
+      priceHistory: nextHistory,
+    });
+    if (!ok) return;
+    toast.success(`Updated ${sub.name} to $${detected.detected.toFixed(2)} and saved price history.`);
+  };
 
   return (
     <div className="space-y-6">
@@ -160,7 +230,10 @@ export default function Subscriptions() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => startEdit(subscriptions.find(s => s.id === sub.id)!)}
+                  onClick={() => {
+                    const target = subscriptions.find((s) => s.id === sub.id);
+                    if (target) startEdit(target);
+                  }}
                   className="rounded-md px-2 py-1 text-xs text-content-tertiary transition-colors hover:bg-surface-highlight hover:text-content-primary"
                 >
                   Review
@@ -171,6 +244,44 @@ export default function Subscriptions() {
           <p className="text-xs text-content-muted mt-3">
             These subscriptions have no matching charge in the last 35 days. Verify they&apos;re still being used.
           </p>
+        </div>
+      )}
+
+      {cancellationQueue.length > 0 && (
+        <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="h-4 w-4 text-rose-300 shrink-0" />
+            <h3 className="text-sm font-semibold text-rose-200">Cancellation review queue</h3>
+            <span className="ml-auto text-xs text-content-secondary">{cancellationQueue.length} flagged</span>
+          </div>
+          <div className="space-y-2">
+            {cancellationQueue.map((sub) => (
+              <div key={sub.id} className="flex items-center justify-between py-2 border-b border-rose-500/20 last:border-0">
+                <div>
+                  <p className="text-sm font-medium text-content-primary">{sub.name}</p>
+                  <p className="text-xs text-content-tertiary">
+                    ${normalizeToMonthly(sub.amount, sub.frequency).toFixed(2)}/mo equivalent
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => startEdit(sub)}
+                    className="rounded-md px-2 py-1 text-xs text-content-tertiary transition-colors hover:bg-surface-highlight hover:text-content-primary"
+                  >
+                    Review
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeFromCancellationReview(sub.id)}
+                    className="rounded-md px-2 py-1 text-xs text-rose-200 transition-colors hover:bg-rose-500/20"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -317,10 +428,14 @@ export default function Subscriptions() {
         <CollapsibleModule title="Your subscriptions" icon={Repeat}>
           <ul className="divide-y divide-surface-highlight -mx-6 -my-6">
             {subscriptions.map((sub) => (
-              <li 
-                key={sub.id} 
+              <li
+                key={sub.id}
                 className="p-4 sm:px-6 hover:bg-surface-elevated transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
               >
+                {(() => {
+                  const detectedChange = detectedAmountChanges.get(sub.id);
+                  return (
+                    <>
                 <div className="flex items-center gap-4">
                   <BrandLogo size="lg" name={sub.name} fallbackIcon={<Repeat className="w-5 h-5 text-content-muted" />} />
                   <div>
@@ -358,8 +473,29 @@ export default function Subscriptions() {
                   <div className="text-right">
                     <p className="text-base font-bold font-mono tabular-nums text-content-primary data-numeric">${sub.amount.toFixed(2)}</p>
                     <p className="text-xs text-content-tertiary normal-case">{sub.frequency}</p>
+                        {detectedChange && (
+                          <p className="text-[10px] text-amber-300 mt-1">
+                            Detected from transactions: ${detectedChange.detected.toFixed(2)}
+                          </p>
+                        )}
                   </div>
                   <div className="flex items-center gap-2">
+                        {detectedChange && (
+                          <button
+                            onClick={() => void applyDetectedPriceChange(sub)}
+                            className="rounded-md px-2 py-1 text-xs text-amber-300 border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
+                            title="Apply detected amount change"
+                          >
+                            Apply change
+                          </button>
+                        )}
+                      <button
+                        onClick={() => flagForCancellationReview(sub.id)}
+                        className="rounded-md px-2 py-1 text-xs text-amber-300 border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
+                        title="Flag for cancellation review"
+                      >
+                        Flag
+                      </button>
                     <button
                       onClick={() => startEdit(sub)}
                       className="p-2 text-content-tertiary hover:text-content-secondary rounded-md hover:bg-surface-elevated transition-colors"
@@ -376,6 +512,9 @@ export default function Subscriptions() {
                     </button>
                   </div>
                 </div>
+                    </>
+                  );
+                })()}
               </li>
             ))}
           </ul>

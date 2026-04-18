@@ -240,6 +240,16 @@ export default function Pricing() {
 
           </div>
 
+          <div className="mt-8 rounded-lg border border-surface-border bg-surface-raised p-5">
+            <h4 className="text-sm font-semibold text-content-primary">Free-tier trust promise</h4>
+            <p className="mt-2 text-sm text-content-secondary">
+              Tracker remains useful without upgrading: you can keep managing core workflows, export your data, and cancel paid plans in-app any time.
+            </p>
+            <p className="mt-1 text-xs text-content-tertiary">
+              No forced phone calls, no hidden cancellation path, and no lock-in for your account controls.
+            </p>
+          </div>
+
           <div className="mt-16 border border-surface-border rounded-lg bg-surface-raised overflow-hidden">
             <div className="grid grid-cols-3 border-b border-surface-border text-xs font-mono uppercase tracking-widest">
               <div className="px-4 py-3 text-content-muted">Feature</div>

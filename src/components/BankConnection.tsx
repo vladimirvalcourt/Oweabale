@@ -7,6 +7,36 @@ import { usePlaidFlow } from '../hooks/usePlaidFlow';
 import { createStripeCheckoutSession } from '../lib/stripe';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 
+const CONNECTION_TIMELINE_STORAGE_KEY = 'oweable_connection_timeline_v1';
+
+type ConnectionTimelineEvent = {
+  id: string;
+  at: string;
+  type: 'sync_success' | 'sync_failure' | 'relink_requested' | 'disconnected' | 'connected';
+  detail: string;
+};
+
+function loadTimeline(): ConnectionTimelineEvent[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(CONNECTION_TIMELINE_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as ConnectionTimelineEvent[];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveTimeline(events: ConnectionTimelineEvent[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(CONNECTION_TIMELINE_STORAGE_KEY, JSON.stringify(events.slice(0, 20)));
+  } catch {
+    // ignore storage failures
+  }
+}
+
 /** When Plaid UI is off, manual-first copy; still allow disconnect if a link exists from earlier testing. */
 function BankConnectionGated() {
   const { bankConnected, plaidInstitutionName, disconnectBank } = useStore();
@@ -65,6 +95,7 @@ function BankConnectionPlaid() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isUpgrading, setIsUpgrading] = useState(false);
+  const [incidentTimeline, setIncidentTimeline] = useState<ConnectionTimelineEvent[]>(() => loadTimeline());
   const { hasFullSuite, isLoading: checkingAccess } = useFullSuiteAccess();
 
   const plaidGloballyEnabled = platformSettings?.plaidEnabled !== false;
@@ -77,16 +108,49 @@ function BankConnectionPlaid() {
 
   const handleConnectClick = async () => {
     await plaidFlow.startConnect();
+    const next: ConnectionTimelineEvent[] = [
+      {
+        id: crypto.randomUUID(),
+        at: new Date().toISOString(),
+        type: 'connected',
+        detail: 'Bank connection flow started.',
+      },
+      ...incidentTimeline,
+    ];
+    setIncidentTimeline(next);
+    saveTimeline(next);
   };
 
   const handleFixConnectionClick = async () => {
     await plaidFlow.startReconnect();
+    const next: ConnectionTimelineEvent[] = [
+      {
+        id: crypto.randomUUID(),
+        at: new Date().toISOString(),
+        type: 'relink_requested',
+        detail: 'User initiated reconnect flow.',
+      },
+      ...incidentTimeline,
+    ];
+    setIncidentTimeline(next);
+    saveTimeline(next);
   };
 
   const handleSyncClick = async () => {
     setIsSyncing(true);
     try {
-      await syncPlaidTransactions();
+      const ok = await syncPlaidTransactions();
+      const next: ConnectionTimelineEvent[] = [
+        {
+          id: crypto.randomUUID(),
+          at: new Date().toISOString(),
+          type: ok ? 'sync_success' : 'sync_failure',
+          detail: ok ? 'Manual sync completed successfully.' : 'Manual sync failed or returned no updates.',
+        },
+        ...incidentTimeline,
+      ];
+      setIncidentTimeline(next);
+      saveTimeline(next);
     } finally {
       setIsSyncing(false);
     }
@@ -96,6 +160,17 @@ function BankConnectionPlaid() {
     setIsDisconnecting(true);
     try {
       await disconnectBank();
+      const next: ConnectionTimelineEvent[] = [
+        {
+          id: crypto.randomUUID(),
+          at: new Date().toISOString(),
+          type: 'disconnected',
+          detail: 'Bank connection was disconnected.',
+        },
+        ...incidentTimeline,
+      ];
+      setIncidentTimeline(next);
+      saveTimeline(next);
     } finally {
       setIsDisconnecting(false);
     }
@@ -190,6 +265,24 @@ function BankConnectionPlaid() {
           </div>
         </div>
       )}
+      <div className="mb-4 rounded-lg border border-surface-border bg-surface-base p-4">
+        <p className="text-sm font-medium text-content-primary">Connection incident timeline</p>
+        <p className="mt-1 text-xs text-content-tertiary">
+          Recent connection events for faster troubleshooting.
+        </p>
+        {incidentTimeline.length === 0 ? (
+          <p className="mt-3 text-xs text-content-muted">No incidents logged yet.</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {incidentTimeline.slice(0, 5).map((event) => (
+              <li key={event.id} className="rounded border border-surface-border bg-surface-raised px-2.5 py-2 text-xs">
+                <p className="font-medium text-content-secondary">{event.detail}</p>
+                <p className="mt-0.5 text-content-tertiary">{new Date(event.at).toLocaleString()}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       {!bankConnected ? (
         <div className="flex flex-col items-start gap-2">
