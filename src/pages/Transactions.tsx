@@ -291,6 +291,11 @@ export default function Transactions() {
                     const isPriceHike = subData && transaction.type === 'expense' && transaction.amount > subData.amount;
                     const txExclusionId = exclusionByTxId.get(transaction.id);
                     const merchantExclusionId = exclusionByMerchantKey.get(transaction.name.toLowerCase().trim());
+                    const exclusionReason = txExclusionId
+                      ? 'Auto-categorization disabled for this transaction.'
+                      : merchantExclusionId
+                        ? 'Auto-categorization disabled for this merchant.'
+                        : null;
                     
                     return (
                       <tr 
@@ -378,9 +383,20 @@ export default function Transactions() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex flex-col gap-1">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[9px] font-mono font-bold uppercase tracking-widest bg-surface-base border border-surface-border text-content-tertiary group-hover:text-content-secondary transition-colors">
+                            <span
+                              title={exclusionReason ?? undefined}
+                              className="inline-flex items-center px-2 py-0.5 rounded-lg text-[9px] font-mono font-bold uppercase tracking-widest bg-surface-base border border-surface-border text-content-tertiary group-hover:text-content-secondary transition-colors"
+                            >
                               {transaction.category}
                             </span>
+                            {exclusionReason && (
+                              <span
+                                title={exclusionReason}
+                                className="inline-flex items-center w-fit rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-medium text-amber-300"
+                              >
+                                Excluded from auto-rules
+                              </span>
+                            )}
                           </div>
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold font-mono tabular-nums text-right ${

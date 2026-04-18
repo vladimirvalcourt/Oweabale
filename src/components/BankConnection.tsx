@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Lock, Loader2, RefreshCw, Unplug, AlertTriangle } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Lock, Loader2, RefreshCw, Unplug, AlertTriangle, ShieldCheck, ShieldAlert, Clock3 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
 import { isPlaidLinkUiEnabled } from '../lib/featureFlags';
 import { usePlaidFlow } from '../hooks/usePlaidFlow';
-import { supabase } from '../lib/supabaseClient';
 import { createStripeCheckoutSession } from '../lib/stripe';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 
@@ -116,6 +115,32 @@ function BankConnectionPlaid() {
 
   const displayName = plaidInstitutionName?.trim() || 'Connected bank';
   const lastSyncLabel = plaidLastSyncAt ? new Date(plaidLastSyncAt).toLocaleString() : null;
+  const syncHealth = useMemo(() => {
+    if (!bankConnected) return { score: 0, state: 'disconnected' as const, detail: 'No bank connected yet.' };
+    if (plaidNeedsRelink) {
+      return {
+        score: 25,
+        state: 'needs_attention' as const,
+        detail: 'Institution sign-in expired. Reconnect to restore syncing.',
+      };
+    }
+    if (!plaidLastSyncAt) {
+      return { score: 60, state: 'warming' as const, detail: 'Connected, waiting for first successful sync.' };
+    }
+    const ageMs = Date.now() - new Date(plaidLastSyncAt).getTime();
+    const hours = ageMs / 3600000;
+    if (hours <= 24) {
+      return { score: 95, state: 'healthy' as const, detail: 'Recent sync in the last 24 hours.' };
+    }
+    if (hours <= 72) {
+      return { score: 75, state: 'stale' as const, detail: 'Sync is older than one day. Run Sync now.' };
+    }
+    return {
+      score: 45,
+      state: 'stale' as const,
+      detail: 'No recent sync for 3+ days. Sync now, then reconnect if needed.',
+    };
+  }, [bankConnected, plaidNeedsRelink, plaidLastSyncAt]);
 
   return (
     <div className="rounded-lg border border-surface-border bg-surface-raised p-6">
@@ -126,6 +151,45 @@ function BankConnectionPlaid() {
           Sync runs automatically and you can refresh on demand.
         </p>
       </div>
+      {bankConnected && (
+        <div className="mb-4 rounded-lg border border-surface-border bg-surface-base p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              {syncHealth.state === 'healthy' ? (
+                <ShieldCheck className="h-4 w-4 text-emerald-400" aria-hidden />
+              ) : syncHealth.state === 'needs_attention' ? (
+                <ShieldAlert className="h-4 w-4 text-amber-400" aria-hidden />
+              ) : (
+                <Clock3 className="h-4 w-4 text-content-tertiary" aria-hidden />
+              )}
+              <p className="text-sm font-medium text-content-primary">Connection resilience center</p>
+            </div>
+            <span className="rounded-full border border-surface-border bg-surface-raised px-2.5 py-0.5 text-xs font-medium text-content-secondary">
+              Health score: {syncHealth.score}/100
+            </span>
+          </div>
+          <p className="mt-2 text-xs font-medium text-content-secondary">{syncHealth.detail}</p>
+          <div className="mt-3 h-2 w-full overflow-hidden rounded-full border border-surface-border bg-surface-raised">
+            <div
+              className={`h-full transition-all ${
+                syncHealth.score >= 90 ? 'bg-emerald-500' : syncHealth.score >= 70 ? 'bg-amber-500' : 'bg-rose-500'
+              }`}
+              style={{ width: `${Math.max(8, syncHealth.score)}%` }}
+            />
+          </div>
+          <div className="mt-3 grid grid-cols-1 gap-2 text-xs text-content-tertiary sm:grid-cols-3">
+            <div className="rounded border border-surface-border bg-surface-raised px-2.5 py-2">
+              1. Sync now to refresh balances and transactions.
+            </div>
+            <div className="rounded border border-surface-border bg-surface-raised px-2.5 py-2">
+              2. If stale or failing, use Reconnect for bank MFA re-auth.
+            </div>
+            <div className="rounded border border-surface-border bg-surface-raised px-2.5 py-2">
+              3. If still failing, disconnect and relink cleanly.
+            </div>
+          </div>
+        </div>
+      )}
 
       {!bankConnected ? (
         <div className="flex flex-col items-start gap-2">
