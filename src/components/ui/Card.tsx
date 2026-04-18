@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils';
  */
 export function Card({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("bg-surface-highlight rounded-md border border-surface-border overflow-hidden shadow-stripe-dark hover:bg-surface-border-subtle transition-colors", className)}>
+    <div className={cn("bg-surface-raised rounded-lg border border-surface-border overflow-hidden shadow-none hover:bg-white/[0.02] transition-colors", className)}>
       {children}
     </div>
   );

@@ -65,7 +65,7 @@ function ProfilePanelInner() {
       <div className="-mx-6 -my-6 p-6 bg-surface-base">
         <form onSubmit={handleProfileSubmit} className="space-y-6">
           <div className="flex items-center gap-6 pb-6 border-b border-surface-border">
-            <div className="h-16 w-16 rounded-sm bg-surface-elevated border border-surface-border flex items-center justify-center overflow-hidden shadow-inner shrink-0 relative">
+            <div className="h-16 w-16 rounded-lg bg-surface-elevated border border-surface-border flex items-center justify-center overflow-hidden shadow-inner shrink-0 relative">
               {user.avatar ? (
                 <img src={user.avatar} alt="Identifier" className="h-full w-full object-cover" data-no-invert />
               ) : (
@@ -76,7 +76,7 @@ function ProfilePanelInner() {
               )}
             </div>
             <div className="space-y-1">
-              <label className="inline-block cursor-pointer px-4 py-1.5 bg-transparent border border-surface-border rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated transition-colors relative">
+              <label className="inline-block cursor-pointer px-4 py-1.5 bg-transparent border border-surface-border rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated transition-colors relative">
                 Update Picture
                 <input
                   type="file"
@@ -125,7 +125,7 @@ function ProfilePanelInner() {
                 value={formData.firstName}
                 onChange={handleChange}
                 required
-                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors"
+                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors"
               />
             </div>
 
@@ -139,7 +139,7 @@ function ProfilePanelInner() {
                 value={formData.lastName}
                 onChange={handleChange}
                 required
-                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors"
+                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors"
               />
             </div>
 
@@ -153,7 +153,7 @@ function ProfilePanelInner() {
                 id="email"
                 value={formData.email}
                 readOnly
-                className="block w-full text-[13px] font-mono border-surface-border bg-surface-base text-content-tertiary rounded-sm px-3 py-2 border focus-app-field cursor-not-allowed select-none"
+                className="block w-full text-[13px] font-mono border-surface-border bg-surface-base text-content-tertiary rounded-lg px-3 py-2 border focus-app-field cursor-not-allowed select-none"
               />
             </div>
 
@@ -167,7 +167,7 @@ function ProfilePanelInner() {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="+1 (555) 000-0000"
-                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors"
+                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors"
               />
             </div>
 
@@ -179,7 +179,7 @@ function ProfilePanelInner() {
                 id="timezone"
                 value={formData.timezone}
                 onChange={handleChange}
-                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors appearance-none"
+                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors appearance-none"
               >
                 <option value="Pacific Time (PT)">Pacific Time (PT)</option>
                 <option value="Eastern Time (ET)">Eastern Time (ET)</option>
@@ -196,7 +196,7 @@ function ProfilePanelInner() {
                 id="language"
                 value={formData.language}
                 onChange={handleChange}
-                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-sm px-3 py-2 border transition-colors appearance-none"
+                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors appearance-none"
               >
                 <option value="English (US)">English (US)</option>
                 <option value="Spanish">Spanish</option>
@@ -210,7 +210,7 @@ function ProfilePanelInner() {
             <button
               type="submit"
               disabled={isSaving}
-              className="flex items-center gap-2 px-6 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors shadow-lg shadow-indigo-500/10"
+              className="flex items-center gap-2 px-6 py-2 bg-white text-black hover:bg-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors shadow-none"
             >
               {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
               {isSaving ? 'Saving...' : 'Save Changes'}

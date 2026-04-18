@@ -80,7 +80,7 @@ function FeedbackPanelInner() {
                 <select
                   value={feedbackForm.type}
                   onChange={(e) => setFeedbackForm((f) => ({ ...f, type: e.target.value }))}
-                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo appearance-none"
+                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field-indigo appearance-none"
                 >
                   <option value="general">General Feedback</option>
                   <option value="feature_request">Feature Request</option>
@@ -112,7 +112,7 @@ function FeedbackPanelInner() {
               <textarea
                 value={feedbackForm.message}
                 onChange={(e) => setFeedbackForm((f) => ({ ...f, message: e.target.value }))}
-                className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 focus-app-field-indigo h-28 resize-none placeholder:text-content-muted"
+                className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-lg px-3 py-2 focus-app-field-indigo h-28 resize-none placeholder:text-content-muted"
                 placeholder="Tell us what's working, what's not, or what you'd like to see..."
               />
             </div>
@@ -120,7 +120,7 @@ function FeedbackPanelInner() {
               <button
                 type="submit"
                 disabled={isSubmittingFeedback}
-                className="flex items-center gap-2 px-6 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors"
+                className="flex items-center gap-2 px-6 py-2 bg-white text-black hover:bg-neutral-200 disabled:opacity-50 text-black rounded-lg text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors"
               >
                 {isSubmittingFeedback ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                 {isSubmittingFeedback ? 'Sending...' : 'Send Feedback'}
@@ -156,11 +156,11 @@ function FeedbackPanelInner() {
                 <div key={fb.id} className="p-5 hover:bg-surface-elevated transition-colors">
                   <div className="flex items-center justify-between mb-2">
                     <span
-                      className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-sm border ${
+                      className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-lg border ${
                         fb.type === 'bug'
                           ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
                           : fb.type === 'feature_request'
-                            ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400'
+                            ? 'bg-white/[0.05] border-surface-border text-content-primary'
                             : 'bg-surface-elevated border-surface-border text-content-tertiary'
                       }`}
                     >

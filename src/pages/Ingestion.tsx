@@ -324,7 +324,7 @@ export default function Ingestion() {
       <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-sans font-medium tracking-tight text-content-primary">
-            Review <span className="text-indigo-500">Inbox</span>
+            Review <span className="text-content-secondary">Inbox</span>
           </h1>
           <p className="text-[14px] font-sans text-content-tertiary mt-2">
             Uploads are read automatically and saved when amounts are detected. Scanned PDFs (photos of paper) are OCR&apos;d page-by-page; if nothing is found, fill fields manually.
@@ -351,7 +351,7 @@ export default function Ingestion() {
             <button 
               type="button"
               onClick={() => cameraInputRef.current?.click()}
-              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-sm border border-surface-border bg-surface-raised px-4 py-2.5 text-xs font-sans font-semibold text-content-secondary transition-colors hover:bg-surface-elevated btn-tactile"
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-4 py-2.5 text-xs font-sans font-semibold text-content-secondary transition-colors hover:bg-surface-elevated btn-tactile"
             >
               <Camera className="h-4 w-4 shrink-0" aria-hidden />
               <span className="text-center leading-tight">Camera</span>
@@ -359,7 +359,7 @@ export default function Ingestion() {
             <button 
               type="button"
               onClick={() => setIsSyncOpen(true)}
-              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-sm border border-brand-violet/30 bg-brand-violet/10 px-4 py-2.5 text-xs font-sans font-semibold text-brand-violet transition-colors hover:bg-brand-violet/20 btn-tactile"
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-lg border border-brand-violet/30 bg-brand-violet/10 px-4 py-2.5 text-xs font-sans font-semibold text-brand-violet transition-colors hover:bg-brand-violet/20 btn-tactile"
             >
               <Smartphone className="h-4 w-4 shrink-0" aria-hidden />
               <span className="text-center leading-tight">Scan via phone</span>
@@ -367,7 +367,7 @@ export default function Ingestion() {
             <button 
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-sm border border-surface-border bg-surface-raised px-4 py-2.5 text-xs font-sans font-semibold text-content-secondary transition-colors hover:bg-surface-elevated btn-tactile"
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-4 py-2.5 text-xs font-sans font-semibold text-content-secondary transition-colors hover:bg-surface-elevated btn-tactile"
             >
               <UploadCloud className="h-4 w-4 shrink-0" aria-hidden />
               <span className="text-center leading-tight">Upload documents</span>
@@ -378,7 +378,7 @@ export default function Ingestion() {
             <button 
               type="button"
               onClick={handleBulkCommit}
-              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-sm bg-brand-cta px-4 py-2.5 text-xs font-sans font-semibold text-white shadow-sm transition-colors hover:bg-brand-cta-hover btn-tactile sm:ml-auto sm:w-auto sm:min-w-[12rem]"
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-xs font-sans font-semibold text-black shadow-none transition-colors hover:bg-neutral-200 btn-tactile sm:ml-auto sm:w-auto sm:min-w-[12rem]"
             >
               <FileCheck className="h-4 w-4 shrink-0" aria-hidden />
               Save all ready
@@ -390,8 +390,8 @@ export default function Ingestion() {
       <div className="space-y-4">
         {pendingIngestions.length === 0 ? (
           <div 
-            className={`border-2 border-dashed rounded-sm p-20 text-center transition-all cursor-pointer ${
-              dragActive ? 'border-indigo-500 bg-indigo-500/5' : 'border-surface-border bg-surface-raised hover:bg-surface-elevated'
+            className={`border-2 border-dashed rounded-lg p-20 text-center transition-all cursor-pointer ${
+              dragActive ? 'border-white bg-white/[0.03]' : 'border-surface-border bg-surface-raised hover:bg-surface-elevated'
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
@@ -399,15 +399,15 @@ export default function Ingestion() {
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
           >
-            <UploadCloud className={`w-12 h-12 mx-auto mb-6 transition-colors ${dragActive ? 'text-indigo-500' : 'text-content-muted'}`} />
+            <UploadCloud className={`w-12 h-12 mx-auto mb-6 transition-colors ${dragActive ? 'text-content-secondary' : 'text-content-muted'}`} />
             <h3 className="text-lg font-sans font-semibold text-content-primary">Inbox is empty</h3>
             <p className="text-sm text-content-tertiary mt-2 max-w-md mx-auto">Drop a PDF or photo, or upload from your computer. Scanned PDFs are read page-by-page when needed; very blurry shots may still need manual entry.</p>
-            <div className="mt-8 inline-block px-8 py-3 rounded-sm bg-brand-cta text-white text-sm font-sans font-semibold shadow-sm btn-tactile">
+            <div className="mt-8 inline-block px-8 py-3 rounded-lg bg-white text-black text-sm font-sans font-semibold shadow-sm btn-tactile">
               Choose files
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-px bg-surface-border border border-surface-border rounded-sm overflow-hidden shadow-2xl">
+          <div className="grid grid-cols-1 gap-px bg-surface-border border border-surface-border rounded-lg overflow-hidden shadow-2xl">
             {/* Table Header */}
             <div className="hidden md:grid grid-cols-12 bg-surface-elevated px-6 py-3 border-b border-surface-border">
               <div className="col-span-4 section-label normal-case text-[10px]">Document</div>
@@ -427,12 +427,12 @@ export default function Ingestion() {
                 <motion.div 
                   layout
                   id={`ingestion-${item.id}`}
-                  className={`grid grid-cols-12 items-center px-6 py-4 hover:bg-surface-elevated/50 transition-colors group ${selectedId === item.id ? 'bg-surface-elevated/40 ring-1 ring-inset ring-indigo-500/30' : ''} ${recentlyAddedId === item.id ? 'bg-brand-violet/10 animate-pulse-highlight' : ''}`}
+                  className={`grid grid-cols-12 items-center px-6 py-4 hover:bg-surface-elevated/50 transition-colors group ${selectedId === item.id ? 'bg-surface-elevated/40 ring-1 ring-inset ring-white/20' : ''} ${recentlyAddedId === item.id ? 'bg-brand-violet/10 animate-pulse-highlight' : ''}`}
                   onClick={() => setSelectedId(item.id)}
                 >
                   <div className="col-span-8 md:col-span-4 flex items-center gap-4">
-                    <div className="w-10 h-10 bg-surface-raised border border-surface-border rounded-sm flex items-center justify-center shrink-0">
-                      {item.originalFile?.type?.includes('image') ? <FileText className="w-5 h-5 text-indigo-400" /> : <FileText className="w-5 h-5 text-content-tertiary" />}
+                    <div className="w-10 h-10 bg-surface-raised border border-surface-border rounded-lg flex items-center justify-center shrink-0">
+                      {item.originalFile?.type?.includes('image') ? <FileText className="w-5 h-5 text-content-primary" /> : <FileText className="w-5 h-5 text-content-tertiary" />}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
@@ -457,7 +457,7 @@ export default function Ingestion() {
                             })
                           }
                           onClick={(e) => e.stopPropagation()}
-                          className="w-full max-w-[200px] bg-surface-raised border border-surface-border text-[9px] font-mono font-bold uppercase tracking-widest text-content-tertiary rounded-sm px-2 py-1 focus-app-field-indigo"
+                          className="w-full max-w-[200px] bg-surface-raised border border-surface-border text-[9px] font-mono font-bold uppercase tracking-widest text-content-tertiary rounded-lg px-2 py-1 focus-app-field-indigo"
                         >
                           <option value="transaction">Transaction</option>
                           <option value="bill">Bill</option>
@@ -479,8 +479,8 @@ export default function Ingestion() {
                           </>
                         ) : item.status.includes('scanning') ? (
                           <>
-                            <Loader2 className="w-3 h-3 text-indigo-500 animate-spin" />
-                            <span className="text-[9px] font-mono font-black text-indigo-500 uppercase tracking-widest leading-none">
+                            <Loader2 className="w-3 h-3 text-content-secondary animate-spin" />
+                            <span className="text-[9px] font-mono font-black text-content-secondary uppercase tracking-widest leading-none">
                               {item.status.replace('scanning', '').trim() || 'Reading...'}
                             </span>
                           </>
@@ -518,7 +518,7 @@ export default function Ingestion() {
                           type: e.target.value as PendingIngestion['type'],
                         })
                       }
-                      className="bg-surface-raised border border-surface-border text-[9px] font-mono font-bold uppercase tracking-widest text-content-tertiary rounded-sm px-2 py-1 focus-app-field-indigo transition-colors"
+                      className="bg-surface-raised border border-surface-border text-[9px] font-mono font-bold uppercase tracking-widest text-content-tertiary rounded-lg px-2 py-1 focus-app-field-indigo transition-colors"
                     >
                       <option value="transaction">Transaction</option>
                       <option value="bill">Bill</option>
@@ -531,20 +531,20 @@ export default function Ingestion() {
                   <div className="col-span-4 md:col-span-2 flex items-center justify-end gap-2">
                     <button 
                       onClick={() => setSelectedId(selectedId === item.id ? null : item.id)}
-                      className={`p-2 transition-all rounded-sm ${selectedId === item.id ? 'text-indigo-400 bg-indigo-500/10' : 'text-content-tertiary hover:text-white hover:bg-surface-highlight'}`}
+                      className={`p-2 transition-all rounded-lg ${selectedId === item.id ? 'text-content-primary bg-white/[0.05]' : 'text-content-tertiary hover:text-white hover:bg-surface-highlight'}`}
                     >
                       <Eye className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => handleCommit(item.id)}
                       disabled={item.status !== 'ready'}
-                      className={`p-2 rounded-sm transition-all ${item.status === 'ready' ? 'text-emerald-500 hover:bg-emerald-500/10 cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 'text-content-muted cursor-not-allowed opacity-60'}`}
+                      className={`p-2 rounded-lg transition-all ${item.status === 'ready' ? 'text-emerald-500 hover:bg-emerald-500/10 cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.1)]' : 'text-content-muted cursor-not-allowed opacity-60'}`}
                     >
                       <Check className="w-4 h-4" />
                     </button>
                     <button 
                       onClick={() => removePendingIngestion(item.id)}
-                      className="p-2 text-content-tertiary hover:text-rose-500 hover:bg-rose-500/10 rounded-sm transition-all"
+                      className="p-2 text-content-tertiary hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-all"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -609,8 +609,8 @@ export default function Ingestion() {
 
                         {/* Verification Form */}
                         <div className="flex flex-col">
-                          <h3 className="text-xs font-mono font-bold text-indigo-400 uppercase tracking-widest mb-8 flex items-center gap-2">
-                            <span className="w-2 h-2 bg-indigo-500 rounded-none inline-block" /> Document Review
+                          <h3 className="text-xs font-mono font-bold text-content-primary uppercase tracking-widest mb-8 flex items-center gap-2">
+                            <span className="w-2 h-2 bg-neutral-500 rounded-none inline-block" /> Document Review
                           </h3>
                           <div className="space-y-8 flex-1">
                             {item.type === 'citation' ? (
@@ -625,7 +625,7 @@ export default function Ingestion() {
                                           extractedData: { ...item.extractedData, citationType: e.target.value },
                                         })
                                       }
-                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-secondary focus-app-field-rose transition-colors"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-secondary focus-app-field-rose transition-colors"
                                     >
                                       <option value="Toll Violation">Toll Violation</option>
                                       <option value="Traffic Citation">Traffic Citation</option>
@@ -652,7 +652,7 @@ export default function Ingestion() {
                                         })
                                       }
                                       placeholder="E.g., Harris County, TX"
-                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
                                     />
                                   </div>
                                 </div>
@@ -666,7 +666,7 @@ export default function Ingestion() {
                                           extractedData: { ...item.extractedData, citationNumber: e.target.value },
                                         })
                                       }
-                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors uppercase"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors uppercase"
                                     />
                                   </div>
                                   <div>
@@ -684,7 +684,7 @@ export default function Ingestion() {
                                           },
                                         })
                                       }
-                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
                                     />
                                   </div>
                                 </div>
@@ -699,7 +699,7 @@ export default function Ingestion() {
                                       })
                                     }
                                     placeholder="https://…"
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
                                   />
                                 </div>
                                 <div className="grid grid-cols-2 gap-8">
@@ -713,7 +713,7 @@ export default function Ingestion() {
                                           extractedData: { ...item.extractedData, date: e.target.value },
                                         })
                                       }
-                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
                                     />
                                   </div>
                                   <div>
@@ -730,7 +730,7 @@ export default function Ingestion() {
                                           },
                                         })
                                       }
-                                      className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
+                                      className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-rose transition-colors"
                                     />
                                   </div>
                                 </div>
@@ -746,7 +746,7 @@ export default function Ingestion() {
                                         extractedData: { ...item.extractedData, biller: e.target.value, name: e.target.value },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
                                   />
                                 </div>
                                 <div>
@@ -758,7 +758,7 @@ export default function Ingestion() {
                                         extractedData: { ...item.extractedData, category: e.target.value },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field-indigo transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field-indigo transition-colors"
                                   >
                                     <option value="utilities">Utilities</option>
                                     <option value="housing">Housing</option>
@@ -793,7 +793,7 @@ export default function Ingestion() {
                                         },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
                                   />
                                 </div>
                                 <div>
@@ -805,7 +805,7 @@ export default function Ingestion() {
                                         extractedData: { ...item.extractedData, category: e.target.value },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field-indigo transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field-indigo transition-colors"
                                   >
                                     <option value="Salary">Salary</option>
                                     <option value="Freelance">Freelance</option>
@@ -825,7 +825,7 @@ export default function Ingestion() {
                                         extractedData: { ...item.extractedData, biller: e.target.value, name: e.target.value },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
                                   />
                                 </div>
                                 <div>
@@ -842,7 +842,7 @@ export default function Ingestion() {
                                         },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
                                   />
                                 </div>
                                 <div className="col-span-2">
@@ -860,7 +860,7 @@ export default function Ingestion() {
                                         },
                                       })
                                     }
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
                                   />
                                 </div>
                               </div>
@@ -871,7 +871,7 @@ export default function Ingestion() {
                                   <input 
                                     value={item.extractedData.biller || ''} 
                                     onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, biller: e.target.value, name: e.target.value } })}
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors uppercase tracking-widest"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors uppercase tracking-widest"
                                   />
                                 </div>
                                 <div>
@@ -879,7 +879,7 @@ export default function Ingestion() {
                                   <select 
                                     value={item.extractedData.category || 'utilities'}
                                     onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, category: e.target.value } })}
-                                    className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field-indigo transition-colors uppercase tracking-widest"
+                                    className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field-indigo transition-colors uppercase tracking-widest"
                                   >
                                     <option value="utilities">Utilities</option>
                                     <option value="housing">Housing</option>
@@ -905,7 +905,7 @@ export default function Ingestion() {
                                   type="number"
                                   value={item.extractedData.amount ?? ''} 
                                   onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, amount: parseFloat(e.target.value) } })}
-                                  className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xl font-mono text-[#4ade80] focus-app focus:border-[#4ade80] transition-colors font-bold"
+                                  className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xl font-mono text-[#4ade80] focus-app focus:border-[#4ade80] transition-colors font-bold"
                                 />
                               </div>
                               <div>
@@ -936,7 +936,7 @@ export default function Ingestion() {
                                       });
                                     }
                                   }}
-                                  className="w-full bg-surface-raised border border-surface-border rounded-sm px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
+                                  className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-primary focus-app-field-indigo transition-colors"
                                 />
                               </div>
                             </div>
@@ -951,7 +951,7 @@ export default function Ingestion() {
                             </button>
                             <button 
                               onClick={() => handleCommit(item.id)}
-                              className="px-10 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-colors shadow-lg shadow-indigo-500/20"
+                              className="px-10 py-3 bg-white text-black hover:bg-neutral-200 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-colors shadow-none"
                             >
                               Approve & Save
                             </button>

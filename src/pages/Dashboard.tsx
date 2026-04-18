@@ -287,11 +287,11 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <div className="space-y-6 animate-pulse p-6">
-        <div className="h-8 bg-surface-border rounded w-1/4"></div>
-        <div className="bg-surface-raised rounded border border-surface-border p-8 h-40"></div>
+        <div className="h-8 bg-surface-border rounded-lg w-1/4"></div>
+        <div className="bg-surface-raised rounded-lg border border-surface-border p-8 h-40"></div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-surface-raised rounded border border-surface-border p-6 h-32"></div>
+            <div key={i} className="bg-surface-raised rounded-lg border border-surface-border p-6 h-32"></div>
           ))}
         </div>
       </div>
@@ -311,16 +311,16 @@ export default function Dashboard() {
             {user?.avatar ? (
               <img src={user.avatar} alt="Profile" className="h-full w-full object-cover" />
             ) : (
-              <div className="h-full w-full flex items-center justify-center bg-indigo-500/10 text-brand-indigo text-xl font-sans font-semibold">
+              <div className="h-full w-full flex items-center justify-center bg-white/10 text-content-primary text-xl font-sans font-semibold">
                 {(user?.firstName?.charAt(0) || '')}{(user?.lastName?.charAt(0) || '')}
               </div>
             )}
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl font-sans font-semibold tracking-tight text-white">
-              Welcome back, <span className="text-brand-indigo">{user?.firstName || 'User'}</span>
+              Welcome back, <span className="text-content-primary">{user?.firstName || 'User'}</span>
             </h1>
-            <p className="text-sm font-sans text-content-tertiary mt-1">Here is your financial overview for today.</p>
+            <p className="text-sm font-sans text-content-secondary mt-1">Here is your financial overview for today.</p>
           </div>
         </div>
       </div>
@@ -334,44 +334,45 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 gap-3">
             {/* Ingestion Action */}
             {pendingIngestions.length > 0 && (
-              <TransitionLink to="/ingestion" className="block focus-app rounded-sm">
+              <TransitionLink to="/ingestion" className="block focus-app rounded-lg">
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                  className="bg-indigo-500/10 border border-indigo-500/20 p-5 rounded-sm flex items-center justify-between hover:bg-indigo-500/15 transition-all shadow-sm group"
+                  className="bg-surface-raised border border-surface-border p-5 rounded-lg flex items-center justify-between hover:bg-white/[0.03] transition-all shadow-none group"
                 >
                   <div className="flex items-center gap-5">
-                    <div className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center shrink-0">
-                      <Inbox className="w-5 h-5 text-indigo-400" />
+                    <div className="w-10 h-10 bg-white/[0.06] rounded-full flex items-center justify-center shrink-0 border border-surface-border">
+                      <Inbox className="w-5 h-5 text-content-primary" />
                     </div>
                     <div>
-                      <p className="text-sm font-sans font-medium text-indigo-300">Requires Review</p>
-                      <p className="text-xs font-sans text-indigo-200/70 mt-0.5">{pendingIngestions.length} document{pendingIngestions.length === 1 ? '' : 's'} waiting for approval.</p>
+                      <p className="text-sm font-sans font-medium text-content-primary">Requires Review</p>
+                      <p className="text-xs font-sans text-content-secondary mt-0.5">{pendingIngestions.length} document{pendingIngestions.length === 1 ? '' : 's'} waiting for approval.</p>
                     </div>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-indigo-400 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 text-content-tertiary group-hover:translate-x-1 transition-transform" />
                 </motion.div>
               </TransitionLink>
             )}
 
             {/* Overdraft Risk Action */}
             {isOverdraftRisk && (
-              <TransitionLink to="/bills" className="block focus-app rounded-sm">
+              <TransitionLink to="/bills" className="block focus-app rounded-lg">
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                  className="bg-rose-500/10 border border-rose-500/30 p-5 rounded-sm flex items-center justify-between hover:bg-rose-500/15 transition-all shadow-sm group"
+                  className="bg-surface-raised border border-surface-border p-5 rounded-lg flex items-center justify-between hover:bg-white/[0.03] transition-all shadow-none group"
                 >
                   <div className="flex items-center gap-5">
-                    <div className="w-10 h-10 bg-rose-500/20 rounded-full flex items-center justify-center shrink-0">
-                      <ShieldAlert className="w-5 h-5 text-rose-400" />
+                    <div className="relative w-10 h-10 bg-white/[0.06] rounded-full flex items-center justify-center shrink-0 border border-surface-border">
+                      <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-red-500 ring-2 ring-[#0a0a0a]" aria-hidden />
+                      <ShieldAlert className="w-5 h-5 text-content-primary" />
                     </div>
                     <div>
-                      <p className="text-sm font-sans font-medium text-rose-400">Cash Flow Warning</p>
-                      <p className="text-xs font-sans text-rose-300/80 mt-0.5">
-                        Upcoming bills exceed current cash by <span className="font-semibold">${Math.abs(liquidBuffer).toFixed(2)}</span> before next payday.
+                      <p className="text-sm font-sans font-medium text-content-primary">Cash Flow Warning</p>
+                      <p className="text-xs font-sans text-content-secondary mt-0.5">
+                        Upcoming bills exceed current cash by <span className="font-mono font-medium text-content-primary">${Math.abs(liquidBuffer).toFixed(2)}</span> before next payday.
                       </p>
                     </div>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-rose-400 group-hover:translate-x-1 transition-transform" />
+                  <ArrowRight className="w-5 h-5 text-content-tertiary group-hover:translate-x-1 transition-transform" />
                 </motion.div>
               </TransitionLink>
             )}
@@ -381,30 +382,31 @@ export default function Dashboard() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-amber-500/10 border border-amber-500/30 rounded-sm shadow-sm flex flex-col sm:flex-row sm:items-stretch overflow-hidden"
+                className="bg-surface-raised border border-surface-border rounded-lg shadow-none flex flex-col sm:flex-row sm:items-stretch overflow-hidden"
               >
                 <TransitionLink
                   to="/taxes"
-                  className="flex flex-1 items-center justify-between gap-4 p-5 min-w-0 hover:bg-amber-500/15 transition-all group focus-app rounded-sm sm:rounded-none"
+                  className="flex flex-1 items-center justify-between gap-4 p-5 min-w-0 hover:bg-white/[0.03] transition-all group focus-app rounded-lg sm:rounded-none"
                 >
                   <div className="flex items-center gap-5 min-w-0">
-                    <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center shrink-0">
-                      <ShieldAlert className="w-5 h-5 text-amber-400" aria-hidden />
+                    <div className="relative w-10 h-10 bg-white/[0.06] rounded-full flex items-center justify-center shrink-0 border border-surface-border">
+                      <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-amber-500 ring-2 ring-[#0a0a0a]" aria-hidden />
+                      <ShieldAlert className="w-5 h-5 text-content-primary" aria-hidden />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-sans font-medium text-amber-400">Low Tax Reserve</p>
-                      <p className="text-xs font-sans text-amber-300/80 mt-0.5">
+                      <p className="text-sm font-sans font-medium text-content-primary">Low Tax Reserve</p>
+                      <p className="text-xs font-sans text-content-secondary mt-0.5">
                         Cash is below the estimated quarterly liability of ${Math.round(cashFlow.taxReserve * 3).toLocaleString()}.
                       </p>
                     </div>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-amber-400 shrink-0 group-hover:translate-x-1 transition-transform" aria-hidden />
+                  <ArrowRight className="w-5 h-5 text-content-tertiary shrink-0 group-hover:translate-x-1 transition-transform" aria-hidden />
                 </TransitionLink>
-                <div className="flex border-t border-amber-500/30 sm:border-t-0 sm:border-l sm:border-amber-500/30">
+                <div className="flex border-t border-surface-border sm:border-t-0 sm:border-l sm:border-surface-border">
                   <button
                     type="button"
                     onClick={dismissLowTaxReserveAlert}
-                    className="w-full sm:w-auto px-5 py-3 sm:py-0 text-xs font-sans font-semibold uppercase tracking-wide text-amber-200/90 hover:bg-amber-500/15 transition-colors focus-app"
+                    className="w-full sm:w-auto px-5 py-3 sm:py-0 text-xs font-sans font-medium text-content-secondary hover:bg-white/[0.04] transition-colors focus-app"
                   >
                     Got it
                   </button>
@@ -417,12 +419,13 @@ export default function Dashboard() {
 
       {/* 3. Primary Metrics Panel — anchor for sidebar "Cash flow" */}
       <section id="cash-flow" className="scroll-mt-24">
-      <div className="mt-8 mb-6 rounded-sm border border-emerald-500/25 bg-emerald-500/5 p-6 shadow-sm">
+      <div className="mt-8 mb-6 rounded-lg border border-surface-border bg-surface-raised p-6 shadow-none">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-2">
-              <Wallet className="h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
-              <p className="metric-label normal-case text-emerald-300/90">Safe to spend (estimate)</p>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" aria-hidden />
+              <Wallet className="h-4 w-4 shrink-0 text-content-secondary" aria-hidden />
+              <p className="metric-label normal-case text-content-secondary">Safe to spend (estimate)</p>
             </div>
             <p className="text-4xl sm:text-5xl font-mono font-bold text-white tabular-nums tracking-tight">
               $<AnimatedValue value={safeToSpend.dailySafeToSpend} decimals={2} />
@@ -439,26 +442,26 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:shrink-0 lg:max-w-xl w-full text-left">
-            <div className="rounded-sm border border-surface-border bg-surface-base/80 px-4 py-3">
+            <div className="rounded-lg border border-surface-border bg-surface-base/80 px-4 py-3">
               <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">Reserved in window</p>
               <p className="text-lg font-mono text-content-primary tabular-nums">
                 ${safeToSpend.scheduledOutflowsTotal.toLocaleString()}
               </p>
             </div>
-            <div className="rounded-sm border border-surface-border bg-surface-base/80 px-4 py-3">
+            <div className="rounded-lg border border-surface-border bg-surface-base/80 px-4 py-3">
               <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">Cash after reservations</p>
               <p className="text-lg font-mono text-content-primary tabular-nums">
                 ${safeToSpend.liquidAfterScheduled.toLocaleString()}
               </p>
             </div>
-            <div className="rounded-sm border border-surface-border bg-surface-base/80 px-4 py-3">
+            <div className="rounded-lg border border-surface-border bg-surface-base/80 px-4 py-3">
               <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">Days in window</p>
               <p className="text-lg font-mono text-content-primary tabular-nums">{safeToSpend.daysInWindow}</p>
             </div>
           </div>
         </div>
-        <details className="mt-5 border-t border-emerald-500/20 pt-4 text-left">
-          <summary className="cursor-pointer text-xs font-sans font-medium text-emerald-200/90 hover:text-emerald-100 focus-app rounded-sm">
+        <details className="mt-5 border-t border-surface-border pt-4 text-left">
+          <summary className="cursor-pointer text-xs font-sans font-medium text-content-secondary hover:text-content-primary focus-app rounded-lg">
             How this is calculated
           </summary>
           <p className="mt-3 text-xs text-content-tertiary leading-relaxed">
@@ -473,7 +476,7 @@ export default function Dashboard() {
           Wondering if you can afford a specific purchase?{' '}
           <TransitionLink
             to="/owe-ai"
-            className="text-emerald-200/90 hover:text-emerald-100 underline underline-offset-2 font-medium focus-app rounded-sm"
+            className="text-content-primary hover:text-white underline underline-offset-2 font-medium focus-app rounded-lg"
           >
             Ask Owe-AI
           </TransitionLink>
@@ -485,7 +488,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Runway Metric Card */}
-        <div className="bg-surface-raised border border-surface-border p-6 rounded-sm shadow-sm md:flex md:flex-col md:justify-between">
+        <div className="bg-surface-raised border border-surface-border p-6 rounded-lg shadow-none md:flex md:flex-col md:justify-between">
           <div className="flex justify-between items-start mb-8">
             <div className="text-left w-full">
               <p className="metric-label mb-3">Operating Runway</p>
@@ -510,21 +513,21 @@ export default function Dashboard() {
 
         {/* Distributed 4-grid for standard numbers */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-sm shadow-sm text-left">
+            <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
               <p className="metric-label mb-3">Net Worth</p>
               <p className="text-2xl sm:text-4xl font-mono text-white font-bold tabular-nums data-numeric">$<AnimatedValue value={netWorth} /></p>
             </div>
-            <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-sm shadow-sm text-left">
+            <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
               <p className="metric-label mb-3">Total Assets</p>
               <p className="text-2xl sm:text-4xl font-mono text-white font-bold tabular-nums data-numeric">$<AnimatedValue value={totalAssets} /></p>
             </div>
-            <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-sm shadow-sm text-left">
+            <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
               <p className="metric-label mb-3 flex items-center gap-2">
                 Tax Savings <ShieldCheck className="w-3.5 h-3.5 text-brand-tax" />
               </p>
               <p className="text-2xl sm:text-4xl font-mono text-brand-tax font-bold tabular-nums data-numeric">-$<AnimatedValue value={cashFlow.taxReserve} /></p>
             </div>
-            <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-sm shadow-sm text-left">
+            <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
               <p className="metric-label mb-3">Monthly Surplus</p>
               <p className="text-2xl sm:text-4xl font-mono text-brand-profit font-bold tabular-nums data-numeric">+$<AnimatedValue value={cashFlow.surplus} /></p>
             </div>
@@ -546,13 +549,14 @@ export default function Dashboard() {
             }
           >
             {showTaxDeductionCard && (
-              <div className="bg-surface-raised rounded-sm p-6 border border-surface-border flex flex-col justify-between shadow-sm group transition-all text-left">
+              <div className="bg-surface-raised rounded-lg p-6 border border-surface-border flex flex-col justify-between shadow-none group transition-all text-left">
                 <div className="mb-8">
                   <div className="flex justify-between items-start mb-6">
-                    <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-sm flex items-center justify-center shrink-0 text-brand-tax">
+                    <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-lg flex items-center justify-center shrink-0 text-content-primary">
                       <ShieldCheck className="w-5 h-5" />
                     </div>
-                    <span className="text-[10px] font-mono bg-brand-tax/10 text-brand-tax px-2 py-1 rounded-sm uppercase tracking-widest font-semibold border border-brand-tax/20">
+                    <span className="inline-flex items-center gap-2 text-[10px] font-sans uppercase tracking-wide text-content-secondary">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
                       Active
                     </span>
                   </div>
@@ -561,7 +565,7 @@ export default function Dashboard() {
                     Automatic extraction of valid deductions from freelancer platforms and records.
                   </p>
                 </div>
-                <div className="bg-surface-base border border-surface-border p-6 rounded-sm">
+                <div className="bg-surface-base border border-surface-border p-6 rounded-lg">
                   <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-2">Lifetime Recovered</p>
                   <p className="text-4xl font-mono text-white font-bold tabular-nums">${lifetimeTaxShield.toLocaleString()}</p>
                 </div>
@@ -570,28 +574,28 @@ export default function Dashboard() {
 
             {showSpendingPulseCard && (
               <div
-                className={`bg-surface-raised rounded-sm p-6 border transition-all text-left flex flex-col justify-between shadow-sm ${
-                  burnVelocity.isHighVelocity ? 'border-brand-expense/30' : 'border-surface-border'
+                className={`bg-surface-raised rounded-lg p-6 border transition-all text-left flex flex-col justify-between shadow-none ${
+                  burnVelocity.isHighVelocity ? 'border-surface-border' : 'border-surface-border'
                 }`}
               >
                 <div className="mb-8">
                   <div className="flex justify-between items-start mb-6">
                     <div
-                      className={`w-10 h-10 border rounded-sm flex items-center justify-center shrink-0 ${
+                      className={`w-10 h-10 border rounded-lg flex items-center justify-center shrink-0 ${
                         burnVelocity.isHighVelocity
-                          ? 'border-brand-expense/30 bg-brand-expense/10 text-brand-expense'
+                          ? 'border-surface-border bg-surface-base text-content-primary'
                           : 'border-surface-border bg-surface-base text-content-tertiary'
                       }`}
                     >
                       <Activity className="w-5 h-5" />
                     </div>
-                    <span
-                      className={`text-[10px] font-mono px-2 py-1 rounded-sm uppercase tracking-widest font-semibold border ${
-                        burnVelocity.isHighVelocity
-                          ? 'bg-brand-expense/10 text-brand-expense border-brand-expense/20'
-                          : 'bg-surface-base text-content-tertiary border-surface-border'
-                      }`}
-                    >
+                    <span className="inline-flex items-center gap-2 text-[10px] font-sans uppercase tracking-wide text-content-secondary">
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          burnVelocity.isHighVelocity ? 'bg-red-500' : burnVelocity.isModerateVelocity ? 'bg-amber-500' : 'bg-emerald-500'
+                        }`}
+                        aria-hidden
+                      />
                       {burnVelocity.isHighVelocity ? 'High' : burnVelocity.isModerateVelocity ? 'Moderate' : 'On Track'}
                     </span>
                   </div>
@@ -606,7 +610,7 @@ export default function Dashboard() {
                     <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-wider">/ {burnVelocity.frequency} txs</p>
                   </div>
                   {burnVelocity.isHighVelocity && (
-                    <p className="text-[11px] font-mono text-brand-expense bg-brand-expense/5 p-3 rounded-sm border border-brand-expense/20">
+                    <p className="text-[11px] font-mono text-content-secondary bg-white/[0.03] p-3 rounded-lg border border-surface-border">
                       Velocity Limit Exceeded
                     </p>
                   )}
@@ -615,10 +619,10 @@ export default function Dashboard() {
             )}
 
             {showDebtAvalancheCard && avalancheTarget && (
-              <div className="bg-surface-raised rounded-sm p-6 border border-surface-border flex flex-col justify-between shadow-sm text-left group transition-all">
+              <div className="bg-surface-raised rounded-lg p-6 border border-surface-border flex flex-col justify-between shadow-none text-left group transition-all">
                 <div className="mb-8">
                   <div className="flex justify-between items-start mb-6">
-                    <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-sm flex items-center justify-center shrink-0 text-content-tertiary">
+                    <div className="w-10 h-10 border border-surface-border bg-surface-base rounded-lg flex items-center justify-center shrink-0 text-content-tertiary">
                       <Flame className="w-5 h-5" />
                     </div>
                   </div>
@@ -638,9 +642,9 @@ export default function Dashboard() {
                       <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{debtProgress.toFixed(0)}% Clear</span>
                     </div>
                   </div>
-                  <div className="w-full h-1.5 bg-surface-raised border border-surface-border rounded-full overflow-hidden mt-4">
+                  <div className="w-full h-1.5 bg-surface-base border border-surface-border rounded-full overflow-hidden mt-4">
                     <div
-                      className="h-full bg-brand-expense transition-all duration-1000 shadow-[0_0_8px_rgba(248,113,113,0.3)]"
+                      className="h-full bg-content-primary transition-all duration-1000"
                       style={{ width: `${debtProgress}%` }}
                     />
                   </div>
@@ -655,13 +659,13 @@ export default function Dashboard() {
       <div className={`grid grid-cols-1 gap-6 mt-8 ${hasLowerSidebar ? 'lg:grid-cols-3' : ''}`}>
         {/* Timeline Chart */}
         <div className={hasLowerSidebar ? 'lg:col-span-2' : ''}>
-          <div className="bg-surface-raised rounded-sm border border-surface-border p-6 shadow-sm">
+          <div className="bg-surface-raised rounded-lg border border-surface-border p-6 shadow-none">
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h3 className="text-sm font-sans font-semibold text-white">Cash Flow Trajectory</h3>
-                <p className="text-xs font-sans text-content-tertiary mt-1">Projected balances across all accounts</p>
+                <h3 className="text-sm font-sans font-semibold text-white tracking-tight">Cash Flow Trajectory</h3>
+                <p className="text-xs font-sans text-content-secondary mt-1">Projected balances across all accounts</p>
               </div>
-              <select className="text-xs font-sans bg-surface-base border border-surface-border text-content-secondary rounded px-3 py-1.5 focus-app-field cursor-pointer">
+              <select className="text-xs font-sans bg-surface-base border border-surface-border text-content-secondary rounded-lg px-3 py-1.5 focus-app-field cursor-pointer">
                 <option>Next 30 Days</option>
                 <option>Next 90 Days</option>
               </select>
@@ -672,20 +676,20 @@ export default function Dashboard() {
                 <AreaChart data={cashFlowChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#818CF8" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#818CF8" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#fafafa" stopOpacity={0.12}/>
+                      <stop offset="95%" stopColor="#fafafa" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#27272A" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#A1A1AA', fontSize: 11, fontFamily: 'sans-serif' }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#A1A1AA', fontSize: 11, fontFamily: 'sans-serif' }} tickFormatter={(val) => `$${Number(val ?? 0) / 1000}k`} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333333" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#888888', fontSize: 11, fontFamily: 'sans-serif' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#888888', fontSize: 11, fontFamily: 'sans-serif' }} tickFormatter={(val) => `$${Number(val ?? 0) / 1000}k`} />
                   <Tooltip 
                     {...rechartsTooltipStableProps}
-                    contentStyle={{ backgroundColor: '#18181B', borderRadius: '6px', border: '1px solid #3F3F46', color: '#FAFAFA', fontFamily: 'sans-serif', fontSize: '13px' }}
-                    itemStyle={{ color: '#818CF8' }}
+                    contentStyle={{ backgroundColor: '#0a0a0a', borderRadius: '8px', border: '1px solid #333333', color: '#fafafa', fontFamily: 'sans-serif', fontSize: '13px' }}
+                    itemStyle={{ color: '#fafafa' }}
                     formatter={(val) => [`$${Number(val ?? 0).toLocaleString()}`, 'Projected Balance']}
                   />
-                  <Area type="monotone" dataKey="balance" stroke="#818CF8" strokeWidth={2} fillOpacity={1} fill="url(#colorBalance)" />
+                  <Area type="monotone" dataKey="balance" stroke="#fafafa" strokeWidth={1.5} fillOpacity={1} fill="url(#colorBalance)" />
                 </AreaChart>
               </SafeResponsiveContainer>
             </div>
@@ -696,20 +700,20 @@ export default function Dashboard() {
         {hasLowerSidebar && (
           <div className="space-y-6">
             {hasBillsSidebar && (
-              <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit max-h-[350px]">
-                <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-surface-raised/80">
+              <div className="bg-surface-raised rounded-lg border border-surface-border shadow-none flex flex-col h-fit max-h-[350px]">
+                <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-transparent">
                   <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-content-secondary">Upcoming Bills</h3>
-                  <TransitionLink to="/bills" className="text-xs font-sans text-indigo-400 hover:text-indigo-300 transition-colors font-medium">
+                  <TransitionLink to="/bills" className="text-xs font-sans text-content-primary hover:text-white transition-colors font-medium">
                     See all
                   </TransitionLink>
                 </div>
 
                 <div className="overflow-y-auto focus-app">
-                  <ul className="divide-y divide-surface-border">
+                  <ul>
                     {upcomingBills.slice(0, 4).map((bill) => (
                       <li
                         key={bill.id}
-                        className="px-6 py-4 hover:bg-surface-base transition-colors flex justify-between items-center group cursor-default"
+                        className="px-6 py-4 hover:bg-white/[0.03] transition-colors flex justify-between items-center group cursor-default border-b border-transparent last:border-0"
                       >
                         <div className="flex items-center gap-4">
                           <div className="text-xs font-mono text-content-tertiary w-10 text-center uppercase">
@@ -736,14 +740,14 @@ export default function Dashboard() {
             )}
 
             {hasCitationsSidebar && (
-              <div className="bg-surface-raised rounded-sm border border-surface-border shadow-sm flex flex-col h-fit">
-                <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-surface-raised/80">
+              <div className="bg-surface-raised rounded-lg border border-surface-border shadow-none flex flex-col h-fit">
+                <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-transparent">
                   <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-content-secondary">Citations & Tickets</h3>
                 </div>
                 <div className="p-0 focus-app">
-                  <ul className="divide-y divide-surface-border">
+                  <ul>
                     {openCitations.map((citation) => (
-                      <li key={citation.id} className="px-6 py-4 hover:bg-surface-base transition-colors">
+                      <li key={citation.id} className="px-6 py-4 hover:bg-white/[0.03] transition-colors border-b border-transparent last:border-0">
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex items-start gap-3">
                             <div
@@ -767,10 +771,10 @@ export default function Dashboard() {
                             setSelectedCitation(citation);
                             setIsCitationModalOpen(true);
                           }}
-                          className={`w-full text-xs font-sans font-medium py-2 rounded transition-colors focus-app ${
+                          className={`w-full text-xs font-sans font-medium py-2 rounded-lg transition-colors focus-app ${
                             citation.daysLeft <= 7
-                              ? 'bg-rose-500 hover:bg-rose-600 text-white'
-                              : 'bg-surface-border hover:bg-surface-elevated text-content-primary'
+                              ? 'bg-white text-black hover:bg-neutral-200'
+                              : 'bg-transparent border border-surface-border hover:bg-white/[0.04] text-content-primary'
                           }`}
                         >
                           Resolve Ticket
@@ -789,14 +793,14 @@ export default function Dashboard() {
        <Dialog open={isCitationModalOpen} onClose={() => setIsCitationModalOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/60" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-sm w-full rounded shadow-xl bg-surface-elevated border border-surface-border overflow-hidden">
+          <Dialog.Panel className="mx-auto max-w-sm w-full rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.55)] bg-surface-elevated border border-surface-border overflow-hidden">
             <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-surface-raised">
               <Dialog.Title className="text-sm font-sans font-semibold text-content-primary">
                 Ticket Details
               </Dialog.Title>
               <button 
                 onClick={() => setIsCitationModalOpen(false)} 
-                className="text-content-tertiary hover:text-white transition-colors focus-app rounded-sm"
+                className="text-content-tertiary hover:text-white transition-colors focus-app rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -840,7 +844,7 @@ export default function Dashboard() {
                         href={sanitizeUrl(selectedCitation.paymentUrl)!}
                         target="_blank"
                         rel="noreferrer noopener"
-                        className="flex items-center justify-center gap-2 w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded px-4 py-2.5 text-sm font-medium transition-colors focus-app"
+                        className="flex items-center justify-center gap-2 w-full bg-white text-black hover:bg-neutral-200 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors focus-app"
                       >
                         Open Payment Portal <ExternalLink className="w-4 h-4" />
                       </a>

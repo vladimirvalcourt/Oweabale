@@ -411,7 +411,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="w-full sm:max-w-md"
             >
-              <Dialog.Panel className="rounded shadow-xl bg-surface-elevated border border-surface-border overflow-hidden flex flex-col max-h-[90vh]">
+              <Dialog.Panel className="rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.55)] bg-surface-elevated border border-surface-border overflow-hidden flex flex-col max-h-[90vh]">
                 
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border bg-surface-raised shrink-0">
@@ -420,7 +420,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   </Dialog.Title>
                   <button 
                     onClick={onClose} 
-                    className="text-content-tertiary hover:text-white transition-colors focus-app rounded-sm"
+                    className="text-content-tertiary hover:text-white transition-colors focus-app rounded-lg"
                   >
                     <span className="sr-only">Close</span>
                     <X className="w-5 h-5" />
@@ -444,17 +444,17 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           <button
                             type="button"
                             onClick={() => setShowPreview(p => !p)}
-                            className={`shrink-0 p-2 rounded-sm border transition-all ${showPreview ? 'border-indigo-500/50 text-indigo-400 bg-indigo-500/10' : 'border-surface-border text-content-tertiary hover:text-white hover:bg-surface-elevated'}`}
+                            className={`shrink-0 p-2 rounded-lg border transition-all ${showPreview ? 'border-surface-border text-content-primary bg-white/[0.06]' : 'border-surface-border text-content-tertiary hover:text-white hover:bg-surface-elevated'}`}
                             title={showPreview ? 'Hide document' : 'Show document'}
                           >
                             {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                           </button>
                         )}
                         <div className="grid grid-cols-2 gap-2 flex-1 min-w-0 sm:min-w-[260px]">
-                          <label className={`relative flex min-h-[2.5rem] w-full items-center justify-center gap-2 px-3 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none text-center leading-tight
+                          <label className={`relative flex min-h-[2.5rem] w-full items-center justify-center gap-2 px-3 py-2 rounded-lg border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none text-center leading-tight
                             ${isScanning
-                              ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
-                              : 'border-surface-border bg-surface-raised text-content-secondary hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
+                              ? 'border-surface-border bg-white/[0.06] text-content-secondary cursor-not-allowed'
+                              : 'border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary hover:bg-white/[0.04]'
                             }`}>
                             <input
                               ref={scanCameraInputRef}
@@ -468,10 +468,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             <Camera className="w-3.5 h-3.5 shrink-0" aria-hidden />
                             <span>Camera</span>
                           </label>
-                          <label className={`relative flex min-h-[2.5rem] w-full items-center justify-center gap-2 px-3 py-2 rounded-sm border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none text-center leading-tight
+                          <label className={`relative flex min-h-[2.5rem] w-full items-center justify-center gap-2 px-3 py-2 rounded-lg border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none text-center leading-tight
                             ${isScanning
-                              ? 'border-indigo-500/50 bg-indigo-500/10 text-indigo-400 cursor-not-allowed'
-                              : 'border-surface-border bg-surface-raised text-content-secondary hover:border-indigo-500/50 hover:text-white hover:bg-indigo-500/5'
+                              ? 'border-surface-border bg-white/[0.06] text-content-secondary cursor-not-allowed'
+                              : 'border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary hover:bg-white/[0.04]'
                             }`}>
                             <input
                               ref={scanFileInputRef}
@@ -522,7 +522,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   {/* Smart Input Bar */}
                   <div className="bg-surface-base p-6 border-b border-surface-border">
                     <div className="flex items-center gap-2 mb-3">
-                      <Terminal className="w-4 h-4 text-indigo-400" />
+                      <Terminal className="w-4 h-4 text-content-secondary" />
                       <span className="text-xs font-sans font-medium text-content-secondary">Natural Language Speed Input</span>
                     </div>
                     
@@ -530,7 +530,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       placeholder="e.g. 'Coffee 5.50 today' or 'Comcast bill 120 next tuesday'"
                       value={nlpText}
                       onChange={handleNLPInput}
-                      className="w-full bg-surface-raised border border-surface-border rounded focus-app-field-indigo text-sm font-sans text-white placeholder:text-content-muted p-3 resize-none transition-colors"
+                      className="w-full bg-surface-raised border border-surface-border rounded-lg focus-app-field-indigo text-sm font-sans text-white placeholder:text-content-muted p-3 resize-none transition-colors"
                       rows={2}
                     />
                   </div>
@@ -539,32 +539,32 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   <div className="flex border-b border-surface-border bg-surface-raised p-1 gap-1">
                     <button
                       onClick={() => { setActiveTab('transaction'); setErrors({}); }}
-                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded ${
-                        activeTab === 'transaction' ? 'bg-surface-border text-white shadow-sm' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
+                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg ${
+                        activeTab === 'transaction' ? 'bg-white text-black' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-app`}
                     >
                       Expense
                     </button>
                     <button
                       onClick={() => { setActiveTab('obligation'); setErrors({}); }}
-                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded ${
-                        activeTab === 'obligation' ? 'bg-surface-border text-white shadow-sm' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
+                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg ${
+                        activeTab === 'obligation' ? 'bg-white text-black' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-app`}
                     >
                       Bill/Debt
                     </button>
                     <button
                       onClick={() => { setActiveTab('income'); setErrors({}); }}
-                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded ${
-                        activeTab === 'income' ? 'bg-surface-border text-white shadow-sm' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
+                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg ${
+                        activeTab === 'income' ? 'bg-white text-black' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-app`}
                     >
                       Income
                     </button>
                     <button
                       onClick={() => { setActiveTab('citation'); setErrors({}); }}
-                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded flex items-center justify-center gap-1.5 ${
-                        activeTab === 'citation' ? 'bg-rose-500/20 text-rose-300 shadow-sm' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
+                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg flex items-center justify-center gap-1.5 ${
+                        activeTab === 'citation' ? 'bg-white/[0.08] text-content-primary border border-surface-border' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-app`}
                     >
                       <AlertTriangle className="w-3 h-3" />
@@ -588,7 +588,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           value={amount}
                           onChange={(e) => { setAmount(e.target.value); if(errors.amount) setErrors({...errors, amount: ''}); }}
                           placeholder="0.00"
-                          className={`w-full bg-surface-base border ${errors.amount ? 'border-red-500/50' : 'border-surface-border'} rounded focus-app-field-indigo pl-7 py-2.5 text-base font-sans font-semibold text-white placeholder:text-content-muted transition-colors`}
+                          className={`w-full bg-surface-base border ${errors.amount ? 'border-red-500/50' : 'border-surface-border'} rounded-lg focus-app-field-indigo pl-7 py-2.5 text-base font-sans font-semibold text-white placeholder:text-content-muted transition-colors`}
                         />
                       </div>
                       {errors.amount && (
@@ -609,7 +609,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 value={description}
                                 onChange={(e) => { setDescription(e.target.value); if(errors.description) setErrors({...errors, description: ''}); }}
                                 placeholder="E.g., Whole Foods"
-                                className={`w-full bg-surface-base border ${errors.description ? 'border-red-500/50' : 'border-surface-border'} rounded focus-app-field-indigo px-3 py-2.5 text-sm font-sans text-white placeholder:text-content-muted transition-colors`}
+                                className={`w-full bg-surface-base border ${errors.description ? 'border-red-500/50' : 'border-surface-border'} rounded-lg focus-app-field-indigo px-3 py-2.5 text-sm font-sans text-white placeholder:text-content-muted transition-colors`}
                               />
                             </div>
                             {description.length > 2 && (
@@ -630,7 +630,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               id="category"
                               value={category}
                               onChange={(e) => setCategory(e.target.value)}
-                              className="w-full bg-surface-base border border-surface-border rounded focus-app-field-indigo px-3 py-2 text-sm font-sans text-white cursor-pointer"
+                              className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field-indigo px-3 py-2 text-sm font-sans text-white cursor-pointer"
                             >
                               <option value="housing">Housing & Rent</option>
                               <option value="utilities">Utilities & Telecom</option>
@@ -657,7 +657,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               type="date"
                               value={date}
                               onChange={(e) => setDate(e.target.value)}
-                              className="input-date-dark w-full bg-surface-base border border-surface-border rounded focus-app-field-indigo px-3 py-2 text-sm font-sans"
+                              className="input-date-dark w-full bg-surface-base border border-surface-border rounded-lg focus-app-field-indigo px-3 py-2 text-sm font-sans"
                             />
                           </div>
                         </div>
@@ -677,7 +677,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 setObligationKind(v);
                                 if (v.startsWith('bill-')) setDebtNoPaymentDue(false);
                               }}
-                              className="w-full bg-surface-base border border-surface-border rounded focus-app-field-indigo px-3 py-2 text-sm font-sans text-white cursor-pointer"
+                              className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field-indigo px-3 py-2 text-sm font-sans text-white cursor-pointer"
                             >
                               <option value="bill-weekly">Weekly bill</option>
                               <option value="bill-biweekly">Bi-weekly bill</option>
@@ -701,7 +701,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               value={dueDate}
                               disabled={obligationKind.startsWith('debt-') && debtNoPaymentDue}
                               onChange={(e) => { setDueDate(e.target.value); if(errors.dueDate) setErrors({...errors, dueDate: ''}); }}
-                              className={`input-date-dark w-full bg-surface-base border ${errors.dueDate ? 'border-red-500/50' : 'border-surface-border'} rounded focus-app-field-indigo px-3 py-2 text-sm font-sans disabled:opacity-40`}
+                              className={`input-date-dark w-full bg-surface-base border ${errors.dueDate ? 'border-red-500/50' : 'border-surface-border'} rounded-lg focus-app-field-indigo px-3 py-2 text-sm font-sans disabled:opacity-40`}
                             />
                             {errors.dueDate && <p className="text-xs text-red-400 mt-1.5">{errors.dueDate}</p>}
                             {obligationKind.startsWith('debt-') && (
@@ -737,7 +737,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                         ? 'E.g., Chase Sapphire'
                                         : 'E.g., SoFi Personal Loan'
                                   }
-                                  className={`w-full bg-surface-base border ${errors.vendor ? 'border-red-500/50' : 'border-surface-border'} rounded focus-app-field-indigo px-3 py-2.5 text-sm font-sans text-white placeholder:text-content-muted transition-colors`}
+                                  className={`w-full bg-surface-base border ${errors.vendor ? 'border-red-500/50' : 'border-surface-border'} rounded-lg focus-app-field-indigo px-3 py-2.5 text-sm font-sans text-white placeholder:text-content-muted transition-colors`}
                                 />
                               </div>
                             </div>
@@ -751,7 +751,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               id="billCategory"
                               value={category}
                               onChange={(e) => setCategory(e.target.value)}
-                              className="w-full bg-surface-base border border-surface-border rounded focus-app-field-indigo px-3 py-2.5 text-sm font-sans text-white cursor-pointer"
+                              className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field-indigo px-3 py-2.5 text-sm font-sans text-white cursor-pointer"
                             >
                               <option value="housing">Housing & Rent</option>
                               <option value="utilities">Utilities & Telecom</option>
@@ -782,7 +782,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 value={apr}
                                 onChange={(e) => setApr(e.target.value)}
                                 placeholder="19.99"
-                                className="w-full bg-surface-base border border-surface-border rounded focus-app-field-indigo px-3 py-2 text-sm font-sans text-white"
+                                className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field-indigo px-3 py-2 text-sm font-sans text-white"
                               />
                             </div>
                             <div>
@@ -794,7 +794,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 value={minPayment}
                                 onChange={(e) => setMinPayment(e.target.value)}
                                 placeholder="Auto"
-                                className="w-full bg-surface-base border border-surface-border rounded focus-app-field-indigo px-3 py-2 text-sm font-sans text-white"
+                                className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field-indigo px-3 py-2 text-sm font-sans text-white"
                               />
                             </div>
                           </div>
@@ -913,7 +913,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="E.g., Google Paycheck, Client Invoice"
-                            className="w-full bg-surface-base border border-surface-border rounded focus-app-field-indigo px-3 py-2.5 text-sm font-sans text-white placeholder:text-content-muted transition-colors"
+                            className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field-indigo px-3 py-2.5 text-sm font-sans text-white placeholder:text-content-muted transition-colors"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -922,7 +922,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             <select
                               value={source}
                               onChange={(e) => setSource(e.target.value)}
-                              className="w-full bg-surface-base border border-surface-border rounded focus-app-field-indigo px-3 py-2 text-sm font-sans text-white cursor-pointer"
+                              className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field-indigo px-3 py-2 text-sm font-sans text-white cursor-pointer"
                             >
                               <option value="salary">Salary / Wages</option>
                               <option value="freelance">Freelance</option>
@@ -935,7 +935,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             <select
                               value={incomeFrequency}
                               onChange={(e) => setIncomeFrequency(e.target.value as IncomeSource['frequency'])}
-                              className="w-full bg-surface-base border border-surface-border rounded focus-app-field-indigo px-3 py-2 text-sm font-sans text-white cursor-pointer"
+                              className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field-indigo px-3 py-2 text-sm font-sans text-white cursor-pointer"
                             >
                               <option value="Weekly">Weekly</option>
                               <option value="Bi-weekly">Bi-weekly</option>
@@ -951,7 +951,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             type="date"
                             value={date}
                             onChange={(e) => { setDate(e.target.value); if(errors.date) setErrors({...errors, date: ''}); }}
-                            className={`input-date-dark w-full bg-surface-base border ${errors.date ? 'border-red-500/50' : 'border-surface-border'} rounded focus-app-field-indigo px-3 py-2 text-sm font-sans`}
+                            className={`input-date-dark w-full bg-surface-base border ${errors.date ? 'border-red-500/50' : 'border-surface-border'} rounded-lg focus-app-field-indigo px-3 py-2 text-sm font-sans`}
                           />
                           {errors.date && <p className="text-xs text-red-400 mt-1.5">{errors.date}</p>}
                         </div>
@@ -973,10 +973,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   <button
                     type="submit"
                     form="quick-add-form"
-                    className={`px-5 py-2 text-white rounded text-sm font-sans font-medium transition-colors focus-app shadow ${
+                    className={`px-5 py-2 rounded-lg text-sm font-sans font-medium transition-colors focus-app ${
                       activeTab === 'citation'
-                        ? 'bg-rose-600 hover:bg-rose-500'
-                        : 'bg-indigo-600 hover:bg-indigo-500'
+                        ? 'bg-white text-black hover:bg-neutral-200 border border-surface-border'
+                        : 'bg-white text-black hover:bg-neutral-200'
                     }`}
                   >
                     Save Entry

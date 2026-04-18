@@ -67,10 +67,10 @@ export function AdminExportBar({ profiles, billingStats }: Props) {
   }
 
   const btnClass =
-    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs border border-surface-border bg-surface-elevated text-content-secondary hover:text-content-primary hover:bg-surface-raised disabled:opacity-40 disabled:cursor-not-allowed';
+    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border border-surface-border bg-surface-elevated text-content-secondary hover:text-content-primary hover:bg-surface-raised disabled:opacity-40 disabled:cursor-not-allowed';
 
   return (
-    <div className="border border-surface-border rounded-sm bg-surface-raised p-4">
+    <div className="border border-surface-border rounded-lg bg-surface-raised p-4">
       <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-3">
         <Download className="w-4 h-4" /> Export Data
       </h2>

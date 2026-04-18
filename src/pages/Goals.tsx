@@ -65,7 +65,7 @@ export default function Goals() {
         <button
           type="button"
           onClick={() => setIsAddingGoal(true)}
-          className="px-4 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2"
+          className="px-4 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           Add goal
@@ -73,7 +73,7 @@ export default function Goals() {
       </div>
 
       {isAddingGoal && (
-        <div className="bg-surface-raised rounded-sm border border-surface-border p-6 mb-6">
+        <div className="bg-surface-raised rounded-lg border border-surface-border p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-base font-sans font-semibold text-content-primary">New goal</h3>
             <button onClick={() => setIsAddingGoal(false)} className="text-content-tertiary hover:text-content-secondary transition-colors">
@@ -89,7 +89,7 @@ export default function Goals() {
                   required
                   value={newGoal.name}
                   onChange={(e) => setNewGoal({ ...newGoal, name: e.target.value })}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
                   placeholder="e.g., EMERGENCY FUND"
                 />
               </div>
@@ -98,7 +98,7 @@ export default function Goals() {
                 <select
                   value={newGoal.type}
                   onChange={(e) => setNewGoal({ ...newGoal, type: e.target.value as Goal['type'] })}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
                 >
                   <option value="savings">Savings</option>
                   <option value="debt">Debt payoff</option>
@@ -116,7 +116,7 @@ export default function Goals() {
                     step="0.01"
                     value={newGoal.targetAmount}
                     onChange={(e) => setNewGoal({ ...newGoal, targetAmount: e.target.value })}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
                   />
                 </div>
               </div>
@@ -130,7 +130,7 @@ export default function Goals() {
                     step="0.01"
                     value={newGoal.currentAmount}
                     onChange={(e) => setNewGoal({ ...newGoal, currentAmount: e.target.value })}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
                   />
                 </div>
               </div>
@@ -141,7 +141,7 @@ export default function Goals() {
                   required
                   value={newGoal.deadline}
                   onChange={(e) => setNewGoal({ ...newGoal, deadline: e.target.value })}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
                 />
               </div>
             </div>
@@ -155,7 +155,7 @@ export default function Goals() {
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold transition-colors shadow-sm"
+                className="px-6 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold transition-colors shadow-sm"
               >
                 Save goal
               </button>
@@ -165,8 +165,8 @@ export default function Goals() {
       )}
 
       {goals.length === 0 && !isAddingGoal ? (
-        <div className="bg-surface-raised rounded-sm border border-surface-border border-dashed p-12 text-center">
-          <div className="w-16 h-16 border border-surface-border rounded-sm flex items-center justify-center mx-auto mb-4 bg-surface-elevated">
+        <div className="bg-surface-raised rounded-lg border border-surface-border border-dashed p-12 text-center">
+          <div className="w-16 h-16 border border-surface-border rounded-lg flex items-center justify-center mx-auto mb-4 bg-surface-elevated">
             <Target className="w-8 h-8 text-content-muted" />
           </div>
           <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No goals yet</h3>
@@ -174,7 +174,7 @@ export default function Goals() {
           <button
             type="button"
             onClick={() => setIsAddingGoal(true)}
-            className="px-8 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-white text-sm font-sans font-semibold transition-colors flex items-center gap-2 mx-auto shadow-sm"
+            className="px-8 py-3 rounded-lg bg-white hover:bg-neutral-200 active:scale-[0.98] text-black text-sm font-sans font-semibold transition-colors flex items-center gap-2 mx-auto shadow-sm"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Create your first goal
@@ -195,13 +195,13 @@ export default function Goals() {
               return (
                 <div 
                   key={goal.id} 
-                  className="bg-surface-elevated rounded-sm border border-surface-border overflow-hidden group hover:border-white/15 transition-colors"
+                  className="bg-surface-elevated rounded-lg border border-surface-border overflow-hidden group hover:border-white/15 transition-colors"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-6">
                       <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-sm border border-surface-border flex items-center justify-center bg-surface-base transition-colors`}>
-                          {isSavings ? <TrendingUp className="w-5 h-5 text-emerald-500" /> : <TrendingDown className="w-5 h-5 text-indigo-500" />}
+                        <div className={`w-10 h-10 rounded-lg border border-surface-border flex items-center justify-center bg-surface-base transition-colors`}>
+                          {isSavings ? <TrendingUp className="w-5 h-5 text-emerald-500" /> : <TrendingDown className="w-5 h-5 text-content-secondary" />}
                         </div>
                         <div>
                           <h3 className="text-sm font-semibold text-content-primary">{goal.name}</h3>
@@ -225,7 +225,7 @@ export default function Goals() {
 
                     <div className="w-full bg-surface-base rounded-none h-2 mb-4">
                       <div
-                        className={`h-2 rounded-none ${isCompleted ? 'bg-emerald-500' : 'bg-indigo-500'}`}
+                        className={`h-2 rounded-none ${isCompleted ? 'bg-emerald-500' : 'bg-neutral-500'}`}
                         style={{ width: `${Math.min(progress, 100)}%` }}
                       />
                     </div>
@@ -235,9 +235,9 @@ export default function Goals() {
                       const monthsLeft = Math.max(1, Math.ceil((new Date(goal.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30)));
                       const needed = (goal.targetAmount - goal.currentAmount) / monthsLeft;
                       return (
-                        <div className="flex items-center justify-between bg-surface-base border border-surface-border rounded-sm px-3 py-2 mb-4">
+                        <div className="flex items-center justify-between bg-surface-base border border-surface-border rounded-lg px-3 py-2 mb-4">
                           <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Needed / month</span>
-                          <span className="text-sm font-mono font-bold text-indigo-400">${needed.toFixed(0)}/mo</span>
+                          <span className="text-sm font-mono font-bold text-content-primary">${needed.toFixed(0)}/mo</span>
                         </div>
                       );
                     })()}
@@ -251,9 +251,9 @@ export default function Goals() {
                           value={progressInput.value}
                           onChange={(e) => setProgressInput({ id: goal.id, value: e.target.value })}
                           placeholder="Amount (+/-)"
-                          className="flex-1 bg-surface-base border border-surface-border rounded-sm px-3 py-1.5 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
+                          className="flex-1 bg-surface-base border border-surface-border rounded-lg px-3 py-1.5 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
                         />
-                        <button type="submit" className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-xs font-bold transition-colors">
+                        <button type="submit" className="px-3 py-1.5 bg-white text-black hover:bg-neutral-200 rounded-lg text-xs font-bold transition-colors">
                           Save
                         </button>
                         <button type="button" onClick={() => setProgressInput(null)} className="px-3 py-1.5 text-content-tertiary hover:text-white transition-colors text-xs">
@@ -265,7 +265,7 @@ export default function Goals() {
                       <button
                         onClick={() => handleUpdateProgress(goal.id)}
                         disabled={isCompleted}
-                        className="text-sm font-medium text-indigo-500 hover:text-indigo-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        className="text-sm font-medium text-content-secondary hover:text-content-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
                         Update Progress
                       </button>

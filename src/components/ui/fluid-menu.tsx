@@ -91,7 +91,7 @@ export function MenuContainer({ children }: { children: React.ReactNode }) {
       <div className="relative">
         {/* First item - always visible */}
         <div 
-          className="relative w-16 h-16 bg-surface-raised border border-surface-border cursor-pointer rounded-full group will-change-transform z-50 flex items-center justify-center shadow-lg hover:shadow-indigo-500/20 transition-shadow"
+          className="relative w-16 h-16 bg-surface-raised border border-surface-border cursor-pointer rounded-full group will-change-transform z-50 flex items-center justify-center shadow-lg hover:shadow-white/10 transition-shadow"
           onClick={handleToggle}
         >
           {childrenArray[0]}

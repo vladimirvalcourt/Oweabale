@@ -41,7 +41,7 @@ function formatDateTime(iso: string): string {
 
 export function AdminWebhooksPanel({ webhooks }: Props) {
   return (
-    <div className="border border-surface-border rounded-sm bg-surface-raised p-5">
+    <div className="border border-surface-border rounded-lg bg-surface-raised p-5">
       <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
         <Zap className="w-4 h-4" /> Stripe Webhooks
       </h2>

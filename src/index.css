@@ -2,43 +2,39 @@
 @plugin "tailwindcss-animate";
 
 @theme {
-  /* Linear-inspired dark native luminance hierarchy */
-  --color-surface-base: #0E0F11;
-  --color-surface-raised: #151618;
-  --color-surface-elevated: #1C1D21;
+  /* Vercel-dashboard–inspired dark surfaces: near-black, thin neutral borders, minimal chrome */
+  --color-surface-base: #000000;
+  --color-surface-raised: #0a0a0a;
+  --color-surface-elevated: #111111;
   --color-surface-highlight: rgba(255, 255, 255, 0.04);
-  --color-surface-border: #222222;
-  --color-surface-border-subtle: #181818;
+  --color-surface-border: #333333;
+  --color-surface-border-subtle: #1a1a1a;
 
-  --color-content-primary: #F7F8F8;
-  --color-content-secondary: #B1B6C0;
-  /* WCAG AA on surface-base / surface-raised (≥4.5:1 body text) */
-  --color-content-tertiary: #9CA3AF;
-  --color-content-muted: #8B919C;
+  --color-content-primary: #ffffff;
+  --color-content-secondary: #888888;
+  --color-content-tertiary: #737373;
+  --color-content-muted: #666666;
 
-  /* Primary interaction hue — keep secondary tints in the same family (less “rainbow SaaS”). */
-  --color-brand-indigo: #60A5FA;
-  --color-brand-violet: #7C8AE8;
-  /* Filled buttons + white label text — #60A5FA fails WCAG AA (~2.5:1); indigo-700/600 passes. */
-  --color-brand-cta: #4338ca;
-  --color-brand-cta-hover: #4f46e5;
-  --color-brand-profit: #4ADE80;
-  --color-brand-expense: #F87171;
-  --color-brand-tax: #60A5FA;
+  /* Neutral “accent” — replaces saturated indigo for chrome/links; components may still use Tailwind palette where needed */
+  --color-brand-indigo: #fafafa;
+  --color-brand-violet: #a3a3a3;
+  --color-brand-cta: #ffffff;
+  --color-brand-cta-hover: #e5e5e5;
+  --color-brand-profit: #22c55e;
+  --color-brand-expense: #ef4444;
+  --color-brand-tax: #a3a3a3;
 
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-sans: "Geist Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   
-  /* Tactical Elevations */
-  --shadow-tactile: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-tactile-hover: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 4px rgba(0, 0, 0, 0.5);
-  --shadow-glow-indigo: 0 0 12px rgba(94, 106, 210, 0.18);
+  --shadow-tactile: 0 1px 0 rgba(255, 255, 255, 0.06);
+  --shadow-tactile-hover: 0 1px 0 rgba(255, 255, 255, 0.1);
+  --shadow-glow-indigo: 0 0 0 1px rgba(255, 255, 255, 0.08);
 
-  /* IBM Carbon Productive Density */
-  --radius-lg: 0px;
-  --radius-md: 0px;
-  --radius-sm: 0px;
-  --radius-xl: 0px;
+  --radius-lg: 8px;
+  --radius-md: 8px;
+  --radius-sm: 6px;
+  --radius-xl: 12px;
 }
 
 @layer utilities {
@@ -77,12 +73,12 @@
   }
   /* Wordmark: sans + weight, not monospace “terminal” styling */
   .brand-header-text {
-    @apply font-sans font-semibold text-sm uppercase tracking-[0.18em] text-content-primary;
+    @apply font-sans font-semibold text-sm uppercase tracking-tight text-content-primary;
   }
 
   /* Section titles — read in sans; reserve mono for numeric data */
   .section-label {
-    @apply text-[11px] font-sans font-semibold uppercase tracking-[0.18em] text-content-tertiary;
+    @apply text-[11px] font-sans font-semibold uppercase tracking-wide text-content-tertiary;
   }
 
   .metric-label {
@@ -96,57 +92,57 @@
   /* Focus — visible keyboard focus (WCAG 2.4.7) + border cues on fields. */
   .focus-app {
     @apply outline-none focus:outline-none;
-    @apply focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .focus-app-field {
     @apply outline-none focus:outline-none;
-    @apply focus-visible:ring-2 focus-visible:ring-brand-indigo/70 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .focus-app-field-indigo {
     @apply outline-none focus:outline-none transition-colors focus:border-indigo-500;
-    @apply focus-visible:ring-2 focus-visible:ring-indigo-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:ring-2 focus-visible:ring-indigo-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .focus-app-field-rose {
     @apply outline-none focus:outline-none transition-colors focus:border-rose-500;
-    @apply focus-visible:ring-2 focus-visible:ring-rose-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:ring-2 focus-visible:ring-rose-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .focus-app-field-neutral {
     @apply outline-none focus:outline-none transition-colors focus:border-content-secondary;
-    @apply focus-visible:ring-2 focus-visible:ring-content-secondary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:ring-2 focus-visible:ring-content-secondary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .focus-app-field-indigo-600 {
     @apply outline-none focus:outline-none transition-colors focus:border-indigo-600;
-    @apply focus-visible:ring-2 focus-visible:ring-indigo-600/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:ring-2 focus-visible:ring-indigo-600/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .focus-app-field-zinc {
     @apply outline-none focus:outline-none transition-colors focus:border-zinc-500;
-    @apply focus-visible:ring-2 focus-visible:ring-zinc-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:ring-2 focus-visible:ring-zinc-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .focus-app-field-amber {
     @apply outline-none focus:outline-none transition-colors focus:border-amber-500;
-    @apply focus-visible:ring-2 focus-visible:ring-amber-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:ring-2 focus-visible:ring-amber-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .focus-app-field-emerald {
     @apply outline-none focus:outline-none transition-colors focus:border-emerald-500;
-    @apply focus-visible:ring-2 focus-visible:ring-emerald-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:ring-2 focus-visible:ring-emerald-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .focus-app-field-cyan {
     @apply outline-none focus:outline-none transition-colors focus:border-cyan-500;
-    @apply focus-visible:ring-2 focus-visible:ring-cyan-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:ring-2 focus-visible:ring-cyan-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .focus-app-field-brand-indigo {
-    @apply outline-none focus:outline-none transition-colors focus:border-brand-indigo;
-    @apply focus-visible:ring-2 focus-visible:ring-brand-indigo/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply outline-none focus:outline-none transition-colors focus:border-white/40;
+    @apply focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   @keyframes float {
@@ -267,7 +263,7 @@ html {
 }
 
 body {
-  @apply bg-surface-base text-content-primary antialiased tabular-nums selection:bg-brand-violet/30;
+  @apply bg-surface-base text-content-primary antialiased tabular-nums selection:bg-white/15;
   font-feature-settings: "cv01" 1, "ss03" 1;
   letter-spacing: normal;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -513,7 +509,7 @@ body {
   --normal-bg: var(--color-surface-raised);
   --normal-border: var(--color-surface-border);
   --normal-text: var(--color-content-primary);
-  --border-radius: 0px;
+  --border-radius: 8px;
 }
 
 [data-sonner-toaster][data-sonner-theme='dark'] [data-description] {
@@ -524,7 +520,7 @@ body {
   --normal-bg: var(--color-surface-raised);
   --normal-border: var(--color-surface-border);
   --normal-text: var(--color-content-primary);
-  --border-radius: 0px;
+  --border-radius: 8px;
 }
 
 [data-sonner-toaster][data-sonner-theme='light'] [data-description] {

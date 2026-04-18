@@ -404,13 +404,13 @@ export default function Layout() {
       {/* Sidebar */}
       <aside 
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col bg-surface-base transition-all duration-300 ease-in-out",
+          "fixed inset-y-0 left-0 z-50 flex flex-col bg-black/55 backdrop-blur-xl transition-all duration-300 ease-in-out supports-[backdrop-filter]:bg-black/40",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           sidebarCollapsed ? "w-20" : "w-[240px]",
           "border-r border-surface-border"
         )}
       >
-        <div className="shrink-0 flex items-center justify-between h-[4.5rem] px-4 border-b border-surface-border">
+        <div className="shrink-0 flex items-center justify-between h-[4.5rem] px-4 border-b border-surface-border/90">
           <div className="flex items-center gap-2 overflow-hidden">
             {!sidebarCollapsed && (
               <div className="flex items-center gap-2">
@@ -423,7 +423,7 @@ export default function Layout() {
           <button 
             type="button"
             aria-label="Close navigation menu"
-            className="lg:hidden text-content-tertiary hover:text-content-secondary p-2 transition-colors focus-app rounded-sm"
+            className="lg:hidden text-content-tertiary hover:text-content-secondary p-2 transition-colors focus-app rounded-lg"
             onClick={closeSidebarMobile}
           >
             <MorphingMenuIcon isOpen={sidebarOpen} className="text-content-primary" />
@@ -465,15 +465,15 @@ export default function Layout() {
                             key={item.name}
                             to={item.linkTo}
                             className={cn(
-                              "flex items-center gap-3 px-4 py-2 transition-colors duration-200 group relative rounded-sm mx-1",
+                              "flex items-center gap-3 px-4 py-2 transition-colors duration-200 group relative rounded-lg mx-1",
                               isActive 
-                                ? "text-content-primary bg-surface-highlight nav-pressed" 
-                                : "text-content-secondary hover:text-content-primary hover:bg-surface-highlight"
+                                ? "text-content-primary bg-white/[0.06]" 
+                                : "text-content-secondary hover:text-content-primary hover:bg-white/[0.04]"
                             )}
                             title={sidebarCollapsed ? item.name : undefined}
                           >
                             {isActive && (
-                              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-r-md h-4 bg-brand-indigo" />
+                              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] rounded-r-sm h-4 bg-white" />
                             )}
                             <TactileIcon 
                               icon={Icon} 
@@ -491,8 +491,11 @@ export default function Layout() {
                                   {item.name}
                                 </span>
                                 {(item as { count?: number }).count !== undefined && (item as { count?: number }).count! > 0 && (
-                                  <span className="text-[10px] font-mono font-bold bg-indigo-500 text-white px-1.5 py-0.5 rounded-full shadow-lg shadow-indigo-500/20">
-                                    {(item as { count?: number }).count}
+                                  <span className="flex items-center gap-1.5 shrink-0">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+                                    <span className="text-[10px] font-mono text-content-secondary tabular-nums">
+                                      {(item as { count?: number }).count}
+                                    </span>
                                   </span>
                                 )}
                               </>
@@ -509,13 +512,13 @@ export default function Layout() {
         </nav>
 
         {/* Collapse button (Desktop only) */}
-        <div className="p-4 border-t border-surface-border bg-surface-base">
+        <div className="p-4 border-t border-surface-border/90 bg-transparent">
           <div className={cn("mb-4", sidebarCollapsed ? "px-0" : "px-2")}>
             <button
               type="button"
               onClick={() => startTransition(() => setSidebarCollapsed((c) => !c))}
               className={cn(
-                "flex items-center w-full py-2 text-[12px] font-sans font-medium text-content-tertiary bg-surface-raised border border-surface-border rounded-sm hover:text-content-primary hover:bg-surface-highlight transition-all group",
+                "flex items-center w-full py-2 text-[12px] font-sans font-medium text-content-secondary bg-transparent border border-surface-border rounded-lg hover:text-content-primary hover:bg-white/[0.04] transition-all group",
                 sidebarCollapsed ? "justify-center px-0" : "justify-start px-3 gap-3"
               )}
             >
@@ -533,7 +536,7 @@ export default function Layout() {
                 startTransition(() => navigate('/auth'));
               }}
               className={cn(
-                "flex items-center w-full py-2 mt-2 text-[12px] font-sans font-bold uppercase tracking-widest text-rose-500/80 bg-rose-500/5 border border-rose-500/10 rounded-sm hover:text-rose-400 hover:bg-rose-500/10 transition-all group",
+                "flex items-center w-full py-2 mt-2 text-[12px] font-sans font-medium text-content-secondary bg-transparent border border-surface-border rounded-lg hover:text-content-primary hover:bg-white/[0.04] transition-all group",
                 sidebarCollapsed ? "justify-center px-0" : "justify-start px-3 gap-3"
               )}
               title={sidebarCollapsed ? "Sign Out" : undefined}
@@ -556,12 +559,12 @@ export default function Layout() {
         )}
       >
         {/* Top Bar */}
-        <header className="shrink-0 bg-surface-base sticky top-0 z-30 h-[4.5rem] flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-surface-border">
+        <header className="shrink-0 bg-black/55 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40 sticky top-0 z-30 h-[4.5rem] flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-surface-border">
           <div className="flex items-center gap-4 flex-1">
             <button 
               type="button"
               aria-label="Open navigation menu"
-              className="lg:hidden text-content-tertiary hover:text-content-secondary focus-app rounded-sm p-1"
+              className="lg:hidden text-content-tertiary hover:text-content-secondary focus-app rounded-lg p-1"
               onClick={() => setSidebarOpen(true)}
             >
               <MorphingMenuIcon isOpen={sidebarOpen} className="scale-110" />
@@ -586,19 +589,19 @@ export default function Layout() {
                   setIsSearchOpen(true);
                 }}
                 onFocus={() => setIsSearchOpen(true)}
-                className="w-full pl-9 pr-4 py-2 bg-surface-highlight rounded-md text-[13px] font-sans text-content-primary placeholder-content-tertiary focus:bg-surface-border-subtle transition-all border border-surface-border outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus:border-content-secondary"
+                className="w-full pl-9 pr-4 py-2 bg-surface-raised/80 rounded-lg text-[13px] font-sans text-content-primary placeholder-content-tertiary focus:bg-surface-elevated/90 transition-all border border-surface-border outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus:border-white/25"
               />
               
               {/* Search Dropdown */}
               {isSearchOpen && searchQuery.trim() !== '' && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-surface-raised border border-surface-border rounded-sm shadow-xl overflow-hidden z-50 max-h-96 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-surface-raised/95 backdrop-blur-md border border-surface-border rounded-lg shadow-[0_12px_40px_rgba(0,0,0,0.45)] overflow-hidden z-50 max-h-96 overflow-y-auto">
                   {searchResults.length > 0 ? (
                     <ul className="py-1">
                       {searchResults.map((result, index) => (
                         <li key={index}>
                           <button
                             onClick={() => handleSearchSelect(result.path)}
-                            className="w-full text-left px-4 py-2 hover:bg-surface-elevated transition-colors flex flex-col"
+                            className="w-full text-left px-4 py-2 hover:bg-white/[0.04] transition-colors flex flex-col"
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium text-content-primary">{result.name}</span>
@@ -633,7 +636,7 @@ export default function Layout() {
               type="button"
               aria-label="Open search"
               onClick={() => setIsMobileSearchOpen(true)} 
-              className="md:hidden text-content-tertiary hover:text-content-secondary transition-colors p-1 focus-app rounded-sm min-w-11 min-h-11 flex items-center justify-center"
+              className="md:hidden text-content-tertiary hover:text-content-secondary transition-colors p-1 focus-app rounded-lg min-w-11 min-h-11 flex items-center justify-center"
             >
               <Search className="w-4 h-4" />
             </button>
@@ -643,7 +646,7 @@ export default function Layout() {
               type="button"
               title="Quick add (keyboard Q)"
               onClick={() => openQuickAdd()}
-              className="hidden sm:inline-flex items-center gap-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-all btn-tactile px-5 py-2.5 focus-app"
+              className="hidden sm:inline-flex items-center gap-2 rounded-lg bg-white text-black hover:bg-neutral-200 text-sm font-sans font-medium shadow-none transition-colors px-5 py-2.5 focus-app"
             >
               <Plus className="w-4 h-4 shrink-0" aria-hidden />
               Add entry
@@ -653,7 +656,7 @@ export default function Layout() {
               aria-label="Add entry"
               title="Quick add (keyboard Q)"
               onClick={() => openQuickAdd()}
-              className="sm:hidden flex items-center justify-center w-11 h-11 bg-brand-cta hover:bg-brand-cta-hover text-white transition-all btn-tactile focus-app"
+              className="sm:hidden flex items-center justify-center w-11 h-11 bg-white text-black hover:bg-neutral-200 transition-colors focus-app rounded-lg"
             >
               <Plus className="w-3.5 h-3.5" aria-hidden />
             </button>
@@ -666,15 +669,15 @@ export default function Layout() {
                 aria-expanded={isNotifOpen}
                 aria-haspopup="true"
                 onClick={() => { setIsNotifOpen(v => !v); if (!isNotifOpen) markNotificationsRead(); }}
-                className="relative p-1 overflow-visible group min-w-11 min-h-11 flex items-center justify-center focus-app rounded-sm"
+                className="relative p-1 overflow-visible group min-w-11 min-h-11 flex items-center justify-center focus-app rounded-lg"
               >
                 <TactileIcon icon={Bell} size={16} className="text-content-tertiary group-hover:text-content-primary" />
                 {notifications.filter(n => !n.read).length > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-brand-indigo rounded-full shadow-glow-indigo" />
+                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-emerald-500 rounded-full" />
                 )}
               </button>
               {isNotifOpen && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-[#0C0D0E]/98 border border-white/10 rounded-sm shadow-2xl z-50 overflow-hidden">
+                <div className="absolute right-0 top-full mt-2 w-80 bg-black/90 backdrop-blur-xl border border-surface-border rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.55)] z-50 overflow-hidden">
                   <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
                     <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-content-secondary">Notifications</span>
                     <button onClick={() => clearNotifications()} className="text-[10px] font-mono text-content-muted hover:text-content-tertiary uppercase tracking-widest transition-colors">Clear all</button>
@@ -684,9 +687,9 @@ export default function Layout() {
                       <div className="px-4 py-8 text-center text-content-muted text-[11px] font-mono uppercase tracking-widest">No notifications</div>
                     ) : (
                       notifications.map((n: Notification) => (
-                        <div key={n.id} className={cn('px-4 py-3 border-b border-white/5 last:border-0', !n.read && 'bg-indigo-500/5')}>
+                        <div key={n.id} className={cn('px-4 py-3 border-b border-surface-border last:border-0', !n.read && 'bg-white/[0.03]')}>
                           <div className="flex items-start gap-2">
-                            <div className={cn('w-1.5 h-1.5 rounded-full mt-1.5 shrink-0', n.type === 'success' ? 'bg-emerald-500' : n.type === 'warning' ? 'bg-amber-500' : n.type === 'error' ? 'bg-red-500' : 'bg-indigo-500')} />
+                            <div className={cn('w-1.5 h-1.5 rounded-full mt-1.5 shrink-0', n.type === 'success' ? 'bg-emerald-500' : n.type === 'warning' ? 'bg-amber-500' : n.type === 'error' ? 'bg-red-500' : 'bg-neutral-500')} />
                             <div>
                               <p className="text-[12px] font-mono text-content-primary font-medium">{n.title}</p>
                               <p className="text-[11px] font-mono text-content-tertiary mt-0.5 leading-relaxed">{n.message}</p>
@@ -704,7 +707,7 @@ export default function Layout() {
             {/* Profile Dropdown */}
             <HeadlessMenu as="div" className="relative">
               <HeadlessMenu.Button
-                className="h-11 w-11 rounded-full bg-surface-raised border border-surface-border flex items-center justify-center overflow-hidden cursor-pointer hover:bg-surface-elevated transition-colors focus-app"
+                className="h-11 w-11 rounded-full bg-surface-raised/80 border border-surface-border flex items-center justify-center overflow-hidden cursor-pointer hover:bg-surface-elevated transition-colors focus-app"
               >
                 <span className="sr-only">Open account menu</span>
                 {user?.avatar ? (
@@ -719,8 +722,8 @@ export default function Layout() {
                     aria-hidden
                   />
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center bg-brand-indigo/10" aria-hidden>
-                    <span className="text-xs font-sans font-semibold text-brand-indigo">{user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}</span>
+                  <div className="h-full w-full flex items-center justify-center bg-white/10" aria-hidden>
+                    <span className="text-xs font-sans font-semibold text-content-primary">{user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}</span>
                   </div>
                 )}
               </HeadlessMenu.Button>
@@ -733,7 +736,7 @@ export default function Layout() {
                 leaveFrom="opacity-100 scale-100 translate-y-0"
                 leaveTo="opacity-0 scale-[0.96] -translate-y-1"
               >
-                <HeadlessMenu.Items className="absolute right-0 mt-3 w-56 origin-top-right bg-[#0C0D0E]/95 border border-white/10 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] focus-app overflow-hidden z-50">
+                <HeadlessMenu.Items className="absolute right-0 mt-3 w-56 origin-top-right bg-black/92 backdrop-blur-xl border border-surface-border rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.55)] focus-app overflow-hidden z-50">
                   <div className="py-1">
                     <HeadlessMenu.Item>
                       {({ active }) => (
@@ -878,7 +881,7 @@ export default function Layout() {
               autoComplete="off"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none text-base text-content-primary placeholder:text-content-muted rounded-sm px-1 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:bg-surface-base/35"
+              className="flex-1 bg-transparent border-none text-base text-content-primary placeholder:text-content-muted rounded-lg px-1 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:bg-surface-base/35"
             />
             <button 
               type="button"
@@ -889,7 +892,7 @@ export default function Layout() {
                   setSearchQuery('');
                 });
               }}
-              className="p-2 text-content-tertiary hover:text-content-secondary min-w-11 min-h-11 flex items-center justify-center focus-app rounded-sm"
+              className="p-2 text-content-tertiary hover:text-content-secondary min-w-11 min-h-11 flex items-center justify-center focus-app rounded-lg"
             >
               <X className="w-5 h-5" />
             </button>
@@ -935,7 +938,7 @@ export default function Layout() {
       <Dialog open={isResetOpen} onClose={() => setIsResetOpen(false)} className="relative z-[70]">
         <div className="fixed inset-0 bg-black/90" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-sm rounded-sm bg-surface-raised border border-surface-border p-6 shadow-2xl">
+          <Dialog.Panel className="mx-auto max-w-sm rounded-lg bg-surface-raised border border-surface-border p-6 shadow-[0_20px_50px_rgba(0,0,0,0.55)]">
             <div className="flex items-center gap-4 mb-4">
               <div className="flex-shrink-0 w-10 h-10 rounded-full border border-amber-500/30 flex items-center justify-center bg-amber-500/5">
                 <AlertTriangle className="w-5 h-5 text-amber-500" />
@@ -949,7 +952,7 @@ export default function Layout() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setIsResetOpen(false)}
-                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-[11px] font-mono font-bold uppercase tracking-widest text-content-tertiary hover:text-content-primary transition-colors"
+                className="px-4 py-2 bg-transparent border border-surface-border rounded-lg text-[11px] font-mono font-bold uppercase tracking-widest text-content-tertiary hover:text-content-primary transition-colors"
               >
                 Cancel
               </button>
@@ -961,7 +964,7 @@ export default function Layout() {
                   setIsResetting(false);
                   setIsResetOpen(false);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-[11px] font-mono font-bold uppercase tracking-widest transition-all shadow-lg shadow-amber-500/10"
+                className="flex items-center gap-2 px-4 py-2 bg-white text-black hover:bg-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-[11px] font-mono font-bold uppercase tracking-widest transition-colors"
               >
                 {isResetting && <Activity className="w-3 h-3 animate-spin" />}
                 {isResetting ? 'Wiping...' : 'Confirm Wipe'}

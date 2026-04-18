@@ -18,7 +18,7 @@ export function AdminRevenueChart({ data }: Props) {
   const isEmpty = data.length === 0 || data.every((d) => d.revenue_cents === 0);
 
   return (
-    <div className="border border-surface-border rounded-sm bg-surface-raised p-5">
+    <div className="border border-surface-border rounded-lg bg-surface-raised p-5">
       <div className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
         <TrendingUp size={14} />
         Monthly Revenue
@@ -54,8 +54,8 @@ export function AdminRevenueChart({ data }: Props) {
                 borderRadius: '4px',
                 fontSize: 11,
               }}
-              formatter={(v) => [
-                `$${((typeof v === 'number' ? v : 0) / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+              formatter={(value) => [
+                `$${(Number(value ?? 0) / 100).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
                 'Revenue',
               ]}
             />

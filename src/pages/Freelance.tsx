@@ -205,7 +205,7 @@ export default function Freelance() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isScanning}
-                className="border border-surface-border hover:bg-surface-elevated text-content-secondary text-sm font-sans font-medium px-6 py-3 rounded-sm transition-all flex items-center gap-2 group"
+                className="border border-surface-border hover:bg-surface-elevated text-content-secondary text-sm font-sans font-medium px-6 py-3 rounded-lg transition-all flex items-center gap-2 group"
               >
                 {isScanning ? <Loader2 className="w-4 h-4 animate-spin text-brand-indigo" /> : <UploadCloud className="w-4 h-4 group-hover:text-brand-indigo shrink-0" aria-hidden />}
                 Scan statement (PDF)
@@ -213,7 +213,7 @@ export default function Freelance() {
               <button 
                 type="button"
                 onClick={() => setIsAddModalOpen(true)}
-                className="bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold px-6 py-3 rounded-sm shadow-sm transition-all flex items-center gap-2"
+                className="bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold px-6 py-3 rounded-lg shadow-sm transition-all flex items-center gap-2"
               >
                 <Plus className="w-4 h-4 shrink-0" aria-hidden /> Add payment
               </button>
@@ -247,10 +247,10 @@ export default function Freelance() {
                                 {new Date(entry.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · Gross <span className="text-white font-mono tabular-nums">${entry.amount.toFixed(0)}</span>
                               </p>
                               <div className="pt-2 flex flex-wrap gap-2">
-                                 <span className="text-[10px] font-mono tabular-nums text-rose-500 border border-rose-500/20 px-1.5 py-0.5 rounded-sm">Tax −${entry.totalLiability.toFixed(0)}</span>
-                                 <span className="text-[10px] font-mono tabular-nums text-emerald-400 border border-emerald-400/20 px-1.5 py-0.5 rounded-sm">You keep +${entry.profit.toFixed(0)}</span>
+                                 <span className="text-[10px] font-mono tabular-nums text-rose-500 border border-rose-500/20 px-1.5 py-0.5 rounded-lg">Tax −${entry.totalLiability.toFixed(0)}</span>
+                                 <span className="text-[10px] font-mono tabular-nums text-emerald-400 border border-emerald-400/20 px-1.5 py-0.5 rounded-lg">You keep +${entry.profit.toFixed(0)}</span>
                                  {entry.scouredWriteOffs && entry.scouredWriteOffs > 0 && (
-                                   <span className="text-[10px] font-sans bg-brand-indigo/20 text-brand-indigo border border-brand-indigo/30 px-1.5 py-0.5 rounded-sm flex items-center gap-1">
+                                   <span className="text-[10px] font-sans bg-brand-indigo/20 text-brand-indigo border border-brand-indigo/30 px-1.5 py-0.5 rounded-lg flex items-center gap-1">
                                      <ShieldCheck className="w-3 h-3 shrink-0" aria-hidden /> Deductions ${entry.scouredWriteOffs.toFixed(0)}
                                    </span>
                                  )}
@@ -267,7 +267,7 @@ export default function Freelance() {
                            </div>
                            <button 
                              onClick={() => toggleFreelanceVault(entry.id)}
-                             className={`px-4 py-2 border text-xs font-sans font-semibold transition-all rounded-sm ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-brand-cta bg-brand-cta text-white hover:bg-brand-cta-hover'}`}
+                             className={`px-4 py-2 border text-xs font-sans font-semibold transition-all rounded-lg ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-surface-border bg-white text-black hover:bg-neutral-200'}`}
                            >
                              {entry.isVaulted ? 'Saved' : 'Move to tax reserve'}
                            </button>
@@ -352,16 +352,16 @@ export default function Freelance() {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                       <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Who paid you?</label>
-                      <input autoFocus type="text" value={formData.client} onChange={e => setFormData({ ...formData, client: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white focus-app-field-brand-indigo transition-colors rounded-sm" placeholder="e.g. Acme Studio" />
+                      <input autoFocus type="text" value={formData.client} onChange={e => setFormData({ ...formData, client: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white focus-app-field-brand-indigo transition-colors rounded-lg" placeholder="e.g. Acme Studio" />
                     </div>
                     <div>
                       <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Payment amount</label>
-                      <input type="number" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white font-mono tabular-nums focus-app-field-brand-indigo transition-colors rounded-sm" placeholder="0.00" />
+                      <input type="number" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white font-mono tabular-nums focus-app-field-brand-indigo transition-colors rounded-lg" placeholder="0.00" />
                     </div>
                     <p className="text-xs text-content-muted leading-relaxed">If this row came from a PDF scan, double-check the amount matches your statement.</p>
                     <div className="pt-4 flex gap-3">
-                      <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 h-12 border border-surface-border text-content-tertiary text-sm font-sans font-medium hover:bg-surface-elevated transition-colors rounded-sm focus-app">Cancel</button>
-                      <button type="submit" className="flex-[2] bg-brand-cta hover:bg-brand-cta-hover text-white h-12 px-8 text-sm font-sans font-semibold transition-all rounded-sm focus-app">Add payment</button>
+                      <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 h-12 border border-surface-border text-content-tertiary text-sm font-sans font-medium hover:bg-surface-elevated transition-colors rounded-lg focus-app">Cancel</button>
+                      <button type="submit" className="flex-[2] bg-white hover:bg-neutral-200 text-black h-12 px-8 text-sm font-sans font-semibold transition-all rounded-lg focus-app">Add payment</button>
                     </div>
                   </form>
                 </Dialog.Panel>

@@ -97,7 +97,7 @@ function NotificationsPanelInner() {
                     setPref(item.id, checked);
                     deferToast(() => toast.success(`${item.label} ${checked ? 'enabled' : 'disabled'}`));
                   }}
-                  className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                  className="h-4 w-4 text-content-secondary focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                 />
               </div>
             </div>
@@ -121,7 +121,7 @@ function NotificationsPanelInner() {
         )}
 
         {isWebPushSupported() && vapidConfigured && (
-          <div className="mb-6 rounded-sm border border-surface-border bg-surface-base p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="mb-6 rounded-lg border border-surface-border bg-surface-base p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-content-primary">This browser</p>
               <p className="text-xs text-content-muted mt-0.5">
@@ -144,7 +144,7 @@ function NotificationsPanelInner() {
                     setWebPushReady(true);
                     toast.success('Browser notifications enabled');
                   }}
-                  className="inline-flex items-center gap-2 rounded-sm bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-xs font-semibold text-white disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-lg bg-white text-black hover:bg-neutral-200 px-4 py-2 text-xs font-semibold disabled:opacity-60"
                 >
                   {webPushBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                   Enable web push
@@ -162,7 +162,7 @@ function NotificationsPanelInner() {
                       if ('error' in r) toast.error(r.error);
                       else toast.success('Test push sent');
                     }}
-                    className="inline-flex items-center gap-2 rounded-sm border border-surface-border bg-surface-elevated px-4 py-2 text-xs font-medium text-content-secondary hover:text-content-primary disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-elevated px-4 py-2 text-xs font-medium text-content-secondary hover:text-content-primary disabled:opacity-60"
                   >
                     {webPushBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                     Send test
@@ -181,7 +181,7 @@ function NotificationsPanelInner() {
                       setWebPushReady(false);
                       toast.success('Browser push disabled on this device');
                     }}
-                    className="inline-flex items-center gap-2 rounded-sm border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-xs font-medium text-rose-300 hover:bg-rose-500/20 disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-xs font-medium text-rose-300 hover:bg-rose-500/20 disabled:opacity-60"
                   >
                     Turn off
                   </button>
@@ -211,7 +211,7 @@ function NotificationsPanelInner() {
                     setPref(item.id, checked);
                     deferToast(() => toast.success(`${item.label} ${checked ? 'enabled' : 'disabled'}`));
                   }}
-                  className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                  className="h-4 w-4 text-content-secondary focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                 />
               </div>
             </div>
@@ -244,7 +244,7 @@ function NotificationsPanelInner() {
                       setPref(item.id, checked);
                       deferToast(() => toast.success(`${item.label} ${checked ? 'enabled' : 'disabled'}`));
                     }}
-                    className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                    className="h-4 w-4 text-content-secondary focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
                   />
                 </div>
               </div>

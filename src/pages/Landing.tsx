@@ -62,7 +62,7 @@ function WordCycler() {
       </span>
       
       {reduceMotion ? (
-        <span className="text-brand-violet col-start-1 row-start-1 inline-block">{CYCLE_WORDS[index]}.</span>
+        <span className="text-content-primary col-start-1 row-start-1 inline-block">{CYCLE_WORDS[index]}.</span>
       ) : (
         <AnimatePresence mode="wait">
           <motion.span
@@ -71,7 +71,7 @@ function WordCycler() {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '-10%', opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-            className="text-brand-violet col-start-1 row-start-1 inline-block"
+            className="text-content-primary col-start-1 row-start-1 inline-block"
           >
             {CYCLE_WORDS[index]}.
           </motion.span>
@@ -200,12 +200,12 @@ export default function Landing() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-brand-violet/30 flex flex-col">
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-white/15 flex flex-col">
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-surface-base/95 border-surface-border' : 'bg-transparent border-transparent'}`}>
+      <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-black/55 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40 border-surface-border' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <TransitionLink to="/" className="brand-header-text flex items-center gap-2">
-            <div className="w-2 h-2 bg-brand-violet shadow-glow-indigo"></div>
+            <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden />
             Oweable
           </TransitionLink>
           <div className="hidden md:flex items-center gap-8 text-sm text-content-tertiary">
@@ -220,14 +220,14 @@ export default function Landing() {
                   useStore.getState().signOut();
                   toast.success('Session Terminated');
                 }}
-                className="hidden sm:block px-6 py-2 bg-transparent border border-surface-border hover:border-content-muted text-content-tertiary hover:text-content-primary text-sm font-sans font-medium transition-all btn-tactile"
+                className="hidden sm:block px-6 py-2 bg-transparent border border-surface-border text-content-secondary hover:text-content-primary hover:bg-white/[0.04] text-sm font-sans font-medium transition-colors rounded-lg"
               >
                 Sign out
               </button>
             )}
             <TransitionLink 
               to={user?.id ? "/dashboard" : "/auth"} 
-              className="px-6 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-all btn-tactile"
+              className="px-6 py-2 rounded-lg bg-white text-black hover:bg-neutral-200 text-sm font-sans font-medium shadow-none transition-colors"
             >
               {user?.id ? "Open dashboard" : "Sign in"}
             </TransitionLink>
@@ -240,11 +240,8 @@ export default function Landing() {
         <div ref={heroRef} className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-32 items-center">
           
           <div className="lg:col-span-7 flex flex-col items-start pr-0 lg:pr-12">
-            <div className="inline-flex items-center gap-3 border border-brand-violet/30 bg-brand-violet/5 px-3 py-1.5 mb-8 text-xs font-sans font-medium text-brand-violet">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full bg-brand-violet opacity-75"></span>
-                <span className="relative inline-flex bg-brand-violet h-2 w-2"></span>
-              </span>
+            <div className="inline-flex items-center gap-2 border border-surface-border bg-surface-raised px-3 py-1.5 mb-8 text-xs font-sans font-medium text-content-secondary rounded-lg">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
               Bank-grade Security
             </div>
             
@@ -255,13 +252,13 @@ export default function Landing() {
               </span>
             </h1>
             
-            <p className="text-lg font-medium text-content-secondary max-w-lg leading-[1.6] mb-10 border-l-2 border-brand-violet/30 pl-6">
+            <p className="text-lg font-medium text-content-secondary max-w-lg leading-[1.6] mb-10 border-l border-surface-border pl-6">
               A precision command center to tame your bills, eliminate debt, track your income, and build financial clarity — no matter where you're starting from.
             </p>
             
             <TransitionLink 
               to={user?.id ? "/dashboard" : "/auth"} 
-              className="group flex items-center gap-4 bg-brand-cta hover:bg-brand-cta-hover text-white px-8 py-4 text-sm font-sans font-semibold shadow-sm rounded-sm transition-all btn-tactile"
+              className="group flex items-center gap-4 bg-white text-black hover:bg-neutral-200 px-8 py-4 text-sm font-sans font-medium shadow-none rounded-lg transition-colors"
             >
               {user?.id ? "Open dashboard" : "Get started for free"}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -269,11 +266,11 @@ export default function Landing() {
           </div>
 
           <div className="lg:col-span-5 relative">
-            <div className="bg-surface-raised border border-surface-border shadow-stripe-dark p-1">
-              <div className="bg-surface-elevated border border-surface-border p-6 flex flex-col gap-6">
+            <div className="bg-surface-raised border border-surface-border rounded-lg p-1 shadow-none">
+              <div className="bg-surface-elevated border border-surface-border rounded-[6px] p-6 flex flex-col gap-6">
                 <div className="flex justify-between items-center border-b border-surface-border pb-4">
                   <span className="text-xs font-sans font-medium text-content-tertiary">Account balances</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-brand-violet shadow-glow-indigo">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-content-secondary">
                     <path d="M17 3a2 2 0 0 1 1.492 0.668l0.108 0.132 3.704 4.939a2 2 0 0 1 -0.012 2.416l-0.108 0.13 -9.259 10.184a1.25 1.25 0 0 1 -1.753 0.096l-0.097 -0.096 -9.259 -10.185a2 2 0 0 1 -0.215 -2.407l0.095 -0.138L5.4 3.8a2 2 0 0 1 1.43 -0.793L7 3zm-2.477 8H9.477L12 17.307zm5.217 0h-3.063l-2.406 6.015zM7.323 11H4.261l5.468 6.015zm5.059 -6h-0.764l-2 4h4.764zM17 5h-2.382l2 4H20zM9.382 5H7L4 9h3.382z"></path>
                   </svg>
                 </div>
@@ -281,37 +278,42 @@ export default function Landing() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
                     <thead>
-                      <tr className="text-xs section-label normal-case text-content-tertiary border-b border-surface-border child:pb-3">
+                      <tr className="text-xs section-label normal-case text-content-secondary border-b border-surface-border child:pb-3">
                         <th className="font-normal w-1/3">Account</th>
                         <th className="font-normal text-right">Trend / Status</th>
                         <th className="font-normal text-right">Tax Est.</th>
                         <th className="font-normal text-right">Balance</th>
                       </tr>
                     </thead>
-                    <tbody className="text-content-primary child:border-b child:border-surface-border child:last:border-0 child:child:py-3 text-sm font-mono tabular-nums">
-                      <tr className="hover:bg-surface-highlight transition-colors">
-                        <td>Uber / Lyft Inflow</td>
-                        <td className="text-right text-emerald-400">+12%</td>
-                        <td className="text-right text-rose-400">22.5%</td>
-                        <td className="text-right">$2,450</td>
+                    <tbody className="text-content-primary text-sm font-mono tabular-nums">
+                      <tr className="hover:bg-white/[0.04] transition-colors">
+                        <td className="py-2.5">Uber / Lyft Inflow</td>
+                        <td className="text-right text-emerald-500 py-2.5">+12%</td>
+                        <td className="text-right text-rose-400 py-2.5">22.5%</td>
+                        <td className="text-right py-2.5">$2,450</td>
                       </tr>
-                      <tr className="hover:bg-surface-highlight transition-colors">
-                        <td>Savings Account</td>
-                        <td className="text-right text-emerald-400">+2.1%</td>
-                        <td className="text-right text-content-tertiary">—</td>
-                        <td className="text-right">$45,230</td>
+                      <tr className="hover:bg-white/[0.04] transition-colors">
+                        <td className="py-2.5">Savings Account</td>
+                        <td className="text-right text-emerald-500 py-2.5">+2.1%</td>
+                        <td className="text-right text-content-tertiary py-2.5">—</td>
+                        <td className="text-right py-2.5">$45,230</td>
                       </tr>
-                      <tr className="hover:bg-surface-highlight transition-colors">
-                        <td>Stock Portfolio</td>
-                        <td className="text-right text-emerald-400">+5.0%</td>
-                        <td className="text-right text-content-tertiary">—</td>
-                        <td className="text-right">$124,550</td>
+                      <tr className="hover:bg-white/[0.04] transition-colors">
+                        <td className="py-2.5">Stock Portfolio</td>
+                        <td className="text-right text-emerald-500 py-2.5">+5.0%</td>
+                        <td className="text-right text-content-tertiary py-2.5">—</td>
+                        <td className="text-right py-2.5">$124,550</td>
                       </tr>
-                      <tr className="hover:bg-surface-highlight transition-colors">
-                        <td>Tax Reserve (Shield)</td>
-                        <td className="text-right text-brand-violet">ACTIVE</td>
-                        <td className="text-right text-content-tertiary">—</td>
-                        <td className="text-right text-emerald-400">$8,400</td>
+                      <tr className="hover:bg-white/[0.04] transition-colors">
+                        <td className="py-2.5">Tax Reserve (Shield)</td>
+                        <td className="text-right py-2.5">
+                          <span className="inline-flex items-center justify-end gap-2 w-full">
+                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+                            <span className="text-content-secondary font-sans text-xs uppercase tracking-wide">Active</span>
+                          </span>
+                        </td>
+                        <td className="text-right text-content-tertiary py-2.5">—</td>
+                        <td className="text-right text-emerald-500 py-2.5">$8,400</td>
                       </tr>
                     </tbody>
                   </table>
@@ -324,7 +326,7 @@ export default function Landing() {
                   </div>
                   <div className="flex gap-1 h-8 items-end w-32">
                     {[40, 70, 45, 90, 65, 80, 100].map((h, i) => (
-                      <div key={i} className="flex-1 bg-brand-violet/30 hover:bg-brand-violet transition-colors shadow-glow-indigo/10" style={{ height: `${h}%` }}></div>
+                      <div key={i} className="flex-1 bg-white/20 hover:bg-white/35 transition-colors rounded-lg" style={{ height: `${h}%` }}></div>
                     ))}
                   </div>
                 </div>
@@ -343,28 +345,13 @@ export default function Landing() {
       <section id="features" className="py-24 border-t border-surface-border bg-surface-base relative">
         <div className="max-w-7xl mx-auto px-6 lg:px-8" ref={archRef}>
           <div className={`mb-16 transition-all duration-1000 ease-out ${archVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <h2 className="text-3xl font-sans font-medium tracking-tight text-content-primary mb-4">
+            <h2 className="text-3xl font-sans font-semibold tracking-tight text-content-primary mb-4">
               Built for clarity
             </h2>
-            <div className="w-full h-[1px] bg-surface-border relative overflow-hidden">
-              <motion.div 
-                initial={{ x: '-100%' }}
-                whileInView={{ x: '0%' }}
-                viewport={{ once: true }}
-                transition={{ duration: 1.5, ease: "circOut" }}
-                className="absolute left-0 top-0 h-full w-full bg-gradient-to-r from-brand-violet to-transparent opacity-50"
-              />
-              <motion.div 
-                initial={{ x: '-100%' }}
-                whileInView={{ x: '0%' }}
-                viewport={{ once: true }}
-                transition={{ duration: 1, ease: "circOut" }}
-                className="absolute left-0 top-0 h-full w-1/4 bg-brand-violet"
-              />
-            </div>
+            <div className="w-full h-px bg-surface-border" />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-l border-t border-surface-border">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               {
                 icon: Target,
@@ -399,16 +386,15 @@ export default function Landing() {
             ].map((feat, i) => (
               <div
                 key={i}
-                className="border-r border-b border-surface-border p-10 bg-surface-base hover:bg-surface-raised transition-colors group relative overflow-hidden"
+                className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-white/[0.02] transition-colors"
               >
-                <feat.icon className="w-5 h-5 text-brand-violet mb-4" />
-                <h3 className="text-lg font-medium text-content-primary mb-3">
+                <feat.icon className="w-5 h-5 text-content-secondary mb-4" />
+                <h3 className="text-lg font-medium tracking-tight text-content-primary mb-3">
                   {feat.title}
                 </h3>
                 <p className="text-sm text-content-secondary leading-relaxed">
                   {feat.desc}
                 </p>
-                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-brand-violet scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500"></div>
               </div>
             ))}
           </div>
@@ -416,13 +402,13 @@ export default function Landing() {
       </section>
 
       {/* Social proof — composite stories aligned with core product areas */}
-      <section id="stories" className="py-24 border-t border-surface-border bg-surface-raised">
+      <section id="stories" className="py-24 border-t border-surface-border bg-surface-base">
         <div className="max-w-7xl mx-auto px-6 lg:px-8" ref={testimonialsRef}>
           <div
             className={`mb-12 transition-all duration-1000 ease-out ${testimonialsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
           >
-            <span className="text-xs font-sans font-medium text-brand-violet">Stories</span>
-            <h2 className="text-3xl font-sans font-medium tracking-tight text-content-primary mt-4 mb-3">
+            <span className="text-xs font-sans font-medium text-content-secondary">Stories</span>
+            <h2 className="text-3xl font-sans font-semibold tracking-tight text-content-primary mt-4 mb-3">
               What people use Oweable for
             </h2>
             <p className="text-content-secondary max-w-2xl leading-relaxed text-sm">
@@ -430,25 +416,25 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-l border-t border-surface-border">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {TESTIMONIALS.map((t, i) => (
               <figure
                 key={i}
-                className="border-r border-b border-surface-border p-8 lg:p-10 bg-surface-base hover:bg-surface-raised transition-colors flex flex-col h-full relative group"
+                className="border border-surface-border rounded-lg p-8 lg:p-10 bg-surface-raised hover:bg-white/[0.02] transition-colors flex flex-col h-full"
               >
-                <Quote className="w-5 h-5 text-brand-violet/80 mb-4 shrink-0" aria-hidden />
+                <Quote className="w-5 h-5 text-content-tertiary mb-4 shrink-0" aria-hidden />
                 <blockquote className="text-sm text-content-secondary leading-relaxed flex-1 mb-6">
                   <span className="text-content-primary/90">&ldquo;{t.quote}&rdquo;</span>
                 </blockquote>
                 <figcaption className="mt-auto pt-4 border-t border-surface-border">
-                  <span className="inline-block text-xs font-sans font-medium text-brand-violet mb-2 px-2 py-0.5 border border-brand-violet/25 bg-brand-violet/5">
+                  <span className="inline-flex items-center gap-2 text-xs font-sans font-medium text-content-secondary mb-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-neutral-500" aria-hidden />
                     {t.tag}
                   </span>
                   <p className="text-sm font-medium text-content-primary">{t.name}</p>
                   <p className="text-xs text-content-tertiary mt-1 leading-relaxed">{t.role}</p>
                   <p className="text-xs text-content-tertiary mt-2">{t.region}</p>
                 </figcaption>
-                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-brand-violet scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
               </figure>
             ))}
           </div>
@@ -460,7 +446,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             <div className="lg:col-span-4">
-              <span className="text-xs font-sans font-medium text-brand-violet">Overview</span>
+              <span className="text-xs font-sans font-medium text-content-secondary">Overview</span>
               <h2 className="text-3xl font-medium tracking-tight text-content-primary mt-4">What is Oweable?</h2>
             </div>
             <div className="lg:col-span-8 flex flex-col gap-4 lg:pt-10">
@@ -479,16 +465,16 @@ export default function Landing() {
       </section>
 
       {/* FAQ Section — indexed by search engines and AI crawlers */}
-      <section id="faq" className="py-24 border-t border-surface-border bg-surface-raised">
+      <section id="faq" className="py-24 border-t border-surface-border bg-surface-base">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="mb-16">
-            <span className="text-xs font-sans font-medium text-brand-violet">FAQ</span>
-            <h2 className="text-3xl font-medium tracking-tight text-content-primary mt-4">Frequently asked questions</h2>
+            <span className="text-xs font-sans font-medium text-content-secondary">FAQ</span>
+            <h2 className="text-3xl font-semibold tracking-tight text-content-primary mt-4">Frequently asked questions</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-l border-t border-surface-border">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {buildFaqItems(isPlaidLinkUiEnabled()).map((item, i) => (
-              <div key={i} className="border-r border-b border-surface-border p-8 bg-surface-base hover:bg-surface-raised transition-colors">
-                <h3 className="text-sm font-medium text-content-primary mb-3">{item.q}</h3>
+              <div key={i} className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-white/[0.02] transition-colors">
+                <h3 className="text-sm font-medium tracking-tight text-content-primary mb-3">{item.q}</h3>
                 <p className="text-sm text-content-secondary leading-relaxed">{item.a}</p>
               </div>
             ))}

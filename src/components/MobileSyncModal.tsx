@@ -113,7 +113,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
     <Dialog open={isOpen} onClose={onClose} className="relative z-[60]">
       <div className="fixed inset-0 bg-black/95" aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="mx-auto max-w-xl w-full bg-surface-raised border border-surface-border rounded-sm shadow-2xl overflow-hidden relative group">
+        <Dialog.Panel className="mx-auto max-w-xl w-full bg-surface-raised border border-surface-border rounded-lg shadow-2xl overflow-hidden relative group">
           <div className="flex h-full flex-col md:flex-row">
             {/* Left Panel: Instructions */}
             <div className="w-full md:w-2/5 p-8 border-r border-surface-border bg-surface-base flex flex-col justify-between">
@@ -173,7 +173,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                        <div className="relative group/qr p-3 bg-surface-raised border border-surface-border shadow-2xl">
                           {status === 'waiting' ? (
                              qrDataUrl
-                               ? <img src={qrDataUrl} alt="QR Code" className="w-[200px] h-[200px] rounded-sm" />
+                               ? <img src={qrDataUrl} alt="QR Code" className="w-[200px] h-[200px] rounded-lg" />
                                : <div className="w-[200px] h-[200px] flex items-center justify-center"><Loader2 className="w-6 h-6 text-brand-violet animate-spin" /></div>
                           ) : (
                              <div className="w-[200px] h-[200px] flex flex-col items-center justify-center bg-brand-violet/5 gap-3 border-4 border-brand-violet/20 animate-pulse">

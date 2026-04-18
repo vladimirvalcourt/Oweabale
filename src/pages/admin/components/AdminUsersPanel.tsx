@@ -21,7 +21,7 @@ type Props = {
 
 const PLAN_STYLES: Record<string, string> = {
   Lifetime: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
-  Pro: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
+  Pro: 'bg-white/[0.06] text-content-secondary border-surface-border',
 };
 
 const SUB_STATUS_STYLES: Record<string, string> = {
@@ -63,7 +63,7 @@ export function AdminUsersPanel({
   };
 
   return (
-    <div className="lg:col-span-2 border border-surface-border rounded-sm bg-surface-raised p-5">
+    <div className="lg:col-span-2 border border-surface-border rounded-lg bg-surface-raised p-5">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
           <Users className="w-4 h-4" /> Users
@@ -75,46 +75,46 @@ export function AdminUsersPanel({
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search email or id"
-            className="pl-7 pr-2 py-1.5 text-xs bg-surface-base border border-surface-border rounded-sm focus-app"
+            className="pl-7 pr-2 py-1.5 text-xs bg-surface-base border border-surface-border rounded-lg focus-app"
           />
         </div>
       </div>
 
       {selected.size > 0 && (
-        <div className="flex items-center gap-2 mb-3 p-2 rounded-sm bg-surface-elevated border border-surface-border">
+        <div className="flex items-center gap-2 mb-3 p-2 rounded-lg bg-surface-elevated border border-surface-border">
           <span className="text-xs text-content-tertiary">{selected.size} selected</span>
           <button
             type="button"
             onClick={() => onBulkAction('ban', [...selected])}
-            className="px-2 py-1 rounded-sm text-xs bg-rose-500/15 text-rose-300 hover:bg-rose-500/25"
+            className="px-2 py-1 rounded-lg text-xs bg-rose-500/15 text-rose-300 hover:bg-rose-500/25"
           >
             Ban
           </button>
           <button
             type="button"
             onClick={() => onBulkAction('unban', [...selected])}
-            className="px-2 py-1 rounded-sm text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+            className="px-2 py-1 rounded-lg text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
           >
             Unban
           </button>
           <button
             type="button"
             onClick={() => onBulkAction('grant_entitlement', [...selected])}
-            className="px-2 py-1 rounded-sm text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+            className="px-2 py-1 rounded-lg text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
           >
             Grant Suite
           </button>
           <button
             type="button"
             onClick={() => onBulkAction('revoke_entitlement', [...selected])}
-            className="px-2 py-1 rounded-sm text-xs bg-amber-500/15 text-amber-300 hover:bg-amber-500/25"
+            className="px-2 py-1 rounded-lg text-xs bg-amber-500/15 text-amber-300 hover:bg-amber-500/25"
           >
             Revoke Suite
           </button>
           <button
             type="button"
             onClick={() => setSelected(new Set())}
-            className="ml-auto px-2 py-1 rounded-sm text-xs bg-surface-base text-content-tertiary hover:text-content-secondary"
+            className="ml-auto px-2 py-1 rounded-lg text-xs bg-surface-base text-content-tertiary hover:text-content-secondary"
           >
             Clear
           </button>
@@ -130,7 +130,7 @@ export function AdminUsersPanel({
                   type="checkbox"
                   checked={allChecked}
                   onChange={toggleAll}
-                  className="accent-indigo-400"
+                  className="accent-white"
                 />
               </th>
               <th className="py-2 text-left">Account</th>
@@ -173,11 +173,11 @@ export function AdminUsersPanel({
                       type="checkbox"
                       checked={selected.has(user.id)}
                       onChange={() => toggleOne(user.id)}
-                      className="accent-indigo-400"
+                      className="accent-white"
                     />
                   </td>
                   <td className="py-2 pr-2">
-                    <span className={user.is_admin ? 'text-indigo-400 font-bold' : ''}>
+                    <span className={user.is_admin ? 'text-content-primary font-bold' : ''}>
                       {user.email || user.id.slice(0, 12)}
                     </span>
                     {!user.has_completed_onboarding && (
@@ -198,7 +198,7 @@ export function AdminUsersPanel({
                     <button
                       type="button"
                       onClick={() => onViewUser(user.id)}
-                      className="px-2 py-1 rounded-sm text-[11px] bg-surface-elevated text-content-secondary hover:text-content-primary"
+                      className="px-2 py-1 rounded-lg text-[11px] bg-surface-elevated text-content-secondary hover:text-content-primary"
                     >
                       View
                     </button>
@@ -207,7 +207,7 @@ export function AdminUsersPanel({
                         type="button"
                         onClick={() => onDemoteAdmin(user.id)}
                         disabled={isPrimary}
-                        className="px-2 py-1 rounded-sm text-[11px] bg-indigo-500/15 text-indigo-300 disabled:opacity-40"
+                        className="px-2 py-1 rounded-lg text-[11px] bg-white/[0.06] text-content-secondary disabled:opacity-40"
                       >
                         Demote
                       </button>
@@ -215,7 +215,7 @@ export function AdminUsersPanel({
                       <button
                         type="button"
                         onClick={() => onPromoteAdmin(user.id)}
-                        className="px-2 py-1 rounded-sm text-[11px] bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"
+                        className="px-2 py-1 rounded-lg text-[11px] bg-white/[0.05] text-content-primary hover:bg-white/[0.08]"
                       >
                         Promote
                       </button>
@@ -225,7 +225,7 @@ export function AdminUsersPanel({
                         type="button"
                         onClick={() => onGrantRevoke('revoke', user.id)}
                         disabled={isPrimary}
-                        className="px-2 py-1 rounded-sm text-[11px] bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 disabled:opacity-40"
+                        className="px-2 py-1 rounded-lg text-[11px] bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 disabled:opacity-40"
                       >
                         Revoke Suite
                       </button>
@@ -233,7 +233,7 @@ export function AdminUsersPanel({
                       <button
                         type="button"
                         onClick={() => onGrantRevoke('grant', user.id)}
-                        className="px-2 py-1 rounded-sm text-[11px] bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+                        className="px-2 py-1 rounded-lg text-[11px] bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
                       >
                         Grant Suite
                       </button>
@@ -242,7 +242,7 @@ export function AdminUsersPanel({
                       <button
                         type="button"
                         onClick={() => onAdminAction('unban', user.id)}
-                        className="px-2 py-1 rounded-sm text-[11px] bg-emerald-500/15 text-emerald-300"
+                        className="px-2 py-1 rounded-lg text-[11px] bg-emerald-500/15 text-emerald-300"
                       >
                         Unban
                       </button>
@@ -251,7 +251,7 @@ export function AdminUsersPanel({
                         type="button"
                         onClick={() => onAdminAction('ban', user.id)}
                         disabled={isPrimary}
-                        className="px-2 py-1 rounded-sm text-[11px] bg-rose-500/15 text-rose-300 disabled:opacity-40"
+                        className="px-2 py-1 rounded-lg text-[11px] bg-rose-500/15 text-rose-300 disabled:opacity-40"
                       >
                         Ban
                       </button>
@@ -260,7 +260,7 @@ export function AdminUsersPanel({
                       type="button"
                       onClick={() => onAdminAction('delete', user.id)}
                       disabled={isPrimary}
-                      className="px-2 py-1 rounded-sm text-[11px] bg-red-500/20 text-red-300 disabled:opacity-40"
+                      className="px-2 py-1 rounded-lg text-[11px] bg-red-500/20 text-red-300 disabled:opacity-40"
                     >
                       Delete
                     </button>

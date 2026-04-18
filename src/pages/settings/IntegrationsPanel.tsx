@@ -7,7 +7,7 @@ function IntegrationsPanelInner() {
     <div className="space-y-6">
       <Suspense
         fallback={
-          <div className="rounded-sm border border-surface-border bg-surface-raised p-8 animate-pulse min-h-[8rem]" aria-hidden />
+          <div className="rounded-lg border border-surface-border bg-surface-raised p-8 animate-pulse min-h-[8rem]" aria-hidden />
         }
       >
         <BankConnection />

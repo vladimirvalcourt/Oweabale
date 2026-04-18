@@ -41,7 +41,7 @@ function RulesPanelInner() {
                 onChange={(e) =>
                   setRuleForm((f) => ({ ...f, match_type: e.target.value as CategorizationRule['match_type'] }))
                 }
-                className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-sm px-3 py-2 focus-app-field-indigo appearance-none w-full sm:w-36"
+                className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-lg px-3 py-2 focus-app-field-indigo appearance-none w-full sm:w-36"
               >
                 <option value="contains">Contains</option>
                 <option value="exact">Exact Match</option>
@@ -53,12 +53,12 @@ function RulesPanelInner() {
                 placeholder="e.g. STARBUCKS"
                 value={ruleForm.match_value}
                 onChange={(e) => setRuleForm((f) => ({ ...f, match_value: e.target.value }))}
-                className="flex-1 bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-sm px-3 py-2 focus-app-field-indigo placeholder:text-content-muted"
+                className="flex-1 bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-lg px-3 py-2 focus-app-field-indigo placeholder:text-content-muted"
               />
               <select
                 value={ruleForm.category}
                 onChange={(e) => setRuleForm((f) => ({ ...f, category: e.target.value }))}
-                className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-sm px-3 py-2 focus-app-field-indigo appearance-none w-full sm:w-44"
+                className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-lg px-3 py-2 focus-app-field-indigo appearance-none w-full sm:w-44"
               >
                 <option value="">— Select category —</option>
                 {categories.map((c) => (
@@ -82,7 +82,7 @@ function RulesPanelInner() {
                   });
                   setRuleForm((f) => ({ ...f, match_value: '' }));
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest transition-colors shrink-0"
+                className="flex items-center gap-2 px-4 py-2 bg-white text-black hover:bg-neutral-200 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-colors shrink-0"
               >
                 <Plus className="w-3 h-3" />
                 Add
@@ -104,7 +104,7 @@ function RulesPanelInner() {
                   className="flex items-center justify-between px-6 py-3 hover:bg-surface-elevated transition-colors group"
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 rounded-sm shrink-0">
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 bg-white/[0.05] border border-surface-border text-content-primary rounded-lg shrink-0">
                       {rule.match_type.replace('_', ' ')}
                     </span>
                     <span className="text-sm font-mono text-white truncate">{rule.match_value}</span>
@@ -148,7 +148,7 @@ function RulesPanelInner() {
               else toast.success(`Updated ${count} transaction${count !== 1 ? 's' : ''}`);
             }}
             disabled={isApplying}
-            className="flex items-center gap-2 px-4 py-2 bg-surface-elevated border border-surface-border text-content-secondary rounded-sm text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-surface-raised transition-colors disabled:opacity-50 shrink-0"
+            className="flex items-center gap-2 px-4 py-2 bg-surface-elevated border border-surface-border text-content-secondary rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-surface-raised transition-colors disabled:opacity-50 shrink-0"
           >
             {isApplying ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
             Apply Retroactively

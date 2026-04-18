@@ -33,7 +33,7 @@ export default function Changelog() {
       </div>
       <ul className="space-y-8">
         {ENTRIES.map((entry) => (
-          <li key={`${entry.date}-${entry.title}`} className="border border-surface-border rounded-sm bg-surface-raised p-6">
+          <li key={`${entry.date}-${entry.title}`} className="border border-surface-border rounded-lg bg-surface-raised p-6">
             <p className="text-xs font-sans text-content-tertiary mb-1">{entry.date}</p>
             <h2 className="text-lg font-sans font-semibold text-content-primary mb-3">{entry.title}</h2>
             <ul className="list-disc pl-5 space-y-2 text-sm text-content-secondary leading-relaxed">

@@ -105,7 +105,7 @@ function SupportPanelInner() {
                 type="text"
                 value={supportForm.subject}
                 onChange={(e) => setSupportForm((f) => ({ ...f, subject: e.target.value }))}
-                className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo placeholder:text-content-muted"
+                className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field-indigo placeholder:text-content-muted"
                 placeholder="Brief summary of your issue or question..."
               />
             </div>
@@ -118,7 +118,7 @@ function SupportPanelInner() {
                 <select
                   value={supportForm.department}
                   onChange={(e) => setSupportForm((f) => ({ ...f, department: e.target.value }))}
-                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo appearance-none"
+                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field-indigo appearance-none"
                 >
                   <option>General Support</option>
                   <option>Integrations</option>
@@ -133,7 +133,7 @@ function SupportPanelInner() {
                 <select
                   value={supportForm.priority}
                   onChange={(e) => setSupportForm((f) => ({ ...f, priority: e.target.value }))}
-                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo appearance-none"
+                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field-indigo appearance-none"
                 >
                   <option value="Low">Low — general question</option>
                   <option value="Normal">Normal — something isn&apos;t working</option>
@@ -149,7 +149,7 @@ function SupportPanelInner() {
               <textarea
                 value={supportForm.description}
                 onChange={(e) => setSupportForm((f) => ({ ...f, description: e.target.value }))}
-                className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 focus-app-field-indigo min-h-[8rem] resize-y placeholder:text-content-muted"
+                className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-lg px-3 py-2 focus-app-field-indigo min-h-[8rem] resize-y placeholder:text-content-muted"
                 placeholder="Include steps to reproduce, what you expected vs what happened, and any relevant details..."
               />
             </div>
@@ -158,7 +158,7 @@ function SupportPanelInner() {
               <button
                 type="submit"
                 disabled={isSubmittingTicket}
-                className="flex items-center gap-2 px-6 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors"
+                className="flex items-center gap-2 px-6 py-2 bg-white text-black hover:bg-neutral-200 disabled:opacity-50 text-black rounded-lg text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors"
               >
                 {isSubmittingTicket ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                 {isSubmittingTicket ? 'Sending...' : 'Submit Request'}
@@ -194,11 +194,11 @@ function SupportPanelInner() {
                 <div key={ticket.id} className="p-5 hover:bg-surface-elevated transition-colors flex items-center justify-between">
                   <div className="flex items-center gap-4 min-w-0">
                     <div
-                      className={`p-1.5 border rounded-sm shrink-0 ${
+                      className={`p-1.5 border rounded-lg shrink-0 ${
                         ticket.status === 'Resolved'
                           ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
                           : ticket.status === 'In Progress'
-                            ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
+                            ? 'bg-white/[0.05] border-surface-border text-content-primary'
                             : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
                       }`}
                     >
@@ -214,7 +214,7 @@ function SupportPanelInner() {
                       <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                         <span className="text-[9px] font-mono text-content-tertiary">{ticket.id}</span>
                         <span
-                          className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-sm border ${
+                          className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-lg border ${
                             ticket.priority === 'Urgent'
                               ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
                               : 'bg-surface-elevated border-surface-border text-content-tertiary'

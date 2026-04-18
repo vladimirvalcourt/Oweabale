@@ -10,7 +10,7 @@ export function AdminPlaidDrilldown({ items }: Props) {
   const healthy = items.filter((i) => !i.last_sync_error && !i.item_login_required);
 
   return (
-    <div className="border border-surface-border rounded-sm bg-surface-raised p-5">
+    <div className="border border-surface-border rounded-lg bg-surface-raised p-5">
       <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-3">
         <Link2Off className="w-4 h-4" /> Plaid Connections
       </h2>
@@ -36,7 +36,7 @@ export function AdminPlaidDrilldown({ items }: Props) {
               return (
                 <div
                   key={item.id}
-                  className={`rounded-sm border p-2 text-[11px] ${
+                  className={`rounded-lg border p-2 text-[11px] ${
                     isBroken
                       ? 'border-rose-500/30 bg-rose-500/5'
                       : 'border-surface-border bg-surface-base'

@@ -31,14 +31,14 @@ export default function Security() {
 
         <div className="space-y-12 text-content-secondary leading-relaxed">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <div className="p-6 bg-surface-raised border border-surface-border flex flex-col gap-4 rounded-sm">
+            <div className="p-6 bg-surface-raised border border-surface-border flex flex-col gap-4 rounded-lg">
               <Database className="w-8 h-8 text-brand-violet shrink-0" aria-hidden />
               <h3 className="text-base font-sans font-semibold text-content-primary">Strong encryption in transit and at rest</h3>
               <p className="text-sm">
                 Sensitive identifiers are encrypted before they reach our primary storage, using industry-standard algorithms and key management practices.
               </p>
             </div>
-            <div className="p-6 bg-surface-raised border border-surface-border flex flex-col gap-4 rounded-sm">
+            <div className="p-6 bg-surface-raised border border-surface-border flex flex-col gap-4 rounded-lg">
               <Key className="w-8 h-8 text-brand-violet shrink-0" aria-hidden />
               <h3 className="text-base font-sans font-semibold text-content-primary">Validated cryptography</h3>
               <p className="text-sm">

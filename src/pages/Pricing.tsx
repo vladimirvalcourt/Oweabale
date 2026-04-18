@@ -37,11 +37,11 @@ function FaqItem({ question, answer }: { question: string, answer: string }) {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center justify-between w-full text-left focus-app group"
       >
-        <span className="text-lg font-medium text-content-primary group-hover:text-indigo-400 transition-colors">{question}</span>
+        <span className="text-lg font-medium text-content-primary group-hover:text-content-primary transition-colors">{question}</span>
         {isOpen ? (
-          <Minus className="w-5 h-5 text-content-tertiary group-hover:text-indigo-400 transition-colors" />
+          <Minus className="w-5 h-5 text-content-tertiary group-hover:text-content-primary transition-colors" />
         ) : (
-          <Plus className="w-5 h-5 text-content-tertiary group-hover:text-indigo-400 transition-colors" />
+          <Plus className="w-5 h-5 text-content-tertiary group-hover:text-content-primary transition-colors" />
         )}
       </button>
       <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-40 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
@@ -90,9 +90,9 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-indigo-500/30 overflow-x-hidden">
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-white/15 overflow-x-hidden">
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-surface-base/95 border-surface-border' : 'bg-transparent border-transparent'}`}>
+      <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-black/55 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40 border-surface-border' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <TransitionLink to="/" className="brand-header-text text-xl text-content-primary transition-colors duration-200">
             Oweable
@@ -104,7 +104,7 @@ export default function Pricing() {
           </div>
           <TransitionLink 
             to="/dashboard" 
-            className="px-5 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors duration-200"
+            className="px-5 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors duration-200"
           >
             Get started
           </TransitionLink>
@@ -115,7 +115,7 @@ export default function Pricing() {
       <section className="relative pt-40 pb-20 overflow-hidden">
         {/* Beta Disclaimer Banner */}
         <div className="max-w-4xl mx-auto px-6 lg:px-8 mb-12">
-          <div className="bg-amber-400/5 border border-amber-400/20 p-4 rounded-sm flex items-center gap-4">
+          <div className="bg-amber-400/5 border border-amber-400/20 p-4 rounded-lg flex items-center gap-4">
             <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
             <p className="text-sm text-amber-200/90 leading-relaxed">
               <span className="text-amber-400 font-semibold">Closed beta:</span> Access is by invitation. Paid plans are active in beta unless your cohort has a separate promo.
@@ -124,7 +124,7 @@ export default function Pricing() {
         </div>
 
         {/* Subtle Background Glow */}
-        <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/10 via-surface-base/0 to-transparent pointer-events-none"></div>
+        <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-500/10 via-surface-base/0 to-transparent pointer-events-none"></div>
 
         <div 
           ref={headerRef}
@@ -155,18 +155,18 @@ export default function Pricing() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             {/* Card 1: Tracker (Free) */}
-            <div className={`bg-surface-raised border border-surface-border rounded-sm p-10 flex flex-col transition-all duration-700 ease-out delay-[100ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
+            <div className={`bg-surface-raised border border-surface-border rounded-lg p-10 flex flex-col transition-all duration-700 ease-out delay-[100ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
               <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Tracker</h3>
               <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Manual bills + settings access. Premium modules require Full Suite.</p>
               
-              <div className="mb-10 p-6 bg-surface-base border border-surface-border rounded-sm">
+              <div className="mb-10 p-6 bg-surface-base border border-surface-border rounded-lg">
                 <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">$0</span>
                 <span className="text-content-muted text-sm ml-3">forever free</span>
               </div>
               
               <TransitionLink 
                 to="/dashboard" 
-                className="w-full py-4 px-6 bg-transparent border border-surface-border hover:border-content-muted hover:bg-white/5 text-content-primary rounded-sm text-sm font-sans font-semibold text-center transition-all duration-200 mb-10"
+                className="w-full py-4 px-6 bg-transparent border border-surface-border hover:border-content-muted hover:bg-white/5 text-content-primary rounded-lg text-sm font-sans font-semibold text-center transition-all duration-200 mb-10"
               >
                 Use free tracker
               </TransitionLink>
@@ -190,17 +190,17 @@ export default function Pricing() {
             {/* Card 2: Full Suite */}
             <div className={`relative transition-all duration-700 ease-out delay-[200ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
               {/* Indigo Glow Behind Card */}
-              <div className="absolute -inset-1 bg-indigo-500/10 blur-3xl rounded-none z-0"></div>
+              <div className="absolute -inset-1 bg-white/[0.05] blur-3xl rounded-none z-0"></div>
               
-              <div className="bg-surface-raised border border-indigo-500/30 rounded-sm p-10 flex flex-col relative z-10 h-full shadow-[0_0_50px_rgba(99,102,241,0.05)]">
+              <div className="bg-surface-raised border border-surface-border rounded-lg p-10 flex flex-col relative z-10 h-full shadow-none">
                 <div className="absolute top-0 right-10 transform -translate-y-1/2">
-                  <span className="bg-emerald-600 text-white text-xs font-sans font-semibold px-3 py-1 rounded-sm">Most popular</span>
+                  <span className="bg-emerald-600 text-white text-xs font-sans font-semibold px-3 py-1 rounded-lg">Most popular</span>
                 </div>
                 
                 <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Full suite</h3>
                 <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Everything in the app with one simple monthly plan.</p>
                 
-                <div className="mb-10 p-6 bg-surface-base border border-indigo-500/20 rounded-sm relative h-[100px] flex items-center shadow-[inset_0_0_20px_rgba(99,102,241,0.02)]">
+                <div className="mb-10 p-6 bg-surface-base border border-surface-border rounded-lg relative h-[100px] flex items-center shadow-none">
                   <div className={`absolute inset-0 px-6 flex items-center transition-all duration-300 ease-in-out`}>
                     <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">
                       ${monthlyPrice.toFixed(2)}
@@ -213,25 +213,25 @@ export default function Pricing() {
                   type="button"
                   onClick={() => startCheckout('pro_monthly')}
                   disabled={isStartingCheckout}
-                  className="w-full py-4 px-6 rounded-sm bg-brand-cta hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-sans font-semibold text-center transition-all duration-200 mb-3 shadow-sm"
+                  className="w-full py-4 px-6 rounded-lg bg-white hover:bg-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed text-black text-sm font-sans font-semibold text-center transition-all duration-200 mb-3 shadow-sm"
                 >
                   {isStartingCheckout ? 'Starting checkout...' : 'Start monthly plan'}
                 </button>
                 <div className="flex flex-col gap-5 mt-auto">
                   <div className="flex items-start gap-3">
-                    <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
+                    <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
                     <span className="text-content-tertiary text-sm">Unlimited account sync</span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
+                    <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
                     <span className="text-content-tertiary text-sm">Debt payoff planner (avalanche & snowball)</span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
+                    <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
                     <span className="text-content-tertiary text-sm">Subscription price-change alerts</span>
                   </div>
                   <div className="flex items-start gap-3">
-                    <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
+                    <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
                     <span className="text-content-tertiary text-sm">Tax tools for freelancers</span>
                   </div>
                 </div>
@@ -240,7 +240,7 @@ export default function Pricing() {
 
           </div>
 
-          <div className="mt-16 border border-surface-border rounded-sm bg-surface-raised overflow-hidden">
+          <div className="mt-16 border border-surface-border rounded-lg bg-surface-raised overflow-hidden">
             <div className="grid grid-cols-3 border-b border-surface-border text-xs font-mono uppercase tracking-widest">
               <div className="px-4 py-3 text-content-muted">Feature</div>
               <div className="px-4 py-3 text-content-muted border-l border-surface-border">Tracker (Free)</div>

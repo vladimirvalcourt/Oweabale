@@ -156,7 +156,7 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface-raised rounded-sm border border-surface-border p-6 mx-4"
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface-raised rounded-lg border border-surface-border p-6 mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
@@ -192,7 +192,7 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
                   {detail.profile.email ?? '(no email)'}
                 </span>
                 {detail.profile.is_admin && (
-                  <span className="inline-block px-1.5 py-0.5 rounded border text-[10px] font-medium bg-indigo-500/15 text-indigo-300 border-indigo-500/30">
+                  <span className="inline-block px-1.5 py-0.5 rounded border text-[10px] font-medium bg-white/[0.06] text-content-secondary border-surface-border">
                     Admin
                   </span>
                 )}
@@ -214,7 +214,7 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
                 type="button"
                 onClick={handleImpersonate}
                 disabled={isOwnAccount || impersonating}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm text-xs bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 {impersonating && <Loader2 className="w-3 h-3 animate-spin" />}
                 Impersonate User
@@ -230,7 +230,7 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
                 ) : (
                   <ul className="space-y-1.5">
                     {detail.entitlements.map((ent) => (
-                      <li key={ent.id} className="rounded-sm border border-surface-border bg-surface-elevated p-2 text-xs">
+                      <li key={ent.id} className="rounded-lg border border-surface-border bg-surface-elevated p-2 text-xs">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="text-content-primary font-medium">{ent.feature_key}</span>
                           <StatusBadge status={ent.status} />
@@ -252,7 +252,7 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
                 ) : (
                   <ul className="space-y-1.5">
                     {detail.subscriptions.map((sub) => (
-                      <li key={sub.id} className="rounded-sm border border-surface-border bg-surface-elevated p-2 text-xs">
+                      <li key={sub.id} className="rounded-lg border border-surface-border bg-surface-elevated p-2 text-xs">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <StatusBadge status={sub.status} />
                           {sub.cancel_at_period_end && (
@@ -332,7 +332,7 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
                   return (
                     <li
                       key={i}
-                      className="rounded-sm border border-surface-border bg-surface-elevated p-2 text-xs flex flex-wrap items-center gap-3"
+                      className="rounded-lg border border-surface-border bg-surface-elevated p-2 text-xs flex flex-wrap items-center gap-3"
                     >
                       <span className="text-content-primary font-medium">
                         {item.institution_name ?? 'Unknown institution'}

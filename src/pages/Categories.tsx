@@ -81,7 +81,7 @@ export default function Categories() {
             setEditingId(null);
             setFormData({ name: '', type: 'expense', color: '#6366F1' });
           }}
-          className="px-4 py-2 bg-content-primary hover:bg-content-tertiary/25 text-surface-base rounded-sm text-xs font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 focus-app"
+          className="px-4 py-2 bg-content-primary hover:bg-content-tertiary/25 text-surface-base rounded-lg text-xs font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 focus-app"
         >
           <Plus className="w-3.5 h-3.5" />
           Add Category
@@ -89,7 +89,7 @@ export default function Categories() {
       </div>
 
       {(isAdding || editingId) && (
-        <div className="bg-surface-raised rounded-sm border border-surface-border p-6 mb-6">
+        <div className="bg-surface-raised rounded-lg border border-surface-border p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold tracking-tight text-content-primary">
               {editingId ? 'Edit Category' : 'Create New Category'}
@@ -108,7 +108,7 @@ export default function Categories() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors"
+                  className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
                   placeholder="e.g., Groceries"
                 />
               </div>
@@ -117,7 +117,7 @@ export default function Categories() {
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                  className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors"
+                  className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
                 >
                   <option value="expense">Expense</option>
                   <option value="income">Income</option>
@@ -130,7 +130,7 @@ export default function Categories() {
                     type="color"
                     value={formData.color}
                     onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                    className="h-9 w-14 p-1 border border-surface-border bg-surface-base rounded-sm cursor-pointer"
+                    className="h-9 w-14 p-1 border border-surface-border bg-surface-base rounded-lg cursor-pointer"
                   />
                   <span className="text-sm text-content-tertiary">{formData.color}</span>
                 </div>
@@ -140,13 +140,13 @@ export default function Categories() {
               <button
                 type="button"
                 onClick={() => { setIsAdding(false); cancelEdit(); }}
-                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
+                className="px-4 py-2 bg-transparent border border-surface-border rounded-lg text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-sm text-sm font-medium transition-colors focus-app"
+                className="px-4 py-2 bg-white text-black hover:bg-neutral-200 rounded-lg text-sm font-medium transition-colors focus-app"
               >
                 {editingId ? 'Save Changes' : 'Add Category'}
               </button>
@@ -156,7 +156,7 @@ export default function Categories() {
       )}
 
       {categories.length === 0 && !isAdding ? (
-        <div className="bg-surface-raised rounded-sm border border-surface-border p-12 text-center">
+        <div className="bg-surface-raised rounded-lg border border-surface-border p-12 text-center">
           <div className="w-16 h-16 border border-surface-border rounded-full flex items-center justify-center mx-auto mb-4">
             <Tags className="w-8 h-8 text-content-tertiary" />
           </div>
@@ -167,7 +167,7 @@ export default function Categories() {
           <button
             type="button"
             onClick={() => setIsAdding(true)}
-            className="inline-flex items-center justify-center px-4 py-2 bg-indigo-500 hover:bg-indigo-600 active:scale-[0.98] text-white rounded-sm text-sm font-medium transition-colors focus-app"
+            className="inline-flex items-center justify-center px-4 py-2 bg-white text-black hover:bg-neutral-200 active:scale-[0.98] text-black rounded-lg text-sm font-medium transition-colors focus-app"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create Category
@@ -179,7 +179,7 @@ export default function Categories() {
           icon={Tags}
           extraHeader={<span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{categories.length} Categories Saved</span>}
         >
-          <div className="bg-surface-raised rounded-sm border border-surface-border overflow-hidden -mx-6 -my-6">
+          <div className="bg-surface-raised rounded-lg border border-surface-border overflow-hidden -mx-6 -my-6">
             <ul className="divide-y divide-surface-highlight">
               {categories.map((category) => (
                 <li 
@@ -188,7 +188,7 @@ export default function Categories() {
                 >
                   <div className="flex items-center gap-4">
                     <div
-                      className="w-10 h-10 rounded-sm flex items-center justify-center text-white border border-surface-border bg-surface-base group-hover:border-white/15 transition-colors"
+                      className="w-10 h-10 rounded-lg flex items-center justify-center text-white border border-surface-border bg-surface-base group-hover:border-white/15 transition-colors"
                       style={{ borderLeftColor: category.color || '#6366F1', borderLeftWidth: '3px' }}
                     >
                       <Tag className="w-5 h-5" style={{ color: category.color || '#6366F1' }} />
@@ -202,7 +202,7 @@ export default function Categories() {
                     <button
                       type="button"
                       onClick={() => startEdit(category)}
-                      className="p-2 text-content-tertiary hover:text-indigo-400 active:scale-95 rounded-sm hover:bg-surface-border transition-colors"
+                      className="p-2 text-content-tertiary hover:text-content-primary active:scale-95 rounded-lg hover:bg-surface-border transition-colors"
                       title="Edit"
                     >
                       <Edit2 className="w-4 h-4" />
@@ -210,7 +210,7 @@ export default function Categories() {
                     <button
                       type="button"
                       onClick={() => handleDelete(category.id)}
-                      className="p-2 text-content-tertiary hover:text-red-400 active:scale-95 rounded-sm hover:bg-surface-border transition-colors"
+                      className="p-2 text-content-tertiary hover:text-red-400 active:scale-95 rounded-lg hover:bg-surface-border transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />

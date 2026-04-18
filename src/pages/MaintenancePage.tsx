@@ -23,14 +23,14 @@ export default function MaintenancePage() {
         <button
           type="button"
           onClick={() => void signOut()}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-surface-border bg-surface-raised text-sm font-medium text-content-primary hover:bg-surface-elevated transition-colors rounded-sm"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-surface-border bg-surface-raised text-sm font-medium text-content-primary hover:bg-surface-elevated transition-colors rounded-lg"
         >
           <LogOut className="w-4 h-4" />
           Sign out
         </button>
         <TransitionLink
           to="/"
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors rounded-sm"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors rounded-lg"
         >
           Home
         </TransitionLink>

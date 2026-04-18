@@ -3,6 +3,13 @@ import { createRoot } from 'react-dom/client';
 import { MotionConfig } from 'motion/react';
 import App from './App.tsx';
 import 'sonner/dist/styles.css';
+import '@fontsource/geist-sans/400.css';
+import '@fontsource/geist-sans/500.css';
+import '@fontsource/geist-sans/600.css';
+import '@fontsource/geist-sans/700.css';
+import '@fontsource/geist-mono/400.css';
+import '@fontsource/geist-mono/500.css';
+import '@fontsource/geist-mono/600.css';
 import './index.css';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;

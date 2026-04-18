@@ -64,7 +64,7 @@ function SecurityPanelInner() {
               type="password"
               required
               minLength={8}
-              className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors"
+              className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
             />
           </div>
           <div>
@@ -73,14 +73,14 @@ function SecurityPanelInner() {
               name="confirmPassword"
               type="password"
               required
-              className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-sm px-3 py-2 border transition-colors"
+              className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
             />
           </div>
           <div className="pt-2">
             <button
               type="submit"
               disabled={isUpdatingPassword}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-medium transition-colors focus-app"
+              className="flex items-center gap-2 px-4 py-2 bg-white text-black hover:bg-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed text-black rounded-lg text-sm font-medium transition-colors focus-app"
             >
               {isUpdatingPassword && <Loader2 className="w-3 h-3 animate-spin" />}
               {isUpdatingPassword ? 'Updating...' : 'Update Password'}
@@ -91,7 +91,7 @@ function SecurityPanelInner() {
 
       <CollapsibleModule title="Two-Factor Authentication" icon={Shield} defaultOpen={false}>
         <p className="text-sm text-content-tertiary mb-6">Add additional security to your account using two-factor authentication.</p>
-        <div className="flex items-center justify-between border border-surface-border rounded-sm p-4 bg-surface-elevated/50">
+        <div className="flex items-center justify-between border border-surface-border rounded-lg p-4 bg-surface-elevated/50">
           <div className="flex items-center gap-3">
             <div
               className={`w-10 h-10 border rounded-full flex items-center justify-center ${
@@ -119,7 +119,7 @@ function SecurityPanelInner() {
             <button
               type="button"
               onClick={() => deferToast(() => toast.info('2FA setup coming soon'))}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-sm text-sm font-medium text-white transition-colors"
+              className="px-4 py-2 bg-white hover:bg-neutral-200 rounded-lg text-sm font-medium text-black transition-colors"
             >
               Enable 2FA
             </button>
@@ -129,10 +129,10 @@ function SecurityPanelInner() {
 
       <CollapsibleModule title="Biometric Authentication" icon={Fingerprint} defaultOpen={false}>
         <p className="text-sm text-content-tertiary mb-6">Require FaceID or TouchID when opening the application.</p>
-        <div className="flex items-center justify-between border border-surface-border rounded-sm p-4 bg-surface-elevated/50">
+        <div className="flex items-center justify-between border border-surface-border rounded-lg p-4 bg-surface-elevated/50">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-surface-raised border border-surface-border rounded-sm flex items-center justify-center">
-              <Fingerprint className="w-5 h-5 text-indigo-400" />
+            <div className="w-10 h-10 bg-surface-raised border border-surface-border rounded-lg flex items-center justify-center">
+              <Fingerprint className="w-5 h-5 text-content-secondary" />
             </div>
             <div>
               <p className="text-sm font-medium text-content-primary">App Lock</p>
@@ -148,7 +148,7 @@ function SecurityPanelInner() {
                 setBiometrics(checked);
                 deferToast(() => toast.success(checked ? 'Biometrics enabled' : 'Biometrics disabled'));
               }}
-              className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+              className="h-4 w-4 text-content-primary focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
             />
           </div>
         </div>
@@ -157,7 +157,7 @@ function SecurityPanelInner() {
       <CollapsibleModule title="Active Sessions" icon={Smartphone} defaultOpen={false}>
         <p className="text-sm text-content-tertiary mb-6">Manage and log out your active sessions on other browsers and devices.</p>
         <div className="space-y-3">
-          <div className="flex items-center justify-between p-4 border border-surface-border bg-surface-elevated/50 rounded-sm">
+          <div className="flex items-center justify-between p-4 border border-surface-border bg-surface-elevated/50 rounded-lg">
             <div className="flex items-center gap-4">
               <Smartphone className="w-6 h-6 text-content-tertiary" />
               <div>

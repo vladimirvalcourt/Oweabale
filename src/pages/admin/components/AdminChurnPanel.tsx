@@ -32,7 +32,7 @@ function formatDate(value: string | null): string {
 
 export function AdminChurnPanel({ stats }: Props) {
   return (
-    <div className="border border-surface-border rounded-sm bg-surface-raised p-5">
+    <div className="border border-surface-border rounded-lg bg-surface-raised p-5">
       <div className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
         <TrendingDown size={14} />
         Churn
@@ -40,22 +40,22 @@ export function AdminChurnPanel({ stats }: Props) {
 
       {stats === null ? (
         <div className="space-y-2">
-          <div className="h-12 bg-surface-border rounded-sm animate-pulse" />
-          <div className="h-12 bg-surface-border rounded-sm animate-pulse" />
-          <div className="h-12 bg-surface-border rounded-sm animate-pulse" />
+          <div className="h-12 bg-surface-border rounded-lg animate-pulse" />
+          <div className="h-12 bg-surface-border rounded-lg animate-pulse" />
+          <div className="h-12 bg-surface-border rounded-lg animate-pulse" />
         </div>
       ) : (
         <>
           <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="border border-surface-border rounded-sm p-3 bg-surface-raised">
+            <div className="border border-surface-border rounded-lg p-3 bg-surface-raised">
               <p className="text-[10px] text-content-tertiary uppercase mb-1">Total Churned</p>
               <p className="text-xl font-bold text-rose-400">{stats.total_canceled}</p>
             </div>
-            <div className="border border-surface-border rounded-sm p-3 bg-surface-raised">
+            <div className="border border-surface-border rounded-lg p-3 bg-surface-raised">
               <p className="text-[10px] text-content-tertiary uppercase mb-1">Churned (30d)</p>
               <p className="text-xl font-bold text-amber-400">{stats.canceled_30d}</p>
             </div>
-            <div className="border border-surface-border rounded-sm p-3 bg-surface-raised">
+            <div className="border border-surface-border rounded-lg p-3 bg-surface-raised">
               <p className="text-[10px] text-content-tertiary uppercase mb-1">Churn Rate</p>
               <p className={`text-xl font-bold ${churnRateColor(stats.churn_rate)}`}>
                 {(stats.churn_rate * 100).toFixed(1)}%

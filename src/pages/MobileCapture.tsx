@@ -262,7 +262,7 @@ export default function MobileCapture() {
               {/* Instructions Section */}
               <div className="space-y-8 mt-4">
                  <div className="flex gap-5 group">
-                    <div className="shrink-0 w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
+                    <div className="shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
                        <Sun className="w-4 h-4 text-content-tertiary group-hover:text-brand-violet" />
                     </div>
                     <div className="space-y-1">
@@ -271,7 +271,7 @@ export default function MobileCapture() {
                     </div>
                  </div>
                  <div className="flex gap-5 group text-left">
-                    <div className="shrink-0 w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
+                    <div className="shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
                        <Maximize className="w-4 h-4 text-content-tertiary group-hover:text-brand-violet" />
                     </div>
                     <div className="space-y-1">
@@ -280,7 +280,7 @@ export default function MobileCapture() {
                     </div>
                  </div>
                  <div className="flex gap-5 group text-left">
-                    <div className="shrink-0 w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
+                    <div className="shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
                        <MousePointer2 className="w-4 h-4 text-content-tertiary group-hover:text-brand-violet" />
                     </div>
                     <div className="space-y-1">
@@ -293,7 +293,7 @@ export default function MobileCapture() {
               {/* Capture Options */}
               <div className="mt-auto mb-8 flex flex-col gap-4">
                 {/* Option 1: Take Photo with Camera */}
-                <div className="relative p-10 bg-surface-base border border-dashed border-white/[0.1] rounded-sm group active:scale-[0.98] transition-all overflow-hidden">
+                <div className="relative p-10 bg-surface-base border border-dashed border-white/[0.1] rounded-lg group active:scale-[0.98] transition-all overflow-hidden">
                   <input
                     type="file"
                     accept="image/*"
@@ -314,7 +314,7 @@ export default function MobileCapture() {
                 </div>
 
                 {/* Option 2: Upload from Gallery or Files */}
-                <div className="relative p-10 bg-surface-base border border-dashed border-white/[0.1] rounded-sm group active:scale-[0.98] transition-all overflow-hidden">
+                <div className="relative p-10 bg-surface-base border border-dashed border-white/[0.1] rounded-lg group active:scale-[0.98] transition-all overflow-hidden">
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
@@ -342,10 +342,10 @@ export default function MobileCapture() {
                  </p>
               </div>
 
-               <div className="relative aspect-[3/4] w-full bg-surface-raised border border-white/[0.12] p-1.5 rounded-sm overflow-hidden shadow-2xl flex-1">
+               <div className="relative aspect-[3/4] w-full bg-surface-raised border border-white/[0.12] p-1.5 rounded-lg overflow-hidden shadow-2xl flex-1">
                  {capturedFileType === 'application/pdf' ? (
                    <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-surface-base">
-                     <div className="w-20 h-20 rounded-sm border border-brand-violet/30 bg-brand-violet/5 flex items-center justify-center">
+                     <div className="w-20 h-20 rounded-lg border border-brand-violet/30 bg-brand-violet/5 flex items-center justify-center">
                        <FolderOpen className="w-10 h-10 text-brand-violet" />
                      </div>
                      <p className="text-[11px] font-mono text-content-tertiary uppercase tracking-widest">PDF Ready to Send</p>
@@ -371,7 +371,7 @@ export default function MobileCapture() {
                   <button 
                     onClick={handleUpload}
                     disabled={status === 'uploading'}
-                    className="w-full bg-brand-violet hover:bg-indigo-500 disabled:bg-surface-raised text-white py-5 rounded-none font-mono font-bold uppercase tracking-widest text-[11px] shadow-xl shadow-brand-violet/20 flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
+                    className="w-full bg-white hover:bg-neutral-200 text-black disabled:bg-surface-raised disabled:text-content-tertiary py-5 rounded-lg font-mono font-bold uppercase tracking-widest text-[11px] shadow-none flex items-center justify-center gap-3 transition-all active:scale-[0.98]"
                   >
                     {status === 'uploading' ? (
                       <>

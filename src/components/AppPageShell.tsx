@@ -8,7 +8,7 @@ export function AppPageShell({ children, className }: { children: ReactNode; cla
   return (
     <div
       className={cn(
-        'min-h-[100dvh] bg-surface-base border-t-2 border-brand-indigo/25',
+        'min-h-[100dvh] bg-surface-base',
         className,
       )}
     >

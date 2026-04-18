@@ -125,7 +125,7 @@ export default function Subscriptions() {
             setEditingId(null);
             setFormData({ name: '', amount: '', frequency: 'Monthly', nextBillingDate: '', status: 'active' });
           }}
-          className="px-4 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 focus-app"
+          className="px-4 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 focus-app"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           Add subscription
@@ -143,14 +143,14 @@ export default function Subscriptions() {
         }
       >
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 -mx-6 -my-6 p-6">
-          <div className="bg-surface-elevated overflow-hidden rounded-sm border border-surface-border p-5">
+          <div className="bg-surface-elevated overflow-hidden rounded-lg border border-surface-border p-5">
             <p className="metric-label normal-case mb-2">Monthly cost</p>
             <p className="text-2xl font-bold font-mono tabular-nums text-content-primary data-numeric">
               ${monthlyCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </p>
             <p className="mt-1 text-xs text-content-tertiary">Across {activeSubscriptions.length} active</p>
           </div>
-          <div className="bg-surface-elevated rounded-sm border border-surface-border p-5">
+          <div className="bg-surface-elevated rounded-lg border border-surface-border p-5">
             <p className="metric-label normal-case mb-2 flex items-center gap-1.5">
               <TrendingUp className="w-3 h-3 shrink-0" aria-hidden /> Price hikes
             </p>
@@ -161,7 +161,7 @@ export default function Subscriptions() {
               {hikedSubs.length > 0 ? hikedSubs.map(s => s.name).join(', ') : 'No recent price increases'}
             </p>
           </div>
-          <div className="bg-surface-elevated overflow-hidden rounded-sm border border-surface-border p-5">
+          <div className="bg-surface-elevated overflow-hidden rounded-lg border border-surface-border p-5">
             <p className="metric-label normal-case mb-2">Annual cost</p>
             <p className="text-2xl font-bold font-mono tabular-nums text-content-primary data-numeric">
               ${(monthlyCost * 12).toLocaleString('en-US', { minimumFractionDigits: 0 })}
@@ -172,7 +172,7 @@ export default function Subscriptions() {
       </CollapsibleModule>
 
       {(isAdding || editingId) && (
-        <div className="bg-surface-raised rounded-sm border border-surface-border p-6 mb-6">
+        <div className="bg-surface-raised rounded-lg border border-surface-border p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-base font-sans font-semibold text-content-primary">
               {editingId ? 'Edit subscription' : 'Add subscription'}
@@ -190,7 +190,7 @@ export default function Subscriptions() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
                   placeholder="e.g., Netflix"
                 />
               </div>
@@ -205,7 +205,7 @@ export default function Subscriptions() {
                     step="0.01"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
                     placeholder="0.00"
                   />
                 </div>
@@ -215,7 +215,7 @@ export default function Subscriptions() {
                 <select
                   value={formData.frequency}
                   onChange={(e) => setFormData({ ...formData, frequency: e.target.value as SubFrequency })}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
                 >
                   <option value="Weekly">Weekly</option>
                   <option value="Bi-weekly">Bi-weekly</option>
@@ -230,7 +230,7 @@ export default function Subscriptions() {
                   required
                   value={formData.nextBillingDate}
                   onChange={(e) => setFormData({ ...formData, nextBillingDate: e.target.value })}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
                 />
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function Subscriptions() {
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors"
+                className="px-6 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors"
               >
                 {editingId ? 'Save changes' : 'Add subscription'}
               </button>
@@ -254,8 +254,8 @@ export default function Subscriptions() {
       )}
 
       {subscriptions.length === 0 && !isAdding ? (
-        <div className="bg-surface-raised rounded-sm border border-surface-border border-dashed p-12 text-center">
-          <div className="w-16 h-16 border border-surface-border rounded-sm flex items-center justify-center mx-auto mb-4">
+        <div className="bg-surface-raised rounded-lg border border-surface-border border-dashed p-12 text-center">
+          <div className="w-16 h-16 border border-surface-border rounded-lg flex items-center justify-center mx-auto mb-4">
             <Repeat className="w-8 h-8 text-content-tertiary" />
           </div>
           <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No subscriptions yet</h3>
@@ -265,7 +265,7 @@ export default function Subscriptions() {
           <button
             type="button"
             onClick={() => setIsAdding(true)}
-            className="px-8 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 mx-auto"
+            className="px-8 py-3 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 mx-auto"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Add subscription
@@ -288,7 +288,7 @@ export default function Subscriptions() {
                         const hike = getPriceHike(sub);
                         if (!hike) return null;
                         return (
-                          <span className="flex items-center gap-1 text-[9px] font-mono font-bold text-amber-400 border border-amber-500/30 bg-amber-500/5 px-1.5 py-0.5 rounded-sm">
+                          <span className="flex items-center gap-1 text-[9px] font-mono font-bold text-amber-400 border border-amber-500/30 bg-amber-500/5 px-1.5 py-0.5 rounded-lg">
                             <TrendingUp className="w-2.5 h-2.5" />
                             +{hike.pct}%
                           </span>

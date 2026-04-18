@@ -23,7 +23,7 @@ export function CollapsibleModule({
   const panelId = React.useId();
 
   return (
-    <div className={`bg-surface-raised border border-surface-border rounded-sm overflow-hidden flex flex-col ${className}`}>
+    <div className={`bg-surface-raised border border-surface-border rounded-lg overflow-hidden flex flex-col ${className}`}>
       <button
         type="button"
         id={`${panelId}-trigger`}

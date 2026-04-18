@@ -146,12 +146,12 @@ export default function Reports() {
           <p className="text-sm text-content-tertiary mt-1">Full financial picture across time.</p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex bg-surface-raised border border-surface-border rounded-sm p-1">
+          <div className="flex bg-surface-raised border border-surface-border rounded-lg p-1">
             {(['30d', '90d', '1y'] as DateRange[]).map(r => (
               <button
                 key={r}
                 onClick={() => setDateRange(r)}
-                className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${
+                className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${
                   dateRange === r ? 'bg-surface-border text-white' : 'text-content-tertiary hover:text-content-secondary'
                 }`}
               >
@@ -164,7 +164,7 @@ export default function Reports() {
               filteredTx.map(t => ({ date: t.date, name: t.name, category: t.category, amount: t.amount.toFixed(2), type: t.type })),
               `oweable-report-${dateRange}.csv`
             )}
-            className="flex items-center gap-2 bg-transparent border border-surface-border text-content-secondary px-4 py-2 rounded-sm text-sm font-medium hover:bg-surface-elevated transition-colors"
+            className="flex items-center gap-2 bg-transparent border border-surface-border text-content-secondary px-4 py-2 rounded-lg text-sm font-medium hover:bg-surface-elevated transition-colors"
           >
             <Download className="w-4 h-4" />
             Export CSV
@@ -178,10 +178,10 @@ export default function Reports() {
           {[
             { label: 'Total Income', value: `$${filteredTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'text-emerald-400' },
             { label: 'Total Expenses', value: `$${filteredTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'text-red-400' },
-            { label: 'Net Savings', value: `$${(filteredTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0) - filteredTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'text-indigo-400' },
+            { label: 'Net Savings', value: `$${(filteredTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0) - filteredTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'text-content-primary' },
             { label: 'Transactions', value: filteredTx.length.toString(), color: 'text-amber-400' },
           ].map(card => (
-            <div key={card.label} className="bg-surface-elevated border border-surface-border rounded-sm p-5">
+            <div key={card.label} className="bg-surface-elevated border border-surface-border rounded-lg p-5">
               <p className="metric-label normal-case text-content-tertiary mb-2">{card.label}</p>
               <p className={`text-2xl font-mono font-bold tabular-nums data-numeric ${card.color}`}>{card.value}</p>
             </div>
@@ -289,12 +289,12 @@ export default function Reports() {
                   </div>
                   <div className="text-right">
                     <span className="text-xs font-mono tabular-nums text-content-tertiary data-numeric">${d.remaining.toLocaleString()} left</span>
-                    <span className="ml-2 text-xs font-mono tabular-nums text-indigo-400 data-numeric">{d.pct}%</span>
+                    <span className="ml-2 text-xs font-mono tabular-nums text-content-primary data-numeric">{d.pct}%</span>
                   </div>
                 </div>
                 <div className="w-full h-2 bg-surface-border rounded-none overflow-hidden">
                   <div
-                    className="h-full bg-indigo-500 transition-all duration-500"
+                    className="h-full bg-neutral-500 transition-all duration-500"
                     style={{ width: `${d.pct}%` }}
                   />
                 </div>

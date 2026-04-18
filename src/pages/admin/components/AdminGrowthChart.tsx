@@ -18,7 +18,7 @@ export function AdminGrowthChart({ data }: Props) {
   const isEmpty = data.length === 0;
 
   return (
-    <div className="border border-surface-border rounded-sm bg-surface-raised p-5">
+    <div className="border border-surface-border rounded-lg bg-surface-raised p-5">
       <div className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
         <Users size={14} />
         Weekly Signups
@@ -52,7 +52,7 @@ export function AdminGrowthChart({ data }: Props) {
                 borderRadius: '4px',
                 fontSize: 11,
               }}
-              formatter={(v) => [typeof v === 'number' ? v : 0, 'Signups']}
+              formatter={(value) => [Number(value ?? 0), 'Signups']}
             />
             <Bar dataKey="signups" fill="#34d399" radius={[2, 2, 0, 0]} />
           </BarChart>

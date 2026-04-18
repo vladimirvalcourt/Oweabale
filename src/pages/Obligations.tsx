@@ -257,7 +257,7 @@ export default function Obligations() {
         <button 
           type="button"
           onClick={() => openQuickAdd(activeTab === 'ambush' ? 'citation' : 'obligation')}
-          className="px-4 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile"
+          className="px-4 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           {activeTab === 'ambush' ? 'Add ticket or fine' : activeTab === 'debt' ? 'Add debt' : 'Add bill'}
@@ -265,26 +265,26 @@ export default function Obligations() {
       </div>
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-surface-elevated border border-surface-border p-5 rounded-sm">
+        <div className="bg-surface-elevated border border-surface-border p-5 rounded-lg">
           <div className="flex items-center gap-2 text-content-tertiary mb-3">
             <Receipt className="w-3.5 h-3.5" />
             <span className="metric-label normal-case text-[11px]">Monthly payments</span>
           </div>
           <p className="text-2xl font-mono text-red-400 font-bold">${totalMonthlyBurn.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
-        <div className="bg-surface-elevated border border-surface-border p-5 rounded-sm">
+        <div className="bg-surface-elevated border border-surface-border p-5 rounded-lg">
           <div className="flex items-center gap-2 text-content-tertiary mb-3">
             <CreditCard className="w-3.5 h-3.5" />
             <span className="metric-label normal-case text-[11px]">Total debt</span>
           </div>
           <p className="text-2xl font-mono text-amber-400 font-bold">${activePrincipal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
-        <div className={`bg-surface-elevated border p-5 rounded-sm relative overflow-hidden ${urgentTotal > 0 ? 'border-rose-500/50' : 'border-surface-border'}`}>
+        <div className={`bg-surface-elevated border p-5 rounded-lg relative overflow-hidden ${urgentTotal > 0 ? 'border-rose-500/50' : 'border-surface-border'}`}>
           {urgentTotal > 0 && <div className="absolute inset-0 bg-rose-500/3" />}
           <div className="flex items-center gap-2 text-content-tertiary mb-3 relative z-10">
             <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
             <span className="metric-label normal-case text-[11px]">Urgent tickets</span>
-            {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold text-rose-400 border border-rose-500/50 px-1 rounded-sm ml-auto">{urgentCitations.length} DUE</span>}
+            {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold text-rose-400 border border-rose-500/50 px-1 rounded-lg ml-auto">{urgentCitations.length} DUE</span>}
           </div>
           <p className={`text-2xl font-mono font-bold relative z-10 ${urgentTotal > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
             ${urgentTotal.toFixed(2)}
@@ -299,7 +299,7 @@ export default function Obligations() {
         extraHeader={
           <TransitionLink
             to="/calendar#calendar-view"
-            className="text-[10px] font-sans font-medium text-brand-violet hover:text-brand-violet/90 border border-brand-violet/30 rounded-sm px-2 py-0.5"
+            className="text-[10px] font-sans font-medium text-brand-violet hover:text-brand-violet/90 border border-brand-violet/30 rounded-lg px-2 py-0.5"
           >
             Month view →
           </TransitionLink>
@@ -322,7 +322,7 @@ export default function Obligations() {
                 { key: '61-90' as const, label: '61–90 days' },
               ] as const
             ).map(({ key, label }) => (
-              <div key={key} className="rounded-sm border border-surface-border bg-surface-base p-4">
+              <div key={key} className="rounded-lg border border-surface-border bg-surface-base p-4">
                 <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-2">{label}</p>
                 <p className="text-xl font-mono font-bold text-content-primary tabular-nums">
                   ${horizonTotals[key].toLocaleString(undefined, { maximumFractionDigits: 0 })}
@@ -340,7 +340,7 @@ export default function Obligations() {
           title="Debt Payoff Plan" 
           icon={Flame}
           extraHeader={
-            <span className="text-xs font-sans text-content-tertiary bg-surface-base border border-surface-border px-2 py-0.5 rounded-sm">
+            <span className="text-xs font-sans text-content-tertiary bg-surface-base border border-surface-border px-2 py-0.5 rounded-lg">
               Payoff {payoffResult.months > 0 ? monthsToDate(payoffResult.months) : '—'}
             </span>
           }
@@ -348,20 +348,20 @@ export default function Obligations() {
           <div className="p-0">
             {/* Controls */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
-              <div className="flex bg-surface-base border border-surface-border rounded-sm p-1">
+              <div className="flex bg-surface-base border border-surface-border rounded-lg p-1">
                 {(['avalanche', 'snowball'] as Strategy[]).map(s => (
                   <button
                     key={s}
                     onClick={() => setStrategy(s)}
-                    className={`px-3 py-1.5 text-xs font-mono rounded-sm transition-colors uppercase tracking-wider ${
-                      strategy === s ? 'bg-indigo-600 text-white' : 'text-content-tertiary hover:text-content-secondary'
+                    className={`px-3 py-1.5 text-xs font-mono rounded-lg transition-colors uppercase tracking-wider ${
+                      strategy === s ? 'bg-white text-black' : 'text-content-tertiary hover:text-content-secondary'
                     }`}
                   >
                     {s === 'avalanche' ? '⚡ Highest Interest First' : '❄️ Smallest Debt First'}
                   </button>
                 ))}
               </div>
-              <div className="flex items-center gap-3 bg-surface-base border border-surface-border rounded-sm px-3 py-1.5">
+              <div className="flex items-center gap-3 bg-surface-base border border-surface-border rounded-lg px-3 py-1.5">
                 <Calculator className="w-3.5 h-3.5 text-content-tertiary" />
                 <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Extra per month:</span>
                 <button onClick={() => setExtraPayment(e => Math.max(0, e - 100))} className="text-content-tertiary hover:text-white"><Minus className="w-3 h-3" /></button>
@@ -372,16 +372,16 @@ export default function Obligations() {
 
             {/* Summary */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-surface-elevated border border-surface-border rounded-sm p-4">
+              <div className="bg-surface-elevated border border-surface-border rounded-lg p-4">
                 <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Debt-Free Date</p>
-                <p className="text-lg font-mono font-bold text-indigo-400">{payoffResult.months > 0 ? monthsToDate(payoffResult.months) : '—'}</p>
+                <p className="text-lg font-mono font-bold text-content-primary">{payoffResult.months > 0 ? monthsToDate(payoffResult.months) : '—'}</p>
                 <p className="text-[10px] font-mono text-content-muted">{payoffResult.months} months</p>
               </div>
-              <div className="bg-surface-elevated border border-surface-border rounded-sm p-4">
+              <div className="bg-surface-elevated border border-surface-border rounded-lg p-4">
                 <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Paid</p>
                 <p className="text-lg font-mono font-bold text-red-400">${payoffResult.totalInterest.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
               </div>
-              <div className="bg-surface-elevated border border-emerald-500/20 rounded-sm p-4">
+              <div className="bg-surface-elevated border border-emerald-500/20 rounded-lg p-4">
                 <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Saved</p>
                 <p className="text-lg font-mono font-bold text-emerald-400">${interestSaved.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                 <p className="text-[10px] font-mono text-content-muted">vs. minimum payments only</p>
@@ -403,14 +403,14 @@ export default function Obligations() {
                     <div key={d.id}>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 text-[10px] font-mono font-bold flex items-center justify-center rounded-sm">{i + 1}</span>
+                          <span className="w-5 h-5 bg-white/[0.08] border border-surface-border text-content-primary text-[10px] font-mono font-bold flex items-center justify-center rounded-lg">{i + 1}</span>
                           <span className="text-sm text-content-primary">{d.name}</span>
-                          <span className="text-[10px] font-mono text-content-muted border border-surface-border px-1.5 py-0.5 rounded-sm">{d.apr}% interest rate</span>
+                          <span className="text-[10px] font-mono text-content-muted border border-surface-border px-1.5 py-0.5 rounded-lg">{d.apr}% interest rate</span>
                         </div>
                         <span className="text-xs font-mono text-content-tertiary">${d.remaining.toLocaleString()} left</span>
                       </div>
                       <div className="w-full h-1.5 bg-surface-border rounded-none overflow-hidden">
-                        <div className="h-full bg-indigo-500 transition-all duration-700" style={{ width: `${pct}%` }} />
+                        <div className="h-full bg-white transition-all duration-700" style={{ width: `${pct}%` }} />
                       </div>
                       <div className="flex justify-between text-[10px] font-mono text-content-muted mt-0.5">
                         <span>{pct}% paid</span>
@@ -419,7 +419,7 @@ export default function Obligations() {
                       <div className="mt-1">
                         <button
                           onClick={() => setExpandedDebtId(isExpanded ? null : d.id)}
-                          className="text-[10px] font-mono text-content-muted hover:text-indigo-400 transition-colors uppercase tracking-widest flex items-center gap-1"
+                          className="text-[10px] font-mono text-content-muted hover:text-content-primary transition-colors uppercase tracking-widest flex items-center gap-1"
                         >
                           {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                           {isExpanded ? 'Hide Schedule' : 'Show 12-Month Schedule'}
@@ -448,13 +448,13 @@ export default function Obligations() {
                                     contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', fontFamily: 'monospace', fontSize: '11px' }}
                                     formatter={(value, name) => [`$${Number(value ?? 0).toFixed(2)}`, name === 'principal' ? 'Principal' : 'Interest']}
                                   />
-                                  <Bar dataKey="principal" fill="#6366f1" stackId="a" />
+                                  <Bar dataKey="principal" fill="#d4d4d4" stackId="a" />
                                   <Bar dataKey="interest" fill="#EF4444" stackId="a" />
                                 </BarChart>
                               </SafeResponsiveContainer>
                             </div>
                             <div className="flex gap-4 mt-2">
-                              <span className="text-[10px] font-mono text-indigo-400">■ Principal</span>
+                              <span className="text-[10px] font-mono text-content-primary">■ Principal</span>
                               <span className="text-[10px] font-mono text-red-400">■ Interest</span>
                               <span className="text-[10px] font-mono text-content-muted ml-auto">
                                 12-mo interest: ${totalInterest12.toFixed(2)}
@@ -490,10 +490,10 @@ export default function Obligations() {
               }`}
             >
               {tab.label}
-              <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-sm ${
-                activeTab === tab.key ? 'bg-indigo-600/30 text-indigo-400' : 'bg-surface-elevated text-content-muted'
+              <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-lg ${
+                activeTab === tab.key ? 'bg-white/10 text-content-primary' : 'bg-surface-elevated text-content-muted'
               }`}>{tab.count}</span>
-              {activeTab === tab.key && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-indigo-500" />}
+              {activeTab === tab.key && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-white" />}
             </button>
           ))}
         </div>
@@ -529,8 +529,8 @@ export default function Obligations() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`text-xs font-mono px-2 py-0.5 rounded-sm border ${
-                        ob.type === 'debt' ? 'border-indigo-500/30 text-indigo-400 bg-indigo-500/10' :
+                      <span className={`text-xs font-mono px-2 py-0.5 rounded-lg border ${
+                        ob.type === 'debt' ? 'border-surface-border text-content-primary bg-white/[0.05]' :
                         ob.type === 'ambush' ? 'border-rose-500/30 text-rose-400 bg-rose-500/10' :
                         'border-surface-border text-content-tertiary bg-surface-elevated'
                       }`}>{ob.subType}</span>
@@ -559,7 +559,7 @@ export default function Obligations() {
                             const d = debts.find((x) => x.id === ob.id);
                             if (d) setEditDebtRow(d);
                           }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-indigo-500/40 hover:bg-indigo-500/10 active:scale-[0.98] text-indigo-300 text-xs font-mono font-semibold rounded-sm transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-surface-border hover:bg-white/[0.05] active:scale-[0.98] text-content-secondary text-xs font-mono font-semibold rounded-lg transition-colors"
                         >
                           <Pencil className="w-3 h-3" aria-hidden />
                           Edit
@@ -573,7 +573,7 @@ export default function Obligations() {
                             const b = bills.find((x) => x.id === ob.id);
                             if (b) setEditBillRow(b);
                           }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-surface-border hover:border-content-muted active:scale-[0.98] text-content-secondary text-xs font-mono rounded-sm transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-surface-border hover:border-content-muted active:scale-[0.98] text-content-secondary text-xs font-mono rounded-lg transition-colors"
                         >
                           <Pencil className="w-3 h-3" aria-hidden />
                           Edit
@@ -589,7 +589,7 @@ export default function Obligations() {
                               if (ok) toast.success(`${ob.name} resolved`);
                             } else toast.error('Citation not found');
                           }}
-                          className="px-3 py-1 border border-rose-500/50 hover:bg-rose-500/10 active:scale-[0.98] text-rose-400 text-xs font-mono font-bold rounded-sm transition-colors"
+                          className="px-3 py-1 border border-rose-500/50 hover:bg-rose-500/10 active:scale-[0.98] text-rose-400 text-xs font-mono font-bold rounded-lg transition-colors"
                         >PAY</button>
                       )}
                     </td>
@@ -665,14 +665,14 @@ function EditBillDialog({
     <Dialog open className="relative z-[100]" onClose={onClose}>
       <div className="fixed inset-0 bg-black/70" aria-hidden />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-md rounded-sm border border-surface-border bg-surface-elevated p-6 shadow-2xl">
+        <Dialog.Panel className="w-full max-w-md rounded-lg border border-surface-border bg-surface-elevated p-6 shadow-2xl">
           <Dialog.Title className="text-lg font-semibold text-content-primary mb-4">Edit bill</Dialog.Title>
           <div className="space-y-3">
             <label className="block text-xs text-content-tertiary">Payee</label>
             <input
               value={biller}
               onChange={(e) => setBiller(e.target.value)}
-              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
             />
             <label className="block text-xs text-content-tertiary">Amount ($)</label>
             <input
@@ -680,26 +680,26 @@ function EditBillDialog({
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
             />
             <label className="block text-xs text-content-tertiary">Category</label>
             <input
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
             />
             <label className="block text-xs text-content-tertiary">Due date</label>
             <input
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="input-date-dark w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm"
+              className="input-date-dark w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm"
             />
             <label className="block text-xs text-content-tertiary">Frequency</label>
             <select
               value={frequency}
               onChange={(e) => setFrequency(e.target.value as Bill['frequency'])}
-              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
             >
               <option value="Weekly">Weekly</option>
               <option value="Bi-weekly">Bi-weekly</option>
@@ -711,7 +711,7 @@ function EditBillDialog({
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-content-tertiary hover:text-content-primary">
               Cancel
             </button>
-            <button type="button" onClick={() => void save()} className="rounded-sm bg-brand-cta px-4 py-2 text-sm font-semibold text-white hover:bg-brand-cta-hover">
+            <button type="button" onClick={() => void save()} className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-neutral-200">
               Save
             </button>
           </div>
@@ -776,7 +776,7 @@ function EditDebtDialog({
     <Dialog open className="relative z-[100]" onClose={onClose}>
       <div className="fixed inset-0 bg-black/70" aria-hidden />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-md rounded-sm border border-surface-border bg-surface-elevated p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <Dialog.Panel className="w-full max-w-md rounded-lg border border-surface-border bg-surface-elevated p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
           <Dialog.Title className="text-lg font-semibold text-content-primary mb-1">Edit debt</Dialog.Title>
           <p className="text-xs text-content-tertiary mb-4">Update balance, APR, minimum payment, or payment due date.</p>
           <div className="space-y-3">
@@ -784,14 +784,14 @@ function EditDebtDialog({
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
             />
             <label className="block text-xs text-content-tertiary">Type</label>
             <input
               value={type}
               onChange={(e) => setType(e.target.value)}
               placeholder="Credit Card, Loan, …"
-              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
             />
             <label className="block text-xs text-content-tertiary">Balance owed ($)</label>
             <input
@@ -799,7 +799,7 @@ function EditDebtDialog({
               step="0.01"
               value={remaining}
               onChange={(e) => setRemaining(e.target.value)}
-              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
             />
             <label className="block text-xs text-content-tertiary">APR (%)</label>
             <input
@@ -807,7 +807,7 @@ function EditDebtDialog({
               step="0.01"
               value={apr}
               onChange={(e) => setApr(e.target.value)}
-              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
             />
             <label className="block text-xs text-content-tertiary">Minimum payment ($/mo)</label>
             <input
@@ -815,7 +815,7 @@ function EditDebtDialog({
               step="0.01"
               value={minPayment}
               onChange={(e) => setMinPayment(e.target.value)}
-              className="w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
             />
             <label className="flex items-center gap-2 text-sm text-content-secondary cursor-pointer">
               <input
@@ -833,7 +833,7 @@ function EditDebtDialog({
                   type="date"
                   value={paymentDue}
                   onChange={(e) => setPaymentDue(e.target.value)}
-                  className="input-date-dark w-full rounded-sm border border-surface-border bg-surface-base px-3 py-2 text-sm"
+                  className="input-date-dark w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm"
                 />
               </>
             )}
@@ -842,7 +842,7 @@ function EditDebtDialog({
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-content-tertiary hover:text-content-primary">
               Cancel
             </button>
-            <button type="button" onClick={() => void save()} className="rounded-sm bg-brand-cta px-4 py-2 text-sm font-semibold text-white hover:bg-brand-cta-hover">
+            <button type="button" onClick={() => void save()} className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-neutral-200">
               Save
             </button>
           </div>

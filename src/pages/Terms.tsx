@@ -49,7 +49,7 @@ export default function Terms() {
 
           <section>
             <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">3. Not financial advice</h2>
-            <p className="p-6 bg-surface-raised border border-brand-violet/20 text-sm text-brand-violet-shade leading-relaxed mb-4 rounded-sm">
+            <p className="p-6 bg-surface-raised border border-brand-violet/20 text-sm text-brand-violet-shade leading-relaxed mb-4 rounded-lg">
               Oweable and its software are not a certified financial planner, legal counsel, or tax advisor.
             </p>
             <p>

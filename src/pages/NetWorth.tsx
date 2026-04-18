@@ -69,7 +69,7 @@ export default function NetWorth() {
 
       {/* Top Level Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-surface-raised rounded-sm border border-surface-border p-6 relative overflow-hidden">
+        <div className="bg-surface-raised rounded-lg border border-surface-border p-6 relative overflow-hidden">
           <p className="metric-label mb-2 normal-case font-semibold">Total net worth</p>
           <p className={`text-4xl font-bold font-mono tabular-nums data-numeric ${netWorth >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
             $<AnimatedValue value={netWorth} decimals={2} />
@@ -80,7 +80,7 @@ export default function NetWorth() {
           </div>
         </div>
 
-        <div className="bg-surface-raised rounded-sm border border-surface-border p-6 relative overflow-hidden">
+        <div className="bg-surface-raised rounded-lg border border-surface-border p-6 relative overflow-hidden">
           <p className="metric-label mb-2 normal-case font-semibold">Total assets</p>
           <p className="text-4xl font-bold font-mono tabular-nums text-content-primary data-numeric">
             $<AnimatedValue value={totalAssets} decimals={2} />
@@ -90,7 +90,7 @@ export default function NetWorth() {
           </div>
         </div>
 
-        <div className="bg-surface-raised rounded-sm border border-surface-border p-6 relative overflow-hidden">
+        <div className="bg-surface-raised rounded-lg border border-surface-border p-6 relative overflow-hidden">
           <p className="metric-label mb-2 normal-case font-semibold">Total liabilities</p>
           <p className="text-4xl font-bold font-mono tabular-nums text-content-primary data-numeric">
             $<AnimatedValue value={totalLiabilities} decimals={2} />

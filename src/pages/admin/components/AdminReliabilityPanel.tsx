@@ -9,7 +9,7 @@ type Props = {
 export function AdminReliabilityPanel({ stripeHealth, auditFeed }: Props) {
   return (
     <div className="space-y-6">
-      <div className="border border-surface-border rounded-sm bg-surface-raised p-5">
+      <div className="border border-surface-border rounded-lg bg-surface-raised p-5">
         <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
           <Activity className="w-4 h-4" /> Stripe / Webhook Health
         </h2>
@@ -17,19 +17,19 @@ export function AdminReliabilityPanel({ stripeHealth, auditFeed }: Props) {
           <p className="text-xs text-content-muted">No health data yet.</p>
         ) : (
           <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="rounded-sm border border-surface-border bg-surface-base p-2">
+            <div className="rounded-lg border border-surface-border bg-surface-base p-2">
               <p className="text-content-tertiary">Events (24h)</p>
               <p className="text-content-primary font-semibold mt-1">{stripeHealth.stripe_events_24h}</p>
             </div>
-            <div className="rounded-sm border border-surface-border bg-surface-base p-2">
+            <div className="rounded-lg border border-surface-border bg-surface-base p-2">
               <p className="text-content-tertiary">Webhook errors (24h)</p>
               <p className="text-content-primary font-semibold mt-1">{stripeHealth.webhook_errors_24h}</p>
             </div>
-            <div className="rounded-sm border border-surface-border bg-surface-base p-2">
+            <div className="rounded-lg border border-surface-border bg-surface-base p-2">
               <p className="text-content-tertiary">Active subscriptions</p>
               <p className="text-content-primary font-semibold mt-1">{stripeHealth.active_subscriptions}</p>
             </div>
-            <div className="rounded-sm border border-surface-border bg-surface-base p-2">
+            <div className="rounded-lg border border-surface-border bg-surface-base p-2">
               <p className="text-content-tertiary">Last webhook</p>
               <p className="text-content-primary font-semibold mt-1">
                 {stripeHealth.last_webhook_at ? new Date(stripeHealth.last_webhook_at).toLocaleString() : 'Never'}
@@ -45,14 +45,14 @@ export function AdminReliabilityPanel({ stripeHealth, auditFeed }: Props) {
         )}
       </div>
 
-      <div className="border border-surface-border rounded-sm bg-surface-raised p-5">
+      <div className="border border-surface-border rounded-lg bg-surface-raised p-5">
         <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
           <ShieldAlert className="w-4 h-4" /> Admin Action Audit Feed
         </h2>
         <div className="space-y-2 max-h-72 overflow-y-auto">
           {auditFeed.length === 0 && <p className="text-xs text-content-muted">No admin actions logged yet.</p>}
           {auditFeed.map((entry) => (
-            <div key={entry.id} className="border border-surface-border rounded-sm p-2 bg-surface-base">
+            <div key={entry.id} className="border border-surface-border rounded-lg p-2 bg-surface-base">
               <p className="text-[11px] text-content-primary font-semibold">{entry.action}</p>
               <p className="text-[10px] text-content-tertiary">{new Date(entry.created_at).toLocaleString()}</p>
               {typeof entry.new_data?.actorEmail !== 'undefined' && (

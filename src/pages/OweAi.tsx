@@ -22,7 +22,7 @@ const OweAiMessageBubble = memo(function OweAiMessageBubble({ message }: { messa
         className={cn(
           'max-w-[84%] px-4 py-2.5 text-sm shadow-sm',
           m.role === 'user'
-            ? 'rounded-[22px] rounded-br-md bg-brand-cta text-white border border-indigo-300/20'
+            ? 'rounded-[22px] rounded-br-md bg-white text-black border border-surface-border'
             : 'rounded-[22px] rounded-bl-md bg-surface-elevated/95 text-content-secondary border border-surface-border',
         )}
       >
@@ -341,7 +341,7 @@ export default function OweAi() {
           <button
             type="submit"
             disabled={loading || !input}
-            className="shrink-0 h-9 w-9 inline-flex items-center justify-center rounded-full bg-brand-cta text-white hover:bg-brand-cta-hover disabled:opacity-40 disabled:pointer-events-none transition-colors mb-1"
+            className="shrink-0 h-9 w-9 inline-flex items-center justify-center rounded-full bg-white text-black hover:bg-neutral-200 disabled:opacity-40 disabled:pointer-events-none transition-colors mb-1"
             aria-label="Send message"
           >
             {loading ? (

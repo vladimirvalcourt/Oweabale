@@ -27,7 +27,7 @@ export function AdminFeatureFlagsPanel({ platformSettings, onSetFeatureFlag }: P
   }
 
   return (
-    <div className="border border-surface-border rounded-sm bg-surface-raised p-5">
+    <div className="border border-surface-border rounded-lg bg-surface-raised p-5">
       <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
         <ToggleRight className="w-4 h-4" /> Feature Flags
       </h2>
@@ -39,7 +39,7 @@ export function AdminFeatureFlagsPanel({ platformSettings, onSetFeatureFlag }: P
                 key={flag.key}
                 className="flex items-center justify-between py-1"
               >
-                <div className="h-3 w-32 rounded-sm bg-surface-elevated animate-pulse" />
+                <div className="h-3 w-32 rounded-lg bg-surface-elevated animate-pulse" />
                 <div className="h-5 w-9 rounded-full bg-surface-elevated animate-pulse" />
               </div>
             ))
@@ -56,7 +56,7 @@ export function AdminFeatureFlagsPanel({ platformSettings, onSetFeatureFlag }: P
                     disabled={isLoading}
                     onClick={() => handleToggle(flag.key, currentValue)}
                     className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus-visible:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
-                      currentValue ? 'bg-indigo-500' : 'bg-surface-elevated'
+                      currentValue ? 'bg-neutral-500' : 'bg-surface-elevated'
                     }`}
                     aria-pressed={currentValue}
                     aria-label={flag.label}

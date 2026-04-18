@@ -164,7 +164,7 @@ export default function Onboarding() {
                 toast.success('Setup skipped.');
                 startTransition(() => navigate('/dashboard'));
               }}
-              className="text-[11px] font-mono text-content-tertiary hover:text-content-primary uppercase tracking-widest transition-colors border border-surface-border px-3 py-1.5 rounded-sm hover:bg-surface-elevated"
+              className="text-[11px] font-mono text-content-tertiary hover:text-content-primary uppercase tracking-widest transition-colors border border-surface-border px-3 py-1.5 rounded-lg hover:bg-surface-elevated"
             >
               Skip Setup
             </button>
@@ -232,7 +232,7 @@ export default function Onboarding() {
               </div>
               <button
                 onClick={() => setShowWelcome(false)}
-                className="bg-brand-cta hover:bg-brand-cta-hover text-white px-8 py-2.5 text-[10px] font-mono font-bold uppercase tracking-[0.1em] transition-all btn-tactile flex items-center gap-2"
+                className="bg-white hover:bg-neutral-200 text-black px-8 py-2.5 text-[10px] font-mono font-bold uppercase tracking-[0.1em] transition-all btn-tactile flex items-center gap-2"
               >
                 Get Started
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -275,7 +275,7 @@ export default function Onboarding() {
             {STEPS.map((_, idx) => (
               <div 
                 key={idx} 
-                className={`w-3 h-full transition-all duration-300 ${idx <= currentStepIndex ? 'bg-brand-violet shadow-glow-indigo' : 'bg-surface-border'}`}
+                className={`w-3 h-full transition-all duration-300 ${idx <= currentStepIndex ? 'bg-white' : 'bg-surface-border'}`}
               />
             ))}
           </div>
@@ -288,7 +288,7 @@ export default function Onboarding() {
               toast.success('Setup skipped. Welcome to your dashboard.');
               startTransition(() => navigate('/dashboard'));
             }}
-            className="text-[11px] font-mono text-content-tertiary hover:text-content-primary uppercase tracking-widest transition-colors border border-surface-border px-3 py-1.5 rounded-sm hover:bg-surface-elevated"
+            className="text-[11px] font-mono text-content-tertiary hover:text-content-primary uppercase tracking-widest transition-colors border border-surface-border px-3 py-1.5 rounded-lg hover:bg-surface-elevated"
           >
             Skip Setup
           </button>
@@ -461,7 +461,7 @@ export default function Onboarding() {
              </div>
             <button 
               onClick={handleNext}
-              className="bg-brand-cta hover:bg-brand-cta-hover text-white px-8 py-2.5 text-[10px] font-mono font-bold uppercase tracking-[0.1em] transition-all btn-tactile flex items-center gap-2"
+              className="bg-white hover:bg-neutral-200 text-black px-8 py-2.5 text-[10px] font-mono font-bold uppercase tracking-[0.1em] transition-all btn-tactile flex items-center gap-2"
             >
               {currentStepIndex === STEPS.length - 1 ? 'Go to Dashboard' : 'Continue'}
               <ArrowRight className="w-3.5 h-3.5" />

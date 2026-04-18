@@ -195,12 +195,12 @@ export default function Analytics() {
           <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Trends</h1>
           <p className="text-sm text-content-tertiary mt-1">Historical performance and spending patterns.</p>
         </div>
-        <div className="flex bg-surface-raised border border-surface-border rounded-sm p-1">
+        <div className="flex bg-surface-raised border border-surface-border rounded-lg p-1">
           {(['1M', '3M', '6M', '1Y', 'ALL'] as Period[]).map(p => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
-              className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${
                 period === p ? 'bg-surface-border text-white' : 'text-content-tertiary hover:text-content-secondary'
               }`}
             >
@@ -229,7 +229,7 @@ export default function Analytics() {
             label: 'YTD Saved',
             value: fmt(ytdMetrics.saved),
             sub: `Income ${fmt(ytdMetrics.income)} · Spend ${fmt(ytdMetrics.expenses)}`,
-            color: ytdMetrics.saved >= 0 ? 'text-indigo-400' : 'text-red-400',
+            color: ytdMetrics.saved >= 0 ? 'text-content-primary' : 'text-red-400',
           },
           {
             label: 'Avg Savings Rate',
@@ -238,7 +238,7 @@ export default function Analytics() {
             color: ytdMetrics.rate >= 20 ? 'text-emerald-400' : ytdMetrics.rate >= 10 ? 'text-amber-400' : 'text-red-400',
           },
         ].map(card => (
-          <div key={card.label} className="bg-surface-elevated border border-surface-border rounded-sm p-5">
+          <div key={card.label} className="bg-surface-elevated border border-surface-border rounded-lg p-5">
             <p className="metric-label normal-case text-content-tertiary mb-2">{card.label}</p>
             <p className={`text-2xl font-mono font-bold tabular-nums data-numeric ${card.color}`}>{card.value}</p>
             <p className="text-xs text-content-tertiary mt-1 truncate">{card.sub}</p>
@@ -282,7 +282,7 @@ export default function Analytics() {
           </SafeResponsiveContainer>
         )}
         <div className="flex gap-5 mt-3">
-          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-indigo-400 inline-block shrink-0" aria-hidden /> Net worth</div>
+          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-white inline-block shrink-0" aria-hidden /> Net worth</div>
           <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-emerald-400 inline-block shrink-0" aria-hidden /> Assets</div>
         </div>
       </CollapsibleModule>
@@ -331,7 +331,7 @@ export default function Analytics() {
           </LineChart>
         </SafeResponsiveContainer>
         <div className="flex gap-5 mt-3">
-          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-indigo-400 inline-block shrink-0" aria-hidden /> Savings rate</div>
+          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-white inline-block shrink-0" aria-hidden /> Savings rate</div>
           <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-4 h-px bg-content-muted/50 inline-block shrink-0 border-t border-dashed border-content-muted/40" aria-hidden /> 20% target</div>
         </div>
       </CollapsibleModule>

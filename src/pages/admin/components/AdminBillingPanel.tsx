@@ -18,7 +18,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function AdminBillingPanel({ stats }: Props) {
   return (
-    <div className="border border-surface-border rounded-sm bg-surface-raised p-5 space-y-4">
+    <div className="border border-surface-border rounded-lg bg-surface-raised p-5 space-y-4">
       <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
         <DollarSign className="w-4 h-4" /> Billing
       </h2>
@@ -28,21 +28,21 @@ export function AdminBillingPanel({ stats }: Props) {
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="rounded-sm border border-surface-border bg-surface-base p-2">
+            <div className="rounded-lg border border-surface-border bg-surface-base p-2">
               <p className="text-content-tertiary">Total revenue</p>
               <p className="text-content-primary font-semibold mt-1">{fmtUsd(stats.total_revenue_cents)}</p>
             </div>
-            <div className="rounded-sm border border-surface-border bg-surface-base p-2">
+            <div className="rounded-lg border border-surface-border bg-surface-base p-2">
               <p className="text-content-tertiary">Revenue (30d)</p>
               <p className="text-content-primary font-semibold mt-1">{fmtUsd(stats.revenue_30d_cents)}</p>
             </div>
-            <div className="rounded-sm border border-surface-border bg-surface-base p-2">
+            <div className="rounded-lg border border-surface-border bg-surface-base p-2">
               <p className="text-content-tertiary">Active subs</p>
               <p className="text-content-primary font-semibold mt-1">
                 {stats.subscription_counts['active'] ?? 0}
               </p>
             </div>
-            <div className="rounded-sm border border-surface-border bg-surface-base p-2">
+            <div className="rounded-lg border border-surface-border bg-surface-base p-2">
               <p className="text-content-tertiary">Failed (30d)</p>
               <p className={`font-semibold mt-1 ${stats.failed_payments_30d > 0 ? 'text-rose-400' : 'text-content-primary'}`}>
                 {stats.failed_payments_30d}

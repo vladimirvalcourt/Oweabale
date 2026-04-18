@@ -32,22 +32,22 @@ export function FullSuiteGateCard({ title, description, compact = false }: FullS
     <div
       className={
         compact
-          ? 'rounded-sm border border-indigo-500/25 bg-indigo-500/10 p-5'
-          : 'max-w-2xl rounded-sm border border-indigo-500/25 bg-surface-raised p-8 shadow-[0_0_30px_rgba(99,102,241,0.08)]'
+          ? 'rounded-lg border border-surface-border bg-surface-raised p-5'
+          : 'max-w-2xl rounded-lg border border-surface-border bg-surface-raised p-8 shadow-none'
       }
     >
       <div className="flex items-start gap-3">
-        <div className="mt-0.5 h-9 w-9 shrink-0 rounded-sm border border-indigo-500/30 bg-indigo-500/15 inline-flex items-center justify-center">
-          <Lock className="h-4 w-4 text-indigo-300" aria-hidden />
+        <div className="mt-0.5 h-9 w-9 shrink-0 rounded-lg border border-surface-border bg-surface-base inline-flex items-center justify-center">
+          <Lock className="h-4 w-4 text-content-secondary" aria-hidden />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-base font-semibold text-content-primary">{title}</h3>
-          <p className="mt-1 text-sm text-content-tertiary">{description}</p>
+          <p className="mt-1 text-sm text-content-secondary">{description}</p>
           <button
             type="button"
             onClick={onUpgrade}
             disabled={isUpgrading}
-            className="mt-4 inline-flex items-center gap-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed text-white px-4 py-2 text-xs font-mono uppercase tracking-widest"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white text-black hover:bg-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed px-4 py-2 text-xs font-sans font-medium"
           >
             {isUpgrading ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : null}
             {isUpgrading ? 'Starting checkout...' : `Upgrade — $${monthlyPrice.toFixed(2)}/mo`}

@@ -45,9 +45,9 @@ const SettingsNav = memo(function SettingsNav({
           type="button"
           onClick={() => onSelect(tab.id)}
           className={cn(
-            'w-full flex items-center px-4 py-2.5 text-[10px] font-mono uppercase tracking-[0.2em] rounded-sm transition-all border border-transparent',
+            'w-full flex items-center px-4 py-2.5 text-[10px] font-mono uppercase tracking-[0.2em] rounded-lg transition-all border border-transparent',
             activeTab === tab.id
-              ? 'bg-surface-elevated text-content-primary border-surface-border shadow-lg shadow-black/20'
+              ? 'bg-white/[0.08] text-content-primary border-white/10 shadow-none'
               : 'text-content-tertiary hover:text-content-primary hover:bg-surface-raised',
           )}
         >
@@ -117,8 +117,8 @@ export default function Settings() {
             Account configuration & preferences
           </p>
         </div>
-        <div className="flex items-center text-[10px] font-mono text-content-tertiary bg-surface-raised px-3 py-1.5 rounded-sm border border-surface-border uppercase tracking-widest">
-          <Shield className="w-3.5 h-3.5 mr-1.5 text-indigo-500" />
+        <div className="flex items-center text-[10px] font-mono text-content-tertiary bg-surface-raised px-3 py-1.5 rounded-lg border border-surface-border uppercase tracking-widest">
+          <Shield className="w-3.5 h-3.5 mr-1.5 text-content-secondary" />
           Secure connection
         </div>
       </div>
@@ -147,7 +147,7 @@ export default function Settings() {
       <Dialog open={isResetDialogOpen} onClose={() => setIsResetDialogOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-sm rounded-sm bg-surface-raised border border-surface-border p-6 shadow-xl">
+          <Dialog.Panel className="mx-auto max-w-sm rounded-lg bg-surface-raised border border-surface-border p-6 shadow-xl">
             <div className="flex items-center gap-4 mb-4">
               <div className="flex-shrink-0 w-10 h-10 rounded-full border border-amber-500/50 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-amber-500" />
@@ -163,7 +163,7 @@ export default function Settings() {
               <button
                 type="button"
                 onClick={() => setIsResetDialogOpen(false)}
-                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
+                className="px-4 py-2 bg-transparent border border-surface-border rounded-lg text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
               >
                 Cancel
               </button>
@@ -171,7 +171,7 @@ export default function Settings() {
                 type="button"
                 onClick={handleResetData}
                 disabled={isResettingData}
-                className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-medium transition-colors focus-app"
+                className="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors focus-app"
               >
                 {isResettingData && <Loader2 className="w-3 h-3 animate-spin" />}
                 {isResettingData ? 'Resetting...' : 'Reset Everything'}
@@ -184,7 +184,7 @@ export default function Settings() {
       <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-sm rounded-sm bg-surface-raised border border-surface-border p-6 shadow-xl">
+          <Dialog.Panel className="mx-auto max-w-sm rounded-lg bg-surface-raised border border-surface-border p-6 shadow-xl">
             <div className="flex items-center gap-4 mb-4">
               <div className="flex-shrink-0 w-10 h-10 rounded-full border border-[#7F1D1D] flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-[#EF4444]" />
@@ -200,7 +200,7 @@ export default function Settings() {
               <button
                 type="button"
                 onClick={() => setIsDeleteDialogOpen(false)}
-                className="px-4 py-2 bg-transparent border border-surface-border rounded-sm text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
+                className="px-4 py-2 bg-transparent border border-surface-border rounded-lg text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
               >
                 Cancel
               </button>
@@ -208,7 +208,7 @@ export default function Settings() {
                 type="button"
                 onClick={handleDeleteAccount}
                 disabled={isDeleting}
-                className="flex items-center gap-2 px-4 py-2 bg-[#EF4444] hover:bg-[#DC2626] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-sm text-sm font-medium transition-colors focus-app"
+                className="flex items-center gap-2 px-4 py-2 bg-[#EF4444] hover:bg-[#DC2626] disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg text-sm font-medium transition-colors focus-app"
               >
                 {isDeleting && <Loader2 className="w-3 h-3 animate-spin" />}
                 {isDeleting ? 'Deleting...' : 'Delete'}

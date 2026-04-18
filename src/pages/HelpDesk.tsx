@@ -139,7 +139,7 @@ export default function HelpDesk() {
           <p className="text-sm font-mono text-content-tertiary mt-1 uppercase tracking-widest">Get help and track your support tickets</p>
         </div>
 
-        <div className="flex bg-surface-elevated p-1 rounded-sm border border-surface-border inline-flex">
+        <div className="flex bg-surface-elevated p-1 rounded-lg border border-surface-border inline-flex">
           <button
             onClick={() => setActiveTab('tickets')}
             className={`px-6 py-2 text-[10px] font-mono uppercase tracking-widest transition-colors ${
@@ -168,7 +168,7 @@ export default function HelpDesk() {
             extraHeader={
               <button
                 onClick={() => setIsNewTicketOpen(true)}
-                className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-indigo-400 hover:text-indigo-300 transition-colors"
+                className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-content-primary hover:text-content-secondary transition-colors"
                 title="Create New Ticket"
               >
                 <Plus className="w-3 h-3" />
@@ -191,9 +191,9 @@ export default function HelpDesk() {
                   {tickets.map(ticket => (
                     <div key={ticket.id} className="p-6 hover:bg-surface-elevated transition-colors flex items-center justify-between group cursor-pointer">
                       <div className="flex items-center gap-4">
-                        <div className={`p-2 border rounded-sm shrink-0 flex items-center justify-center ${
+                        <div className={`p-2 border rounded-lg shrink-0 flex items-center justify-center ${
                           ticket.status === 'Resolved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
-                          ticket.status === 'In Progress' ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' :
+                          ticket.status === 'In Progress' ? 'bg-white/[0.05] border-surface-border text-content-primary' :
                           'bg-amber-500/10 border-amber-500/20 text-amber-500'
                         }`}>
                           {ticket.status === 'Resolved' ? <CheckCircle2 className="w-5 h-5" /> :
@@ -203,7 +203,7 @@ export default function HelpDesk() {
                         <div>
                           <div className="flex items-center gap-3 mb-1">
                             <span className="text-[10px] font-mono text-content-tertiary">{ticket.id}</span>
-                            <span className={`text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-sm border ${
+                            <span className={`text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 rounded-lg border ${
                               ticket.priority === 'Urgent' ? 'bg-rose-500/10 border-rose-500/30 text-rose-400' :
                               ticket.priority === 'Normal' ? 'bg-surface-elevated border-surface-border text-content-tertiary' :
                               'bg-surface-elevated border-surface-border text-content-tertiary'
@@ -233,16 +233,16 @@ export default function HelpDesk() {
               <Loader2 className="w-5 h-5 text-content-tertiary animate-spin" />
             </div>
           ) : broadcasts.length === 0 ? (
-            <div className="p-12 text-center border border-surface-border rounded-sm bg-surface-raised">
+            <div className="p-12 text-center border border-surface-border rounded-lg bg-surface-raised">
               <Radio className="w-7 h-7 text-content-muted mx-auto mb-3" />
               <p className="text-sm font-mono text-content-tertiary uppercase tracking-widest">No broadcasts at this time.</p>
             </div>
           ) : (
             <div className="space-y-4">
               {broadcasts.map(msg => (
-                <div key={msg.id} className="p-6 bg-surface-raised border border-surface-border rounded-sm relative overflow-hidden">
+                <div key={msg.id} className="p-6 bg-surface-raised border border-surface-border rounded-lg relative overflow-hidden">
                   <div className={`absolute top-0 left-0 w-1 h-full ${
-                    msg.type === 'warning' ? 'bg-amber-500' : 'bg-indigo-500'
+                    msg.type === 'warning' ? 'bg-amber-500' : 'bg-neutral-500'
                   }`} />
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-sm font-semibold text-white">{msg.title}</h3>
@@ -260,9 +260,9 @@ export default function HelpDesk() {
       <Dialog open={isNewTicketOpen} onClose={() => setIsNewTicketOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-surface-base/95" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto w-full max-w-lg bg-surface-elevated border border-surface-border shadow-2xl p-6 rounded-sm">
+          <Dialog.Panel className="mx-auto w-full max-w-lg bg-surface-elevated border border-surface-border shadow-2xl p-6 rounded-lg">
             <Dialog.Title className="text-sm font-mono font-bold text-white uppercase tracking-widest flex items-center gap-2 mb-6 pb-4 border-b border-surface-border">
-              <LifeBuoy className="w-4 h-4 text-indigo-400" />
+              <LifeBuoy className="w-4 h-4 text-content-primary" />
               New Support Request
             </Dialog.Title>
 
@@ -274,7 +274,7 @@ export default function HelpDesk() {
                   type="text"
                   value={formData.subject}
                   onChange={e => setFormData({...formData, subject: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo"
+                  className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field-indigo"
                   placeholder="Brief summary of the issue..."
                 />
               </div>
@@ -285,7 +285,7 @@ export default function HelpDesk() {
                   <select
                     value={formData.department}
                     onChange={e => setFormData({...formData, department: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo appearance-none"
+                    className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field-indigo appearance-none"
                   >
                     <option>General Support</option>
                     <option>Integrations</option>
@@ -298,7 +298,7 @@ export default function HelpDesk() {
                   <select
                     value={formData.priority}
                     onChange={e => setFormData({...formData, priority: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-sm px-3 py-2 focus-app-field-indigo appearance-none"
+                    className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field-indigo appearance-none"
                   >
                     <option value="Low">Low</option>
                     <option value="Normal">Normal</option>
@@ -312,7 +312,7 @@ export default function HelpDesk() {
                 <textarea
                   value={formData.description}
                   onChange={e => setFormData({...formData, description: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border text-white text-sm font-mono rounded-sm px-3 py-2 focus-app-field-indigo min-h-[8rem] resize-y"
+                  className="w-full bg-surface-base border border-surface-border text-white text-sm font-mono rounded-lg px-3 py-2 focus-app-field-indigo min-h-[8rem] resize-y"
                   placeholder="Provide context or reproduction steps..."
                 />
               </div>
@@ -321,7 +321,7 @@ export default function HelpDesk() {
                 <button type="button" onClick={() => setIsNewTicketOpen(false)} className="px-4 py-2 text-[10px] font-mono font-bold text-content-tertiary hover:text-white uppercase tracking-widest transition-colors">
                   Cancel
                 </button>
-                <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white rounded-sm text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors flex items-center gap-2">
+                <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-white text-black hover:bg-neutral-200 disabled:opacity-50 text-black rounded-lg text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors flex items-center gap-2">
                   {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                   Submit
                 </button>

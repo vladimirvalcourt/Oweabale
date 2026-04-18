@@ -111,27 +111,27 @@ export default function Taxes() {
           <select 
             value={taxState} 
             onChange={(e) => setTaxSettings(e.target.value, STATE_TAX_MAP[e.target.value].rate)}
-            className="bg-surface-raised border border-surface-border text-sm font-sans text-content-primary px-3 py-1.5 focus-app-field rounded-sm"
+            className="bg-surface-raised border border-surface-border text-sm font-sans text-content-primary px-3 py-1.5 focus-app-field rounded-lg"
           >
             {Object.keys(STATE_TAX_MAP).map(k => (
               <option key={k} value={k}>{STATE_TAX_MAP[k].name} ({STATE_TAX_MAP[k].rate}%)</option>
             ))}
           </select>
-          <div className="flex bg-surface-raised border border-surface-border rounded-sm p-1">
+          <div className="flex bg-surface-raised border border-surface-border rounded-lg p-1">
             <button
               onClick={() => setFilingStatus('single')}
-              className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${filingStatus === 'single' ? 'bg-brand-cta text-white' : 'text-content-tertiary hover:text-content-secondary'}`}
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${filingStatus === 'single' ? 'bg-white text-black' : 'text-content-tertiary hover:text-content-secondary'}`}
             >Single</button>
             <button
               onClick={() => setFilingStatus('married')}
-              className={`px-3 py-1 text-xs font-sans font-medium rounded-sm transition-colors ${filingStatus === 'married' ? 'bg-brand-cta text-white' : 'text-content-tertiary hover:text-content-secondary'}`}
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${filingStatus === 'married' ? 'bg-white text-black' : 'text-content-tertiary hover:text-content-secondary'}`}
             >Married</button>
           </div>
         </div>
       </div>
 
       {/* Gig Worker Education Banner */}
-      <div className="bg-amber-500/10 border border-amber-500/40 rounded-sm p-4 flex items-start gap-3 shadow-[0_0_20px_rgba(245,158,11,0.05)]">
+      <div className="bg-amber-500/10 border border-amber-500/40 rounded-lg p-4 flex items-start gap-3 shadow-[0_0_20px_rgba(245,158,11,0.05)]">
         <Zap className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
         <div>
           <p className="text-sm font-sans font-semibold text-amber-400 mb-1">Freelancer tip: the savings rule</p>
@@ -181,17 +181,17 @@ export default function Taxes() {
             <div className="p-0">
                <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-elevated/50">
                   <p className="text-sm font-sans font-medium text-content-secondary">Write-offs from your ledger</p>
-                  <button type="button" onClick={() => setShowAddForm(!showAddForm)} className="bg-brand-cta hover:bg-brand-cta-hover text-white text-xs font-sans font-semibold px-3 py-1.5 rounded-sm transition-all">Add deduction</button>
+                  <button type="button" onClick={() => setShowAddForm(!showAddForm)} className="bg-white hover:bg-neutral-200 text-black text-xs font-sans font-semibold px-3 py-1.5 rounded-lg transition-all">Add deduction</button>
                </div>
                {showAddForm && (
                  <div className="p-6 bg-surface-elevated border-b border-surface-border flex gap-3 items-end">
                     <div className="flex-1">
                       <p className="text-xs text-content-tertiary mb-1">Expense label</p>
-                      <input type="text" placeholder="e.g. Adobe Suite" value={newDeduction.name} onChange={e => setNewDeduction({...newDeduction, name: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-sm h-10 px-3 text-sm text-white focus-app-field-brand-indigo transition-colors" />
+                      <input type="text" placeholder="e.g. Adobe Suite" value={newDeduction.name} onChange={e => setNewDeduction({...newDeduction, name: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-white focus-app-field-brand-indigo transition-colors" />
                     </div>
                     <div className="w-24">
                       <p className="text-xs text-content-tertiary mb-1">Amount</p>
-                      <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-sm h-10 px-3 text-sm font-mono tabular-nums text-white focus-app-field-brand-indigo transition-colors" />
+                      <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm font-mono tabular-nums text-white focus-app-field-brand-indigo transition-colors" />
                     </div>
                     <button type="button" onClick={async () => {
                       if (!newDeduction.name.trim()) { toast.error('Enter an expense label'); return; }
@@ -201,7 +201,7 @@ export default function Taxes() {
                       if (!ok) return;
                       toast.success('Deduction added');
                       setNewDeduction({name: '', amount: '', category: ''}); setShowAddForm(false);
-                    }} className="bg-emerald-500 text-black h-10 px-4 text-sm font-sans font-semibold rounded-sm hover:bg-emerald-400 transition-colors">Add</button>
+                    }} className="bg-emerald-500 text-black h-10 px-4 text-sm font-sans font-semibold rounded-lg hover:bg-emerald-400 transition-colors">Add</button>
                  </div>
                )}
                <div className="divide-y divide-surface-border">
@@ -226,10 +226,10 @@ export default function Taxes() {
           <CollapsibleModule title="Quarterly Tax Deadlines" icon={Clock}>
             <div className="space-y-4">
               {quarterlyDates.map(q => (
-                <div key={q.label} className={`p-4 rounded-sm border ${q.overdue ? 'bg-surface-raised border-surface-border opacity-50' : q.daysLeft < 15 ? 'bg-rose-500/5 border-rose-500/30 shadow-[inset_0_0_15px_rgba(244,63,94,0.05)]' : 'bg-surface-elevated border-surface-border'}`}>
+                <div key={q.label} className={`p-4 rounded-lg border ${q.overdue ? 'bg-surface-raised border-surface-border opacity-50' : q.daysLeft < 15 ? 'bg-rose-500/5 border-rose-500/30 shadow-[inset_0_0_15px_rgba(244,63,94,0.05)]' : 'bg-surface-elevated border-surface-border'}`}>
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-xs font-sans font-semibold text-content-tertiary">{q.label} estimated payment</span>
-                    {q.overdue ? <span className="bg-surface-elevated text-content-tertiary text-xs px-2 py-0.5 rounded-sm">Completed</span> : <span className="text-emerald-400 text-xs font-sans font-medium">{q.daysLeft}d left</span>}
+                    {q.overdue ? <span className="bg-surface-elevated text-content-tertiary text-xs px-2 py-0.5 rounded-lg">Completed</span> : <span className="text-emerald-400 text-xs font-sans font-medium">{q.daysLeft}d left</span>}
                   </div>
                   <div className="flex items-center justify-between gap-4">
                     <p className="text-xs text-content-tertiary">Due {q.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
@@ -244,7 +244,7 @@ export default function Taxes() {
             </div>
           </CollapsibleModule>
 
-          <div className="bg-surface-raised border border-surface-border p-6 rounded-sm space-y-6">
+          <div className="bg-surface-raised border border-surface-border p-6 rounded-lg space-y-6">
              <div>
                <h3 className="text-sm font-sans font-semibold text-brand-indigo mb-4">Smart freelance tips</h3>
                <div className="space-y-4">

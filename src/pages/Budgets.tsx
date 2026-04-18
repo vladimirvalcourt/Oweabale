@@ -98,7 +98,7 @@ export default function Budgets() {
         <button 
           onClick={openAddModal}
           type="button"
-          className="px-4 py-2.5 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus-app"
+          className="px-4 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus-app"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           Create budget
@@ -106,8 +106,8 @@ export default function Budgets() {
       </div>
 
       {budgets.length === 0 ? (
-        <div className="bg-surface-raised border border-surface-border rounded-sm p-12 text-center">
-          <div className="w-16 h-16 bg-surface-elevated rounded-sm flex items-center justify-center mx-auto mb-4 border border-surface-border">
+        <div className="bg-surface-raised border border-surface-border rounded-lg p-12 text-center">
+          <div className="w-16 h-16 bg-surface-elevated rounded-lg flex items-center justify-center mx-auto mb-4 border border-surface-border">
             <PieChart className="w-8 h-8 text-content-muted" />
           </div>
           <h3 className="text-lg font-semibold text-content-primary mb-2">No budgets yet</h3>
@@ -115,7 +115,7 @@ export default function Budgets() {
           <button 
             type="button"
             onClick={openAddModal}
-            className="px-6 py-3 rounded-sm bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-white text-sm font-sans font-semibold transition-colors inline-flex items-center gap-2 shadow-sm"
+            className="px-6 py-3 rounded-lg bg-white hover:bg-neutral-200 active:scale-[0.98] text-black text-sm font-sans font-semibold transition-colors inline-flex items-center gap-2 shadow-sm"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Create your first budget
@@ -137,14 +137,14 @@ export default function Budgets() {
               const isOverBudget = spent > budget.amount;
               const isNearLimit = percentage >= 80 && !isOverBudget;
 
-              let progressColor = 'bg-indigo-500';
+              let progressColor = 'bg-white';
               if (isOverBudget) progressColor = 'bg-red-500';
               else if (isNearLimit) progressColor = 'bg-amber-500';
 
               return (
                 <div 
                   key={budget.id} 
-                  className="bg-surface-elevated rounded-sm border border-surface-border p-5 flex flex-col relative group hover:border-white/15 transition-colors"
+                  className="bg-surface-elevated rounded-lg border border-surface-border p-5 flex flex-col relative group hover:border-white/15 transition-colors"
                 >
                   <div className="flex justify-between items-start mb-6">
                     <div>
@@ -208,7 +208,7 @@ export default function Budgets() {
                     </p>
                   </div>
 
-                  <div className="w-full bg-surface-raised border border-surface-border rounded-sm h-1.5 mb-2 overflow-hidden">
+                  <div className="w-full bg-surface-raised border border-surface-border rounded-lg h-1.5 mb-2 overflow-hidden">
                     <div className={`${progressColor} h-full transition-all duration-700 ease-out`} style={{ width: `${percentage}%` }}></div>
                   </div>
 
@@ -233,7 +233,7 @@ export default function Budgets() {
       <Dialog open={isAddModalOpen || isEditModalOpen} onClose={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="relative z-50">
         <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-sm w-full rounded-sm bg-surface-raised border border-surface-border shadow-2xl">
+          <Dialog.Panel className="mx-auto max-w-sm w-full rounded-lg bg-surface-raised border border-surface-border shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-surface-border">
               <Dialog.Title className="text-base font-sans font-semibold text-content-primary">
                 {isEditModalOpen ? 'Edit budget' : 'New budget'}
@@ -250,7 +250,7 @@ export default function Budgets() {
                   required
                   value={formData.category}
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
                 >
                   <option value="" disabled>Select category</option>
                   {expenseCategories.map(c => (
@@ -273,7 +273,7 @@ export default function Budgets() {
                     min="0"
                     value={formData.amount}
                     onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
                     placeholder="0.00"
                   />
                 </div>
@@ -284,7 +284,7 @@ export default function Budgets() {
                 <select 
                   value={formData.period}
                   onChange={(e) => setFormData({...formData, period: e.target.value as 'Monthly' | 'Yearly'})}
-                  className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
                 >
                   <option value="Monthly">Monthly</option>
                   <option value="Yearly">Yearly</option>
@@ -301,7 +301,7 @@ export default function Budgets() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded-sm bg-brand-cta hover:bg-brand-cta-hover text-white text-sm font-sans font-semibold transition-colors shadow-sm"
+                  className="px-6 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold transition-colors shadow-sm"
                 >
                   {isEditModalOpen ? 'Save changes' : 'Save budget'}
                 </button>
