@@ -4,6 +4,7 @@ import type { PlaidHealthStats, SupportTicket } from './types';
 type Props = {
   ticketsLoading: boolean;
   tickets: SupportTicket[];
+  resolvedTickets: SupportTicket[];
   resolvingTicketId: string | null;
   plaidStats: PlaidHealthStats | null;
   onResolveTicket: (ticketId: string) => void;
@@ -12,6 +13,7 @@ type Props = {
 export function AdminSupportPanel({
   ticketsLoading,
   tickets,
+  resolvedTickets,
   resolvingTicketId,
   plaidStats,
   onResolveTicket,
@@ -52,6 +54,23 @@ export function AdminSupportPanel({
                   {resolvingTicketId === ticket.id ? '...' : 'Resolve'}
                 </button>
               </div>
+            </div>
+          ))}
+        </div>
+
+        <h3 className="mt-5 text-[11px] font-semibold uppercase tracking-wider text-content-tertiary">Recently resolved</h3>
+        <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
+          {ticketsLoading && <p className="text-xs text-content-muted">Loading…</p>}
+          {!ticketsLoading && resolvedTickets.length === 0 && (
+            <p className="text-[10px] text-content-muted">No resolved tickets in this window.</p>
+          )}
+          {resolvedTickets.map((ticket) => (
+            <div key={ticket.id} className="border border-surface-border/60 rounded-lg p-2 bg-surface-base/80 opacity-90">
+              <p className="text-[11px] text-content-primary font-medium truncate">{ticket.subject}</p>
+              <p className="text-[10px] text-content-tertiary">{ticket.ticket_number} · {ticket.userEmail}</p>
+              <p className="text-[10px] text-content-muted mt-1">
+                Resolved {ticket.updated_at ? new Date(ticket.updated_at).toLocaleDateString() : '—'}
+              </p>
             </div>
           ))}
         </div>

@@ -41,7 +41,7 @@ const Pricing        = lazy(() => import('./pages/Pricing'));
 const Privacy        = lazy(() => import('./pages/Privacy'));
 const Terms          = lazy(() => import('./pages/Terms'));
 const Security       = lazy(() => import('./pages/Security'));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AdminApp        = lazy(() => import('./features/admin/AdminApp'));
 const Education      = lazy(() => import('./pages/Education'));
 const HelpDesk       = lazy(() => import('./pages/HelpDesk'));
 const Changelog      = lazy(() => import('./pages/Changelog'));
@@ -105,7 +105,7 @@ function AppRoutes() {
         <Route element={<MaintenanceGuard />}>
         {/* Admin — requires both authentication AND is_admin = true on profile */}
         <Route element={<AdminGuard />}>
-          <Route path="/admin" element={<ErrorBoundary><AdminDashboard /></ErrorBoundary>} />
+          <Route path="/admin/*" element={<ErrorBoundary><AdminApp /></ErrorBoundary>} />
         </Route>
 
         {/* Onboarding doesn't need Layout sidebar/topbar */}

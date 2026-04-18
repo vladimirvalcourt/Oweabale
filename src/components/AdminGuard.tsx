@@ -30,8 +30,36 @@ export default function AdminGuard() {
         .eq('id', user.id)
         .single();
 
+      let hasAdminRole = false;
+      if (!error && data?.is_admin === true) {
+        hasAdminRole = true;
+      } else {
+        const { data: roleRows, error: roleErr } = await supabase
+          .from('admin_user_roles')
+          .select('role_id, admin_roles(key)')
+          .eq('user_id', user.id)
+          .limit(5);
+        if (!roleErr) {
+          hasAdminRole = (roleRows ?? []).some((row: { admin_roles?: { key?: string } | { key?: string }[] }) => {
+            const role = Array.isArray(row.admin_roles) ? row.admin_roles[0] : row.admin_roles;
+            return role?.key === 'admin';
+          });
+        }
+      }
+
+      const requireMfa = (import.meta.env.VITE_ADMIN_REQUIRE_MFA ?? 'false').toLowerCase() === 'true';
+      if (requireMfa && hasAdminRole) {
+        try {
+          const { data: factorsData } = await supabase.auth.mfa.listFactors();
+          const hasVerifiedTotp = (factorsData?.totp ?? []).some((f) => f.status === 'verified');
+          hasAdminRole = hasVerifiedTotp;
+        } catch {
+          hasAdminRole = false;
+        }
+      }
+
       if (!cancelled) {
-        setStatus(!error && data?.is_admin === true ? 'allowed' : 'denied');
+        setStatus(hasAdminRole ? 'allowed' : 'denied');
       }
     }
 

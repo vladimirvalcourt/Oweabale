@@ -894,9 +894,130 @@ export interface Database {
           created_at?: string
         }
       }
+      moderation_queue: {
+        Row: {
+          id: string
+          entity_type: string
+          entity_id: string
+          submitted_by: string | null
+          report_reason: string | null
+          status: 'pending' | 'approved' | 'rejected' | 'flagged'
+          moderator_note: string | null
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          entity_type: string
+          entity_id: string
+          submitted_by?: string | null
+          report_reason?: string | null
+          status?: 'pending' | 'approved' | 'rejected' | 'flagged'
+          moderator_note?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          entity_type?: string
+          entity_id?: string
+          submitted_by?: string | null
+          report_reason?: string | null
+          status?: 'pending' | 'approved' | 'rejected' | 'flagged'
+          moderator_note?: string | null
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+        }
+      }
+      system_notifications: {
+        Row: {
+          id: string
+          type: string
+          title: string
+          body: string
+          source: string | null
+          severity: 'info' | 'warning' | 'critical'
+          is_read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          type?: string
+          title: string
+          body: string
+          source?: string | null
+          severity?: 'info' | 'warning' | 'critical'
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          type?: string
+          title?: string
+          body?: string
+          source?: string | null
+          severity?: 'info' | 'warning' | 'critical'
+          is_read?: boolean
+          created_at?: string
+        }
+      }
+      admin_roles: {
+        Row: {
+          id: string
+          key: string
+          label: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          key: string
+          label: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          key?: string
+          label?: string
+          created_at?: string
+        }
+      }
+      admin_user_roles: {
+        Row: {
+          user_id: string
+          role_id: string
+          assigned_by: string | null
+          created_at: string
+        }
+        Insert: {
+          user_id: string
+          role_id: string
+          assigned_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          user_id?: string
+          role_id?: string
+          assigned_by?: string | null
+          created_at?: string
+        }
+      }
     }
     Views: {
-      [_ in never]: never
+      audit_logs: {
+        Row: {
+          id: string
+          user_id: string | null
+          table_name: string
+          record_id: string | null
+          action: string
+          old_data: Json | null
+          new_data: Json | null
+          created_at: string
+        }
+      }
     }
     Functions: {
       get_closed_beta_public: {

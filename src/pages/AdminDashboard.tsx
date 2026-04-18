@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { TransitionLink } from '../components/TransitionLink';
-import { ArrowLeft, RefreshCw } from 'lucide-react';
+import { ArrowLeft, RefreshCw, LayoutDashboard, LineChart, Users, SlidersHorizontal, Landmark } from 'lucide-react';
+import { CollapsibleModule } from '../components/CollapsibleModule';
 import { supabase } from '../lib/supabase';
 import { PrivacyScreenWhenHidden } from '../components/PrivacyScreenWhenHidden';
 import { toast } from 'sonner';
@@ -19,8 +20,21 @@ import { AdminRevenueChart } from './admin/components/AdminRevenueChart';
 import { AdminWebhooksPanel } from './admin/components/AdminWebhooksPanel';
 import { AdminFeatureFlagsPanel } from './admin/components/AdminFeatureFlagsPanel';
 import { AdminExportBar } from './admin/components/AdminExportBar';
+import { AdminFeedbackPanel } from './admin/components/AdminFeedbackPanel';
+import { AdminBroadcastsPanel } from './admin/components/AdminBroadcastsPanel';
+import { AdminChatMessagesPanel } from './admin/components/AdminChatMessagesPanel';
+import { AdminUserDataPanel } from './admin/components/AdminUserDataPanel';
+import { AdminIngestionQueuesPanel } from './admin/components/AdminIngestionQueuesPanel';
 import type {
+  AdminAiLearningProfile,
   AdminAuditEntry,
+  AdminBroadcastRow,
+  AdminCaptureSession,
+  AdminChatMessage,
+  AdminFeedbackEntry,
+  AdminInsurancePolicy,
+  AdminInvestmentAccount,
+  AdminPendingIngestion,
   BillingStats,
   ChurnStats,
   EnrichedUser,
@@ -49,6 +63,7 @@ export default function AdminDashboard() {
   const [subMap, setSubMap] = useState<Record<string, UserSubscription>>({});
 
   const [openTickets, setOpenTickets] = useState<SupportTicket[]>([]);
+  const [resolvedTickets, setResolvedTickets] = useState<SupportTicket[]>([]);
   const [ticketsLoading, setTicketsLoading] = useState(false);
   const [resolvingTicketId, setResolvingTicketId] = useState<string | null>(null);
 
@@ -71,6 +86,19 @@ export default function AdminDashboard() {
   >([]);
   const [profilesTotalCount, setProfilesTotalCount] = useState<number | null>(null);
   const [profilesLoadingMore, setProfilesLoadingMore] = useState(false);
+  const [feedbackEntries, setFeedbackEntries] = useState<AdminFeedbackEntry[]>([]);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [adminBroadcasts, setAdminBroadcasts] = useState<AdminBroadcastRow[]>([]);
+  const [broadcastsLoading, setBroadcastsLoading] = useState(false);
+  const [chatMessages, setChatMessages] = useState<AdminChatMessage[]>([]);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [learningProfiles, setLearningProfiles] = useState<AdminAiLearningProfile[]>([]);
+  const [investmentAccounts, setInvestmentAccounts] = useState<AdminInvestmentAccount[]>([]);
+  const [insurancePolicies, setInsurancePolicies] = useState<AdminInsurancePolicy[]>([]);
+  const [userDataLoading, setUserDataLoading] = useState(false);
+  const [pendingIngestions, setPendingIngestions] = useState<AdminPendingIngestion[]>([]);
+  const [captureSessions, setCaptureSessions] = useState<AdminCaptureSession[]>([]);
+  const [queuesLoading, setQueuesLoading] = useState(false);
 
   const invokeAdminActions = useCallback(async (body: Record<string, unknown>) => {
     const {
@@ -204,26 +232,223 @@ export default function AdminDashboard() {
       );
 
     setTicketsLoading(true);
-    const { data: tickets, error: ticketErr } = await supabase
-      .from('support_tickets')
-      .select('*')
-      .in('status', ['Open', 'In Progress'])
-      .order('created_at', { ascending: false });
+    setFeedbackLoading(true);
+    setBroadcastsLoading(true);
+    setChatLoading(true);
+    setUserDataLoading(true);
+    setQueuesLoading(true);
+    const [
+      { data: ticketsOpen, error: ticketOpenErr },
+      { data: ticketsResolved, error: ticketResolvedErr },
+      { data: feedbackRows, error: feedbackErr },
+      { data: broadcastRows, error: broadcastErr },
+      { data: chatRows, error: chatErr },
+      { data: aiProfilesRows, error: aiProfilesErr },
+      { data: investmentRows, error: investmentErr },
+      { data: insuranceRows, error: insuranceErr },
+      { data: pendingRows, error: pendingErr },
+      { data: captureRows, error: captureErr },
+    ] = await Promise.all([
+      supabase
+        .from('support_tickets')
+        .select('*')
+        .in('status', ['Open', 'In Progress'])
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('support_tickets')
+        .select('*')
+        .eq('status', 'Resolved')
+        .order('updated_at', { ascending: false })
+        .limit(15),
+      supabase
+        .from('user_feedback')
+        .select('id, user_id, type, rating, message, created_at')
+        .order('created_at', { ascending: false })
+        .limit(100),
+      supabase.from('admin_broadcasts').select('*').order('created_at', { ascending: false }).limit(50),
+      supabase
+        .from('chat_messages')
+        .select('id, user_id, role, content, mode, created_at')
+        .order('created_at', { ascending: false })
+        .limit(80),
+      supabase
+        .from('ai_learning_profiles')
+        .select('user_id, familiarity_level, preferred_style, topics_covered, recent_focus, total_lessons, total_messages, updated_at')
+        .order('updated_at', { ascending: false })
+        .limit(80),
+      supabase
+        .from('investment_accounts')
+        .select('id, user_id, name, type, institution, balance, last_updated')
+        .order('last_updated', { ascending: false })
+        .limit(120),
+      supabase
+        .from('insurance_policies')
+        .select('id, user_id, type, provider, premium, frequency, status, updated_at')
+        .order('updated_at', { ascending: false })
+        .limit(120),
+      supabase
+        .from('pending_ingestions')
+        .select('id, user_id, type, status, source, created_at, storage_path')
+        .order('created_at', { ascending: false })
+        .limit(100),
+      supabase
+        .from('document_capture_sessions')
+        .select('id, user_id, status, uploaded_file_url, expires_at, created_at, updated_at')
+        .order('updated_at', { ascending: false })
+        .limit(100),
+    ]);
     setTicketsLoading(false);
+    setFeedbackLoading(false);
+    setBroadcastsLoading(false);
+    setChatLoading(false);
+    setUserDataLoading(false);
+    setQueuesLoading(false);
 
-    if (ticketErr) {
-      toast.error(`Tickets load failed: ${ticketErr.message}`);
-    } else if (tickets) {
-      const profileMap: Record<string, string> = {};
-      profileData?.forEach((p) => {
+    const profileMap: Record<string, string> = {};
+    profileData?.forEach((p) => {
+      if (p.email) profileMap[p.id] = p.email;
+    });
+
+    const allUserIds = new Set<string>();
+    const collectUserIds = (rows: Array<{ user_id: string }> | null | undefined) => {
+      rows?.forEach((row) => allUserIds.add(row.user_id));
+    };
+    collectUserIds((ticketsOpen ?? []) as Array<{ user_id: string }>);
+    collectUserIds((ticketsResolved ?? []) as Array<{ user_id: string }>);
+    collectUserIds((feedbackRows ?? []) as Array<{ user_id: string }>);
+    collectUserIds((chatRows ?? []) as Array<{ user_id: string }>);
+    collectUserIds((investmentRows ?? []) as Array<{ user_id: string }>);
+    collectUserIds((insuranceRows ?? []) as Array<{ user_id: string }>);
+    collectUserIds((pendingRows ?? []) as Array<{ user_id: string }>);
+    collectUserIds((captureRows ?? []) as Array<{ user_id: string }>);
+    (aiProfilesRows ?? []).forEach((row: { user_id: string }) => allUserIds.add(row.user_id));
+
+    const missingUserIds = [...allUserIds].filter((id) => !profileMap[id]);
+    if (missingUserIds.length > 0) {
+      const { data: extraProf, error: extraProfErr } = await supabase
+        .from('profiles')
+        .select('id, email')
+        .in('id', missingUserIds);
+      if (extraProfErr) toast.error(`User emails load failed: ${extraProfErr.message}`);
+      extraProf?.forEach((p: { id: string; email: string | null }) => {
         if (p.email) profileMap[p.id] = p.email;
       });
-      setOpenTickets(
-        (tickets as SupportTicket[]).map((t) => ({
-          ...t,
-          userEmail: profileMap[t.user_id] || t.user_id.slice(0, 8),
+    }
+    const mapTicket = (t: SupportTicket) => ({
+      ...t,
+      userEmail: profileMap[t.user_id] || `${t.user_id.slice(0, 8)}…`,
+    });
+
+    if (ticketOpenErr) {
+      toast.error(`Open tickets load failed: ${ticketOpenErr.message}`);
+      setOpenTickets([]);
+    } else {
+      setOpenTickets((ticketsOpen ?? []).map(mapTicket));
+    }
+    if (ticketResolvedErr) {
+      toast.error(`Resolved tickets load failed: ${ticketResolvedErr.message}`);
+      setResolvedTickets([]);
+    } else {
+      setResolvedTickets((ticketsResolved ?? []).map(mapTicket));
+    }
+
+    if (broadcastErr) {
+      toast.error(`Broadcasts load failed: ${broadcastErr.message}`);
+      setAdminBroadcasts([]);
+    } else {
+      setAdminBroadcasts((broadcastRows ?? []) as AdminBroadcastRow[]);
+    }
+
+    if (chatErr) {
+      toast.error(`Chat messages load failed: ${chatErr.message}`);
+      setChatMessages([]);
+    } else {
+      setChatMessages(
+        ((chatRows ?? []) as Omit<AdminChatMessage, 'userEmail'>[]).map((row) => ({
+          ...row,
+          userEmail: profileMap[row.user_id] || `${row.user_id.slice(0, 8)}…`,
         })),
       );
+    }
+
+    if (aiProfilesErr) {
+      toast.error(`AI profiles load failed: ${aiProfilesErr.message}`);
+      setLearningProfiles([]);
+    } else {
+      setLearningProfiles(
+        ((aiProfilesRows ?? []) as Omit<AdminAiLearningProfile, 'userEmail'>[]).map((row) => ({
+          ...row,
+          userEmail: profileMap[row.user_id] || `${row.user_id.slice(0, 8)}…`,
+        })),
+      );
+    }
+
+    if (investmentErr) {
+      toast.error(`Investment accounts load failed: ${investmentErr.message}`);
+      setInvestmentAccounts([]);
+    } else {
+      setInvestmentAccounts(
+        ((investmentRows ?? []) as Omit<AdminInvestmentAccount, 'userEmail'>[]).map((row) => ({
+          ...row,
+          userEmail: profileMap[row.user_id] || `${row.user_id.slice(0, 8)}…`,
+        })),
+      );
+    }
+
+    if (insuranceErr) {
+      toast.error(`Insurance policies load failed: ${insuranceErr.message}`);
+      setInsurancePolicies([]);
+    } else {
+      setInsurancePolicies(
+        ((insuranceRows ?? []) as Omit<AdminInsurancePolicy, 'userEmail'>[]).map((row) => ({
+          ...row,
+          userEmail: profileMap[row.user_id] || `${row.user_id.slice(0, 8)}…`,
+        })),
+      );
+    }
+
+    if (pendingErr) {
+      toast.error(`Pending ingestions load failed: ${pendingErr.message}`);
+      setPendingIngestions([]);
+    } else {
+      setPendingIngestions(
+        ((pendingRows ?? []) as Omit<AdminPendingIngestion, 'userEmail'>[]).map((row) => ({
+          ...row,
+          userEmail: profileMap[row.user_id] || `${row.user_id.slice(0, 8)}…`,
+        })),
+      );
+    }
+
+    if (captureErr) {
+      toast.error(`Capture sessions load failed: ${captureErr.message}`);
+      setCaptureSessions([]);
+    } else {
+      setCaptureSessions(
+        ((captureRows ?? []) as Omit<AdminCaptureSession, 'userEmail'>[]).map((row) => ({
+          ...row,
+          userEmail: profileMap[row.user_id] || `${row.user_id.slice(0, 8)}…`,
+        })),
+      );
+    }
+
+    if (feedbackErr) {
+      toast.error(`Feedback load failed: ${feedbackErr.message}`);
+      setFeedbackEntries([]);
+    } else if (feedbackRows && feedbackRows.length > 0) {
+      const ids = [...new Set(feedbackRows.map((r: { user_id: string }) => r.user_id))];
+      const { data: profRows, error: profErr } = await supabase.from('profiles').select('id, email').in('id', ids);
+      if (profErr) toast.error(`Feedback emails failed: ${profErr.message}`);
+      const emailMap = Object.fromEntries(
+        (profRows ?? []).map((p: { id: string; email: string | null }) => [p.id, p.email?.trim() || '']),
+      );
+      setFeedbackEntries(
+        (feedbackRows as Omit<AdminFeedbackEntry, 'userEmail'>[]).map((r) => ({
+          ...r,
+          userEmail: emailMap[r.user_id] || `${r.user_id.slice(0, 8)}…`,
+        })),
+      );
+    } else {
+      setFeedbackEntries([]);
     }
 
     setIsRefreshing(false);
@@ -279,6 +504,36 @@ export default function AdminDashboard() {
         void loadAll();
       })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'support_tickets' }, () => {
+        void loadAll();
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'user_feedback' }, () => {
+        void loadAll();
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'admin_broadcasts' }, () => {
+        void loadAll();
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'admin_broadcasts' }, () => {
+        void loadAll();
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'admin_broadcasts' }, () => {
+        void loadAll();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_messages' }, () => {
+        void loadAll();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'ai_learning_profiles' }, () => {
+        void loadAll();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'investment_accounts' }, () => {
+        void loadAll();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'insurance_policies' }, () => {
+        void loadAll();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'pending_ingestions' }, () => {
+        void loadAll();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'document_capture_sessions' }, () => {
         void loadAll();
       })
       .subscribe();
@@ -379,6 +634,34 @@ export default function AdminDashboard() {
     void loadAll();
   };
 
+  const createAdminBroadcast = useCallback(
+    async (payload: { title: string; content: string; type: 'info' | 'warning' | 'error' }) => {
+      const { error } = await supabase.from('admin_broadcasts').insert(payload);
+      if (error) {
+        toast.error(`Broadcast failed: ${error.message}`);
+        return false;
+      }
+      toast.success('Structured broadcast published.');
+      void loadAll();
+      return true;
+    },
+    [loadAll],
+  );
+
+  const deleteAdminBroadcast = useCallback(
+    async (id: string) => {
+      const { error } = await supabase.from('admin_broadcasts').delete().eq('id', id);
+      if (error) {
+        toast.error(`Delete failed: ${error.message}`);
+        return false;
+      }
+      toast.success('Broadcast removed.');
+      void loadAll();
+      return true;
+    },
+    [loadAll],
+  );
+
   const resolveTicket = async (ticketId: string) => {
     setResolvingTicketId(ticketId);
     const { error } = await supabase
@@ -473,61 +756,92 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <AdminMetricsBar metrics={metricData} />
+        <CollapsibleModule title="At a glance" icon={LayoutDashboard} defaultOpen>
+          <AdminMetricsBar metrics={metricData} />
+        </CollapsibleModule>
 
-        <AdminExportBar profiles={profiles} billingStats={billingStats} />
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <AdminRevenueChart data={revenueChart} />
-          <AdminGrowthChart data={growthChart} />
-          <AdminChurnPanel stats={churnStats} />
-          <AdminWebhooksPanel webhooks={webhookRows} />
-        </div>
+        <CollapsibleModule title="Exports & analytics" icon={LineChart} defaultOpen>
+          <div className="space-y-6">
+            <AdminExportBar profiles={profiles} billingStats={billingStats} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <AdminRevenueChart data={revenueChart} />
+              <AdminGrowthChart data={growthChart} />
+              <AdminChurnPanel stats={churnStats} />
+              <AdminWebhooksPanel webhooks={webhookRows} />
+            </div>
+          </div>
+        </CollapsibleModule>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <AdminUsersPanel
-            users={filteredProfiles}
-            search={userSearch}
-            onSearchChange={setUserSearch}
-            getEnrichedProfile={getEnrichedProfile}
-            primaryAdminEmail={PRIMARY_ADMIN_EMAIL}
-            subMap={subMap}
-            profilesTotalCount={profilesTotalCount}
-            profilesLoadingMore={profilesLoadingMore}
-            onLoadMoreProfiles={() => void loadMoreProfiles()}
-            onPromoteAdmin={(userId) => void handlePromoteAdmin(userId)}
-            onDemoteAdmin={(userId) => void handleDemoteAdmin(userId)}
-            onAdminAction={(action, userId) => void handleAdminAction(action, userId)}
-            onViewUser={setViewingUserId}
-            onGrantRevoke={(action, userId) => void handleGrantRevoke(action, userId)}
-            onBulkAction={(action, userIds) => void handleBulkAction(action, userIds)}
-          />
+          <CollapsibleModule title="Users & roles" icon={Users} defaultOpen className="lg:col-span-2">
+            <AdminUsersPanel
+              users={filteredProfiles}
+              search={userSearch}
+              onSearchChange={setUserSearch}
+              getEnrichedProfile={getEnrichedProfile}
+              primaryAdminEmail={PRIMARY_ADMIN_EMAIL}
+              subMap={subMap}
+              profilesTotalCount={profilesTotalCount}
+              profilesLoadingMore={profilesLoadingMore}
+              onLoadMoreProfiles={() => void loadMoreProfiles()}
+              onPromoteAdmin={(userId) => void handlePromoteAdmin(userId)}
+              onDemoteAdmin={(userId) => void handleDemoteAdmin(userId)}
+              onAdminAction={(action, userId) => void handleAdminAction(action, userId)}
+              onViewUser={setViewingUserId}
+              onGrantRevoke={(action, userId) => void handleGrantRevoke(action, userId)}
+              onBulkAction={(action, userIds) => void handleBulkAction(action, userIds)}
+            />
+          </CollapsibleModule>
 
-          <div className="space-y-6">
-            <AdminBillingPanel stats={billingStats} stripeDashboardUrl={STRIPE_DASHBOARD_URL || undefined} />
-            <AdminFeatureFlagsPanel platformSettings={platformSettingsForFlags} onSetFeatureFlag={handleSetFeatureFlag} />
-            <AdminReliabilityPanel stripeHealth={stripeHealth} auditFeed={auditFeed} />
-            <AdminControlsPanel
-              isMaintenance={isMaintenance}
-              isPlaidEnabled={isPlaidEnabled}
-              broadcastMsg={broadcastMsg}
-              isSavingBroadcast={isSavingBroadcast}
-              onToggleMaintenance={() => void toggleMaintenance()}
-              onTogglePlaid={() => void togglePlaid()}
-              onBroadcastChange={setBroadcastMsg}
-              onSaveBroadcast={() => void handleSendBroadcast()}
-            />
-            <AdminSupportPanel
-              ticketsLoading={ticketsLoading}
-              tickets={openTickets}
-              resolvingTicketId={resolvingTicketId}
-              plaidStats={plaidStats}
-              onResolveTicket={(ticketId) => void resolveTicket(ticketId)}
-            />
+          <CollapsibleModule title="Billing, flags & support" icon={SlidersHorizontal} defaultOpen className="min-w-0">
+            <div className="space-y-6">
+              <AdminBillingPanel stats={billingStats} stripeDashboardUrl={STRIPE_DASHBOARD_URL || undefined} />
+              <AdminFeatureFlagsPanel platformSettings={platformSettingsForFlags} onSetFeatureFlag={handleSetFeatureFlag} />
+              <AdminReliabilityPanel stripeHealth={stripeHealth} auditFeed={auditFeed} />
+              <AdminControlsPanel
+                isMaintenance={isMaintenance}
+                isPlaidEnabled={isPlaidEnabled}
+                broadcastMsg={broadcastMsg}
+                isSavingBroadcast={isSavingBroadcast}
+                onToggleMaintenance={() => void toggleMaintenance()}
+                onTogglePlaid={() => void togglePlaid()}
+                onBroadcastChange={setBroadcastMsg}
+                onSaveBroadcast={() => void handleSendBroadcast()}
+              />
+              <AdminBroadcastsPanel
+                loading={broadcastsLoading}
+                items={adminBroadcasts}
+                onCreate={(payload) => createAdminBroadcast(payload)}
+                onDelete={(id) => deleteAdminBroadcast(id)}
+              />
+              <AdminSupportPanel
+                ticketsLoading={ticketsLoading}
+                tickets={openTickets}
+                resolvedTickets={resolvedTickets}
+                resolvingTicketId={resolvingTicketId}
+                plaidStats={plaidStats}
+                onResolveTicket={(ticketId) => void resolveTicket(ticketId)}
+              />
+              <AdminFeedbackPanel loading={feedbackLoading} items={feedbackEntries} />
+              <AdminChatMessagesPanel loading={chatLoading} items={chatMessages} />
+              <AdminUserDataPanel
+                loading={userDataLoading}
+                learningProfiles={learningProfiles}
+                investmentAccounts={investmentAccounts}
+                insurancePolicies={insurancePolicies}
+              />
+              <AdminIngestionQueuesPanel
+                loading={queuesLoading}
+                pendingIngestions={pendingIngestions}
+                captureSessions={captureSessions}
+              />
           </div>
+          </CollapsibleModule>
         </div>
 
-        <AdminPlaidDrilldown items={plaidItems} />
+        <CollapsibleModule title="Plaid connections" icon={Landmark} defaultOpen={false}>
+          <AdminPlaidDrilldown items={plaidItems} />
+        </CollapsibleModule>
       </div>
 
       <AdminUserModal

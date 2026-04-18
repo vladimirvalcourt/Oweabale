@@ -30,6 +30,7 @@ export interface SupportTicket {
   priority: 'Low' | 'Normal' | 'Urgent';
   status: string;
   created_at: string;
+  updated_at?: string;
   user_id: string;
   userEmail?: string;
 }
@@ -91,4 +92,89 @@ export interface PlaidItemRow {
   item_login_required: boolean;
   last_webhook_at: string | null;
   created_at: string;
+}
+
+export interface AdminFeedbackEntry {
+  id: string;
+  user_id: string;
+  type: string;
+  rating: number | null;
+  message: string;
+  created_at: string;
+  userEmail: string;
+}
+
+export interface AdminBroadcastRow {
+  id: string;
+  title: string;
+  content: string;
+  type: 'info' | 'warning' | 'error';
+  created_at: string;
+}
+
+export interface AdminChatMessage {
+  id: string;
+  user_id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  mode: 'advisor' | 'academy';
+  created_at: string;
+  userEmail: string;
+}
+
+export interface AdminAiLearningProfile {
+  user_id: string;
+  familiarity_level: 'beginner' | 'intermediate' | 'advanced';
+  preferred_style: 'plain_language' | 'step_by_step' | 'concise';
+  topics_covered: string[];
+  recent_focus: string[];
+  total_lessons: number;
+  total_messages: number;
+  updated_at: string;
+  userEmail: string;
+}
+
+export interface AdminInvestmentAccount {
+  id: string;
+  user_id: string;
+  name: string;
+  type: string;
+  institution: string | null;
+  balance: number;
+  last_updated: string;
+  userEmail: string;
+}
+
+export interface AdminInsurancePolicy {
+  id: string;
+  user_id: string;
+  type: string;
+  provider: string;
+  premium: number;
+  frequency: string;
+  status: string;
+  updated_at: string;
+  userEmail: string;
+}
+
+export interface AdminPendingIngestion {
+  id: string;
+  user_id: string;
+  type: string;
+  status: string | null;
+  source: string | null;
+  created_at: string;
+  storage_path: string | null;
+  userEmail: string;
+}
+
+export interface AdminCaptureSession {
+  id: string;
+  user_id: string;
+  status: 'idle' | 'pending' | 'active' | 'completed' | 'error';
+  uploaded_file_url: string | null;
+  expires_at: string | null;
+  created_at: string;
+  updated_at: string;
+  userEmail: string;
 }
