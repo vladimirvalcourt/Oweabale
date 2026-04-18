@@ -23,7 +23,7 @@ export function Card({ children, className }: { children: React.ReactNode; class
 export function CardHeader({ title, action, className }: { title: string; action?: React.ReactNode; className?: string }) {
   return (
     <div className={cn("px-6 py-4 border-b border-surface-border flex items-center justify-between", className)}>
-      <h2 className="text-base font-semibold tracking-tight text-content-primary">{title}</h2>
+      <h2 className="text-base font-semibold tracking-tight text-content-primary leading-snug">{title}</h2>
       {action && <div>{action}</div>}
     </div>
   );

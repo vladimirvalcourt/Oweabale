@@ -17,7 +17,7 @@ export default function Footer() {
             </p>
             <TransitionLink
               to="/onboarding"
-              className="inline-block bg-white text-black px-6 py-3 text-xs font-sans font-medium rounded-lg hover:bg-neutral-200 transition-colors"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-sans font-semibold text-black transition-colors hover:bg-neutral-200"
             >
               Get Started Free
             </TransitionLink>

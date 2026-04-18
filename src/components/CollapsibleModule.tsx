@@ -32,9 +32,9 @@ export function CollapsibleModule({
         onClick={() => startTransition(() => setIsOpen((o) => !o))}
         className="w-full text-left px-6 py-3 bg-surface-elevated/80 border-b border-surface-border flex items-center justify-between cursor-pointer group active:translate-y-[1px] hover:bg-surface-highlight transition-all border-t border-t-white/5 focus-app"
       >
-        <div className="flex items-center gap-3">
-          {Icon && <Icon className="w-3.5 h-3.5 text-content-tertiary group-hover:text-content-secondary transition-colors" />}
-          <h3 className="brand-header-text group-hover:text-content-primary transition-colors text-[10px]">{title}</h3>
+        <div className="flex items-center gap-3 min-w-0">
+          {Icon && <Icon className="w-4 h-4 shrink-0 text-content-tertiary group-hover:text-content-secondary transition-colors" aria-hidden />}
+          <h3 className="section-label group-hover:text-content-secondary transition-colors truncate">{title}</h3>
         </div>
         <div className="flex items-center gap-4">
           {!isOpen && extraHeader}

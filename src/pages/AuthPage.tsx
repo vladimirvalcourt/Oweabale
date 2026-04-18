@@ -44,7 +44,7 @@ export default function AuthPage() {
         className="absolute inset-0 pointer-events-none opacity-90"
         style={{
           background:
-            'radial-gradient(ellipse 85% 55% at 50% 42%, rgba(34, 211, 238, 0.07) 0%, transparent 52%), radial-gradient(ellipse 60% 40% at 50% 100%, rgba(124, 138, 232, 0.06) 0%, transparent 45%)',
+            'radial-gradient(ellipse 85% 55% at 50% 42%, rgba(255, 255, 255, 0.06) 0%, transparent 52%), radial-gradient(ellipse 60% 40% at 50% 100%, rgba(255, 255, 255, 0.04) 0%, transparent 45%)',
         }}
         aria-hidden
       />
@@ -64,13 +64,7 @@ export default function AuthPage() {
               Oweable
             </span>
           </div>
-          <h1
-            className="font-mono text-2xl text-white font-bold tracking-tight"
-            style={{
-              textShadow:
-                '0 0 18px rgba(34, 211, 238, 0.15), 0 0 36px rgba(124, 138, 232, 0.08)',
-            }}
-          >
+          <h1 className="font-mono text-2xl font-bold tracking-tight text-content-primary [text-shadow:0_1px_0_rgba(255,255,255,0.06)]">
             Sign in to Oweable
           </h1>
           <p className="font-mono text-xs text-content-tertiary uppercase tracking-[0.2em] mt-2">
@@ -83,7 +77,7 @@ export default function AuthPage() {
           type="button"
           onClick={handleGoogleSignIn}
           disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-3 bg-white text-black font-mono text-sm font-bold py-4 px-4 hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-8 focus-app"
+          className="mb-8 flex min-h-12 w-full items-center justify-center gap-3 rounded-lg bg-white px-4 py-3 font-mono text-sm font-bold text-black transition-colors hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50 focus-app"
         >
           {googleLoading ? (
             <span className="text-xs tracking-widest uppercase">Redirecting…</span>

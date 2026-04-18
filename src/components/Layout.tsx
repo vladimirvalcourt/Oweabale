@@ -465,10 +465,10 @@ export default function Layout() {
                             key={item.name}
                             to={item.linkTo}
                             className={cn(
-                              "flex items-center gap-3 px-4 py-2 transition-colors duration-200 group relative rounded-lg mx-1",
+                              "relative mx-1 flex min-h-10 items-center gap-3 rounded-lg px-4 py-2.5 transition-colors duration-200 group",
                               isActive 
-                                ? "text-content-primary bg-white/[0.06]" 
-                                : "text-content-secondary hover:text-content-primary hover:bg-white/[0.04]"
+                                ? "bg-white/[0.06] text-content-primary" 
+                                : "text-content-secondary hover:bg-white/[0.04] hover:text-content-primary"
                             )}
                             title={sidebarCollapsed ? item.name : undefined}
                           >
@@ -564,7 +564,7 @@ export default function Layout() {
             <button 
               type="button"
               aria-label="Open navigation menu"
-              className="lg:hidden text-content-tertiary hover:text-content-secondary focus-app rounded-lg p-1"
+              className="lg:hidden flex min-h-11 min-w-11 items-center justify-center rounded-lg text-content-tertiary transition-colors hover:text-content-secondary focus-app"
               onClick={() => setSidebarOpen(true)}
             >
               <MorphingMenuIcon isOpen={sidebarOpen} className="scale-110" />
@@ -589,7 +589,7 @@ export default function Layout() {
                   setIsSearchOpen(true);
                 }}
                 onFocus={() => setIsSearchOpen(true)}
-                className="w-full pl-9 pr-4 py-2 bg-surface-raised/80 rounded-lg text-[13px] font-sans text-content-primary placeholder-content-tertiary focus:bg-surface-elevated/90 transition-all border border-surface-border outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus:border-white/25"
+                className="w-full min-h-10 rounded-lg border border-surface-border bg-surface-raised/80 py-2.5 pl-9 pr-4 font-sans text-[13px] text-content-primary outline-none transition-all placeholder:text-content-tertiary focus:border-white/25 focus:bg-surface-elevated/90 focus:outline-none focus-visible:outline-none focus-visible:ring-0"
               />
               
               {/* Search Dropdown */}
@@ -601,7 +601,7 @@ export default function Layout() {
                         <li key={index}>
                           <button
                             onClick={() => handleSearchSelect(result.path)}
-                            className="w-full text-left px-4 py-2 hover:bg-white/[0.04] transition-colors flex flex-col"
+                            className="flex w-full flex-col px-4 py-2.5 text-left transition-colors hover:bg-white/[0.04]"
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium text-content-primary">{result.name}</span>
