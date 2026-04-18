@@ -1,0 +1,40 @@
+-- Persist Owe-AI chat history per user and mode.
+CREATE TABLE IF NOT EXISTS public.chat_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+  content TEXT NOT NULL CHECK (char_length(content) <= 10000),
+  mode TEXT NOT NULL DEFAULT 'advisor' CHECK (mode IN ('advisor', 'academy')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can read own chat messages" ON public.chat_messages;
+CREATE POLICY "Users can read own chat messages"
+  ON public.chat_messages FOR SELECT
+  USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can insert own chat messages" ON public.chat_messages;
+CREATE POLICY "Users can insert own chat messages"
+  ON public.chat_messages FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can delete own chat messages" ON public.chat_messages;
+CREATE POLICY "Users can delete own chat messages"
+  ON public.chat_messages FOR DELETE
+  USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Admins can manage chat messages" ON public.chat_messages;
+CREATE POLICY "Admins can manage chat messages"
+  ON public.chat_messages FOR ALL
+  USING (EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.is_admin = TRUE))
+  WITH CHECK (EXISTS (SELECT 1 FROM profiles p WHERE p.id = auth.uid() AND p.is_admin = TRUE));
+
+-- Fast "last N messages" retrieval per user
+CREATE INDEX IF NOT EXISTS chat_messages_user_created_idx
+  ON public.chat_messages (user_id, created_at DESC);
+
+-- Filter by mode (advisor vs academy)
+CREATE INDEX IF NOT EXISTS chat_messages_user_mode_idx
+  ON public.chat_messages (user_id, mode);

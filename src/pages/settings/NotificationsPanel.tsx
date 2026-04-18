@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { Mail, BellRing, BrainCircuit, Loader2 } from 'lucide-react';
+import { Mail, BellRing, BrainCircuit, Loader2, Zap } from 'lucide-react';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { NOTIF_PREFS_STORAGE_KEY, type NotifPrefKey, loadNotifPrefs } from './constants';
@@ -195,6 +195,40 @@ function NotificationsPanelInner() {
           {[
             { id: 'push-reminders' as const, label: 'Due Date Alerts', desc: 'Immediate alerts on the day a bill is due.' },
             { id: 'push-payments' as const, label: 'Payment Confirmations', desc: 'Get notified when a payment is successfully recorded.' },
+          ].map((item) => (
+            <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
+              <div className="pr-4">
+                <label htmlFor={item.id} className="text-sm font-medium text-content-primary cursor-pointer">{item.label}</label>
+                <p className="text-xs text-content-tertiary mt-1">{item.desc}</p>
+              </div>
+              <div className="flex items-center h-5 mt-1">
+                <input
+                  id={item.id}
+                  type="checkbox"
+                  checked={notifPrefs[item.id]}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setPref(item.id, checked);
+                    deferToast(() => toast.success(`${item.label} ${checked ? 'enabled' : 'disabled'}`));
+                  }}
+                  className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </CollapsibleModule>
+
+      <CollapsibleModule title="Financial Alerts" icon={Zap} defaultOpen={false}>
+        <p className="text-sm text-content-tertiary mb-6">
+          Get push alerts when your finances need attention. Requires browser push to be enabled above.
+        </p>
+        <div className="space-y-6">
+          {[
+            { id: 'alert-bill-due' as const, label: 'Bill Due Soon', desc: 'Alert 1–3 days before a bill is due.' },
+            { id: 'alert-over-budget' as const, label: 'Over Budget', desc: 'Alert when a budget category is exceeded this month.' },
+            { id: 'alert-low-cash' as const, label: 'Low Cash Warning', desc: 'Alert when your liquid cash drops below one week of safe-to-spend.' },
+            { id: 'alert-debt-due' as const, label: 'Debt Payment Due', desc: 'Alert 2 days before a debt minimum payment is due.' },
           ].map((item) => (
             <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
               <div className="pr-4">

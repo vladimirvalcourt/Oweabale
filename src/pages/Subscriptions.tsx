@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useStore, type Subscription } from '../store/useStore';
-import { normalizeToMonthly } from '../lib/finance';
-import { Repeat, Plus, Edit2, Trash2, TrendingUp, X } from 'lucide-react';
+import { normalizeToMonthly, detectUnusedSubscriptions } from '../lib/finance';
+import { Repeat, Plus, Edit2, Trash2, TrendingUp, X, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
@@ -14,7 +14,7 @@ function toSubFrequency(value: string): SubFrequency {
 }
 
 export default function Subscriptions() {
-  const { subscriptions, addSubscription, editSubscription, deleteSubscription } = useStore();
+  const { subscriptions, transactions, addSubscription, editSubscription, deleteSubscription } = useStore();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -93,6 +93,11 @@ export default function Subscriptions() {
     0
   );
 
+  const unusedSubs = useMemo(() =>
+    detectUnusedSubscriptions(subscriptions, transactions),
+    [subscriptions, transactions]
+  );
+
   // Price hike detector
   const hikedSubs = subscriptions.filter(sub => {
     const hist = sub.priceHistory;
@@ -132,9 +137,46 @@ export default function Subscriptions() {
         </button>
       </div>
 
+      {/* Subscription Optimizer */}
+      {unusedSubs.length > 0 && (
+        <div className="rounded-sm border border-amber-500/20 bg-amber-500/5 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
+            <h3 className="text-sm font-semibold text-amber-300">Subscription Optimizer</h3>
+            <span className="ml-auto text-xs text-content-tertiary">{unusedSubs.length} possibly unused</span>
+          </div>
+          <div className="space-y-2">
+            {unusedSubs.map(sub => (
+              <div key={sub.id} className="flex items-center justify-between py-2 border-b border-amber-500/10 last:border-0">
+                <div>
+                  <p className="text-sm font-medium text-content-primary">{sub.name}</p>
+                  <p className="text-xs text-content-tertiary mt-0.5">
+                    ${sub.monthlyEquivalent.toFixed(2)}/mo
+                    {sub.hasPriceHike && sub.previousAmount != null && (
+                      <span className="ml-2 text-amber-400"> · Price went up from ${sub.previousAmount}</span>
+                    )}
+                    {' · '}No charge in 35 days
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => startEdit(subscriptions.find(s => s.id === sub.id)!)}
+                  className="text-xs text-content-tertiary hover:text-content-primary px-2 py-1 rounded-sm hover:bg-surface-highlight transition-colors"
+                >
+                  Review
+                </button>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-content-muted mt-3">
+            These subscriptions have no matching charge in the last 35 days. Verify they&apos;re still being used.
+          </p>
+        </div>
+      )}
+
       {/* Overview Stats */}
-      <CollapsibleModule 
-        title="Subscription overview" 
+      <CollapsibleModule
+        title="Subscription overview"
         icon={TrendingUp}
         extraHeader={
           <span className="text-sm font-mono tabular-nums font-semibold text-content-primary data-numeric">

@@ -255,7 +255,7 @@ async function buildUserContextJson(
 ): Promise<string> {
   const scheduleBaseMs = Date.now();
 
-  const [billsR, debtsR, assetsR, incomesR, subsR, citR, goalsR, budgetsR, txR, profileR] = await Promise.all([
+  const [billsR, debtsR, assetsR, incomesR, subsR, citR, goalsR, budgetsR, txR, profileR, investR, insurR] = await Promise.all([
     supabaseAdmin.from('bills').select('amount,frequency,status,due_date,biller,category').eq('user_id', uid),
     supabaseAdmin.from('debts').select('name,remaining,min_payment,apr,payment_due_date').eq('user_id', uid),
     supabaseAdmin.from('assets').select('name,type,value').eq('user_id', uid),
@@ -271,6 +271,8 @@ async function buildUserContextJson(
       .order('date', { ascending: false })
       .limit(40),
     supabaseAdmin.from('profiles').select('first_name,last_name,email').eq('id', uid).maybeSingle(),
+    supabaseAdmin.from('investment_accounts').select('name,type,institution,balance').eq('user_id', uid),
+    supabaseAdmin.from('insurance_policies').select('type,provider,premium,frequency,status,expiration_date,coverage_amount').eq('user_id', uid).eq('status', 'active'),
   ]);
 
   if (billsR.error) throw billsR.error;
@@ -283,6 +285,7 @@ async function buildUserContextJson(
   if (budgetsR.error) throw budgetsR.error;
   if (txR.error) throw txR.error;
   if (profileR.error) throw profileR.error;
+  // investR and insurR are best-effort — tables may not exist yet; don't throw
 
   const bills = (billsR.data || []) as Record<string, unknown>[];
   const debts = (debtsR.data || []) as Record<string, unknown>[];
@@ -356,7 +359,7 @@ async function buildUserContextJson(
     scheduleBaseMs,
   });
 
-  const payload = {
+  const payload: Record<string, unknown> = {
     generatedAt: new Date().toISOString(),
     userProfile: {
       firstName,
@@ -454,6 +457,120 @@ async function buildUserContextJson(
     },
   };
 
+  // Investment accounts
+  const investments = (investR.data ?? []) as Record<string, unknown>[];
+  const investmentTotal = investments.reduce((s, a) => s + num(a.balance), 0);
+  payload.investmentAccounts = investments.map(a => ({
+    name: str(a.name).slice(0, 60),
+    type: str(a.type),
+    institution: str(a.institution ?? '').slice(0, 60),
+    balance: num(a.balance),
+  }));
+  payload.investmentTotal = parseFloat(investmentTotal.toFixed(2));
+
+  // Insurance summary
+  const policies = (insurR.data ?? []) as Record<string, unknown>[];
+  const coveredTypes = policies.map(p => str(p.type));
+  const allTypes = ['health', 'life', 'auto', 'renters', 'homeowners', 'disability'];
+  const missingTypes = allTypes.filter(t => !coveredTypes.includes(t));
+  const monthlyInsurancePremium = policies.reduce((s, p) => {
+    const freq = str(p.frequency) || 'Monthly';
+    let monthly = num(p.premium);
+    if (freq.toLowerCase() === 'yearly') monthly /= 12;
+    else if (freq.toLowerCase() === 'weekly') monthly *= 4.33;
+    return s + monthly;
+  }, 0);
+  payload.insuranceSummary = {
+    coveredTypes,
+    missingTypes,
+    monthlyPremium: parseFloat(monthlyInsurancePremium.toFixed(2)),
+    policyCount: policies.length,
+  };
+
+  // Spending anomalies — compute from existing transactions data (already fetched above)
+  const txData = (txR.data ?? []) as Record<string, unknown>[];
+  const now2 = new Date();
+  const monthStart = new Date(now2.getFullYear(), now2.getMonth(), 1);
+  const threeMonthStart = new Date(now2.getFullYear(), now2.getMonth() - 3, 1);
+  const currentByCategory: Record<string, number> = {};
+  const historicalByCategory: Record<string, number> = {};
+  for (const tx of txData) {
+    if (str(tx.type) !== 'expense') continue;
+    const d = new Date(str(tx.date).includes('T') ? str(tx.date) : `${str(tx.date)}T12:00:00`);
+    if (Number.isNaN(d.getTime())) continue;
+    const cat = str(tx.category) || 'Other';
+    if (d >= monthStart) {
+      currentByCategory[cat] = (currentByCategory[cat] ?? 0) + num(tx.amount);
+    } else if (d >= threeMonthStart) {
+      historicalByCategory[cat] = (historicalByCategory[cat] ?? 0) + num(tx.amount);
+    }
+  }
+  const anomalies: { category: string; currentMonth: number; avg: number; overagePct: number }[] = [];
+  for (const [cat, curr] of Object.entries(currentByCategory)) {
+    const hist = historicalByCategory[cat] ?? 0;
+    if (hist < 10) continue;
+    const avg = hist / 3;
+    const overage = curr - avg;
+    if (overage <= 0) continue;
+    const pct = (overage / avg) * 100;
+    if (pct >= 25) anomalies.push({ category: cat, currentMonth: parseFloat(curr.toFixed(2)), avg: parseFloat(avg.toFixed(2)), overagePct: parseFloat(pct.toFixed(1)) });
+  }
+  payload.spendingAnomalies = anomalies.sort((a, b) => b.overagePct - a.overagePct).slice(0, 3);
+
+  // Unused subscriptions — simple name-match against recent transactions
+  const subsData = (subsR.data ?? []) as Record<string, unknown>[];
+  const recentTxNames = new Set(
+    txData
+      .filter(tx => {
+        const d = new Date(str(tx.date).includes('T') ? str(tx.date) : `${str(tx.date)}T12:00:00`);
+        return !Number.isNaN(d.getTime()) && Date.now() - d.getTime() < 35 * 86400000 && str(tx.type) === 'expense';
+      })
+      .map(tx => str(tx.name).toLowerCase().replace(/\s+/g, ''))
+  );
+  const unusedSubs = subsData.filter(s => {
+    if (str(s.status) !== 'active') return false;
+    const nameLower = str(s.name).toLowerCase().replace(/\s+/g, '');
+    return !Array.from(recentTxNames).some(txn => txn.includes(nameLower.slice(0, 5)) || nameLower.includes(txn.slice(0, 5)));
+  });
+  payload.unusedSubscriptions = unusedSubs.slice(0, 5).map(s => ({ name: str(s.name), amount: num(s.amount), frequency: str(s.frequency) }));
+
+  // Cash flow forecast summary
+  const billsForForecast = (billsR.data ?? []).filter(b => str(b.status) !== 'paid').map(b => ({ dueDate: str(b.due_date ?? ''), amount: num(b.amount) }));
+  const cashFlowResult = calcMonthlyCashFlow(
+    (incomesR.data ?? []).map(i => ({ amount: num(i.amount), frequency: str(i.frequency), status: str(i.status), isTaxWithheld: Boolean(i.is_tax_withheld) })),
+    billsForForecast,
+    (debtsR.data ?? []).map(d => ({ remaining: num(d.remaining), minPayment: num(d.min_payment ?? 0) })),
+    (subsR.data ?? []).map(s => ({ amount: num(s.amount), frequency: str(s.frequency), status: str(s.status) })),
+  );
+  const dailySurplus = cashFlowResult.surplus / 30;
+  const liquidCashForForecast = (assetsR.data ?? []).filter(a => str(a.type).toLowerCase() === 'cash').reduce((s, a) => s + num(a.value), 0);
+  // Build 30-day forecast and find lowest balance day
+  let balance30 = liquidCashForForecast;
+  let lowestBalance = liquidCashForForecast;
+  let lowestBalanceDay = '';
+  const now3 = new Date();
+  const outflowMap: Record<string, number> = {};
+  const addO = (iso: string | null | undefined, amt: number) => {
+    if (!iso) return;
+    const raw = iso.includes('T') ? iso : `${iso}T12:00:00`;
+    const d = new Date(raw);
+    if (!Number.isNaN(d.getTime())) { const k = d.toISOString().slice(0, 10); outflowMap[k] = (outflowMap[k] ?? 0) + amt; }
+  };
+  for (const b of billsForForecast) addO(b.dueDate, b.amount);
+  for (const s of (subsR.data ?? []) as Record<string, unknown>[]) { if (str(s.status) === 'active') addO(str(s.next_billing_date ?? ''), num(s.amount)); }
+  for (const d of (debtsR.data ?? []) as Record<string, unknown>[]) { if (num(d.remaining) > 0) addO(str(d.payment_due_date ?? ''), num(d.min_payment ?? 0)); }
+  for (let i = 0; i < 30; i++) {
+    const day = new Date(now3); day.setDate(day.getDate() + i);
+    const k = day.toISOString().slice(0, 10);
+    balance30 = balance30 - (outflowMap[k] ?? 0) + dailySurplus;
+    if (balance30 < lowestBalance) { lowestBalance = balance30; lowestBalanceDay = day.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); }
+  }
+  payload.cashFlowForecast = {
+    lowestBalance: parseFloat(lowestBalance.toFixed(2)),
+    lowestBalanceDay: lowestBalanceDay || null,
+    dailySurplus: parseFloat(dailySurplus.toFixed(2)),
+  };
+
   return JSON.stringify(payload);
 }
 
@@ -463,7 +580,9 @@ Core rules (must follow):
 - Use ONLY the JSON snapshot in USER_FINANCIAL_CONTEXT plus the chat history. Do not invent accounts, amounts, institutions, or events.
 - If data is missing, say so in plain words and point them to the right place in Oweable (Bills, Transactions, Budgets, Goals, etc.).
 - Stay on personal finance and finance education only. Refuse coding, weather, recipes, trivia, or unrelated chat.
-- No legal, tax, or investment advice. Educational explanations and general budgeting habits are fine.
+- No legal advice. No personalized investment advice (do not tell them to buy specific stocks/funds). Educational explanations are fine.
+- Tax optimization guidance IS allowed but must always include this disclaimer inline: "(This is educational guidance — for your specific situation, consult a CPA.)" Topics you may discuss: Roth vs Traditional contributions, HSA maximization, tax bracket awareness, standard vs itemized deductions, estimated quarterly taxes for freelancers.
+- Insurance coverage gap auditing IS allowed. If the user's snapshot shows insurance data, you may flag missing coverage types (e.g., "you have auto but no renters/disability insurance") and explain the general cost/benefit.
 - You may teach broad finance topics even if they are not tied to a specific account entry (for example: credit utilization, APR, debt payoff strategies, emergency funds, loans, budgeting systems, net worth basics).
 
 Conversation style (must follow):
@@ -506,7 +625,23 @@ Teaching format for academy-style answers:
   2) Why it matters for the user
   3) Quick example (preferably with their context if available)
   4) Common mistake to avoid
-- If the user asks to learn deeply, provide a mini-lesson with clear steps and checkpoints instead of one long block.`;
+- If the user asks to learn deeply, provide a mini-lesson with clear steps and checkpoints instead of one long block.
+
+What-if scenario results:
+- When a TOOL_RESULT message appears in the conversation (formatted as "TOOL_RESULT: run_amortization → {...}"), use those exact numbers in your response. Do not invent alternative calculations.
+- Lead with the key insight from the tool result, then explain what it means in plain English.
+
+Investment accounts:
+- If USER_FINANCIAL_CONTEXT.investmentAccounts is present, use it to discuss portfolio diversification and retirement readiness in general terms. Do not recommend specific funds or stocks.
+
+Insurance:
+- If USER_FINANCIAL_CONTEXT.insuranceSummary is present, use it. Note missing coverage types if any. Explain the risk gap in plain English.
+
+Spending anomalies:
+- If USER_FINANCIAL_CONTEXT.spendingAnomalies is present and non-empty, proactively mention the top anomaly in your first response (not every response). Example: "I noticed your [category] spending is [X]% above your usual this month."
+
+Cash flow forecast:
+- If USER_FINANCIAL_CONTEXT.cashFlowForecast.lowestBalanceDay is present, you may reference when the user's balance will be tightest this month.`;
 
 /** Open-weight instruct model on Hugging Face Inference (router). Override with OWE_AI_MODEL. */
 const DEFAULT_OWE_AI_MODEL = 'Qwen/Qwen2.5-7B-Instruct';
@@ -523,6 +658,197 @@ function oweAiModelId(): string {
     Deno.env.get('OWE_AI_MODEL')?.trim() || Deno.env.get('HF_INFERENCE_MODEL')?.trim();
   return fromEnv || DEFAULT_OWE_AI_MODEL;
 }
+
+// ---------------------------------------------------------------------------
+// What-if tool definitions
+// ---------------------------------------------------------------------------
+
+const WHAT_IF_TOOLS = [
+  {
+    type: 'function',
+    function: {
+      name: 'run_amortization',
+      description:
+        'Calculate debt payoff timeline and total interest when making extra monthly payments on a specific debt.',
+      parameters: {
+        type: 'object',
+        properties: {
+          debtName: {
+            type: 'string',
+            description: 'Name of the debt from USER_FINANCIAL_CONTEXT.debts',
+          },
+          extraMonthly: {
+            type: 'number',
+            description: 'Extra amount paid monthly beyond the minimum',
+          },
+        },
+        required: ['debtName', 'extraMonthly'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'run_cash_flow_if',
+      description:
+        'Compute new monthly surplus if income or expenses change by a given amount.',
+      parameters: {
+        type: 'object',
+        properties: {
+          incomeChange: {
+            type: 'number',
+            description:
+              'Monthly income change (positive = increase, negative = decrease)',
+          },
+          expenseChange: {
+            type: 'number',
+            description:
+              'Monthly expense change (positive = more expenses, negative = fewer)',
+          },
+        },
+        required: [],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'run_net_worth_projection',
+      description:
+        'Project net worth N months into the future given optional extra monthly debt payment.',
+      parameters: {
+        type: 'object',
+        properties: {
+          months: {
+            type: 'number',
+            description: 'Number of months to project (1-24)',
+          },
+          extraMonthly: {
+            type: 'number',
+            description:
+              'Extra payment applied to highest-APR debt each month',
+          },
+        },
+        required: ['months'],
+      },
+    },
+  },
+];
+
+// ---------------------------------------------------------------------------
+// What-if tool executor
+// ---------------------------------------------------------------------------
+
+function amortizeMonths(principal: number, aprPct: number, monthly: number): { months: number; totalInterest: number } {
+  if (monthly <= 0 || principal <= 0) return { months: 0, totalInterest: 0 };
+  const monthlyRate = aprPct / 100 / 12;
+  let balance = principal;
+  let totalInterest = 0;
+  let months = 0;
+  while (balance > 0 && months < 600) {
+    const interest = balance * monthlyRate;
+    totalInterest += interest;
+    balance = balance + interest - monthly;
+    months++;
+    if (balance < 0.01) { balance = 0; break; }
+    // If payment doesn't cover interest, it will never pay off
+    if (monthly <= interest + 0.01 && months > 1) { months = 600; break; }
+  }
+  return { months, totalInterest: parseFloat(totalInterest.toFixed(2)) };
+}
+
+function executeWhatIfTool(
+  toolName: string,
+  args: Record<string, unknown>,
+  ctxJson: string,
+): string {
+  try {
+    const ctx = JSON.parse(ctxJson) as Record<string, unknown>;
+
+    if (toolName === 'run_amortization') {
+      const debtName = str(args.debtName).toLowerCase();
+      const extraMonthly = num(args.extraMonthly, 0);
+      const debts = (ctx.debts as Record<string, unknown>[] | undefined) ?? [];
+      const debt = debts.find(
+        (d) => str(d.name).toLowerCase().includes(debtName) || debtName.includes(str(d.name).toLowerCase()),
+      );
+      if (!debt) {
+        return JSON.stringify({ error: `Debt matching "${args.debtName}" not found in context.` });
+      }
+      const remaining = num(debt.remaining, 0);
+      const minPayment = num(debt.minPayment ?? debt.min_payment, 0);
+      const aprPct = num(debt.apr, 0);
+      const baseResult = amortizeMonths(remaining, aprPct, minPayment);
+      const extraResult = amortizeMonths(remaining, aprPct, minPayment + extraMonthly);
+      const monthsSaved = baseResult.months - extraResult.months;
+      const interestSaved = parseFloat((baseResult.totalInterest - extraResult.totalInterest).toFixed(2));
+      return JSON.stringify({
+        debtName: str(debt.name),
+        remaining,
+        minPayment,
+        aprPct,
+        extraMonthly,
+        basePayoff: { months: baseResult.months, totalInterest: baseResult.totalInterest },
+        extraPayoff: { months: extraResult.months, totalInterest: extraResult.totalInterest },
+        monthsSaved,
+        interestSaved,
+      });
+    }
+
+    if (toolName === 'run_cash_flow_if') {
+      const incomeChange = num(args.incomeChange, 0);
+      const expenseChange = num(args.expenseChange, 0);
+      const cashFlow = (ctx.monthlyCashFlow as Record<string, unknown> | undefined) ?? {};
+      const currentSurplus = num(cashFlow.surplus, 0);
+      const newSurplus = parseFloat((currentSurplus + incomeChange - expenseChange).toFixed(2));
+      const change = parseFloat((newSurplus - currentSurplus).toFixed(2));
+      return JSON.stringify({
+        currentSurplus,
+        incomeChange,
+        expenseChange,
+        newSurplus,
+        change,
+        positive: newSurplus >= 0,
+      });
+    }
+
+    if (toolName === 'run_net_worth_projection') {
+      const months = Math.min(Math.max(1, Math.round(num(args.months, 1))), 24);
+      const extraMonthly = num(args.extraMonthly, 0);
+      const cashFlow = (ctx.monthlyCashFlow as Record<string, unknown> | undefined) ?? {};
+      const surplus = num(cashFlow.surplus, 0);
+      const assets = (ctx.nonCashAssets as Record<string, unknown>[] | undefined) ?? [];
+      const liquidCash = num(ctx.liquidCash, 0);
+      const investmentTotal = num(ctx.investmentTotal, 0);
+      const debts = (ctx.debts as Record<string, unknown>[] | undefined) ?? [];
+      const totalAssets = liquidCash + investmentTotal + assets.reduce((s, a) => s + num(a.value, 0), 0);
+      const totalDebt = debts.reduce((s, d) => s + num(d.remaining, 0), 0);
+      const startNetWorth = parseFloat((totalAssets - totalDebt).toFixed(2));
+
+      const projection: { month: number; label: string; netWorth: number }[] = [];
+      let runningDebt = totalDebt;
+      const now4 = new Date();
+      for (let m = 1; m <= months; m++) {
+        const label = new Date(now4.getFullYear(), now4.getMonth() + m, 1).toLocaleDateString(undefined, { month: 'short', year: '2-digit' });
+        // Apply surplus + extra to reduce debt (simplified: no per-debt interest simulation)
+        const debtReduction = Math.min(runningDebt, extraMonthly);
+        runningDebt = Math.max(0, runningDebt - debtReduction);
+        const projectedAssets = totalAssets + surplus * m;
+        const projectedNW = parseFloat((projectedAssets - runningDebt).toFixed(2));
+        projection.push({ month: m, label, netWorth: projectedNW });
+      }
+      return JSON.stringify({ startNetWorth, months, extraMonthly, projection });
+    }
+
+    return JSON.stringify({ error: `Unknown tool: ${toolName}` });
+  } catch (err) {
+    return JSON.stringify({ error: err instanceof Error ? err.message : String(err) });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// HF chat completion with tool-call support
+// ---------------------------------------------------------------------------
 
 /**
  * Hugging Face Inference Providers — OpenAI-compatible chat completions.
@@ -544,15 +870,16 @@ async function callHuggingFaceChat(
     ? `\nUSER_LEVEL_HINT: ${levelHint}\n- Respect this hint for explanation depth in this response.`
     : '';
 
+  const systemContent = `${SYSTEM_PROMPT}\n\n${runtimeDirective}${levelDirective}\n\nUSER_FINANCIAL_CONTEXT (JSON):\n${userContextJson}`;
+
   const body = {
     model: modelId,
     temperature: 0.35,
     max_tokens: 900,
+    tools: WHAT_IF_TOOLS,
+    tool_choice: 'auto',
     messages: [
-      {
-        role: 'system',
-        content: `${SYSTEM_PROMPT}\n\n${runtimeDirective}${levelDirective}\n\nUSER_FINANCIAL_CONTEXT (JSON):\n${userContextJson}`,
-      },
+      { role: 'system', content: systemContent },
       ...messages.map((m) => ({ role: m.role, content: m.content })),
     ],
   };
@@ -571,16 +898,99 @@ async function callHuggingFaceChat(
     throw new Error(`Hugging Face inference error ${res.status}: ${t.slice(0, 400)}`);
   }
 
+  type ToolCall = { id: string; type: 'function'; function: { name: string; arguments: string } };
   const json = (await res.json()) as {
-    choices?: Array<{ message?: { content?: string } }>;
+    choices?: Array<{
+      message?: {
+        content?: string;
+        tool_calls?: ToolCall[];
+      };
+    }>;
     error?: { message?: string };
   };
   if (json.error?.message) {
     throw new Error(json.error.message.slice(0, 400));
   }
-  const text = json.choices?.[0]?.message?.content?.trim();
-  if (!text) throw new Error('Empty model response');
-  return text;
+
+  const firstChoice = json.choices?.[0]?.message;
+  if (!firstChoice) throw new Error('Empty model response');
+
+  // If no tool calls, return content directly
+  if (!firstChoice.tool_calls || firstChoice.tool_calls.length === 0) {
+    const text = firstChoice.content?.trim();
+    if (!text) throw new Error('Empty model response');
+    return text;
+  }
+
+  // --- Tool call path ---
+  const toolCall = firstChoice.tool_calls[0];
+  const toolName = toolCall.function.name;
+  let toolArgs: Record<string, unknown> = {};
+  try {
+    toolArgs = JSON.parse(toolCall.function.arguments) as Record<string, unknown>;
+  } catch {
+    // If args fail to parse, fall back to any text content
+    const fallback = firstChoice.content?.trim();
+    if (fallback) return fallback;
+    throw new Error('Tool call args parse failed and no fallback content');
+  }
+
+  let toolResult: string;
+  try {
+    toolResult = executeWhatIfTool(toolName, toolArgs, userContextJson);
+  } catch (err) {
+    toolResult = JSON.stringify({ error: err instanceof Error ? err.message : String(err) });
+  }
+
+  // Build follow-up request with tool result
+  const followUpMessages = [
+    { role: 'system', content: systemContent },
+    ...messages.map((m) => ({ role: m.role, content: m.content })),
+    { role: 'assistant', content: firstChoice.content ?? '', tool_calls: firstChoice.tool_calls },
+    { role: 'tool', tool_call_id: toolCall.id, content: toolResult },
+  ];
+
+  const followUpBody = {
+    model: modelId,
+    temperature: 0.35,
+    max_tokens: 900,
+    messages: followUpMessages,
+  };
+
+  const followUpRes = await fetch('https://router.huggingface.co/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${hfToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(followUpBody),
+  });
+
+  if (!followUpRes.ok) {
+    // Tool follow-up failed — fall back to any initial text content
+    const fallback = firstChoice.content?.trim();
+    if (fallback) return fallback;
+    const t = await followUpRes.text().catch(() => '');
+    throw new Error(`Hugging Face tool follow-up error ${followUpRes.status}: ${t.slice(0, 400)}`);
+  }
+
+  const followUpJson = (await followUpRes.json()) as {
+    choices?: Array<{ message?: { content?: string } }>;
+    error?: { message?: string };
+  };
+  if (followUpJson.error?.message) {
+    const fallback = firstChoice.content?.trim();
+    if (fallback) return fallback;
+    throw new Error(followUpJson.error.message.slice(0, 400));
+  }
+  const finalText = followUpJson.choices?.[0]?.message?.content?.trim();
+  if (!finalText) {
+    // Last resort: return any content from the first response
+    const fallback = firstChoice.content?.trim();
+    if (fallback) return fallback;
+    throw new Error('Empty model response after tool call');
+  }
+  return finalText;
 }
 
 function isModelNotFoundError(msg: string): boolean {
@@ -733,13 +1143,55 @@ Deno.serve(async (req: Request) => {
 
     const modelId = oweAiModelId();
     const learningProfile = await readLearningProfile(supabaseAdmin, user.id);
+
+    // Load last 10 persisted messages for context continuity across sessions
+    let dbHistory: ChatMessage[] = [];
+    try {
+      const { data: histRows } = await supabaseAdmin
+        .from('chat_messages')
+        .select('role,content')
+        .eq('user_id', user.id)
+        .eq('mode', mode)
+        .order('created_at', { ascending: false })
+        .limit(10);
+      if (histRows && histRows.length > 0) {
+        dbHistory = (histRows as { role: string; content: string }[])
+          .reverse()
+          .map(r => ({ role: (r.role === 'assistant' ? 'assistant' : 'user') as 'user' | 'assistant', content: r.content }));
+      }
+    } catch (err) {
+      console.warn('[owe-ai] history load failed:', err instanceof Error ? err.message : String(err));
+    }
+
+    // Merge: dbHistory provides context; client messages are the active turn
+    // Deduplicate by not including dbHistory messages that overlap with client messages
+    const clientContents = new Set(messages.map(m => m.content));
+    const dedupedHistory = dbHistory.filter(m => !clientContents.has(m.content));
+    const mergedMessages = [...dedupedHistory, ...messages].slice(-20);
+
     const contextJson = await buildUserContextJson(supabaseAdmin, user.id, learningProfile);
-    const reply = await callHuggingFaceWithFallback(hfToken, modelId, contextJson, messages, mode, levelHint);
+    const reply = await callHuggingFaceWithFallback(hfToken, modelId, contextJson, mergedMessages, mode, levelHint);
+
+    // Persist new messages to chat_messages table (fire and forget — don't block response)
+    void (async () => {
+      try {
+        const lastMsg = messages[messages.length - 1];
+        if (lastMsg?.role === 'user') {
+          await supabaseAdmin.from('chat_messages').insert([
+            { user_id: user.id, role: 'user', content: lastMsg.content.slice(0, 10000), mode },
+            { user_id: user.id, role: 'assistant', content: reply.slice(0, 10000), mode },
+          ]);
+        }
+      } catch (err) {
+        console.warn('[owe-ai] chat history persist failed:', err instanceof Error ? err.message : String(err));
+      }
+    })();
+
     const profileAfter = await upsertLearningProfile(
       supabaseAdmin,
       user.id,
       learningProfile,
-      messages,
+      mergedMessages,
       lastUser.content,
       reply,
       levelHint,

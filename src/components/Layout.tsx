@@ -4,7 +4,7 @@ import { TransitionLink } from './TransitionLink';
 import { 
   Bell, Search, Home, Receipt, Target, Activity,
   Settings, Repeat, BarChart3, Plus, X, ChevronDown, Inbox,
-  Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LineChart, ShieldCheck,
+  Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LineChart, ShieldCheck, Shield,
   Wallet, Clock, CreditCard, Sparkles
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
@@ -334,6 +334,8 @@ export default function Layout() {
         label: 'Planning & Growth',
         items: [
           { name: 'Net Worth', path: '/net-worth', icon: TrendingUp },
+          { name: 'Investments', path: '/investments', icon: TrendingUp },
+          { name: 'Insurance', path: '/insurance', icon: Shield },
           { name: 'Budgets', path: '/budgets', icon: PieChart },
           { name: 'Academy', path: '/education', icon: GraduationCap },
           { name: 'Calendar', path: '/calendar', icon: CalendarIcon },
