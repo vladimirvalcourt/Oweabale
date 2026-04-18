@@ -735,7 +735,7 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-surface-base text-content-secondary p-4 sm:p-8">
       <PrivacyScreenWhenHidden />
 
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="w-full space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-surface-border pb-5">
           <div>
             <h1 className="text-xl font-medium text-content-primary sm:text-2xl">Admin dashboard</h1>

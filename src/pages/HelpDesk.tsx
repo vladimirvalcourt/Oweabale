@@ -153,7 +153,7 @@ export default function HelpDesk() {
           <button
             onClick={() => setActiveTab('tickets')}
             className={`px-6 py-2 text-[10px] font-mono uppercase tracking-widest transition-colors ${
-              activeTab === 'tickets' ? 'bg-surface-raised text-white border border-surface-border shadow-sm' : 'text-content-tertiary hover:text-content-secondary'
+              activeTab === 'tickets' ? 'bg-surface-raised text-content-primary border border-surface-border shadow-sm' : 'text-content-tertiary hover:text-content-secondary'
             }`}
           >
             My Tickets
@@ -161,7 +161,7 @@ export default function HelpDesk() {
           <button
             onClick={() => setActiveTab('broadcast')}
             className={`px-6 py-2 text-[10px] font-mono uppercase tracking-widest transition-colors flex items-center gap-2 ${
-              activeTab === 'broadcast' ? 'bg-surface-raised text-white border border-surface-border shadow-sm' : 'text-content-tertiary hover:text-content-secondary'
+              activeTab === 'broadcast' ? 'bg-surface-raised text-content-primary border border-surface-border shadow-sm' : 'text-content-tertiary hover:text-content-secondary'
             }`}
           >
             <Radio className="w-3 h-3" />
@@ -203,7 +203,7 @@ export default function HelpDesk() {
                       <div className="flex items-center gap-4">
                         <div className={`p-2 border rounded-lg shrink-0 flex items-center justify-center ${
                           ticket.status === 'Resolved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500' :
-                          ticket.status === 'In Progress' ? 'bg-white/[0.05] border-surface-border text-content-primary' :
+                          ticket.status === 'In Progress' ? 'bg-content-primary/[0.05] border-surface-border text-content-primary' :
                           'bg-amber-500/10 border-amber-500/20 text-amber-500'
                         }`}>
                           {ticket.status === 'Resolved' ? <CheckCircle2 className="w-5 h-5" /> :
@@ -222,7 +222,7 @@ export default function HelpDesk() {
                             </span>
                             <span className="text-[9px] font-mono text-content-muted uppercase tracking-widest">{ticket.department}</span>
                           </div>
-                          <h3 className="text-sm font-semibold text-content-primary group-hover:text-white transition-colors">{ticket.subject}</h3>
+                          <h3 className="text-sm font-semibold text-content-primary group-hover:text-content-secondary transition-colors">{ticket.subject}</h3>
                         </div>
                       </div>
                       <div className="text-right">
@@ -265,7 +265,7 @@ export default function HelpDesk() {
                     msg.type === 'warning' ? 'bg-amber-500' : 'bg-neutral-500'
                   }`} />
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-semibold text-white">{msg.title}</h3>
+                    <h3 className="text-sm font-semibold text-content-primary">{msg.title}</h3>
                     <span className="text-[10px] font-mono text-content-tertiary">{msg.date}</span>
                   </div>
                   <p className="text-sm text-content-tertiary leading-relaxed font-mono">{msg.content}</p>
@@ -281,7 +281,7 @@ export default function HelpDesk() {
         <div className="fixed inset-0 bg-surface-base/95" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto w-full max-w-lg bg-surface-elevated border border-surface-border shadow-2xl p-6 rounded-lg">
-            <Dialog.Title className="text-sm font-mono font-bold text-white uppercase tracking-widest flex items-center gap-2 mb-6 pb-4 border-b border-surface-border">
+            <Dialog.Title className="text-sm font-mono font-bold text-content-primary uppercase tracking-widest flex items-center gap-2 mb-6 pb-4 border-b border-surface-border">
               <LifeBuoy className="w-4 h-4 text-content-primary" />
               New Support Request
             </Dialog.Title>
@@ -294,7 +294,7 @@ export default function HelpDesk() {
                   type="text"
                   value={formData.subject}
                   onChange={e => setFormData({...formData, subject: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field"
+                  className="w-full bg-surface-base border border-surface-border text-content-primary text-sm rounded-lg px-3 py-2 focus-app-field"
                   placeholder="Brief summary of the issue..."
                 />
               </div>
@@ -305,7 +305,7 @@ export default function HelpDesk() {
                   <select
                     value={formData.department}
                     onChange={e => setFormData({...formData, department: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field appearance-none"
+                    className="w-full bg-surface-base border border-surface-border text-content-primary text-sm rounded-lg px-3 py-2 focus-app-field appearance-none"
                   >
                     <option>General Support</option>
                     <option>Integrations</option>
@@ -318,7 +318,7 @@ export default function HelpDesk() {
                   <select
                     value={formData.priority}
                     onChange={e => setFormData({...formData, priority: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field appearance-none"
+                    className="w-full bg-surface-base border border-surface-border text-content-primary text-sm rounded-lg px-3 py-2 focus-app-field appearance-none"
                   >
                     <option value="Low">Low</option>
                     <option value="Normal">Normal</option>
@@ -332,16 +332,16 @@ export default function HelpDesk() {
                 <textarea
                   value={formData.description}
                   onChange={e => setFormData({...formData, description: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border text-white text-sm font-mono rounded-lg px-3 py-2 focus-app-field min-h-[8rem] resize-y"
+                  className="w-full bg-surface-base border border-surface-border text-content-primary text-sm font-mono rounded-lg px-3 py-2 focus-app-field min-h-[8rem] resize-y"
                   placeholder="Provide context or reproduction steps..."
                 />
               </div>
 
               <div className="pt-4 flex justify-end gap-3 border-t border-surface-border">
-                <button type="button" onClick={() => setIsNewTicketOpen(false)} className="px-4 py-2 text-[10px] font-mono font-bold text-content-tertiary hover:text-white uppercase tracking-widest transition-colors">
+                <button type="button" onClick={() => setIsNewTicketOpen(false)} className="px-4 py-2 text-[10px] font-mono font-bold text-content-tertiary hover:text-content-primary uppercase tracking-widest transition-colors">
                   Cancel
                 </button>
-                <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-white text-black hover:bg-neutral-200 disabled:opacity-50 text-black rounded-lg text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors flex items-center gap-2">
+                <button type="submit" disabled={isSubmitting} className="px-6 py-2 bg-brand-cta text-surface-base hover:bg-brand-cta-hover disabled:opacity-50 rounded-lg text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors flex items-center gap-2">
                   {isSubmitting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                   Submit
                 </button>

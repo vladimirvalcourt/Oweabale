@@ -4,7 +4,11 @@ import {
   upsertOneTimePaymentAndEntitlement,
   upsertSubscriptionAndEntitlement,
 } from '../_shared/stripeBilling.ts';
-import { getStripeSecretKey, getStripeWebhookSecret } from '../_shared/stripeEnv.ts';
+import {
+  getStripeSecretKey,
+  getStripeWebhookSecret,
+  STRIPE_API_VERSION,
+} from '../_shared/stripeEnv.ts';
 
 type AdminClient = ReturnType<typeof createClient>;
 
@@ -23,29 +27,20 @@ async function claimStripeWebhookEvent(
   supabaseAdmin: AdminClient,
   event: Stripe.Event,
 ): Promise<ClaimResult> {
-  const { error } = await supabaseAdmin.from('stripe_events').insert({
-    stripe_event_id: event.id,
-    event_type: event.type,
-    payload: payloadJson(event),
-    processing_completed: false,
+  const { data, error } = await supabaseAdmin.rpc('claim_stripe_event', {
+    p_event_id: event.id,
+    p_event_type: event.type,
+    p_payload: payloadJson(event),
   });
-
-  if (!error) return 'inserted';
-  if (error.code === '23505' || error.message?.includes('duplicate key')) {
-    const { data, error: selErr } = await supabaseAdmin
-      .from('stripe_events')
-      .select('processing_completed')
-      .eq('stripe_event_id', event.id)
-      .maybeSingle();
-    if (selErr) {
-      console.error('[stripe-webhook] duplicate claim select failed', selErr);
-      throw new Error(selErr.message);
-    }
-    if (data?.processing_completed === true) return 'duplicate_completed';
-    return 'duplicate_pending';
+  if (error) {
+    console.error('[stripe-webhook] claim_stripe_event rpc failed', error);
+    throw new Error(error.message);
   }
-  console.error('[stripe-webhook] stripe_events claim insert failed', error);
-  throw new Error(error.message);
+  const result = typeof data === 'string' ? data : String(data);
+  if (result === 'inserted' || result === 'duplicate_completed' || result === 'duplicate_pending') {
+    return result as ClaimResult;
+  }
+  throw new Error(`Unexpected claim_stripe_event result: ${result}`);
 }
 
 async function markStripeWebhookEventComplete(
@@ -83,7 +78,7 @@ Deno.serve(async (req: Request) => {
     if (!signature) throw new Error('Missing stripe-signature');
 
     const rawBody = await req.text();
-    const stripe = new Stripe(stripeSecret, { apiVersion: '2024-06-20' });
+    const stripe = new Stripe(stripeSecret, { apiVersion: STRIPE_API_VERSION });
     const event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
     const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
       auth: { autoRefreshToken: false, persistSession: false },

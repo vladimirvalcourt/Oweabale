@@ -48,7 +48,7 @@ export function FullSuiteGateCard({ title, description, compact = false }: FullS
             type="button"
             onClick={onUpgrade}
             disabled={isUpgrading}
-            className="mt-5 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-sans font-semibold text-black shadow-none transition-colors hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-5 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-sans font-semibold text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isUpgrading ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : null}
             {isUpgrading ? 'Starting checkout...' : `Upgrade — $${monthlyPrice.toFixed(2)}/mo`}

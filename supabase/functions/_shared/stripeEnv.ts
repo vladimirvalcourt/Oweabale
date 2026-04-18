@@ -1,3 +1,6 @@
+/** Keep Stripe API version in one place so webhook + sync + checkout stay aligned. */
+export const STRIPE_API_VERSION = '2024-06-20' as const;
+
 const LIVE_SECRET_PREFIX = 'sk_live_';
 const TEST_SECRET_PREFIX = 'sk_test_';
 const LIVE_WEBHOOK_PREFIX = 'whsec_';

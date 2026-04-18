@@ -13,12 +13,13 @@ import { CollapsibleModule } from '../components/CollapsibleModule';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 import { buildSpendingRecap } from '../lib/finance';
+import { formatCategoryLabel } from '../lib/categoryDisplay';
 
 type DateRange = '30d' | '90d' | '1y';
 
 const CATEGORY_COLORS = [
   '#d4d4d4', '#34D399', '#F59E0B', '#EF4444', '#737373',
-  '#06B6D4', '#F97316', '#10B981', '#EC4899', '#84CC16',
+  '#a3a3a3', '#64748b', '#78716c', '#525252', '#404040',
 ];
 
 function exportCSV(data: { date: string; name: string; category: string; amount: string; type: string }[], filename: string) {
@@ -131,7 +132,7 @@ export default function Reports() {
   const tooltipStyle = {
     backgroundColor: '#141414',
     border: '1px solid #262626',
-    borderRadius: '0px',
+    borderRadius: '8px',
     color: '#FAFAFA',
     fontFamily: 'monospace',
     fontSize: '11px',
@@ -155,7 +156,7 @@ export default function Reports() {
                 key={r}
                 onClick={() => setDateRange(r)}
                 className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${
-                  dateRange === r ? 'bg-surface-border text-white' : 'text-content-tertiary hover:text-content-secondary'
+                  dateRange === r ? 'bg-surface-elevated text-content-primary border border-surface-border' : 'text-content-tertiary hover:text-content-secondary'
                 }`}
               >
                 {r === '30d' ? '30D' : r === '90d' ? '90D' : '1Y'}
@@ -164,7 +165,7 @@ export default function Reports() {
           </div>
           <button
             onClick={() => exportCSV(
-              filteredTx.map(t => ({ date: t.date, name: t.name, category: t.category, amount: t.amount.toFixed(2), type: t.type })),
+              filteredTx.map(t => ({ date: t.date, name: t.name, category: formatCategoryLabel(t.category), amount: t.amount.toFixed(2), type: t.type })),
               `oweable-report-${dateRange}.csv`
             )}
             className="flex items-center gap-2 bg-transparent border border-surface-border text-content-secondary px-4 py-2 rounded-lg text-sm font-medium hover:bg-surface-elevated transition-colors"
@@ -209,7 +210,7 @@ export default function Reports() {
               </p>
               {recap.topCategory ? (
                 <p className="mt-3 text-xs text-content-secondary">
-                  Top category: <span className="text-content-primary font-medium">{recap.topCategory}</span> (${recap.topCategoryAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })})
+                  Top category: <span className="text-content-primary font-medium">{formatCategoryLabel(recap.topCategory)}</span> (${recap.topCategoryAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })})
                   {' · '}
                   {recap.topCategoryChangePercent >= 0 ? 'up' : 'down'} {Math.abs(recap.topCategoryChangePercent).toFixed(1)}%
                 </p>
@@ -268,8 +269,8 @@ export default function Reports() {
                 {categoryData.slice(0, 6).map((cat, i) => (
                   <div key={cat.name} className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="w-2 h-2 shrink-0 rounded-none" style={{ backgroundColor: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }} />
-                      <span className="text-xs text-content-secondary truncate">{cat.name}</span>
+                      <span className="w-2 h-2 shrink-0 rounded-sm" style={{ backgroundColor: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }} />
+                      <span className="text-xs text-content-secondary truncate">{formatCategoryLabel(cat.name)}</span>
                     </div>
                     <span className="text-xs font-mono tabular-nums text-content-primary data-numeric shrink-0">${cat.value.toLocaleString()}</span>
                   </div>

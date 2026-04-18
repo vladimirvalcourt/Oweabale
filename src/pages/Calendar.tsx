@@ -250,7 +250,7 @@ export default function Calendar() {
           <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border bg-surface-elevated">
             <button
               onClick={prevMonth}
-              className="p-1.5 text-content-tertiary hover:text-white hover:bg-surface-border rounded-lg transition-colors"
+              className="p-1.5 text-content-tertiary hover:text-content-primary hover:bg-surface-border rounded-lg transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -261,7 +261,7 @@ export default function Calendar() {
             </div>
             <button
               onClick={nextMonth}
-              className="p-1.5 text-content-tertiary hover:text-white hover:bg-surface-border rounded-lg transition-colors"
+              className="p-1.5 text-content-tertiary hover:text-content-primary hover:bg-surface-border rounded-lg transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -301,7 +301,7 @@ export default function Calendar() {
                   {isCurrentMonth && (
                     <>
                       <div className={`w-6 h-6 flex items-center justify-center text-xs font-mono mb-1 rounded-lg
-                        ${isToday ? 'bg-white text-black font-bold' : 'text-white'}
+                        ${isToday ? 'bg-brand-cta text-surface-base font-bold' : 'text-content-primary'}
                       `}>
                         {dayNum}
                       </div>

@@ -390,6 +390,8 @@ interface AppState {
   // Supabase Syncing
   fetchData: (userId?: string, options?: { background?: boolean }) => Promise<void>;
   isLoading: boolean;
+  /** False until phase-2 Supabase hydration (investments, goals, …) finishes or is skipped. */
+  phase2Hydrated: boolean;
   
   // Modal State
   addNotification: (note: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void;
@@ -1469,7 +1471,7 @@ export const useStore = create<AppState>()(
       });
 
       toast.success('All data has been cleared. You are back at square one.');
-      window.location.href = '/onboarding';
+      window.location.href = '/onboarding/setup';
     } catch (error) {
       console.error('Reset error:', error);
       toast.error('Failed to reset account data');
@@ -1912,6 +1914,11 @@ export const useStore = create<AppState>()(
         void removeIngestionStoragePath(item.storagePath);
       }
     }
+    // Free the local preview Blob URL to avoid memory leaks.
+    const blobUrl = item?.originalFile?.url;
+    if (typeof blobUrl === 'string' && blobUrl.startsWith('blob:')) {
+      try { URL.revokeObjectURL(blobUrl); } catch { /* ignore */ }
+    }
     set((state) => ({
       pendingIngestions: state.pendingIngestions.filter(pi => pi.id !== id)
     }));
@@ -2089,15 +2096,16 @@ export const useStore = create<AppState>()(
 
   // Supabase Implementation
   isLoading: false,
+  phase2Hydrated: false,
   fetchData: async (userId?: string, options?: { background?: boolean }) => {
     const background = options?.background === true;
     // Set immediately so App never redirects to onboarding on a frame where auth is ready but this async fn has not yet reached the old loading gate.
-    if (!background) set({ isLoading: true });
+    if (!background) set({ isLoading: true, phase2Hydrated: false });
 
     const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
     if (!resolvedUserId) {
       console.warn('[fetchData] No user ID available — skipping load');
-      if (!background) set({ isLoading: false });
+      if (!background) set({ isLoading: false, phase2Hydrated: true });
       return;
     }
 
@@ -2243,11 +2251,11 @@ export const useStore = create<AppState>()(
         } : get().credit,
         user: profile ? {
           id: profile.id,
-          firstName: profile.first_name,
-          lastName: profile.last_name,
-          email: profile.email,
-          avatar: profile.avatar,
-          theme: profile.theme,
+          firstName: profile.first_name ?? '',
+          lastName: profile.last_name ?? '',
+          email: profile.email ?? '',
+          avatar: profile.avatar ?? '',
+          theme: profile.theme ?? 'Dark',
           phone: profile.phone ?? '',
           timezone: profile.timezone ?? 'Eastern Time (ET)',
           language: profile.language || 'English (US)',
@@ -2445,6 +2453,8 @@ export const useStore = create<AppState>()(
           (adminBroadcasts?.length ?? 0);
       } catch (phase2Error) {
         console.error('[fetchData] phase 2 hydration failed:', phase2Error);
+      } finally {
+        if (!background) set({ phase2Hydrated: true });
       }
 
       // Upsert today's net worth snapshot for historical trending.
@@ -2479,7 +2489,10 @@ export const useStore = create<AppState>()(
     } catch (err) {
       console.error('[fetchData] failed:', err);
     } finally {
-      if (!background && get().isLoading) set({ isLoading: false });
+      if (!background) {
+        if (get().isLoading) set({ isLoading: false });
+        if (!get().phase2Hydrated) set({ phase2Hydrated: true });
+      }
     }
   },
 

@@ -121,7 +121,7 @@ export default function Insurance() {
 
   return (
     <AppPageShell>
-      <div className="space-y-6 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-6">
+      <div className="space-y-6 w-full max-w-4xl mx-auto pb-8">
 
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -132,7 +132,7 @@ export default function Insurance() {
           <button
             type="button"
             onClick={openAdd}
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
           >
             <Plus className="h-4 w-4 shrink-0" aria-hidden />
             Add Policy
@@ -199,7 +199,7 @@ export default function Insurance() {
             <button
               type="button"
               onClick={openAdd}
-              className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
+              className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
             >
               <Plus className="h-4 w-4 shrink-0" aria-hidden />
               Add your first policy
@@ -211,12 +211,12 @@ export default function Insurance() {
               {insurancePolicies.map(policy => (
                 <div
                   key={policy.id}
-                  className="flex items-start justify-between gap-4 rounded-lg border border-surface-border bg-surface-base p-4 transition-colors hover:border-white/15"
+                  className="flex items-start justify-between gap-4 rounded-lg border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary/15"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-semibold text-content-primary">{policy.provider}</span>
-                      <span className="rounded-full border border-surface-border bg-white/[0.04] px-1.5 py-0.5 text-[11px] font-semibold text-content-secondary">
+                      <span className="rounded-full border border-surface-border bg-content-primary/[0.04] px-1.5 py-0.5 text-[11px] font-semibold text-content-secondary">
                         {TYPE_LABELS[policy.type]}
                       </span>
                       {policy.status !== 'active' && (
@@ -394,13 +394,13 @@ export default function Insurance() {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-transparent px-3 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-white/[0.04] hover:text-content-primary focus-app"
+                    className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-transparent px-3 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
+                    className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
                   >
                     {editingId ? 'Save Changes' : 'Add Policy'}
                   </button>

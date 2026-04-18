@@ -15,13 +15,28 @@ function parseAllowedOrigins(): string[] {
   return raw.split(',').map((s) => s.trim()).filter(Boolean);
 }
 
+function parseVercelProjectAllowlist(): string[] {
+  // Explicit project subdomains, e.g. "oweable-foo.vercel.app,oweable-bar.vercel.app".
+  const raw = Deno.env.get('VERCEL_PREVIEW_ALLOWLIST');
+  if (!raw?.trim()) return [];
+  return raw.split(',').map((s) => s.trim()).filter(Boolean);
+}
+
 function originAllowed(origin: string | null): string {
   if (!origin) return 'https://oweable.com';
   const list = parseAllowedOrigins();
   if (list.includes(origin)) return origin;
+  // Whitelist specific preview domains only (no open-ended *.vercel.app).
   try {
     const u = new URL(origin);
-    if (u.protocol === 'https:' && u.hostname.endsWith('.vercel.app')) return origin;
+    const vercelAllow = parseVercelProjectAllowlist();
+    if (
+      u.protocol === 'https:' &&
+      vercelAllow.length > 0 &&
+      vercelAllow.includes(u.hostname)
+    ) {
+      return origin;
+    }
   } catch {
     /* ignore */
   }

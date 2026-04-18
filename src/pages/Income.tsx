@@ -141,7 +141,7 @@ export default function Income() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Income</h1>
@@ -150,7 +150,7 @@ export default function Income() {
         <button 
           type="button"
           onClick={openAddModal}
-          className="px-4 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus-app text-sm font-sans font-semibold"
+          className="px-4 py-2 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus-app text-sm font-sans font-semibold"
         >
           <Plus className="w-3.5 h-3.5 shrink-0" aria-hidden />
           Add income
@@ -159,7 +159,7 @@ export default function Income() {
 
       {incomes.length === 0 ? (
         <div className="bg-surface-raised rounded-lg border border-surface-border py-20 px-6 flex flex-col items-center justify-center text-center">
-          <div className="w-12 h-12 border border-surface-border bg-surface-elevated rounded-none flex items-center justify-center mb-4">
+          <div className="w-12 h-12 border border-surface-border bg-surface-elevated rounded-lg flex items-center justify-center mb-4">
             <Vault className="w-5 h-5 text-content-tertiary" />
           </div>
           <h2 className="text-lg font-sans font-semibold text-content-primary mb-2">No income yet</h2>
@@ -167,7 +167,7 @@ export default function Income() {
           <button 
             type="button"
             onClick={openAddModal}
-            className="mt-6 px-6 py-3 rounded-lg bg-white hover:bg-neutral-200 active:scale-[0.98] text-black text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 focus-app"
+            className="mt-6 px-6 py-3 rounded-lg bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 focus-app"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Add income source
@@ -213,7 +213,7 @@ export default function Income() {
               {incomes.map((income) => (
                 <div 
                   key={income.id} 
-                  className="bg-surface-elevated rounded-lg border border-surface-border p-5 flex flex-col relative group hover:border-white/15 transition-colors"
+                  className="bg-surface-elevated rounded-lg border border-surface-border p-5 flex flex-col relative group hover:border-content-primary/15 transition-colors"
                 >
                   {income.status === 'paused' && (
                     <div className="absolute top-0 right-0 bg-surface-border text-content-tertiary text-xs font-sans font-medium px-2 py-1 border-b border-l border-surface-border">
@@ -318,7 +318,7 @@ export default function Income() {
               <Dialog.Title className="text-base font-sans font-semibold text-content-primary">
                 {isEditModalOpen ? 'Edit income source' : 'New income source'}
               </Dialog.Title>
-              <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-content-tertiary hover:text-white transition-colors">
+              <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-content-tertiary hover:text-content-primary transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -424,7 +424,7 @@ export default function Income() {
               <div className="pt-6">
                 <button
                   type="submit"
-                  className="w-full rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors py-3 focus-app"
+                  className="w-full rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors py-3 focus-app"
                 >
                   {isEditModalOpen ? 'Save changes' : 'Add income'}
                 </button>
@@ -441,7 +441,7 @@ export default function Income() {
           <Dialog.Panel className="mx-auto max-w-sm w-full rounded-lg bg-surface-raised border border-surface-border shadow-2xl">
             <div className="flex items-center justify-between p-4 border-b border-surface-border bg-surface-elevated">
               <Dialog.Title className="text-base font-sans font-semibold text-content-primary">Log deposit</Dialog.Title>
-              <button onClick={() => setIsDepositModalOpen(false)} className="text-content-tertiary hover:text-white transition-colors">
+              <button onClick={() => setIsDepositModalOpen(false)} className="text-content-tertiary hover:text-content-primary transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -471,7 +471,7 @@ export default function Income() {
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors py-3 focus-app block"
+                  className="w-full rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors py-3 focus-app block"
                 >
                   Confirm deposit
                 </button>

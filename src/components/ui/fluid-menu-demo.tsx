@@ -6,12 +6,12 @@ export function MenuDemo() {
   return (
     <div className="flex flex-col items-center gap-8 p-8">
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-sans font-bold text-white uppercase italic tracking-tight">Fluid Navigation</h2>
+        <h2 className="text-2xl font-sans font-bold text-content-primary uppercase italic tracking-tight">Fluid Navigation</h2>
         <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">Experimental Pulse Menu</p>
       </div>
       
       <div className="relative mt-4">
-        <div className="absolute inset-0 bg-white/[0.04] blur-3xl -z-10 rounded-full" />
+        <div className="absolute inset-0 bg-content-primary/[0.04] blur-3xl -z-10 rounded-full" />
         <MenuContainer>
           <MenuItem 
             className="rounded-full !h-full"

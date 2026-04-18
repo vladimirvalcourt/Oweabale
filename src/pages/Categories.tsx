@@ -81,7 +81,7 @@ export default function Categories() {
             setEditingId(null);
             setFormData({ name: '', type: 'expense', color: '#737373' });
           }}
-          className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
         >
           <Plus className="w-3.5 h-3.5" />
           Add Category
@@ -146,7 +146,7 @@ export default function Categories() {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-white text-black hover:bg-neutral-200 rounded-lg text-sm font-medium transition-colors focus-app"
+                className="px-4 py-2 bg-brand-cta text-surface-base hover:bg-brand-cta-hover rounded-lg text-sm font-medium transition-colors focus-app"
               >
                 {editingId ? 'Save Changes' : 'Add Category'}
               </button>
@@ -167,7 +167,7 @@ export default function Categories() {
           <button
             type="button"
             onClick={() => setIsAdding(true)}
-            className="inline-flex items-center justify-center px-4 py-2 bg-white text-black hover:bg-neutral-200 active:scale-[0.98] text-black rounded-lg text-sm font-medium transition-colors focus-app"
+            className="inline-flex items-center justify-center px-4 py-2 bg-brand-cta text-surface-base hover:bg-brand-cta-hover active:scale-[0.98] rounded-lg text-sm font-medium transition-colors focus-app"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create Category
@@ -188,7 +188,7 @@ export default function Categories() {
                 >
                   <div className="flex items-center gap-4">
                     <div
-                      className="w-10 h-10 rounded-lg flex items-center justify-center text-white border border-surface-border bg-surface-base group-hover:border-white/15 transition-colors"
+                      className="w-10 h-10 rounded-lg flex items-center justify-center text-content-primary border border-surface-border bg-surface-base group-hover:border-content-secondary/30 transition-colors"
                       style={{ borderLeftColor: category.color || '#737373', borderLeftWidth: '3px' }}
                     >
                       <Tag className="w-5 h-5" style={{ color: category.color || '#737373' }} />

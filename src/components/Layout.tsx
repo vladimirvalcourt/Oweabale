@@ -58,6 +58,7 @@ export default function Layout() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [showDueSoonPreview, setShowDueSoonPreview] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const gChordAtRef = useRef<number | null>(null);
@@ -291,6 +292,49 @@ export default function Layout() {
     return n;
   }, [bills, citations, subscriptions]);
 
+  const dueSoonPreview = React.useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const toDateLabel = (isoLike: string): string => {
+      const d = new Date(isoLike.includes('T') ? isoLike : `${isoLike}T12:00:00`);
+      return Number.isNaN(d.getTime()) ? 'Unknown date' : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    };
+
+    const upcomingBills = bills
+      .filter((b) => b?.status !== 'paid' && b?.dueDate)
+      .map((b) => ({
+        name: b.biller,
+        amount: b.amount,
+        dueDate: b.dueDate,
+      }))
+      .filter((b) => {
+        const due = new Date(`${b.dueDate}T12:00:00`);
+        const days = Math.floor((due.getTime() - today.getTime()) / 86400000);
+        return days >= 0 && days <= 7;
+      });
+
+    const upcomingSubs = subscriptions
+      .filter((s) => s.status === 'active' && s.nextBillingDate)
+      .map((s) => ({
+        name: s.name,
+        amount: s.amount,
+        dueDate: s.nextBillingDate,
+      }))
+      .filter((s) => {
+        const due = new Date(`${s.dueDate}T12:00:00`);
+        const days = Math.floor((due.getTime() - today.getTime()) / 86400000);
+        return days >= 0 && days <= 7;
+      });
+
+    return [...upcomingBills, ...upcomingSubs]
+      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+      .slice(0, 3)
+      .map((item) => ({
+        ...item,
+        label: `${item.name} · $${item.amount.toFixed(2)} · ${toDateLabel(item.dueDate)}`,
+      }));
+  }, [bills, subscriptions]);
+
   const handleSearchSelect = useCallback((path: string) => {
     startTransition(() => {
       navigate(path);
@@ -308,17 +352,16 @@ export default function Layout() {
       {
         label: 'Overview',
         items: [
-          { name: 'Dashboard', path: '/dashboard', icon: Home },
           { name: 'Owe-AI', path: '/owe-ai', icon: Zap },
+          { name: 'Dashboard', path: '/dashboard', icon: Home },
           { name: 'Cash flow', path: '/dashboard', icon: RefreshCw, hash: 'cash-flow' },
           { name: 'Income', path: '/income', icon: DollarSign },
           { name: 'Freelance Vault', path: '/freelance', icon: Briefcase },
           { name: 'Regular Bills', path: '/bills', icon: FileText },
           { name: 'Debts & loans', path: '/bills?tab=debt', icon: CreditCard },
           { name: 'Due soon', path: '/bills', icon: Clock, hash: 'due-soon', count: dueSoonCount },
-          { name: 'Tickets & Fines', path: '/bills?tab=ambush', icon: AlertTriangle },
           { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },
-          { name: 'Review Inbox', path: '/ingestion', icon: Inbox, count: pendingIngestions.length },
+          { name: 'Document Inbox', path: '/ingestion', icon: Inbox, count: pendingIngestions.length },
         ],
       },
       {
@@ -461,47 +504,97 @@ export default function Layout() {
                       {group.items.map((item) => {
                         const Icon = item.icon;
                         const isActive = item.isActive;
+                        const isOweAi = item.name === 'Owe-AI';
+                        const isDueSoonItem = item.name === 'Due soon' && ((item as { count?: number }).count ?? 0) > 0;
                         return (
-                          <TransitionLink
+                          <div
                             key={item.name}
-                            to={item.linkTo}
-                            className={cn(
-                              "relative mx-1 flex min-h-10 items-center gap-3 rounded-lg px-4 py-2.5 transition-colors duration-200 group",
-                              isActive 
-                                ? "bg-white/[0.06] text-content-primary" 
-                                : "text-content-secondary hover:bg-white/[0.04] hover:text-content-primary"
-                            )}
-                            title={sidebarCollapsed ? item.name : undefined}
+                            className="relative mx-1"
+                            onMouseEnter={() => { if (isDueSoonItem) setShowDueSoonPreview(true); }}
+                            onMouseLeave={() => { if (isDueSoonItem) setShowDueSoonPreview(false); }}
                           >
-                            {isActive && (
-                              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] rounded-r-sm h-4 bg-white" />
-                            )}
-                            <TactileIcon 
-                              icon={Icon} 
-                              size={16} 
-                              active={isActive}
-                              variant="static"
+                            <TransitionLink
+                              to={item.linkTo}
                               className={cn(
-                                "shrink-0",
-                                !isActive && "group-hover:translate-x-0.5"
+                                "relative flex min-h-10 items-center gap-3 rounded-lg px-4 py-2.5 transition-colors duration-200 group",
+                                isOweAi
+                                  ? isActive
+                                    ? "bg-emerald-500/15 text-content-primary border border-emerald-400/35"
+                                    : "bg-emerald-500/8 text-content-secondary border border-emerald-400/20 hover:bg-emerald-500/15"
+                                  : isActive
+                                    ? "bg-content-primary/[0.06] text-content-primary"
+                                    : "text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary"
                               )}
-                            />
-                            {!sidebarCollapsed && (
-                              <>
-                                <span className="pointer-events-none text-[13px] font-sans font-medium tracking-normal flex-1">
-                                  {item.name}
-                                </span>
-                                {(item as { count?: number }).count !== undefined && (item as { count?: number }).count! > 0 && (
-                                  <span className="flex items-center gap-1.5 shrink-0">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
-                                    <span className="text-[10px] font-mono text-content-secondary tabular-nums">
-                                      {(item as { count?: number }).count}
-                                    </span>
+                              title={sidebarCollapsed ? item.name : undefined}
+                              onClick={(e) => {
+                                if (!isDueSoonItem) return;
+                                const isMobile = window.matchMedia('(max-width: 1023px)').matches;
+                                if (isMobile) {
+                                  e.preventDefault();
+                                  setShowDueSoonPreview((v) => !v);
+                                  return;
+                                }
+                                setShowDueSoonPreview(false);
+                              }}
+                            >
+                              {isActive && !isOweAi && (
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] rounded-r-sm h-4 bg-brand-cta" />
+                              )}
+                              <div className={cn(isOweAi && "rounded-md bg-emerald-500/20 p-1")}>
+                                <TactileIcon
+                                  icon={Icon}
+                                  size={16}
+                                  active={isActive}
+                                  variant="static"
+                                  className={cn(
+                                    "shrink-0",
+                                    !isActive && "group-hover:translate-x-0.5"
+                                  )}
+                                />
+                              </div>
+                              {!sidebarCollapsed && (
+                                <>
+                                  <span className={cn("pointer-events-none flex-1 tracking-normal", isOweAi ? "text-[14px] font-semibold" : "text-[13px] font-medium")}>
+                                    {item.name}
                                   </span>
-                                )}
-                              </>
+                                  {isOweAi && (
+                                    <span className="rounded border border-emerald-400/25 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-emerald-200/90">
+                                      AI
+                                    </span>
+                                  )}
+                                  {(item as { count?: number }).count !== undefined && (item as { count?: number }).count! > 0 && (
+                                    <span className="relative flex items-center gap-1.5 shrink-0 px-1">
+                                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+                                      <span className="text-[10px] font-mono text-content-secondary tabular-nums">
+                                        {(item as { count?: number }).count}
+                                      </span>
+                                    </span>
+                                  )}
+                                </>
+                              )}
+                            </TransitionLink>
+                            {isDueSoonItem && showDueSoonPreview && !sidebarCollapsed && (
+                              <div className="absolute left-0 top-full z-50 mt-2 w-64 rounded-lg border border-surface-border bg-black/95 p-3 shadow-[0_20px_50px_rgba(0,0,0,0.55)] lg:left-full lg:top-1/2 lg:ml-2 lg:mt-0 lg:-translate-y-1/2">
+                                <p className="text-[10px] font-mono uppercase tracking-widest text-content-tertiary mb-2">Due Soon Preview</p>
+                                <div className="space-y-1.5">
+                                  {dueSoonPreview.length === 0 ? (
+                                    <p className="text-xs text-content-tertiary">No upcoming bills in next 7 days.</p>
+                                  ) : (
+                                    dueSoonPreview.map((entry) => (
+                                      <p key={entry.label} className="text-xs text-content-secondary">{entry.label}</p>
+                                    ))
+                                  )}
+                                </div>
+                                <TransitionLink
+                                  to="/bills#due-soon"
+                                  className="mt-3 inline-flex text-xs text-content-primary hover:text-content-secondary"
+                                  onClick={() => setShowDueSoonPreview(false)}
+                                >
+                                  View All →
+                                </TransitionLink>
+                              </div>
                             )}
-                          </TransitionLink>
+                          </div>
                         );
                       })}
                     </div>
@@ -519,7 +612,7 @@ export default function Layout() {
               type="button"
               onClick={() => startTransition(() => setSidebarCollapsed((c) => !c))}
               className={cn(
-                "flex items-center w-full py-2 text-[12px] font-sans font-medium text-content-secondary bg-transparent border border-surface-border rounded-lg hover:text-content-primary hover:bg-white/[0.04] transition-all group",
+                "flex items-center w-full py-2 text-[12px] font-sans font-medium text-content-secondary bg-transparent border border-surface-border rounded-lg hover:text-content-primary hover:bg-content-primary/[0.04] transition-all group",
                 sidebarCollapsed ? "justify-center px-0" : "justify-start px-3 gap-3"
               )}
             >
@@ -537,7 +630,7 @@ export default function Layout() {
                 startTransition(() => navigate('/auth'));
               }}
               className={cn(
-                "flex items-center w-full py-2 mt-2 text-[12px] font-sans font-medium text-content-secondary bg-transparent border border-surface-border rounded-lg hover:text-content-primary hover:bg-white/[0.04] transition-all group",
+                "flex items-center w-full py-2 mt-2 text-[12px] font-sans font-medium text-content-secondary bg-transparent border border-surface-border rounded-lg hover:text-content-primary hover:bg-content-primary/[0.04] transition-all group",
                 sidebarCollapsed ? "justify-center px-0" : "justify-start px-3 gap-3"
               )}
               title={sidebarCollapsed ? "Sign Out" : undefined}
@@ -590,7 +683,7 @@ export default function Layout() {
                   setIsSearchOpen(true);
                 }}
                 onFocus={() => setIsSearchOpen(true)}
-                className="w-full min-h-10 rounded-lg border border-surface-border bg-surface-raised/80 py-2.5 pl-9 pr-4 font-sans text-[13px] text-content-primary outline-none transition-all placeholder:text-content-tertiary focus:border-white/25 focus:bg-surface-elevated/90 focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+                className="w-full min-h-10 rounded-lg border border-surface-border bg-surface-raised/80 py-2.5 pl-9 pr-4 font-sans text-[13px] text-content-primary outline-none transition-all placeholder:text-content-tertiary focus:border-content-primary/25 focus:bg-surface-elevated/90 focus:outline-none focus-visible:outline-none focus-visible:ring-0"
               />
               
               {/* Search Dropdown */}
@@ -602,7 +695,7 @@ export default function Layout() {
                         <li key={index}>
                           <button
                             onClick={() => handleSearchSelect(result.path)}
-                            className="flex w-full flex-col px-4 py-2.5 text-left transition-colors hover:bg-white/[0.04]"
+                            className="flex w-full flex-col px-4 py-2.5 text-left transition-colors hover:bg-content-primary/[0.04]"
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium text-content-primary">{result.name}</span>
@@ -647,7 +740,7 @@ export default function Layout() {
               type="button"
               title="Quick add (keyboard Q)"
               onClick={() => openQuickAdd()}
-              className="hidden sm:inline-flex items-center gap-2 rounded-lg bg-white text-black hover:bg-neutral-200 text-sm font-sans font-medium shadow-none transition-colors px-5 py-2.5 focus-app"
+              className="hidden sm:inline-flex items-center gap-2 rounded-lg bg-brand-cta text-surface-base hover:bg-brand-cta-hover text-sm font-sans font-medium shadow-none transition-colors px-5 py-2.5 focus-app"
             >
               <Plus className="w-4 h-4 shrink-0" aria-hidden />
               Add entry
@@ -657,7 +750,7 @@ export default function Layout() {
               aria-label="Add entry"
               title="Quick add (keyboard Q)"
               onClick={() => openQuickAdd()}
-              className="sm:hidden flex items-center justify-center w-11 h-11 bg-white text-black hover:bg-neutral-200 transition-colors focus-app rounded-lg"
+              className="sm:hidden flex items-center justify-center w-11 h-11 bg-brand-cta text-surface-base hover:bg-brand-cta-hover transition-colors focus-app rounded-lg"
             >
               <Plus className="w-3.5 h-3.5" aria-hidden />
             </button>
@@ -679,7 +772,7 @@ export default function Layout() {
               </button>
               {isNotifOpen && (
                 <div className="absolute right-0 top-full mt-2 w-80 bg-black/90 backdrop-blur-xl border border-surface-border rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.55)] z-50 overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-white/5">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-content-primary/5">
                     <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-content-secondary">Notifications</span>
                     <button onClick={() => clearNotifications()} className="text-[10px] font-mono text-content-muted hover:text-content-tertiary uppercase tracking-widest transition-colors">Clear all</button>
                   </div>
@@ -688,7 +781,7 @@ export default function Layout() {
                       <div className="px-4 py-8 text-center text-content-muted text-[11px] font-mono uppercase tracking-widest">No notifications</div>
                     ) : (
                       notifications.map((n: Notification) => (
-                        <div key={n.id} className={cn('px-4 py-3 border-b border-surface-border last:border-0', !n.read && 'bg-white/[0.03]')}>
+                        <div key={n.id} className={cn('px-4 py-3 border-b border-surface-border last:border-0', !n.read && 'bg-content-primary/[0.03]')}>
                           <div className="flex items-start gap-2">
                             <div className={cn('w-1.5 h-1.5 rounded-full mt-1.5 shrink-0', n.type === 'success' ? 'bg-emerald-500' : n.type === 'warning' ? 'bg-amber-500' : n.type === 'error' ? 'bg-red-500' : 'bg-neutral-500')} />
                             <div>
@@ -723,7 +816,7 @@ export default function Layout() {
                     aria-hidden
                   />
                 ) : (
-                  <div className="h-full w-full flex items-center justify-center bg-white/10" aria-hidden>
+                  <div className="h-full w-full flex items-center justify-center bg-content-primary/10" aria-hidden>
                     <span className="text-xs font-sans font-semibold text-content-primary">{user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}</span>
                   </div>
                 )}
@@ -745,7 +838,7 @@ export default function Layout() {
                           to="/settings"
                           className={cn(
                             'flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
-                            active ? 'bg-white/5 text-white' : 'text-content-tertiary'
+                            active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary'
                           )}
                         >
                           <div className="w-4 h-4 flex items-center justify-center text-content-tertiary">
@@ -759,7 +852,7 @@ export default function Layout() {
 
                   </div>
 
-                  <div className="h-[1px] bg-white/5 my-1" />
+                  <div className="h-[1px] bg-content-primary/5 my-1" />
 
                   <div className="py-1">
                     <HeadlessMenu.Item>
@@ -768,7 +861,7 @@ export default function Layout() {
                           to="/"
                           className={cn(
                             'flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
-                            active ? 'bg-white/5 text-white' : 'text-content-tertiary'
+                            active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary'
                           )}
                         >
                           <div className="w-4 h-4 flex items-center justify-center">
@@ -799,10 +892,10 @@ export default function Layout() {
                     <HeadlessMenu.Item>
                       {({ active }) => (
                         <TransitionLink
-                          to="/onboarding"
+                          to="/onboarding/setup"
                           className={cn(
                             'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
-                            active ? 'bg-white/5 text-white' : 'text-content-tertiary'
+                            active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary'
                           )}
                         >
                           <div className="w-4 h-4 flex items-center justify-center">
@@ -814,7 +907,7 @@ export default function Layout() {
                     </HeadlessMenu.Item>
                   </div>
 
-                  <div className="h-[1px] bg-white/5 my-1" />
+                  <div className="h-[1px] bg-content-primary/5 my-1" />
 
                   <div className="py-1">
                     <HeadlessMenu.Item>
@@ -827,7 +920,7 @@ export default function Layout() {
                           }}
                           className={cn(
                             'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
-                            active ? 'bg-white/5 text-red-400' : 'text-content-tertiary'
+                            active ? 'bg-content-primary/5 text-red-400' : 'text-content-tertiary'
                           )}
                         >
                           <div className="w-4 h-4 flex items-center justify-center">
@@ -965,7 +1058,7 @@ export default function Layout() {
                   setIsResetting(false);
                   setIsResetOpen(false);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-white text-black hover:bg-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-[11px] font-mono font-bold uppercase tracking-widest transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-brand-cta text-surface-base hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-[11px] font-mono font-bold uppercase tracking-widest transition-colors"
               >
                 {isResetting && <Activity className="w-3 h-3 animate-spin" />}
                 {isResetting ? 'Wiping...' : 'Confirm Wipe'}

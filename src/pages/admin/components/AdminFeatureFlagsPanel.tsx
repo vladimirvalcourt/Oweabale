@@ -62,7 +62,7 @@ export function AdminFeatureFlagsPanel({ platformSettings, onSetFeatureFlag }: P
                     aria-label={flag.label}
                   >
                     <span
-                      className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow transition-transform ${
+                      className={`inline-block h-3.5 w-3.5 rounded-full bg-brand-cta shadow transition-transform ${
                         currentValue ? 'translate-x-4' : 'translate-x-0.5'
                       }`}
                     />

@@ -47,7 +47,7 @@ export default function NetWorth() {
   }, [assets, debts, incomes, bills, subscriptions, extraMonthly]);
 
   // Asset allocation by type
-  const ASSET_COLORS = ['#d4d4d4', '#34D399', '#F59E0B', '#737373', '#06B6D4', '#EC4899'];
+  const ASSET_COLORS = ['#d4d4d4', '#34D399', '#F59E0B', '#737373', '#a3a3a3', '#525252'];
   const assetAllocation = useMemo(() => {
     const map = new Map<string, number>();
     assets.forEach(a => map.set(a.type, (map.get(a.type) || 0) + a.value));
@@ -104,13 +104,13 @@ export default function NetWorth() {
           <button
             type="button"
             onClick={() => setExtraMonthly(e => Math.max(0, e - 100))}
-            className="text-content-tertiary hover:text-white text-sm font-mono transition-colors"
+            className="text-content-tertiary hover:text-content-primary text-sm font-mono transition-colors"
           >−</button>
           <span className="text-sm font-mono text-content-primary w-20 text-center tabular-nums">${extraMonthly.toLocaleString()}</span>
           <button
             type="button"
             onClick={() => setExtraMonthly(e => e + 100)}
-            className="text-content-tertiary hover:text-white text-sm font-mono transition-colors"
+            className="text-content-tertiary hover:text-content-primary text-sm font-mono transition-colors"
           >+</button>
           {extraMonthly > 0 && (
             <span className="text-xs font-sans text-content-secondary ml-2">Accelerated payoff</span>
@@ -130,7 +130,7 @@ export default function NetWorth() {
               <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${(Number(v ?? 0) / 1000).toFixed(0)}k`} dx={-10} fontFamily="monospace" />
               <Tooltip
                 {...rechartsTooltipStableProps}
-                contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', color: '#FAFAFA', fontFamily: 'monospace', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '8px', color: '#FAFAFA', fontFamily: 'monospace', fontSize: '12px' }}
                 formatter={(value) => [`$${Number(value ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`, 'Net Worth']}
               />
               <Area type="monotone" dataKey="value" stroke="#d4d4d4" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" dot={{ fill: '#d4d4d4', strokeWidth: 0, r: 3 }} />
@@ -156,7 +156,7 @@ export default function NetWorth() {
                   </Pie>
                   <Tooltip
                     {...rechartsTooltipStableProps}
-                    contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', fontFamily: 'monospace', fontSize: '11px' }}
+                    contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '8px', fontFamily: 'monospace', fontSize: '11px' }}
                     formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Value']}
                   />
                 </RechartsPie>

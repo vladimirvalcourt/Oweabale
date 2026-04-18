@@ -41,6 +41,7 @@ const Pricing        = lazy(() => import('./pages/Pricing'));
 const Privacy        = lazy(() => import('./pages/Privacy'));
 const Terms          = lazy(() => import('./pages/Terms'));
 const Security       = lazy(() => import('./pages/Security'));
+const Support        = lazy(() => import('./pages/Support'));
 const AdminApp        = lazy(() => import('./features/admin/AdminApp'));
 const Education      = lazy(() => import('./pages/Education'));
 const HelpDesk       = lazy(() => import('./pages/HelpDesk'));
@@ -76,9 +77,9 @@ function AppRoutes() {
     user.id === authUser.id &&
     !user.hasCompletedOnboarding &&
     !isLoading &&
-    location.pathname !== '/onboarding'
+    location.pathname !== '/onboarding/setup'
   ) {
-    return <Navigate to="/onboarding" replace />;
+    return <Navigate to="/onboarding/setup" replace />;
   }
 
   return (
@@ -90,11 +91,13 @@ function AppRoutes() {
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/security" element={<Security />} />
+      <Route path="/support" element={<Support />} />
+      <Route path="/onboarding" element={<AuthPage mode="signup" />} />
 
       {/* ── Auth route — redirect to dashboard if already signed in ── */}
       <Route
         path="/auth"
-        element={authUser ? <Navigate to="/dashboard" replace /> : <AuthPage />}
+        element={authUser ? <Navigate to="/dashboard" replace /> : <AuthPage mode="signin" />}
       />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/plaid/callback" element={<PlaidCallback />} />
@@ -109,7 +112,7 @@ function AppRoutes() {
         </Route>
 
         {/* Onboarding doesn't need Layout sidebar/topbar */}
-        <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/onboarding/setup" element={<Onboarding />} />
         
         <Route element={<DeviceGuard><Layout /></DeviceGuard>}>
           <Route
@@ -304,7 +307,7 @@ function AppRoutes() {
             }
           />
           <Route
-            path="support"
+            path="app/support"
             element={
               <ErrorBoundary>
                 <FullSuiteRouteGuard featureName="Support tools">

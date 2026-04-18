@@ -21,7 +21,8 @@
       "mcp__46d29a87-71b9-4bfe-ba92-e3709a647d4c__stripe_api_search",
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "mcp__Desktop_Commander__read_file"
     ]
   }
 }

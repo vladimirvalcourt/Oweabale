@@ -21,7 +21,7 @@ export function AdminSupportPanel({
   const priorityClass = (priority: string) => {
     if (priority === 'Urgent') return 'text-rose-400 bg-rose-500/10';
     if (priority === 'Normal') return 'text-amber-400 bg-amber-500/10';
-    return 'text-content-tertiary bg-white/5';
+    return 'text-content-tertiary bg-content-primary/5';
   };
 
   return (

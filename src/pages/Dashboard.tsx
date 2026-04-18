@@ -5,7 +5,7 @@ import {
   ArrowRight, Activity, ShieldCheck, Flame, Inbox, ShieldAlert,
   X, Copy, ExternalLink, Wallet
 } from 'lucide-react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ReferenceArea } from 'recharts';
 import { toast } from 'sonner';
 import { Dialog } from '@headlessui/react';
 import { motion, animate, useMotionValue, useTransform } from 'motion/react';
@@ -15,26 +15,30 @@ import { projectNetWorth, calcMonthlyCashFlow, computeSafeToSpend, forecast30Day
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { AppPageShell } from '../components/AppPageShell';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
+import { formatCategoryLabel } from '../lib/categoryDisplay';
 
 import type { Citation } from '../store/useStore';
 
 /** v3: one-time dismissal persisted across sessions/devices on this browser. */
-const LOW_TAX_RESERVE_DISMISS_KEY = 'oweable_dismiss_dashboard_low_tax_reserve_v3';
 const DASHBOARD_CALM_MODE_KEY = 'oweable_dashboard_calm_mode_v1';
-
-function parseLowTaxDismissed(): boolean {
-  try {
-    return localStorage.getItem(LOW_TAX_RESERVE_DISMISS_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
+const LOW_TAX_RESERVE_SNOOZE_UNTIL_KEY = 'oweable_low_tax_reserve_snooze_until_v1';
+const SAFE_TO_SPEND_MIN_PROMPT = 5;
 
 function parseCalmModeEnabled(): boolean {
   try {
     return localStorage.getItem(DASHBOARD_CALM_MODE_KEY) === '1';
   } catch {
     return false;
+  }
+}
+
+function parseLowTaxSnoozeUntil(): number {
+  try {
+    const raw = localStorage.getItem(LOW_TAX_RESERVE_SNOOZE_UNTIL_KEY);
+    const parsed = raw ? Number(raw) : 0;
+    return Number.isFinite(parsed) ? parsed : 0;
+  } catch {
+    return 0;
   }
 }
 
@@ -74,7 +78,7 @@ export default function Dashboard() {
   const isLoading = useStore((state) => state.isLoading);
   const [isCitationModalOpen, setIsCitationModalOpen] = useState(false);
   const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
-  const [dismissedLowTaxReserve, setDismissedLowTaxReserve] = useState<boolean>(() => parseLowTaxDismissed());
+  const [lowTaxReserveSnoozeUntil, setLowTaxReserveSnoozeUntil] = useState<number>(() => parseLowTaxSnoozeUntil());
   const [calmMode, setCalmMode] = useState<boolean>(() => parseCalmModeEnabled());
   /** Stable anchor for citation due dates (matches Obligations / safe-to-spend math). */
   const [scheduleBaseMs] = useState(() => Date.now());
@@ -140,6 +144,14 @@ export default function Dashboard() {
     const totalMonthlyCommitted = cashFlow.fixedExpenses + cashFlow.subscriptions;
     return Math.max(0, (totalMonthlyCommitted / monthlyIncome) * 100);
   }, [cashFlow.fixedExpenses, cashFlow.subscriptions, monthlyIncome]);
+  const spendingBenchmark = useMemo(() => {
+    if (spendingShareOfIncome === null) return null;
+    if (spendingShareOfIncome <= 30) return { label: 'Well under budget', emoji: '🟢', tone: 'text-emerald-400' };
+    if (spendingShareOfIncome <= 50) return { label: 'On track', emoji: '🟡', tone: 'text-amber-300' };
+    if (spendingShareOfIncome <= 75) return { label: 'Approaching limit', emoji: '🟠', tone: 'text-amber-400' };
+    if (spendingShareOfIncome <= 100) return { label: 'At limit', emoji: '🔴', tone: 'text-rose-400' };
+    return { label: 'Over budget', emoji: '🔴', tone: 'text-rose-400' };
+  }, [spendingShareOfIncome]);
 
   const weeklySpendingRecap = useMemo(() => {
     const now = new Date();
@@ -165,6 +177,9 @@ export default function Dashboard() {
       topCategory: topCategory?.name ?? null,
     };
   }, [transactions]);
+  const weeklyTopCategoryLabel = weeklySpendingRecap.topCategory
+    ? formatCategoryLabel(weeklySpendingRecap.topCategory)
+    : null;
 
   const next30DayBills = useMemo(() => {
     const now = new Date();
@@ -200,30 +215,79 @@ export default function Dashboard() {
       }),
     [liquidCash, cashFlow.surplus, bills, incomes, subscriptions, debts, citations, scheduleBaseMs],
   );
+  const hasIncomeWithNextPayday = useMemo(
+    () => (incomes || []).some((inc) => inc?.status === 'active' && Boolean(inc?.nextDate)),
+    [incomes],
+  );
+  const showSafeToSpendPrompt =
+    !hasIncomeWithNextPayday || safeToSpend.dailySafeToSpend < SAFE_TO_SPEND_MIN_PROMPT;
 
   const survivalMonths = isFinite(liquidCash / (monthlyBurn || 1)) ? Math.max(0, liquidCash / (monthlyBurn || 1)) : 0;
+  const showLowRunwayCoach = survivalMonths < 1;
+  const nextBestMoveSteps = useMemo(() => {
+    const steps: string[] = [];
+    if (!hasIncomeWithNextPayday) {
+      steps.push('Log your next income source and payday so your spending window is accurate.');
+    }
+    if ((subscriptions || []).some((s) => s.status === 'active')) {
+      steps.push('Defer one non-essential subscription this week to extend runway immediately.');
+    }
+    const overdueCitation = (citations || []).find((c) => c.status === 'open' && c.daysLeft < 0);
+    if (overdueCitation) {
+      steps.push(`Resolve your overdue ${overdueCitation.type.toLowerCase()} before additional penalties accrue.`);
+    }
+    if (steps.length === 0) {
+      steps.push('Review due bills in the next 7 days and align payment timing with expected income.');
+    }
+    return steps.slice(0, 3);
+  }, [hasIncomeWithNextPayday, subscriptions, citations]);
   
-  const upcomingBills = useMemo(() => (bills || [])
-    .filter(b => b?.status === 'upcoming' && b?.dueDate)
-    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()), 
-  [bills]);
+  const dueSoonAndOverdueBills = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return (bills || [])
+      .filter((b) => b?.status !== 'paid' && b?.dueDate)
+      .map((b) => {
+        const dueDate = new Date(`${b.dueDate}T12:00:00`);
+        const diffDays = Math.floor((dueDate.getTime() - today.getTime()) / 86400000);
+        return { ...b, diffDays, isOverdue: diffDays < 0 };
+      })
+      .sort((a, b) => {
+        if (a.isOverdue !== b.isOverdue) return a.isOverdue ? -1 : 1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      });
+  }, [bills]);
+  const upcomingBills = useMemo(
+    () => dueSoonAndOverdueBills.filter((b) => !b.isOverdue),
+    [dueSoonAndOverdueBills],
+  );
+  const overdueBills = useMemo(
+    () => dueSoonAndOverdueBills.filter((b) => b.isOverdue),
+    [dueSoonAndOverdueBills],
+  );
 
   const taxInsolvencyRisk = useMemo(() => {
     const currentTaxLiability = (cashFlow?.taxReserve || 0) * 3; // Est quarterly
     return liquidCash < currentTaxLiability;
   }, [cashFlow.taxReserve, liquidCash]);
+  const estimatedQuarterlyLiability = useMemo(
+    () => (cashFlow.taxReserve || 0) * 3,
+    [cashFlow.taxReserve],
+  );
+  const taxReservePosition = liquidCash - estimatedQuarterlyLiability;
 
   const showLowTaxReserveAlert = useMemo(() => {
-    return taxInsolvencyRisk && !dismissedLowTaxReserve;
-  }, [taxInsolvencyRisk, dismissedLowTaxReserve]);
+    return taxInsolvencyRisk && scheduleBaseMs >= lowTaxReserveSnoozeUntil;
+  }, [taxInsolvencyRisk, lowTaxReserveSnoozeUntil, scheduleBaseMs]);
 
-  const dismissLowTaxReserveAlert = useCallback(() => {
+  const snoozeLowTaxReserveAlert = useCallback(() => {
+    const nextReminderAt = Date.now() + 3 * 24 * 60 * 60 * 1000;
     try {
-      localStorage.setItem(LOW_TAX_RESERVE_DISMISS_KEY, '1');
+      localStorage.setItem(LOW_TAX_RESERVE_SNOOZE_UNTIL_KEY, String(nextReminderAt));
     } catch {
       /* ignore quota / private mode */
     }
-    setDismissedLowTaxReserve(true);
+    setLowTaxReserveSnoozeUntil(nextReminderAt);
   }, []);
 
   const toggleCalmMode = useCallback(() => {
@@ -382,7 +446,7 @@ export default function Dashboard() {
 
   return (
     <AppPageShell>
-      <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-6">
+      <div className="space-y-8 w-full pb-8">
       
       {/* 1. Dashboard Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -391,13 +455,13 @@ export default function Dashboard() {
             {user?.avatar ? (
               <img src={user.avatar} alt="Profile" className="h-full w-full object-cover" />
             ) : (
-              <div className="h-full w-full flex items-center justify-center bg-white/10 text-content-primary text-xl font-sans font-semibold">
+              <div className="h-full w-full flex items-center justify-center bg-content-primary/10 text-content-primary text-xl font-sans font-semibold">
                 {(user?.firstName?.charAt(0) || '')}{(user?.lastName?.charAt(0) || '')}
               </div>
             )}
           </div>
           <div>
-            <h1 className="text-2xl font-medium tracking-tight text-white sm:text-3xl">
+            <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">
               Welcome back, <span className="text-content-primary">{user?.firstName || 'User'}</span>
             </h1>
             <p className="mt-1 text-sm font-medium text-content-secondary">Here is your financial overview for today.</p>
@@ -424,10 +488,10 @@ export default function Dashboard() {
               <TransitionLink to="/ingestion" className="block focus-app rounded-lg">
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                  className="bg-surface-raised border border-surface-border p-5 rounded-lg flex items-center justify-between hover:bg-white/[0.03] transition-all shadow-none group"
+                  className="bg-surface-raised border border-surface-border p-5 rounded-lg flex items-center justify-between hover:bg-content-primary/[0.03] transition-all shadow-none group"
                 >
                   <div className="flex items-center gap-5">
-                    <div className="w-10 h-10 bg-white/[0.06] rounded-full flex items-center justify-center shrink-0 border border-surface-border">
+                    <div className="w-10 h-10 bg-content-primary/[0.06] rounded-full flex items-center justify-center shrink-0 border border-surface-border">
                       <Inbox className="w-5 h-5 text-content-primary" />
                     </div>
                     <div>
@@ -445,10 +509,10 @@ export default function Dashboard() {
               <TransitionLink to="/bills" className="block focus-app rounded-lg">
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-                  className="bg-surface-raised border border-surface-border p-5 rounded-lg flex items-center justify-between hover:bg-white/[0.03] transition-all shadow-none group"
+                  className="bg-surface-raised border border-surface-border p-5 rounded-lg flex items-center justify-between hover:bg-content-primary/[0.03] transition-all shadow-none group"
                 >
                   <div className="flex items-center gap-5">
-                    <div className="relative w-10 h-10 bg-white/[0.06] rounded-full flex items-center justify-center shrink-0 border border-surface-border">
+                    <div className="relative w-10 h-10 bg-content-primary/[0.06] rounded-full flex items-center justify-center shrink-0 border border-surface-border">
                       <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-red-500 ring-2 ring-[#0a0a0a]" aria-hidden />
                       <ShieldAlert className="w-5 h-5 text-content-primary" />
                     </div>
@@ -473,10 +537,10 @@ export default function Dashboard() {
               >
                 <TransitionLink
                   to="/taxes"
-                  className="flex flex-1 items-center justify-between gap-4 p-5 min-w-0 hover:bg-white/[0.03] transition-all group focus-app rounded-lg sm:rounded-none"
+                  className="flex flex-1 items-center justify-between gap-4 p-5 min-w-0 hover:bg-content-primary/[0.03] transition-all group focus-app rounded-lg sm:rounded-none"
                 >
                   <div className="flex items-center gap-5 min-w-0">
-                    <div className="relative w-10 h-10 bg-white/[0.06] rounded-full flex items-center justify-center shrink-0 border border-surface-border">
+                    <div className="relative w-10 h-10 bg-content-primary/[0.06] rounded-full flex items-center justify-center shrink-0 border border-surface-border">
                       <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-amber-500 ring-2 ring-[#0a0a0a]" aria-hidden />
                       <ShieldAlert className="w-5 h-5 text-content-primary" aria-hidden />
                     </div>
@@ -490,12 +554,18 @@ export default function Dashboard() {
                   <ArrowRight className="w-5 h-5 text-content-tertiary shrink-0 group-hover:translate-x-1 transition-transform" aria-hidden />
                 </TransitionLink>
                 <div className="flex border-t border-surface-border sm:border-t-0 sm:border-l sm:border-surface-border">
+                  <TransitionLink
+                    to="/taxes"
+                    className="inline-flex min-h-10 w-full items-center justify-center px-4 py-2 text-sm font-medium text-content-primary hover:bg-content-primary/[0.04] transition-colors focus-app sm:w-auto"
+                  >
+                    Go to Taxes →
+                  </TransitionLink>
                   <button
                     type="button"
-                    onClick={dismissLowTaxReserveAlert}
-                    className="inline-flex min-h-10 w-full items-center justify-center px-4 py-2 text-sm font-medium text-content-secondary hover:bg-white/[0.04] transition-colors focus-app sm:w-auto"
+                    onClick={snoozeLowTaxReserveAlert}
+                    className="inline-flex min-h-10 w-full items-center justify-center px-4 py-2 text-sm font-medium text-content-secondary hover:bg-content-primary/[0.04] transition-colors focus-app sm:w-auto"
                   >
-                    Got it
+                    Remind me in 3 days
                   </button>
                 </div>
               </motion.div>
@@ -507,63 +577,76 @@ export default function Dashboard() {
       {/* 3. Primary Metrics Panel — anchor for sidebar "Cash flow" */}
       <section id="cash-flow" className="scroll-mt-24 space-y-6">
       <div className="rounded-lg border border-surface-border bg-surface-raised p-6 shadow-none">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" aria-hidden />
-              <Wallet className="h-4 w-4 shrink-0 text-content-secondary" aria-hidden />
-              <p className="metric-label normal-case text-content-secondary">Safe to spend (estimate)</p>
+        {showSafeToSpendPrompt ? (
+          <div className="rounded-lg border border-surface-border bg-surface-base/80 p-5 text-left">
+            <div className="flex items-center gap-2 mb-3">
+              <Wallet className="h-4 w-4 text-content-secondary" aria-hidden />
+              <p className="text-xs font-mono uppercase tracking-wider text-content-tertiary">Setup required</p>
             </div>
-            <p className="text-4xl sm:text-5xl font-mono font-bold text-white tabular-nums tracking-tight">
-              $<AnimatedValue value={safeToSpend.dailySafeToSpend} decimals={2} />
-              <span className="text-lg sm:text-xl font-sans font-medium text-content-tertiary ml-2">/ day</span>
+            <h3 className="text-xl font-semibold text-content-primary">Unlock your real spending window</h3>
+            <p className="mt-2 text-sm text-content-secondary max-w-2xl">
+              Add your income source and next payday to see how much you can safely spend each day.
             </p>
-            <p className="mt-2 text-sm text-content-secondary">
-              Through{' '}
-              <span className="text-content-primary font-medium">{safeToSpend.windowEndLabel}</span>
-              {safeToSpend.windowMode === 'to_next_payday'
-                ? ' (until your next income date)'
-                : ' (rest of this month — add an income with a next date for payday-based windows)'}
-              . Monthly surplus (modeled):{' '}
-              <span className="font-mono text-brand-profit">${safeToSpend.monthlySurplus.toLocaleString()}</span>.
-            </p>
+            <TransitionLink
+              to="/income"
+              className="mt-4 inline-flex min-h-10 items-center justify-center rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
+            >
+              Add Income →
+            </TransitionLink>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:shrink-0 lg:max-w-xl w-full text-left">
-            <div className="rounded-lg border border-surface-border bg-surface-base/80 px-4 py-3">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">Reserved in window</p>
-              <p className="text-lg font-mono text-content-primary tabular-nums">
-                ${safeToSpend.scheduledOutflowsTotal.toLocaleString()}
+        ) : (
+          <>
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" aria-hidden />
+                  <Wallet className="h-4 w-4 shrink-0 text-content-secondary" aria-hidden />
+                  <p className="metric-label normal-case text-content-secondary">Safe to spend (estimate)</p>
+                </div>
+                <p className="text-4xl sm:text-5xl font-mono font-bold text-content-primary tabular-nums tracking-tight">
+                  $<AnimatedValue value={safeToSpend.dailySafeToSpend} decimals={2} />
+                  <span className="text-lg sm:text-xl font-sans font-medium text-content-tertiary ml-2">/ day</span>
+                </p>
+                <p className="mt-2 text-sm text-content-secondary">
+                  Through <span className="text-content-primary font-medium">{safeToSpend.windowEndLabel}</span> (until your next income date). Monthly surplus (modeled):{' '}
+                  <span className="font-mono text-brand-profit">${safeToSpend.monthlySurplus.toLocaleString()}</span>.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:shrink-0 lg:max-w-xl w-full text-left">
+                <div className="rounded-lg border border-surface-border bg-surface-base/80 px-4 py-3">
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">Reserved in window</p>
+                  <p className="text-lg font-mono text-content-primary tabular-nums">
+                    ${safeToSpend.scheduledOutflowsTotal.toLocaleString()}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-surface-border bg-surface-base/80 px-4 py-3">
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">Cash after reservations</p>
+                  <p className="text-lg font-mono text-content-primary tabular-nums">
+                    ${safeToSpend.liquidAfterScheduled.toLocaleString()}
+                  </p>
+                </div>
+                <div className="rounded-lg border border-surface-border bg-surface-base/80 px-4 py-3">
+                  <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">Days in window</p>
+                  <p className="text-lg font-mono text-content-primary tabular-nums">{safeToSpend.daysInWindow}</p>
+                </div>
+              </div>
+            </div>
+            <details className="mt-5 border-t border-surface-border pt-4 text-left">
+              <summary className="cursor-pointer text-xs font-sans font-medium text-content-secondary hover:text-content-primary focus-app rounded-lg">
+                How this is calculated
+              </summary>
+              <p className="mt-3 text-xs text-content-tertiary leading-relaxed">
+                We take liquid cash (cash-type assets), subtract bills, subscriptions, minimum debt payments, and open fines with a due
+                date in this window (today through your next paycheck), then divide by the number of days in that window for a rough daily amount.
               </p>
-            </div>
-            <div className="rounded-lg border border-surface-border bg-surface-base/80 px-4 py-3">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">Cash after reservations</p>
-              <p className="text-lg font-mono text-content-primary tabular-nums">
-                ${safeToSpend.liquidAfterScheduled.toLocaleString()}
-              </p>
-            </div>
-            <div className="rounded-lg border border-surface-border bg-surface-base/80 px-4 py-3">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-1">Days in window</p>
-              <p className="text-lg font-mono text-content-primary tabular-nums">{safeToSpend.daysInWindow}</p>
-            </div>
-          </div>
-        </div>
-        <details className="mt-5 border-t border-surface-border pt-4 text-left">
-          <summary className="cursor-pointer text-xs font-sans font-medium text-content-secondary hover:text-content-primary focus-app rounded-lg">
-            How this is calculated
-          </summary>
-          <p className="mt-3 text-xs text-content-tertiary leading-relaxed">
-            We take liquid cash (cash-type assets), subtract bills, subscriptions, minimum debt payments, and open fines with a due
-            date in this window (today through your next paycheck, or month-end if no income date), then divide by the number of days
-            in that window for a rough daily amount. This is not financial advice — it does not include pending holds, investments,
-            or unplanned spending. Unusual pay schedules or one-off expenses can change what feels safe day to day; use this as a
-            directional guide, not a guarantee.
-          </p>
-        </details>
+            </details>
+          </>
+        )}
         <p className="mt-4 text-xs text-content-tertiary">
           Wondering if you can afford a specific purchase?{' '}
           <TransitionLink
             to="/owe-ai"
-            className="text-content-primary hover:text-white underline underline-offset-2 font-medium focus-app rounded-lg"
+            className="text-content-primary hover:text-content-secondary underline underline-offset-2 font-medium focus-app rounded-lg"
           >
             Ask Owe-AI
           </TransitionLink>
@@ -578,7 +661,7 @@ export default function Dashboard() {
           <div className="flex flex-wrap gap-x-5 gap-y-1">
             {spendingAnomalies.slice(0, 3).map(a => (
               <span key={a.category} className="text-xs text-content-secondary">
-                <span className="font-medium text-amber-300">{a.category}</span>
+                <span className="font-medium text-amber-300">{formatCategoryLabel(a.category)}</span>
                 {' '}is {a.overagePercent.toFixed(0)}% above your usual ${a.threeMonthAvg.toFixed(0)}/mo
               </span>
             ))}
@@ -594,7 +677,7 @@ export default function Dashboard() {
           </p>
           <p className="mt-1 text-xs text-content-secondary">
             {weeklySpendingRecap.txCount} expense transactions
-            {weeklySpendingRecap.topCategory ? ` • Top category: ${weeklySpendingRecap.topCategory}` : ''}.
+            {weeklyTopCategoryLabel ? ` • Top category: ${weeklyTopCategoryLabel}` : ''}.
           </p>
         </div>
 
@@ -604,6 +687,14 @@ export default function Dashboard() {
             {spendingShareOfIncome === null ? 'Add income to unlock this' : `${spendingShareOfIncome.toFixed(0)}% of monthly income`}
           </p>
           <p className="mt-1 text-xs text-content-secondary">Fixed bills, debt minimums, and subscriptions as share of income.</p>
+          {spendingBenchmark && (
+            <p className={`mt-1 text-xs font-medium ${spendingBenchmark.tone}`}>
+              {spendingBenchmark.label} {spendingBenchmark.emoji}
+            </p>
+          )}
+          <p className="mt-1 text-[11px] text-content-tertiary">
+            This represents your tracked spending as a % of your logged monthly income.
+          </p>
         </div>
 
         <div className="rounded-lg border border-surface-border bg-surface-raised p-4 text-left">
@@ -631,6 +722,7 @@ export default function Dashboard() {
               ) : null;
             })()}
           </div>
+          <p className="text-xs text-content-secondary mb-2">Balance ($)</p>
           <SafeResponsiveContainer width="100%" height={100}>
             <AreaChart data={cashFlowForecast} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
               <defs>
@@ -640,15 +732,29 @@ export default function Dashboard() {
                 </linearGradient>
               </defs>
               <XAxis dataKey="label" tick={{ fontSize: 9, fill: '#6b7280' }} tickLine={false} axisLine={false} interval={6} />
-              <YAxis hide />
+              <YAxis tick={{ fontSize: 9, fill: '#6b7280' }} tickLine={false} axisLine={false} width={36} />
               <Tooltip
                 {...rechartsTooltipStableProps}
                 formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Balance']}
                 contentStyle={{ background: 'var(--surface-elevated)', border: '1px solid var(--surface-border)', borderRadius: '4px', fontSize: '11px' }}
               />
+              {Math.min(...cashFlowForecast.map((d) => d.balance)) < 0 && (
+                <ReferenceArea y1={0} y2={Math.min(...cashFlowForecast.map((d) => d.balance))} fill="rgba(244,63,94,0.2)" />
+              )}
+              <ReferenceLine y={0} stroke="#6b7280" strokeDasharray="3 3" />
+              <ReferenceLine x={cashFlowForecast[0]?.label} stroke="#9ca3af" strokeDasharray="2 2" label={{ value: 'Today', position: 'insideTopLeft', fill: '#9ca3af', fontSize: 9 }} />
               <Area type="monotone" dataKey="balance" stroke="#6366f1" fill="url(#forecastGrad)" strokeWidth={1.5} dot={false} />
             </AreaChart>
           </SafeResponsiveContainer>
+          <div className="mt-2 flex flex-wrap items-center gap-4 text-[11px] text-content-tertiary">
+            <span>— Projected Balance</span>
+            <span>--- Safe to Spend floor</span>
+          </div>
+          <p className="mt-1 text-[11px] text-content-secondary">
+            If current patterns continue, your projected balance could reach $
+            {cashFlowForecast[cashFlowForecast.length - 1]?.balance.toFixed(0)} by {cashFlowForecast[cashFlowForecast.length - 1]?.label}.
+          </p>
+          <p className="mt-1 text-[11px] text-content-tertiary">Dates shown on X-axis (e.g., Apr 18, Apr 25, May 2).</p>
         </div>
       )}
 
@@ -660,7 +766,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-start mb-8">
             <div className="text-left w-full">
               <p className="metric-label mb-3">Operating Runway</p>
-              <h2 className="text-5xl sm:text-6xl font-mono font-bold text-white tracking-tighter tabular-nums leading-none data-numeric">
+              <h2 className="text-5xl sm:text-6xl font-mono font-bold text-content-primary tracking-tighter tabular-nums leading-none data-numeric">
                 <AnimatedValue value={survivalMonths} decimals={1} />
                 <span className="text-2xl font-sans text-content-tertiary font-medium ml-3 uppercase tracking-wide">Months</span>
               </h2>
@@ -674,7 +780,7 @@ export default function Dashboard() {
             </div>
             <div className="text-left">
               <p className="metric-label mb-2">Monthly Expenses</p>
-              <p className="text-2xl font-mono text-white font-bold tabular-nums">${Math.round(monthlyBurn).toLocaleString()}</p>
+              <p className="text-2xl font-mono text-content-primary font-bold tabular-nums">${Math.round(monthlyBurn).toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -683,17 +789,41 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
               <p className="metric-label mb-3">Net Worth</p>
-              <p className="text-2xl sm:text-4xl font-mono text-white font-bold tabular-nums data-numeric">$<AnimatedValue value={netWorth} /></p>
+              <p className="text-2xl sm:text-4xl font-mono text-content-primary font-bold tabular-nums data-numeric">$<AnimatedValue value={netWorth} /></p>
             </div>
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
               <p className="metric-label mb-3">Total Assets</p>
-              <p className="text-2xl sm:text-4xl font-mono text-white font-bold tabular-nums data-numeric">$<AnimatedValue value={totalAssets} /></p>
+              <p className="text-2xl sm:text-4xl font-mono text-content-primary font-bold tabular-nums data-numeric">$<AnimatedValue value={totalAssets} /></p>
             </div>
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
-              <p className="metric-label mb-3 flex items-center gap-2">
-                Tax Savings <ShieldCheck className="w-3.5 h-3.5 text-brand-tax" />
-              </p>
-              <p className="text-2xl sm:text-4xl font-mono text-brand-tax font-bold tabular-nums data-numeric">-$<AnimatedValue value={cashFlow.taxReserve} /></p>
+              {taxReservePosition > 0 ? (
+                <>
+                  <p className="metric-label mb-3 flex items-center gap-2 text-emerald-400">
+                    Tax Reserve <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  </p>
+                  <p className="text-2xl sm:text-4xl font-mono text-emerald-400 font-bold tabular-nums data-numeric">
+                    $<AnimatedValue value={taxReservePosition} />
+                  </p>
+                </>
+              ) : taxReservePosition === 0 ? (
+                <>
+                  <p className="metric-label mb-3">Tax Reserve</p>
+                  <p className="text-2xl sm:text-4xl font-mono text-content-primary font-bold tabular-nums data-numeric">$0</p>
+                  <TransitionLink to="/taxes" className="mt-2 inline-flex text-xs text-content-secondary hover:text-content-primary">
+                    Start saving for taxes →
+                  </TransitionLink>
+                </>
+              ) : (
+                <>
+                  <p className="metric-label mb-3 text-rose-400">Tax Shortfall</p>
+                  <p className="text-2xl sm:text-4xl font-mono text-rose-400 font-bold tabular-nums data-numeric">
+                    $<AnimatedValue value={Math.abs(taxReservePosition)} />
+                  </p>
+                  <p className="mt-2 text-xs text-content-secondary">
+                    You're ${Math.abs(taxReservePosition).toLocaleString()} below your estimated quarterly liability.
+                  </p>
+                </>
+              )}
             </div>
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
               <p className="metric-label mb-3">Monthly Surplus</p>
@@ -701,6 +831,19 @@ export default function Dashboard() {
             </div>
         </div>
       </div>
+      {showLowRunwayCoach && (
+        <div className="rounded-lg border border-surface-border bg-surface-raised p-5">
+          <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary mb-2">Your Next Best Move · Owe-AI</p>
+          <p className="text-sm text-content-secondary mb-3">
+            Your runway is critically short. Focus on the highest-impact moves first:
+          </p>
+          <ol className="space-y-1.5 text-sm text-content-primary list-decimal pl-5">
+            {nextBestMoveSteps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        </div>
+      )}
       </section>
 
       {/* 4. Active Intelligence Grid — only modules that have underlying data */}
@@ -735,7 +878,7 @@ export default function Dashboard() {
                 </div>
                 <div className="bg-surface-base border border-surface-border p-6 rounded-lg">
                   <p className="text-xs font-mono uppercase tracking-wider text-content-tertiary mb-2">Lifetime recovered</p>
-                  <p className="text-4xl font-mono text-white font-bold tabular-nums">${lifetimeTaxShield.toLocaleString()}</p>
+                  <p className="text-4xl font-mono text-content-primary font-bold tabular-nums">${lifetimeTaxShield.toLocaleString()}</p>
                 </div>
               </div>
             )}
@@ -774,11 +917,11 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <div className="flex items-baseline gap-3 mb-4">
-                    <p className="text-4xl font-mono text-white tabular-nums">${burnVelocity.totalSpent.toFixed(0)}</p>
+                    <p className="text-4xl font-mono text-content-primary tabular-nums">${burnVelocity.totalSpent.toFixed(0)}</p>
                     <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-wider">/ {burnVelocity.frequency} txs</p>
                   </div>
                   {burnVelocity.isHighVelocity && (
-                    <p className="text-[11px] font-mono text-content-secondary bg-white/[0.03] p-3 rounded-lg border border-surface-border">
+                    <p className="text-[11px] font-mono text-content-secondary bg-content-primary/[0.03] p-3 rounded-lg border border-surface-border">
                       Velocity Limit Exceeded
                     </p>
                   )}
@@ -806,7 +949,7 @@ export default function Dashboard() {
                       Prioritizing: {avalancheTarget.name}
                     </p>
                     <div className="flex justify-between items-baseline">
-                      <span className="text-4xl font-mono text-white tabular-nums">${avalancheTarget.remaining.toLocaleString()}</span>
+                      <span className="text-4xl font-mono text-content-primary tabular-nums">${avalancheTarget.remaining.toLocaleString()}</span>
                       <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{debtProgress.toFixed(0)}% Clear</span>
                     </div>
                   </div>
@@ -830,7 +973,7 @@ export default function Dashboard() {
           <div className="bg-surface-raised rounded-lg border border-surface-border p-6 shadow-none">
             <div className="flex justify-between items-center mb-6">
               <div>
-                <h3 className="text-sm font-sans font-semibold text-white tracking-tight">Cash Flow Trajectory</h3>
+                <h3 className="text-sm font-sans font-semibold text-content-primary tracking-tight">Cash Flow Trajectory</h3>
                 <p className="text-xs font-sans text-content-secondary mt-1">Projected balances across all accounts</p>
               </div>
               <select className="h-10 rounded-lg border border-surface-border bg-surface-base px-3 text-sm font-medium text-content-secondary focus-app-field cursor-pointer">
@@ -871,17 +1014,19 @@ export default function Dashboard() {
               <div className="bg-surface-raised rounded-lg border border-surface-border shadow-none flex flex-col h-fit max-h-[350px]">
                 <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-transparent">
                   <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-content-secondary">Upcoming Bills</h3>
-                  <TransitionLink to="/bills" className="inline-flex h-9 items-center rounded-lg px-3 text-sm font-medium text-content-primary hover:bg-white/[0.04] hover:text-white transition-colors focus-app">
+                  <TransitionLink to="/bills" className="inline-flex h-9 items-center rounded-lg px-3 text-sm font-medium text-content-primary hover:bg-content-primary/[0.04] hover:text-content-secondary transition-colors focus-app">
                     See all
                   </TransitionLink>
                 </div>
 
                 <div className="overflow-y-auto focus-app">
                   <ul>
-                    {upcomingBills.slice(0, 4).map((bill) => (
+                    {[...overdueBills.slice(0, 2), ...upcomingBills.slice(0, 4)].map((bill) => (
                       <li
                         key={bill.id}
-                        className="px-6 py-4 hover:bg-white/[0.03] transition-colors flex justify-between items-center group cursor-default border-b border-transparent last:border-0"
+                        className={`px-6 py-4 transition-colors flex justify-between items-center group cursor-default border-b border-transparent last:border-0 ${
+                          bill.isOverdue ? 'bg-rose-500/10 hover:bg-rose-500/15' : 'hover:bg-content-primary/[0.03]'
+                        }`}
                       >
                         <div className="flex items-center gap-4">
                           <div className="text-xs font-mono text-content-tertiary w-10 text-center uppercase">
@@ -897,7 +1042,14 @@ export default function Dashboard() {
                               'N/A'
                             )}
                           </div>
-                          <p className="text-sm font-sans font-medium text-content-primary">{bill.biller}</p>
+                          <div>
+                            <p className="text-sm font-sans font-medium text-content-primary">{bill.biller}</p>
+                            {bill.isOverdue ? (
+                              <p className={`text-[11px] font-medium ${Math.abs(bill.diffDays) <= 7 ? 'text-amber-300' : 'text-rose-400'}`}>
+                                ⚠️ OVERDUE — {Math.abs(bill.diffDays)} day{Math.abs(bill.diffDays) === 1 ? '' : 's'}
+                              </p>
+                            ) : null}
+                          </div>
                         </div>
                         <p className="text-sm font-mono text-content-secondary font-medium tabular-nums">${bill.amount.toFixed(2)}</p>
                       </li>
@@ -915,24 +1067,53 @@ export default function Dashboard() {
                 <div className="p-0 focus-app">
                   <ul>
                     {openCitations.map((citation) => (
-                      <li key={citation.id} className="px-6 py-4 hover:bg-white/[0.03] transition-colors border-b border-transparent last:border-0">
+                      <li
+                        key={citation.id}
+                        className={`px-6 py-4 transition-colors border-b border-transparent last:border-0 ${
+                          citation.daysLeft < 0
+                            ? Math.abs(citation.daysLeft) >= 8
+                              ? 'bg-rose-500/12 hover:bg-rose-500/15'
+                              : 'bg-amber-500/10 hover:bg-amber-500/12'
+                            : 'hover:bg-content-primary/[0.03]'
+                        }`}
+                      >
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex items-start gap-3">
                             <div
                               className={`w-9 h-9 rounded bg-surface-base border flex flex-col justify-center items-center shrink-0 ${
-                                citation.daysLeft <= 7 ? 'text-rose-400 border-rose-500/30' : 'text-content-tertiary border-surface-border'
+                                citation.daysLeft < 0
+                                  ? Math.abs(citation.daysLeft) >= 8
+                                    ? 'text-rose-400 border-rose-500/30'
+                                    : 'text-amber-300 border-amber-500/30'
+                                  : citation.daysLeft <= 7
+                                    ? 'text-rose-400 border-rose-500/30'
+                                    : 'text-content-tertiary border-surface-border'
                               }`}
                             >
-                              <span className="text-xs font-bold font-mono leading-none">{citation.daysLeft}</span>
-                              <span className="text-[11px] font-sans font-medium text-content-tertiary">Days</span>
+                              <span className="text-xs font-bold font-mono leading-none">{Math.abs(citation.daysLeft)}</span>
+                              <span className="text-[11px] font-sans font-medium text-content-tertiary">
+                                {citation.daysLeft < 0 ? 'Late' : 'Days'}
+                              </span>
                             </div>
                             <div>
                               <p className="text-sm font-sans font-medium text-content-primary">{citation.type}</p>
                               <p className="text-xs font-sans text-content-tertiary">{citation.jurisdiction}</p>
+                              {citation.daysLeft < 0 ? (
+                                <p className={`mt-1 text-[11px] font-semibold ${Math.abs(citation.daysLeft) >= 8 ? 'text-rose-400' : 'text-amber-300'}`}>
+                                  ⚠️ OVERDUE — {Math.abs(citation.daysLeft)} day{Math.abs(citation.daysLeft) === 1 ? '' : 's'}
+                                </p>
+                              ) : null}
                             </div>
                           </div>
                           <p className="text-sm font-mono font-bold text-content-secondary tabular-nums">${citation.amount.toFixed(2)}</p>
                         </div>
+                        {citation.daysLeft < 0 && (
+                          <p className="mb-3 text-[11px] text-content-secondary leading-relaxed">
+                            {citation.jurisdiction.toLowerCase().includes('rhode island')
+                              ? 'Rhode Island toll violations may accrue additional penalties after 30 days. Resolve now to avoid escalation.'
+                              : 'This overdue ticket may accrue additional penalties if unresolved. Resolve now to avoid escalation.'}
+                          </p>
+                        )}
                         <button
                           type="button"
                           onClick={() => {
@@ -940,12 +1121,16 @@ export default function Dashboard() {
                             setIsCitationModalOpen(true);
                           }}
                           className={`inline-flex min-h-10 w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-app ${
-                            citation.daysLeft <= 7
-                              ? 'bg-white text-black hover:bg-neutral-200'
-                              : 'bg-transparent border border-surface-border hover:bg-white/[0.04] text-content-primary'
+                            citation.daysLeft < 0
+                              ? Math.abs(citation.daysLeft) >= 8
+                                ? 'bg-rose-500 text-white hover:bg-rose-400'
+                                : 'bg-amber-500 text-surface-base hover:bg-amber-400'
+                              : citation.daysLeft <= 7
+                                ? 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover'
+                                : 'bg-transparent border border-surface-border hover:bg-content-primary/[0.04] text-content-primary'
                           }`}
                         >
-                          Resolve Ticket
+                          {citation.daysLeft < 0 ? 'Resolve Now →' : 'Resolve Ticket'}
                         </button>
                       </li>
                     ))}
@@ -968,7 +1153,7 @@ export default function Dashboard() {
               </Dialog.Title>
               <button 
                 onClick={() => setIsCitationModalOpen(false)} 
-                className="text-content-tertiary hover:text-white transition-colors focus-app rounded-lg"
+                className="text-content-tertiary hover:text-content-primary transition-colors focus-app rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -977,12 +1162,15 @@ export default function Dashboard() {
             {selectedCitation && (
               <div className="p-6 space-y-6">
                 <div>
-                  <h4 className="text-lg font-sans font-medium text-white mb-1">{selectedCitation.type}</h4>
+                  <h4 className="text-lg font-sans font-medium text-content-primary mb-1">{selectedCitation.type}</h4>
                   <p className="text-sm text-content-tertiary">{selectedCitation.jurisdiction}</p>
                   {selectedCitation.daysLeft <= 7 && (
-                     <p className="text-xs font-medium text-rose-400 mt-2 bg-rose-500/10 px-2 py-1 rounded inline-block">
-                       Due in {selectedCitation.daysLeft} days. ${selectedCitation.penaltyFee} penalty fee approaching.
-                     </p>
+                    <p className="text-xs font-medium text-rose-400 mt-2 bg-rose-500/10 px-2 py-1 rounded inline-block">
+                      {selectedCitation.daysLeft < 0
+                        ? `Overdue by ${Math.abs(selectedCitation.daysLeft)} days.`
+                        : `Due in ${selectedCitation.daysLeft} days.`}{' '}
+                      ${selectedCitation.penaltyFee} penalty fee approaching.
+                    </p>
                   )}
                 </div>
                 
@@ -1014,7 +1202,7 @@ export default function Dashboard() {
                         href={safePaymentUrl}
                         target="_blank"
                         rel="noreferrer noopener"
-                        className="flex items-center justify-center gap-2 w-full bg-white text-black hover:bg-neutral-200 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors focus-app"
+                        className="flex items-center justify-center gap-2 w-full bg-brand-cta text-surface-base hover:bg-brand-cta-hover rounded-lg px-4 py-2.5 text-sm font-medium transition-colors focus-app"
                       >
                         Open Payment Portal <ExternalLink className="w-4 h-4" />
                       </a>

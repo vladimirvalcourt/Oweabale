@@ -28,7 +28,7 @@ export function AdminControlsPanel({
         <button type="button" onClick={onToggleMaintenance} className="w-full text-left px-3 py-2 rounded-lg bg-rose-500/10 text-rose-300 border border-rose-500/20">
           {isMaintenance ? 'Disable maintenance mode' : 'Enable maintenance mode'}
         </button>
-        <button type="button" onClick={onTogglePlaid} className="w-full text-left px-3 py-2 rounded-lg bg-white/[0.05] text-content-secondary border border-surface-border">
+        <button type="button" onClick={onTogglePlaid} className="w-full text-left px-3 py-2 rounded-lg bg-content-primary/[0.05] text-content-secondary border border-surface-border">
           {isPlaidEnabled ? 'Disable bank syncing' : 'Enable bank syncing'}
         </button>
         <textarea

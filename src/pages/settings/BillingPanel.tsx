@@ -285,7 +285,7 @@ function BillingPanelInner() {
                 type="button"
                 onClick={onManageBilling}
                 disabled={isWorking}
-                className="shrink-0 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white shadow-[0_0_15px_rgba(16,185,129,0.25)] transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                className="shrink-0 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white shadow-none transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isWorking ? 'Working...' : 'Manage billing'}
               </button>
@@ -308,7 +308,7 @@ function BillingPanelInner() {
             </div>
           </div>
         ) : (
-          <div className="bg-white/[0.05] border border-surface-border rounded-lg p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-content-primary/[0.05] border border-surface-border rounded-lg p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
               <h4 className="flex items-center gap-2 font-medium text-content-primary">Upgrade to Full Suite</h4>
               <p className="text-sm text-content-secondary/70 mt-1 max-w-md">
@@ -320,7 +320,7 @@ function BillingPanelInner() {
               type="button"
               onClick={onUpgrade}
               disabled={isWorking}
-              className="shrink-0 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-colors hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
+              className="shrink-0 rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isWorking ? 'Working...' : `Upgrade — $${monthlyPrice.toFixed(2)}/mo`}
             </button>
@@ -372,7 +372,7 @@ function BillingPanelInner() {
           type="button"
           onClick={onManageBilling}
           disabled={isWorking}
-          className="text-sm font-medium text-content-primary hover:text-white transition-colors bg-surface-elevated px-4 py-2 border border-surface-border rounded-lg focus-app"
+          className="text-sm font-medium text-content-primary hover:text-content-secondary transition-colors bg-surface-elevated px-4 py-2 border border-surface-border rounded-lg focus-app"
         >
           Manage in Stripe Portal
         </button>

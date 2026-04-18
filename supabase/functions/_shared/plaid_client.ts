@@ -1,3 +1,5 @@
+import { fetchWithTimeout } from './fetchWithTimeout.ts';
+
 export function plaidBaseUrl(): string {
   const env = (Deno.env.get('PLAID_ENV') ?? 'sandbox').toLowerCase();
   if (env === 'production') return 'https://production.plaid.com';
@@ -14,7 +16,7 @@ export async function plaidPost<T = Record<string, unknown>>(
   if (!clientId || !secret) {
     throw new Error('Plaid is not configured (PLAID_CLIENT_ID / PLAID_SECRET)');
   }
-  const res = await fetch(`${plaidBaseUrl()}${path}`, {
+  const res = await fetchWithTimeout(`${plaidBaseUrl()}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -22,6 +24,8 @@ export async function plaidPost<T = Record<string, unknown>>(
       secret,
       ...body,
     }),
+    timeoutMs: 20_000,
+    retries: 1,
   });
   const json = (await res.json()) as T & {
     error_message?: string;

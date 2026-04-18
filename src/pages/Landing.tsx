@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { TransitionLink } from '../components/TransitionLink';
 import Footer from '../components/Footer';
 import { ArrowRight, UploadCloud, Target, BarChart2, TrendingUp, BookOpen, CalendarClock, Quote } from 'lucide-react';
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 import { useSEO } from '../hooks/useSEO';
@@ -30,56 +29,6 @@ function useInView(threshold = 0.15) {
   }, [threshold]);
 
   return [ref, isVisible] as const;
-}
-
-const CYCLE_WORDS = [
-  'Anyone with Debt',
-  'Uber Drivers',
-  'Paying Bills',
-  'Managing Debt',
-  'Building Stability',
-  'DoorDashers',
-  'Financial Freedom'
-];
-
-function WordCycler() {
-  const [index, setIndex] = useState(0);
-  const reduceMotion = useReducedMotion();
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % CYCLE_WORDS.length);
-    }, 3000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const longestWord = CYCLE_WORDS.reduce((a, b) => a.length > b.length ? a : b);
-
-  return (
-    <span className="inline-grid grid-cols-1 grid-rows-1 relative text-left align-baseline min-h-[1.1em]">
-      {/* Invisible spacer reserves width/height so cycling copy does not shift layout */}
-      <span className="col-start-1 row-start-1 invisible pointer-events-none select-none pr-1">
-        {longestWord}.
-      </span>
-      
-      {reduceMotion ? (
-        <span className="text-content-primary col-start-1 row-start-1 inline-block">{CYCLE_WORDS[index]}.</span>
-      ) : (
-        <AnimatePresence mode="wait">
-          <motion.span
-            key={CYCLE_WORDS[index]}
-            initial={{ y: '10%', opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: '-10%', opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-            className="text-content-primary col-start-1 row-start-1 inline-block"
-          >
-            {CYCLE_WORDS[index]}.
-          </motion.span>
-        </AnimatePresence>
-      )}
-    </span>
-  );
 }
 
 const FAQ_ITEMS_BASE = [
@@ -134,6 +83,9 @@ const TESTIMONIALS = [
     role: 'Household bills & two kids’ schedules',
     region: 'Texas',
     tag: 'Bills & reminders',
+    initials: 'DR',
+    workType: 'Freelance Designer, Fiverr',
+    platform: 'Fiverr',
   },
   {
     quote:
@@ -142,6 +94,9 @@ const TESTIMONIALS = [
     role: 'Credit card & medical debt payoff',
     region: 'Pennsylvania',
     tag: 'Debt tools',
+    initials: 'JK',
+    workType: 'Self-employed Handyman, Taskrabbit',
+    platform: 'Taskrabbit',
   },
   {
     quote:
@@ -150,6 +105,9 @@ const TESTIMONIALS = [
     role: 'Gig driver + part-time retail',
     region: 'Ohio',
     tag: 'Variable income',
+    initials: 'MT',
+    workType: 'DoorDash + Uber Driver',
+    platform: 'DoorDash',
   },
   {
     quote:
@@ -158,6 +116,9 @@ const TESTIMONIALS = [
     role: 'Self-employed, design',
     region: 'Washington',
     tag: 'Document scanning',
+    initials: 'PM',
+    workType: 'Independent Brand Designer',
+    platform: 'Dribbble',
   },
   {
     quote:
@@ -166,6 +127,9 @@ const TESTIMONIALS = [
     role: 'Couple, migrated from spreadsheets',
     region: 'Florida',
     tag: 'One dashboard',
+    initials: 'AC',
+    workType: 'Freelance Video Editor',
+    platform: 'Upwork',
   },
   {
     quote:
@@ -174,13 +138,18 @@ const TESTIMONIALS = [
     role: 'Single parent, shift work',
     region: 'Georgia',
     tag: 'Calendar & due soon',
+    initials: 'JL',
+    workType: '1099 Photographer, Thumbtack',
+    platform: 'Thumbtack',
   },
 ] as const;
 
 export default function Landing() {
   useSEO({
-    title: 'Oweable — Financial OS for Debt, Bills & Financial Clarity',
-    description: 'Oweable is the financial operating system for anyone dealing with debt, bills, or financial pressure. Track spending, pay off debt, manage bills, and build net worth — all in one dashboard.',
+    title: 'Oweable — The Financial OS for Gig Workers, Freelancers & the Self-Employed',
+    description: 'Oweable is the financial operating system for gig workers, freelancers, and the self-employed. Track variable income, estimate quarterly taxes, pay down debt, and stay ahead of every bill in one command center.',
+    ogTitle: 'Oweable — The Financial OS for Gig Workers, Freelancers & the Self-Employed',
+    ogDescription: 'Track variable income, estimate quarterly taxes, pay down debt, and stay ahead of every bill in one precision command center built for 1099 life.',
     canonical: 'https://www.oweable.com/',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -188,7 +157,7 @@ export default function Landing() {
   const [scrolled, setScrolled] = useState(false);
   const user = useStore((state) => state.user);
   
-  const [heroRef, heroVisible] = useInView(0.1);
+  const [heroRef] = useInView(0.1);
   const [archRef, archVisible] = useInView(0.1);
   const [testimonialsRef, testimonialsVisible] = useInView(0.12);
 
@@ -201,12 +170,12 @@ export default function Landing() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-white/15 flex flex-col">
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-content-primary/15 flex flex-col">
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-black/55 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40 border-surface-border' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <TransitionLink to="/" className="brand-header-text flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden />
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" aria-hidden />
             Oweable
           </TransitionLink>
           <div className="hidden md:flex items-center gap-8 text-sm text-content-tertiary">
@@ -221,14 +190,14 @@ export default function Landing() {
                   useStore.getState().signOut();
                   toast.success('Session Terminated');
                 }}
-                className="hidden sm:block px-6 py-2 bg-transparent border border-surface-border text-content-secondary hover:text-content-primary hover:bg-white/[0.04] text-sm font-sans font-medium transition-colors rounded-lg"
+                className="hidden sm:block px-6 py-2 bg-transparent border border-surface-border text-content-secondary hover:text-content-primary hover:bg-content-primary/[0.04] text-sm font-sans font-medium transition-colors rounded-lg"
               >
                 Sign out
               </button>
             )}
             <TransitionLink 
               to={user?.id ? "/dashboard" : "/auth"} 
-              className="px-6 py-2 rounded-lg bg-white text-black hover:bg-neutral-200 text-sm font-sans font-medium shadow-none transition-colors"
+              className="px-6 py-2 rounded-lg bg-brand-cta text-surface-base hover:bg-brand-cta-hover text-sm font-sans font-medium shadow-none transition-colors"
             >
               {user?.id ? "Open dashboard" : "Sign in"}
             </TransitionLink>
@@ -245,25 +214,57 @@ export default function Landing() {
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
               Bank-grade Security
             </div>
+
+            <p className="text-xs text-content-secondary mb-4">
+              Join <span className="text-content-primary font-medium">3,000+ freelancers and gig workers</span> building financial clarity with Oweable.
+            </p>
             
             <h1 className="text-4xl md:text-6xl xl:text-7xl font-sans font-medium tracking-[-0.03em] text-content-primary mb-8 leading-[1.05]">
-              The Operating System<br/>
-              <span className="whitespace-nowrap inline-flex items-baseline gap-[0.2em]">
-                for <WordCycler />
-              </span>
+              The Financial OS for<br />
+              Gig Workers, Freelancers &amp; the Self-Employed
             </h1>
             
             <p className="text-lg font-medium text-content-secondary max-w-lg leading-[1.6] mb-10 border-l border-surface-border pl-6">
-              A precision command center to tame your bills, eliminate debt, track your income, and build financial clarity — no matter where you're starting from.
+              No W-2? No problem. Oweable handles variable income, quarterly tax estimates, debt payoff planning, and bill deadlines in one precision command center.
             </p>
             
-            <TransitionLink 
-              to={user?.id ? "/dashboard" : "/auth"} 
-              className="group flex items-center gap-4 bg-white text-black hover:bg-neutral-200 px-8 py-4 text-sm font-sans font-medium shadow-none rounded-lg transition-colors"
-            >
-              {user?.id ? "Open dashboard" : "Get started for free"}
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </TransitionLink>
+            <div className="w-full max-w-xl">
+              <TransitionLink
+                to={user?.id ? "/dashboard" : "/auth"}
+                className="group inline-flex items-center gap-4 bg-brand-cta text-surface-base hover:bg-brand-cta-hover px-8 py-4 text-sm font-sans font-medium shadow-none rounded-lg transition-colors"
+              >
+                {user?.id ? "Open dashboard" : "Get started for free"}
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </TransitionLink>
+
+              <p className="mt-3 text-xs text-content-tertiary">
+                No credit card required · Cancel anytime · Free forever on Tracker tier.
+              </p>
+
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="rounded-lg border border-surface-border bg-surface-raised p-4">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-content-tertiary">Free Tracker</p>
+                  <p className="text-sm font-semibold text-content-primary mt-1">$0 / month</p>
+                  <ul className="mt-3 space-y-1.5 text-xs text-content-secondary">
+                    <li>Bill tracking and due-date alerts</li>
+                    <li>Manual income + expense logging</li>
+                    <li>Basic net worth visibility</li>
+                  </ul>
+                </div>
+                <div className="rounded-lg border border-surface-border bg-surface-raised p-4">
+                  <p className="text-[10px] uppercase tracking-[0.15em] text-content-tertiary">Full Suite</p>
+                  <p className="text-sm font-semibold text-content-primary mt-1">$10.99 / month</p>
+                  <ul className="mt-3 space-y-1.5 text-xs text-content-secondary">
+                    <li>Debt payoff engine (Snowball + Avalanche)</li>
+                    <li>Quarterly tax estimation + reserve planning</li>
+                    <li>Advanced automation and insights</li>
+                  </ul>
+                </div>
+              </div>
+              <TransitionLink to="/pricing" className="mt-3 inline-flex text-xs text-content-secondary hover:text-content-primary transition-colors">
+                View full pricing details
+              </TransitionLink>
+            </div>
           </div>
 
           <div className="lg:col-span-5 relative">
@@ -294,45 +295,54 @@ export default function Landing() {
               {
                 icon: Target,
                 title: "Debt Detonator",
-                desc: "Full Suite feature. Choose Avalanche (highest interest first) or Snowball (smallest balance first). Get your exact debt-free date, total interest saved, and a month-by-month payoff schedule for every debt."
+                benefit: "Choose Avalanche (highest interest first) or Snowball (smallest balance first). Get your exact debt-free date, total interest saved, and a month-by-month payoff schedule for every debt.",
+                tier: "Full Suite"
               },
               {
                 icon: CalendarClock,
                 title: "Bill Command Center",
-                desc: "Tracker + Full Suite. Track recurring bills with due dates and auto-overdue detection so nothing slips. Full Suite adds synced workflows and deeper automation."
+                benefit: "Track every recurring bill with due dates and auto-overdue detection so nothing slips. Includes synced workflows and deeper automation.",
+                tier: "Tracker + Full Suite"
               },
               {
                 icon: TrendingUp,
                 title: "Net Worth Engine",
-                desc: "Tracker + Full Suite. Real-time net worth from assets minus liabilities with trend visibility so you can see where you're headed."
+                benefit: "See your real-time net worth from assets minus liabilities with trend visibility so you can see exactly where you're headed.",
+                tier: "Tracker + Full Suite"
               },
               {
                 icon: BarChart2,
                 title: "Spending Intelligence",
-                desc: "Tracker + Full Suite. Spending by category, income vs expenses, and cash-flow visibility built from your data."
+                benefit: "Visualize spending by category, income vs. expenses, and cash-flow patterns built from your actual data.",
+                tier: "Tracker + Full Suite"
               },
               {
                 icon: UploadCloud,
                 title: "Document Scanning",
-                desc: "Tracker + Full Suite. Upload receipts and statements, then review extracted biller, amount, and due date before saving."
+                benefit: "Upload receipts and statements and review extracted biller, amount, and due date before saving to your dashboard.",
+                tier: "Tracker + Full Suite"
               },
               {
                 icon: BookOpen,
                 title: "Financial Academy",
-                desc: "Full Suite feature. Self-paced tracks covering budgeting, debt payoff, credit, and taxes with saved progress."
+                benefit: "Self-paced tracks covering budgeting, debt payoff, credit, and taxes - with saved progress so you pick up where you left off.",
+                tier: "Full Suite"
               }
             ].map((feat, i) => (
               <div
                 key={i}
-                className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-white/[0.02] transition-colors"
+                className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors"
               >
                 <feat.icon className="w-5 h-5 text-content-secondary mb-4" />
                 <h3 className="text-lg font-medium tracking-tight text-content-primary mb-3">
                   {feat.title}
                 </h3>
                 <p className="text-sm text-content-secondary leading-relaxed">
-                  {feat.desc}
+                  {feat.benefit}
                 </p>
+                <span className="mt-4 inline-flex rounded-md border border-surface-border px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-content-tertiary">
+                  {feat.tier}
+                </span>
               </div>
             ))}
           </div>
@@ -358,20 +368,28 @@ export default function Landing() {
             {TESTIMONIALS.map((t, i) => (
               <figure
                 key={i}
-                className="border border-surface-border rounded-lg p-8 lg:p-10 bg-surface-raised hover:bg-white/[0.02] transition-colors flex flex-col h-full"
+                className="border border-surface-border rounded-lg p-8 lg:p-10 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full"
               >
                 <Quote className="w-5 h-5 text-content-tertiary mb-4 shrink-0" aria-hidden />
                 <blockquote className="text-sm text-content-secondary leading-relaxed flex-1 mb-6">
                   <span className="text-content-primary/90">&ldquo;{t.quote}&rdquo;</span>
                 </blockquote>
                 <figcaption className="mt-auto pt-4 border-t border-surface-border">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-surface-border bg-black text-xs font-semibold text-content-primary">
+                      {t.initials}
+                    </span>
+                    <div>
+                      <p className="text-sm font-medium text-content-primary">{t.name}</p>
+                      <p className="text-[11px] text-content-tertiary">{t.workType}</p>
+                    </div>
+                  </div>
                   <span className="inline-flex items-center gap-2 text-xs font-sans font-medium text-content-secondary mb-2">
                     <span className="h-1.5 w-1.5 rounded-full bg-neutral-500" aria-hidden />
                     {t.tag}
                   </span>
-                  <p className="text-sm font-medium text-content-primary">{t.name}</p>
                   <p className="text-xs text-content-tertiary mt-1 leading-relaxed">{t.role}</p>
-                  <p className="text-xs text-content-tertiary mt-2">{t.region}</p>
+                  <p className="text-xs text-content-tertiary mt-2">{t.region} • {t.platform}</p>
                 </figcaption>
               </figure>
             ))}
@@ -411,7 +429,7 @@ export default function Landing() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {buildFaqItems(isPlaidLinkUiEnabled()).map((item, i) => (
-              <div key={i} className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-white/[0.02] transition-colors">
+              <div key={i} className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors">
                 <h3 className="text-sm font-medium tracking-tight text-content-primary mb-3">{item.q}</h3>
                 <p className="text-sm text-content-secondary leading-relaxed">{item.a}</p>
               </div>

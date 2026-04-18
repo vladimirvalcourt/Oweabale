@@ -22,7 +22,7 @@ function CustomColor() {
       backgroundColor="#1e1b4b"
       className="p-6"
     >
-      <div className="text-white text-center space-y-4">
+      <div className="text-content-primary text-center space-y-4">
         <div className="flex justify-center mb-4">
           <Zap className="w-8 h-8 text-blue-400" />
         </div>
@@ -52,7 +52,7 @@ function FastAnimation() {
       backgroundColor="#1a0505"
       className="p-6"
     >
-      <div className="text-white text-center space-y-4">
+      <div className="text-content-primary text-center space-y-4">
         <div className="flex justify-center mb-4">
           <Shield className="w-8 h-8 text-red-400" />
         </div>
@@ -85,7 +85,7 @@ function HoverToRotate() {
       backgroundColor="#062016"
       className="p-6"
     >
-      <div className="text-white text-center space-y-4">
+      <div className="text-content-primary text-center space-y-4">
         <div className="flex justify-center mb-4">
           <Heart className="w-8 h-8 text-green-400" />
         </div>
@@ -119,7 +119,7 @@ function StopOnHover() {
       backgroundColor="#1a0b2e"
       className="p-6"
     >
-      <div className="text-white text-center space-y-4">
+      <div className="text-content-primary text-center space-y-4">
         <div className="flex justify-center mb-4">
           <User className="w-8 h-8 text-content-secondary" />
         </div>
@@ -127,11 +127,11 @@ function StopOnHover() {
         <p className="text-content-tertiary mb-4 text-xs font-mono">Animation pauses on hover — neutral chrome</p>
         <div className="space-y-3">
           <div className="flex gap-2 justify-center">
-            <button className="px-3 py-2 bg-white hover:bg-neutral-200 text-black rounded-lg transition-colors text-[10px] font-bold uppercase tracking-widest">
+            <button className="px-3 py-2 bg-brand-cta hover:bg-brand-cta-hover text-surface-base rounded-lg transition-colors text-[10px] font-bold uppercase tracking-widest">
               <Mail className="w-4 h-4 inline mr-1" />
               Message
             </button>
-            <button className="px-3 py-2 bg-white hover:bg-neutral-200 text-black rounded-lg transition-colors text-[10px] font-bold uppercase tracking-widest">
+            <button className="px-3 py-2 bg-brand-cta hover:bg-brand-cta-hover text-surface-base rounded-lg transition-colors text-[10px] font-bold uppercase tracking-widest">
               <Phone className="w-4 h-4 inline mr-1" />
               Call
             </button>

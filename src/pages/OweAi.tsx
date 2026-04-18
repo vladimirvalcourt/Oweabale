@@ -21,10 +21,10 @@ const OweAiMessageBubble = memo(function OweAiMessageBubble({ message }: { messa
     <div className={cn('flex w-full', m.role === 'user' ? 'justify-end' : 'justify-start')}>
       <div
         className={cn(
-          'max-w-[84%] px-4 py-2.5 text-sm shadow-sm',
+          'max-w-[84%] px-4 py-2.5 text-sm shadow-none',
           m.role === 'user'
-            ? 'rounded-[22px] rounded-br-md bg-white text-black border border-surface-border'
-            : 'rounded-[22px] rounded-bl-md bg-surface-elevated/95 text-content-secondary border border-surface-border',
+            ? 'rounded-lg rounded-br-md bg-brand-cta text-surface-base border border-surface-border'
+            : 'rounded-lg rounded-bl-md bg-surface-elevated text-content-secondary border border-surface-border',
         )}
       >
         {m.role === 'assistant' ? (
@@ -216,7 +216,7 @@ export default function OweAi() {
     <div className="min-h-[calc(100dvh-12rem)] max-w-3xl mx-auto w-full flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 h-9 w-9 rounded-full bg-white/10 border border-white/15 inline-flex items-center justify-center">
+          <div className="mt-0.5 h-9 w-9 rounded-full bg-surface-elevated border border-surface-border inline-flex items-center justify-center">
             <Sparkles className="w-4.5 h-4.5 text-content-secondary" aria-hidden />
           </div>
           <div>
@@ -240,13 +240,13 @@ export default function OweAi() {
         )}
       </div>
 
-      <div className="rounded-2xl border border-surface-border bg-surface-raised/70 p-3 sm:p-4 flex flex-col gap-3">
+      <div className="rounded-lg border border-surface-border bg-surface-raised p-3 sm:p-4 flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <p className="text-xs text-content-tertiary">
             Chat mode: <span className="text-content-secondary font-medium">{MODE_LABEL[mode]}</span>
           </p>
           {learningProfile && mode === 'academy' && (
-            <span className="text-[11px] rounded-full border border-white/20 bg-white/[0.06] text-content-secondary px-2.5 py-1">
+            <span className="text-[11px] rounded-full border border-surface-border bg-surface-elevated text-content-secondary px-2.5 py-1">
               Level: {learningProfile.familiarityLevel}
             </span>
           )}
@@ -261,7 +261,7 @@ export default function OweAi() {
               className={cn(
                 'text-xs rounded-full border px-3 py-1.5 transition-colors',
                 mode === m
-                  ? 'border-white/30 bg-white/[0.08] text-content-primary'
+                  ? 'border-content-secondary/40 bg-surface-elevated text-content-primary'
                   : 'border-surface-border bg-surface-base text-content-secondary hover:bg-surface-elevated',
               )}
             >
@@ -286,7 +286,7 @@ export default function OweAi() {
                 className={cn(
                   'text-[11px] rounded-full border px-3 py-1 transition-colors',
                   levelHint === option.value
-                    ? 'border-white/25 bg-white/[0.08] text-content-primary'
+                    ? 'border-content-secondary/35 bg-surface-elevated text-content-primary'
                     : 'border-surface-border bg-surface-base text-content-tertiary hover:text-content-secondary',
                 )}
               >
@@ -318,10 +318,10 @@ export default function OweAi() {
       </div>
 
       <div
-        className="relative flex-1 min-h-[320px] max-h-[min(58dvh,560px)] overflow-y-auto rounded-3xl border border-surface-border bg-gradient-to-b from-surface-raised/70 to-surface-base/90 px-4 py-5 space-y-3"
+        className="relative flex-1 min-h-[320px] max-h-[min(58dvh,560px)] overflow-y-auto rounded-lg border border-surface-border bg-surface-raised px-4 py-5 space-y-3"
         aria-live="polite"
       >
-        <div className="sticky top-0 z-10 -mx-4 -mt-5 mb-2 px-4 py-2 bg-gradient-to-b from-surface-base/90 to-transparent">
+        <div className="sticky top-0 z-10 -mx-4 -mt-5 mb-2 px-4 py-2 bg-surface-raised/95 backdrop-blur-sm border-b border-surface-border/60">
           <p className="text-[11px] uppercase tracking-[0.14em] text-content-muted">Your conversation</p>
         </div>
         {messages.length === 0 && !loading && (
@@ -337,7 +337,7 @@ export default function OweAi() {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="inline-flex items-center gap-2 rounded-[18px] rounded-bl-md border border-surface-border bg-surface-elevated/95 px-3 py-2 text-sm text-content-tertiary">
+            <div className="inline-flex items-center gap-2 rounded-lg rounded-bl-md border border-surface-border bg-surface-elevated px-3 py-2 text-sm text-content-tertiary">
               <Loader2 className="w-4 h-4 animate-spin" aria-hidden />
               One moment…
             </div>
@@ -353,7 +353,7 @@ export default function OweAi() {
             type="button"
             onClick={() => sendQuickPrompt(prompt)}
             disabled={loading}
-            className="text-xs rounded-full border border-surface-border bg-surface-raised/70 text-content-secondary px-3 py-1.5 hover:bg-surface-elevated hover:text-content-primary transition-colors disabled:opacity-40 disabled:pointer-events-none"
+            className="text-xs rounded-full border border-surface-border bg-surface-raised text-content-secondary px-3 py-1.5 hover:bg-surface-elevated hover:text-content-primary transition-colors disabled:opacity-40 disabled:pointer-events-none"
           >
             {prompt}
           </button>
@@ -364,7 +364,7 @@ export default function OweAi() {
         <label htmlFor="owe-ai-input" className="sr-only">
           Message to Owe-AI
         </label>
-        <div className="rounded-full border border-surface-border bg-surface-raised px-2 py-1.5 flex items-end gap-2 transition-colors focus-within:border-white/35 focus-within:ring-1 focus-within:ring-white/20">
+        <div className="rounded-full border border-surface-border bg-surface-raised px-2 py-1.5 flex items-end gap-2 transition-colors focus-within:border-content-secondary/50 focus-within:ring-1 focus-within:ring-content-secondary/15">
           <textarea
             id="owe-ai-input"
             rows={2}
@@ -378,7 +378,7 @@ export default function OweAi() {
           <button
             type="submit"
             disabled={loading || !input}
-            className="shrink-0 h-9 w-9 inline-flex items-center justify-center rounded-full bg-white text-black hover:bg-neutral-200 disabled:opacity-40 disabled:pointer-events-none transition-colors mb-1"
+            className="shrink-0 h-9 w-9 inline-flex items-center justify-center rounded-full bg-brand-cta text-surface-base hover:bg-brand-cta-hover disabled:opacity-40 disabled:pointer-events-none transition-colors mb-1"
             aria-label="Send message"
           >
             {loading ? (

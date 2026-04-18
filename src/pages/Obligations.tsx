@@ -27,6 +27,7 @@ import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveCont
 import type { Bill, Debt } from '../store/useStore';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 import { FullSuiteGateCard } from '../components/FullSuiteGate';
+import { formatCategoryLabel } from '../lib/categoryDisplay';
 
 type ObligationType = 'recurring' | 'debt' | 'ambush';
 type Strategy = 'avalanche' | 'snowball';
@@ -350,7 +351,7 @@ export default function Obligations() {
         <button 
           type="button"
           onClick={() => openQuickAdd(activeTab === 'ambush' ? 'citation' : 'obligation')}
-          className="px-4 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile"
+          className="px-4 py-2.5 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           {activeTab === 'ambush' ? 'Add ticket or fine' : activeTab === 'debt' ? 'Add debt' : 'Add bill'}
@@ -391,10 +392,10 @@ export default function Obligations() {
             Low-balance warning: ${liquidCash.toFixed(0)} cash vs ${weekAheadDueTotal.toFixed(0)} due in the next 7 days.
           </p>
           <div className="mt-2 flex flex-wrap gap-3 text-xs">
-            <TransitionLink to="/dashboard#cash-flow" className="text-content-primary hover:text-white underline underline-offset-2">
+            <TransitionLink to="/dashboard#cash-flow" className="text-content-primary hover:text-content-secondary underline underline-offset-2">
               Open safe-to-spend
             </TransitionLink>
-            <TransitionLink to="/calendar#calendar-view" className="text-content-primary hover:text-white underline underline-offset-2">
+            <TransitionLink to="/calendar#calendar-view" className="text-content-primary hover:text-content-secondary underline underline-offset-2">
               Open due-date calendar
             </TransitionLink>
           </div>
@@ -445,7 +446,7 @@ export default function Obligations() {
         extraHeader={
           <TransitionLink
             to="/calendar#calendar-view"
-            className="text-[10px] font-sans font-medium text-content-primary hover:text-content-secondary border border-white/20 rounded-lg px-2 py-0.5"
+            className="text-[10px] font-sans font-medium text-content-primary hover:text-content-secondary border border-content-primary/20 rounded-lg px-2 py-0.5"
           >
             Month view →
           </TransitionLink>
@@ -511,7 +512,7 @@ export default function Obligations() {
                     key={s}
                     onClick={() => setStrategy(s)}
                     className={`px-3 py-1.5 text-xs font-mono rounded-lg transition-colors uppercase tracking-wider ${
-                      strategy === s ? 'bg-white text-black' : 'text-content-tertiary hover:text-content-secondary'
+                      strategy === s ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-secondary'
                     }`}
                   >
                     {s === 'avalanche' ? '⚡ Highest Interest First' : '❄️ Smallest Debt First'}
@@ -521,9 +522,9 @@ export default function Obligations() {
               <div className="flex items-center gap-3 bg-surface-base border border-surface-border rounded-lg px-3 py-1.5">
                 <Calculator className="w-3.5 h-3.5 text-content-tertiary" />
                 <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Extra per month:</span>
-                <button onClick={() => setExtraPayment(e => Math.max(0, e - 100))} className="text-content-tertiary hover:text-white"><Minus className="w-3 h-3" /></button>
+                <button onClick={() => setExtraPayment(e => Math.max(0, e - 100))} className="text-content-tertiary hover:text-content-primary"><Minus className="w-3 h-3" /></button>
                 <span className="text-sm font-mono text-content-primary w-16 text-center">${extraPayment}</span>
-                <button onClick={() => setExtraPayment(e => e + 100)} className="text-content-tertiary hover:text-white"><Plus className="w-3 h-3" /></button>
+                <button onClick={() => setExtraPayment(e => e + 100)} className="text-content-tertiary hover:text-content-primary"><Plus className="w-3 h-3" /></button>
               </div>
             </div>
 
@@ -560,14 +561,14 @@ export default function Obligations() {
                     <div key={d.id}>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 bg-white/[0.08] border border-surface-border text-content-primary text-[10px] font-mono font-bold flex items-center justify-center rounded-lg">{i + 1}</span>
+                          <span className="w-5 h-5 bg-content-primary/[0.08] border border-surface-border text-content-primary text-[10px] font-mono font-bold flex items-center justify-center rounded-lg">{i + 1}</span>
                           <span className="text-sm text-content-primary">{d.name}</span>
                           <span className="text-[10px] font-mono text-content-muted border border-surface-border px-1.5 py-0.5 rounded-lg">{d.apr}% interest rate</span>
                         </div>
                         <span className="text-xs font-mono text-content-tertiary">${d.remaining.toLocaleString()} left</span>
                       </div>
                       <div className="w-full h-1.5 bg-surface-border rounded-none overflow-hidden">
-                        <div className="h-full bg-white transition-all duration-700" style={{ width: `${pct}%` }} />
+                        <div className="h-full bg-brand-cta transition-all duration-700" style={{ width: `${pct}%` }} />
                       </div>
                       <div className="flex justify-between text-[10px] font-mono text-content-muted mt-0.5">
                         <span>{pct}% paid</span>
@@ -602,7 +603,7 @@ export default function Obligations() {
                                   <YAxis tick={{ fill: '#52525B', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}`} />
                                   <Tooltip
                                     {...rechartsTooltipStableProps}
-                                    contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', fontFamily: 'monospace', fontSize: '11px' }}
+                                    contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '8px', fontFamily: 'monospace', fontSize: '11px' }}
                                     formatter={(value, name) => [`$${Number(value ?? 0).toFixed(2)}`, name === 'principal' ? 'Principal' : 'Interest']}
                                   />
                                   <Bar dataKey="principal" fill="#d4d4d4" stackId="a" />
@@ -660,14 +661,14 @@ export default function Obligations() {
               key={tab.key}
               onClick={() => selectTab(tab.key)}
               className={`pb-3 text-sm font-medium transition-colors relative flex items-center gap-1.5 ${
-                activeTab === tab.key ? 'text-white' : 'text-content-tertiary hover:text-content-secondary'
+                activeTab === tab.key ? 'text-content-primary' : 'text-content-tertiary hover:text-content-secondary'
               }`}
             >
               {tab.label}
               <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-lg ${
-                activeTab === tab.key ? 'bg-white/10 text-content-primary' : 'bg-surface-elevated text-content-muted'
+                activeTab === tab.key ? 'bg-content-primary/10 text-content-primary' : 'bg-surface-elevated text-content-muted'
               }`}>{tab.count}</span>
-              {activeTab === tab.key && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-white" />}
+              {activeTab === tab.key && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-cta" />}
             </button>
           ))}
         </div>
@@ -704,7 +705,7 @@ export default function Obligations() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`text-xs font-mono px-2 py-0.5 rounded-lg border ${
-                        ob.type === 'debt' ? 'border-surface-border text-content-primary bg-white/[0.05]' :
+                        ob.type === 'debt' ? 'border-surface-border text-content-primary bg-content-primary/[0.05]' :
                         ob.type === 'ambush' ? 'border-rose-500/30 text-rose-400 bg-rose-500/10' :
                         'border-surface-border text-content-tertiary bg-surface-elevated'
                       }`}>{ob.subType}</span>
@@ -738,7 +739,7 @@ export default function Obligations() {
                             const d = debts.find((x) => x.id === ob.id);
                             if (d) setEditDebtRow(d);
                           }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-surface-border hover:bg-white/[0.05] active:scale-[0.98] text-content-secondary text-xs font-mono font-semibold rounded-lg transition-colors"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-surface-border hover:bg-content-primary/[0.05] active:scale-[0.98] text-content-secondary text-xs font-mono font-semibold rounded-lg transition-colors"
                         >
                           <Pencil className="w-3 h-3" aria-hidden />
                           Edit
@@ -810,7 +811,7 @@ export default function Obligations() {
                   <tr key={tx.id} className="border-b border-surface-highlight last:border-0">
                     <td className="px-2 py-2 text-xs text-content-secondary">{tx.date}</td>
                     <td className="px-2 py-2 text-xs text-content-primary">{tx.name}</td>
-                    <td className="px-2 py-2 text-xs text-content-tertiary">{tx.category}</td>
+                    <td className="px-2 py-2 text-xs text-content-tertiary">{formatCategoryLabel(tx.category)}</td>
                     <td className="px-2 py-2 text-xs font-mono text-content-primary text-right">${tx.amount.toFixed(2)}</td>
                   </tr>
                 ))}
@@ -919,7 +920,7 @@ function EditBillDialog({
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-content-tertiary hover:text-content-primary">
               Cancel
             </button>
-            <button type="button" onClick={() => void save()} className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-neutral-200">
+            <button type="button" onClick={() => void save()} className="rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover">
               Save
             </button>
           </div>
@@ -1050,7 +1051,7 @@ function EditDebtDialog({
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-content-tertiary hover:text-content-primary">
               Cancel
             </button>
-            <button type="button" onClick={() => void save()} className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-neutral-200">
+            <button type="button" onClick={() => void save()} className="rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover">
               Save
             </button>
           </div>

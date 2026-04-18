@@ -153,7 +153,7 @@ function NotificationsPanelInner() {
                     setWebPushReady(true);
                     toast.success('Browser notifications enabled');
                   }}
-                  className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:opacity-60"
                 >
                   {webPushBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                   Enable web push

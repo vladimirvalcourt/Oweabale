@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
+import { syncSentryUserFromSupabaseUser } from '../lib/sentry';
 
 export interface AuthState {
   user: User | null;
@@ -83,14 +84,11 @@ export function useAuth(): AuthState {
       }
     );
 
-    const fallback = window.setTimeout(() => {
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
       if (cancelled || initialResolveRef.current) return;
-      supabase.auth.getSession().then(({ data: { session: s } }) => {
-        if (cancelled || initialResolveRef.current) return;
-        initialResolveRef.current = true;
-        applySession(s, 'getSession-fallback');
-      });
-    }, 1500);
+      initialResolveRef.current = true;
+      applySession(s, 'getSession-fallback');
+    });
 
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) window.location.reload();
@@ -99,11 +97,14 @@ export function useAuth(): AuthState {
 
     return () => {
       cancelled = true;
-      window.clearTimeout(fallback);
       subscription.unsubscribe();
       window.removeEventListener('pageshow', handlePageShow);
     };
   }, []);
+
+  useEffect(() => {
+    syncSentryUserFromSupabaseUser(user);
+  }, [user]);
 
   const lastActivityRef = useRef(0);
 

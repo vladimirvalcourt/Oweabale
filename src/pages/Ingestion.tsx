@@ -323,7 +323,7 @@ export default function Ingestion() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="w-full space-y-6">
       <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">
@@ -362,7 +362,7 @@ export default function Ingestion() {
             <button 
               type="button"
               onClick={() => setIsSyncOpen(true)}
-              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/[0.06] px-4 py-2.5 text-xs font-sans font-semibold text-content-primary transition-colors hover:bg-white/[0.1] btn-tactile"
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-lg border border-content-primary/20 bg-content-primary/[0.06] px-4 py-2.5 text-xs font-sans font-semibold text-content-primary transition-colors hover:bg-content-primary/[0.1] btn-tactile"
             >
               <Smartphone className="h-4 w-4 shrink-0" aria-hidden />
               <span className="text-center leading-tight">Scan via phone</span>
@@ -381,7 +381,7 @@ export default function Ingestion() {
             <button 
               type="button"
               onClick={handleBulkCommit}
-              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-2.5 text-xs font-sans font-semibold text-black shadow-none transition-colors hover:bg-neutral-200 btn-tactile sm:ml-auto sm:w-auto sm:min-w-[12rem]"
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-lg bg-brand-cta px-4 py-2.5 text-xs font-sans font-semibold text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover btn-tactile sm:ml-auto sm:w-auto sm:min-w-[12rem]"
             >
               <FileCheck className="h-4 w-4 shrink-0" aria-hidden />
               Save all ready
@@ -394,7 +394,7 @@ export default function Ingestion() {
         {pendingIngestions.length === 0 ? (
           <div 
             className={`border-2 border-dashed rounded-lg p-20 text-center transition-all cursor-pointer ${
-              dragActive ? 'border-white bg-white/[0.03]' : 'border-surface-border bg-surface-raised hover:bg-surface-elevated'
+              dragActive ? 'border-content-primary bg-content-primary/[0.03]' : 'border-surface-border bg-surface-raised hover:bg-surface-elevated'
             }`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
@@ -405,12 +405,12 @@ export default function Ingestion() {
             <UploadCloud className={`w-12 h-12 mx-auto mb-6 transition-colors ${dragActive ? 'text-content-secondary' : 'text-content-muted'}`} />
             <h3 className="text-lg font-sans font-semibold text-content-primary">Inbox is empty</h3>
             <p className="text-sm text-content-tertiary mt-2 max-w-md mx-auto">Drop a PDF or photo, or upload from your computer. Scanned PDFs are read page-by-page when needed; very blurry shots may still need manual entry.</p>
-            <div className="mt-8 inline-block px-8 py-3 rounded-lg bg-white text-black text-sm font-sans font-semibold shadow-sm btn-tactile">
+            <div className="mt-8 inline-block px-8 py-3 rounded-lg bg-brand-cta text-surface-base text-sm font-sans font-semibold shadow-sm btn-tactile">
               Choose files
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-px bg-surface-border border border-surface-border rounded-lg overflow-hidden shadow-2xl">
+          <div className="grid grid-cols-1 gap-px bg-surface-border border border-surface-border rounded-lg overflow-hidden shadow-none">
             {/* Table Header */}
             <div className="hidden md:grid grid-cols-12 bg-surface-elevated px-6 py-3 border-b border-surface-border">
               <div className="col-span-4 section-label normal-case text-[10px]">Document</div>
@@ -430,7 +430,7 @@ export default function Ingestion() {
                 <motion.div 
                   layout
                   id={`ingestion-${item.id}`}
-                  className={`grid grid-cols-12 items-center px-6 py-4 hover:bg-surface-elevated/50 transition-colors group ${selectedId === item.id ? 'bg-surface-elevated/40 ring-1 ring-inset ring-white/20' : ''} ${recentlyAddedId === item.id ? 'bg-white/[0.06] animate-pulse-highlight' : ''}`}
+                  className={`grid grid-cols-12 items-center px-6 py-4 hover:bg-surface-elevated/50 transition-colors group ${selectedId === item.id ? 'bg-surface-elevated/40 ring-1 ring-inset ring-content-primary/20' : ''} ${recentlyAddedId === item.id ? 'bg-content-primary/[0.06] animate-pulse-highlight' : ''}`}
                   onClick={() => setSelectedId(item.id)}
                 >
                   <div className="col-span-8 md:col-span-4 flex items-center gap-4">
@@ -441,7 +441,7 @@ export default function Ingestion() {
                       <div className="flex items-center gap-1.5">
                         <p className="text-xs font-mono font-bold text-content-primary truncate">{item.extractedData.biller || item.extractedData.name || item.originalFile?.name || 'Uploaded File'}</p>
                         {item.source === 'mobile' && (
-                          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white/[0.06] border border-white/15" title="Source: Mobile Capture">
+                          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-content-primary/[0.06] border border-content-primary/15" title="Source: Mobile Capture">
                              <Smartphone className="w-2.5 h-2.5 text-content-secondary" />
                              <span className="text-[7px] font-mono font-bold text-content-secondary uppercase">Sync</span>
                           </div>
@@ -534,7 +534,7 @@ export default function Ingestion() {
                   <div className="col-span-4 md:col-span-2 flex items-center justify-end gap-2">
                     <button 
                       onClick={() => setSelectedId(selectedId === item.id ? null : item.id)}
-                      className={`p-2 transition-all rounded-lg ${selectedId === item.id ? 'text-content-primary bg-white/[0.05]' : 'text-content-tertiary hover:text-white hover:bg-surface-highlight'}`}
+                      className={`p-2 transition-all rounded-lg ${selectedId === item.id ? 'text-content-primary bg-content-primary/[0.05]' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-highlight'}`}
                     >
                       <Eye className="w-4 h-4" />
                     </button>
@@ -580,7 +580,7 @@ export default function Ingestion() {
                                 href={safeStorage}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-[9px] font-mono text-content-muted hover:text-white uppercase tracking-widest flex items-center gap-1 transition-colors"
+                                className="text-[9px] font-mono text-content-muted hover:text-content-primary uppercase tracking-widest flex items-center gap-1 transition-colors"
                               >
                                 <ExternalLink className="w-3 h-3" /> Open
                               </a>
@@ -954,7 +954,7 @@ export default function Ingestion() {
                             </button>
                             <button 
                               onClick={() => handleCommit(item.id)}
-                              className="px-10 py-3 bg-white text-black hover:bg-neutral-200 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-colors shadow-none"
+                              className="px-10 py-3 bg-brand-cta text-surface-base hover:bg-brand-cta-hover rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-colors shadow-none"
                             >
                               Approve & Save
                             </button>

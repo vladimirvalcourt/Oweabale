@@ -43,7 +43,7 @@ export function PrivacyScreenWhenHidden() {
       'click',
       'scroll',
       'touchstart',
-      'visibilitychange',
+      'visibilitychange' as keyof WindowEventMap,
     ];
 
     for (const evt of events) {

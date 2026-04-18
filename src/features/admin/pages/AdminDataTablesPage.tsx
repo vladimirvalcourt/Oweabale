@@ -165,7 +165,7 @@ export default function AdminDataTablesPage() {
               setSelectedIds([]);
             }}
             className={`rounded-lg px-3 py-1.5 text-xs ${
-              activeKey === entity.key ? 'bg-white text-black' : 'border border-surface-border bg-surface-raised text-content-secondary'
+              activeKey === entity.key ? 'bg-brand-cta text-surface-base' : 'border border-surface-border bg-surface-raised text-content-secondary'
             }`}
           >
             {entity.key}
@@ -318,7 +318,7 @@ export default function AdminDataTablesPage() {
               <button
                 type="button"
                 onClick={() => void saveEdit()}
-                className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-black"
+                className="rounded-lg bg-brand-cta px-3 py-2 text-xs font-semibold text-surface-base"
               >
                 Save
               </button>

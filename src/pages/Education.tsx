@@ -204,7 +204,7 @@ export default function Education() {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Financial Academy</h1>
@@ -219,8 +219,8 @@ export default function Education() {
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="w-full flex items-center justify-between px-2 pb-2 group"
           >
-            <h2 className="text-xs font-sans font-medium text-content-tertiary group-hover:text-white transition-colors">Available courses</h2>
-            <ChevronDown className={`w-4 h-4 text-content-tertiary group-hover:text-white transition-all duration-300 ${isSidebarOpen ? 'rotate-180' : ''}`} />
+            <h2 className="text-xs font-sans font-medium text-content-tertiary group-hover:text-content-primary transition-colors">Available courses</h2>
+            <ChevronDown className={`w-4 h-4 text-content-tertiary group-hover:text-content-primary transition-all duration-300 ${isSidebarOpen ? 'rotate-180' : ''}`} />
           </button>
 
           <AnimatePresence initial={false}>
@@ -242,16 +242,16 @@ export default function Education() {
                       onClick={() => setSelectedModule(mod.id)}
                       className={`w-full flex items-start gap-4 p-4 rounded-lg border text-left transition-all ${
                         isSelected
-                          ? 'border-surface-border bg-white/[0.03] bg-surface-base'
+                          ? 'border-surface-border bg-content-primary/[0.03] bg-surface-base'
                           : 'border-surface-border bg-surface-elevated hover:bg-surface-base'
                       }`}
                     >
-                      <div className={`p-2 rounded-lg shrink-0 ${isSelected ? 'bg-white/[0.05] text-content-primary' : 'bg-surface-base border border-surface-border text-content-tertiary'}`}>
+                      <div className={`p-2 rounded-lg shrink-0 ${isSelected ? 'bg-content-primary/[0.05] text-content-primary' : 'bg-surface-base border border-surface-border text-content-tertiary'}`}>
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h3 className={`text-sm font-bold truncate ${isSelected ? 'text-white' : 'text-content-primary'}`}>{mod.title}</h3>
+                          <h3 className={`text-sm font-bold truncate ${isSelected ? 'text-content-primary' : 'text-content-secondary'}`}>{mod.title}</h3>
                           {!isSelected && <span className="text-xs text-content-tertiary shrink-0 ml-2">{mod.duration}</span>}
                         </div>
 
@@ -277,7 +277,7 @@ export default function Education() {
                                 </div>
                                 <div className="h-1 w-full bg-surface-base overflow-hidden rounded-full">
                                   <div
-                                    className={`h-full ${progress === 100 ? 'bg-emerald-500' : 'bg-white'}`}
+                                    className={`h-full ${progress === 100 ? 'bg-emerald-500' : 'bg-brand-cta'}`}
                                     style={{ width: `${progress}%` }}
                                   />
                                 </div>
@@ -317,7 +317,7 @@ export default function Education() {
                             className="group flex items-center justify-between p-4 bg-surface-base border border-surface-border rounded-lg hover:border-content-muted transition-colors cursor-pointer"
                           >
                             <div className="flex items-center gap-4">
-                              <div className={`p-1.5 rounded-lg ${isDone ? 'text-emerald-500' : 'text-content-tertiary group-hover:text-white transition-colors'}`}>
+                              <div className={`p-1.5 rounded-lg ${isDone ? 'text-emerald-500' : 'text-content-tertiary group-hover:text-content-primary transition-colors'}`}>
                                 {isDone ? <CheckCircle2 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
                               </div>
                               <div>
@@ -329,7 +329,7 @@ export default function Education() {
                               <span className="text-xs text-content-tertiary px-2 py-1 bg-surface-elevated border border-surface-border hidden sm:block">
                                 {lesson.readTime}
                               </span>
-                              <ArrowRight className="w-4 h-4 text-content-muted group-hover:text-white transition-colors" />
+                              <ArrowRight className="w-4 h-4 text-content-muted group-hover:text-content-primary transition-colors" />
                             </div>
                           </div>
                         );
@@ -340,7 +340,7 @@ export default function Education() {
                       <button
                         type="button"
                         onClick={() => openLesson(activeModule.lessons[0])}
-                        className="px-6 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2"
+                        className="px-6 py-2.5 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2"
                       >
                         <PlayCircle className="w-4 h-4 shrink-0" aria-hidden />
                         {progress === 0 ? 'Start course' : progress === 100 ? 'Review course' : 'Resume course'}
@@ -392,7 +392,7 @@ export default function Education() {
                         </div>
                         <button
                           onClick={() => setViewerOpen(false)}
-                          className="text-content-tertiary hover:text-white"
+                          className="text-content-tertiary hover:text-content-primary"
                         >
                           <ArrowRight className="w-5 h-5" />
                         </button>
@@ -407,7 +407,7 @@ export default function Education() {
                       <div className="bg-surface-elevated border-t border-surface-border px-4 py-4 sm:px-6 flex justify-end">
                         <button
                           type="button"
-                          className="inline-flex items-center gap-2 justify-center rounded-lg bg-white px-6 py-2.5 text-xs font-mono font-bold uppercase tracking-widest text-black hover:bg-neutral-200 focus-app transition-colors"
+                          className="inline-flex items-center gap-2 justify-center rounded-lg bg-brand-cta px-6 py-2.5 text-xs font-mono font-bold uppercase tracking-widest text-surface-base hover:bg-brand-cta-hover focus-app transition-colors"
                           onClick={markComplete}
                         >
                           <CheckCircle2 className="w-4 h-4" />

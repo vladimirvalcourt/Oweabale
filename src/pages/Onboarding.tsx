@@ -82,8 +82,8 @@ function ChoiceCard({ selected, onSelect, title, description, accent = 'neutral'
         selected
           ? accent === 'rose'
             ? 'border-rose-500/50 bg-surface-elevated ring-2 ring-rose-500/35'
-            : 'border-white/25 bg-surface-elevated ring-2 ring-white/20'
-          : 'border-surface-border bg-surface-base hover:border-white/15 hover:bg-surface-raised/80',
+            : 'border-content-primary/25 bg-surface-elevated ring-2 ring-content-primary/20'
+          : 'border-surface-border bg-surface-base hover:border-content-primary/15 hover:bg-surface-raised/80',
         className,
       )}
     >
@@ -92,7 +92,7 @@ function ChoiceCard({ selected, onSelect, title, description, accent = 'neutral'
         <span
           className={cn(
             'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors',
-            selected ? 'border-white/40 bg-white/10 text-content-primary' : 'border-surface-border bg-transparent text-transparent',
+            selected ? 'border-content-primary/40 bg-content-primary/10 text-content-primary' : 'border-surface-border bg-transparent text-transparent',
           )}
           aria-hidden
         >
@@ -213,7 +213,7 @@ export default function Onboarding() {
     return (
       <>
         <PrivacyScreenWhenHidden />
-        <div className="fixed inset-0 flex flex-col bg-surface-base font-sans text-content-primary selection:bg-white/10">
+        <div className="fixed inset-0 flex flex-col bg-surface-base font-sans text-content-primary selection:bg-content-primary/10">
           <SubtleGrid />
 
           <header className="relative z-20 flex h-14 shrink-0 items-center justify-between border-b border-surface-border bg-surface-base/90 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/75 sm:px-6">
@@ -254,7 +254,7 @@ export default function Onboarding() {
                 ].map(({ icon: Icon, label, desc }) => (
                   <div
                     key={label}
-                    className="flex gap-3 rounded-xl border border-surface-border bg-surface-raised/90 p-4 transition-colors hover:border-white/10"
+                    className="flex gap-3 rounded-xl border border-surface-border bg-surface-raised/90 p-4 transition-colors hover:border-content-primary/10"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-surface-border bg-surface-elevated">
                       <Icon className="h-4 w-4 text-content-secondary" aria-hidden />
@@ -284,7 +284,7 @@ export default function Onboarding() {
                 <button
                   type="button"
                   onClick={() => setShowWelcome(false)}
-                  className="btn-tactile flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-white px-6 text-sm font-semibold text-black transition-colors hover:bg-neutral-200 focus-app sm:w-auto"
+                  className="btn-tactile flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-cta px-6 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app sm:w-auto"
                 >
                   Get started
                   <ArrowRight className="h-4 w-4" aria-hidden />
@@ -300,7 +300,7 @@ export default function Onboarding() {
   return (
     <>
       <PrivacyScreenWhenHidden />
-      <div className="fixed inset-0 flex flex-col bg-surface-base font-sans text-content-primary selection:bg-white/10">
+      <div className="fixed inset-0 flex flex-col bg-surface-base font-sans text-content-primary selection:bg-content-primary/10">
         <SubtleGrid />
 
         <header className="relative z-20 flex h-14 shrink-0 items-center gap-3 border-b border-surface-border bg-surface-base/90 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/75 sm:gap-4 sm:px-6">
@@ -374,7 +374,7 @@ export default function Onboarding() {
                       <label className="sr-only" htmlFor="onboard-cash">
                         Cash and bank balance
                       </label>
-                      <div className="flex items-end border-b border-surface-border pb-1 transition-colors focus-within:border-white/25">
+                      <div className="flex items-end border-b border-surface-border pb-1 transition-colors focus-within:border-content-primary/25">
                         <span className="select-none pb-2 pr-1 font-sans text-3xl leading-none text-content-tertiary sm:text-5xl">$</span>
                         <input
                           id="onboard-cash"
@@ -396,7 +396,7 @@ export default function Onboarding() {
                       <label className="sr-only" htmlFor="onboard-bills">
                         Monthly bills total
                       </label>
-                      <div className="flex items-end border-b border-surface-border pb-1 transition-colors focus-within:border-white/25">
+                      <div className="flex items-end border-b border-surface-border pb-1 transition-colors focus-within:border-content-primary/25">
                         <span className="select-none pb-2 pr-1 font-sans text-3xl leading-none text-content-tertiary sm:text-5xl">$</span>
                         <input
                           id="onboard-bills"
@@ -418,7 +418,7 @@ export default function Onboarding() {
                       <label className="sr-only" htmlFor="onboard-daily">
                         Daily spending target
                       </label>
-                      <div className="flex items-end border-b border-surface-border pb-1 transition-colors focus-within:border-white/25">
+                      <div className="flex items-end border-b border-surface-border pb-1 transition-colors focus-within:border-content-primary/25">
                         <span className="select-none pb-2 pr-1 font-sans text-3xl leading-none text-content-tertiary sm:text-5xl">$</span>
                         <input
                           id="onboard-daily"
@@ -504,7 +504,7 @@ export default function Onboarding() {
                 type="button"
                 onClick={() => void handleNext()}
                 disabled={isSubmitting}
-                className="btn-tactile flex min-h-11 items-center gap-2 rounded-lg bg-white px-6 text-sm font-semibold text-black transition-colors hover:bg-neutral-200 focus-app"
+                className="btn-tactile flex min-h-11 items-center gap-2 rounded-lg bg-brand-cta px-6 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app"
               >
                 {isSubmitting ? 'Saving…' : currentStepIndex === STEPS.length - 1 ? 'Go to dashboard' : 'Continue'}
                 <ArrowRight className="h-4 w-4" aria-hidden />

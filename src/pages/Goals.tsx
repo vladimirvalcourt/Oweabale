@@ -160,7 +160,7 @@ export default function Goals() {
                 setCheckInText('');
                 toast.success('Check-in saved. Keep going.');
               }}
-              className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-black hover:bg-neutral-200"
+              className="rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover"
             >
               Save check-in
             </button>
@@ -186,7 +186,7 @@ export default function Goals() {
         <button
           type="button"
           onClick={() => setIsAddingGoal(true)}
-          className="flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
+          className="flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           Add goal
@@ -276,7 +276,7 @@ export default function Goals() {
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold transition-colors shadow-sm"
+                className="px-6 py-2 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold transition-colors shadow-sm"
               >
                 Save goal
               </button>
@@ -295,7 +295,7 @@ export default function Goals() {
           <button
             type="button"
             onClick={() => setIsAddingGoal(true)}
-            className="px-8 py-3 rounded-lg bg-white hover:bg-neutral-200 active:scale-[0.98] text-black text-sm font-sans font-semibold transition-colors flex items-center gap-2 mx-auto shadow-sm"
+            className="px-8 py-3 rounded-lg bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-surface-base text-sm font-sans font-semibold transition-colors flex items-center gap-2 mx-auto shadow-sm"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Create your first goal
@@ -316,7 +316,7 @@ export default function Goals() {
               return (
                 <div 
                   key={goal.id} 
-                  className="bg-surface-elevated rounded-lg border border-surface-border overflow-hidden group hover:border-white/15 transition-colors"
+                  className="bg-surface-elevated rounded-lg border border-surface-border overflow-hidden group hover:border-content-primary/15 transition-colors"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-6">
@@ -374,10 +374,10 @@ export default function Goals() {
                           placeholder="Amount (+/-)"
                           className="flex-1 bg-surface-base border border-surface-border rounded-lg px-3 py-1.5 text-sm font-mono text-content-primary focus-app-field transition-colors"
                         />
-                        <button type="submit" className="px-3 py-1.5 bg-white text-black hover:bg-neutral-200 rounded-lg text-xs font-bold transition-colors">
+                        <button type="submit" className="px-3 py-1.5 bg-brand-cta text-surface-base hover:bg-brand-cta-hover rounded-lg text-xs font-bold transition-colors">
                           Save
                         </button>
-                        <button type="button" onClick={() => setProgressInput(null)} className="px-3 py-1.5 text-content-tertiary hover:text-white transition-colors text-xs">
+                        <button type="button" onClick={() => setProgressInput(null)} className="px-3 py-1.5 text-content-tertiary hover:text-content-primary transition-colors text-xs">
                           Cancel
                         </button>
                       </form>

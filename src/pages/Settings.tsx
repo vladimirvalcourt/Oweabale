@@ -2,6 +2,7 @@ import React, { memo, startTransition, useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Dialog } from '@headlessui/react';
 import { AlertTriangle, Shield, Loader2 } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
@@ -54,7 +55,7 @@ const SettingsNav = memo(function SettingsNav({
           className={cn(
             'w-full flex items-center px-4 py-2.5 text-[10px] font-mono uppercase tracking-[0.2em] rounded-lg transition-all border border-transparent',
             activeTab === tab.id
-              ? 'bg-white/[0.08] text-content-primary border-white/10 shadow-none'
+              ? 'bg-content-primary/[0.08] text-content-primary border-content-primary/10 shadow-none'
               : 'text-content-tertiary hover:text-content-primary hover:bg-surface-raised',
           )}
         >
@@ -79,17 +80,19 @@ export default function Settings() {
     deletedAt: string;
     summary: Record<string, number>;
   } | null>(null);
-  const exportSnapshot = useStore((state) => ({
-    bills: state.bills.length,
-    debts: state.debts.length,
-    transactions: state.transactions.length,
-    assets: state.assets.length,
-    subscriptions: state.subscriptions.length,
-    goals: state.goals.length,
-    incomes: state.incomes.length,
-    budgets: state.budgets.length,
-    categories: state.categories.length,
-  }));
+  const exportSnapshot = useStore(
+    useShallow((state) => ({
+      bills: state.bills.length,
+      debts: state.debts.length,
+      transactions: state.transactions.length,
+      assets: state.assets.length,
+      subscriptions: state.subscriptions.length,
+      goals: state.goals.length,
+      incomes: state.incomes.length,
+      budgets: state.budgets.length,
+      categories: state.categories.length,
+    })),
+  );
 
   const tabFromUrl = searchParams.get('tab');
   const activeTab: SettingsTab =
@@ -149,7 +152,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
+    <div className="w-full max-w-5xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Settings</h1>

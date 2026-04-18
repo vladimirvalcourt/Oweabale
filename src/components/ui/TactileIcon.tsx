@@ -104,7 +104,7 @@ function TactileIconInteractive({
       </motion.div>
 
       <motion.div
-        className="absolute inset-0 rounded-full bg-white/10 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100"
+        className="absolute inset-0 rounded-full bg-content-primary/10 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100"
         style={{ translateZ: -5 }}
       />
     </motion.div>

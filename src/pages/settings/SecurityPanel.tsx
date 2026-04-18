@@ -80,7 +80,7 @@ function SecurityPanelInner() {
             <button
               type="submit"
               disabled={isUpdatingPassword}
-              className="flex items-center gap-2 px-4 py-2 bg-white text-black hover:bg-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed text-black rounded-lg text-sm font-medium transition-colors focus-app"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-cta text-surface-base hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors focus-app"
             >
               {isUpdatingPassword && <Loader2 className="w-3 h-3 animate-spin" />}
               {isUpdatingPassword ? 'Updating...' : 'Update Password'}
@@ -119,7 +119,7 @@ function SecurityPanelInner() {
             <button
               type="button"
               onClick={() => deferToast(() => toast.info('2FA setup coming soon'))}
-              className="px-4 py-2 bg-white hover:bg-neutral-200 rounded-lg text-sm font-medium text-black transition-colors"
+              className="px-4 py-2 bg-brand-cta hover:bg-brand-cta-hover rounded-lg text-sm font-medium text-surface-base transition-colors"
             >
               Enable 2FA
             </button>

@@ -169,11 +169,11 @@ export default function Freelance() {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 w-full">
       {/* Hero: The Vault Status */}
-      <div className="bg-surface-raised border border-surface-border p-8 md:p-12 relative overflow-hidden group shadow-2xl">
-        <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-white/25"></div>
-        <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-white/25"></div>
+      <div className="bg-surface-raised border border-surface-border p-8 md:p-12 relative overflow-hidden group shadow-none">
+        <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-surface-border" />
+        <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-surface-border" />
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-12">
           <div>
@@ -184,7 +184,7 @@ export default function Freelance() {
             
             <div className="flex flex-col">
               <span className="text-xs text-content-tertiary mb-1">Tax still owed (unreserved)</span>
-              <h2 className="text-7xl md:text-8xl font-mono font-bold text-white tracking-tighter tabular-nums leading-none data-numeric">
+              <h2 className="text-7xl md:text-8xl font-mono font-bold text-content-primary tracking-tighter tabular-nums leading-none data-numeric">
                 ${totalUnreserved.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </h2>
             </div>
@@ -216,7 +216,7 @@ export default function Freelance() {
               <button 
                 type="button"
                 onClick={() => setIsAddModalOpen(true)}
-                className="bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold px-6 py-3 rounded-lg shadow-sm transition-all flex items-center gap-2"
+                className="bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold px-6 py-3 rounded-lg shadow-none transition-all flex items-center gap-2"
               >
                 <Plus className="w-4 h-4 shrink-0" aria-hidden /> Add payment
               </button>
@@ -245,15 +245,15 @@ export default function Freelance() {
                              {entry.isVaulted ? <ShieldCheck className="w-6 h-6 text-emerald-500" /> : <ShieldAlert className="w-6 h-6 text-content-muted" />}
                            </div>
                            <div className="space-y-1">
-                              <h3 className="font-sans font-semibold text-white text-sm">{entry.client}</h3>
+                              <h3 className="font-sans font-semibold text-content-primary text-sm">{entry.client}</h3>
                               <p className="text-xs text-content-tertiary">
-                                {new Date(entry.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · Gross <span className="text-white font-mono tabular-nums">${entry.amount.toFixed(0)}</span>
+                                {new Date(entry.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · Gross <span className="text-content-primary font-mono tabular-nums">${entry.amount.toFixed(0)}</span>
                               </p>
                               <div className="pt-2 flex flex-wrap gap-2">
                                  <span className="text-[10px] font-mono tabular-nums text-rose-500 border border-rose-500/20 px-1.5 py-0.5 rounded-lg">Tax −${entry.totalLiability.toFixed(0)}</span>
                                  <span className="text-[10px] font-mono tabular-nums text-emerald-400 border border-emerald-400/20 px-1.5 py-0.5 rounded-lg">You keep +${entry.profit.toFixed(0)}</span>
                                  {entry.scouredWriteOffs && entry.scouredWriteOffs > 0 && (
-                                   <span className="text-[10px] font-sans bg-white/[0.08] text-content-primary border border-white/15 px-1.5 py-0.5 rounded-lg flex items-center gap-1">
+                                   <span className="text-[10px] font-sans bg-surface-elevated text-content-primary border border-surface-border px-1.5 py-0.5 rounded-lg flex items-center gap-1">
                                      <ShieldCheck className="w-3 h-3 shrink-0" aria-hidden /> Deductions ${entry.scouredWriteOffs.toFixed(0)}
                                    </span>
                                  )}
@@ -265,12 +265,12 @@ export default function Freelance() {
                            <div className="text-right">
                               <p className="text-xs text-content-tertiary mb-1">% you keep</p>
                               <div className="w-24 bg-surface-base h-1 rounded-none overflow-hidden">
-                                 <div className="bg-white/50 h-full" style={{ width: `${(entry.profit / entry.amount) * 100}%` }} />
+                                 <div className="bg-content-primary/50 h-full" style={{ width: `${(entry.profit / entry.amount) * 100}%` }} />
                               </div>
                            </div>
                            <button 
                              onClick={() => toggleFreelanceVault(entry.id)}
-                             className={`px-4 py-2 border text-xs font-sans font-semibold transition-all rounded-lg ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-surface-border bg-white text-black hover:bg-neutral-200'}`}
+                             className={`px-4 py-2 border text-xs font-sans font-semibold transition-all rounded-lg ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-surface-border bg-brand-cta text-surface-base hover:bg-brand-cta-hover'}`}
                            >
                              {entry.isVaulted ? 'Saved' : 'Move to tax reserve'}
                            </button>
@@ -291,14 +291,14 @@ export default function Freelance() {
                  <h3 className="text-sm font-sans font-semibold text-content-primary">Freelance tips</h3>
               </div>
               <div className="space-y-6">
-                 <div className="border-l-2 border-white/20 pl-4">
-                    <p className="text-sm font-sans font-medium text-white mb-1">Self-employment tax (15.3%)</p>
+                 <div className="border-l-2 border-surface-border pl-4">
+                    <p className="text-sm font-sans font-medium text-content-primary mb-1">Self-employment tax (15.3%)</p>
                     <p className="text-xs text-content-tertiary leading-relaxed">
                       We set aside 15.3% from each payment toward self-employment tax.
                     </p>
                  </div>
-                 <div className="border-l-2 border-white/20 pl-4">
-                    <p className="text-sm font-sans font-medium text-white mb-1">State tax · {taxState}</p>
+                 <div className="border-l-2 border-surface-border pl-4">
+                    <p className="text-sm font-sans font-medium text-content-primary mb-1">State tax · {taxState}</p>
                     <p className="text-xs text-content-tertiary leading-relaxed">
                       Save an extra {stateRate}% for state. Suggested total rate about {(stateRate + 15.3 + 12).toFixed(1)}%.
                     </p>
@@ -350,21 +350,21 @@ export default function Freelance() {
                 exit={{ scale: 0.95, opacity: 0 }}
                 className="w-full max-w-md"
               >
-                <Dialog.Panel className="bg-surface-raised border border-surface-border p-8 shadow-2xl">
-                  <Dialog.Title className="text-xl font-sans font-semibold text-white mb-6">Add payment</Dialog.Title>
+                <Dialog.Panel className="bg-surface-raised border border-surface-border p-8 shadow-none">
+                  <Dialog.Title className="text-xl font-sans font-semibold text-content-primary mb-6">Add payment</Dialog.Title>
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                       <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Who paid you?</label>
-                      <input autoFocus type="text" value={formData.client} onChange={e => setFormData({ ...formData, client: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white focus-app-field transition-colors rounded-lg" placeholder="e.g. Acme Studio" />
+                      <input autoFocus type="text" value={formData.client} onChange={e => setFormData({ ...formData, client: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-content-primary focus-app-field transition-colors rounded-lg" placeholder="e.g. Acme Studio" />
                     </div>
                     <div>
                       <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Payment amount</label>
-                      <input type="number" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white font-mono tabular-nums focus-app-field transition-colors rounded-lg" placeholder="0.00" />
+                      <input type="number" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-content-primary font-mono tabular-nums focus-app-field transition-colors rounded-lg" placeholder="0.00" />
                     </div>
                     <p className="text-xs text-content-muted leading-relaxed">If this row came from a PDF scan, double-check the amount matches your statement.</p>
                     <div className="pt-4 flex gap-3">
                       <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 h-12 border border-surface-border text-content-tertiary text-sm font-sans font-medium hover:bg-surface-elevated transition-colors rounded-lg focus-app">Cancel</button>
-                      <button type="submit" className="flex-[2] bg-white hover:bg-neutral-200 text-black h-12 px-8 text-sm font-sans font-semibold transition-all rounded-lg focus-app">Add payment</button>
+                      <button type="submit" className="flex-[2] bg-brand-cta hover:bg-brand-cta-hover text-surface-base h-12 px-8 text-sm font-sans font-semibold transition-all rounded-lg focus-app">Add payment</button>
                     </div>
                   </form>
                 </Dialog.Panel>

@@ -7,20 +7,20 @@ import { useSEO } from '../hooks/useSEO';
 export default function Terms() {
   useSEO({
     title: 'Terms of Service — Oweable',
-    description: 'Terms of Service for Oweable. Read the terms that govern your use of the Oweable financial platform.',
+    description: 'Terms of Service for Oweable, including payments, cancellations, refunds, account termination, and legal notices.',
     canonical: 'https://www.oweable.com/terms',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
 
   return (
     <>
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-white/15">
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-content-primary/15">
       <div className="max-w-3xl mx-auto">
         <TransitionLink to="/" className="inline-flex items-center gap-2 text-sm text-content-tertiary hover:text-content-primary transition-colors mb-12 font-sans">
           <ChevronLeft className="w-4 h-4 shrink-0" aria-hidden /> Back to home
         </TransitionLink>
         
-        <header className="mb-16 border-l-4 border-white/25 pl-8">
+        <header className="mb-16 border-l-4 border-surface-border pl-8">
           <div className="flex items-center gap-3 text-content-secondary mb-4">
             <Scale className="w-6 h-6 shrink-0" aria-hidden />
             <span className="text-xs font-sans font-medium">Legal</span>
@@ -58,9 +58,55 @@ export default function Terms() {
           </section>
 
           <section>
-            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">4. Limitation of liability</h2>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">4. Payments &amp; cancellations</h2>
+            <p className="mb-4">
+              Paid subscriptions are billed monthly on your original signup date (or the date you upgrade to a paid plan). By starting a paid plan, you authorize recurring charges until cancellation.
+            </p>
+            <p className="mb-4">
+              You may cancel anytime from your billing settings. Cancellation stops future renewals and your paid access remains active through the end of the current billing period.
+            </p>
+            <p className="mb-4">
+              New paid subscribers are eligible for a refund request within 7 calendar days of the first paid charge. After this window, charges are non-refundable and we do not provide prorated refunds for partial billing periods unless required by law.
+            </p>
             <p>
-              Oweable provides its services "as is" and "as available". We are not responsible for financial losses, missed tax deadlines, or penalties incurred through the use of this software. Our total liability is limited to the amount paid by you for the service in the preceding 12-month period.
+              After cancellation, your account transitions to the free tier (if available). Data retention and deletion requests follow the &quot;Right to Fade&quot; process in our{' '}
+              <TransitionLink to="/privacy" className="underline underline-offset-2 hover:text-content-primary">
+                Privacy Policy
+              </TransitionLink>.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">5. Account termination</h2>
+            <p className="mb-4">
+              We may suspend or terminate access for fraud, abuse, security threats, repeated policy violations, non-payment, or illegal activity. We may also remove content or restrict features to protect the platform and other users.
+            </p>
+            <p>
+              When feasible, we provide notice before termination. Immediate suspension may occur when required to address urgent security or legal issues.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">6. Changes to these terms</h2>
+            <p>
+              We may update these Terms from time to time. Material changes are communicated by email, in-app notice, or both. Continued use of Oweable after the effective date of updated terms constitutes acceptance of those updates.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">7. Governing law and jurisdiction</h2>
+            <p className="mb-4">
+              These Terms are governed by the laws of the State of New York, without regard to conflict-of-laws principles.
+            </p>
+            <p>
+              Any dispute arising from these Terms or your use of Oweable will be brought in the state or federal courts located in New York County, New York, unless applicable law requires otherwise.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">8. Limitation of liability</h2>
+            <p>
+              Oweable provides its services &quot;as is&quot; and &quot;as available&quot;. We are not responsible for financial losses, missed tax deadlines, or penalties incurred through the use of this software. Our total liability is limited to the amount paid by you for the service in the preceding 12-month period.
             </p>
           </section>
         </div>

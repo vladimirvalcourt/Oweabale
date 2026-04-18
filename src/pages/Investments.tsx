@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
 import { useStore, type InvestmentAccount } from '../store/useStore';
-import { TrendingUp, Plus, Edit2, Trash2, Building2, X } from 'lucide-react';
+import {
+  TrendingUp,
+  Plus,
+  Edit2,
+  Trash2,
+  Building2,
+  X,
+  Landmark,
+  PiggyBank,
+  LineChart,
+  HeartPulse,
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { CollapsibleModule } from '../components/CollapsibleModule';
 import { AppPageShell } from '../components/AppPageShell';
 import { Dialog } from '@headlessui/react';
 import { yieldForPaint } from '../lib/interaction';
+import { cn } from '../lib/utils';
 
 const TYPE_LABELS: Record<InvestmentAccount['type'], string> = {
   brokerage: 'Brokerage',
@@ -37,14 +48,199 @@ const EMPTY_FORM = {
 
 type FormState = typeof EMPTY_FORM;
 
+function formatMoney(n: number, opts?: { maximumFractionDigits?: number }) {
+  return n.toLocaleString('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: opts?.maximumFractionDigits ?? 0,
+  });
+}
+
+function formatSignedMoney(n: number) {
+  const sign = n > 0 ? '+' : n < 0 ? '−' : '';
+  const abs = Math.abs(n);
+  return `${sign}$${formatMoney(abs)}`;
+}
+
+function formatRelativeTime(iso: string) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  const diffMs = Date.now() - d.getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 48) return `${hrs}h ago`;
+  return d.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+}
+
+function InvestmentsPageSkeleton() {
+  const bar = (className?: string) => (
+    <div className={cn('rounded-md skeleton-shimmer h-4', className)} />
+  );
+  return (
+    <div className="space-y-6" aria-busy="true" aria-label="Loading investments">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div className="space-y-2 w-full max-w-md">
+          {bar('h-7 w-48')}
+          {bar('h-3 w-full')}
+        </div>
+        {bar('h-9 w-36 shrink-0 self-end sm:self-start')}
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {bar('h-24 w-full')}
+        {bar('h-24 w-full')}
+        {bar('h-24 w-full')}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 space-y-3">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="rounded-lg border border-surface-border bg-surface-raised p-4 flex gap-4"
+            >
+              <div className="skeleton-shimmer rounded-lg w-10 h-10 shrink-0" />
+              <div className="flex-1 space-y-2">
+                {bar('h-3 w-40')}
+                {bar('h-3 w-24')}
+                {bar('h-4 w-28')}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="rounded-lg border border-surface-border bg-surface-raised p-5 space-y-3">
+          {bar('h-3 w-36')}
+          {bar('h-32 w-full')}
+          {bar('h-3 w-full')}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PortfolioVsDebtWidget({
+  portfolio,
+  debt,
+}: {
+  portfolio: number;
+  debt: number;
+}) {
+  const total = portfolio + debt;
+  const invPct = total > 0 ? (portfolio / total) * 100 : 50;
+  const debtPct = total > 0 ? (debt / total) * 100 : 50;
+
+  return (
+    <div className="rounded-lg border border-surface-border bg-surface-raised p-5">
+      <h3 className="text-xs font-medium uppercase tracking-wider text-content-tertiary mb-1">
+        Portfolio vs. debt
+      </h3>
+      <p className="text-sm text-content-secondary mb-4">
+        How your invested assets compare to what you owe — the same lens as your net worth timeline.
+      </p>
+      <div className="h-3 w-full rounded-full overflow-hidden flex bg-surface-elevated border border-surface-border">
+        {portfolio > 0 && (
+          <div
+            className="h-full bg-emerald-500/80 min-w-[4px] transition-all"
+            style={{ width: `${invPct}%` }}
+            title={`Investments $${formatMoney(portfolio)}`}
+          />
+        )}
+        {debt > 0 && (
+          <div
+            className="h-full bg-rose-500/75 min-w-[4px] transition-all"
+            style={{ width: `${debtPct}%` }}
+            title={`Debt $${formatMoney(debt)}`}
+          />
+        )}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs">
+        <span className="inline-flex items-center gap-1.5 text-content-secondary">
+          <span className="h-2 w-2 rounded-full bg-emerald-500/90" aria-hidden />
+          Investments <span className="font-mono tabular-nums text-content-primary">${formatMoney(portfolio)}</span>
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-content-secondary">
+          <span className="h-2 w-2 rounded-full bg-rose-500/90" aria-hidden />
+          Debt <span className="font-mono tabular-nums text-content-primary">${formatMoney(debt)}</span>
+        </span>
+      </div>
+      {total === 0 && (
+        <p className="text-xs text-content-tertiary mt-2">Add accounts and debts to see this comparison.</p>
+      )}
+    </div>
+  );
+}
+
+function AccountTypeIconCluster() {
+  const tile = (Icon: typeof Landmark, label: string, className: string) => (
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center gap-1.5 rounded-lg border px-3 py-3 min-w-[4.5rem]',
+        className
+      )}
+    >
+      <Icon className="w-5 h-5 opacity-90" aria-hidden />
+      <span className="text-[10px] font-semibold uppercase tracking-wide text-content-secondary">{label}</span>
+    </div>
+  );
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3" aria-hidden>
+      {tile(Landmark, '401(k)', 'border-blue-500/25 bg-blue-500/5')}
+      {tile(PiggyBank, 'IRA', 'border-purple-500/25 bg-purple-500/5')}
+      {tile(LineChart, 'Brokerage', 'border-emerald-500/25 bg-emerald-500/5')}
+      {tile(HeartPulse, 'HSA', 'border-teal-500/25 bg-teal-500/5')}
+    </div>
+  );
+}
+
 export default function Investments() {
-  const { investmentAccounts, addInvestmentAccount, editInvestmentAccount, deleteInvestmentAccount } = useStore();
+  const {
+    investmentAccounts,
+    debts,
+    user,
+    phase2Hydrated,
+    addInvestmentAccount,
+    editInvestmentAccount,
+    deleteInvestmentAccount,
+  } = useStore();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
+  const userId = user?.id ?? '';
+  const today = new Date().toISOString().split('T')[0];
+
   const totalPortfolio = investmentAccounts.reduce((sum, a) => sum + a.balance, 0);
+  const totalDebt = debts.reduce((sum, d) => sum + (d.remaining || 0), 0);
+
+  /** Session baselines (read/write sessionStorage during render — intentional for lightweight client metrics). */
+  const dayStartPortfolio = (() => {
+    if (!phase2Hydrated || !userId) return null;
+    const dayKey = `oweable:inv-port-day-total:${userId}:${today}`;
+    let raw = sessionStorage.getItem(dayKey);
+    if (raw === null) {
+      raw = String(totalPortfolio);
+      sessionStorage.setItem(dayKey, raw);
+    }
+    const n = parseFloat(raw);
+    return Number.isFinite(n) ? n : totalPortfolio;
+  })();
+
+  const accountDeltas: Record<string, number | null> = (() => {
+    if (!phase2Hydrated || !userId) return {};
+    const next: Record<string, number | null> = {};
+    for (const a of investmentAccounts) {
+      const key = `oweable:inv-prev-bal:${userId}:${a.id}`;
+      const raw = sessionStorage.getItem(key);
+      const prev = raw === null ? null : parseFloat(raw);
+      next[a.id] =
+        prev === null || !Number.isFinite(prev) ? null : a.balance - prev;
+      sessionStorage.setItem(key, String(a.balance));
+    }
+    return next;
+  })();
+
+  const todayPortfolioDelta = dayStartPortfolio !== null ? totalPortfolio - dayStartPortfolio : 0;
 
   const openAdd = () => {
     setEditingId(null);
@@ -110,177 +306,193 @@ export default function Investments() {
     toast.success('Account removed');
   };
 
-  // Group balances by type for summary breakdown
-  const byType = investmentAccounts.reduce<Partial<Record<InvestmentAccount['type'], number>>>((acc, a) => {
-    acc[a.type] = (acc[a.type] ?? 0) + a.balance;
-    return acc;
-  }, {});
+  const showSkeleton = !phase2Hydrated;
+  const isEmpty = phase2Hydrated && investmentAccounts.length === 0;
+  const hasAccounts = phase2Hydrated && investmentAccounts.length > 0;
 
   return (
     <AppPageShell>
-      <div className="p-6 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Investment accounts</h1>
-            <p className="mt-1 text-sm font-medium text-content-secondary">Track your portfolio across all accounts.</p>
-          </div>
-          <button
-            type="button"
-            onClick={openAdd}
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
-          >
-            <Plus className="w-4 h-4 shrink-0" aria-hidden />
-            Add Account
-          </button>
-        </div>
-
-        {/* Summary bar */}
-        {investmentAccounts.length > 0 && (
-          <CollapsibleModule
-            title="Portfolio overview"
-            icon={TrendingUp}
-            extraHeader={
-              <span className="text-sm font-mono tabular-nums font-semibold text-content-primary">
-                ${totalPortfolio.toLocaleString('en-US', { minimumFractionDigits: 0 })}
-              </span>
-            }
-          >
-            <div className="-mx-6 -my-6 p-6 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-surface-elevated rounded-lg border border-surface-border p-5">
-                  <p className="text-xs font-medium text-content-tertiary uppercase tracking-wider mb-2">Total Portfolio Value</p>
-                  <p className="text-3xl font-bold font-mono tabular-nums text-content-primary">
-                    ${totalPortfolio.toLocaleString('en-US', { minimumFractionDigits: 0 })}
-                  </p>
-                  <p className="text-xs text-content-tertiary mt-1">
-                    Across {investmentAccounts.length} account{investmentAccounts.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-                <div className="bg-surface-elevated rounded-lg border border-surface-border p-5">
-                  <p className="text-xs font-medium text-content-tertiary uppercase tracking-wider mb-3">Breakdown by Type</p>
-                  <ul className="space-y-1.5">
-                    {(Object.entries(byType) as [InvestmentAccount['type'], number][]).map(([type, amount]) => {
-                      const pct = totalPortfolio > 0 ? ((amount / totalPortfolio) * 100).toFixed(0) : '0';
-                      return (
-                        <li key={type} className="flex items-center justify-between text-xs">
-                          <span className="text-content-secondary">
-                            {TYPE_LABELS[type]}
-                          </span>
-                          <span className="font-mono tabular-nums text-content-primary">
-                            ${amount.toLocaleString('en-US', { minimumFractionDigits: 0 })}
-                            <span className="text-content-tertiary ml-1.5">({pct}%)</span>
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              </div>
-
-              {/* Inline account type summary pills */}
-              <div className="flex flex-wrap gap-2">
-                {investmentAccounts.map((a) => (
-                  <span
-                    key={a.id}
-                    className={`inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 font-mono text-xs ${TYPE_BADGE[a.type]}`}
-                  >
-                    {TYPE_LABELS[a.type]}
-                    {a.institution ? ` · ${a.institution}` : ''}
-                    {' · '}
-                    ${a.balance.toLocaleString('en-US', { minimumFractionDigits: 0 })}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </CollapsibleModule>
-        )}
-
-        {/* Empty state */}
-        {investmentAccounts.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-surface-border bg-surface-raised p-12 text-center">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg border border-surface-border bg-surface-elevated">
-              <TrendingUp className="w-8 h-8 text-content-muted" />
-            </div>
-            <h3 className="mb-2 text-lg font-medium tracking-tight text-content-primary">No investment accounts yet</h3>
-            <p className="mx-auto mb-8 max-w-sm text-sm font-medium text-content-secondary">
-              Add your 401(k), IRA, brokerage, and HSA balances so net worth and planning stay accurate.
-            </p>
-            <button
-              type="button"
-              onClick={openAdd}
-              className="mx-auto inline-flex items-center gap-2 rounded-lg bg-white px-8 py-3 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
-            >
-              <Plus className="w-4 h-4 shrink-0" aria-hidden />
-              Add Account
-            </button>
-          </div>
+      <div className="space-y-6 w-full pb-4">
+        {showSkeleton ? (
+          <InvestmentsPageSkeleton />
         ) : (
-          /* Account list */
-          <CollapsibleModule title="Your accounts" icon={Building2}>
-            <ul className="divide-y divide-surface-highlight -mx-6 -my-6">
-              {investmentAccounts.map((account) => (
-                <li
-                  key={account.id}
-                  className="p-4 sm:px-6 hover:bg-surface-elevated transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+          <>
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+              <div>
+                <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">
+                  Investment accounts
+                </h1>
+                <p className="mt-1 text-sm font-medium text-content-secondary max-w-xl">
+                  See how your investments stack up against your debt and net worth — all in one place.
+                </p>
+              </div>
+              {hasAccounts && (
+                <button
+                  type="button"
+                  onClick={openAdd}
+                  className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app shrink-0 self-end sm:self-start"
                 >
-                  <div className="flex items-start gap-4 min-w-0">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-surface-border bg-surface-base">
-                      <TrendingUp className="w-4 h-4 text-content-muted" />
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="text-sm font-semibold text-content-primary">{account.name}</h4>
-                        <span
-                          className={`inline-flex items-center rounded-md border px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide ${TYPE_BADGE[account.type]}`}
-                        >
-                          {TYPE_LABELS[account.type]}
-                        </span>
-                      </div>
-                      {account.institution && (
-                        <p className="text-xs text-content-tertiary mt-1 flex items-center gap-1">
-                          <Building2 className="w-3 h-3 shrink-0" />
-                          {account.institution}
-                        </p>
+                  <Plus className="w-4 h-4 shrink-0" aria-hidden />
+                  Add Account
+                </button>
+              )}
+            </div>
+
+            {isEmpty && (
+              <div className="rounded-lg border border-dashed border-surface-border bg-surface-raised p-8 sm:p-12 text-center">
+                <AccountTypeIconCluster />
+                <h3 className="mt-8 text-lg font-medium tracking-tight text-content-primary">
+                  See your full financial picture
+                </h3>
+                <p className="mx-auto mt-2 max-w-lg text-sm font-medium text-content-secondary leading-relaxed">
+                  Connect your 401(k), IRA, brokerage, or HSA to track your total net worth in real time — including how
+                  your investments are moving against your debt payoff progress.
+                </p>
+                <button
+                  type="button"
+                  onClick={openAdd}
+                  className="mt-8 inline-flex items-center gap-2 rounded-lg bg-brand-cta px-8 py-3 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
+                >
+                  <Plus className="w-4 h-4 shrink-0" aria-hidden />
+                  Add Investment Account
+                </button>
+                <p className="mt-4 text-xs text-content-tertiary max-w-md mx-auto">
+                  Enter balances manually — we&apos;ll track changes over time
+                </p>
+              </div>
+            )}
+
+            {hasAccounts && (
+              <>
+                {/* Summary row */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="rounded-lg border border-surface-border bg-surface-raised p-4 sm:p-5">
+                    <p className="text-xs font-medium text-content-tertiary uppercase tracking-wider">Total portfolio value</p>
+                    <p className="mt-2 text-2xl sm:text-3xl font-bold font-mono tabular-nums text-content-primary">
+                      ${formatMoney(totalPortfolio)}
+                    </p>
+                    <p className="text-xs text-content-tertiary mt-1">
+                      {investmentAccounts.length} account{investmentAccounts.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-surface-border bg-surface-raised p-4 sm:p-5">
+                    <p className="text-xs font-medium text-content-tertiary uppercase tracking-wider">Today&apos;s change</p>
+                    <p
+                      className={cn(
+                        'mt-2 text-2xl sm:text-3xl font-bold font-mono tabular-nums',
+                        todayPortfolioDelta > 0
+                          ? 'text-emerald-400'
+                          : todayPortfolioDelta < 0
+                            ? 'text-rose-400'
+                            : 'text-content-primary'
                       )}
-                      {account.notes && (
-                        <p className="text-xs text-content-tertiary mt-0.5 truncate max-w-xs">{account.notes}</p>
-                      )}
-                    </div>
+                    >
+                      {formatSignedMoney(todayPortfolioDelta)}
+                    </p>
+                    <p className="text-xs text-content-tertiary mt-1">Since first visit today (manual balances)</p>
+                  </div>
+                  <div className="rounded-lg border border-surface-border bg-surface-raised p-4 sm:p-5">
+                    <p className="text-xs font-medium text-content-tertiary uppercase tracking-wider">Total return</p>
+                    <p className="mt-2 text-2xl sm:text-3xl font-bold font-mono tabular-nums text-content-tertiary">
+                      —
+                    </p>
+                    <p className="text-xs text-content-tertiary mt-1">Cost basis tracking coming soon</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  <div className="lg:col-span-2 space-y-3">
+                    <h2 className="text-xs font-medium uppercase tracking-wider text-content-tertiary">Your accounts</h2>
+                    <ul className="space-y-3">
+                      {investmentAccounts.map((account) => {
+                        const delta = accountDeltas[account.id];
+                        const deltaUnknown = delta === null || delta === undefined;
+                        return (
+                          <li
+                            key={account.id}
+                            className="rounded-lg border border-surface-border bg-surface-raised p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                          >
+                            <div className="flex items-start gap-4 min-w-0">
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-surface-border bg-surface-base">
+                                <TrendingUp className="w-4 h-4 text-content-muted" aria-hidden />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <h4 className="text-sm font-semibold text-content-primary">{account.name}</h4>
+                                  <span
+                                    className={`inline-flex items-center rounded-md border px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide ${TYPE_BADGE[account.type]}`}
+                                  >
+                                    {TYPE_LABELS[account.type]}
+                                  </span>
+                                </div>
+                                {account.institution && (
+                                  <p className="text-xs text-content-tertiary mt-1 flex items-center gap-1">
+                                    <Building2 className="w-3 h-3 shrink-0" aria-hidden />
+                                    {account.institution}
+                                  </p>
+                                )}
+                                {account.notes && (
+                                  <p className="text-xs text-content-tertiary mt-0.5 truncate max-w-md">{account.notes}</p>
+                                )}
+                                <p className="text-[11px] text-content-tertiary mt-2">
+                                  Last updated {formatRelativeTime(account.lastUpdated)}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
+                              <div className="text-right space-y-0.5">
+                                <p className="text-xl font-bold font-mono tabular-nums text-content-primary">
+                                  ${formatMoney(account.balance)}
+                                </p>
+                                <p
+                                  className={cn(
+                                    'text-xs font-mono tabular-nums',
+                                    deltaUnknown
+                                      ? 'text-content-tertiary'
+                                      : delta > 0
+                                        ? 'text-emerald-400'
+                                        : delta < 0
+                                          ? 'text-rose-400'
+                                          : 'text-content-tertiary'
+                                  )}
+                                >
+                                  {deltaUnknown
+                                    ? 'Change —'
+                                    : `${formatSignedMoney(delta)} since last visit`}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => openEdit(account)}
+                                  className="p-2 text-content-tertiary hover:text-content-secondary rounded-md hover:bg-surface-elevated transition-colors"
+                                  title="Edit account"
+                                >
+                                  <Edit2 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDelete(account.id)}
+                                  className="p-2 text-content-tertiary hover:text-rose-400 rounded-md hover:bg-surface-elevated transition-colors"
+                                  title="Delete account"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </div>
 
-                  <div className="flex items-center justify-between sm:justify-end gap-8 w-full sm:w-auto">
-                    <div className="text-right">
-                      <p className="text-xl font-bold font-mono tabular-nums text-content-primary">
-                        ${account.balance.toLocaleString('en-US', { minimumFractionDigits: 0 })}
-                      </p>
-                      {account.lastUpdated && (
-                        <p className="text-[10px] text-content-tertiary mt-0.5">
-                          Updated {new Date(account.lastUpdated).toLocaleDateString()}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => openEdit(account)}
-                        className="p-2 text-content-tertiary hover:text-content-secondary rounded-md hover:bg-surface-elevated transition-colors"
-                        title="Edit account"
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(account.id)}
-                        className="p-2 text-content-tertiary hover:text-rose-400 rounded-md hover:bg-surface-elevated transition-colors"
-                        title="Delete account"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </CollapsibleModule>
+                  <PortfolioVsDebtWidget portfolio={totalPortfolio} debt={totalDebt} />
+                </div>
+              </>
+            )}
+          </>
         )}
       </div>
 
@@ -294,6 +506,7 @@ export default function Investments() {
                 {editingId ? 'Edit Account' : 'Add Investment Account'}
               </Dialog.Title>
               <button
+                type="button"
                 onClick={closeModal}
                 className="rounded-md p-1 text-content-tertiary transition-colors hover:text-content-secondary"
               >
@@ -303,7 +516,6 @@ export default function Investments() {
 
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                {/* Account Name */}
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-medium text-content-secondary mb-1.5">
                     Account name <span className="text-rose-400">*</span>
@@ -318,7 +530,6 @@ export default function Investments() {
                   />
                 </div>
 
-                {/* Account Type */}
                 <div>
                   <label className="block text-xs font-medium text-content-secondary mb-1.5">Account type</label>
                   <select
@@ -336,7 +547,6 @@ export default function Investments() {
                   </select>
                 </div>
 
-                {/* Institution */}
                 <div>
                   <label className="block text-xs font-medium text-content-secondary mb-1.5">Institution</label>
                   <input
@@ -348,7 +558,6 @@ export default function Investments() {
                   />
                 </div>
 
-                {/* Balance */}
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-medium text-content-secondary mb-1.5">
                     Current balance <span className="text-rose-400">*</span>
@@ -368,7 +577,6 @@ export default function Investments() {
                   </div>
                 </div>
 
-                {/* Notes */}
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-medium text-content-secondary mb-1.5">Notes</label>
                   <textarea
@@ -385,13 +593,13 @@ export default function Investments() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-transparent px-3 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-white/[0.04] hover:text-content-primary focus-app"
+                  className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-transparent px-3 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
+                  className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
                 >
                   {editingId ? 'Save changes' : 'Add account'}
                 </button>

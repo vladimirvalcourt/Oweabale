@@ -57,7 +57,7 @@ export default function Pricing() {
 
   useSEO({
     title: 'Pricing — Oweable',
-    description: 'Simple, transparent pricing for anyone dealing with debt, bills, or financial pressure. Start free. Upgrade when ready.',
+    description: 'Simple, transparent pricing for freelancers, gig workers, and the self-employed. Start free and upgrade to Full Suite when ready.',
     canonical: 'https://www.oweable.com/pricing',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -90,7 +90,7 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-white/15 overflow-x-hidden">
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-content-primary/15 overflow-x-hidden">
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-black/55 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40 border-surface-border' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
@@ -98,15 +98,15 @@ export default function Pricing() {
             Oweable
           </TransitionLink>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-content-tertiary">
-            <TransitionLink to="/#features" className="hover:text-white transition-colors duration-200">Features</TransitionLink>
-            <TransitionLink to="/pricing" className="text-white transition-colors duration-200">Pricing</TransitionLink>
-            <TransitionLink to="/dashboard" className="hover:text-white transition-colors duration-200">Sign In</TransitionLink>
+            <TransitionLink to="/#features" className="hover:text-content-secondary transition-colors duration-200 text-content-primary">Features</TransitionLink>
+            <TransitionLink to="/pricing" className="text-content-primary transition-colors duration-200">Pricing</TransitionLink>
+            <TransitionLink to="/auth" className="hover:text-content-secondary transition-colors duration-200 text-content-primary">Sign In</TransitionLink>
           </div>
           <TransitionLink 
-            to="/dashboard" 
-            className="px-5 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors duration-200"
+            to="/onboarding" 
+            className="px-5 py-2.5 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors duration-200"
           >
-            Get started
+            Join free
           </TransitionLink>
         </div>
       </nav>
@@ -115,11 +115,17 @@ export default function Pricing() {
       <section className="relative pt-40 pb-20 overflow-hidden">
         {/* Beta Disclaimer Banner */}
         <div className="max-w-4xl mx-auto px-6 lg:px-8 mb-12">
-          <div className="bg-amber-400/5 border border-amber-400/20 p-4 rounded-lg flex items-center gap-4">
+          <div className="bg-amber-400/5 border border-amber-400/20 p-4 rounded-lg flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
             <p className="text-sm text-amber-200/90 leading-relaxed">
-              <span className="text-amber-400 font-semibold">Closed beta:</span> Access is by invitation. Paid plans are active in beta unless your cohort has a separate promo.
+              <span className="text-amber-400 font-semibold">Early access:</span> Oweable is in early access. Sign up free to join the waitlist — paid plans unlock immediately upon approval.
             </p>
+            <TransitionLink
+              to="/onboarding"
+              className="inline-flex min-h-10 items-center justify-center rounded-lg bg-amber-300/90 px-4 text-xs font-semibold text-surface-base hover:bg-amber-200 transition-colors"
+            >
+              Request access
+            </TransitionLink>
           </div>
         </div>
 
@@ -165,8 +171,8 @@ export default function Pricing() {
               </div>
               
               <TransitionLink 
-                to="/dashboard" 
-                className="w-full py-4 px-6 bg-transparent border border-surface-border hover:border-content-muted hover:bg-white/5 text-content-primary rounded-lg text-sm font-sans font-semibold text-center transition-all duration-200 mb-10"
+                to="/onboarding" 
+                className="w-full py-4 px-6 bg-transparent border border-surface-border hover:border-content-muted hover:bg-content-primary/5 text-content-primary rounded-lg text-sm font-sans font-semibold text-center transition-all duration-200 mb-10"
               >
                 Use free tracker
               </TransitionLink>
@@ -190,7 +196,7 @@ export default function Pricing() {
             {/* Card 2: Full Suite */}
             <div className={`relative transition-all duration-700 ease-out delay-[200ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
               {/* Indigo Glow Behind Card */}
-              <div className="absolute -inset-1 z-0 rounded-2xl bg-white/[0.05] blur-3xl"></div>
+              <div className="absolute -inset-1 z-0 rounded-2xl bg-content-primary/[0.05] blur-3xl"></div>
               
               <div className="bg-surface-raised border border-surface-border rounded-lg p-10 flex flex-col relative z-10 h-full shadow-none">
                 <div className="absolute top-0 right-10 transform -translate-y-1/2">
@@ -213,7 +219,7 @@ export default function Pricing() {
                   type="button"
                   onClick={() => startCheckout('pro_monthly')}
                   disabled={isStartingCheckout}
-                  className="w-full py-4 px-6 rounded-lg bg-white hover:bg-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed text-black text-sm font-sans font-semibold text-center transition-all duration-200 mb-3 shadow-sm"
+                  className="w-full py-4 px-6 rounded-lg bg-brand-cta hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed text-surface-base text-sm font-sans font-semibold text-center transition-all duration-200 mb-3 shadow-sm"
                 >
                   {isStartingCheckout ? 'Starting checkout...' : 'Start monthly plan'}
                 </button>

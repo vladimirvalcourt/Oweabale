@@ -62,7 +62,7 @@ export function AdminLayout() {
               className={({ isActive }) =>
                 `rounded-lg px-3 py-1.5 text-xs transition ${
                   isActive
-                    ? 'bg-white text-black'
+                    ? 'bg-brand-cta text-surface-base'
                     : 'border border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary'
                 }`
               }

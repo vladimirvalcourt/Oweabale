@@ -30,7 +30,7 @@ export function Menu({ trigger, children, align = "left", showChevron = true }: 
         <div
           className={`absolute ${
             align === "right" ? "right-0" : "left-0"
-          } mt-2 w-56 rounded-md bg-surface-raised shadow-xl ring-1 ring-white/10 focus-app z-50`}
+          } mt-2 w-56 rounded-md bg-surface-raised shadow-xl ring-1 ring-content-primary/10 focus-app z-50`}
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="menu-button"
@@ -57,8 +57,8 @@ export function MenuItem({ children, onClick, disabled = false, icon, isActive =
   return (
     <button
       className={`relative block w-full h-16 text-center group transition-all
-        ${disabled ? "text-content-muted cursor-not-allowed" : "text-content-tertiary hover:text-white"}
-        ${isActive ? "bg-white/5 text-white" : ""}
+        ${disabled ? "text-content-muted cursor-not-allowed" : "text-content-tertiary hover:text-content-primary"}
+        ${isActive ? "bg-content-primary/5 text-content-primary" : ""}
         ${className}
       `}
       role="menuitem"
@@ -91,7 +91,7 @@ export function MenuContainer({ children }: { children: React.ReactNode }) {
       <div className="relative">
         {/* First item - always visible */}
         <div 
-          className="relative w-16 h-16 bg-surface-raised border border-surface-border cursor-pointer rounded-full group will-change-transform z-50 flex items-center justify-center shadow-lg hover:shadow-white/10 transition-shadow"
+          className="relative w-16 h-16 bg-surface-raised border border-surface-border cursor-pointer rounded-full group will-change-transform z-50 flex items-center justify-center shadow-lg hover:shadow-content-primary/10 transition-shadow"
           onClick={handleToggle}
         >
           {childrenArray[0]}

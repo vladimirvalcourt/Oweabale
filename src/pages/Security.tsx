@@ -14,13 +14,13 @@ export default function Security() {
 
   return (
     <>
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-white/15">
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-content-primary/15">
       <div className="max-w-3xl mx-auto">
         <TransitionLink to="/" className="inline-flex items-center gap-2 text-sm text-content-tertiary hover:text-content-primary transition-colors mb-12 font-sans">
           <ChevronLeft className="w-4 h-4 shrink-0" aria-hidden /> Back to home
         </TransitionLink>
         
-        <header className="mb-16 border-l-4 border-white/25 pl-8">
+        <header className="mb-16 border-l-4 border-surface-border pl-8">
           <div className="flex items-center gap-3 text-content-secondary mb-4">
             <ShieldCheck className="w-6 h-6 shrink-0" aria-hidden />
             <span className="text-xs font-sans font-medium">Security</span>
@@ -50,7 +50,7 @@ export default function Security() {
           <section>
             <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">1. SOC 2 framework</h2>
             <p>
-              Oweable's operational security follows the SOC 2 Type II framework for Trust Services Criteria. This includes rigorous internal access controls, mandatory security training for all engineering staff, and routine third-party penetration testing.
+              We are building toward SOC 2 Type II certification and use SOC 2 security controls as our internal operating standard today. This includes strict access controls, security training for engineering staff, and recurring security testing.
             </p>
           </section>
 

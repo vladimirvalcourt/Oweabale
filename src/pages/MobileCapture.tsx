@@ -227,7 +227,7 @@ export default function MobileCapture() {
           <button 
             type="button"
             onClick={() => { setPreviewUrl(null); setStatus('idle'); }}
-            className="w-full rounded-lg bg-white py-3.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 active:scale-[0.99]"
+            className="w-full rounded-lg bg-brand-cta py-3.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover active:scale-[0.99]"
           >
             Capture another
           </button>
@@ -268,7 +268,7 @@ export default function MobileCapture() {
               {/* Instructions Section */}
               <div className="space-y-8 mt-4">
                  <div className="flex gap-5 group">
-                    <div className="shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
+                    <div className="shrink-0 w-8 h-8 rounded-lg bg-content-primary/5 border border-content-primary/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
                        <Sun className="w-4 h-4 text-content-tertiary group-hover:text-content-primary" />
                     </div>
                     <div className="space-y-1">
@@ -277,7 +277,7 @@ export default function MobileCapture() {
                     </div>
                  </div>
                  <div className="flex gap-5 group text-left">
-                    <div className="shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
+                    <div className="shrink-0 w-8 h-8 rounded-lg bg-content-primary/5 border border-content-primary/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
                        <Maximize className="w-4 h-4 text-content-tertiary group-hover:text-content-primary" />
                     </div>
                     <div className="space-y-1">
@@ -286,7 +286,7 @@ export default function MobileCapture() {
                     </div>
                  </div>
                  <div className="flex gap-5 group text-left">
-                    <div className="shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
+                    <div className="shrink-0 w-8 h-8 rounded-lg bg-content-primary/5 border border-content-primary/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
                        <MousePointer2 className="w-4 h-4 text-content-tertiary group-hover:text-content-primary" />
                     </div>
                     <div className="space-y-1">
@@ -299,7 +299,7 @@ export default function MobileCapture() {
               {/* Capture Options */}
               <div className="mt-auto mb-8 flex flex-col gap-4">
                 {/* Option 1: Take Photo with Camera */}
-                <div className="relative p-10 bg-surface-base border border-dashed border-white/[0.1] rounded-lg group active:scale-[0.98] transition-all overflow-hidden">
+                <div className="relative p-10 bg-surface-base border border-dashed border-content-primary/[0.1] rounded-lg group active:scale-[0.98] transition-all overflow-hidden">
                   <input
                     type="file"
                     accept="image/*"
@@ -308,7 +308,7 @@ export default function MobileCapture() {
                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                   />
                   <div className="flex items-center gap-5 relative z-1">
-                    <div className="w-14 h-14 rounded-full bg-white/[0.05] border border-white/20 flex items-center justify-center group-hover:border-white/35 transition-all shrink-0">
+                    <div className="w-14 h-14 rounded-full bg-content-primary/[0.05] border border-content-primary/20 flex items-center justify-center group-hover:border-content-primary/35 transition-all shrink-0">
                       <Camera className="w-6 h-6 text-content-primary" />
                     </div>
                     <div>
@@ -320,7 +320,7 @@ export default function MobileCapture() {
                 </div>
 
                 {/* Option 2: Upload from Gallery or Files */}
-                <div className="relative p-10 bg-surface-base border border-dashed border-white/[0.1] rounded-lg group active:scale-[0.98] transition-all overflow-hidden">
+                <div className="relative p-10 bg-surface-base border border-dashed border-content-primary/[0.1] rounded-lg group active:scale-[0.98] transition-all overflow-hidden">
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
@@ -328,7 +328,7 @@ export default function MobileCapture() {
                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                   />
                   <div className="flex items-center gap-5 relative z-1">
-                    <div className="w-14 h-14 rounded-full bg-white/[0.03] border border-white/10 flex items-center justify-center group-hover:border-white/20 transition-all shrink-0">
+                    <div className="w-14 h-14 rounded-full bg-content-primary/[0.03] border border-content-primary/10 flex items-center justify-center group-hover:border-content-primary/20 transition-all shrink-0">
                       <FolderOpen className="w-6 h-6 text-content-tertiary" />
                     </div>
                     <div>
@@ -348,7 +348,7 @@ export default function MobileCapture() {
                  </p>
               </div>
 
-               <div className="relative aspect-[3/4] w-full bg-surface-raised border border-white/[0.12] p-1.5 rounded-lg overflow-hidden shadow-2xl flex-1">
+               <div className="relative aspect-[3/4] w-full bg-surface-raised border border-content-primary/[0.12] p-1.5 rounded-lg overflow-hidden shadow-2xl flex-1">
                  {capturedFileType === 'application/pdf' ? (
                    <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-surface-base">
                      <div className="w-20 h-20 rounded-lg border border-content-primary/30 bg-content-primary/5 flex items-center justify-center">
@@ -361,7 +361,7 @@ export default function MobileCapture() {
                  )}
                  
                  {/* Visual Viewfinder Overlay */}
-                 <div className="absolute inset-8 border border-white/20 pointer-events-none">
+                 <div className="absolute inset-8 border border-content-primary/20 pointer-events-none">
                     <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-content-primary"></div>
                     <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-content-primary"></div>
                     <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-content-primary"></div>
@@ -369,7 +369,7 @@ export default function MobileCapture() {
                  </div>
 
                  {status === 'uploading' && (
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-white shadow-[0_0_20px_rgba(255,255,255,0.2)] animate-scan-y z-20"></div>
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-brand-cta shadow-[0_0_20px_rgba(255,255,255,0.2)] animate-scan-y z-20"></div>
                  )}
                </div>
 
@@ -377,7 +377,7 @@ export default function MobileCapture() {
                   <button 
                     onClick={handleUpload}
                     disabled={status === 'uploading'}
-                    className="flex w-full items-center justify-center gap-3 rounded-lg bg-white py-4 text-sm font-medium text-black shadow-none transition-all hover:bg-neutral-200 active:scale-[0.98] disabled:bg-surface-raised disabled:text-content-tertiary"
+                    className="flex w-full items-center justify-center gap-3 rounded-lg bg-brand-cta py-4 text-sm font-medium text-surface-base shadow-none transition-all hover:bg-brand-cta-hover active:scale-[0.98] disabled:bg-surface-raised disabled:text-content-tertiary"
                   >
                     {status === 'uploading' ? (
                       <>

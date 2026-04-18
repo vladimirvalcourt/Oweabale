@@ -30,7 +30,7 @@ export default function MaintenancePage() {
         </button>
         <TransitionLink
           to="/"
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover"
         >
           Home
         </TransitionLink>

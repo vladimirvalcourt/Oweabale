@@ -1,5 +1,6 @@
 import React, { memo, useState } from 'react';
 import { EyeOff, Download, AlertTriangle } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { useStore } from '../../store/useStore';
@@ -17,23 +18,25 @@ type PrivacyPanelProps = {
 
 function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPanelProps) {
   const [privacyMode, setPrivacyMode] = useState(false);
-  const exportPayload = useStore((s) => ({
-    profile: s.user,
-    bills: s.bills,
-    debts: s.debts,
-    transactions: s.transactions,
-    assets: s.assets,
-    subscriptions: s.subscriptions,
-    goals: s.goals,
-    incomes: s.incomes,
-    budgets: s.budgets,
-    categories: s.categories,
-    categorizationRules: s.categorizationRules,
-    categorizationExclusions: s.categorizationExclusions,
-    citations: s.citations,
-    deductions: s.deductions,
-    freelanceEntries: s.freelanceEntries,
-  }));
+  const exportPayload = useStore(
+    useShallow((s) => ({
+      profile: s.user,
+      bills: s.bills,
+      debts: s.debts,
+      transactions: s.transactions,
+      assets: s.assets,
+      subscriptions: s.subscriptions,
+      goals: s.goals,
+      incomes: s.incomes,
+      budgets: s.budgets,
+      categories: s.categories,
+      categorizationRules: s.categorizationRules,
+      categorizationExclusions: s.categorizationExclusions,
+      citations: s.citations,
+      deductions: s.deductions,
+      freelanceEntries: s.freelanceEntries,
+    })),
+  );
 
   const handleExportData = () => {
     const exportedAt = new Date().toISOString();

@@ -13,6 +13,7 @@ import { useStore } from '../store/useStore';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
+import { formatCategoryLabel } from '../lib/categoryDisplay';
 
 type Period = '1M' | '3M' | '6M' | '1Y' | 'ALL';
 
@@ -25,13 +26,13 @@ interface Snapshot {
 
 const CHART_COLORS = [
   '#d4d4d4', '#34D399', '#F59E0B', '#EF4444',
-  '#737373', '#06B6D4', '#F97316', '#EC4899',
+  '#737373', '#a3a3a3', '#78716c', '#64748b', '#525252',
 ];
 
 const tooltipStyle = {
   backgroundColor: '#141414',
   border: '1px solid #262626',
-  borderRadius: '0px',
+  borderRadius: '8px',
   color: '#FAFAFA',
   fontFamily: 'monospace',
   fontSize: '11px',
@@ -201,7 +202,7 @@ export default function Analytics() {
               key={p}
               onClick={() => setPeriod(p)}
               className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${
-                period === p ? 'bg-surface-border text-white' : 'text-content-tertiary hover:text-content-secondary'
+                period === p ? 'bg-surface-elevated text-content-primary border border-surface-border' : 'text-content-tertiary hover:text-content-secondary'
               }`}
             >
               {p}
@@ -282,7 +283,7 @@ export default function Analytics() {
           </SafeResponsiveContainer>
         )}
         <div className="flex gap-5 mt-3">
-          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-white inline-block shrink-0" aria-hidden /> Net worth</div>
+          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-brand-cta inline-block shrink-0" aria-hidden /> Net worth</div>
           <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-emerald-400 inline-block shrink-0" aria-hidden /> Assets</div>
         </div>
       </CollapsibleModule>
@@ -300,7 +301,7 @@ export default function Analytics() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
                 <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval={1} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={fmt} width={52} />
-                <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v: any, name: any) => [`$${Number(v).toLocaleString()}`, name]} />
+                <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v: any, name: any) => [`$${Number(v).toLocaleString()}`, formatCategoryLabel(String(name))]} />
                 {topCategories.map((cat, i) => (
                   <Bar key={cat} dataKey={cat} stackId="stack" fill={CHART_COLORS[i % CHART_COLORS.length]} radius={0} />
                 ))}
@@ -310,7 +311,7 @@ export default function Analytics() {
               {topCategories.map((cat, i) => (
                 <div key={cat} className="flex items-center gap-1.5 text-xs text-content-tertiary">
                   <span className="w-2 h-2 inline-block shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} aria-hidden />
-                  {cat}
+                  {formatCategoryLabel(cat)}
                 </div>
               ))}
             </div>
@@ -331,7 +332,7 @@ export default function Analytics() {
           </LineChart>
         </SafeResponsiveContainer>
         <div className="flex gap-5 mt-3">
-          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-white inline-block shrink-0" aria-hidden /> Savings rate</div>
+          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-brand-cta inline-block shrink-0" aria-hidden /> Savings rate</div>
           <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-4 h-px bg-content-muted/50 inline-block shrink-0 border-t border-dashed border-content-muted/40" aria-hidden /> 20% target</div>
         </div>
       </CollapsibleModule>

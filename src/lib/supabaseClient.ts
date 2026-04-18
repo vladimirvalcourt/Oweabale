@@ -20,8 +20,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
-    // Session-scoped storage: closing the browser ends the session (tokens are not kept in localStorage).
-    storage: window.sessionStorage,
+    // Persistent storage keeps deep links and bookmarked routes usable across browser restarts.
+    storage: window.localStorage,
     autoRefreshToken: true,
     detectSessionInUrl: true,
   },

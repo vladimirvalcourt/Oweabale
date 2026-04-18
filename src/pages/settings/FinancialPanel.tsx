@@ -87,7 +87,7 @@ function FinancialPanelInner() {
             <button
               type="button"
               onClick={() => deferToast(() => toast.success('Preferences saved'))}
-              className="rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
+              className="rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
             >
               Save preferences
             </button>
@@ -121,7 +121,7 @@ function FinancialPanelInner() {
             <button
               type="button"
               onClick={() => deferToast(() => toast.success('Budget limits updated'))}
-              className="rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
+              className="rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
             >
               Update limits
             </button>

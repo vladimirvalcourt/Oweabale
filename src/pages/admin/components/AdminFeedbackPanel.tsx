@@ -9,7 +9,7 @@ type Props = {
 const TYPE_STYLES: Record<string, string> = {
   bug: 'text-rose-300 bg-rose-500/10 border-rose-500/25',
   feature_request: 'text-sky-300 bg-sky-500/10 border-sky-500/25',
-  general: 'text-content-secondary bg-white/5 border-surface-border',
+  general: 'text-content-secondary bg-content-primary/5 border-surface-border',
 };
 
 function typeLabel(t: string): string {

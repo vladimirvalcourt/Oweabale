@@ -60,7 +60,7 @@ function ProfilePanelInner() {
       icon={User}
       extraHeader={
         <span className="text-xs font-medium text-content-tertiary">
-          {user.firstName} {user.lastName} · verified
+          {[user.firstName, user.lastName].filter(Boolean).join(' ') || 'Profile'} · verified
         </span>
       }
     >
@@ -72,8 +72,8 @@ function ProfilePanelInner() {
                 <img src={user.avatar} alt="Identifier" className="h-full w-full object-cover" data-no-invert />
               ) : (
                 <span className="text-xl font-semibold text-content-tertiary">
-                  {user.firstName.charAt(0)}
-                  {user.lastName.charAt(0)}
+                  {(user.firstName || '?').charAt(0)}
+                  {(user.lastName || '?').charAt(0)}
                 </span>
               )}
             </div>
@@ -214,7 +214,7 @@ function ProfilePanelInner() {
             <button
               type="submit"
               disabled={isSaving}
-              className="flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex items-center gap-2 rounded-lg bg-brand-cta px-6 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
               {isSaving ? 'Saving...' : 'Save Changes'}

@@ -81,7 +81,7 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
 // App-level full screen loader (for initial data fetch)
 export function AppLoader({ message = 'Syncing financial data' }: { message?: string }) {
   return (
-    <div className="fixed inset-0 bg-surface-base z-50 flex flex-col items-center justify-center font-sans selection:bg-white/15">
+    <div className="fixed inset-0 bg-surface-base z-50 flex flex-col items-center justify-center font-sans selection:bg-content-primary/15">
       <div
         className="absolute inset-0 opacity-[0.04] pointer-events-none"
         style={{
@@ -93,7 +93,7 @@ export function AppLoader({ message = 'Syncing financial data' }: { message?: st
       />
       <div className="relative mb-8">
         <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-surface-border bg-surface-raised">
-          <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" aria-hidden />
+          <span className="h-1.5 w-1.5 rounded-full bg-brand-cta animate-pulse" aria-hidden />
         </div>
       </div>
       <p className="relative text-xs font-medium text-content-tertiary tracking-tight text-center max-w-[14rem]">

@@ -205,7 +205,7 @@ export default function Subscriptions() {
             setEditingId(null);
             setFormData({ name: '', amount: '', frequency: 'Monthly', nextBillingDate: '', status: 'active' });
           }}
-          className="px-4 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 focus-app"
+          className="px-4 py-2 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 focus-app"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           Add subscription
@@ -402,7 +402,7 @@ export default function Subscriptions() {
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors"
+                className="px-6 py-2 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors"
               >
                 {editingId ? 'Save changes' : 'Add subscription'}
               </button>
@@ -423,7 +423,7 @@ export default function Subscriptions() {
           <button
             type="button"
             onClick={() => setIsAdding(true)}
-            className="px-8 py-3 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 mx-auto"
+            className="px-8 py-3 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 mx-auto"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Add subscription

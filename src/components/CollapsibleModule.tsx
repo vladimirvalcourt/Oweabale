@@ -30,7 +30,7 @@ export function CollapsibleModule({
         aria-expanded={isOpen}
         aria-controls={panelId}
         onClick={() => startTransition(() => setIsOpen((o) => !o))}
-        className="w-full text-left px-6 py-3 bg-surface-elevated/80 border-b border-surface-border flex items-center justify-between cursor-pointer group active:translate-y-[1px] hover:bg-surface-highlight transition-all border-t border-t-white/5 focus-app"
+        className="w-full text-left px-6 py-3 bg-surface-elevated/80 border-b border-surface-border flex items-center justify-between cursor-pointer group active:translate-y-[1px] hover:bg-surface-highlight transition-all border-t border-t-content-primary/5 focus-app"
       >
         <div className="flex items-center gap-3 min-w-0">
           {Icon && <Icon className="w-4 h-4 shrink-0 text-content-tertiary group-hover:text-content-secondary transition-colors" aria-hidden />}

@@ -19,7 +19,7 @@ export function AdminBroadcastsPanel({ loading, items, onCreate, onDelete }: Pro
   const typeStyle = (t: string) => {
     if (t === 'warning') return 'text-amber-400 bg-amber-500/10 border-amber-500/20';
     if (t === 'error') return 'text-rose-400 bg-rose-500/10 border-rose-500/20';
-    return 'text-content-secondary bg-white/5 border-surface-border';
+    return 'text-content-secondary bg-content-primary/5 border-surface-border';
   };
 
   async function handleSubmit(e: React.FormEvent) {
@@ -89,7 +89,7 @@ export function AdminBroadcastsPanel({ loading, items, onCreate, onDelete }: Pro
         <button
           type="submit"
           disabled={saving || !title.trim() || !content.trim()}
-          className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-white px-4 text-xs font-semibold text-black hover:bg-neutral-200 disabled:opacity-40"
+          className="inline-flex min-h-10 items-center gap-2 rounded-lg bg-brand-cta px-4 text-xs font-semibold text-surface-base hover:bg-brand-cta-hover disabled:opacity-40"
         >
           <Plus className="h-3.5 w-3.5" aria-hidden />
           {saving ? 'Publishing…' : 'Publish broadcast'}

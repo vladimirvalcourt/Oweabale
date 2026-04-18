@@ -192,7 +192,7 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
                   {detail.profile.email ?? '(no email)'}
                 </span>
                 {detail.profile.is_admin && (
-                  <span className="inline-block px-1.5 py-0.5 rounded border text-[10px] font-medium bg-white/[0.06] text-content-secondary border-surface-border">
+                  <span className="inline-block px-1.5 py-0.5 rounded border text-[10px] font-medium bg-content-primary/[0.06] text-content-secondary border-surface-border">
                     Admin
                   </span>
                 )}

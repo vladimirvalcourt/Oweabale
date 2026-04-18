@@ -120,11 +120,11 @@ export default function Taxes() {
           <div className="flex bg-surface-raised border border-surface-border rounded-lg p-1">
             <button
               onClick={() => setFilingStatus('single')}
-              className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${filingStatus === 'single' ? 'bg-white text-black' : 'text-content-tertiary hover:text-content-secondary'}`}
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${filingStatus === 'single' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-secondary'}`}
             >Single</button>
             <button
               onClick={() => setFilingStatus('married')}
-              className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${filingStatus === 'married' ? 'bg-white text-black' : 'text-content-tertiary hover:text-content-secondary'}`}
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${filingStatus === 'married' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-secondary'}`}
             >Married</button>
           </div>
         </div>
@@ -146,7 +146,7 @@ export default function Taxes() {
           <CollapsibleModule title="Yearly Tax Estimates" icon={Calculator}>
             <div className="flex flex-col items-center justify-center py-10">
               <p className="metric-label normal-case text-content-tertiary mb-2">Estimated total liability</p>
-              <h2 className="text-6xl font-bold font-mono text-white tabular-nums tracking-tighter data-numeric">
+              <h2 className="text-6xl font-bold font-mono text-content-primary tabular-nums tracking-tighter data-numeric">
                 ${totalLiability.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </h2>
               <div className="mt-6 flex items-center gap-4">
@@ -181,17 +181,17 @@ export default function Taxes() {
             <div className="p-0">
                <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-elevated/50">
                   <p className="text-sm font-sans font-medium text-content-secondary">Write-offs from your ledger</p>
-                  <button type="button" onClick={() => setShowAddForm(!showAddForm)} className="bg-white hover:bg-neutral-200 text-black text-xs font-sans font-semibold px-3 py-1.5 rounded-lg transition-all">Add deduction</button>
+                  <button type="button" onClick={() => setShowAddForm(!showAddForm)} className="bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-xs font-sans font-semibold px-3 py-1.5 rounded-lg transition-all">Add deduction</button>
                </div>
                {showAddForm && (
                  <div className="p-6 bg-surface-elevated border-b border-surface-border flex gap-3 items-end">
                     <div className="flex-1">
                       <p className="text-xs text-content-tertiary mb-1">Expense label</p>
-                      <input type="text" placeholder="e.g. Adobe Suite" value={newDeduction.name} onChange={e => setNewDeduction({...newDeduction, name: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-white focus-app-field transition-colors" />
+                      <input type="text" placeholder="e.g. Adobe Suite" value={newDeduction.name} onChange={e => setNewDeduction({...newDeduction, name: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-content-primary focus-app-field transition-colors" />
                     </div>
                     <div className="w-24">
                       <p className="text-xs text-content-tertiary mb-1">Amount</p>
-                      <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm font-mono tabular-nums text-white focus-app-field transition-colors" />
+                      <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm font-mono tabular-nums text-content-primary focus-app-field transition-colors" />
                     </div>
                     <button type="button" onClick={async () => {
                       if (!newDeduction.name.trim()) { toast.error('Enter an expense label'); return; }
@@ -201,7 +201,7 @@ export default function Taxes() {
                       if (!ok) return;
                       toast.success('Deduction added');
                       setNewDeduction({name: '', amount: '', category: ''}); setShowAddForm(false);
-                    }} className="bg-emerald-500 text-black h-10 px-4 text-sm font-sans font-semibold rounded-lg hover:bg-emerald-400 transition-colors">Add</button>
+                    }} className="bg-emerald-500 text-surface-base h-10 px-4 text-sm font-sans font-semibold rounded-lg hover:bg-emerald-400 transition-colors">Add</button>
                  </div>
                )}
                <div className="divide-y divide-surface-border">
@@ -249,7 +249,7 @@ export default function Taxes() {
                <h3 className="text-sm font-sans font-semibold text-content-primary mb-4">Smart freelance tips</h3>
                <div className="space-y-4">
                  <div className="flex gap-3">
-                   <div className="w-1.5 h-1.5 bg-white/50 mt-1.5 shrink-0 rounded-full" />
+                   <div className="w-1.5 h-1.5 bg-content-primary/50 mt-1.5 shrink-0 rounded-full" />
                    <div>
                      <p className="text-sm font-sans font-medium text-content-primary">Check your real pay</p>
                      <p className="text-xs text-content-tertiary mt-1 leading-normal">
@@ -258,7 +258,7 @@ export default function Taxes() {
                    </div>
                  </div>
                  <div className="flex gap-3">
-                   <div className="w-1.5 h-1.5 bg-white/50 mt-1.5 shrink-0 rounded-full" />
+                   <div className="w-1.5 h-1.5 bg-content-primary/50 mt-1.5 shrink-0 rounded-full" />
                    <div>
                      <p className="text-sm font-sans font-medium text-content-primary">Audit for deductions</p>
                      <p className="text-xs text-content-tertiary mt-1 leading-normal">
@@ -267,7 +267,7 @@ export default function Taxes() {
                    </div>
                  </div>
                  <div className="flex gap-3">
-                   <div className="w-1.5 h-1.5 bg-white/50 mt-1.5 shrink-0 rounded-full" />
+                   <div className="w-1.5 h-1.5 bg-content-primary/50 mt-1.5 shrink-0 rounded-full" />
                    <div>
                      <p className="text-sm font-sans font-medium text-content-primary">Quarterly discipline</p>
                      <p className="text-xs text-content-tertiary mt-1 leading-normal">

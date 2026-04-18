@@ -20,6 +20,7 @@
     "@fontsource/geist-sans": "^5.2.5",
     "@geist-ui/icons": "^1.0.2",
     "@headlessui/react": "^2.2.9",
+    "@sentry/react": "^10.49.0",
     "@supabase/supabase-js": "^2.101.1",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.14",
@@ -49,6 +50,7 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@sentry/vite-plugin": "^4.9.1",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "@types/react-dom": "^19.2.3",

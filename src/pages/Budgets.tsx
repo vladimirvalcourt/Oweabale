@@ -256,7 +256,7 @@ export default function Budgets() {
         <button 
           onClick={openAddModal}
           type="button"
-          className="px-4 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus-app"
+          className="px-4 py-2.5 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus-app"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           Create budget
@@ -273,7 +273,7 @@ export default function Budgets() {
           <button 
             type="button"
             onClick={openAddModal}
-            className="px-6 py-3 rounded-lg bg-white hover:bg-neutral-200 active:scale-[0.98] text-black text-sm font-sans font-semibold transition-colors inline-flex items-center gap-2 shadow-sm"
+            className="px-6 py-3 rounded-lg bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-surface-base text-sm font-sans font-semibold transition-colors inline-flex items-center gap-2 shadow-sm"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Create your first budget
@@ -382,14 +382,14 @@ export default function Budgets() {
                 projectedEndSpend,
               } = snapshot;
 
-              let progressColor = 'bg-white';
+              let progressColor = 'bg-brand-cta';
               if (isOverBudget) progressColor = 'bg-red-500';
               else if (isNearLimit) progressColor = 'bg-amber-500';
 
               return (
                 <div 
                   key={budget.id} 
-                  className="bg-surface-elevated rounded-lg border border-surface-border p-5 flex flex-col relative group hover:border-white/15 transition-colors"
+                  className="bg-surface-elevated rounded-lg border border-surface-border p-5 flex flex-col relative group hover:border-content-primary/15 transition-colors"
                 >
                   <div className="flex justify-between items-start mb-6">
                     <div>
@@ -555,7 +555,7 @@ export default function Budgets() {
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, amount: selectedSinkingFundSuggestion.toFixed(2) })}
-                      className="text-[11px] font-medium text-content-primary hover:text-white focus-app rounded-lg px-2 py-1"
+                      className="text-[11px] font-medium text-content-primary hover:text-content-secondary focus-app rounded-lg px-2 py-1"
                     >
                       Use target
                     </button>
@@ -616,7 +616,7 @@ export default function Budgets() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold transition-colors shadow-sm"
+                  className="px-6 py-2 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold transition-colors shadow-sm"
                 >
                   {isEditModalOpen ? 'Save changes' : 'Save budget'}
                 </button>

@@ -9,6 +9,8 @@
   --color-surface-highlight: rgba(255, 255, 255, 0.04);
   --color-surface-border: #333333;
   --color-surface-border-subtle: #1a1a1a;
+  /* Skeleton / shimmer base — slightly lifted from elevated for contrast */
+  --color-surface-offset: #161616;
 
   --color-content-primary: #ffffff;
   --color-content-secondary: #888888;
@@ -98,58 +100,58 @@
   /* Focus — visible keyboard focus (WCAG 2.4.7) + border cues on fields. */
   .focus-app {
     @apply outline-none focus:outline-none;
-    @apply focus-visible:ring-2 focus-visible:ring-white/25 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply focus-visible:ring-2 focus-visible:ring-content-primary/25 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field {
     @apply outline-none focus:outline-none;
-    @apply focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply focus-visible:ring-2 focus-visible:ring-content-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   /* Legacy name: same neutral focus as .focus-app-field (no indigo ring). */
   .focus-app-field-indigo {
-    @apply outline-none focus:outline-none transition-colors focus:border-white/35;
-    @apply focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply outline-none focus:outline-none transition-colors focus:border-content-primary/35;
+    @apply focus-visible:ring-2 focus-visible:ring-content-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-rose {
     @apply outline-none focus:outline-none transition-colors focus:border-rose-500;
-    @apply focus-visible:ring-2 focus-visible:ring-rose-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply focus-visible:ring-2 focus-visible:ring-rose-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-neutral {
     @apply outline-none focus:outline-none transition-colors focus:border-content-secondary;
-    @apply focus-visible:ring-2 focus-visible:ring-content-secondary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply focus-visible:ring-2 focus-visible:ring-content-secondary/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-indigo-600 {
-    @apply outline-none focus:outline-none transition-colors focus:border-white/35;
-    @apply focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply outline-none focus:outline-none transition-colors focus:border-content-primary/35;
+    @apply focus-visible:ring-2 focus-visible:ring-content-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-zinc {
     @apply outline-none focus:outline-none transition-colors focus:border-zinc-500;
-    @apply focus-visible:ring-2 focus-visible:ring-zinc-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply focus-visible:ring-2 focus-visible:ring-zinc-400/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-amber {
     @apply outline-none focus:outline-none transition-colors focus:border-amber-500;
-    @apply focus-visible:ring-2 focus-visible:ring-amber-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply focus-visible:ring-2 focus-visible:ring-amber-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-emerald {
     @apply outline-none focus:outline-none transition-colors focus:border-emerald-500;
-    @apply focus-visible:ring-2 focus-visible:ring-emerald-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply focus-visible:ring-2 focus-visible:ring-emerald-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-cyan {
     @apply outline-none focus:outline-none transition-colors focus:border-cyan-500;
-    @apply focus-visible:ring-2 focus-visible:ring-cyan-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply focus-visible:ring-2 focus-visible:ring-cyan-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field-brand-indigo {
-    @apply outline-none focus:outline-none transition-colors focus:border-white/40;
-    @apply focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply outline-none focus:outline-none transition-colors focus:border-content-primary/40;
+    @apply focus-visible:ring-2 focus-visible:ring-content-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   @keyframes float {
@@ -199,6 +201,20 @@
   @keyframes pulse-highlight {
     0%, 100% { background-color: transparent; }
     50% { background-color: rgba(255, 255, 255, 0.06); }
+  }
+  @keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .skeleton-shimmer {
+    background: linear-gradient(
+      110deg,
+      var(--color-surface-offset) 0%,
+      var(--color-surface-elevated) 45%,
+      var(--color-surface-offset) 90%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.35s ease-in-out infinite;
   }
   .animate-scan-y {
     animation: scan-y-full 2.5s ease-in-out infinite;
@@ -278,7 +294,7 @@ html {
 }
 
 body {
-  @apply bg-surface-base font-sans text-content-primary antialiased selection:bg-white/15;
+  @apply bg-surface-base font-sans text-content-primary antialiased selection:bg-content-primary/15;
   /* 14px / 1.5 — matches Vercel marketing & dashboard body copy */
   font-size: var(--text-ui-body);
   line-height: var(--leading-ui-body);

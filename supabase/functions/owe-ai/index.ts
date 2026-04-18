@@ -3,6 +3,7 @@ import { corsHeaders } from '../_shared/cors.ts';
 import { calcMonthlyCashFlow, computeSafeToSpend } from '../_shared/finance_safe_to_spend.ts';
 import { guardOweAiMessage } from '../_shared/owe_ai_guard.ts';
 import { hasPaidFullSuiteAccess } from '../_shared/plaidAccess.ts';
+import { fetchWithTimeout } from '../_shared/fetchWithTimeout.ts';
 
 function num(v: unknown, fallback = 0): number {
   const n = typeof v === 'number' ? v : Number(v);
@@ -255,15 +256,17 @@ async function buildUserContextJson(
 ): Promise<string> {
   const scheduleBaseMs = Date.now();
 
+  // Per-table caps keep context building bounded even for power users.
+  const CTX_LIMIT = 50;
   const [billsR, debtsR, assetsR, incomesR, subsR, citR, goalsR, budgetsR, txR, profileR, investR, insurR] = await Promise.all([
-    supabaseAdmin.from('bills').select('amount,frequency,status,due_date,biller,category').eq('user_id', uid),
-    supabaseAdmin.from('debts').select('name,remaining,min_payment,apr,payment_due_date').eq('user_id', uid),
-    supabaseAdmin.from('assets').select('name,type,value').eq('user_id', uid),
-    supabaseAdmin.from('incomes').select('name,amount,frequency,status,is_tax_withheld,next_date').eq('user_id', uid),
-    supabaseAdmin.from('subscriptions').select('name,amount,frequency,status,next_billing_date').eq('user_id', uid),
-    supabaseAdmin.from('citations').select('status,amount,date,type').eq('user_id', uid),
-    supabaseAdmin.from('goals').select('name,target_amount,current_amount,deadline,type').eq('user_id', uid),
-    supabaseAdmin.from('budgets').select('category,amount,period').eq('user_id', uid),
+    supabaseAdmin.from('bills').select('amount,frequency,status,due_date,biller,category').eq('user_id', uid).limit(CTX_LIMIT),
+    supabaseAdmin.from('debts').select('name,remaining,min_payment,apr,payment_due_date').eq('user_id', uid).limit(CTX_LIMIT),
+    supabaseAdmin.from('assets').select('name,type,value').eq('user_id', uid).limit(CTX_LIMIT),
+    supabaseAdmin.from('incomes').select('name,amount,frequency,status,is_tax_withheld,next_date').eq('user_id', uid).limit(CTX_LIMIT),
+    supabaseAdmin.from('subscriptions').select('name,amount,frequency,status,next_billing_date').eq('user_id', uid).limit(CTX_LIMIT),
+    supabaseAdmin.from('citations').select('status,amount,date,type').eq('user_id', uid).limit(CTX_LIMIT),
+    supabaseAdmin.from('goals').select('name,target_amount,current_amount,deadline,type').eq('user_id', uid).limit(CTX_LIMIT),
+    supabaseAdmin.from('budgets').select('category,amount,period').eq('user_id', uid).limit(CTX_LIMIT),
     supabaseAdmin
       .from('transactions')
       .select('name, category, date, amount, type')
@@ -271,8 +274,8 @@ async function buildUserContextJson(
       .order('date', { ascending: false })
       .limit(40),
     supabaseAdmin.from('profiles').select('first_name,last_name,email').eq('id', uid).maybeSingle(),
-    supabaseAdmin.from('investment_accounts').select('name,type,institution,balance').eq('user_id', uid),
-    supabaseAdmin.from('insurance_policies').select('type,provider,premium,frequency,status,expiration_date,coverage_amount').eq('user_id', uid).eq('status', 'active'),
+    supabaseAdmin.from('investment_accounts').select('name,type,institution,balance').eq('user_id', uid).limit(CTX_LIMIT),
+    supabaseAdmin.from('insurance_policies').select('type,provider,premium,frequency,status,expiration_date,coverage_amount').eq('user_id', uid).eq('status', 'active').limit(CTX_LIMIT),
   ]);
 
   if (billsR.error) throw billsR.error;
@@ -884,13 +887,15 @@ async function callHuggingFaceChat(
     ],
   };
 
-  const res = await fetch('https://router.huggingface.co/v1/chat/completions', {
+  const res = await fetchWithTimeout('https://router.huggingface.co/v1/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${hfToken}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
+    timeoutMs: 30_000,
+    retries: 1,
   });
 
   if (!res.ok) {
@@ -957,13 +962,15 @@ async function callHuggingFaceChat(
     messages: followUpMessages,
   };
 
-  const followUpRes = await fetch('https://router.huggingface.co/v1/chat/completions', {
+  const followUpRes = await fetchWithTimeout('https://router.huggingface.co/v1/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${hfToken}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(followUpBody),
+    timeoutMs: 30_000,
+    retries: 1,
   });
 
   if (!followUpRes.ok) {

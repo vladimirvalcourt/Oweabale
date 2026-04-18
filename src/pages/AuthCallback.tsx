@@ -14,6 +14,9 @@ export default function AuthCallback() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const redirectTarget = params.get('redirect');
+    const finalRedirect =
+      redirectTarget && redirectTarget.startsWith('/') ? redirectTarget : '/dashboard';
     const oauthError = params.get('error') ?? hashParams.get('error');
     const oauthDesc = params.get('error_description') ?? hashParams.get('error_description');
     if (oauthError && !handledOAuthErrorRef.current) {
@@ -28,13 +31,13 @@ export default function AuthCallback() {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate('/dashboard', { replace: true });
+        navigate(finalRedirect, { replace: true });
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
-        navigate('/dashboard', { replace: true });
+        navigate(finalRedirect, { replace: true });
       } else if (event === 'SIGNED_OUT') {
         navigate('/auth', { replace: true });
       }

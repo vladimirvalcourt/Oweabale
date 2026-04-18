@@ -68,15 +68,12 @@ Deno.serve(async (req: Request) => {
   const rawBody = await req.text();
   const jwtHeader = req.headers.get('plaid-verification') ?? req.headers.get('Plaid-Verification');
 
-  const skipVerify = Deno.env.get('PLAID_SKIP_WEBHOOK_VERIFY') === 'true';
-  if (!skipVerify) {
-    const ok = await verifyPlaidWebhook(rawBody, jwtHeader);
-    if (!ok) {
-      return new Response(JSON.stringify({ error: 'Invalid webhook signature' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+  const ok = await verifyPlaidWebhook(rawBody, jwtHeader);
+  if (!ok) {
+    return new Response(JSON.stringify({ error: 'Invalid webhook signature' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 
   let body: PlaidWebhookBody;

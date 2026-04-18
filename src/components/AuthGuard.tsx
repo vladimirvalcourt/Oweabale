@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { AppLoader } from './PageSkeleton';
 
@@ -9,9 +9,13 @@ import { AppLoader } from './PageSkeleton';
  */
 export default function AuthGuard() {
   const { user, authLoading } = useAuth();
+  const location = useLocation();
 
   if (authLoading) return <AppLoader />;
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) {
+    const redirectPath = `${location.pathname}${location.search}${location.hash}`;
+    return <Navigate to={`/auth?redirect=${encodeURIComponent(redirectPath)}`} replace />;
+  }
 
   return <Outlet />;
 }

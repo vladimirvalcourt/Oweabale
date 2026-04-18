@@ -119,13 +119,13 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
             <div className="w-full md:w-2/5 p-8 border-r border-surface-border bg-surface-base flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 rounded-full border border-white/15 flex items-center justify-center bg-white/[0.05]">
+                  <div className="w-8 h-8 rounded-full border border-content-primary/15 flex items-center justify-center bg-content-primary/[0.05]">
                     <Smartphone className="w-4 h-4 text-content-secondary" />
                   </div>
-                  <Dialog.Title className="text-sm font-bold text-white uppercase tracking-widest font-mono">Mobile Sync</Dialog.Title>
+                  <Dialog.Title className="text-sm font-bold text-content-primary uppercase tracking-widest font-mono">Mobile Sync</Dialog.Title>
                 </div>
                 
-                <h2 className="text-2xl font-bold text-white mb-4 uppercase tracking-tighter leading-tight font-sans">
+                <h2 className="text-2xl font-bold text-content-primary mb-4 uppercase tracking-tighter leading-tight font-sans">
                   Handoff to Phone
                 </h2>
                 
@@ -151,14 +151,14 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                     <span className="text-[9px] font-mono text-content-muted uppercase tracking-widest">Secure connection</span>
                  </div>
                  <div className="w-full h-0.5 bg-surface-border rounded-full overflow-hidden">
-                    <div className={cn("h-full bg-white/60 transition-all duration-300", status === 'waiting' ? 'w-1/3' : status === 'active' ? 'w-2/3' : status === 'completed' ? 'w-full' : 'w-0')} />
+                    <div className={cn("h-full bg-content-primary/60 transition-all duration-300", status === 'waiting' ? 'w-1/3' : status === 'active' ? 'w-2/3' : status === 'completed' ? 'w-full' : 'w-0')} />
                  </div>
               </div>
             </div>
 
             {/* Right Panel: QR Display */}
             <div className="flex-1 p-10 flex flex-col items-center justify-center bg-surface-raised relative">
-               <button onClick={onClose} className="absolute top-4 right-4 text-content-muted hover:text-white transition-colors">
+               <button onClick={onClose} className="absolute top-4 right-4 text-content-muted hover:text-content-primary transition-colors">
                  <X className="w-5 h-5" />
                </button>
 
@@ -176,7 +176,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                                ? <img src={qrDataUrl} alt="QR Code" className="w-[200px] h-[200px] rounded-lg" />
                                : <div className="w-[200px] h-[200px] flex items-center justify-center"><Loader2 className="w-6 h-6 text-content-secondary animate-spin" /></div>
                           ) : (
-                             <div className="w-[200px] h-[200px] flex flex-col items-center justify-center bg-white/[0.04] gap-3 border-4 border-white/15 animate-pulse">
+                             <div className="w-[200px] h-[200px] flex flex-col items-center justify-center bg-content-primary/[0.04] gap-3 border-4 border-content-primary/15 animate-pulse">
                                 <Zap className={`w-8 h-8 ${status === 'completed' ? 'text-content-primary' : 'text-emerald-400'}`} />
                                 <span className={`text-[9px] font-mono font-bold uppercase tracking-widest text-center ${status === 'completed' ? 'text-content-primary' : 'text-emerald-400'}`}>
                                    {status === 'completed' ? 'RECEIVING DATA' : 'SESSION ACTIVE'}
@@ -184,8 +184,8 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                              </div>
                           )}
                           
-                          <div className="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-white/40"></div>
-                          <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-white/40"></div>
+                          <div className="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-content-primary/40"></div>
+                          <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-content-primary/40"></div>
                        </div>
                        
                        <div className="mt-8 text-center min-h-[50px] flex flex-col items-center justify-center">

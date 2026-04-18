@@ -1,18 +1,27 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
 import { runAfterPaint } from '../lib/interaction';
 
-export default function AuthPage() {
+type AuthPageProps = {
+  mode?: 'signin' | 'signup';
+};
+
+export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const isSignupMode = mode === 'signup';
+  const location = useLocation();
 
   useSEO({
-    title: 'Sign in — Oweable',
-    description: 'Sign in to Oweable with Google. Secure access to your financial OS for debt, bills, and clarity.',
-    canonical: 'https://www.oweable.com/auth',
+    title: isSignupMode ? 'Create your free account — Oweable' : 'Sign in — Oweable',
+    description: isSignupMode
+      ? 'Create your free Oweable account to start your financial OS with no credit card required.'
+      : 'Sign in to Oweable with Google. Secure access to your financial OS for freelancers, gig workers, and the self-employed.',
+    canonical: isSignupMode ? 'https://www.oweable.com/onboarding' : 'https://www.oweable.com/auth',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
 
@@ -26,11 +35,16 @@ export default function AuthPage() {
     if (googleLoading) return;
     setGoogleLoading(true);
     try {
+      const redirectTarget = new URLSearchParams(location.search).get('redirect');
+      const callbackRedirect =
+        redirectTarget && redirectTarget.startsWith('/')
+          ? `${window.location.origin}/auth/callback?redirect=${encodeURIComponent(redirectTarget)}`
+          : `${window.location.origin}/auth/callback`;
       const { error } = await runAfterPaint('auth_google_signin', async () =>
         supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: `${window.location.origin}/auth/callback`,
+            redirectTo: callbackRedirect,
             queryParams: {
               access_type: 'offline',
               prompt: 'consent',
@@ -50,7 +64,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-white/15 flex flex-col">
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-content-primary/15 flex flex-col">
       <nav
         className={`fixed top-0 z-50 w-full border-b py-4 transition-colors duration-300 ${
           scrolled
@@ -60,7 +74,7 @@ export default function AuthPage() {
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-8">
           <TransitionLink to="/" className="brand-header-text flex items-center gap-2 text-content-primary">
-            <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden />
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" aria-hidden />
             Oweable
           </TransitionLink>
           <div className="flex items-center gap-6 text-sm text-content-tertiary">
@@ -98,21 +112,23 @@ export default function AuthPage() {
             <div className="rounded-[10px] border border-surface-border bg-surface-elevated px-8 py-10 sm:px-10 sm:py-12">
               <div className="mb-8 inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-base px-3 py-1.5 text-xs font-medium text-content-secondary">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
-                Secure sign-in
+                {isSignupMode ? 'Start free' : 'Secure sign-in'}
               </div>
 
               <h1 className="text-3xl font-medium tracking-[-0.03em] text-content-primary sm:text-4xl">
-                Welcome back
+                {isSignupMode ? 'Create your free account' : 'Welcome back'}
               </h1>
               <p className="mt-3 max-w-md text-base font-medium leading-relaxed text-content-secondary">
-                Sign in to manage debt, bills, and your full financial picture in one place.
+                {isSignupMode
+                  ? 'Start your financial OS - no credit card required'
+                  : 'Sign in to manage debt, bills, and your full financial picture in one place.'}
               </p>
 
               <button
                 type="button"
                 onClick={() => void handleGoogleSignIn()}
                 disabled={googleLoading}
-                className="mt-10 flex min-h-12 w-full items-center justify-center gap-3 rounded-lg bg-white px-4 py-3 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-50 focus-app"
+                className="mt-10 flex min-h-12 w-full items-center justify-center gap-3 rounded-lg bg-brand-cta px-4 py-3 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-50 focus-app"
               >
                 {googleLoading ? (
                   <span className="text-content-secondary">Redirecting…</span>
@@ -136,10 +152,19 @@ export default function AuthPage() {
                         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                       />
                     </svg>
-                    Continue with Google
+                    {isSignupMode ? 'Sign Up Free' : 'Sign In'}
                   </>
                 )}
               </button>
+
+              {isSignupMode ? (
+                <p className="mt-4 text-center text-xs text-content-tertiary">
+                  Already have an account?{' '}
+                  <TransitionLink to="/auth" className="underline underline-offset-2 hover:text-content-primary">
+                    Sign in
+                  </TransitionLink>
+                </p>
+              ) : null}
 
               <p className="mt-8 text-center text-xs leading-relaxed text-content-tertiary">
                 Authentication is handled by Google Identity. Oweable does not receive your Google password.

@@ -23,8 +23,8 @@ type Props = {
 };
 
 const PLAN_STYLES: Record<string, string> = {
-  Lifetime: 'bg-white/10 text-content-secondary border-white/15',
-  Pro: 'bg-white/[0.06] text-content-secondary border-surface-border',
+  Lifetime: 'bg-content-primary/10 text-content-secondary border-content-primary/15',
+  Pro: 'bg-content-primary/[0.06] text-content-secondary border-surface-border',
 };
 
 const SUB_STATUS_STYLES: Record<string, string> = {
@@ -148,7 +148,7 @@ export function AdminUsersPanel({
                   type="checkbox"
                   checked={allChecked}
                   onChange={toggleAll}
-                  className="accent-white"
+                  className="accent-content-primary"
                 />
               </th>
               <th className="py-2 text-left">Account</th>
@@ -191,7 +191,7 @@ export function AdminUsersPanel({
                       type="checkbox"
                       checked={selected.has(user.id)}
                       onChange={() => toggleOne(user.id)}
-                      className="accent-white"
+                      className="accent-content-primary"
                     />
                   </td>
                   <td className="py-2 pr-2">
@@ -225,7 +225,7 @@ export function AdminUsersPanel({
                         type="button"
                         onClick={() => onDemoteAdmin(user.id)}
                         disabled={isPrimary}
-                        className="px-2 py-1 rounded-lg text-[11px] bg-white/[0.06] text-content-secondary disabled:opacity-40"
+                        className="px-2 py-1 rounded-lg text-[11px] bg-content-primary/[0.06] text-content-secondary disabled:opacity-40"
                       >
                         Demote
                       </button>
@@ -233,7 +233,7 @@ export function AdminUsersPanel({
                       <button
                         type="button"
                         onClick={() => onPromoteAdmin(user.id)}
-                        className="px-2 py-1 rounded-lg text-[11px] bg-white/[0.05] text-content-primary hover:bg-white/[0.08]"
+                        className="px-2 py-1 rounded-lg text-[11px] bg-content-primary/[0.05] text-content-primary hover:bg-content-primary/[0.08]"
                       >
                         Promote
                       </button>

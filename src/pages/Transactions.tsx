@@ -4,19 +4,12 @@ import { useShallow } from 'zustand/react/shallow';
 import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, Hash, Tag, Download, TrendingUp, Ban } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
-
-function formatCategoryLabel(category: string): string {
-  return category
-    .replace(/[_-]+/g, ' ')
-    .trim()
-    .replace(/\s+/g, ' ')
-    .replace(/\b\w/g, (ch) => ch.toUpperCase());
-}
+import { formatCategoryLabel } from '../lib/categoryDisplay';
 
 const BUTTON_BASE_CLASS =
   'inline-flex min-h-10 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-app disabled:opacity-50 disabled:cursor-not-allowed';
 const BUTTON_SECONDARY_CLASS = `${BUTTON_BASE_CLASS} border border-surface-border bg-transparent text-content-secondary hover:bg-surface-elevated hover:text-content-primary`;
-const BUTTON_PRIMARY_CLASS = `${BUTTON_BASE_CLASS} bg-white text-black hover:bg-neutral-200`;
+const BUTTON_PRIMARY_CLASS = `${BUTTON_BASE_CLASS} bg-brand-cta text-surface-base hover:bg-brand-cta-hover`;
 
 export default function Transactions() {
   const { transactions, subscriptions, openQuickAdd, categorizationExclusions, addCategorizationExclusion, deleteCategorizationExclusion } = useStore(
@@ -170,7 +163,7 @@ export default function Transactions() {
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                 className={`${BUTTON_BASE_CLASS} gap-2 border ${
                   showAdvancedFilters 
-                    ? 'bg-white border-white text-black'
+                    ? 'bg-brand-cta border-surface-border text-surface-base'
                     : 'bg-transparent border-surface-border text-content-secondary hover:text-content-primary hover:bg-surface-elevated'
                 }`}
               >
@@ -340,7 +333,7 @@ export default function Transactions() {
                     return (
                       <tr 
                         key={transaction.id} 
-                        className="group hover:bg-surface-elevated transition-colors border-l-2 border-transparent hover:border-white"
+                        className="group hover:bg-surface-elevated transition-colors border-l-2 border-transparent hover:border-content-secondary/50"
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
@@ -358,7 +351,7 @@ export default function Transactions() {
                               <div className="flex items-center gap-2">
                                 <div className="text-sm font-bold text-content-primary uppercase tracking-tight">{transaction.name}</div>
                                 {isPriceHike && (
-                                  <span className="flex items-center gap-1 text-[8px] bg-rose-500 text-black px-1.5 font-black uppercase tracking-tighter animate-pulse">
+                                  <span className="flex items-center gap-1 text-[8px] bg-rose-500 text-surface-base px-1.5 font-black uppercase tracking-tighter animate-pulse">
                                     <TrendingUp className="w-2 h-2" /> Price Hike
                                   </span>
                                 )}

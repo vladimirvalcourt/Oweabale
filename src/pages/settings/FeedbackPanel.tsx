@@ -122,7 +122,7 @@ function FeedbackPanelInner() {
               <button
                 type="submit"
                 disabled={isSubmittingFeedback}
-                className="flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition-colors hover:bg-neutral-200 disabled:opacity-50"
+                className="flex items-center gap-2 rounded-lg bg-brand-cta px-6 py-2.5 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover disabled:opacity-50"
               >
                 {isSubmittingFeedback ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                 {isSubmittingFeedback ? 'Sending...' : 'Send Feedback'}
@@ -162,7 +162,7 @@ function FeedbackPanelInner() {
                         fb.type === 'bug'
                           ? 'border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400'
                           : fb.type === 'feature_request'
-                            ? 'border-surface-border bg-white/[0.05] text-content-primary'
+                            ? 'border-surface-border bg-content-primary/[0.05] text-content-primary'
                             : 'border-surface-border bg-surface-elevated text-content-secondary'
                       }`}
                     >

@@ -118,7 +118,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   ].filter(Boolean);
                   void navigator.clipboard.writeText(lines.join('\n\n'));
                 }}
-                className="px-4 py-2 border border-content-muted text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated hover:text-white transition-all mb-4"
+                className="px-4 py-2 border border-content-muted text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated hover:text-content-primary transition-all mb-4"
               >
                 Copy error details
               </button>
@@ -126,7 +126,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
             <button
               onClick={this.handleReset}
-              className="px-6 py-2 border border-surface-border text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated hover:text-white transition-all flex items-center gap-2 mx-auto"
+              className="px-6 py-2 border border-surface-border text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated hover:text-content-primary transition-all flex items-center gap-2 mx-auto"
             >
               <RefreshCw className="w-3 h-3" />
               Attempt Recovery

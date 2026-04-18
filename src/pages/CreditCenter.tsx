@@ -129,12 +129,12 @@ ${user.firstName} ${user.lastName}
 
   return (
     <AppPageShell className="min-h-screen">
-      <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 pt-8">
+      <div className="space-y-8 w-full pb-12">
         
         {/* Header & Score Gauge */}
         <div className="flex flex-col md:flex-row gap-8 items-start">
           <div className="flex-1 space-y-2">
-            <h1 className="font-sans text-3xl font-medium tracking-tight text-white sm:text-4xl">Credit workshop</h1>
+            <h1 className="font-sans text-3xl font-medium tracking-tight text-content-primary sm:text-4xl">Credit workshop</h1>
             <p className="max-w-xl font-sans text-sm font-medium leading-relaxed text-content-secondary">
               Track your score, dispute errors, and plan paydowns. This view is for organization only—not credit repair advice.
             </p>
@@ -144,11 +144,11 @@ ${user.firstName} ${user.lastName}
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-surface-raised border border-surface-border p-8 rounded-lg shrink-0 w-full md:w-64 text-center relative overflow-hidden shadow-2xl"
+            className="bg-surface-raised border border-surface-border p-8 rounded-lg shrink-0 w-full md:w-64 text-center relative overflow-hidden shadow-none"
           >
-            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+            <div className="absolute top-0 left-0 w-full h-px bg-surface-border" />
             <p className="text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">Estimated Score</p>
-            <p className="text-6xl font-mono font-bold text-white tracking-tighter mb-2">{creditScore || '—'}</p>
+            <p className="text-6xl font-mono font-bold text-content-primary tracking-tighter mb-2">{creditScore || '—'}</p>
             {credit?.lastUpdated ? (
               <div className="flex items-center justify-center gap-2 text-[11px] font-mono uppercase tracking-widest text-content-tertiary">
                 <Calendar className="w-3 h-3" />
@@ -166,7 +166,7 @@ ${user.firstName} ${user.lastName}
           <div className="lg:col-span-2 space-y-8">
             
             {/* Main Factors */}
-            <section className="bg-surface-raised border border-surface-border rounded-lg overflow-hidden shadow-sm">
+            <section className="bg-surface-raised border border-surface-border rounded-lg overflow-hidden shadow-none">
               <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-raised/80">
                 <h2 className="text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest">Score Breakdown</h2>
                 <button className="text-[10px] font-mono text-content-primary hover:text-content-secondary uppercase tracking-widest flex items-center gap-1">
@@ -175,10 +175,10 @@ ${user.firstName} ${user.lastName}
               </div>
               <div className="divide-y divide-surface-border">
                 {(credit?.factors || []).map(factor => (
-                  <div key={factor.id} className="p-6 flex flex-col md:flex-row gap-4 items-start md:items-center hover:bg-white/5 transition-colors">
+                  <div key={factor.id} className="p-6 flex flex-col md:flex-row gap-4 items-start md:items-center hover:bg-content-primary/5 transition-colors">
                     <div className="flex-1 space-y-1 text-left w-full">
                       <div className="flex items-center justify-between md:justify-start gap-3">
-                        <span className="text-sm font-sans font-bold text-white">{factor.name}</span>
+                        <span className="text-sm font-sans font-bold text-content-primary">{factor.name}</span>
                         <span className={`px-1.5 py-0.5 rounded-lg text-[9px] font-mono font-bold uppercase border ${getImpactColor(factor.impact)}`}>
                           {factor.impact} Impact
                         </span>
@@ -194,7 +194,7 @@ ${user.firstName} ${user.lastName}
             </section>
 
             {/* Quick Boost Section */}
-            <section className="bg-white/[0.03] border border-surface-border rounded-lg p-8 relative overflow-hidden group">
+            <section className="bg-content-primary/[0.03] border border-surface-border rounded-lg p-8 relative overflow-hidden group">
               <div className="absolute -top-4 -right-4 text-content-secondary/10 group-hover:text-content-secondary/20 transition-all duration-700">
                 <TrendingUp className="w-32 h-32 rotate-12" />
               </div>
@@ -204,12 +204,12 @@ ${user.firstName} ${user.lastName}
                 </h2>
                 {boostTip ? (
                   <>
-                    <p className="text-2xl font-sans font-bold text-white mb-4 italic leading-tight">
+                    <p className="text-2xl font-sans font-bold text-content-primary mb-4 italic leading-tight">
                       Reduce <span className="text-content-primary">{boostTip.cardName}</span> balance <br className="hidden md:block"/>
                       to <span className="text-content-primary">10% utilization</span> 
                     </p>
                     <p className="text-sm text-content-tertiary mb-6 max-w-lg leading-relaxed">
-                      Your current utilization on this account is suppressing your score. Pay <span className="text-white font-mono">${boostTip.amountToPay.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span> to trigger a recalculation.
+                      Your current utilization on this account is suppressing your score. Pay <span className="text-content-primary font-mono">${boostTip.amountToPay.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span> to trigger a recalculation.
                     </p>
                     <div className="inline-flex items-center bg-black/30 border border-surface-border px-4 py-2 rounded-lg text-xs font-mono">
                       <span className="text-content-tertiary uppercase tracking-widest mr-2">Est. Boost</span>
@@ -227,14 +227,14 @@ ${user.firstName} ${user.lastName}
           <div className="space-y-8">
             
             {/* Fix-it List */}
-            <section className="bg-surface-raised border border-surface-border rounded-lg flex flex-col h-full shadow-lg">
+            <section className="bg-surface-raised border border-surface-border rounded-lg flex flex-col h-full shadow-none">
               <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-raised/80">
                 <h2 className="text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-500" /> Dispute Hub
                 </h2>
                 <button 
                   onClick={() => setIsFixModalOpen(true)}
-                  className="p-1 px-3 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 text-[10px] font-mono font-bold uppercase text-white transition-all"
+                  className="p-1 px-3 bg-surface-elevated border border-surface-border rounded-lg hover:bg-surface-highlight text-[10px] font-mono font-bold uppercase text-content-primary transition-all"
                 >
                   New Case
                 </button>
@@ -255,22 +255,22 @@ ${user.firstName} ${user.lastName}
                   </div>
                 ) : (
                   credit.fixes.map(fix => (
-                    <div key={fix.id} className="p-5 space-y-3 hover:bg-white/5 transition-colors text-left group">
+                    <div key={fix.id} className="p-5 space-y-3 hover:bg-content-primary/5 transition-colors text-left group">
                       <div className="flex items-start justify-between">
                         <div>
-                          <h3 className="text-sm font-sans font-bold text-white">{fix.item}</h3>
+                          <h3 className="text-sm font-sans font-bold text-content-primary">{fix.item}</h3>
                           <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{fix.bureau}</p>
                         </div>
                         <span className={`text-[10px] font-mono px-2 py-0.5 rounded-lg border ${
                           fix.status === 'resolved' ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/5' : 
-                          fix.status === 'sent' ? 'border-surface-border text-content-primary bg-white/[0.03]' : 
-                          'border-white/10 text-content-tertiary'
+                          fix.status === 'sent' ? 'border-surface-border text-content-primary bg-content-primary/[0.03]' : 
+                          'border-content-primary/10 text-content-tertiary'
                         }`}>
                           {fix.status.toUpperCase()}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs font-mono text-white font-bold">${fix.amount.toLocaleString()}</span>
+                        <span className="text-xs font-mono text-content-primary font-bold">${fix.amount.toLocaleString()}</span>
                         <div className="h-px bg-surface-border flex-1" />
                       </div>
                       
@@ -280,13 +280,13 @@ ${user.firstName} ${user.lastName}
                             setSelectedFixId(fix.id);
                             setIsLetterModalOpen(true);
                           }}
-                          className="flex-1 py-1.5 bg-white/[0.06] hover:bg-white/[0.08] text-content-primary border border-surface-border rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                          className="flex-1 py-1.5 bg-content-primary/[0.06] hover:bg-content-primary/[0.08] text-content-primary border border-surface-border rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2"
                         >
                           <FileText className="w-3 h-3" /> Letter
                         </button>
                         <button 
                           onClick={() => updateCreditFix(fix.id, { status: fix.status === 'resolved' ? 'todo' : 'resolved' })}
-                          className="flex-1 py-1.5 bg-surface-elevated hover:bg-surface-border text-content-secondary border border-white/5 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-all"
+                          className="flex-1 py-1.5 bg-surface-elevated hover:bg-surface-border text-content-secondary border border-content-primary/5 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-all"
                         >
                           {fix.status === 'resolved' ? 'Undo' : 'Resolve'}
                         </button>
@@ -307,10 +307,10 @@ ${user.firstName} ${user.lastName}
                   <ShieldAlert className="w-3.5 h-3.5 text-content-secondary" /> Protection Shield
                 </div>
                 <div className="space-y-2">
-                  <a href="https://www.annualcreditreport.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2.5 text-[11px] text-content-tertiary hover:text-white bg-white/5 border border-white/5 rounded-lg transition-all group">
+                  <a href="https://www.annualcreditreport.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2.5 text-[11px] text-content-tertiary hover:text-content-primary bg-surface-elevated border border-surface-border rounded-lg transition-all group">
                     Full Credit Report <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100" />
                   </a>
-                  <a href="https://www.experian.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2.5 text-[11px] text-content-tertiary hover:text-white bg-white/5 border border-white/5 rounded-lg transition-all group">
+                  <a href="https://www.experian.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2.5 text-[11px] text-content-tertiary hover:text-content-primary bg-surface-elevated border border-surface-border rounded-lg transition-all group">
                     Freeze Credit <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100" />
                   </a>
                 </div>
@@ -337,8 +337,8 @@ ${user.firstName} ${user.lastName}
                   exit={{ opacity: 0, scale: 0.95, y: 10 }}
                   className="w-full max-w-md"
                 >
-                  <Dialog.Panel className="bg-surface-elevated border border-surface-border rounded-lg shadow-2xl p-8">
-                    <Dialog.Title className="text-sm font-mono font-bold text-white uppercase tracking-widest mb-6 border-b border-surface-border pb-4">
+                  <Dialog.Panel className="bg-surface-elevated border border-surface-border rounded-lg shadow-none p-8">
+                    <Dialog.Title className="text-sm font-mono font-bold text-content-primary uppercase tracking-widest mb-6 border-b border-surface-border pb-4">
                       Report Error
                     </Dialog.Title>
                     <form onSubmit={handleAddFix} className="space-y-4">
@@ -350,7 +350,7 @@ ${user.firstName} ${user.lastName}
                           value={fixItem}
                           onChange={e => setFixItem(e.target.value)}
                           placeholder="e.g., Inaccurate Medical Collection"
-                          className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-white focus-app-field placeholder:text-content-muted"
+                          className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-content-primary focus-app-field placeholder:text-content-muted"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
@@ -361,7 +361,7 @@ ${user.firstName} ${user.lastName}
                             value={fixAmount}
                             onChange={e => setFixAmount(e.target.value)}
                             placeholder="0.00"
-                            className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-white focus-app-field"
+                            className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-content-primary focus-app-field"
                           />
                         </div>
                         <div>
@@ -369,7 +369,7 @@ ${user.firstName} ${user.lastName}
                           <select 
                             value={fixBureau}
                             onChange={e => setFixBureau(e.target.value)}
-                            className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-white focus-app-field h-[46px]"
+                            className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-content-primary focus-app-field h-[46px]"
                           >
                             <option>Experian</option>
                             <option>Equifax</option>
@@ -384,20 +384,20 @@ ${user.firstName} ${user.lastName}
                           value={fixNotes}
                           onChange={e => setFixNotes(e.target.value)}
                           placeholder="Explain why this is incorrect..."
-                          className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-white focus-app-field h-24 resize-none placeholder:text-content-muted"
+                          className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-content-primary focus-app-field h-24 resize-none placeholder:text-content-muted"
                         />
                       </div>
                       <div className="flex gap-3 pt-4">
                         <button 
                           type="button"
                           onClick={() => setIsFixModalOpen(false)}
-                          className="flex-1 py-3 text-xs font-mono font-bold text-content-tertiary hover:text-white uppercase tracking-widest transition-colors"
+                          className="flex-1 py-3 text-xs font-mono font-bold text-content-tertiary hover:text-content-secondary uppercase tracking-widest transition-colors"
                         >
                           Dismiss
                         </button>
                         <button 
                           type="submit"
-                          className="flex-1 py-3 bg-white text-black hover:bg-neutral-200 rounded-lg text-xs font-mono font-bold uppercase tracking-widest transition-all shadow-none"
+                          className="flex-1 py-3 bg-brand-cta text-surface-base hover:bg-brand-cta-hover rounded-lg text-xs font-mono font-bold uppercase tracking-widest transition-all shadow-none"
                         >
                           Add Case
                         </button>
@@ -432,11 +432,11 @@ ${user.firstName} ${user.lastName}
                   exit={{ opacity: 0, scale: 0.9, rotateX: 10 }}
                   className="w-full max-w-2xl"
                 >
-                  <Dialog.Panel className="bg-white text-surface-base rounded-lg shadow-2xl p-10 font-serif border border-black/10">
+                  <Dialog.Panel className="bg-brand-cta text-surface-base rounded-lg shadow-2xl p-10 font-serif border border-black/10">
                 <div className="flex justify-between items-start mb-8 border-b border-black/10 pb-4 no-print">
                   <div className="space-y-1">
                     <Dialog.Title className="text-xl font-sans font-black uppercase italic tracking-tighter text-surface-base">
-                      Dispute <span className="text-content-primary">Letter</span>
+                      Dispute <span className="text-emerald-800">Letter</span>
                     </Dialog.Title>
                     <p className="text-xs font-sans text-content-tertiary uppercase tracking-widest">Formal Legal Correspondence</p>
                   </div>
@@ -484,7 +484,7 @@ ${user.firstName} ${user.lastName}
                       setIsLetterModalOpen(false);
                       toast.success('Status updated to SENT');
                     }}
-                    className="px-6 py-2 bg-surface-base text-white font-sans font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-white hover:text-black transition-colors"
+                    className="px-6 py-2 bg-surface-base text-content-primary font-sans font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-brand-cta hover:text-surface-base transition-colors"
                     type="button"
                   >
                     Mark as Sent

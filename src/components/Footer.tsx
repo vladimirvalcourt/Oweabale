@@ -9,15 +9,15 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <TransitionLink to="/" className="brand-header-text flex items-center gap-2 mb-5">
-              <span className="h-1.5 w-1.5 rounded-full bg-white" aria-hidden />
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" aria-hidden />
               Oweable
             </TransitionLink>
             <p className="text-sm text-content-tertiary max-w-sm leading-relaxed mb-8">
-              Autonomous financial infrastructure for the modern worker. Track, save, and protect your profit with bank-grade precision.
+              The Financial OS for Gig Workers, Freelancers &amp; the Self-Employed.
             </p>
             <TransitionLink
               to="/onboarding"
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-6 py-3 text-sm font-sans font-semibold text-black transition-colors hover:bg-neutral-200"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-cta px-6 py-3 text-sm font-sans font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
             >
               Get Started Free
             </TransitionLink>

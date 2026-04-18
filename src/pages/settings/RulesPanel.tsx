@@ -147,7 +147,7 @@ function RulesPanelInner() {
                   });
                   setRuleForm((f) => ({ ...f, match_value: '' }));
                 }}
-                className="flex shrink-0 items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-neutral-200"
+                className="flex shrink-0 items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover"
               >
                 <Plus className="w-3 h-3" />
                 Add
@@ -185,7 +185,7 @@ function RulesPanelInner() {
                   className="flex items-center justify-between px-6 py-3 hover:bg-surface-elevated transition-colors group"
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="shrink-0 rounded-lg border border-surface-border bg-white/[0.05] px-2 py-0.5 text-[11px] font-medium capitalize text-content-primary">
+                    <span className="shrink-0 rounded-lg border border-surface-border bg-content-primary/[0.05] px-2 py-0.5 text-[11px] font-medium capitalize text-content-primary">
                       {rule.match_type.replace('_', ' ')}
                     </span>
                     <span className="truncate text-sm font-medium text-content-primary">{rule.match_value}</span>
@@ -273,7 +273,7 @@ function RulesPanelInner() {
                 setSimulatedChanges([]);
               }}
               disabled={isApplying || simulatedChanges.length === 0}
-              className="flex shrink-0 items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-neutral-200 disabled:opacity-50"
+              className="flex shrink-0 items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover disabled:opacity-50"
             >
               {isApplying ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
               Confirm Apply

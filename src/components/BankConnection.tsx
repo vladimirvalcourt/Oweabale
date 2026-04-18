@@ -297,7 +297,7 @@ function BankConnectionPlaid() {
             type="button"
             onClick={handleConnectClick}
             disabled={plaidFlow.isBusy || !plaidEnabledForUser}
-            className="flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex items-center gap-2 rounded-lg bg-brand-cta px-6 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-70"
           >
             {plaidFlow.isBusy ? (
               <>
