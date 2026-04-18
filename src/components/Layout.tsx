@@ -3,8 +3,9 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { TransitionLink } from './TransitionLink';
 import { 
   Bell, Search, Home, FileText, Target, Activity,
-  Settings, Repeat, BarChart2, Plus, X, ChevronDown, Inbox,
-  DollarSign, PieChart, TrendingUp, Calendar as CalendarIcon, Percent, Briefcase, BookOpen, Shield, Clock, CreditCard, Zap, AlertTriangle
+  Settings, Repeat, BarChart2, BarChart, Plus, X, ChevronDown, Inbox,
+  DollarSign, PieChart, Layers, Calendar as CalendarIcon, Percent, Briefcase, BookOpen, Shield, Clock, CreditCard, Zap, AlertTriangle,
+  RefreshCw,
 } from '@geist-ui/icons';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
@@ -309,7 +310,7 @@ export default function Layout() {
         items: [
           { name: 'Dashboard', path: '/dashboard', icon: Home },
           { name: 'Owe-AI', path: '/owe-ai', icon: Zap },
-          { name: 'Cash flow', path: '/dashboard', icon: DollarSign, hash: 'cash-flow' },
+          { name: 'Cash flow', path: '/dashboard', icon: RefreshCw, hash: 'cash-flow' },
           { name: 'Income', path: '/income', icon: DollarSign },
           { name: 'Freelance Vault', path: '/freelance', icon: Briefcase },
           { name: 'Regular Bills', path: '/bills', icon: FileText },
@@ -331,8 +332,8 @@ export default function Layout() {
       {
         label: 'Planning & Growth',
         items: [
-          { name: 'Net Worth', path: '/net-worth', icon: TrendingUp },
-          { name: 'Investments', path: '/investments', icon: TrendingUp },
+          { name: 'Net Worth', path: '/net-worth', icon: Layers },
+          { name: 'Investments', path: '/investments', icon: BarChart },
           { name: 'Insurance', path: '/insurance', icon: Shield },
           { name: 'Budgets', path: '/budgets', icon: PieChart },
           { name: 'Academy', path: '/education', icon: BookOpen },
