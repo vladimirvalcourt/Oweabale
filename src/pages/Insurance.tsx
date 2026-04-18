@@ -6,6 +6,7 @@ import { normalizeToMonthly } from '../lib/finance';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { AppPageShell } from '../components/AppPageShell';
 import { Dialog } from '@headlessui/react';
+import { yieldForPaint } from '../lib/interaction';
 
 const TYPE_LABELS: Record<InsurancePolicy['type'], string> = {
   health: 'Health', life: 'Life', auto: 'Auto', renters: 'Renters',
@@ -36,6 +37,7 @@ const EMPTY_FORM = {
 
 export default function Insurance() {
   const { insurancePolicies, addInsurancePolicy, editInsurancePolicy, deleteInsurancePolicy } = useStore();
+  const [insuranceNowMs] = useState(() => Date.now());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -96,6 +98,7 @@ export default function Insurance() {
       status: form.status,
       notes: form.notes,
     };
+    await yieldForPaint();
     const ok = editingId
       ? await editInsurancePolicy(editingId, payload)
       : await addInsurancePolicy(payload);
@@ -105,6 +108,7 @@ export default function Insurance() {
   };
 
   const handleDelete = async (id: string) => {
+    await yieldForPaint();
     const ok = await deleteInsurancePolicy(id);
     if (ok) toast.success('Policy removed');
   };
@@ -112,7 +116,7 @@ export default function Insurance() {
   const isExpiringSoon = (dateStr?: string) => {
     if (!dateStr) return false;
     const ms = new Date(dateStr).getTime();
-    return ms > Date.now() && ms - Date.now() < 60 * 86400000;
+    return ms > insuranceNowMs && ms - insuranceNowMs < 60 * 86400000;
   };
 
   return (

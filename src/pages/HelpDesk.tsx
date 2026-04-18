@@ -4,6 +4,7 @@ import { CollapsibleModule } from '../components/CollapsibleModule';
 import { Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
+import { yieldForPaint } from '../lib/interaction';
 
 interface Ticket {
   id: string;
@@ -103,6 +104,7 @@ export default function HelpDesk() {
     }
 
     setIsSubmitting(true);
+    await yieldForPaint();
     const { data: { user: authUser } } = await supabase.auth.getUser();
     if (!authUser) { toast.error('Not authenticated'); setIsSubmitting(false); return; }
     const { data, error } = await supabase

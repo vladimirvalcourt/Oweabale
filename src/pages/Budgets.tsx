@@ -6,6 +6,7 @@ import {
   buildPersonalizedSavingsSuggestions,
   detectSpendingAnomalies,
 } from '../lib/finance';
+import { yieldForPaint } from '../lib/interaction';
 import { startOfBudgetPeriod, shiftBudgetPeriod } from '../lib/budgetPeriods';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { Dialog, Menu, Transition } from '@headlessui/react';
@@ -208,6 +209,7 @@ export default function Budgets() {
 
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    await yieldForPaint();
     const ok = await addBudget({
       category: formData.category,
       amount: parseFloat(formData.amount),
@@ -223,6 +225,7 @@ export default function Budgets() {
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedBudget) {
+      await yieldForPaint();
       const ok = await editBudget(selectedBudget.id, {
         category: formData.category,
         amount: parseFloat(formData.amount),
@@ -237,6 +240,7 @@ export default function Budgets() {
   };
 
   const handleDelete = async (id: string) => {
+    await yieldForPaint();
     const ok = await deleteBudget(id);
     if (!ok) return;
     toast.success('Budget deleted');

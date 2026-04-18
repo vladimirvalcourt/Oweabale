@@ -4,6 +4,7 @@ import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import type { UserFeedback } from './types';
+import { yieldForPaint } from '../../lib/interaction';
 
 function FeedbackPanelInner() {
   const [feedbacks, setFeedbacks] = useState<UserFeedback[]>([]);
@@ -39,6 +40,7 @@ function FeedbackPanelInner() {
       return;
     }
     setIsSubmittingFeedback(true);
+    await yieldForPaint();
     const {
       data: { user: authUser },
     } = await supabase.auth.getUser();

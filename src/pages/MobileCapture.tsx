@@ -8,6 +8,7 @@ import {
 import { createCaptureSupabaseClient } from '../lib/supabaseCaptureClient';
 import { toast } from 'sonner';
 import { validateIngestionFile, safeExtFromMime } from '../lib/security';
+import { yieldForPaint } from '../lib/interaction';
 
 export default function MobileCapture() {
   const [searchParams] = useSearchParams();
@@ -117,6 +118,7 @@ export default function MobileCapture() {
     if (!activeImage || !sessionId || !token || !captureDb) return;
 
     setStatus('uploading');
+    await yieldForPaint();
     try {
       // Re-validate token on upload — prevents forged requests
       const { data: session, error: sessionErr } = await captureDb

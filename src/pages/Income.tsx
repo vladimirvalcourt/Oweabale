@@ -7,6 +7,7 @@ import { Dialog, Menu, Transition } from '@headlessui/react';
 import { Fragment, useEffect } from 'react';
 import { toast } from 'sonner';
 import { guessCategory } from '../lib/categorizer';
+import { yieldForPaint } from '../lib/interaction';
 
 export default function Income() {
   const { incomes, addIncome, editIncome, deleteIncome, recordIncomeDeposit } = useStore();
@@ -87,6 +88,7 @@ export default function Income() {
 
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    await yieldForPaint();
     const ok = await addIncome({
       name: formData.name,
       amount: parseFloat(formData.amount),
@@ -104,6 +106,7 @@ export default function Income() {
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedIncome) {
+      await yieldForPaint();
       const ok = await editIncome(selectedIncome.id, {
         name: formData.name,
         amount: parseFloat(formData.amount),
@@ -122,6 +125,7 @@ export default function Income() {
   const handleDepositSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedIncome) {
+      await yieldForPaint();
       const ok = await recordIncomeDeposit(selectedIncome.id, parseFloat(depositAmount));
       if (!ok) return;
       setIsDepositModalOpen(false);
@@ -130,6 +134,7 @@ export default function Income() {
   };
 
   const handleDelete = async (id: string) => {
+    await yieldForPaint();
     const ok = await deleteIncome(id);
     if (!ok) return;
     toast.success('Income source removed');

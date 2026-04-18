@@ -6,6 +6,7 @@ import { isPlaidLinkUiEnabled } from '../lib/featureFlags';
 import { usePlaidFlow } from '../hooks/usePlaidFlow';
 import { createStripeCheckoutSession } from '../lib/stripe';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
+import { yieldForPaint } from '../lib/interaction';
 
 const CONNECTION_TIMELINE_STORAGE_KEY = 'oweable_connection_timeline_v1';
 
@@ -44,6 +45,7 @@ function BankConnectionGated() {
 
   const handleDisconnect = async () => {
     setIsDisconnecting(true);
+    await yieldForPaint();
     try {
       await disconnectBank();
       toast.success('Bank connection removed.');
@@ -107,6 +109,7 @@ function BankConnectionPlaid() {
   });
 
   const handleConnectClick = async () => {
+    await yieldForPaint();
     await plaidFlow.startConnect();
     const next: ConnectionTimelineEvent[] = [
       {
@@ -122,6 +125,7 @@ function BankConnectionPlaid() {
   };
 
   const handleFixConnectionClick = async () => {
+    await yieldForPaint();
     await plaidFlow.startReconnect();
     const next: ConnectionTimelineEvent[] = [
       {
@@ -138,6 +142,7 @@ function BankConnectionPlaid() {
 
   const handleSyncClick = async () => {
     setIsSyncing(true);
+    await yieldForPaint();
     try {
       const ok = await syncPlaidTransactions();
       const next: ConnectionTimelineEvent[] = [
@@ -158,6 +163,7 @@ function BankConnectionPlaid() {
 
   const handleDisconnectClick = async () => {
     setIsDisconnecting(true);
+    await yieldForPaint();
     try {
       await disconnectBank();
       const next: ConnectionTimelineEvent[] = [
@@ -178,6 +184,7 @@ function BankConnectionPlaid() {
 
   const handleUpgradeClick = async () => {
     setIsUpgrading(true);
+    await yieldForPaint();
     try {
       const checkout = await createStripeCheckoutSession('pro_monthly');
       if ('error' in checkout) {

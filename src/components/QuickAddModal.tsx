@@ -8,6 +8,7 @@ import { useStore, type IncomeSource } from '../store/useStore';
 import { guessCategory } from '../lib/categorizer';
 import { validateIngestionFile } from '../lib/security';
 import { extractCitationFieldsFromText, looksLikeCitationDocument } from '../lib/citationFromDocument';
+import { yieldForPaint } from '../lib/interaction';
 
 interface QuickAddModalProps {
   isOpen: boolean;
@@ -60,6 +61,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   // Scan state
   const [isScanning, setIsScanning] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [scannedPreviewUrl, setScannedPreviewUrl] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const scanFileInputRef = useRef<HTMLInputElement>(null);
@@ -308,10 +310,13 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     if (!validateForm()) return;
     
     const numAmount = parseFloat(amount);
 
+    setIsSubmitting(true);
+    await yieldForPaint();
     try {
       if (activeTab === 'transaction') {
         const ok = await addTransaction({
@@ -395,6 +400,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     } catch (error) {
       toast.error('Failed to save to ledger');
       console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -1005,6 +1012,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   <button
                     type="button"
                     onClick={onClose}
+                    disabled={isSubmitting}
                     className="px-4 py-2 text-sm font-sans font-medium text-content-tertiary hover:text-white transition-colors focus-app rounded"
                   >
                     Cancel
@@ -1012,13 +1020,14 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   <button
                     type="submit"
                     form="quick-add-form"
+                    disabled={isSubmitting}
                     className={`px-5 py-2 rounded-lg text-sm font-sans font-medium transition-colors focus-app ${
                       activeTab === 'citation'
                         ? 'bg-white text-black hover:bg-neutral-200 border border-surface-border'
                         : 'bg-white text-black hover:bg-neutral-200'
                     }`}
                   >
-                    Save Entry
+                    {isSubmitting ? 'Saving…' : 'Save Entry'}
                   </button>
                 </div>
               </Dialog.Panel>

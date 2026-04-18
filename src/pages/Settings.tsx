@@ -16,6 +16,7 @@ import { PrivacyPanel } from './settings/PrivacyPanel';
 import { RulesPanel } from './settings/RulesPanel';
 import { SupportPanel } from './settings/SupportPanel';
 import { FeedbackPanel } from './settings/FeedbackPanel';
+import { yieldForPaint } from '../lib/interaction';
 
 const tabs = [
   { id: 'profile' as const, name: 'Profile' },
@@ -107,6 +108,7 @@ export default function Settings() {
 
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
+    await yieldForPaint();
     try {
       await deleteAccount();
       const receipt = {
@@ -139,6 +141,7 @@ export default function Settings() {
 
   const handleResetData = async () => {
     setIsResettingData(true);
+    await yieldForPaint();
     await resetData();
     setIsResettingData(false);
     setIsResetDialogOpen(false);

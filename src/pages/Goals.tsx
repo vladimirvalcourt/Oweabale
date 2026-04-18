@@ -4,6 +4,7 @@ import type { Goal } from '../store/useStore';
 import { Target, Plus, TrendingUp, TrendingDown, CheckCircle2, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
+import { yieldForPaint } from '../lib/interaction';
 
 const ACCOUNTABILITY_CHECKIN_KEY = 'oweable_accountability_checkins_v1';
 export default function Goals() {
@@ -84,6 +85,7 @@ export default function Goals() {
       return;
     }
 
+    await yieldForPaint();
     const ok = await addGoal({
       name: newGoal.name,
       targetAmount,
@@ -124,6 +126,7 @@ export default function Goals() {
       toast.error('Update exceeds target amount. Use a smaller value.');
       return;
     }
+    await yieldForPaint();
     const ok = await addGoalProgress(id, numAmount);
     if (!ok) return;
     toast.success('Progress updated');

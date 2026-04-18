@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { validateAvatarFile } from '../../lib/security';
 import { supabase } from '../../lib/supabase';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
+import { yieldForPaint } from '../../lib/interaction';
 
 function ProfilePanelInner() {
   const user = useStore((s) => s.user);
@@ -38,6 +39,7 @@ function ProfilePanelInner() {
       return;
     }
     setIsSaving(true);
+    await yieldForPaint();
     try {
       const ok = await updateUser(formData);
       if (ok) toast.success('Profile updated successfully');
@@ -91,6 +93,7 @@ function ProfilePanelInner() {
                       e.target.value = '';
                       return;
                     }
+                    await yieldForPaint();
                     const ext = file.name.split('.').pop() ?? 'jpg';
                     const path = `${user.id}/avatar.${ext}`;
                     const { error: uploadError } = await supabase.storage

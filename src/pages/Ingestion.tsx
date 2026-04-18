@@ -24,6 +24,7 @@ import { validateIngestionFile, sanitizeUrl } from '../lib/security';
 import { buildScanExtraction } from '../lib/ingestionExtraction';
 import { extractDocumentText } from '../lib/ingestionScan';
 import type { PendingIngestion } from '../store/useStore';
+import { yieldForPaint } from '../lib/interaction';
 
 // Upload rate limiter — max 5 files per 60 seconds
 const uploadTimestamps: number[] = [];
@@ -265,6 +266,7 @@ export default function Ingestion() {
   };
 
   const handleCommit = async (id: string) => {
+    await yieldForPaint();
     const ok = await useStore.getState().commitIngestion(id);
     if (ok && selectedId === id) setSelectedId(null);
   };
@@ -272,6 +274,7 @@ export default function Ingestion() {
   const handleBulkCommit = async () => {
     const readyItems = pendingIngestions.filter(pi => pi.status === 'ready');
     let n = 0;
+    await yieldForPaint();
     for (const item of readyItems) {
       if (await useStore.getState().commitIngestion(item.id)) n++;
     }

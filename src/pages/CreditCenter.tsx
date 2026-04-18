@@ -10,6 +10,7 @@ import {
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
 import { AppPageShell } from '../components/AppPageShell';
+import { yieldForPaint } from '../lib/interaction';
 
 export default function CreditCenter() {
   const { credit, updateCreditScore, addCreditFix, updateCreditFix, deleteCreditFix, debts, user } = useStore();
@@ -59,7 +60,8 @@ export default function CreditCenter() {
   const handleAddFix = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!fixItem) return;
-    
+
+    await yieldForPaint();
     await addCreditFix({
       item: fixItem,
       amount: parseFloat(fixAmount) || 0,

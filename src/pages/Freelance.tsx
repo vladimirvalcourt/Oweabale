@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { IRS_MILEAGE_RATE } from '../lib/finance';
+import { yieldForPaint } from '../lib/interaction';
 
 /** Simplified average federal income rate used for freelance tax estimates. */
 const FED_INCOME_ESTIMATE_RATE = 0.12;
@@ -29,6 +30,7 @@ export default function Freelance() {
     if (!uploadedFile) return;
     
     setIsScanning(true);
+    await yieldForPaint();
     toast.info('Scanning statement...');
 
     try {
@@ -152,6 +154,7 @@ export default function Freelance() {
     e.preventDefault();
     if (!formData.client) { toast.error('Enter the client name'); return; }
     if (!formData.amount || isNaN(parseFloat(formData.amount)) || parseFloat(formData.amount) <= 0) { toast.error('Enter a valid payment amount.'); return; }
+    await yieldForPaint();
     const ok = await addFreelanceEntry({
       client: formData.client,
       amount: parseFloat(formData.amount),

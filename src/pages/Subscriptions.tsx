@@ -5,6 +5,7 @@ import { Repeat, Plus, Edit2, Trash2, TrendingUp, X, AlertTriangle } from 'lucid
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
+import { yieldForPaint } from '../lib/interaction';
 type SubFrequency = 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Yearly';
 
 const SUB_FREQUENCIES: SubFrequency[] = ['Weekly', 'Bi-weekly', 'Monthly', 'Yearly'];
@@ -62,6 +63,7 @@ export default function Subscriptions() {
       return;
     }
 
+    await yieldForPaint();
     const ok = await addSubscription({
       name: formData.name,
       amount: Number(formData.amount),
@@ -80,6 +82,7 @@ export default function Subscriptions() {
     e.preventDefault();
     if (!editingId || !formData.name || !formData.amount || !formData.nextBillingDate) return;
 
+    await yieldForPaint();
     const ok = await editSubscription(editingId, {
       name: formData.name,
       amount: Number(formData.amount),
@@ -112,6 +115,7 @@ export default function Subscriptions() {
   };
 
   const handleDelete = async (id: string) => {
+    await yieldForPaint();
     const ok = await deleteSubscription(id);
     if (!ok) return;
     toast.success('Subscription deleted');
@@ -178,6 +182,7 @@ export default function Subscriptions() {
       ...(sub.priceHistory ?? []),
       { date: detected.txDate, amount: detected.detected },
     ];
+    await yieldForPaint();
     const ok = await editSubscription(sub.id, {
       amount: detected.detected,
       priceHistory: nextHistory,

@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { AppPageShell } from '../components/AppPageShell';
 import { Dialog } from '@headlessui/react';
+import { yieldForPaint } from '../lib/interaction';
 
 const TYPE_LABELS: Record<InvestmentAccount['type'], string> = {
   brokerage: 'Brokerage',
@@ -88,6 +89,7 @@ export default function Investments() {
       notes: form.notes.trim(),
     };
 
+    await yieldForPaint();
     if (editingId) {
       const ok = await editInvestmentAccount(editingId, payload);
       if (!ok) return;
@@ -102,6 +104,7 @@ export default function Investments() {
   };
 
   const handleDelete = async (id: string) => {
+    await yieldForPaint();
     const ok = await deleteInvestmentAccount(id);
     if (!ok) return;
     toast.success('Account removed');

@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
+import { runAfterPaint } from '../lib/interaction';
 
 export default function AuthPage() {
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -22,18 +23,21 @@ export default function AuthPage() {
   }, []);
 
   const handleGoogleSignIn = async () => {
+    if (googleLoading) return;
     setGoogleLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: 'offline',
-            prompt: 'consent',
+      const { error } = await runAfterPaint('auth_google_signin', async () =>
+        supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/auth/callback`,
+            queryParams: {
+              access_type: 'offline',
+              prompt: 'consent',
+            },
           },
-        },
-      });
+        }),
+      );
 
       if (error) {
         throw error;

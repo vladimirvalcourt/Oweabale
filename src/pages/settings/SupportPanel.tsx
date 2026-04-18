@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import type { SupportTicket } from './types';
 import { useStore } from '../../store/useStore';
+import { yieldForPaint } from '../../lib/interaction';
 
 function SupportPanelInner() {
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
@@ -87,6 +88,7 @@ function SupportPanelInner() {
       return;
     }
     setIsSubmittingTicket(true);
+    await yieldForPaint();
     const {
       data: { user: authUser },
     } = await supabase.auth.getUser();

@@ -13,6 +13,7 @@ import {
   createStripePortalSession,
   syncStripeBilling,
 } from '../../lib/stripe';
+import { yieldForPaint } from '../../lib/interaction';
 
 function isEntitlementActive(row: { status: string; ends_at: string | null } | undefined) {
   if (!row || row.status !== 'active') return false;
@@ -191,6 +192,7 @@ function BillingPanelInner() {
   const onUpgrade = async () => {
     if (isWorking) return;
     setIsWorking(true);
+    await yieldForPaint();
     const result = await createStripeCheckoutSession('pro_monthly');
     if ('error' in result) {
       toast.error(result.error);
@@ -203,6 +205,7 @@ function BillingPanelInner() {
   const onManageBilling = async () => {
     if (isWorking) return;
     setIsWorking(true);
+    await yieldForPaint();
     const result = await createStripePortalSession(`${window.location.origin}/settings?tab=billing`);
     if ('error' in result) {
       toast.error(result.error);
@@ -221,6 +224,7 @@ function BillingPanelInner() {
     );
     if (!confirmed) return;
     setIsWorking(true);
+    await yieldForPaint();
     const result = await cancelStripeSubscription({ immediate });
     if ('error' in result) {
       toast.error(result.error);

@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 import { PrivacyScreenWhenHidden } from '../components/PrivacyScreenWhenHidden';
 import { cn } from '../lib/utils';
+import { yieldForPaint } from '../lib/interaction';
 
 type Step = {
   id: string;
@@ -107,6 +108,7 @@ export default function Onboarding() {
   const [showWelcome, setShowWelcome] = useState(true);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     cash: '',
     bills: '',
@@ -156,12 +158,18 @@ export default function Onboarding() {
   };
 
   const handleNext = async () => {
+    if (isSubmitting) return;
     if (currentStepIndex < STEPS.length - 1) {
       setDirection(1);
       setCurrentStepIndex((prev) => prev + 1);
     } else {
+      setIsSubmitting(true);
+      await yieldForPaint();
       const ok = await persistOnboardingData();
-      if (!ok) return;
+      if (!ok) {
+        setIsSubmitting(false);
+        return;
+      }
       toast.success('Setup complete. Welcome to Oweable.');
       startTransition(() => navigate('/dashboard'));
     }
@@ -495,9 +503,10 @@ export default function Onboarding() {
               <button
                 type="button"
                 onClick={() => void handleNext()}
+                disabled={isSubmitting}
                 className="btn-tactile flex min-h-11 items-center gap-2 rounded-lg bg-white px-6 text-sm font-semibold text-black transition-colors hover:bg-neutral-200 focus-app"
               >
-                {currentStepIndex === STEPS.length - 1 ? 'Go to dashboard' : 'Continue'}
+                {isSubmitting ? 'Saving…' : currentStepIndex === STEPS.length - 1 ? 'Go to dashboard' : 'Continue'}
                 <ArrowRight className="h-4 w-4" aria-hidden />
               </button>
             </div>
