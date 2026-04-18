@@ -1,0 +1,5 @@
+# Oweable machine-readable index
+canonical: https://www.oweable.com/llms.txt
+full: https://www.oweable.com/llms-full.txt
+site: https://www.oweable.com/
+brand: Oweable

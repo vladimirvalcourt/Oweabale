@@ -9,6 +9,8 @@ Allow: /security
 Allow: /privacy
 Allow: /terms
 Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai.txt
 Allow: /.well-known/
 Disallow: /dashboard
 Disallow: /bills
@@ -40,6 +42,8 @@ Allow: /security
 Allow: /privacy
 Allow: /terms
 Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 # ── Perplexity ─────────────────────────────────────────────────
 User-agent: PerplexityBot
@@ -49,6 +53,8 @@ Allow: /security
 Allow: /privacy
 Allow: /terms
 Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 # ── Anthropic / Claude ─────────────────────────────────────────
 User-agent: ClaudeBot
@@ -58,6 +64,8 @@ Allow: /security
 Allow: /privacy
 Allow: /terms
 Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 User-agent: anthropic-ai
 Allow: /
@@ -66,6 +74,8 @@ Allow: /security
 Allow: /privacy
 Allow: /terms
 Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 # ── Google Gemini / AI Overviews ───────────────────────────────
 User-agent: Google-Extended
@@ -75,6 +85,8 @@ Allow: /security
 Allow: /privacy
 Allow: /terms
 Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 # ── Meta / Llama ───────────────────────────────────────────────
 User-agent: Meta-ExternalAgent
@@ -84,6 +96,8 @@ Allow: /security
 Allow: /privacy
 Allow: /terms
 Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 # ── Cohere ─────────────────────────────────────────────────────
 User-agent: cohere-ai
@@ -93,6 +107,8 @@ Allow: /security
 Allow: /privacy
 Allow: /terms
 Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 # ── You.com ────────────────────────────────────────────────────
 User-agent: YouBot
@@ -102,6 +118,8 @@ Allow: /security
 Allow: /privacy
 Allow: /terms
 Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 # ── Common AI research scrapers ────────────────────────────────
 User-agent: CCBot
@@ -119,6 +137,8 @@ Allow: /security
 Allow: /privacy
 Allow: /terms
 Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 # ── ChatGPT user-triggered fetch (live page / research) ─────
 User-agent: ChatGPT-User
@@ -127,6 +147,8 @@ Allow: /pricing
 Allow: /security
 Allow: /privacy
 Allow: /terms
+Allow: /llms-full.txt
+Allow: /ai.txt
 Allow: /llms.txt
 Allow: /.well-known/
 
@@ -137,6 +159,8 @@ Allow: /pricing
 Allow: /security
 Allow: /privacy
 Allow: /terms
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 # ── Bing legacy crawler ────────────────────────────────────────
 User-agent: msnbot
@@ -145,6 +169,8 @@ Allow: /pricing
 Allow: /security
 Allow: /privacy
 Allow: /terms
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 # ── Apple Search / Siri ────────────────────────────────────────
 User-agent: Applebot
@@ -153,6 +179,8 @@ Allow: /pricing
 Allow: /security
 Allow: /privacy
 Allow: /terms
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 # ── DuckDuckGo ─────────────────────────────────────────────────
 User-agent: DuckDuckBot
@@ -161,6 +189,8 @@ Allow: /pricing
 Allow: /security
 Allow: /privacy
 Allow: /terms
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 # ── Yahoo / Verizon ────────────────────────────────────────────
 User-agent: Slurp
@@ -169,5 +199,8 @@ Allow: /pricing
 Allow: /security
 Allow: /privacy
 Allow: /terms
+Allow: /llms-full.txt
+Allow: /ai.txt
 
 Sitemap: https://www.oweable.com/sitemap.xml
+Host: https://www.oweable.com
