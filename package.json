@@ -12,7 +12,8 @@
     "lint": "tsc --noEmit && eslint src",
     "secrets:scan": "gitleaks detect --source . --config .gitleaks.toml --redact --verbose",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "generate:hero-loop": "node scripts/generate-hero-loop.mjs"
   },
   "dependencies": {
     "@fontsource/geist-mono": "^5.2.7",
