@@ -220,7 +220,7 @@ export default function OweAi() {
             <Sparkles className="w-4.5 h-4.5 text-content-secondary" aria-hidden />
           </div>
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-content-primary leading-none">Owe-AI</h1>
+            <h1 className="text-xl font-medium tracking-tight text-content-primary leading-none sm:text-2xl">Owe-AI</h1>
             <p className="text-sm text-content-tertiary mt-1.5 max-w-xl">
               Chat the way you would with an advisor at the branch—plain language, short answers, and a clear next step.
               Owe-AI uses <strong className="text-content-secondary">your</strong> bills, income, debts, budgets, and goals

@@ -136,11 +136,11 @@ export default function Pricing() {
             <div className="h-[1px] w-8 bg-[#F59E0B]"></div>
           </div>
           
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[1.1] mb-8">
+          <h1 className="mb-8 text-4xl font-medium tracking-tight text-content-primary md:text-6xl md:leading-[1.1]">
             Priced for maximum leverage.
           </h1>
           
-          <p className="text-base md:text-lg text-content-tertiary max-w-2xl mx-auto leading-relaxed font-light">
+          <p className="mx-auto max-w-2xl text-base font-medium leading-relaxed text-content-secondary md:text-lg">
             Stop paying for apps that just track your debt. Invest in the arsenal that eliminates it.
           </p>
         </div>
@@ -190,7 +190,7 @@ export default function Pricing() {
             {/* Card 2: Full Suite */}
             <div className={`relative transition-all duration-700 ease-out delay-[200ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
               {/* Indigo Glow Behind Card */}
-              <div className="absolute -inset-1 bg-white/[0.05] blur-3xl rounded-none z-0"></div>
+              <div className="absolute -inset-1 z-0 rounded-2xl bg-white/[0.05] blur-3xl"></div>
               
               <div className="bg-surface-raised border border-surface-border rounded-lg p-10 flex flex-col relative z-10 h-full shadow-none">
                 <div className="absolute top-0 right-10 transform -translate-y-1/2">

@@ -112,12 +112,10 @@ export default function Settings() {
     <div className="max-w-5xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-content-primary">Settings</h1>
-          <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary mt-1">
-            Account configuration & preferences
-          </p>
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Settings</h1>
+          <p className="mt-1 text-sm font-medium text-content-secondary">Account, billing, security, and preferences.</p>
         </div>
-        <div className="flex items-center text-[10px] font-mono text-content-tertiary bg-surface-raised px-3 py-1.5 rounded-lg border border-surface-border uppercase tracking-widest">
+        <div className="flex items-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-xs font-medium text-content-secondary">
           <Shield className="w-3.5 h-3.5 mr-1.5 text-content-secondary" />
           Secure connection
         </div>

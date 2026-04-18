@@ -136,7 +136,7 @@ export default function Calendar() {
         className="scroll-mt-24 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Financial Calendar</h1>
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Financial calendar</h1>
           <p className="text-sm text-content-tertiary mt-1">
             All financial events plotted in time. Pairs with the 30 / 60 / 90 outlook on Bills & debts.
           </p>

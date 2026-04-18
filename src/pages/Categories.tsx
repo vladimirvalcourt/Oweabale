@@ -72,8 +72,8 @@ export default function Categories() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-content-primary">Categories</h1>
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-tertiary mt-1">Saved categories for transaction analysis</p>
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Categories</h1>
+          <p className="mt-1 text-sm font-medium text-content-secondary">Saved categories for transaction analysis and rules.</p>
         </div>
         <button
           onClick={() => {
@@ -81,7 +81,7 @@ export default function Categories() {
             setEditingId(null);
             setFormData({ name: '', type: 'expense', color: '#737373' });
           }}
-          className="px-4 py-2 bg-content-primary hover:bg-content-tertiary/25 text-surface-base rounded-lg text-xs font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 focus-app"
+          className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
         >
           <Plus className="w-3.5 h-3.5" />
           Add Category

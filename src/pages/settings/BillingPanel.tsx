@@ -184,7 +184,7 @@ function BillingPanelInner() {
         icon={Building2}
         defaultOpen
         extraHeader={
-          <span className="inline-flex items-center text-[10px] font-mono font-bold text-content-tertiary bg-surface-raised px-2.5 py-1 rounded-lg border border-surface-border uppercase tracking-widest">
+          <span className="inline-flex items-center rounded-lg border border-surface-border bg-surface-raised px-2.5 py-1 text-xs font-medium text-content-secondary">
             {tierLabel}
           </span>
         }
@@ -197,7 +197,7 @@ function BillingPanelInner() {
             type="button"
             onClick={() => void loadBillingState({ stripeSyncFirst: true })}
             disabled={isLoading || isWorking}
-            className="inline-flex shrink-0 items-center justify-center gap-2 self-start px-3 py-2 text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:text-content-primary bg-surface-raised border border-surface-border rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus-app"
+            className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm font-medium text-content-secondary transition-colors hover:text-content-primary focus-app disabled:cursor-not-allowed disabled:opacity-50"
           >
             <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} aria-hidden />
             Refresh status
@@ -206,7 +206,7 @@ function BillingPanelInner() {
         {hasPaidAccess ? (
           <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-lg p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <h4 className="text-content-primary font-bold flex items-center gap-2">You&apos;re on Full Suite</h4>
+              <h4 className="flex items-center gap-2 font-medium text-content-primary">You&apos;re on Full Suite</h4>
               <p className="text-sm text-emerald-200/70 mt-1 max-w-md">
                 Full Suite is active. Update your plan, payment method, or invoices anytime in the billing portal.
               </p>
@@ -215,7 +215,7 @@ function BillingPanelInner() {
               type="button"
               onClick={onManageBilling}
               disabled={isWorking}
-              className="shrink-0 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg text-sm font-bold transition-colors shadow-[0_0_15px_rgba(16,185,129,0.25)]"
+              className="shrink-0 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white shadow-[0_0_15px_rgba(16,185,129,0.25)] transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isWorking ? 'Working...' : 'Manage billing'}
             </button>
@@ -223,7 +223,7 @@ function BillingPanelInner() {
         ) : (
           <div className="bg-white/[0.05] border border-surface-border rounded-lg p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <h4 className="text-content-primary font-bold flex items-center gap-2">Upgrade to Full Suite</h4>
+              <h4 className="flex items-center gap-2 font-medium text-content-primary">Upgrade to Full Suite</h4>
               <p className="text-sm text-content-secondary/70 mt-1 max-w-md">
                 Unlock Full Suite: unlimited account sync, debt payoff planner, subscription alerts,
                 and freelancer tax tools for ${monthlyPrice.toFixed(2)}/month.
@@ -233,7 +233,7 @@ function BillingPanelInner() {
               type="button"
               onClick={onUpgrade}
               disabled={isWorking}
-              className="shrink-0 px-5 py-2.5 bg-white text-black hover:bg-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed text-black rounded-lg text-sm font-bold transition-colors shadow-[0_0_15px_rgba(99,102,241,0.3)]"
+              className="shrink-0 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black shadow-[0_0_15px_rgba(99,102,241,0.3)] transition-colors hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isWorking ? 'Working...' : `Upgrade — $${monthlyPrice.toFixed(2)}/mo`}
             </button>
@@ -246,8 +246,8 @@ function BillingPanelInner() {
         {paymentHistory.length === 0 ? (
           <div className="border border-surface-border border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center bg-surface-base">
             <Download className="w-7 h-7 text-content-muted mb-3" />
-            <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">No billing history</p>
-            <p className="text-[10px] font-mono text-content-muted mt-1">
+            <p className="text-sm font-medium text-content-secondary">No billing history</p>
+            <p className="mt-1 text-xs font-medium text-content-tertiary">
               {hasPaidAccess
                 ? 'Invoices from Stripe will appear here after your first charge.'
                 : 'You are on the free tier — no charges have been made.'}
@@ -256,12 +256,12 @@ function BillingPanelInner() {
         ) : (
           <div className="border border-surface-border rounded-lg bg-surface-base divide-y divide-surface-border">
             {paymentHistory.map((payment) => (
-              <div key={payment.id} className="px-4 py-3 flex items-center justify-between text-xs font-mono">
+              <div key={payment.id} className="flex items-center justify-between px-4 py-3 text-xs font-medium">
                 <span className="text-content-secondary">{new Date(payment.created_at).toLocaleDateString()}</span>
-                <span className="text-content-primary">
+                <span className="tabular-nums text-content-primary">
                   ${(payment.amount_total / 100).toFixed(2)} {payment.currency.toUpperCase()}
                 </span>
-                <span className="uppercase text-content-tertiary">{payment.status}</span>
+                <span className="capitalize text-content-tertiary">{payment.status}</span>
               </div>
             ))}
           </div>
@@ -272,10 +272,10 @@ function BillingPanelInner() {
         <p className="text-sm text-content-tertiary mb-6">Manage payment methods used for your subscriptions.</p>
         <div className="border border-surface-border border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center mb-4 bg-surface-base">
           <CreditCardIcon className="w-8 h-8 text-content-muted mb-3" />
-          <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">
+          <p className="text-sm font-medium text-content-secondary">
             {hasPaidAccess ? 'Cards on file' : 'No payment method on file'}
           </p>
-          <p className="text-[10px] font-mono text-content-muted mt-1">
+          <p className="mt-1 text-xs font-medium text-content-tertiary">
             {hasPaidAccess
               ? 'Add, remove, or replace cards in the Stripe Customer Portal.'
               : 'Free tier — no billing required'}

@@ -19,14 +19,17 @@ function FinancialPanelInner() {
   return (
     <div className="space-y-6">
       <CollapsibleModule title="Currency & Formatting" icon={Globe} defaultOpen={false}>
-        <p className="text-sm text-content-tertiary mb-6">Set your preferred currency and date format.</p>
-        <div className="space-y-4 max-w-md">
+        <p className="mb-6 text-sm font-medium text-content-secondary">Set your preferred currency and date format.</p>
+        <div className="max-w-md space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-content-secondary">Primary Currency</label>
+            <label className="mb-2 block text-xs font-medium text-content-secondary" htmlFor="pref-currency">
+              Primary currency
+            </label>
             <select
+              id="pref-currency"
               value={prefCurrency}
               onChange={(e) => setPrefCurrency(e.target.value)}
-              className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+              className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
             >
               <option>USD ($)</option>
               <option>EUR (€)</option>
@@ -35,11 +38,14 @@ function FinancialPanelInner() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-content-secondary">Date Format</label>
+            <label className="mb-2 block text-xs font-medium text-content-secondary" htmlFor="pref-date-format">
+              Date format
+            </label>
             <select
+              id="pref-date-format"
               value={prefDateFormat}
               onChange={(e) => setPrefDateFormat(e.target.value)}
-              className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+              className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
             >
               <option>MM/DD/YYYY</option>
               <option>DD/MM/YYYY</option>
@@ -47,11 +53,14 @@ function FinancialPanelInner() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-content-secondary">Fiscal Year Start</label>
+            <label className="mb-2 block text-xs font-medium text-content-secondary" htmlFor="pref-fiscal-year">
+              Fiscal year start
+            </label>
             <select
+              id="pref-fiscal-year"
               value={prefFiscalYear}
               onChange={(e) => setPrefFiscalYear(e.target.value)}
-              className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+              className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
             >
               <option>January</option>
               <option>April</option>
@@ -60,11 +69,14 @@ function FinancialPanelInner() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-content-secondary">Default Dashboard View</label>
+            <label className="mb-2 block text-xs font-medium text-content-secondary" htmlFor="pref-dashboard-view">
+              Default dashboard view
+            </label>
             <select
+              id="pref-dashboard-view"
               value={prefDashboardView}
               onChange={(e) => setPrefDashboardView(e.target.value)}
-              className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+              className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
             >
               <option>Net Worth Overview</option>
               <option>Upcoming Bills</option>
@@ -75,30 +87,33 @@ function FinancialPanelInner() {
             <button
               type="button"
               onClick={() => deferToast(() => toast.success('Preferences saved'))}
-              className="px-4 py-2 bg-white text-black hover:bg-neutral-200 rounded-lg text-sm font-medium transition-colors focus-app"
+              className="rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
             >
-              Save Preferences
+              Save preferences
             </button>
           </div>
         </div>
       </CollapsibleModule>
 
       <CollapsibleModule title="Budget Limits" icon={PieChart} defaultOpen={false}>
-        <p className="text-sm text-content-tertiary mb-6">
+        <p className="mb-6 text-sm font-medium text-content-secondary">
           Set global budget limits to receive alerts when you&apos;re close to overspending.
         </p>
-        <div className="space-y-4 max-w-md">
+        <div className="max-w-md space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-content-secondary">Monthly Spending Limit</label>
-            <div className="mt-1 relative rounded-lg">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="text-content-tertiary sm:text-sm">$</span>
+            <label className="mb-2 block text-xs font-medium text-content-secondary" htmlFor="pref-spending-limit">
+              Monthly spending limit
+            </label>
+            <div className="relative rounded-lg">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <span className="text-sm text-content-tertiary">$</span>
               </div>
               <input
+                id="pref-spending-limit"
                 type="number"
                 value={prefSpendingLimit}
                 onChange={(e) => setPrefSpendingLimit(e.target.value)}
-                className="focus-app-field block w-full pl-7 sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg py-2 border transition-colors"
+                className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised py-2 pl-7 pr-3 text-sm text-content-primary transition-colors"
               />
             </div>
           </div>
@@ -106,9 +121,9 @@ function FinancialPanelInner() {
             <button
               type="button"
               onClick={() => deferToast(() => toast.success('Budget limits updated'))}
-              className="px-4 py-2 bg-white text-black hover:bg-neutral-200 rounded-lg text-sm font-medium transition-colors focus-app"
+              className="rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
             >
-              Update Limits
+              Update limits
             </button>
           </div>
         </div>

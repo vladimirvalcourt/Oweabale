@@ -139,7 +139,7 @@ export default function Income() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Income</h1>
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Income</h1>
           <p className="text-sm text-content-tertiary mt-1">Expected pay, deposits, and tax handling in one view.</p>
         </div>
         <button 

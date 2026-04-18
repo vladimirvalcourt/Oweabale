@@ -62,7 +62,7 @@ export default function NetWorth() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Net Worth</h1>
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Net worth</h1>
           <p className="text-sm text-content-tertiary mt-1">Track your total assets minus total liabilities over time.</p>
         </div>
       </div>

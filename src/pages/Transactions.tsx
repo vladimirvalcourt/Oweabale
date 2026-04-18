@@ -61,10 +61,10 @@ export default function Transactions() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-content-primary">Transaction History</h1>
-          <p className="text-xs font-sans text-content-tertiary mt-1">
-          {filteredTransactions.length} of {transactions.length} transactions
-        </p>
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Transaction history</h1>
+          <p className="mt-1 text-sm font-medium text-content-secondary">
+            {filteredTransactions.length} of {transactions.length} transactions
+          </p>
         </div>
         <button
           onClick={() => {

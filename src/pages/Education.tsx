@@ -207,7 +207,7 @@ export default function Education() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Financial Academy</h1>
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Financial Academy</h1>
           <p className="text-sm text-content-tertiary mt-1">Short lessons you can finish in one sitting.</p>
         </div>
       </div>

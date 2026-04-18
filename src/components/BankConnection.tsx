@@ -24,24 +24,24 @@ function BankConnectionGated() {
   };
 
   return (
-    <div className="bg-surface-elevated rounded-lg border border-surface-border p-6">
-      <h3 className="text-sm font-sans font-semibold text-content-primary">Bank connections</h3>
-      <p className="mt-2 text-sm text-content-tertiary leading-relaxed">
+    <div className="rounded-lg border border-surface-border bg-surface-raised p-6">
+      <h3 className="text-base font-medium tracking-tight text-content-primary">Bank connections</h3>
+      <p className="mt-2 text-sm font-medium leading-relaxed text-content-secondary">
         Oweable works without linking a bank: add bills and debts manually, import transactions via CSV, and use document uploads
         where you need them. Automatic bank sync may appear here when it is available for your account.
       </p>
       {bankConnected && (
         <div className="mt-4 rounded-lg border border-surface-border bg-surface-base p-4">
-          <p className="text-sm text-content-secondary">
+          <p className="text-sm font-medium text-content-secondary">
             A bank was linked previously:{' '}
-            <span className="font-medium text-content-primary">{plaidInstitutionName?.trim() || 'Unknown institution'}</span>
+            <span className="text-content-primary">{plaidInstitutionName?.trim() || 'Unknown institution'}</span>
           </p>
-          <p className="mt-2 text-xs text-content-tertiary">You can disconnect to clear the stored connection.</p>
+          <p className="mt-2 text-xs font-medium text-content-tertiary">You can disconnect to clear the stored connection.</p>
           <button
             type="button"
             onClick={handleDisconnect}
             disabled={isDisconnecting}
-            className="mt-3 inline-flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-sm font-sans font-medium text-rose-300 transition-colors hover:bg-rose-500/20 disabled:opacity-60"
+            className="mt-3 inline-flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-700 transition-colors hover:bg-rose-500/20 disabled:opacity-60 dark:text-rose-300"
           >
             {isDisconnecting ? <Loader2 className="h-4 w-4 animate-spin shrink-0" aria-hidden /> : <Unplug className="h-4 w-4 shrink-0" aria-hidden />}
             Disconnect bank
@@ -118,10 +118,10 @@ function BankConnectionPlaid() {
   const lastSyncLabel = plaidLastSyncAt ? new Date(plaidLastSyncAt).toLocaleString() : null;
 
   return (
-    <div className="bg-surface-elevated rounded-lg border border-surface-border p-6">
+    <div className="rounded-lg border border-surface-border bg-surface-raised p-6">
       <div className="mb-6">
-        <h3 className="text-xs font-mono uppercase tracking-widest text-content-primary">Data Sources</h3>
-        <p className="mt-1 text-sm text-content-tertiary">
+        <h3 className="text-base font-medium tracking-tight text-content-primary">Bank connections</h3>
+        <p className="mt-1 text-sm font-medium leading-relaxed text-content-secondary">
           Connect your bank through our partner Plaid. You sign in at your bank; we only keep what is needed to sync transactions.
           Sync runs automatically and you can refresh on demand.
         </p>
@@ -133,27 +133,27 @@ function BankConnectionPlaid() {
             type="button"
             onClick={handleConnectClick}
             disabled={plaidFlow.isBusy || !plaidEnabledForUser}
-            className="bg-content-primary text-black hover:bg-content-tertiary/25 font-bold px-6 py-3 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {plaidFlow.isBusy ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="font-mono text-sm tracking-widest">
-                  {plaidFlow.stage === 'oauth_redirect' ? 'AWAITING BANK AUTH…' : 'PREPARING SECURE LINK…'}
+                <Loader2 className="h-4 w-4 animate-spin shrink-0" aria-hidden />
+                <span>
+                  {plaidFlow.stage === 'oauth_redirect' ? 'Awaiting bank…' : 'Preparing secure link…'}
                 </span>
               </>
             ) : (
               <>
-                <Lock className="w-4 h-4" />
-                <span className="font-mono text-sm tracking-widest">CONNECT WITH PLAID</span>
+                <Lock className="h-4 w-4 shrink-0" aria-hidden />
+                <span>Connect with Plaid</span>
               </>
             )}
           </button>
           {!plaidGloballyEnabled && (
-            <p className="text-xs font-mono text-amber-500/90">Bank linking is disabled by the platform.</p>
+            <p className="text-xs font-medium text-amber-700 dark:text-amber-400/90">Bank linking is disabled by the platform.</p>
           )}
           {plaidGloballyEnabled && !checkingAccess && !hasFullSuite && (
-            <div className="rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs text-content-secondary">
+            <div className="rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-xs font-medium text-content-secondary">
               Plaid bank linking is available on Full Suite.
               <button
                 type="button"
@@ -166,7 +166,7 @@ function BankConnectionPlaid() {
             </div>
           )}
           {plaidFlow.stage === 'error' && plaidFlow.errorMessage && (
-            <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+            <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-800 dark:text-rose-200">
               {plaidFlow.errorMessage}
               <button
                 type="button"
@@ -182,17 +182,17 @@ function BankConnectionPlaid() {
         <div className="space-y-4">
           {plaidNeedsRelink && (
             <div className="flex items-start gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-4">
-              <AlertTriangle className="w-5 h-5 shrink-0 text-amber-400" />
+              <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden />
               <div className="min-w-0">
-                <p className="text-sm font-mono text-amber-200">Bank needs attention</p>
-                <p className="mt-1 text-xs text-content-tertiary">
+                <p className="text-sm font-medium text-amber-900 dark:text-amber-100">Bank needs attention</p>
+                <p className="mt-1 text-xs font-medium text-content-secondary">
                   Your institution needs you to sign in again. Use Fix connection to reconnect securely.
                 </p>
                 <button
                   type="button"
                   onClick={handleFixConnectionClick}
                   disabled={plaidFlow.isBusy || !plaidEnabledForUser}
-                  className="mt-3 bg-amber-500/20 text-amber-200 hover:bg-amber-500/30 font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-lg border border-amber-500/30 disabled:opacity-60"
+                  className="mt-3 rounded-lg border border-amber-500/35 bg-amber-500/15 px-4 py-2 text-sm font-medium text-amber-900 transition-colors hover:bg-amber-500/25 disabled:opacity-60 dark:text-amber-100"
                 >
                   {plaidFlow.isBusy && plaidFlow.activeIntent === 'update' ? 'Opening…' : 'Fix connection'}
                 </button>
@@ -200,26 +200,29 @@ function BankConnectionPlaid() {
             </div>
           )}
 
-          <div className="bg-surface-base border border-surface-border rounded-lg p-4">
+          <div className="rounded-lg border border-surface-border bg-surface-base p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="font-mono text-sm text-content-primary">
-                [STATUS: <span className="text-emerald-400 animate-pulse">ACTIVE</span>] {displayName}
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <span className="inline-flex shrink-0 items-center rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                  Active
+                </span>
+                <span className="truncate text-sm font-medium text-content-primary">{displayName}</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={handleSyncClick}
                   disabled={isSyncing || !plaidEnabledForUser}
-                  className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-surface-border text-content-primary font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-lg disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-primary transition-colors hover:border-content-muted hover:bg-surface-elevated disabled:opacity-60"
                 >
-                  {isSyncing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                  {isSyncing ? <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" aria-hidden /> : <RefreshCw className="h-3.5 w-3.5 shrink-0" aria-hidden />}
                   Sync now
                 </button>
                 <button
                   type="button"
                   onClick={handleFixConnectionClick}
                   disabled={plaidFlow.isBusy || !plaidEnabledForUser}
-                  className="inline-flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-surface-border text-content-secondary font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-lg disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:border-content-muted hover:text-content-primary disabled:opacity-60"
                 >
                   Reconnect
                 </button>
@@ -227,20 +230,20 @@ function BankConnectionPlaid() {
                   type="button"
                   onClick={handleDisconnectClick}
                   disabled={isDisconnecting}
-                  className="inline-flex items-center gap-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-300 font-mono text-xs uppercase tracking-wider px-4 py-2 rounded-lg disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-700 transition-colors hover:bg-rose-500/20 disabled:opacity-60 dark:text-rose-300"
                 >
-                  {isDisconnecting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Unplug className="w-3.5 h-3.5" />}
+                  {isDisconnecting ? <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" aria-hidden /> : <Unplug className="h-3.5 w-3.5 shrink-0" aria-hidden />}
                   Disconnect
                 </button>
               </div>
             </div>
-            <div className="mt-3 text-xs font-mono text-content-tertiary">
+            <div className="mt-3 text-xs font-medium text-content-tertiary">
               {lastSyncLabel
                 ? `Last transaction sync: ${lastSyncLabel}`
                 : 'No sync yet — use Sync now or wait for automatic updates.'}
             </div>
             {plaidFlow.stage === 'error' && plaidFlow.errorMessage && (
-              <div className="mt-3 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+              <div className="mt-3 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-800 dark:text-rose-200">
                 {plaidFlow.errorMessage}
                 <button
                   type="button"

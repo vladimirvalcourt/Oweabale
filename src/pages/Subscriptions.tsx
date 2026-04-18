@@ -120,8 +120,8 @@ export default function Subscriptions() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-content-primary">Subscriptions</h1>
-          <p className="text-sm text-content-tertiary mt-1">Recurring charges and renewal dates in one place.</p>
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Subscriptions</h1>
+          <p className="mt-1 text-sm font-medium text-content-secondary">Recurring charges and renewal dates in one place.</p>
         </div>
         <button
           type="button"
@@ -139,7 +139,7 @@ export default function Subscriptions() {
 
       {/* Subscription Optimizer */}
       {unusedSubs.length > 0 && (
-        <div className="rounded-sm border border-amber-500/20 bg-amber-500/5 p-4">
+        <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4">
           <div className="flex items-center gap-2 mb-3">
             <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
             <h3 className="text-sm font-semibold text-amber-300">Subscription Optimizer</h3>
@@ -161,7 +161,7 @@ export default function Subscriptions() {
                 <button
                   type="button"
                   onClick={() => startEdit(subscriptions.find(s => s.id === sub.id)!)}
-                  className="text-xs text-content-tertiary hover:text-content-primary px-2 py-1 rounded-sm hover:bg-surface-highlight transition-colors"
+                  className="rounded-md px-2 py-1 text-xs text-content-tertiary transition-colors hover:bg-surface-highlight hover:text-content-primary"
                 >
                   Review
                 </button>

@@ -98,27 +98,27 @@ function SupportPanelInner() {
         <div className="-mx-6 -my-6 p-6 bg-surface-base">
           <form onSubmit={handleSubmitTicket} className="space-y-4">
             <div>
-              <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">
+              <label className="mb-2 block text-xs font-medium text-content-secondary">
                 What do you need help with?
               </label>
               <input
                 type="text"
                 value={supportForm.subject}
                 onChange={(e) => setSupportForm((f) => ({ ...f, subject: e.target.value }))}
-                className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field placeholder:text-content-muted"
+                className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary placeholder:text-content-muted"
                 placeholder="Brief summary of your issue or question..."
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">
+                <label className="mb-2 block text-xs font-medium text-content-secondary">
                   Category
                 </label>
                 <select
                   value={supportForm.department}
                   onChange={(e) => setSupportForm((f) => ({ ...f, department: e.target.value }))}
-                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field appearance-none"
+                  className="focus-app-field w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary"
                 >
                   <option>General Support</option>
                   <option>Integrations</option>
@@ -127,13 +127,13 @@ function SupportPanelInner() {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">
+                <label className="mb-2 block text-xs font-medium text-content-secondary">
                   Priority
                 </label>
                 <select
                   value={supportForm.priority}
                   onChange={(e) => setSupportForm((f) => ({ ...f, priority: e.target.value }))}
-                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field appearance-none"
+                  className="focus-app-field w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary"
                 >
                   <option value="Low">Low — general question</option>
                   <option value="Normal">Normal — something isn&apos;t working</option>
@@ -143,13 +143,13 @@ function SupportPanelInner() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">
+              <label className="mb-2 block text-xs font-medium text-content-secondary">
                 Describe the issue in detail
               </label>
               <textarea
                 value={supportForm.description}
                 onChange={(e) => setSupportForm((f) => ({ ...f, description: e.target.value }))}
-                className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-lg px-3 py-2 focus-app-field min-h-[8rem] resize-y placeholder:text-content-muted"
+                className="focus-app-field min-h-[8rem] w-full resize-y rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary placeholder:text-content-muted"
                 placeholder="Include steps to reproduce, what you expected vs what happened, and any relevant details..."
               />
             </div>
@@ -158,7 +158,7 @@ function SupportPanelInner() {
               <button
                 type="submit"
                 disabled={isSubmittingTicket}
-                className="flex items-center gap-2 px-6 py-2 bg-white text-black hover:bg-neutral-200 disabled:opacity-50 text-black rounded-lg text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors"
+                className="flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition-colors hover:bg-neutral-200 disabled:opacity-50"
               >
                 {isSubmittingTicket ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                 {isSubmittingTicket ? 'Sending...' : 'Submit Request'}
@@ -172,7 +172,7 @@ function SupportPanelInner() {
         title="My Tickets"
         icon={MessageSquare}
         extraHeader={
-          <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">
+          <span className="text-xs font-medium text-content-tertiary">
             {tickets.length} ticket{tickets.length !== 1 ? 's' : ''}
           </span>
         }
@@ -186,7 +186,7 @@ function SupportPanelInner() {
           ) : tickets.length === 0 ? (
             <div className="p-10 text-center">
               <MessageSquare className="w-7 h-7 text-content-muted mx-auto mb-3" />
-              <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">No tickets yet.</p>
+              <p className="text-sm font-medium text-content-secondary">No tickets yet.</p>
             </div>
           ) : (
             <div className="divide-y divide-surface-border">
@@ -212,12 +212,12 @@ function SupportPanelInner() {
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                        <span className="text-[9px] font-mono text-content-tertiary">{ticket.id}</span>
+                        <span className="font-mono text-xs text-content-tertiary">{ticket.id}</span>
                         <span
-                          className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-lg border ${
+                          className={`rounded-lg border px-1.5 py-0.5 text-xs font-medium ${
                             ticket.priority === 'Urgent'
-                              ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                              : 'bg-surface-elevated border-surface-border text-content-tertiary'
+                              ? 'border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                              : 'border-surface-border bg-surface-elevated text-content-secondary'
                           }`}
                         >
                           {ticket.priority}
@@ -227,8 +227,8 @@ function SupportPanelInner() {
                     </div>
                   </div>
                   <div className="text-right shrink-0 ml-4">
-                    <div className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{ticket.status}</div>
-                    <div className="text-[10px] font-mono text-content-muted mt-0.5">{ticket.date}</div>
+                    <div className="text-xs font-medium capitalize text-content-secondary">{ticket.status}</div>
+                    <div className="mt-0.5 text-xs font-medium text-content-muted">{ticket.date}</div>
                   </div>
                 </div>
               ))}

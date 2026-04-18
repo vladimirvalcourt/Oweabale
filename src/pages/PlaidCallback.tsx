@@ -73,5 +73,5 @@ export default function PlaidCallback() {
     };
   }, [location.search, navigate]);
 
-  return <AppLoader />;
+  return <AppLoader message="Finishing bank link…" />;
 }

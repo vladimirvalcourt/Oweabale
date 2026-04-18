@@ -57,8 +57,8 @@ function ProfilePanelInner() {
       title="Personal Information"
       icon={User}
       extraHeader={
-        <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">
-          {user.firstName} {user.lastName} VERIFIED
+        <span className="text-xs font-medium text-content-tertiary">
+          {user.firstName} {user.lastName} · verified
         </span>
       }
     >
@@ -69,15 +69,15 @@ function ProfilePanelInner() {
               {user.avatar ? (
                 <img src={user.avatar} alt="Identifier" className="h-full w-full object-cover" data-no-invert />
               ) : (
-                <span className="text-xl font-mono font-bold text-content-tertiary">
+                <span className="text-xl font-semibold text-content-tertiary">
                   {user.firstName.charAt(0)}
                   {user.lastName.charAt(0)}
                 </span>
               )}
             </div>
             <div className="space-y-1">
-              <label className="inline-block cursor-pointer px-4 py-1.5 bg-transparent border border-surface-border rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:bg-surface-elevated transition-colors relative">
-                Update Picture
+              <label className="relative inline-block cursor-pointer rounded-lg border border-surface-border bg-transparent px-4 py-1.5 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-elevated">
+                Update picture
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/gif"
@@ -108,16 +108,17 @@ function ProfilePanelInner() {
                   }}
                 />
               </label>
-              <p className="text-[9px] font-mono text-content-muted shadow-none uppercase tracking-widest block pt-2">
-                User ID: OWE_{user.id?.substring(0, 8)}
+              <p className="block pt-2 text-xs font-medium text-content-tertiary">
+                User ID:{' '}
+                <span className="font-mono text-content-muted">OWE_{user.id?.substring(0, 8)}</span>
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6 pt-4">
             <div className="sm:col-span-3">
-              <label htmlFor="firstName" className="block text-[10px] font-mono font-bold text-content-muted uppercase tracking-widest mb-2">
-                First Name
+              <label htmlFor="firstName" className="mb-2 block text-xs font-medium text-content-secondary">
+                First name
               </label>
               <input
                 type="text"
@@ -125,13 +126,13 @@ function ProfilePanelInner() {
                 value={formData.firstName}
                 onChange={handleChange}
                 required
-                className="focus-app-field block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors"
+                className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
               />
             </div>
 
             <div className="sm:col-span-3">
-              <label htmlFor="lastName" className="block text-[10px] font-mono font-bold text-content-muted uppercase tracking-widest mb-2">
-                Last Name
+              <label htmlFor="lastName" className="mb-2 block text-xs font-medium text-content-secondary">
+                Last name
               </label>
               <input
                 type="text"
@@ -139,27 +140,27 @@ function ProfilePanelInner() {
                 value={formData.lastName}
                 onChange={handleChange}
                 required
-                className="focus-app-field block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors"
+                className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
               />
             </div>
 
             <div className="sm:col-span-4">
-              <label htmlFor="email" className="block text-[10px] font-mono font-bold text-content-muted uppercase tracking-widest mb-2">
-                Email Address
-                <span className="ml-2 text-content-muted normal-case tracking-normal font-normal">(managed by Google)</span>
+              <label htmlFor="email" className="mb-2 block text-xs font-medium text-content-secondary">
+                Email address
+                <span className="ml-2 font-normal text-content-tertiary">(managed by Google)</span>
               </label>
               <input
                 type="email"
                 id="email"
                 value={formData.email}
                 readOnly
-                className="block w-full text-[13px] font-mono border-surface-border bg-surface-base text-content-tertiary rounded-lg px-3 py-2 border focus-app-field cursor-not-allowed select-none"
+                className="block w-full cursor-not-allowed select-none rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-tertiary focus-app-field"
               />
             </div>
 
             <div className="sm:col-span-4">
-              <label htmlFor="phone" className="block text-[10px] font-mono font-bold text-content-muted uppercase tracking-widest mb-2">
-                Phone Number
+              <label htmlFor="phone" className="mb-2 block text-xs font-medium text-content-secondary">
+                Phone number
               </label>
               <input
                 type="tel"
@@ -167,19 +168,19 @@ function ProfilePanelInner() {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="+1 (555) 000-0000"
-                className="focus-app-field block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors"
+                className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
               />
             </div>
 
             <div className="sm:col-span-3">
-              <label htmlFor="timezone" className="block text-[10px] font-mono font-bold text-content-muted uppercase tracking-widest mb-2">
+              <label htmlFor="timezone" className="mb-2 block text-xs font-medium text-content-secondary">
                 Timezone
               </label>
               <select
                 id="timezone"
                 value={formData.timezone}
                 onChange={handleChange}
-                className="focus-app-field block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors appearance-none"
+                className="focus-app-field block w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
               >
                 <option value="Pacific Time (PT)">Pacific Time (PT)</option>
                 <option value="Eastern Time (ET)">Eastern Time (ET)</option>
@@ -189,14 +190,14 @@ function ProfilePanelInner() {
             </div>
 
             <div className="sm:col-span-3">
-              <label htmlFor="language" className="block text-[10px] font-mono font-bold text-content-muted uppercase tracking-widest mb-2">
+              <label htmlFor="language" className="mb-2 block text-xs font-medium text-content-secondary">
                 Language
               </label>
               <select
                 id="language"
                 value={formData.language}
                 onChange={handleChange}
-                className="focus-app-field block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors appearance-none"
+                className="focus-app-field block w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
               >
                 <option value="English (US)">English (US)</option>
                 <option value="Spanish">Spanish</option>
@@ -210,7 +211,7 @@ function ProfilePanelInner() {
             <button
               type="submit"
               disabled={isSaving}
-              className="flex items-center gap-2 px-6 py-2 bg-white text-black hover:bg-neutral-200 disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors shadow-none"
+              className="flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSaving && <Loader2 className="w-3 h-3 animate-spin" />}
               {isSaving ? 'Saving...' : 'Save Changes'}

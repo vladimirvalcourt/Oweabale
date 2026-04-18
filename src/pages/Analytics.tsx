@@ -192,7 +192,7 @@ export default function Analytics() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Trends</h1>
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Trends</h1>
           <p className="text-sm text-content-tertiary mt-1">Historical performance and spending patterns.</p>
         </div>
         <div className="flex bg-surface-raised border border-surface-border rounded-lg p-1">

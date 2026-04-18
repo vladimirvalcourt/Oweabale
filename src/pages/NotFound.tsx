@@ -8,10 +8,10 @@ export default function NotFound() {
   return (
     <div className="min-h-screen bg-surface-base flex flex-col items-center justify-center px-6 py-20">
       <p className="section-label mb-5">404</p>
-      <h1 className="text-3xl sm:text-4xl font-semibold text-content-primary tracking-tight text-center mb-3">
+      <h1 className="mb-3 text-center text-3xl font-medium tracking-tight text-content-primary sm:text-4xl">
         Page not found
       </h1>
-      <p className="text-sm text-content-secondary text-center max-w-md leading-relaxed mb-12">
+      <p className="mb-12 max-w-md text-center text-sm font-medium leading-relaxed text-content-secondary">
         That URL does not exist in Oweable. Check the address or return to your dashboard.
       </p>
       <div className="flex w-full max-w-sm flex-col gap-3 sm:flex-row sm:justify-center">
@@ -24,7 +24,7 @@ export default function NotFound() {
         </TransitionLink>
         <TransitionLink
           to="/dashboard"
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-sans font-semibold text-black shadow-none transition-colors hover:bg-neutral-200"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200"
         >
           <ArrowLeft className="w-4 h-4 rotate-180 shrink-0" aria-hidden />
           Dashboard

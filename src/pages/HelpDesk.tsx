@@ -135,7 +135,7 @@ export default function HelpDesk() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-content-primary">Help & Support</h1>
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Help & support</h1>
           <p className="text-sm font-mono text-content-tertiary mt-1 uppercase tracking-widest">Get help and track your support tickets</p>
         </div>
 

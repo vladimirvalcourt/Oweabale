@@ -59,13 +59,13 @@ export default function Goals() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-content-primary">Goals Overview</h1>
-          <p className="text-sm text-content-tertiary mt-1">Savings, debt payoff, and emergency fund targets.</p>
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Goals overview</h1>
+          <p className="mt-1 text-sm font-medium text-content-secondary">Savings, debt payoff, and emergency fund targets.</p>
         </div>
         <button
           type="button"
           onClick={() => setIsAddingGoal(true)}
-          className="px-4 py-2.5 rounded-lg bg-white hover:bg-neutral-200 text-black text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2"
+          className="flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           Add goal

@@ -58,7 +58,7 @@ function SecurityPanelInner() {
           }}
         >
           <div>
-            <label className="block text-sm font-semibold text-content-secondary">New Password</label>
+            <label className="block text-sm font-medium text-content-secondary">New password</label>
             <input
               name="newPassword"
               type="password"
@@ -68,7 +68,7 @@ function SecurityPanelInner() {
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-content-secondary">Confirm Password</label>
+            <label className="block text-sm font-medium text-content-secondary">Confirm password</label>
             <input
               name="confirmPassword"
               type="password"
@@ -169,7 +169,7 @@ function SecurityPanelInner() {
               Active
             </span>
           </div>
-          <p className="text-[10px] font-mono text-content-muted uppercase tracking-widest">
+          <p className="text-xs font-medium text-content-muted">
             Multi-device session management is not yet available.
           </p>
         </div>

@@ -282,7 +282,7 @@ export default function Freelance() {
         </div>
 
         <div className="space-y-6">
-           <div className="bg-surface-raised border border-surface-border p-6 rounded-none">
+           <div className="rounded-lg border border-surface-border bg-surface-raised p-6">
               <div className="flex items-center gap-2 text-content-tertiary mb-4">
                  <Zap className="w-4 h-4 text-content-secondary" />
                  <h3 className="text-sm font-sans font-semibold text-content-primary">Freelance tips</h3>
@@ -303,7 +303,7 @@ export default function Freelance() {
               </div>
            </div>
 
-           <div className="bg-surface-raised border border-surface-border p-6 rounded-none">
+           <div className="rounded-lg border border-surface-border bg-surface-raised p-6">
               <div className="flex items-center gap-2 mb-5">
                  <div className="w-1.5 h-1.5 bg-emerald-500" />
                  <h3 className="text-sm font-sans font-semibold text-content-primary">Weekly summary</h3>

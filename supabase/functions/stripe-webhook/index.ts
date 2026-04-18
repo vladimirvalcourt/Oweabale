@@ -8,21 +8,61 @@ import { getStripeSecretKey, getStripeWebhookSecret } from '../_shared/stripeEnv
 
 type AdminClient = ReturnType<typeof createClient>;
 
-async function recordStripeEventOrDuplicate(
+type ClaimResult = 'inserted' | 'duplicate_completed' | 'duplicate_pending';
+
+function payloadJson(event: Stripe.Event): Record<string, unknown> {
+  return JSON.parse(JSON.stringify(event.data.object)) as Record<string, unknown>;
+}
+
+/**
+ * Claim this event id before running handlers so Stripe retries do not double-apply.
+ * Returns duplicate_completed when a prior delivery finished; duplicate_pending when
+ * a prior attempt failed mid-flight and should be retried.
+ */
+async function claimStripeWebhookEvent(
   supabaseAdmin: AdminClient,
   event: Stripe.Event,
-  payload: unknown
-): Promise<'inserted' | 'duplicate' | 'failed'> {
+): Promise<ClaimResult> {
   const { error } = await supabaseAdmin.from('stripe_events').insert({
     stripe_event_id: event.id,
     event_type: event.type,
-    payload: payload as Record<string, unknown>,
+    payload: payloadJson(event),
+    processing_completed: false,
   });
 
   if (!error) return 'inserted';
-  if (error.code === '23505' || error.message?.includes('duplicate key')) return 'duplicate';
-  console.error('[stripe-webhook] stripe_events insert failed', error);
-  return 'failed';
+  if (error.code === '23505' || error.message?.includes('duplicate key')) {
+    const { data, error: selErr } = await supabaseAdmin
+      .from('stripe_events')
+      .select('processing_completed')
+      .eq('stripe_event_id', event.id)
+      .maybeSingle();
+    if (selErr) {
+      console.error('[stripe-webhook] duplicate claim select failed', selErr);
+      throw new Error(selErr.message);
+    }
+    if (data?.processing_completed === true) return 'duplicate_completed';
+    return 'duplicate_pending';
+  }
+  console.error('[stripe-webhook] stripe_events claim insert failed', error);
+  throw new Error(error.message);
+}
+
+async function markStripeWebhookEventComplete(
+  supabaseAdmin: AdminClient,
+  eventId: string,
+): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from('stripe_events')
+    .update({
+      processing_completed: true,
+      processed_at: new Date().toISOString(),
+    })
+    .eq('stripe_event_id', eventId);
+  if (error) {
+    console.error('[stripe-webhook] mark processing_completed failed', error);
+    throw new Error(error.message);
+  }
 }
 
 Deno.serve(async (req: Request) => {
@@ -48,6 +88,14 @@ Deno.serve(async (req: Request) => {
     const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
+
+    const claim = await claimStripeWebhookEvent(supabaseAdmin, event);
+    if (claim === 'duplicate_completed') {
+      return new Response(JSON.stringify({ received: true, duplicate: true }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
     switch (event.type) {
       case 'checkout.session.completed': {
@@ -102,15 +150,10 @@ Deno.serve(async (req: Request) => {
         break;
     }
 
-    const rec = await recordStripeEventOrDuplicate(supabaseAdmin, event, event.data.object);
-    if (rec === 'failed') {
-      return new Response(JSON.stringify({ error: 'Could not record event' }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-    if (rec === 'duplicate') {
-      console.log('[stripe-webhook] duplicate event id (after handler)', event.id);
+    await markStripeWebhookEventComplete(supabaseAdmin, event.id);
+
+    if (claim === 'duplicate_pending') {
+      console.log('[stripe-webhook] completed retry for event', event.id);
     }
 
     return new Response(JSON.stringify({ received: true }), {
@@ -119,13 +162,16 @@ Deno.serve(async (req: Request) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Webhook error';
-    const hint =
-      /signature|No signatures found|timestamp/i.test(message)
-        ? 'stripe_webhook_signature_mismatch'
-        : 'stripe_webhook_handler_error';
+    const isSignature =
+      /signature|No signatures found|timestamp/i.test(message) ||
+      message.includes('Missing stripe-signature');
+    const hint = isSignature ? 'stripe_webhook_signature_mismatch' : 'stripe_webhook_handler_error';
     console.error(`[stripe-webhook] ${hint}:`, message);
+    // 400: malformed / bad signature (Stripe should not retry the same body blindly).
+    // 500: handler / DB errors so Stripe retries; claim row stays processing_completed=false.
+    const status = isSignature ? 400 : 500;
     return new Response(JSON.stringify({ error: message }), {
-      status: 400,
+      status,
       headers: { 'Content-Type': 'application/json' },
     });
   }

@@ -101,10 +101,10 @@ export default function Taxes() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-content-primary flex items-center gap-3">
-            <ShieldAlert className="w-7 h-7 text-content-secondary" /> Freelance Tax Guide
+          <h1 className="flex items-center gap-3 text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">
+            <ShieldAlert className="h-7 w-7 shrink-0 text-content-secondary" aria-hidden /> Freelance tax guide
           </h1>
-          <p className="text-sm text-content-tertiary mt-1">Estimates and quarterly reminders based on your ledger.</p>
+          <p className="mt-1 text-sm font-medium text-content-secondary">Estimates and quarterly reminders based on your ledger.</p>
         </div>
         
         <div className="flex flex-wrap gap-2">

@@ -25,15 +25,15 @@ function RulesPanelInner() {
         title="Smart Categories"
         icon={Filter}
         extraHeader={
-          <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">
+          <span className="text-xs font-medium text-content-tertiary">
             {categorizationRules.length} rule{categorizationRules.length !== 1 ? 's' : ''}
           </span>
         }
       >
         <div className="-mx-6 -my-6">
           <div className="p-6 border-b border-surface-border bg-surface-base">
-            <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest mb-4">
-              New Auto-Category — applied when a transaction name matches
+            <p className="mb-4 text-sm font-medium text-content-secondary">
+              New auto-category — applied when a transaction name matches
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <select
@@ -41,7 +41,7 @@ function RulesPanelInner() {
                 onChange={(e) =>
                   setRuleForm((f) => ({ ...f, match_type: e.target.value as CategorizationRule['match_type'] }))
                 }
-                className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-lg px-3 py-2 focus-app-field appearance-none w-full sm:w-36"
+                className="w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-primary focus-app-field sm:w-36"
               >
                 <option value="contains">Contains</option>
                 <option value="exact">Exact Match</option>
@@ -53,12 +53,12 @@ function RulesPanelInner() {
                 placeholder="e.g. STARBUCKS"
                 value={ruleForm.match_value}
                 onChange={(e) => setRuleForm((f) => ({ ...f, match_value: e.target.value }))}
-                className="flex-1 bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-lg px-3 py-2 focus-app-field placeholder:text-content-muted"
+                className="flex-1 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-primary placeholder:text-content-muted focus-app-field"
               />
               <select
                 value={ruleForm.category}
                 onChange={(e) => setRuleForm((f) => ({ ...f, category: e.target.value }))}
-                className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-lg px-3 py-2 focus-app-field appearance-none w-full sm:w-44"
+                className="w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-primary focus-app-field sm:w-44"
               >
                 <option value="">— Select category —</option>
                 {categories.map((c) => (
@@ -82,7 +82,7 @@ function RulesPanelInner() {
                   });
                   setRuleForm((f) => ({ ...f, match_value: '' }));
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-white text-black hover:bg-neutral-200 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-colors shrink-0"
+                className="flex shrink-0 items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-neutral-200"
               >
                 <Plus className="w-3 h-3" />
                 Add
@@ -93,8 +93,8 @@ function RulesPanelInner() {
           {categorizationRules.length === 0 ? (
             <div className="p-10 text-center">
               <Filter className="w-7 h-7 text-content-muted mx-auto mb-3" />
-              <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">No auto-categories yet — add one above.</p>
-              <p className="text-[10px] font-mono text-content-muted mt-2">Example: &quot;STARBUCKS&quot; → Coffee</p>
+              <p className="text-sm font-medium text-content-secondary">No auto-categories yet — add one above.</p>
+              <p className="mt-2 text-xs font-medium text-content-tertiary">Example: &quot;STARBUCKS&quot; → Coffee</p>
             </div>
           ) : (
             <div className="divide-y divide-surface-border">
@@ -104,12 +104,12 @@ function RulesPanelInner() {
                   className="flex items-center justify-between px-6 py-3 hover:bg-surface-elevated transition-colors group"
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 bg-white/[0.05] border border-surface-border text-content-primary rounded-lg shrink-0">
+                    <span className="shrink-0 rounded-lg border border-surface-border bg-white/[0.05] px-2 py-0.5 text-[11px] font-medium capitalize text-content-primary">
                       {rule.match_type.replace('_', ' ')}
                     </span>
-                    <span className="text-sm font-mono text-white truncate">{rule.match_value}</span>
-                    <span className="text-content-muted font-mono text-xs shrink-0">→</span>
-                    <span className="text-xs font-mono text-emerald-400 truncate">{rule.category}</span>
+                    <span className="truncate text-sm font-medium text-content-primary">{rule.match_value}</span>
+                    <span className="shrink-0 text-xs text-content-muted">→</span>
+                    <span className="truncate text-xs font-medium text-emerald-500">{rule.category}</span>
                   </div>
                   <button
                     type="button"
@@ -148,7 +148,7 @@ function RulesPanelInner() {
               else toast.success(`Updated ${count} transaction${count !== 1 ? 's' : ''}`);
             }}
             disabled={isApplying}
-            className="flex items-center gap-2 px-4 py-2 bg-surface-elevated border border-surface-border text-content-secondary rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-surface-raised transition-colors disabled:opacity-50 shrink-0"
+            className="flex shrink-0 items-center gap-2 rounded-lg border border-surface-border bg-surface-elevated px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-raised disabled:opacity-50"
           >
             {isApplying ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
             Apply Retroactively

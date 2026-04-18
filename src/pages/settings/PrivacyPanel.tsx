@@ -57,9 +57,9 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
             <button
               type="button"
               onClick={() => deferToast(() => toast.success('Data export started.'))}
-              className="px-4 py-2 bg-surface-raised border border-surface-border rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary hover:text-white transition-colors focus-app"
+              className="rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:text-content-primary focus-app"
             >
-              Export Data
+              Export data
             </button>
           </div>
 
@@ -71,9 +71,9 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
             <button
               type="button"
               onClick={onOpenResetDialog}
-              className="px-4 py-2 bg-amber-500/10 border border-amber-500/50 text-amber-500 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-amber-500 hover:text-white transition-colors focus-app"
+              className="rounded-lg border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-600 transition-colors hover:bg-amber-500 hover:text-white focus-app dark:text-amber-500"
             >
-              Reset Data
+              Reset data
             </button>
           </div>
         </div>
@@ -88,9 +88,9 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
           <button
             type="button"
             onClick={onOpenDeleteDialog}
-            className="px-4 py-2 bg-red-500/10 border border-red-500/50 text-red-500 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-colors focus-app"
+            className="rounded-lg border border-red-500/50 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-500 hover:text-white focus-app dark:text-red-500"
           >
-            Delete Account
+            Delete account
           </button>
         </div>
       </CollapsibleModule>

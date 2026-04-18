@@ -323,10 +323,10 @@ export default function Ingestion() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-sans font-medium tracking-tight text-content-primary">
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">
             Review <span className="text-content-secondary">Inbox</span>
           </h1>
-          <p className="text-[14px] font-sans text-content-tertiary mt-2">
+          <p className="mt-2 max-w-2xl font-sans text-sm font-medium leading-relaxed text-content-secondary">
             Uploads are read automatically and saved when amounts are detected. Scanned PDFs (photos of paper) are OCR&apos;d page-by-page; if nothing is found, fill fields manually.
           </p>
         </div>

@@ -132,9 +132,9 @@ ${user.firstName} ${user.lastName}
         {/* Header & Score Gauge */}
         <div className="flex flex-col md:flex-row gap-8 items-start">
           <div className="flex-1 space-y-2">
-            <h1 className="text-3xl font-sans font-bold tracking-tight text-white uppercase italic">Credit Workshop</h1>
-            <p className="text-content-tertiary font-sans max-w-xl">
-              Track your reputation, dispute errors, and execute tactical payoffs. This is your command center for credit repair.
+            <h1 className="font-sans text-3xl font-medium tracking-tight text-white sm:text-4xl">Credit workshop</h1>
+            <p className="max-w-xl font-sans text-sm font-medium leading-relaxed text-content-secondary">
+              Track your score, dispute errors, and plan paydowns. This view is for organization only—not credit repair advice.
             </p>
           </div>
 

@@ -25,11 +25,11 @@ export default function Changelog() {
   return (
     <div className="space-y-8 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-content-primary mb-1 flex items-center gap-2">
-          <ScrollText className="w-7 h-7 text-content-primary shrink-0" aria-hidden />
+        <h1 className="mb-1 flex items-center gap-2 text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">
+          <ScrollText className="h-7 w-7 shrink-0 text-content-primary" aria-hidden />
           Changelog
         </h1>
-        <p className="text-sm text-content-tertiary">Product updates and notable changes.</p>
+        <p className="text-sm font-medium text-content-secondary">Product updates and notable changes.</p>
       </div>
       <ul className="space-y-8">
         {ENTRIES.map((entry) => (

@@ -119,13 +119,13 @@ export default function Investments() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-content-primary">Investment Accounts</h1>
-            <p className="text-sm text-content-tertiary mt-1">Track your portfolio across all accounts.</p>
+            <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Investment accounts</h1>
+            <p className="mt-1 text-sm font-medium text-content-secondary">Track your portfolio across all accounts.</p>
           </div>
           <button
             type="button"
             onClick={openAdd}
-            className="inline-flex items-center gap-2 rounded-sm bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-sm font-medium text-white transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Add Account
@@ -145,7 +145,7 @@ export default function Investments() {
           >
             <div className="-mx-6 -my-6 p-6 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-surface-elevated rounded-sm border border-surface-border p-5">
+                <div className="bg-surface-elevated rounded-lg border border-surface-border p-5">
                   <p className="text-xs font-medium text-content-tertiary uppercase tracking-wider mb-2">Total Portfolio Value</p>
                   <p className="text-3xl font-bold font-mono tabular-nums text-content-primary">
                     ${totalPortfolio.toLocaleString('en-US', { minimumFractionDigits: 0 })}
@@ -154,7 +154,7 @@ export default function Investments() {
                     Across {investmentAccounts.length} account{investmentAccounts.length !== 1 ? 's' : ''}
                   </p>
                 </div>
-                <div className="bg-surface-elevated rounded-sm border border-surface-border p-5">
+                <div className="bg-surface-elevated rounded-lg border border-surface-border p-5">
                   <p className="text-xs font-medium text-content-tertiary uppercase tracking-wider mb-3">Breakdown by Type</p>
                   <ul className="space-y-1.5">
                     {(Object.entries(byType) as [InvestmentAccount['type'], number][]).map(([type, amount]) => {
@@ -180,7 +180,7 @@ export default function Investments() {
                 {investmentAccounts.map((a) => (
                   <span
                     key={a.id}
-                    className={`inline-flex items-center gap-1.5 border rounded-sm px-2 py-1 text-xs font-mono ${TYPE_BADGE[a.type]}`}
+                    className={`inline-flex items-center gap-1.5 rounded-lg border px-2 py-1 font-mono text-xs ${TYPE_BADGE[a.type]}`}
                   >
                     {TYPE_LABELS[a.type]}
                     {a.institution ? ` · ${a.institution}` : ''}
@@ -195,18 +195,18 @@ export default function Investments() {
 
         {/* Empty state */}
         {investmentAccounts.length === 0 ? (
-          <div className="bg-surface-raised rounded-sm border border-surface-border border-dashed p-12 text-center">
-            <div className="w-16 h-16 border border-surface-border rounded-sm flex items-center justify-center mx-auto mb-4 bg-surface-elevated">
+          <div className="rounded-lg border border-dashed border-surface-border bg-surface-raised p-12 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg border border-surface-border bg-surface-elevated">
               <TrendingUp className="w-8 h-8 text-content-muted" />
             </div>
-            <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No investment accounts tracked yet</h3>
-            <p className="text-sm text-content-tertiary max-w-sm mx-auto mb-8">
-              Add your 401k, IRA, brokerage accounts to get the full picture.
+            <h3 className="mb-2 text-lg font-medium tracking-tight text-content-primary">No investment accounts yet</h3>
+            <p className="mx-auto mb-8 max-w-sm text-sm font-medium text-content-secondary">
+              Add your 401(k), IRA, brokerage, and HSA balances so net worth and planning stay accurate.
             </p>
             <button
               type="button"
               onClick={openAdd}
-              className="inline-flex items-center gap-2 rounded-sm bg-indigo-600 hover:bg-indigo-500 px-8 py-3 text-sm font-medium text-white transition-colors mx-auto"
+              className="mx-auto inline-flex items-center gap-2 rounded-lg bg-white px-8 py-3 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
             >
               <Plus className="w-4 h-4 shrink-0" aria-hidden />
               Add Account
@@ -222,14 +222,14 @@ export default function Investments() {
                   className="p-4 sm:px-6 hover:bg-surface-elevated transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                 >
                   <div className="flex items-start gap-4 min-w-0">
-                    <div className="w-10 h-10 rounded-sm border border-surface-border bg-surface-base flex items-center justify-center shrink-0">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-surface-border bg-surface-base">
                       <TrendingUp className="w-4 h-4 text-content-muted" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="text-sm font-semibold text-content-primary">{account.name}</h4>
                         <span
-                          className={`inline-flex items-center border rounded-sm px-1.5 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-wide ${TYPE_BADGE[account.type]}`}
+                          className={`inline-flex items-center rounded-md border px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide ${TYPE_BADGE[account.type]}`}
                         >
                           {TYPE_LABELS[account.type]}
                         </span>
@@ -285,14 +285,14 @@ export default function Investments() {
       <Dialog open={modalOpen} onClose={closeModal} className="relative z-50">
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="w-full max-w-lg bg-surface-raised rounded-sm border border-surface-border shadow-xl">
+          <Dialog.Panel className="w-full max-w-lg rounded-lg border border-surface-border bg-surface-raised shadow-xl">
             <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border">
               <Dialog.Title className="text-base font-semibold text-content-primary">
                 {editingId ? 'Edit Account' : 'Add Investment Account'}
               </Dialog.Title>
               <button
                 onClick={closeModal}
-                className="text-content-tertiary hover:text-content-secondary transition-colors p-1 rounded-sm"
+                className="rounded-md p-1 text-content-tertiary transition-colors hover:text-content-secondary"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -310,7 +310,7 @@ export default function Investments() {
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+                    className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary transition-colors"
                     placeholder="e.g., Fidelity 401(k)"
                   />
                 </div>
@@ -321,7 +321,7 @@ export default function Investments() {
                   <select
                     value={form.type}
                     onChange={(e) => setForm({ ...form, type: e.target.value as InvestmentAccount['type'] })}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+                    className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary transition-colors"
                   >
                     <option value="brokerage">Brokerage</option>
                     <option value="ira">Traditional IRA</option>
@@ -340,7 +340,7 @@ export default function Investments() {
                     type="text"
                     value={form.institution}
                     onChange={(e) => setForm({ ...form, institution: e.target.value })}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+                    className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary transition-colors"
                     placeholder="e.g., Fidelity"
                   />
                 </div>
@@ -359,7 +359,7 @@ export default function Investments() {
                       step="0.01"
                       value={form.balance}
                       onChange={(e) => setForm({ ...form, balance: e.target.value })}
-                      className="w-full bg-surface-base border border-surface-border rounded-sm pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors"
+                      className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base py-2 pl-7 pr-3 font-mono text-sm text-content-primary transition-colors"
                       placeholder="0.00"
                     />
                   </div>
@@ -372,7 +372,7 @@ export default function Investments() {
                     rows={2}
                     value={form.notes}
                     onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                    className="w-full bg-surface-base border border-surface-border rounded-sm px-3 py-2 text-sm text-content-primary focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors resize-none"
+                    className="focus-app-field w-full resize-none rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary transition-colors"
                     placeholder="Optional notes…"
                   />
                 </div>
@@ -382,13 +382,13 @@ export default function Investments() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="inline-flex items-center gap-2 rounded-sm border border-surface-border bg-surface-elevated px-3 py-2 text-sm text-content-secondary hover:text-content-primary transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-transparent px-3 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-white/[0.04] hover:text-content-primary focus-app"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 rounded-sm bg-indigo-600 hover:bg-indigo-500 px-4 py-2 text-sm font-medium text-white transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
                 >
                   {editingId ? 'Save changes' : 'Add account'}
                 </button>

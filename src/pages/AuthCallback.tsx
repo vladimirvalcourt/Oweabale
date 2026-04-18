@@ -43,5 +43,5 @@ export default function AuthCallback() {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  return <AppLoader />;
+  return <AppLoader message="Signing you in…" />;
 }

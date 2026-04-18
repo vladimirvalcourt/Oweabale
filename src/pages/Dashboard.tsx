@@ -335,10 +335,10 @@ export default function Dashboard() {
             )}
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-sans font-semibold tracking-tight text-white">
+            <h1 className="text-2xl font-medium tracking-tight text-white sm:text-3xl">
               Welcome back, <span className="text-content-primary">{user?.firstName || 'User'}</span>
             </h1>
-            <p className="text-sm font-sans text-content-secondary mt-1">Here is your financial overview for today.</p>
+            <p className="mt-1 text-sm font-medium text-content-secondary">Here is your financial overview for today.</p>
           </div>
         </div>
       </div>
@@ -504,7 +504,7 @@ export default function Dashboard() {
 
       {/* Spending Anomaly Callout */}
       {spendingAnomalies.length > 0 && (
-        <div className="rounded-sm border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+        <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3">
           <p className="text-xs font-semibold text-amber-400 mb-1.5">Spending Anomalies Detected</p>
           <div className="flex flex-wrap gap-x-5 gap-y-1">
             {spendingAnomalies.slice(0, 3).map(a => (
@@ -519,7 +519,7 @@ export default function Dashboard() {
 
       {/* 30-Day Cash Flow Forecast */}
       {cashFlowForecast.length > 0 && (
-        <div className="rounded-sm border border-surface-border bg-surface-elevated p-4">
+        <div className="rounded-lg border border-surface-border bg-surface-elevated p-4">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-content-primary">30-Day Cash Flow Forecast</h3>
             {(() => {

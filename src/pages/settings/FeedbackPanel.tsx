@@ -74,13 +74,13 @@ function FeedbackPanelInner() {
           <form onSubmit={handleSubmitFeedback} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">
+                <label className="mb-2 block text-xs font-medium text-content-secondary">
                   Type
                 </label>
                 <select
                   value={feedbackForm.type}
                   onChange={(e) => setFeedbackForm((f) => ({ ...f, type: e.target.value }))}
-                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field appearance-none"
+                  className="focus-app-field w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary"
                 >
                   <option value="general">General Feedback</option>
                   <option value="feature_request">Feature Request</option>
@@ -88,7 +88,7 @@ function FeedbackPanelInner() {
                 </select>
               </div>
               <div>
-                <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">
+                <label className="mb-2 block text-xs font-medium text-content-secondary">
                   Rating (optional)
                 </label>
                 <div className="flex items-center gap-1.5 h-[38px]">
@@ -106,13 +106,13 @@ function FeedbackPanelInner() {
               </div>
             </div>
             <div>
-              <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">
-                Your Message
+              <label className="mb-2 block text-xs font-medium text-content-secondary">
+                Your message
               </label>
               <textarea
                 value={feedbackForm.message}
                 onChange={(e) => setFeedbackForm((f) => ({ ...f, message: e.target.value }))}
-                className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-lg px-3 py-2 focus-app-field h-28 resize-none placeholder:text-content-muted"
+                className="focus-app-field h-28 w-full resize-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary placeholder:text-content-muted"
                 placeholder="Tell us what's working, what's not, or what you'd like to see..."
               />
             </div>
@@ -120,7 +120,7 @@ function FeedbackPanelInner() {
               <button
                 type="submit"
                 disabled={isSubmittingFeedback}
-                className="flex items-center gap-2 px-6 py-2 bg-white text-black hover:bg-neutral-200 disabled:opacity-50 text-black rounded-lg text-[10px] font-mono font-bold uppercase tracking-[0.2em] transition-colors"
+                className="flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition-colors hover:bg-neutral-200 disabled:opacity-50"
               >
                 {isSubmittingFeedback ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                 {isSubmittingFeedback ? 'Sending...' : 'Send Feedback'}
@@ -134,7 +134,7 @@ function FeedbackPanelInner() {
         title="My Feedback History"
         icon={MessageSquare}
         extraHeader={
-          <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">
+          <span className="text-xs font-medium text-content-tertiary">
             {feedbacks.length} submission{feedbacks.length !== 1 ? 's' : ''}
           </span>
         }
@@ -148,7 +148,7 @@ function FeedbackPanelInner() {
           ) : feedbacks.length === 0 ? (
             <div className="p-10 text-center">
               <ThumbsUp className="w-7 h-7 text-content-muted mx-auto mb-3" />
-              <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">No feedback submitted yet.</p>
+              <p className="text-sm font-medium text-content-secondary">No feedback submitted yet.</p>
             </div>
           ) : (
             <div className="divide-y divide-surface-border">
@@ -156,12 +156,12 @@ function FeedbackPanelInner() {
                 <div key={fb.id} className="p-5 hover:bg-surface-elevated transition-colors">
                   <div className="flex items-center justify-between mb-2">
                     <span
-                      className={`text-[9px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-lg border ${
+                      className={`rounded-lg border px-1.5 py-0.5 text-xs font-medium ${
                         fb.type === 'bug'
-                          ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                          ? 'border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400'
                           : fb.type === 'feature_request'
-                            ? 'bg-white/[0.05] border-surface-border text-content-primary'
-                            : 'bg-surface-elevated border-surface-border text-content-tertiary'
+                            ? 'border-surface-border bg-white/[0.05] text-content-primary'
+                            : 'border-surface-border bg-surface-elevated text-content-secondary'
                       }`}
                     >
                       {fb.type === 'feature_request' ? 'Feature Request' : fb.type === 'bug' ? 'Bug Report' : 'General'}
@@ -174,7 +174,7 @@ function FeedbackPanelInner() {
                           ))}
                         </div>
                       ) : null}
-                      <span className="text-[10px] font-mono text-content-muted">{fb.created_at.split('T')[0]}</span>
+                      <span className="text-xs font-medium text-content-muted">{fb.created_at.split('T')[0]}</span>
                     </div>
                   </div>
                   <p className="text-sm text-content-secondary leading-relaxed">{fb.message}</p>

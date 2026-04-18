@@ -1,6 +1,7 @@
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=deno';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
+import { safeRedirectUrl } from '../_shared/stripeRedirects.ts';
 import { getStripeSecretKey } from '../_shared/stripeEnv.ts';
 
 function isNoSuchCustomerError(error: unknown): boolean {
@@ -54,10 +55,13 @@ Deno.serve(async (req: Request) => {
 
     const stripe = new Stripe(stripeSecret, { apiVersion: '2024-06-20' });
     const createAndPersistCustomer = async () => {
-      const customer = await stripe.customers.create({
-        email: user.email ?? (profile?.email as string | undefined),
-        metadata: { user_id: user.id },
-      });
+      const customer = await stripe.customers.create(
+        {
+          email: user.email ?? (profile?.email as string | undefined),
+          metadata: { user_id: user.id },
+        },
+        { idempotencyKey: `customer_${user.id}` },
+      );
       const nextCustomerId = customer.id;
       await supabaseAdmin
         .from('profiles')
@@ -73,20 +77,26 @@ Deno.serve(async (req: Request) => {
     const body = (await req.json().catch(() => ({}))) as { returnUrl?: string };
     const defaultOrigin =
       origin && /^https?:\/\//.test(origin) ? origin : 'https://oweable.com';
+    const returnUrl = safeRedirectUrl(
+      body.returnUrl,
+      `${defaultOrigin}/settings`,
+      defaultOrigin,
+    );
+    const portalIdempotencyKey = `portal_${user.id}_${Math.floor(Date.now() / 10_000)}`;
 
     let session: Stripe.BillingPortal.Session;
     try {
-      session = await stripe.billingPortal.sessions.create({
-        customer: customerId,
-        return_url: body.returnUrl ?? `${defaultOrigin}/settings`,
-      });
+      session = await stripe.billingPortal.sessions.create(
+        { customer: customerId, return_url: returnUrl },
+        { idempotencyKey: portalIdempotencyKey },
+      );
     } catch (error) {
       if (!isNoSuchCustomerError(error)) throw error;
       customerId = await createAndPersistCustomer();
-      session = await stripe.billingPortal.sessions.create({
-        customer: customerId,
-        return_url: body.returnUrl ?? `${defaultOrigin}/settings`,
-      });
+      session = await stripe.billingPortal.sessions.create(
+        { customer: customerId, return_url: returnUrl },
+        { idempotencyKey: `${portalIdempotencyKey}_recustomer` },
+      );
     }
 
     return new Response(JSON.stringify({ url: session.url }), {

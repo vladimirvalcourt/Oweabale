@@ -251,7 +251,7 @@ export default function Obligations() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-content-primary mb-1">Bills & debts</h1>
+          <h1 className="mb-1 text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Bills & debts</h1>
           <p className="text-sm text-content-tertiary">Everything you owe, in one place.</p>
         </div>
         <button 

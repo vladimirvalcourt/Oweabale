@@ -79,17 +79,25 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
 }
 
 // App-level full screen loader (for initial data fetch)
-export function AppLoader() {
+export function AppLoader({ message = 'Syncing financial data' }: { message?: string }) {
   return (
-    <div className="fixed inset-0 bg-[#08090A] z-50 flex flex-col items-center justify-center">
-      <div className="relative mb-6">
-        <div className="w-8 h-8 border border-white/20 flex items-center justify-center">
-          <div className="w-1.5 h-1.5 bg-content-secondary animate-ping" />
+    <div className="fixed inset-0 bg-surface-base z-50 flex flex-col items-center justify-center font-sans selection:bg-white/15">
+      <div
+        className="absolute inset-0 opacity-[0.04] pointer-events-none"
+        style={{
+          backgroundImage:
+            'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }}
+        aria-hidden
+      />
+      <div className="relative mb-8">
+        <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-surface-border bg-surface-raised">
+          <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" aria-hidden />
         </div>
-        <div className="absolute -inset-2 border border-white/10 animate-pulse" />
       </div>
-      <p className="text-[9px] font-mono text-content-muted uppercase tracking-[0.4em]">
-        Syncing Financial Data
+      <p className="relative text-xs font-medium text-content-tertiary tracking-tight text-center max-w-[14rem]">
+        {message}
       </p>
     </div>
   );

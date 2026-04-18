@@ -327,7 +327,7 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-surface-border pb-5">
           <div>
-            <h1 className="text-xl text-content-primary font-bold">Admin Dashboard</h1>
+            <h1 className="text-xl font-medium text-content-primary sm:text-2xl">Admin dashboard</h1>
             <p className="text-xs text-content-tertiary mt-1">Lean operator view: users, support, and platform controls</p>
           </div>
           <div className="flex items-center gap-3">

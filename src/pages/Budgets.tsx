@@ -102,8 +102,8 @@ export default function Budgets() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-content-primary">Budget Planner</h1>
-          <p className="text-sm text-content-tertiary mt-1">Set and manage your spending limits.</p>
+          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Budget planner</h1>
+          <p className="mt-1 text-sm font-medium text-content-secondary">Set and manage your spending limits.</p>
         </div>
         <button 
           onClick={openAddModal}

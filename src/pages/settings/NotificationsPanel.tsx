@@ -75,17 +75,17 @@ function NotificationsPanelInner() {
   return (
     <div className="space-y-6">
       <CollapsibleModule title="Email Notifications" icon={Mail} defaultOpen>
-        <p className="text-sm text-content-tertiary mb-6">Choose what updates you want to receive via email.</p>
+        <p className="mb-6 text-sm font-medium text-content-secondary">Choose what updates you want to receive via email.</p>
         <div className="space-y-6">
           {[
-            { id: 'bill-reminders' as const, label: 'Bill Reminders', desc: 'Get notified 3 days before a bill is due.' },
-            { id: 'weekly-summary' as const, label: 'Weekly Summary', desc: 'Receive a weekly overview of your spending and upcoming bills.' },
-            { id: 'new-login' as const, label: 'New Device Login', desc: 'Security alerts when your account is accessed from a new device.' },
+            { id: 'bill-reminders' as const, label: 'Bill reminders', desc: 'Get notified 3 days before a bill is due.' },
+            { id: 'weekly-summary' as const, label: 'Weekly summary', desc: 'Receive a weekly overview of your spending and upcoming bills.' },
+            { id: 'new-login' as const, label: 'New device login', desc: 'Security alerts when your account is accessed from a new device.' },
           ].map((item) => (
             <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
               <div className="pr-4">
                 <label htmlFor={item.id} className="text-sm font-medium text-content-primary cursor-pointer">{item.label}</label>
-                <p className="text-xs text-content-tertiary mt-1">{item.desc}</p>
+                <p className="mt-1 text-xs font-medium text-content-tertiary">{item.desc}</p>
               </div>
               <div className="flex items-center h-5 mt-1">
                 <input
@@ -97,7 +97,7 @@ function NotificationsPanelInner() {
                     setPref(item.id, checked);
                     deferToast(() => toast.success(`${item.label} ${checked ? 'enabled' : 'disabled'}`));
                   }}
-                  className="h-4 w-4 text-content-secondary focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                  className="h-4 w-4 cursor-pointer rounded border-surface-border bg-surface-base text-emerald-500 transition-colors focus-app"
                 />
               </div>
             </div>
@@ -106,17 +106,21 @@ function NotificationsPanelInner() {
       </CollapsibleModule>
 
       <CollapsibleModule title="Push Notifications" icon={BellRing} defaultOpen={false}>
-        <p className="text-sm text-content-tertiary mb-6">
+        <p className="mb-6 text-sm font-medium text-content-secondary">
           Browser push for this device. When you enable due-date and payment alerts below, we&apos;ll use this subscription to deliver
           them once server scheduling is wired.
         </p>
 
         {!isWebPushSupported() && (
-          <p className="text-xs text-content-muted mb-4">Your browser does not support web push.</p>
+          <p className="mb-4 text-xs font-medium text-content-muted">Your browser does not support web push.</p>
         )}
         {isWebPushSupported() && !vapidConfigured && (
-          <p className="text-xs text-amber-500/90 mb-4">
-            Web push is not configured yet (add <span className="font-mono">VITE_VAPID_PUBLIC_KEY</span>).
+          <p className="mb-4 text-xs font-medium leading-relaxed text-amber-700 dark:text-amber-400/90">
+            Web push is not configured yet (add{' '}
+            <code className="rounded-md border border-surface-border bg-surface-raised px-1.5 py-0.5 font-mono text-[11px] text-content-primary">
+              VITE_VAPID_PUBLIC_KEY
+            </code>
+            ).
           </p>
         )}
 
@@ -124,7 +128,7 @@ function NotificationsPanelInner() {
           <div className="mb-6 rounded-lg border border-surface-border bg-surface-base p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-content-primary">This browser</p>
-              <p className="text-xs text-content-muted mt-0.5">
+              <p className="mt-0.5 text-xs font-medium text-content-muted">
                 {webPushReady === null ? 'Checking…' : webPushReady ? 'Push enabled for this device.' : 'Push not enabled yet.'}
               </p>
             </div>
@@ -144,7 +148,7 @@ function NotificationsPanelInner() {
                     setWebPushReady(true);
                     toast.success('Browser notifications enabled');
                   }}
-                  className="inline-flex items-center gap-2 rounded-lg bg-white text-black hover:bg-neutral-200 px-4 py-2 text-xs font-semibold disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-black shadow-none transition-colors hover:bg-neutral-200 disabled:opacity-60"
                 >
                   {webPushBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                   Enable web push
@@ -162,7 +166,7 @@ function NotificationsPanelInner() {
                       if ('error' in r) toast.error(r.error);
                       else toast.success('Test push sent');
                     }}
-                    className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-elevated px-4 py-2 text-xs font-medium text-content-secondary hover:text-content-primary disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:border-content-muted hover:text-content-primary disabled:opacity-60"
                   >
                     {webPushBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                     Send test
@@ -181,7 +185,7 @@ function NotificationsPanelInner() {
                       setWebPushReady(false);
                       toast.success('Browser push disabled on this device');
                     }}
-                    className="inline-flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-xs font-medium text-rose-300 hover:bg-rose-500/20 disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-700 transition-colors hover:bg-rose-500/20 disabled:opacity-60 dark:text-rose-300"
                   >
                     Turn off
                   </button>
@@ -193,13 +197,13 @@ function NotificationsPanelInner() {
 
         <div className="space-y-6">
           {[
-            { id: 'push-reminders' as const, label: 'Due Date Alerts', desc: 'Immediate alerts on the day a bill is due.' },
-            { id: 'push-payments' as const, label: 'Payment Confirmations', desc: 'Get notified when a payment is successfully recorded.' },
+            { id: 'push-reminders' as const, label: 'Due date alerts', desc: 'Immediate alerts on the day a bill is due.' },
+            { id: 'push-payments' as const, label: 'Payment confirmations', desc: 'Get notified when a payment is successfully recorded.' },
           ].map((item) => (
             <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
               <div className="pr-4">
                 <label htmlFor={item.id} className="text-sm font-medium text-content-primary cursor-pointer">{item.label}</label>
-                <p className="text-xs text-content-tertiary mt-1">{item.desc}</p>
+                <p className="mt-1 text-xs font-medium text-content-tertiary">{item.desc}</p>
               </div>
               <div className="flex items-center h-5 mt-1">
                 <input
@@ -225,15 +229,15 @@ function NotificationsPanelInner() {
         </p>
         <div className="space-y-6">
           {[
-            { id: 'alert-bill-due' as const, label: 'Bill Due Soon', desc: 'Alert 1–3 days before a bill is due.' },
-            { id: 'alert-over-budget' as const, label: 'Over Budget', desc: 'Alert when a budget category is exceeded this month.' },
-            { id: 'alert-low-cash' as const, label: 'Low Cash Warning', desc: 'Alert when your liquid cash drops below one week of safe-to-spend.' },
-            { id: 'alert-debt-due' as const, label: 'Debt Payment Due', desc: 'Alert 2 days before a debt minimum payment is due.' },
+            { id: 'alert-bill-due' as const, label: 'Bill due soon', desc: 'Alert 1–3 days before a bill is due.' },
+            { id: 'alert-over-budget' as const, label: 'Over budget', desc: 'Alert when a budget category is exceeded this month.' },
+            { id: 'alert-low-cash' as const, label: 'Low cash warning', desc: 'Alert when your liquid cash drops below one week of safe-to-spend.' },
+            { id: 'alert-debt-due' as const, label: 'Debt payment due', desc: 'Alert 2 days before a debt minimum payment is due.' },
           ].map((item) => (
             <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
               <div className="pr-4">
                 <label htmlFor={item.id} className="text-sm font-medium text-content-primary cursor-pointer">{item.label}</label>
-                <p className="text-xs text-content-tertiary mt-1">{item.desc}</p>
+                <p className="mt-1 text-xs font-medium text-content-tertiary">{item.desc}</p>
               </div>
               <div className="flex items-center h-5 mt-1">
                 <input
@@ -245,7 +249,7 @@ function NotificationsPanelInner() {
                     setPref(item.id, checked);
                     deferToast(() => toast.success(`${item.label} ${checked ? 'enabled' : 'disabled'}`));
                   }}
-                  className="h-4 w-4 text-indigo-500 focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                  className="h-4 w-4 cursor-pointer rounded border-surface-border bg-surface-base text-emerald-500 transition-colors focus-app"
                 />
               </div>
             </div>
@@ -254,19 +258,19 @@ function NotificationsPanelInner() {
       </CollapsibleModule>
 
       <CollapsibleModule title="Smart Alerts (Full Suite)" icon={BrainCircuit} defaultOpen={false}>
-        <p className="text-sm text-content-tertiary mb-6">Optional premium alerts for subscriptions and debt progress.</p>
+        <p className="mb-6 text-sm font-medium text-content-secondary">Optional premium alerts for subscriptions and debt progress.</p>
         {hasFullSuite || isAdmin ? (
           <div className="space-y-6">
             {[
-              { id: 'sniper-increase' as const, label: 'Subscription Sniper: Price Hikes', desc: 'Alert me instantly if a subscription price increases.' },
-              { id: 'sniper-renewal' as const, label: 'Subscription Sniper: Auto-Renewals', desc: 'Alert me 7 days before an annual subscription renews.' },
-              { id: 'detonator-milestone' as const, label: 'Debt Detonator: Milestones', desc: 'Celebrate when I pay off 25%, 50%, 75%, and 100% of a debt.' },
-              { id: 'detonator-rate' as const, label: 'Debt Detonator: Rate Changes', desc: 'Alert me if a variable interest rate changes.' },
+              { id: 'sniper-increase' as const, label: 'Subscription Sniper: price hikes', desc: 'Alert me instantly if a subscription price increases.' },
+              { id: 'sniper-renewal' as const, label: 'Subscription Sniper: auto-renewals', desc: 'Alert me 7 days before an annual subscription renews.' },
+              { id: 'detonator-milestone' as const, label: 'Debt Detonator: milestones', desc: 'Celebrate when I pay off 25%, 50%, 75%, and 100% of a debt.' },
+              { id: 'detonator-rate' as const, label: 'Debt Detonator: rate changes', desc: 'Alert me if a variable interest rate changes.' },
             ].map((item) => (
               <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
                 <div className="pr-4">
                   <label htmlFor={item.id} className="text-sm font-medium text-content-primary cursor-pointer">{item.label}</label>
-                  <p className="text-xs text-content-tertiary mt-1">{item.desc}</p>
+                  <p className="mt-1 text-xs font-medium text-content-tertiary">{item.desc}</p>
                 </div>
                 <div className="flex items-center h-5 mt-1">
                   <input
@@ -278,7 +282,7 @@ function NotificationsPanelInner() {
                       setPref(item.id, checked);
                       deferToast(() => toast.success(`${item.label} ${checked ? 'enabled' : 'disabled'}`));
                     }}
-                    className="h-4 w-4 text-content-secondary focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
+                    className="h-4 w-4 cursor-pointer rounded border-surface-border bg-surface-base text-emerald-500 transition-colors focus-app"
                   />
                 </div>
               </div>

@@ -1,6 +1,7 @@
 import Stripe from 'https://esm.sh/stripe@14.25.0?target=deno';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
+import { safeRedirectUrl } from '../_shared/stripeRedirects.ts';
 import { getStripeSecretKey } from '../_shared/stripeEnv.ts';
 
 type PlanKey = 'pro_monthly';
@@ -14,16 +15,6 @@ type PlanConfig = {
 
 function isNoSuchCustomerError(error: unknown): boolean {
   return error instanceof Error && error.message.includes('No such customer');
-}
-
-function safeRedirectUrl(supplied: string | undefined, fallback: string, trustedOrigin: string): string {
-  if (!supplied) return fallback;
-  // Accept relative paths — prefix with trusted origin
-  if (/^\/[^/]/.test(supplied) || supplied === '/') return `${trustedOrigin}${supplied}`;
-  // Accept full URLs only if they start with the trusted origin
-  if (supplied.startsWith(`${trustedOrigin}/`)) return supplied;
-  // Reject anything else (external URLs, protocol-relative, etc.)
-  return fallback;
 }
 
 function getPlanConfig(planKey: string): PlanConfig | null {
@@ -87,6 +78,7 @@ Deno.serve(async (req: Request) => {
     if (!plan) throw new Error('Unknown plan or missing Stripe price env configuration');
 
     const stripe = new Stripe(stripeSecret, { apiVersion: '2024-06-20' });
+    const checkoutAttemptId = crypto.randomUUID();
 
     const { data: profile } = await supabaseAdmin
       .from('profiles')
@@ -95,10 +87,13 @@ Deno.serve(async (req: Request) => {
       .maybeSingle();
 
     const createAndPersistCustomer = async () => {
-      const customer = await stripe.customers.create({
-        email: user.email ?? (profile?.email as string | undefined),
-        metadata: { user_id: user.id },
-      });
+      const customer = await stripe.customers.create(
+        {
+          email: user.email ?? (profile?.email as string | undefined),
+          metadata: { user_id: user.id },
+        },
+        { idempotencyKey: `customer_${user.id}` },
+      );
       const nextCustomerId = customer.id;
       await supabaseAdmin
         .from('profiles')
@@ -124,49 +119,40 @@ Deno.serve(async (req: Request) => {
       defaultOrigin,
     );
 
-    let session: Stripe.Checkout.Session;
-    try {
-      session = await stripe.checkout.sessions.create({
-        mode: plan.mode,
-        customer: customerId,
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-        line_items: [{ price: plan.priceId, quantity: 1 }],
+    const checkoutSessionParams = {
+      mode: plan.mode,
+      customer: customerId,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      line_items: [{ price: plan.priceId, quantity: 1 }],
+      metadata: {
+        user_id: user.id,
+        plan_key: plan.planKey,
+        feature_key: plan.featureKey,
+      },
+      subscription_data: {
         metadata: {
           user_id: user.id,
           plan_key: plan.planKey,
           feature_key: plan.featureKey,
         },
-        subscription_data: {
-          metadata: {
-            user_id: user.id,
-            plan_key: plan.planKey,
-            feature_key: plan.featureKey,
-          },
-        },
+      },
+    };
+
+    let session: Stripe.Checkout.Session;
+    try {
+      session = await stripe.checkout.sessions.create(checkoutSessionParams, {
+        idempotencyKey: `checkout_${user.id}_${plan.planKey}_${checkoutAttemptId}`,
       });
     } catch (error) {
       if (!isNoSuchCustomerError(error)) throw error;
       customerId = await createAndPersistCustomer();
-      session = await stripe.checkout.sessions.create({
-        mode: plan.mode,
-        customer: customerId,
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-        line_items: [{ price: plan.priceId, quantity: 1 }],
-        metadata: {
-          user_id: user.id,
-          plan_key: plan.planKey,
-          feature_key: plan.featureKey,
+      session = await stripe.checkout.sessions.create(
+        { ...checkoutSessionParams, customer: customerId },
+        {
+          idempotencyKey: `checkout_${user.id}_${plan.planKey}_${checkoutAttemptId}_recustomer`,
         },
-        subscription_data: {
-          metadata: {
-            user_id: user.id,
-            plan_key: plan.planKey,
-            feature_key: plan.featureKey,
-          },
-        },
-      });
+      );
     }
 
     return new Response(
