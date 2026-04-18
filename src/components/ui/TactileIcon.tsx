@@ -1,10 +1,15 @@
 import React from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
-import { LucideIcon } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
+export type AppIcon = React.ComponentType<{
+  size?: number | string;
+  className?: string;
+  strokeWidth?: number | string;
+}>;
+
 interface TactileIconProps {
-  icon: LucideIcon;
+  icon: AppIcon;
   className?: string;
   iconClassName?: string;
   size?: number;

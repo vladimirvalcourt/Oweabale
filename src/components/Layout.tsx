@@ -2,14 +2,12 @@ import React, { useState, useRef, useEffect, useCallback, useMemo, startTransiti
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { TransitionLink } from './TransitionLink';
 import { 
-  Bell, Search, Home, Receipt, Target, Activity,
-  Settings, Repeat, BarChart3, Plus, X, ChevronDown, Inbox,
-  Vault, PieChart, TrendingUp, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, LineChart, ShieldCheck, Shield,
-  Wallet, Clock, CreditCard, Sparkles
-} from 'lucide-react';
+  Bell, Search, Home, FileText, Target, Activity,
+  Settings, Repeat, BarChart2, Plus, X, ChevronDown, Inbox,
+  DollarSign, PieChart, TrendingUp, Calendar as CalendarIcon, Percent, Briefcase, BookOpen, Shield, Clock, CreditCard, Zap, AlertTriangle
+} from '@geist-ui/icons';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
-import { AlertTriangle } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import { useShallow } from 'zustand/react/shallow';
@@ -310,11 +308,11 @@ export default function Layout() {
         label: 'Overview',
         items: [
           { name: 'Dashboard', path: '/dashboard', icon: Home },
-          { name: 'Owe-AI', path: '/owe-ai', icon: Sparkles },
-          { name: 'Cash flow', path: '/dashboard', icon: Wallet, hash: 'cash-flow' },
-          { name: 'Income', path: '/income', icon: Vault },
+          { name: 'Owe-AI', path: '/owe-ai', icon: Zap },
+          { name: 'Cash flow', path: '/dashboard', icon: DollarSign, hash: 'cash-flow' },
+          { name: 'Income', path: '/income', icon: DollarSign },
           { name: 'Freelance Vault', path: '/freelance', icon: Briefcase },
-          { name: 'Regular Bills', path: '/bills', icon: Receipt },
+          { name: 'Regular Bills', path: '/bills', icon: FileText },
           { name: 'Debts & loans', path: '/bills?tab=debt', icon: CreditCard },
           { name: 'Due soon', path: '/bills', icon: Clock, hash: 'due-soon', count: dueSoonCount },
           { name: 'Tickets & Fines', path: '/bills?tab=ambush', icon: AlertTriangle },
@@ -325,8 +323,8 @@ export default function Layout() {
       {
         label: 'Activity',
         items: [
-          { name: 'Trends', path: '/analytics', icon: LineChart },
-          { name: 'Reports', path: '/reports', icon: BarChart3 },
+          { name: 'Trends', path: '/analytics', icon: Activity },
+          { name: 'Reports', path: '/reports', icon: BarChart2 },
           { name: 'Transactions', path: '/transactions', icon: Activity },
         ],
       },
@@ -337,11 +335,11 @@ export default function Layout() {
           { name: 'Investments', path: '/investments', icon: TrendingUp },
           { name: 'Insurance', path: '/insurance', icon: Shield },
           { name: 'Budgets', path: '/budgets', icon: PieChart },
-          { name: 'Academy', path: '/education', icon: GraduationCap },
+          { name: 'Academy', path: '/education', icon: BookOpen },
           { name: 'Calendar', path: '/calendar', icon: CalendarIcon },
           { name: 'Goals', path: '/goals', icon: Target },
-          { name: 'Credit Workshop', path: '/credit', icon: ShieldCheck },
-          { name: 'Taxes', path: '/taxes', icon: Calculator },
+          { name: 'Credit Workshop', path: '/credit', icon: Shield },
+          { name: 'Taxes', path: '/taxes', icon: Percent },
         ],
       },
     ],
