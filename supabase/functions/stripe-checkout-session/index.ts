@@ -4,7 +4,7 @@ import { corsHeaders } from '../_shared/cors.ts';
 import { safeRedirectUrl } from '../_shared/stripeRedirects.ts';
 import { getStripeSecretKey } from '../_shared/stripeEnv.ts';
 
-type PlanKey = 'pro_monthly';
+type PlanKey = 'pro_monthly' | 'pro_yearly';
 
 type PlanConfig = {
   planKey: PlanKey;
@@ -19,10 +19,14 @@ function isNoSuchCustomerError(error: unknown): boolean {
 
 function getPlanConfig(planKey: string): PlanConfig | null {
   const monthly = Deno.env.get('STRIPE_PRICE_PRO_MONTHLY');
+  const yearly = Deno.env.get('STRIPE_PRICE_PRO_YEARLY');
 
   const plans: Record<PlanKey, PlanConfig | null> = {
     pro_monthly: monthly
       ? { planKey: 'pro_monthly', mode: 'subscription', priceId: monthly, featureKey: 'full_suite' }
+      : null,
+    pro_yearly: yearly
+      ? { planKey: 'pro_yearly', mode: 'subscription', priceId: yearly, featureKey: 'full_suite' }
       : null,
   };
 

@@ -22,10 +22,10 @@ async function parseFunctionError(error: unknown): Promise<string> {
   return BILLING_USER_SAFE_MESSAGE;
 }
 
-type PlanKey = 'pro_monthly';
+export type StripeCheckoutPlanKey = 'pro_monthly' | 'pro_yearly';
 
 export async function createStripeCheckoutSession(
-  planKey: PlanKey
+  planKey: StripeCheckoutPlanKey
 ): Promise<{ checkoutUrl: string } | { error: string }> {
   const {
     data: { session },

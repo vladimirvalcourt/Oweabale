@@ -1,6 +1,6 @@
 /**
  * Human-readable labels for Plaid PERSONAL_FINANCE_CATEGORY_* style strings.
- * Keep in sync with `supabase/functions/_shared/plaidCategoryLabels.ts` (Edge Functions).
+ * Duplicate of `src/lib/plaidCategoryLabels.ts` — update both when adding Plaid enums.
  */
 export const PLAID_CATEGORY_LABELS: Record<string, string> = {
   RENT_AND_UTILITIES_TELEPHONE: 'Rent & Phone',

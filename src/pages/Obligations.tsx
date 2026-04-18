@@ -434,7 +434,8 @@ export default function Obligations() {
                   <div>
                     <p className="text-sm font-semibold text-content-primary">{suggestion.provider}</p>
                     <p className="mt-1 text-xs text-content-secondary">
-                      Current spend is about ${suggestion.currentMonthlyCost.toFixed(0)}/mo in {suggestion.category}.
+                      Current spend is about ${suggestion.currentMonthlyCost.toFixed(0)}/mo in{' '}
+                      {formatCategoryLabel(suggestion.category)}.
                     </p>
                     <p className="mt-1 text-xs text-content-tertiary">
                       Users who renegotiate similar bills often save around ${suggestion.benchmarkMonthlySavings.toFixed(0)}/mo.

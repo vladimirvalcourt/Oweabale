@@ -1,4 +1,7 @@
-import { PLAID_CATEGORY_LABELS } from './plaidCategoryLabels';
+/**
+ * Keep in sync with `src/lib/categoryDisplay.ts` (same behavior as web).
+ */
+import { PLAID_CATEGORY_LABELS } from './plaidCategoryLabels.ts';
 
 const CATEGORY_LABEL_MAP: Record<string, string> = {
   ...PLAID_CATEGORY_LABELS,
@@ -6,7 +9,6 @@ const CATEGORY_LABEL_MAP: Record<string, string> = {
 
 const PLAID_PREFIXES = ['personal_finance_category_', 'pfc_'];
 
-/** Title-case token handling common Plaid-style segments */
 function titleCaseWords(s: string): string {
   const small = new Set(['and', 'or', 'the', 'a', 'an', 'in', 'on', 'at', 'to', 'for', 'of', 'vs']);
   return s
@@ -33,13 +35,9 @@ function stripPlaidNoise(raw: string): string {
   return s.replace(/_+/g, '_');
 }
 
-/** Plaid-style slug: segments of letters/digits separated by underscores */
+/** Plaid-style slug: segments of letters/digits separated by single underscores */
 const SNAKE_SLUG = /^[a-zA-Z0-9]+(_[a-zA-Z0-9]+)*$/;
 
-/**
- * Turn raw Plaid / API category strings into short, human-readable labels.
- * Strips common prefixes, maps known Plaid enums, and title-cases underscore slugs.
- */
 export function formatCategoryLabel(rawCategory: string | null | undefined): string {
   const stripped = stripPlaidNoise(rawCategory ?? '');
   if (!stripped) return 'Uncategorized';

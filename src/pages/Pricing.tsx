@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 import { Check, Plus, Minus } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
 import { toast } from 'sonner';
-import { createStripeCheckoutSession } from '../lib/stripe';
+import { createStripeCheckoutSession, type StripeCheckoutPlanKey } from '../lib/stripe';
 
 function useInView(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
@@ -54,6 +54,15 @@ function FaqItem({ question, answer }: { question: string, answer: string }) {
 export default function Pricing() {
   const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
   const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
+  const configuredYearly = Number(import.meta.env.VITE_PRICING_YEARLY_DISPLAY);
+  const yearlyTotal =
+    Number.isFinite(configuredYearly) && configuredYearly > 0 ? configuredYearly : null;
+  const hasYearlyPricing = yearlyTotal !== null;
+  const yearlyEffectiveMonthly = hasYearlyPricing ? yearlyTotal / 12 : null;
+  const yearlySavingsPct =
+    hasYearlyPricing && monthlyPrice * 12 > yearlyTotal
+      ? Math.round((1 - yearlyTotal / (monthlyPrice * 12)) * 100)
+      : 0;
 
   useSEO({
     title: 'Pricing — Oweable',
@@ -64,6 +73,7 @@ export default function Pricing() {
 
   const [scrolled, setScrolled] = useState(false);
   const [isStartingCheckout, setIsStartingCheckout] = useState(false);
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   
   const [headerRef, headerVisible] = useInView();
   const [cardsRef, cardsVisible] = useInView();
@@ -77,7 +87,7 @@ export default function Pricing() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const startCheckout = async (planKey: 'pro_monthly') => {
+  const startCheckout = async (planKey: StripeCheckoutPlanKey) => {
     if (isStartingCheckout) return;
     setIsStartingCheckout(true);
     const response = await createStripeCheckoutSession(planKey);
@@ -88,6 +98,18 @@ export default function Pricing() {
     }
     window.location.href = response.checkoutUrl;
   };
+
+  const checkoutPlanKey: StripeCheckoutPlanKey =
+    hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly';
+
+  const onFullSuiteCheckout = () => startCheckout(checkoutPlanKey);
+
+  const fullSuiteColumnLabel = (() => {
+    if (hasYearlyPricing && billingPeriod === 'yearly') {
+      return `Full Suite ($${yearlyTotal.toFixed(0)}/yr)`;
+    }
+    return `Full Suite ($${monthlyPrice.toFixed(2)}/mo)`;
+  })();
 
   return (
     <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-content-primary/15 overflow-x-hidden">
@@ -113,22 +135,6 @@ export default function Pricing() {
 
       {/* Header Section */}
       <section className="relative pt-40 pb-20 overflow-hidden">
-        {/* Beta Disclaimer Banner */}
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 mb-12">
-          <div className="bg-amber-400/5 border border-amber-400/20 p-4 rounded-lg flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
-            <p className="text-sm text-amber-200/90 leading-relaxed">
-              <span className="text-amber-400 font-semibold">Early access:</span> Oweable is in early access. Sign up free to join the waitlist — paid plans unlock immediately upon approval.
-            </p>
-            <TransitionLink
-              to="/onboarding"
-              className="inline-flex min-h-10 items-center justify-center rounded-lg bg-amber-300/90 px-4 text-xs font-semibold text-surface-base hover:bg-amber-200 transition-colors"
-            >
-              Request access
-            </TransitionLink>
-          </div>
-        </div>
-
         {/* Subtle Background Glow */}
         <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-500/10 via-surface-base/0 to-transparent pointer-events-none"></div>
 
@@ -204,24 +210,85 @@ export default function Pricing() {
                 </div>
                 
                 <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Full suite</h3>
-                <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Everything in the app with one simple monthly plan.</p>
-                
-                <div className="mb-10 p-6 bg-surface-base border border-surface-border rounded-lg relative h-[100px] flex items-center shadow-none">
-                  <div className={`absolute inset-0 px-6 flex items-center transition-all duration-300 ease-in-out`}>
-                    <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">
-                      ${monthlyPrice.toFixed(2)}
-                    </span>
-                    <span className="text-content-muted text-sm ml-3">per month</span>
+                <p className="text-content-tertiary text-sm mb-6 min-h-[2.5rem] leading-relaxed">
+                  {hasYearlyPricing && billingPeriod === 'yearly'
+                    ? 'Same features as monthly — billed once per year at a lower effective rate.'
+                    : 'Everything in the app with one simple monthly plan.'}
+                </p>
+
+                {hasYearlyPricing ? (
+                  <div
+                    className="mb-6 flex rounded-lg border border-surface-border p-1 bg-surface-base"
+                    role="group"
+                    aria-label="Billing period"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setBillingPeriod('monthly')}
+                      aria-pressed={billingPeriod === 'monthly'}
+                      className={`flex-1 rounded-md py-2.5 text-sm font-sans font-semibold transition-colors ${
+                        billingPeriod === 'monthly'
+                          ? 'bg-surface-raised text-content-primary shadow-sm'
+                          : 'text-content-tertiary hover:text-content-secondary'
+                      }`}
+                    >
+                      Monthly
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBillingPeriod('yearly')}
+                      aria-pressed={billingPeriod === 'yearly'}
+                      className={`relative flex-1 rounded-md py-2.5 text-sm font-sans font-semibold transition-colors ${
+                        billingPeriod === 'yearly'
+                          ? 'bg-surface-raised text-content-primary shadow-sm'
+                          : 'text-content-tertiary hover:text-content-secondary'
+                      }`}
+                    >
+                      Yearly
+                      {yearlySavingsPct > 0 ? (
+                        <span className="ml-1.5 text-xs font-semibold text-emerald-600">−{yearlySavingsPct}%</span>
+                      ) : null}
+                    </button>
                   </div>
+                ) : null}
+                
+                <div className="mb-10 p-6 bg-surface-base border border-surface-border rounded-lg relative min-h-[100px] flex flex-col justify-center shadow-none">
+                  {hasYearlyPricing && billingPeriod === 'yearly' && yearlyEffectiveMonthly !== null ? (
+                    <div className="transition-all duration-300 ease-in-out">
+                      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                        <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">
+                          ${yearlyEffectiveMonthly.toFixed(2)}
+                        </span>
+                        <span className="text-content-muted text-sm">/ month</span>
+                      </div>
+                      <p className="mt-2 text-sm text-content-tertiary">
+                        Billed ${yearlyTotal.toFixed(2)} per year
+                        {yearlySavingsPct > 0 ? (
+                          <span className="text-emerald-600 font-medium"> · Save {yearlySavingsPct}%</span>
+                        ) : null}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="transition-all duration-300 ease-in-out flex flex-wrap items-baseline gap-x-3">
+                      <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">
+                        ${monthlyPrice.toFixed(2)}
+                      </span>
+                      <span className="text-content-muted text-sm">per month</span>
+                    </div>
+                  )}
                 </div>
                 
                 <button
                   type="button"
-                  onClick={() => startCheckout('pro_monthly')}
+                  onClick={onFullSuiteCheckout}
                   disabled={isStartingCheckout}
                   className="w-full py-4 px-6 rounded-lg bg-brand-cta hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed text-surface-base text-sm font-sans font-semibold text-center transition-all duration-200 mb-3 shadow-sm"
                 >
-                  {isStartingCheckout ? 'Starting checkout...' : 'Start monthly plan'}
+                  {isStartingCheckout
+                    ? 'Starting checkout...'
+                    : hasYearlyPricing && billingPeriod === 'yearly'
+                      ? 'Start yearly plan'
+                      : 'Start monthly plan'}
                 </button>
                 <div className="flex flex-col gap-5 mt-auto">
                   <div className="flex items-start gap-3">
@@ -260,7 +327,7 @@ export default function Pricing() {
             <div className="grid grid-cols-3 border-b border-surface-border text-xs font-mono uppercase tracking-widest">
               <div className="px-4 py-3 text-content-muted">Feature</div>
               <div className="px-4 py-3 text-content-muted border-l border-surface-border">Tracker (Free)</div>
-              <div className="px-4 py-3 text-content-muted border-l border-surface-border">Full Suite ($10.99/mo)</div>
+              <div className="px-4 py-3 text-content-muted border-l border-surface-border">{fullSuiteColumnLabel}</div>
             </div>
 
             {[
@@ -307,6 +374,12 @@ export default function Pricing() {
                 question="Do I need to link my bank accounts?" 
                 answer="No. Free tier uses manual bills only. Plaid syncing and all advanced workflows are part of Full Suite." 
               />
+              {hasYearlyPricing ? (
+                <FaqItem
+                  question="Is there a discount for paying yearly?"
+                  answer={`Yes. When you choose annual billing on this page, you pay one yearly charge instead of twelve monthly renewals. The headline rate shows your effective monthly cost; savings are calculated versus twelve months at the standard monthly price ($${monthlyPrice.toFixed(2)}/mo).`}
+                />
+              ) : null}
             </div>
           </div>
         </div>

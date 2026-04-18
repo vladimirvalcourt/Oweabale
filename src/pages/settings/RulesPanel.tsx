@@ -88,7 +88,7 @@ function RulesPanelInner() {
     return [...counts.entries()]
       .sort((a, b) => b[1] - a[1])
       .slice(0, 24)
-      .map(([from]) => ({ from, to: formatCategoryLabel(from) }));
+      .map(([from, count]) => ({ from, to: formatCategoryLabel(from), count }));
   }, [transactions]);
 
   const runSimulation = () => {
@@ -133,8 +133,12 @@ function RulesPanelInner() {
                     key={s.from}
                     className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-surface-border bg-surface-raised px-3 py-2"
                   >
-                    <span className="text-xs font-mono text-content-secondary">
-                      {s.from} → <span className="text-emerald-400">{s.to}</span>
+                    <span className="text-xs text-content-secondary">
+                      <span className="font-medium text-content-primary">{s.to}</span>
+                      <span className="text-content-tertiary">
+                        {' '}
+                        · {s.count} transaction{s.count !== 1 ? 's' : ''} with raw bank codes
+                      </span>
                     </span>
                     <div className="flex items-center gap-2">
                       <button
@@ -234,7 +238,8 @@ function RulesPanelInner() {
                 <ul className="space-y-1">
                   {previewExamples.map((tx) => (
                     <li key={tx.id} className="text-xs text-content-tertiary">
-                      <span className="text-content-primary">{tx.name}</span> ({tx.date}) → {ruleForm.category}
+                      <span className="text-content-primary">{tx.name}</span> ({tx.date}) →{' '}
+                      {formatCategoryLabel(ruleForm.category)}
                     </li>
                   ))}
                 </ul>
@@ -261,7 +266,9 @@ function RulesPanelInner() {
                     </span>
                     <span className="truncate text-sm font-medium text-content-primary">{rule.match_value}</span>
                     <span className="shrink-0 text-xs text-content-muted">→</span>
-                    <span className="truncate text-xs font-medium text-emerald-500">{rule.category}</span>
+                    <span className="truncate text-xs font-medium text-emerald-500">
+                      {formatCategoryLabel(rule.category)}
+                    </span>
                   </div>
                   <button
                     type="button"
@@ -284,9 +291,11 @@ function RulesPanelInner() {
             <div className="rounded-lg border border-surface-border bg-surface-base p-4 flex items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-content-primary">
-                  Auto-categorized “{lastAutoCategorization.name}” to {lastAutoCategorization.to}
+                  Auto-categorized “{lastAutoCategorization.name}” to {formatCategoryLabel(lastAutoCategorization.to)}
                 </p>
-                <p className="text-xs text-content-tertiary mt-0.5">Was previously {lastAutoCategorization.from}.</p>
+                <p className="text-xs text-content-tertiary mt-0.5">
+                  Was previously {formatCategoryLabel(lastAutoCategorization.from)}.
+                </p>
               </div>
               <button
                 type="button"
@@ -364,7 +373,7 @@ function RulesPanelInner() {
                   <div key={change.id} className="rounded border border-surface-border bg-surface-raised px-3 py-2">
                     <p className="text-xs text-content-primary font-medium">{change.name}</p>
                     <p className="text-[11px] text-content-tertiary mt-0.5">
-                      {change.date} · {change.from} → {change.to}
+                      {change.date} · {formatCategoryLabel(change.from)} → {formatCategoryLabel(change.to)}
                     </p>
                   </div>
                 ))}

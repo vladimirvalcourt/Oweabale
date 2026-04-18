@@ -23,6 +23,10 @@ interface ImportMetaEnv {
   readonly VITE_SENTRY_RELEASE_RESOLVED: string;
   /** Build-time: resolved environment for Sentry (VITE_SENTRY_ENVIRONMENT / VERCEL_ENV / MODE). */
   readonly VITE_SENTRY_ENVIRONMENT_RESOLVED: string;
+  /** Marketing: monthly price label on /pricing (must match Stripe monthly Price). */
+  readonly VITE_PRICING_MONTHLY_DISPLAY?: string;
+  /** Marketing: annual total for Full Suite; when set, enables yearly plan toggle on /pricing. */
+  readonly VITE_PRICING_YEARLY_DISPLAY?: string;
 }
 
 interface ImportMeta {

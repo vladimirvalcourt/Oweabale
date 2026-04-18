@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { type CategorizationRule, type CategorizationExclusion, applyCategorizationRules, merchantKey } from '../lib/categorizationRules';
 import { disconnectPlaid, syncPlaidTransactions as invokePlaidSync } from '../lib/plaid';
+import { formatCategoryLabel } from '../lib/categoryDisplay';
 export type { CategorizationRule, CategorizationExclusion };
 
 /** Mobile capture stores under `incoming/` in `scans`; desktop uploads use `ingestion-files`. */
@@ -558,7 +559,8 @@ export const useStore = create<AppState>()(
           const lockMode = categoryBudget.lockMode ?? 'none';
 
           if (overBy > 0) {
-            const message = `${transaction.category} exceeds your ${categoryBudget.period.toLowerCase()} budget by $${overBy.toFixed(2)}.`;
+            const catLabel = formatCategoryLabel(transaction.category);
+            const message = `${catLabel} exceeds your ${categoryBudget.period.toLowerCase()} budget by $${overBy.toFixed(2)}.`;
             set({
               lastBudgetGuardrail: {
                 type: lockMode === 'hard' ? 'hard' : 'soft',

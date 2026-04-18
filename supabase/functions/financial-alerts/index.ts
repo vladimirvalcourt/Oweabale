@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
+import { formatCategoryLabel } from '../_shared/formatCategoryLabel.ts';
 import { isWebPushConfigured, sendPushToSubscription } from '../_shared/vapidWebPush.ts';
 
 // ---------------------------------------------------------------------------
@@ -232,7 +233,7 @@ async function processUser(
       const spent = spendByCategory[cat] ?? 0;
       if (spent > budgetAmt) {
         alertMessages.push(
-          `You're over budget in ${cat}: spent $${spent.toFixed(2)} vs $${budgetAmt.toFixed(2)} limit.`,
+          `You're over budget in ${formatCategoryLabel(cat)}: spent $${spent.toFixed(2)} vs $${budgetAmt.toFixed(2)} limit.`,
         );
       }
     }

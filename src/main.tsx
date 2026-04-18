@@ -3,6 +3,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MotionConfig } from 'motion/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Analytics } from '@vercel/analytics/react';
 import { reactErrorHandler } from '@sentry/react';
 import App from './App.tsx';
 import 'sonner/dist/styles.css';
@@ -76,6 +77,7 @@ createRoot(rootEl, {
     <MotionConfig reducedMotion="user">
       <QueryClientProvider client={queryClient}>
         <App />
+        <Analytics />
       </QueryClientProvider>
     </MotionConfig>
   </StrictMode>,

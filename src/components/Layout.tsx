@@ -17,6 +17,7 @@ import { PrivacyScreenWhenHidden } from './PrivacyScreenWhenHidden';
 import { TactileIcon, MorphingMenuIcon } from './ui/TactileIcon';
 import type { Notification } from '../store/useStore';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
+import { formatCategoryLabel } from '../lib/categoryDisplay';
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
 const NAV_ROUTE_HASHES: Record<string, string[]> = {
@@ -246,7 +247,12 @@ export default function Layout() {
 
     budgets.forEach(b => {
       if (b.category.toLowerCase().includes(query)) {
-        results.push({ type: 'Budget', name: b.category, detail: `$${b.amount} ${b.period}`, path: '/budgets' });
+        results.push({
+          type: 'Budget',
+          name: formatCategoryLabel(b.category),
+          detail: `$${b.amount} ${b.period}`,
+          path: '/budgets',
+        });
       }
     });
 
