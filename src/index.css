@@ -69,7 +69,7 @@
   }
 
   .btn-tactile {
-    @apply relative transition-all duration-200 active:translate-y-[1px];
+    @apply relative transition-[color,background-color,box-shadow,filter,transform] duration-200 active:translate-y-[1px];
     box-shadow: var(--shadow-tactile);
   }
   .btn-tactile:hover {
@@ -189,8 +189,8 @@
     50% { transform: translateY(1000%); } /* Based on height of element */
   }
   @keyframes scan-y-full {
-    0% { top: 0; }
-    100% { top: 100%; }
+    0% { transform: translateY(0); }
+    100% { transform: translateY(100vh); }
   }
   @keyframes progress-once {
     0% { width: 0; }
@@ -202,12 +202,15 @@
   }
   .animate-scan-y {
     animation: scan-y-full 2.5s ease-in-out infinite;
+    will-change: transform;
   }
   .animate-progress-once {
     animation: progress-once 1.5s ease-out forwards;
+    will-change: width;
   }
   .animate-pulse-highlight {
     animation: pulse-highlight 2s ease-in-out infinite;
+    will-change: background-color;
   }
 
   /** Native date/datetime inputs: avoid black text/icon on dark surfaces (WebKit + Firefox). */
@@ -232,14 +235,15 @@
   .pulse-border-container::before {
     content: '';
     @apply absolute -inset-[2px] opacity-0 transition-opacity duration-500 rounded-[inherit];
-    background: conic-gradient(from 0deg, 
-      transparent 0, 
-      transparent 25%, 
-      var(--color-brand-indigo) 50%, 
-      transparent 75%, 
+    background: conic-gradient(from 0deg,
+      transparent 0,
+      transparent 25%,
+      var(--color-brand-indigo) 50%,
+      transparent 75%,
       transparent 100%
     );
     animation: rotate-border 4s linear infinite;
+    will-change: transform;
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: exclude;
     padding: 1px;

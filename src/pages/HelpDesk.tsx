@@ -28,6 +28,7 @@ export default function HelpDesk() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [broadcasts, setBroadcasts] = useState<Broadcast[]>([]);
   const [broadcastsLoading, setBroadcastsLoading] = useState(false);
+  const [livePlatformMessage, setLivePlatformMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -65,10 +66,17 @@ export default function HelpDesk() {
     async function loadBroadcasts() {
       setBroadcastsLoading(true);
       try {
-        const { data, error } = await supabase
-          .from('admin_broadcasts')
-          .select('*')
-          .order('created_at', { ascending: false });
+        const [{ data, error }, { data: plat }] = await Promise.all([
+          supabase.from('admin_broadcasts').select('*').order('created_at', { ascending: false }),
+          supabase
+            .from('platform_settings')
+            .select('broadcast_message')
+            .order('created_at', { ascending: true })
+            .limit(1)
+            .maybeSingle(),
+        ]);
+        const pinned = typeof plat?.broadcast_message === 'string' ? plat.broadcast_message.trim() : '';
+        setLivePlatformMessage(pinned.length > 0 ? pinned : null);
         if (!error && data) {
           setBroadcasts(data.map((b: Record<string, any>) => ({
             id: b.id,
@@ -232,13 +240,23 @@ export default function HelpDesk() {
             <div className="p-12 flex justify-center">
               <Loader2 className="w-5 h-5 text-content-tertiary animate-spin" />
             </div>
-          ) : broadcasts.length === 0 ? (
+          ) : broadcasts.length === 0 && !livePlatformMessage ? (
             <div className="p-12 text-center border border-surface-border rounded-lg bg-surface-raised">
               <Radio className="w-7 h-7 text-content-muted mx-auto mb-3" />
               <p className="text-sm font-mono text-content-tertiary uppercase tracking-widest">No broadcasts at this time.</p>
             </div>
           ) : (
             <div className="space-y-4">
+              {livePlatformMessage ? (
+                <div className="p-6 bg-amber-500/5 border border-amber-500/25 rounded-lg relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-amber-500" />
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-xs font-mono font-semibold text-amber-200 uppercase tracking-widest">Live platform message</h3>
+                    <span className="text-[10px] font-mono text-amber-400/80">From admin dashboard</span>
+                  </div>
+                  <p className="text-sm text-content-secondary leading-relaxed whitespace-pre-wrap">{livePlatformMessage}</p>
+                </div>
+              ) : null}
               {broadcasts.map(msg => (
                 <div key={msg.id} className="p-6 bg-surface-raised border border-surface-border rounded-lg relative overflow-hidden">
                   <div className={`absolute top-0 left-0 w-1 h-full ${

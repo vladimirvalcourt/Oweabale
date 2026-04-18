@@ -11,6 +11,9 @@ type Props = {
   getEnrichedProfile: (profile: ProfileRow) => EnrichedProfile;
   primaryAdminEmail: string;
   subMap: Record<string, UserSubscription>;
+  profilesTotalCount: number | null;
+  profilesLoadingMore?: boolean;
+  onLoadMoreProfiles?: () => void;
   onPromoteAdmin: (userId: string) => void;
   onDemoteAdmin: (userId: string) => void;
   onAdminAction: (action: 'ban' | 'unban' | 'delete', userId: string) => void;
@@ -36,6 +39,9 @@ export function AdminUsersPanel({
   getEnrichedProfile,
   primaryAdminEmail,
   subMap,
+  profilesTotalCount,
+  profilesLoadingMore = false,
+  onLoadMoreProfiles,
   onPromoteAdmin,
   onDemoteAdmin,
   onAdminAction,
@@ -65,9 +71,17 @@ export function AdminUsersPanel({
   return (
     <div className="lg:col-span-2 border border-surface-border rounded-lg bg-surface-raised p-5">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
-          <Users className="w-4 h-4" /> Users
-        </h2>
+        <div>
+          <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
+            <Users className="w-4 h-4" /> Users
+          </h2>
+          {profilesTotalCount !== null && (
+            <p className="text-[10px] text-content-tertiary mt-1">
+              Showing {users.length} of {profilesTotalCount}
+              {profilesTotalCount > users.length && onLoadMoreProfiles ? ' · more available' : ''}
+            </p>
+          )}
+        </div>
         <div className="relative">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-content-muted" />
           <input
@@ -278,6 +292,21 @@ export function AdminUsersPanel({
           </tbody>
         </table>
       </div>
+
+      {profilesTotalCount !== null &&
+        onLoadMoreProfiles &&
+        users.length < profilesTotalCount && (
+          <div className="mt-4 flex justify-center">
+            <button
+              type="button"
+              onClick={() => onLoadMoreProfiles()}
+              disabled={profilesLoadingMore}
+              className="px-4 py-2 rounded-lg text-xs border border-surface-border bg-surface-elevated text-content-secondary hover:text-content-primary disabled:opacity-50"
+            >
+              {profilesLoadingMore ? 'Loading…' : `Load more (${profilesTotalCount - users.length} remaining)`}
+            </button>
+          </div>
+        )}
     </div>
   );
 }

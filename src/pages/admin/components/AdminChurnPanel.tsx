@@ -1,14 +1,9 @@
 import React from 'react';
 import { TrendingDown } from 'lucide-react';
+import type { ChurnStats } from './types';
 
 interface Props {
-  stats: {
-    total_canceled: number;
-    active_subscriptions: number;
-    canceled_30d: number;
-    churn_rate: number;
-    recent_churns: { email: string | null; canceled_at: string | null }[];
-  } | null;
+  stats: ChurnStats | null;
 }
 
 function churnRateColor(rate: number): string {

@@ -2,7 +2,7 @@
  * Calendar — Financial Events Calendar
  * Full monthly grid showing bills, income, subscriptions, and goals from the store.
  */
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   ChevronLeft, ChevronRight, Receipt, TrendingUp, Repeat, Target, CalendarDays
@@ -54,16 +54,16 @@ export default function Calendar() {
     }
   }, [location.hash]);
 
-  const prevMonth = () => {
+  const prevMonth = useCallback(() => {
     if (month === 0) { setYear(y => y - 1); setMonth(11); }
     else setMonth(m => m - 1);
     setPopover(null);
-  };
-  const nextMonth = () => {
+  }, [month]);
+  const nextMonth = useCallback(() => {
     if (month === 11) { setYear(y => y + 1); setMonth(0); }
     else setMonth(m => m + 1);
     setPopover(null);
-  };
+  }, [month]);
 
   // Calendar grid
   const firstDay = new Date(year, month, 1).getDay();
@@ -121,15 +121,19 @@ export default function Calendar() {
     goal: { color: 'bg-blue-500', text: 'text-blue-400', icon: Target },
   };
 
-  const handleDayClick = (dayNum: number, e: React.MouseEvent<HTMLDivElement>) => {
+  const handleDayClick = useCallback((dayNum: number, e: React.MouseEvent<HTMLDivElement>) => {
     const events = eventsByDay.get(dayNum);
     if (!events || events.length === 0) { setPopover(null); return; }
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     setPopover({ day: dayNum, events, x: rect.left, y: rect.bottom + window.scrollY + 4 });
-  };
+  }, [eventsByDay]);
+
+  const handleContainerClick = useCallback((e: React.MouseEvent) => {
+    if (!(e.target as HTMLElement).closest('[data-day]')) setPopover(null);
+  }, []);
 
   return (
-    <div className="space-y-6" onClick={(e) => { if (!(e.target as HTMLElement).closest('[data-day]')) setPopover(null); }}>
+    <div className="space-y-6" onClick={handleContainerClick}>
       {/* Header — anchor for Bills & debts → Month view */}
       <div
         id="calendar-view"

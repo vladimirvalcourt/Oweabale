@@ -5,30 +5,26 @@ import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { TrendingUp, TrendingDown, Hash, Building2, CreditCard, Vault, PieChart, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart as RechartsPie, Pie, Cell } from 'recharts';
 import { toast } from 'sonner';
-import { animate } from 'motion/react';
+import { motion, animate, useMotionValue, useTransform } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 
 function AnimatedValue({ value, prefix = "", suffix = "", decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
-  const [displayValue, setDisplayValue] = useState(0);
+  const mv = useMotionValue(0);
+  const formatted = useTransform(mv, (val) =>
+    `${prefix}${val.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}`
+  );
 
   useEffect(() => {
-    const controls = animate(displayValue, value, {
+    const controls = animate(mv, value, {
       duration: 1.5,
-      ease: [0.16, 1, 0.3, 1], // HUD-style ease out
-      onUpdate(value) {
-        setDisplayValue(value);
-      },
+      ease: [0.16, 1, 0.3, 1],
     });
     return () => controls.stop();
-  }, [value]);
+  }, [value, mv]);
 
-  return (
-    <span>
-      {prefix}{displayValue.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}{suffix}
-    </span>
-  );
+  return <motion.span>{formatted}</motion.span>;
 }
 
 export default function NetWorth() {

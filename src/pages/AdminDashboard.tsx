@@ -13,9 +13,16 @@ import { AdminReliabilityPanel } from './admin/components/AdminReliabilityPanel'
 import { AdminBillingPanel } from './admin/components/AdminBillingPanel';
 import { AdminPlaidDrilldown } from './admin/components/AdminPlaidDrilldown';
 import { AdminUserModal } from './admin/components/AdminUserModal';
+import { AdminChurnPanel } from './admin/components/AdminChurnPanel';
+import { AdminGrowthChart } from './admin/components/AdminGrowthChart';
+import { AdminRevenueChart } from './admin/components/AdminRevenueChart';
+import { AdminWebhooksPanel } from './admin/components/AdminWebhooksPanel';
+import { AdminFeatureFlagsPanel } from './admin/components/AdminFeatureFlagsPanel';
+import { AdminExportBar } from './admin/components/AdminExportBar';
 import type {
   AdminAuditEntry,
   BillingStats,
+  ChurnStats,
   EnrichedUser,
   PlaidHealthStats,
   PlaidItemRow,
@@ -26,6 +33,8 @@ import type {
 } from './admin/components/types';
 
 const PRIMARY_ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL ?? '').trim().toLowerCase();
+const STRIPE_DASHBOARD_URL = (import.meta.env.VITE_STRIPE_DASHBOARD_URL ?? '').trim();
+const PROFILE_PAGE_SIZE = 200;
 
 export default function AdminDashboard() {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -50,6 +59,18 @@ export default function AdminDashboard() {
   const [stripeHealth, setStripeHealth] = useState<StripeHealthStats | null>(null);
   const [auditFeed, setAuditFeed] = useState<AdminAuditEntry[]>([]);
   const [billingStats, setBillingStats] = useState<BillingStats | null>(null);
+  const [platformSettingsId, setPlatformSettingsId] = useState<string | null>(null);
+  const [platformSettingsForFlags, setPlatformSettingsForFlags] = useState<{
+    feature_flags?: Record<string, boolean>;
+  } | null>(null);
+  const [churnStats, setChurnStats] = useState<ChurnStats | null>(null);
+  const [growthChart, setGrowthChart] = useState<{ week: string; signups: number }[]>([]);
+  const [revenueChart, setRevenueChart] = useState<{ month: string; revenue_cents: number }[]>([]);
+  const [webhookRows, setWebhookRows] = useState<
+    { id: string; stripe_event_id: string; event_type: string; processed_at: string }[]
+  >([]);
+  const [profilesTotalCount, setProfilesTotalCount] = useState<number | null>(null);
+  const [profilesLoadingMore, setProfilesLoadingMore] = useState(false);
 
   const invokeAdminActions = useCallback(async (body: Record<string, unknown>) => {
     const {
@@ -67,28 +88,55 @@ export default function AdminDashboard() {
 
   const loadAll = useCallback(async () => {
     setIsRefreshing(true);
+    setChurnStats(null);
+    setGrowthChart([]);
+    setRevenueChart([]);
+    setWebhookRows([]);
 
-    const { data: settings } = await supabase
+    const { data: settings, error: settingsErr } = await supabase
       .from('platform_settings')
       .select('*')
-      .eq('id', '00000000-0000-0000-0000-000000000001')
-      .single();
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (settingsErr) {
+      toast.error(`Platform settings failed: ${settingsErr.message}`);
+    }
     if (settings) {
+      setPlatformSettingsId(settings.id);
       setBroadcastMsg(settings.broadcast_message || '');
       setIsMaintenance(settings.maintenance_mode || false);
       setIsPlaidEnabled(settings.plaid_enabled !== false);
+      const raw = 'feature_flags' in settings ? (settings as { feature_flags?: unknown }).feature_flags : undefined;
+      const flags: Record<string, boolean> =
+        raw && typeof raw === 'object' && !Array.isArray(raw)
+          ? Object.fromEntries(
+              Object.entries(raw as Record<string, unknown>).filter(([, v]) => typeof v === 'boolean') as [
+                string,
+                boolean,
+              ][],
+            )
+          : {};
+      setPlatformSettingsForFlags({ feature_flags: flags });
+    } else {
+      setPlatformSettingsId(null);
+      setPlatformSettingsForFlags({ feature_flags: {} });
+      if (!settingsErr) {
+        toast.error('No platform_settings row found. Add one or run migrations.', { id: 'no-platform-settings' });
+      }
     }
 
-    const { data: profileData, error: profileErr } = await supabase
+    const { data: profileData, error: profileErr, count: profileCount } = await supabase
       .from('profiles')
-      .select('id, email, is_admin, is_banned, has_completed_onboarding, created_at')
+      .select('id, email, is_admin, is_banned, has_completed_onboarding, created_at', { count: 'exact' })
       .order('created_at', { ascending: false })
-      .limit(200);
+      .range(0, PROFILE_PAGE_SIZE - 1);
 
     if (profileErr) {
       toast.error(`Failed to load users: ${profileErr.message}`);
     } else if (profileData) {
       setProfiles(profileData as ProfileRow[]);
+      setProfilesTotalCount(typeof profileCount === 'number' ? profileCount : null);
     }
 
     // Fire all admin-actions fetches in parallel
@@ -100,6 +148,10 @@ export default function AdminDashboard() {
       billingStatsRes,
       billingByUserRes,
       plaidItemsRes,
+      churnRes,
+      growthRes,
+      revenueRes,
+      webhookRes,
     ] = await Promise.all([
       invokeAdminActions({ action: 'list' }),
       invokeAdminActions({ action: 'plaid_stats' }),
@@ -108,6 +160,10 @@ export default function AdminDashboard() {
       invokeAdminActions({ action: 'billing_stats' }),
       invokeAdminActions({ action: 'billing_by_user' }),
       invokeAdminActions({ action: 'plaid_items_list' }),
+      invokeAdminActions({ action: 'churn_stats' }),
+      invokeAdminActions({ action: 'growth_chart' }),
+      invokeAdminActions({ action: 'revenue_chart' }),
+      invokeAdminActions({ action: 'webhook_list' }),
     ]);
 
     if (enrichedRes.error) toast.error(`Auth enrichment failed: ${enrichedRes.error.message}`);
@@ -130,6 +186,22 @@ export default function AdminDashboard() {
 
     if (plaidItemsRes.error) toast.error(`Plaid items failed: ${plaidItemsRes.error.message}`);
     else if (Array.isArray(plaidItemsRes.data?.plaid_items)) setPlaidItems(plaidItemsRes.data.plaid_items as PlaidItemRow[]);
+
+    if (churnRes.error) toast.error(`Churn stats failed: ${churnRes.error.message}`);
+    else if (churnRes.data?.churn_stats) setChurnStats(churnRes.data.churn_stats as ChurnStats);
+
+    if (growthRes.error) toast.error(`Growth chart failed: ${growthRes.error.message}`);
+    else if (Array.isArray(growthRes.data?.growth_chart)) setGrowthChart(growthRes.data.growth_chart as { week: string; signups: number }[]);
+
+    if (revenueRes.error) toast.error(`Revenue chart failed: ${revenueRes.error.message}`);
+    else if (Array.isArray(revenueRes.data?.revenue_chart))
+      setRevenueChart(revenueRes.data.revenue_chart as { month: string; revenue_cents: number }[]);
+
+    if (webhookRes.error) toast.error(`Webhooks failed: ${webhookRes.error.message}`);
+    else if (Array.isArray(webhookRes.data?.webhooks))
+      setWebhookRows(
+        webhookRes.data.webhooks as { id: string; stripe_event_id: string; event_type: string; processed_at: string }[],
+      );
 
     setTicketsLoading(true);
     const { data: tickets, error: ticketErr } = await supabase
@@ -157,12 +229,56 @@ export default function AdminDashboard() {
     setIsRefreshing(false);
   }, [invokeAdminActions]);
 
+  const loadMoreProfiles = useCallback(async () => {
+    if (profilesLoadingMore || profilesTotalCount === null || profiles.length >= profilesTotalCount) return;
+    setProfilesLoadingMore(true);
+    const from = profiles.length;
+    const to = from + PROFILE_PAGE_SIZE - 1;
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, email, is_admin, is_banned, has_completed_onboarding, created_at')
+      .order('created_at', { ascending: false })
+      .range(from, to);
+    setProfilesLoadingMore(false);
+    if (error) {
+      toast.error(`Failed to load more users: ${error.message}`);
+      return;
+    }
+    if (data?.length) setProfiles((prev) => [...prev, ...(data as ProfileRow[])]);
+  }, [profilesLoadingMore, profilesTotalCount, profiles.length]);
+
+  const handleSetFeatureFlag = useCallback(
+    async (scope: 'global', key: string, value: boolean) => {
+      const { error } = await invokeAdminActions({
+        action: 'set_feature_flag',
+        flagScope: scope,
+        flagKey: key,
+        flagValue: value,
+      });
+      if (error) {
+        toast.error(`Feature flag failed: ${error.message}`);
+        return;
+      }
+      setPlatformSettingsForFlags((prev) => ({
+        feature_flags: { ...(prev?.feature_flags ?? {}), [key]: value },
+      }));
+      toast.success('Feature flag updated.');
+    },
+    [invokeAdminActions],
+  );
+
   useEffect(() => {
     void loadAll();
 
     const ticketSub = supabase
       .channel('admin-tickets-lean')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'support_tickets' }, () => {
+        void loadAll();
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'support_tickets' }, () => {
+        void loadAll();
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'support_tickets' }, () => {
         void loadAll();
       })
       .subscribe();
@@ -279,11 +395,15 @@ export default function AdminDashboard() {
   };
 
   const toggleMaintenance = async () => {
+    if (!platformSettingsId) {
+      toast.error('Platform settings row not found.');
+      return;
+    }
     const newValue = !isMaintenance;
     const { error } = await supabase
       .from('platform_settings')
       .update({ maintenance_mode: newValue })
-      .eq('id', '00000000-0000-0000-0000-000000000001');
+      .eq('id', platformSettingsId);
     if (error) {
       toast.error('Failed to update maintenance mode.');
       return;
@@ -293,11 +413,15 @@ export default function AdminDashboard() {
   };
 
   const togglePlaid = async () => {
+    if (!platformSettingsId) {
+      toast.error('Platform settings row not found.');
+      return;
+    }
     const newValue = !isPlaidEnabled;
     const { error } = await supabase
       .from('platform_settings')
       .update({ plaid_enabled: newValue })
-      .eq('id', '00000000-0000-0000-0000-000000000001');
+      .eq('id', platformSettingsId);
     if (error) {
       toast.error('Failed to update bank syncing.');
       return;
@@ -307,11 +431,15 @@ export default function AdminDashboard() {
   };
 
   const handleSendBroadcast = async () => {
+    if (!platformSettingsId) {
+      toast.error('Platform settings row not found.');
+      return;
+    }
     setIsSavingBroadcast(true);
     const { error } = await supabase
       .from('platform_settings')
       .update({ broadcast_message: broadcastMsg.trim() === '' ? null : broadcastMsg })
-      .eq('id', '00000000-0000-0000-0000-000000000001');
+      .eq('id', platformSettingsId);
     setIsSavingBroadcast(false);
     if (error) {
       toast.error('Failed to update broadcast message.');
@@ -347,6 +475,15 @@ export default function AdminDashboard() {
 
         <AdminMetricsBar metrics={metricData} />
 
+        <AdminExportBar profiles={profiles} billingStats={billingStats} />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AdminRevenueChart data={revenueChart} />
+          <AdminGrowthChart data={growthChart} />
+          <AdminChurnPanel stats={churnStats} />
+          <AdminWebhooksPanel webhooks={webhookRows} />
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <AdminUsersPanel
             users={filteredProfiles}
@@ -355,6 +492,9 @@ export default function AdminDashboard() {
             getEnrichedProfile={getEnrichedProfile}
             primaryAdminEmail={PRIMARY_ADMIN_EMAIL}
             subMap={subMap}
+            profilesTotalCount={profilesTotalCount}
+            profilesLoadingMore={profilesLoadingMore}
+            onLoadMoreProfiles={() => void loadMoreProfiles()}
             onPromoteAdmin={(userId) => void handlePromoteAdmin(userId)}
             onDemoteAdmin={(userId) => void handleDemoteAdmin(userId)}
             onAdminAction={(action, userId) => void handleAdminAction(action, userId)}
@@ -364,7 +504,8 @@ export default function AdminDashboard() {
           />
 
           <div className="space-y-6">
-            <AdminBillingPanel stats={billingStats} />
+            <AdminBillingPanel stats={billingStats} stripeDashboardUrl={STRIPE_DASHBOARD_URL || undefined} />
+            <AdminFeatureFlagsPanel platformSettings={platformSettingsForFlags} onSetFeatureFlag={handleSetFeatureFlag} />
             <AdminReliabilityPanel stripeHealth={stripeHealth} auditFeed={auditFeed} />
             <AdminControlsPanel
               isMaintenance={isMaintenance}

@@ -8,8 +8,7 @@ import {
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { toast } from 'sonner';
 import { Dialog } from '@headlessui/react';
-import { motion } from 'motion/react';
-import { animate } from 'motion/react';
+import { motion, animate, useMotionValue, useTransform } from 'motion/react';
 import { useStore } from '../store/useStore';
 import { sanitizeUrl } from '../lib/security';
 import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting, computeSafeToSpend, forecast30DayCashFlow, detectSpendingAnomalies } from '../lib/finance';
@@ -30,26 +29,22 @@ function parseLowTaxDismissed(): boolean {
   }
 }
 
-// Helper for animated numbers
-function AnimatedValue({ value, prefix = "", suffix = "" , decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
-  const [displayValue, setDisplayValue] = useState(0);
+// Helper for animated numbers — uses MotionValue to avoid React re-renders per frame
+function AnimatedValue({ value, prefix = "", suffix = "", decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
+  const mv = useMotionValue(0);
+  const formatted = useTransform(mv, (val) =>
+    `${prefix}${val.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}`
+  );
 
   useEffect(() => {
-    const controls = animate(displayValue, value, {
+    const controls = animate(mv, value, {
       duration: 1.5,
-      ease: [0.16, 1, 0.3, 1], // Standard Ease-out
-      onUpdate(val) {
-        setDisplayValue(val);
-      },
+      ease: [0.16, 1, 0.3, 1],
     });
     return () => controls.stop();
-  }, [value]);
+  }, [value, mv]);
 
-  return (
-    <span>
-      {prefix}{displayValue.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}{suffix}
-    </span>
-  );
+  return <motion.span>{formatted}</motion.span>;
 }
 
 

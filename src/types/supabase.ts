@@ -772,6 +772,7 @@ export interface Database {
           maintenance_mode: boolean
           plaid_enabled: boolean
           broadcast_message: string
+          feature_flags: Json
           tax_standard_deduction: number
           tax_top_bracket: number
           created_at: string
@@ -782,6 +783,7 @@ export interface Database {
           maintenance_mode?: boolean
           plaid_enabled?: boolean
           broadcast_message?: string
+          feature_flags?: Json
           tax_standard_deduction?: number
           tax_top_bracket?: number
           created_at?: string
@@ -792,6 +794,7 @@ export interface Database {
           maintenance_mode?: boolean
           plaid_enabled?: boolean
           broadcast_message?: string
+          feature_flags?: Json
           tax_standard_deduction?: number
           tax_top_bracket?: number
           created_at?: string

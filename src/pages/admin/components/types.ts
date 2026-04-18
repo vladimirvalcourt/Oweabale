@@ -68,6 +68,14 @@ export interface BillingStats {
   recent_payments: BillingPaymentRow[];
 }
 
+export interface ChurnStats {
+  total_canceled: number;
+  active_subscriptions: number;
+  canceled_30d: number;
+  churn_rate: number;
+  recent_churns: { email: string | null; canceled_at: string | null }[];
+}
+
 export interface UserSubscription {
   plan: string;
   status: string;

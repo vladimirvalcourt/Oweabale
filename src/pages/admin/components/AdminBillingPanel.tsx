@@ -1,8 +1,9 @@
-import { DollarSign } from 'lucide-react';
+import { DollarSign, ExternalLink } from 'lucide-react';
 import type { BillingStats } from './types';
 
 type Props = {
   stats: BillingStats | null;
+  stripeDashboardUrl?: string;
 };
 
 const fmtUsd = (cents: number) =>
@@ -16,12 +17,24 @@ const STATUS_COLORS: Record<string, string> = {
   unpaid: 'text-rose-400',
 };
 
-export function AdminBillingPanel({ stats }: Props) {
+export function AdminBillingPanel({ stats, stripeDashboardUrl }: Props) {
   return (
     <div className="border border-surface-border rounded-lg bg-surface-raised p-5 space-y-4">
-      <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
-        <DollarSign className="w-4 h-4" /> Billing
-      </h2>
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
+          <DollarSign className="w-4 h-4" /> Billing
+        </h2>
+        {stripeDashboardUrl ? (
+          <a
+            href={stripeDashboardUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-[11px] text-content-tertiary hover:text-content-primary"
+          >
+            Stripe <ExternalLink className="w-3 h-3" />
+          </a>
+        ) : null}
+      </div>
 
       {!stats ? (
         <p className="text-xs text-content-muted">No billing data yet.</p>

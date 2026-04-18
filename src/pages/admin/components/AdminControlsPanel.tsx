@@ -38,6 +38,12 @@ export function AdminControlsPanel({
           placeholder="Broadcast message shown in app"
           className="w-full bg-surface-base border border-surface-border rounded-lg p-2 text-xs focus-app"
         />
+        <p className="text-[10px] text-content-tertiary leading-relaxed">
+          This text is stored on the platform row and appears as a live banner in Help → Admin Broadcast. Structured notices still use the{' '}
+          <span className="text-content-muted">admin_broadcasts</span> table. The email in{' '}
+          <span className="font-mono text-content-muted">VITE_ADMIN_EMAIL</span> is the primary admin (console protection);{' '}
+          <span className="text-content-muted">Promote</span> grants dashboard access via <span className="font-mono">is_admin</span>.
+        </p>
         <button
           type="button"
           onClick={onSaveBroadcast}

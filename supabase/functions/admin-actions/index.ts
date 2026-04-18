@@ -201,6 +201,7 @@ Deno.serve(async (req: Request) => {
         { data: recentPayments },
         { count: failedCount },
         { data: allPaidPayments },
+        { data: paid30dRows },
       ] = await Promise.all([
         supabaseAdmin.from('billing_subscriptions').select('status'),
         supabaseAdmin
@@ -217,6 +218,11 @@ Deno.serve(async (req: Request) => {
           .from('billing_payments')
           .select('amount_total')
           .eq('status', 'paid'),
+        supabaseAdmin
+          .from('billing_payments')
+          .select('amount_total')
+          .eq('status', 'paid')
+          .gte('created_at', thirtyDaysAgo),
       ])
 
       const statusCounts: Record<string, number> = {}
@@ -227,9 +233,10 @@ Deno.serve(async (req: Request) => {
       const totalRevenueCents = (allPaidPayments ?? []).reduce(
         (sum: number, p: { amount_total: number }) => sum + (p.amount_total ?? 0), 0
       )
-      const revenue30dCents = (recentPayments ?? [])
-        .filter((p: { status: string; created_at: string }) => p.status === 'paid' && p.created_at >= thirtyDaysAgo)
-        .reduce((sum: number, p: { amount_total: number }) => sum + (p.amount_total ?? 0), 0)
+      const revenue30dCents = (paid30dRows ?? []).reduce(
+        (sum: number, p: { amount_total: number }) => sum + (p.amount_total ?? 0),
+        0,
+      )
 
       return new Response(
         JSON.stringify({
@@ -579,7 +586,7 @@ Deno.serve(async (req: Request) => {
           .from('billing_subscriptions')
           .select('id, user_id, canceled_at, created_at', { count: 'exact' })
           .eq('status', 'canceled')
-          .order('created_at', { ascending: false })
+          .order('canceled_at', { ascending: false, nullsFirst: false })
           .limit(10),
         supabaseAdmin
           .from('billing_subscriptions')
@@ -589,7 +596,7 @@ Deno.serve(async (req: Request) => {
           .from('billing_subscriptions')
           .select('id', { count: 'exact', head: true })
           .eq('status', 'canceled')
-          .gte('created_at', thirtyDaysAgo),
+          .gte('canceled_at', thirtyDaysAgo),
       ])
 
       const userIds = [...new Set((canceledRows ?? []).map((r: { user_id: string }) => r.user_id))]
@@ -685,17 +692,20 @@ Deno.serve(async (req: Request) => {
       if (typeof flagValue !== 'boolean') throw new Error('flagValue must be a boolean')
       await enforceRateLimit(supabaseAdmin, user.id, 'set_feature_flag')
       if (flagScope === 'global') {
-        const { data: settingsRow } = await supabaseAdmin
+        const { data: settingsRow, error: settingsReadErr } = await supabaseAdmin
           .from('platform_settings')
-          .select('feature_flags')
+          .select('id, feature_flags')
+          .order('created_at', { ascending: true })
           .limit(1)
           .maybeSingle()
-        const current = (settingsRow?.feature_flags as Record<string, unknown>) ?? {}
+        if (settingsReadErr) throw settingsReadErr
+        if (!settingsRow?.id) throw new Error('platform_settings row missing; run migrations / seed.')
+        const current = (settingsRow.feature_flags as Record<string, unknown>) ?? {}
         const updated = { ...current, [flagKey as string]: flagValue }
         const { error } = await supabaseAdmin
           .from('platform_settings')
           .update({ feature_flags: updated })
-          .limit(1)
+          .eq('id', settingsRow.id)
         if (error) throw error
       } else {
         if (typeof flagTargetUserId !== 'string' || !UUID_RE.test(flagTargetUserId as string)) {

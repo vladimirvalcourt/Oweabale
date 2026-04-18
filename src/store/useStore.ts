@@ -1890,7 +1890,7 @@ export const useStore = create<AppState>()(
       supabase.from('categorization_rules').select('*').eq('user_id', resolvedUserId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
       supabase.from('credit_fixes').select('*').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
       supabase.from('admin_broadcasts').select('*').order('created_at', { ascending: false }).limit(10),
-      supabase.from('platform_settings').select('*').maybeSingle(),
+      supabase.from('platform_settings').select('*').order('created_at', { ascending: true }).limit(1).maybeSingle(),
       supabase.from('net_worth_snapshots').select('*').eq('user_id', resolvedUserId).order('date', { ascending: true }).limit(90),
       supabase.from('credit_factors').select('*').eq('user_id', resolvedUserId),
       supabase.from('investment_accounts').select('id,name,type,institution,balance,notes,last_updated').eq('user_id', resolvedUserId),
