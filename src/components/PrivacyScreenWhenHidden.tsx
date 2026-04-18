@@ -1,28 +1,64 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { toast } from 'sonner';
+import { useStore } from '../store/useStore';
+
+const INACTIVITY_TIMEOUT_MS = 10 * 60 * 1000;
 
 /**
- * Web equivalent of obscuring sensitive UI when the app goes to the background:
- * covers financial shell content while the tab is hidden (alt-tab, app switcher, etc.).
+ * Global inactivity guard:
+ * if no user interaction occurs for N minutes, sign out automatically.
  */
 export function PrivacyScreenWhenHidden() {
-  const [hidden, setHidden] = useState(() =>
-    typeof document !== 'undefined' ? document.visibilityState === 'hidden' : false
-  );
-
+  const signOut = useStore((s) => s.signOut);
+  const userId = useStore((s) => s.user.id);
+  const timerRef = useRef<number | null>(null);
+  const signingOutRef = useRef(false);
   useEffect(() => {
-    const onVis = () => setHidden(document.visibilityState === 'hidden');
-    document.addEventListener('visibilitychange', onVis);
-    return () => document.removeEventListener('visibilitychange', onVis);
-  }, []);
+    if (!userId) return;
 
-  if (!hidden) return null;
+    const clearTimer = () => {
+      if (timerRef.current !== null) {
+        window.clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
 
-  return (
-    <div
-      className="fixed inset-0 z-[10000] flex items-center justify-center bg-[#08090A] text-content-tertiary"
-      aria-hidden="true"
-    >
-      <p className="text-[10px] font-mono uppercase tracking-[0.25em]">Oweable — hidden for privacy</p>
-    </div>
-  );
+    const startTimer = () => {
+      clearTimer();
+      timerRef.current = window.setTimeout(async () => {
+        if (signingOutRef.current) return;
+        signingOutRef.current = true;
+        toast.info('Signed out due to inactivity.');
+        await signOut();
+      }, INACTIVITY_TIMEOUT_MS);
+    };
+
+    const onActivity = () => {
+      startTimer();
+    };
+
+    const events: Array<keyof WindowEventMap> = [
+      'mousemove',
+      'keydown',
+      'click',
+      'scroll',
+      'touchstart',
+      'visibilitychange',
+    ];
+
+    for (const evt of events) {
+      window.addEventListener(evt, onActivity, { passive: true });
+    }
+
+    startTimer();
+
+    return () => {
+      clearTimer();
+      for (const evt of events) {
+        window.removeEventListener(evt, onActivity);
+      }
+    };
+  }, [signOut, userId]);
+
+  return null;
 }

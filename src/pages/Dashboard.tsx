@@ -11,7 +11,7 @@ import { Dialog } from '@headlessui/react';
 import { motion, animate, useMotionValue, useTransform } from 'motion/react';
 import { useStore } from '../store/useStore';
 import { sanitizeUrl } from '../lib/security';
-import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting, computeSafeToSpend, forecast30DayCashFlow, detectSpendingAnomalies } from '../lib/finance';
+import { projectNetWorth, calcMonthlyCashFlow, computeSafeToSpend, forecast30DayCashFlow, detectSpendingAnomalies } from '../lib/finance';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { AppPageShell } from '../components/AppPageShell';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
@@ -66,11 +66,9 @@ export default function Dashboard() {
   const subscriptions = useStore(state => state.subscriptions);
   const incomes = useStore(state => state.incomes);
   const user = useStore(state => state.user);
-  const goals = useStore(state => state.goals);
   const freelanceEntries = useStore(state => state.freelanceEntries);
   const pendingIngestions = useStore(state => state.pendingIngestions);
   const citations = useStore(state => state.citations);
-  const resolveCitation = useStore(state => state.resolveCitation);
   
   /** Global fetch flag from Zustand — true while `fetchData` runs after login/refresh. */
   const isLoading = useStore((state) => state.isLoading);
@@ -188,11 +186,6 @@ export default function Dashboard() {
     return (next30DayBillsTotal / monthlyIncome) * 100;
   }, [next30DayBillsTotal, monthlyIncome]);
 
-  const surplusRouting = useMemo(
-    () => calcSurplusRouting(cashFlow.surplus || 0, goals || [], debts || []),
-    [cashFlow.surplus, goals, debts]
-  );
-
   const safeToSpend = useMemo(
     () =>
       computeSafeToSpend({
@@ -261,7 +254,7 @@ export default function Dashboard() {
   }, [avalancheTarget]);
 
   // 2. Cash Gap
-  const { isOverdraftRisk, liquidBuffer, imminentTotal, nextPaydayStr } = useMemo(() => {
+  const { isOverdraftRisk, liquidBuffer } = useMemo(() => {
     const today = new Date();
     const activeIncomes = (incomes || []).filter(i => i?.status === 'active' && i?.nextDate && new Date(i.nextDate) >= today);
     const nextPayday = activeIncomes.sort((a, b) => new Date(a.nextDate).getTime() - new Date(b.nextDate).getTime())[0];
@@ -324,7 +317,7 @@ export default function Dashboard() {
 
   // 5. Total Tax Shield
   const lifetimeTaxShield = useMemo(() => {
-    return (freelanceEntries || []).reduce((sum: number, e: any) => sum + (e?.scouredWriteOffs || 0), 0);
+    return (freelanceEntries || []).reduce((sum, e) => sum + (e?.scouredWriteOffs || 0), 0);
   }, [freelanceEntries]);
 
   const hasOutstandingDebt = useMemo(
@@ -392,7 +385,7 @@ export default function Dashboard() {
       <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 pt-6">
       
       {/* 1. Dashboard Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-5">
           <div className="h-14 w-14 rounded-full bg-surface-raised border border-surface-border flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
             {user?.avatar ? (
@@ -413,7 +406,7 @@ export default function Dashboard() {
         <button
           type="button"
           onClick={toggleCalmMode}
-          className="rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-secondary hover:text-content-primary focus-app"
+          className="inline-flex items-center justify-center rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary hover:text-content-primary focus-app"
         >
           {calmMode ? 'Calm mode: on' : 'Calm mode: off'}
         </button>
@@ -500,7 +493,7 @@ export default function Dashboard() {
                   <button
                     type="button"
                     onClick={dismissLowTaxReserveAlert}
-                    className="w-full sm:w-auto px-5 py-3 sm:py-0 text-xs font-sans font-medium text-content-secondary hover:bg-white/[0.04] transition-colors focus-app"
+                    className="inline-flex min-h-10 w-full items-center justify-center px-4 py-2 text-sm font-medium text-content-secondary hover:bg-white/[0.04] transition-colors focus-app sm:w-auto"
                   >
                     Got it
                   </button>
@@ -512,8 +505,8 @@ export default function Dashboard() {
       )}
 
       {/* 3. Primary Metrics Panel — anchor for sidebar "Cash flow" */}
-      <section id="cash-flow" className="scroll-mt-24">
-      <div className="mt-8 mb-6 rounded-lg border border-surface-border bg-surface-raised p-6 shadow-none">
+      <section id="cash-flow" className="scroll-mt-24 space-y-6">
+      <div className="rounded-lg border border-surface-border bg-surface-raised p-6 shadow-none">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-2">
@@ -713,7 +706,7 @@ export default function Dashboard() {
       {/* 4. Active Intelligence Grid — only modules that have underlying data */}
       {!calmMode && smartAlertsVisibleCount > 0 && (
         <>
-          <h2 className="section-label pl-1 mt-12 mb-4">Smart Alerts & Active Monitoring</h2>
+          <h2 className="section-label pl-1 mb-4">Smart Alerts & Active Monitoring</h2>
           <div
             className={
               smartAlertsVisibleCount === 1
@@ -735,13 +728,13 @@ export default function Dashboard() {
                       Active
                     </span>
                   </div>
-                  <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Tax Deduction Finder</h3>
-                  <p className="text-xs font-sans text-content-tertiary leading-relaxed">
+                  <h3 className="text-sm font-semibold text-content-primary mb-2">Tax Deduction Finder</h3>
+                  <p className="text-xs text-content-secondary leading-relaxed">
                     Automatic extraction of valid deductions from freelancer platforms and records.
                   </p>
                 </div>
                 <div className="bg-surface-base border border-surface-border p-6 rounded-lg">
-                  <p className="text-[12px] font-mono text-content-tertiary uppercase tracking-[0.05em] mb-2">Lifetime Recovered</p>
+                  <p className="text-xs font-mono uppercase tracking-wider text-content-tertiary mb-2">Lifetime recovered</p>
                   <p className="text-4xl font-mono text-white font-bold tabular-nums">${lifetimeTaxShield.toLocaleString()}</p>
                 </div>
               </div>
@@ -774,8 +767,8 @@ export default function Dashboard() {
                       {burnVelocity.isHighVelocity ? 'High' : burnVelocity.isModerateVelocity ? 'Moderate' : 'On Track'}
                     </span>
                   </div>
-                  <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Recent Spending (72h)</h3>
-                  <p className="text-xs font-sans text-content-tertiary leading-relaxed">
+                  <h3 className="text-sm font-semibold text-content-primary mb-2">Recent spending (72h)</h3>
+                  <p className="text-xs text-content-secondary leading-relaxed">
                     Real-time monitoring of cash outflow velocity across all connected accounts.
                   </p>
                 </div>
@@ -801,15 +794,15 @@ export default function Dashboard() {
                       <Flame className="w-5 h-5" />
                     </div>
                   </div>
-                  <h3 className="text-sm font-sans font-bold text-white uppercase tracking-tight mb-2">Debt Avalanche Shield</h3>
-                  <p className="text-xs font-sans text-content-tertiary leading-relaxed">
+                  <h3 className="text-sm font-semibold text-content-primary mb-2">Debt Avalanche Shield</h3>
+                  <p className="text-xs text-content-secondary leading-relaxed">
                     Mathematical priority on highest interest accounts to minimize capital waste.
                   </p>
                 </div>
 
                 <div>
                   <div className="mb-4">
-                    <p className="text-[12px] font-mono text-brand-expense uppercase tracking-wider mb-2 truncate">
+                    <p className="text-xs font-mono text-brand-expense uppercase tracking-wider mb-2 truncate">
                       Prioritizing: {avalancheTarget.name}
                     </p>
                     <div className="flex justify-between items-baseline">
@@ -831,7 +824,7 @@ export default function Dashboard() {
       )}
 
       {/* 5. Lower Content Panels */}
-      <div className={`grid grid-cols-1 gap-6 mt-8 ${hasLowerSidebar ? 'lg:grid-cols-3' : ''}`}>
+      <div className={`grid grid-cols-1 gap-6 ${hasLowerSidebar ? 'lg:grid-cols-3' : ''}`}>
         {/* Timeline Chart */}
         <div className={hasLowerSidebar ? 'lg:col-span-2' : ''}>
           <div className="bg-surface-raised rounded-lg border border-surface-border p-6 shadow-none">
@@ -840,7 +833,7 @@ export default function Dashboard() {
                 <h3 className="text-sm font-sans font-semibold text-white tracking-tight">Cash Flow Trajectory</h3>
                 <p className="text-xs font-sans text-content-secondary mt-1">Projected balances across all accounts</p>
               </div>
-              <select className="text-xs font-sans bg-surface-base border border-surface-border text-content-secondary rounded-lg px-3 py-1.5 focus-app-field cursor-pointer">
+              <select className="h-10 rounded-lg border border-surface-border bg-surface-base px-3 text-sm font-medium text-content-secondary focus-app-field cursor-pointer">
                 <option>Next 30 Days</option>
                 <option>Next 90 Days</option>
               </select>
@@ -878,7 +871,7 @@ export default function Dashboard() {
               <div className="bg-surface-raised rounded-lg border border-surface-border shadow-none flex flex-col h-fit max-h-[350px]">
                 <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-transparent">
                   <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-content-secondary">Upcoming Bills</h3>
-                  <TransitionLink to="/bills" className="text-xs font-sans text-content-primary hover:text-white transition-colors font-medium">
+                  <TransitionLink to="/bills" className="inline-flex h-9 items-center rounded-lg px-3 text-sm font-medium text-content-primary hover:bg-white/[0.04] hover:text-white transition-colors focus-app">
                     See all
                   </TransitionLink>
                 </div>
@@ -946,7 +939,7 @@ export default function Dashboard() {
                             setSelectedCitation(citation);
                             setIsCitationModalOpen(true);
                           }}
-                          className={`w-full text-xs font-sans font-medium py-2 rounded-lg transition-colors focus-app ${
+                          className={`inline-flex min-h-10 w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-app ${
                             citation.daysLeft <= 7
                               ? 'bg-white text-black hover:bg-neutral-200'
                               : 'bg-transparent border border-surface-border hover:bg-white/[0.04] text-content-primary'
@@ -1005,7 +998,7 @@ export default function Dashboard() {
                       />
                       <button 
                         onClick={() => { navigator.clipboard.writeText(selectedCitation.citationNumber).then(() => toast.success('Copied to clipboard')).catch(() => toast.error('Failed to copy')); }} 
-                        className="bg-surface-border hover:bg-surface-elevated text-content-secondary px-3 border border-l-0 border-surface-border rounded-r transition-colors focus-app z-10"
+                        className="inline-flex min-h-10 items-center justify-center bg-surface-border hover:bg-surface-elevated text-content-secondary px-3 border border-l-0 border-surface-border rounded-r transition-colors focus-app z-10"
                         title="Copy"
                       >
                         <Copy className="w-4 h-4" />
@@ -1014,9 +1007,11 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Online Payment Portal</label>
-                    {sanitizeUrl(selectedCitation.paymentUrl) ? (
+                    {(() => {
+                      const safePaymentUrl = sanitizeUrl(selectedCitation.paymentUrl);
+                      return safePaymentUrl ? (
                       <a
-                        href={sanitizeUrl(selectedCitation.paymentUrl)!}
+                        href={safePaymentUrl}
                         target="_blank"
                         rel="noreferrer noopener"
                         className="flex items-center justify-center gap-2 w-full bg-white text-black hover:bg-neutral-200 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors focus-app"
@@ -1027,7 +1022,8 @@ export default function Dashboard() {
                       <span className="flex items-center justify-center gap-2 w-full bg-surface-elevated text-content-tertiary rounded px-4 py-2.5 text-sm font-medium cursor-not-allowed">
                         No Payment Link Available
                       </span>
-                    )}
+                    );
+                    })()}
                   </div>
                 </div>
               </div>

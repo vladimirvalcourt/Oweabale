@@ -4,6 +4,20 @@ import { useShallow } from 'zustand/react/shallow';
 import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, Hash, Tag, Download, TrendingUp, Ban } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
+
+function formatCategoryLabel(category: string): string {
+  return category
+    .replace(/[_-]+/g, ' ')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/\b\w/g, (ch) => ch.toUpperCase());
+}
+
+const BUTTON_BASE_CLASS =
+  'inline-flex min-h-10 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-app disabled:opacity-50 disabled:cursor-not-allowed';
+const BUTTON_SECONDARY_CLASS = `${BUTTON_BASE_CLASS} border border-surface-border bg-transparent text-content-secondary hover:bg-surface-elevated hover:text-content-primary`;
+const BUTTON_PRIMARY_CLASS = `${BUTTON_BASE_CLASS} bg-white text-black hover:bg-neutral-200`;
+
 export default function Transactions() {
   const { transactions, subscriptions, openQuickAdd, categorizationExclusions, addCategorizationExclusion, deleteCategorizationExclusion } = useStore(
     useShallow((s) => ({
@@ -97,7 +111,13 @@ export default function Transactions() {
             const rowsSource = filteredTransactions;
             requestAnimationFrame(() => {
               const headers = ['Date', 'Name', 'Category', 'Type', 'Amount'];
-              const rows = rowsSource.map((t) => [t.date, `"${t.name}"`, t.category, t.type, t.amount.toFixed(2)]);
+              const rows = rowsSource.map((t) => [
+                t.date,
+                `"${t.name}"`,
+                formatCategoryLabel(t.category),
+                t.type,
+                t.amount.toFixed(2),
+              ]);
               const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
               const blob = new Blob([csv], { type: 'text/csv' });
               const url = URL.createObjectURL(blob);
@@ -108,7 +128,7 @@ export default function Transactions() {
               URL.revokeObjectURL(url);
             });
           }}
-          className="flex items-center gap-2 px-4 py-2 border border-surface-border text-content-secondary text-sm font-medium hover:bg-surface-elevated rounded-lg transition-colors"
+          className={`${BUTTON_SECONDARY_CLASS} gap-2`}
         >
           <Download className="w-4 h-4" /> Export CSV
         </button>
@@ -140,7 +160,7 @@ export default function Transactions() {
                   setHistoryScope(historyScope === 'recent' ? 'all' : 'recent');
                   setPage(1);
                 }}
-                className="px-3 py-2 border border-surface-border rounded-lg text-[10px] font-mono uppercase tracking-widest text-content-tertiary hover:text-content-primary hover:bg-surface-elevated transition-colors"
+                className={BUTTON_SECONDARY_CLASS}
               >
                 {historyScope === 'recent' ? `Load full history (${transactions.length})` : `Use fast mode (${RECENT_HISTORY_LIMIT})`}
               </button>
@@ -148,10 +168,10 @@ export default function Transactions() {
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className={`px-4 py-2 border rounded-lg text-[10px] font-mono uppercase tracking-widest flex items-center gap-2 transition-all ${
+                className={`${BUTTON_BASE_CLASS} gap-2 border ${
                   showAdvancedFilters 
-                    ? 'bg-white border-white text-black' 
-                    : 'bg-transparent border-surface-border text-content-tertiary hover:text-white hover:bg-surface-elevated'
+                    ? 'bg-white border-white text-black'
+                    : 'bg-transparent border-surface-border text-content-secondary hover:text-content-primary hover:bg-surface-elevated'
                 }`}
               >
                 <Filter className="w-3.5 h-3.5" />
@@ -168,7 +188,7 @@ export default function Transactions() {
                 </label>
                 <select
                   value={filterType}
-                  onChange={(e) => setFilterType(e.target.value as any)}
+                  onChange={(e) => setFilterType(e.target.value as 'all' | 'income' | 'expense')}
                   className="block w-full px-3 py-2 border border-surface-border rounded-lg bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus-app-field transition-colors"
                 >
                   <option value="all">All Types</option>
@@ -188,7 +208,7 @@ export default function Transactions() {
                 >
                   <option value="all">All Categories</option>
                   {uniqueCategories.map(cat => (
-                    <option key={cat} value={cat}>{cat.toUpperCase()}</option>
+                    <option key={cat} value={cat}>{formatCategoryLabel(cat)}</option>
                   ))}
                 </select>
               </div>
@@ -263,7 +283,7 @@ export default function Transactions() {
                 <button
                   type="button"
                   onClick={() => openQuickAdd()}
-                  className="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-sans font-semibold text-black shadow-none transition-colors hover:bg-neutral-200 focus-app"
+                  className={`${BUTTON_PRIMARY_CLASS} mt-6 gap-2`}
                 >
                   Add your first transaction
                 </button>
@@ -278,7 +298,7 @@ export default function Transactions() {
                   setDateRange({start: '', end: ''});
                   setAmountRange({min: '', max: ''});
                 }}
-                className="mt-4 px-4 py-2 bg-transparent border border-surface-border rounded-md text-sm font-medium text-content-secondary hover:bg-surface-elevated transition-colors focus-app"
+                className={`${BUTTON_SECONDARY_CLASS} mt-4`}
               >
                 Clear Filters
               </button>
@@ -407,7 +427,7 @@ export default function Transactions() {
                               title={exclusionReason ?? undefined}
                               className="inline-flex items-center px-2 py-0.5 rounded-lg text-[9px] font-mono font-bold uppercase tracking-widest bg-surface-base border border-surface-border text-content-tertiary group-hover:text-content-secondary transition-colors"
                             >
-                              {transaction.category}
+                              {formatCategoryLabel(transaction.category)}
                             </span>
                             {exclusionReason && (
                               <span
@@ -442,14 +462,14 @@ export default function Transactions() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-content-tertiary hover:text-white hover:bg-surface-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className={BUTTON_SECONDARY_CLASS}
               >
                 Prev
               </button>
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-widest border border-surface-border text-content-tertiary hover:text-white hover:bg-surface-elevated disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className={BUTTON_SECONDARY_CLASS}
               >
                 Next
               </button>
