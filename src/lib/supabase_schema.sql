@@ -91,8 +91,14 @@ CREATE TABLE IF NOT EXISTS transactions (
 );
 
 ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own transactions" ON transactions;
 DROP POLICY IF EXISTS "Users can manage their own transactions" ON transactions;
-CREATE POLICY "Users can manage their own transactions" ON transactions FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Users manage own transactions"
+  ON transactions
+  FOR ALL
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
 
 -- 5. ASSETS
 CREATE TABLE IF NOT EXISTS assets (
