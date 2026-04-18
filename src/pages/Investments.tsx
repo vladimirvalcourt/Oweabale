@@ -29,13 +29,13 @@ const TYPE_LABELS: Record<InvestmentAccount['type'], string> = {
 };
 
 const TYPE_BADGE: Record<InvestmentAccount['type'], string> = {
-  '401k': 'bg-blue-500/10 text-blue-300 border-blue-500/20',
-  '403b': 'bg-blue-500/10 text-blue-300 border-blue-500/20',
-  ira: 'bg-purple-500/10 text-purple-300 border-purple-500/20',
-  roth_ira: 'bg-purple-500/10 text-purple-300 border-purple-500/20',
-  brokerage: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
-  hsa: 'bg-teal-500/10 text-teal-300 border-teal-500/20',
-  other: 'bg-surface-elevated text-content-tertiary border-surface-border',
+  '401k': 'border-surface-border bg-surface-base text-content-secondary',
+  '403b': 'border-surface-border bg-surface-base text-content-secondary',
+  ira: 'border-surface-border bg-surface-base text-content-secondary',
+  roth_ira: 'border-surface-border bg-surface-base text-content-secondary',
+  brokerage: 'border-content-primary/15 bg-content-primary/[0.06] text-content-primary',
+  hsa: 'border-surface-border bg-surface-base text-content-secondary',
+  other: 'border-surface-border bg-surface-elevated text-content-tertiary',
 };
 
 const EMPTY_FORM = {
@@ -80,38 +80,40 @@ function InvestmentsPageSkeleton() {
   );
   return (
     <div className="space-y-6" aria-busy="true" aria-label="Loading investments">
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div className="space-y-2 w-full max-w-md">
-          {bar('h-7 w-48')}
-          {bar('h-3 w-full')}
-        </div>
-        {bar('h-9 w-36 shrink-0 self-end sm:self-start')}
-      </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {bar('h-24 w-full')}
-        {bar('h-24 w-full')}
-        {bar('h-24 w-full')}
+        {bar('h-20 sm:h-24 w-full')}
+        {bar('h-20 sm:h-24 w-full')}
+        {bar('h-20 sm:h-24 w-full')}
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-3">
+          <div className="skeleton-shimmer h-3 w-32 rounded-md" />
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="rounded-lg border border-surface-border bg-surface-raised p-4 flex gap-4"
+              className="rounded-xl border border-surface-border bg-surface-raised p-4 sm:p-5 flex gap-4"
             >
               <div className="skeleton-shimmer rounded-lg w-10 h-10 shrink-0" />
               <div className="flex-1 space-y-2">
-                {bar('h-3 w-40')}
-                {bar('h-3 w-24')}
-                {bar('h-4 w-28')}
+                {bar('h-3 w-48')}
+                {bar('h-3 w-20')}
+                <div className="flex gap-2 pt-1">
+                  {bar('h-5 w-16')}
+                  {bar('h-4 w-24')}
+                </div>
+              </div>
+              <div className="hidden sm:block space-y-2 text-right shrink-0 w-24">
+                {bar('h-5 w-full')}
+                {bar('h-3 w-full')}
               </div>
             </div>
           ))}
         </div>
-        <div className="rounded-lg border border-surface-border bg-surface-raised p-5 space-y-3">
-          {bar('h-3 w-36')}
-          {bar('h-32 w-full')}
+        <div className="rounded-xl border border-surface-border bg-surface-raised p-5 space-y-4">
+          {bar('h-3 w-40')}
+          <div className="skeleton-shimmer mx-auto h-36 w-36 rounded-full" />
           {bar('h-3 w-full')}
+          {bar('h-3 max-w-[85%]')}
         </div>
       </div>
     </div>
@@ -128,66 +130,94 @@ function PortfolioVsDebtWidget({
   const total = portfolio + debt;
   const invPct = total > 0 ? (portfolio / total) * 100 : 50;
   const debtPct = total > 0 ? (debt / total) * 100 : 50;
+  const invDeg = total > 0 ? (portfolio / total) * 360 : 180;
 
   return (
-    <div className="rounded-lg border border-surface-border bg-surface-raised p-5">
-      <h3 className="text-xs font-medium uppercase tracking-wider text-content-tertiary mb-1">
-        Portfolio vs. debt
-      </h3>
-      <p className="text-sm text-content-secondary mb-4">
-        How your invested assets compare to what you owe — the same lens as your net worth timeline.
+    <div className="rounded-xl border border-surface-border bg-surface-raised p-5 sm:p-6">
+      <h3 className="metric-label mb-1 normal-case">Portfolio vs. debt</h3>
+      <p className="text-sm text-content-secondary mb-5 leading-relaxed">
+        Invested assets vs. liabilities — the same lens as net worth, without leaving Oweable.
       </p>
-      <div className="h-3 w-full rounded-full overflow-hidden flex bg-surface-elevated border border-surface-border">
-        {portfolio > 0 && (
+
+      <div className="flex flex-col items-center gap-5">
+        <div className="relative h-36 w-36 shrink-0" aria-hidden>
           <div
-            className="h-full bg-emerald-500/80 min-w-[4px] transition-all"
-            style={{ width: `${invPct}%` }}
-            title={`Investments $${formatMoney(portfolio)}`}
+            className="absolute inset-0 rounded-full"
+            style={{
+              background:
+                total <= 0
+                  ? 'conic-gradient(var(--color-surface-elevated) 0deg 360deg)'
+                  : `conic-gradient(var(--color-brand-profit) 0deg ${invDeg}deg, var(--color-brand-expense) ${invDeg}deg 360deg)`,
+            }}
           />
-        )}
-        {debt > 0 && (
-          <div
-            className="h-full bg-rose-500/75 min-w-[4px] transition-all"
-            style={{ width: `${debtPct}%` }}
-            title={`Debt $${formatMoney(debt)}`}
-          />
-        )}
+          <div className="absolute inset-[16%] flex flex-col items-center justify-center rounded-full border border-surface-border bg-surface-base text-center px-2">
+            <span className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary">Mix</span>
+            <span className="text-sm font-mono font-semibold tabular-nums text-content-primary">
+              {total > 0 ? `${Math.round(invPct)}%` : '—'}
+            </span>
+            <span className="text-[10px] text-content-tertiary">invested</span>
+          </div>
+        </div>
+
+        <div className="h-2 w-full max-w-xs rounded-full overflow-hidden flex bg-surface-elevated border border-surface-border">
+          {portfolio > 0 && (
+            <div
+              className="h-full bg-brand-profit min-w-[4px] transition-all"
+              style={{ width: `${invPct}%` }}
+              title={`Investments $${formatMoney(portfolio)}`}
+            />
+          )}
+          {debt > 0 && (
+            <div
+              className="h-full bg-brand-expense min-w-[4px] transition-all"
+              style={{ width: `${debtPct}%` }}
+              title={`Debt $${formatMoney(debt)}`}
+            />
+          )}
+        </div>
       </div>
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs">
-        <span className="inline-flex items-center gap-1.5 text-content-secondary">
-          <span className="h-2 w-2 rounded-full bg-emerald-500/90" aria-hidden />
-          Investments <span className="font-mono tabular-nums text-content-primary">${formatMoney(portfolio)}</span>
+
+      <div className="mt-5 flex flex-col gap-2 text-xs">
+        <span className="inline-flex items-center justify-between gap-2 text-content-secondary">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-brand-profit" aria-hidden />
+            Investments
+          </span>
+          <span className="font-mono tabular-nums text-content-primary">${formatMoney(portfolio)}</span>
         </span>
-        <span className="inline-flex items-center gap-1.5 text-content-secondary">
-          <span className="h-2 w-2 rounded-full bg-rose-500/90" aria-hidden />
-          Debt <span className="font-mono tabular-nums text-content-primary">${formatMoney(debt)}</span>
+        <span className="inline-flex items-center justify-between gap-2 text-content-secondary">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-brand-expense" aria-hidden />
+            Debt
+          </span>
+          <span className="font-mono tabular-nums text-content-primary">${formatMoney(debt)}</span>
         </span>
       </div>
       {total === 0 && (
-        <p className="text-xs text-content-tertiary mt-2">Add accounts and debts to see this comparison.</p>
+        <p className="text-xs text-content-tertiary mt-4">Add investment accounts and debts to see this comparison.</p>
       )}
     </div>
   );
 }
 
 function AccountTypeIconCluster() {
-  const tile = (Icon: typeof Landmark, label: string, className: string) => (
+  const tile = (Icon: typeof Landmark, label: string) => (
     <div
       className={cn(
-        'flex flex-col items-center justify-center gap-1.5 rounded-lg border px-3 py-3 min-w-[4.5rem]',
-        className
+        'flex flex-col items-center justify-center gap-1.5 rounded-xl border border-surface-border bg-surface-base px-3 py-3 min-w-[4.75rem]',
+        'shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'
       )}
     >
-      <Icon className="w-5 h-5 opacity-90" aria-hidden />
-      <span className="text-[10px] font-semibold uppercase tracking-wide text-content-secondary">{label}</span>
+      <Icon className="w-5 h-5 text-content-secondary" aria-hidden />
+      <span className="text-[10px] font-mono font-medium uppercase tracking-[0.12em] text-content-tertiary">{label}</span>
     </div>
   );
   return (
     <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3" aria-hidden>
-      {tile(Landmark, '401(k)', 'border-blue-500/25 bg-blue-500/5')}
-      {tile(PiggyBank, 'IRA', 'border-purple-500/25 bg-purple-500/5')}
-      {tile(LineChart, 'Brokerage', 'border-emerald-500/25 bg-emerald-500/5')}
-      {tile(HeartPulse, 'HSA', 'border-teal-500/25 bg-teal-500/5')}
+      {tile(Landmark, '401(k)')}
+      {tile(PiggyBank, 'IRA')}
+      {tile(LineChart, 'Brokerage')}
+      {tile(HeartPulse, 'HSA')}
     </div>
   );
 }
@@ -313,62 +343,62 @@ export default function Investments() {
   return (
     <AppPageShell>
       <div className="space-y-6 w-full pb-4">
+        {/* Stable header — avoids layout jump; CTA only when user has accounts (single empty-state CTA otherwise). */}
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div>
+            <p className="section-label mb-2">Investments</p>
+            <h1 className="text-2xl font-semibold tracking-tight text-content-primary sm:text-3xl">Investment accounts</h1>
+            <p className="mt-2 text-sm text-content-secondary max-w-xl leading-relaxed">
+              See how your investments stack up against your debt and net worth — all in one place.
+            </p>
+          </div>
+          {hasAccounts && !showSkeleton && (
+            <button
+              type="button"
+              onClick={openAdd}
+              className="inline-flex items-center gap-2 rounded-lg bg-content-primary px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app shrink-0 self-end sm:self-start btn-tactile"
+            >
+              <Plus className="w-4 h-4 shrink-0" aria-hidden />
+              + Add Account
+            </button>
+          )}
+        </div>
+
         {showSkeleton ? (
           <InvestmentsPageSkeleton />
         ) : (
           <>
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-              <div>
-                <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">
-                  Investment accounts
-                </h1>
-                <p className="mt-1 text-sm font-medium text-content-secondary max-w-xl">
-                  See how your investments stack up against your debt and net worth — all in one place.
-                </p>
-              </div>
-              {hasAccounts && (
-                <button
-                  type="button"
-                  onClick={openAdd}
-                  className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app shrink-0 self-end sm:self-start"
-                >
-                  <Plus className="w-4 h-4 shrink-0" aria-hidden />
-                  Add Account
-                </button>
-              )}
-            </div>
-
             {isEmpty && (
-              <div className="rounded-lg border border-dashed border-surface-border bg-surface-raised p-8 sm:p-12 text-center">
+              <div className="rounded-xl border border-dashed border-surface-border bg-surface-raised p-8 sm:p-12 text-center shadow-none">
                 <AccountTypeIconCluster />
-                <h3 className="mt-8 text-lg font-medium tracking-tight text-content-primary">
+                <h2 className="mt-8 text-xl font-semibold tracking-tight text-content-primary sm:text-2xl">
                   See your full financial picture
-                </h3>
-                <p className="mx-auto mt-2 max-w-lg text-sm font-medium text-content-secondary leading-relaxed">
+                </h2>
+                <p className="mx-auto mt-3 max-w-lg text-sm text-content-secondary leading-relaxed">
                   Connect your 401(k), IRA, brokerage, or HSA to track your total net worth in real time — including how
                   your investments are moving against your debt payoff progress.
                 </p>
                 <button
                   type="button"
                   onClick={openAdd}
-                  className="mt-8 inline-flex items-center gap-2 rounded-lg bg-brand-cta px-8 py-3 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
+                  className="mt-8 inline-flex items-center gap-2 rounded-lg bg-content-primary px-8 py-3 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app btn-tactile"
                 >
                   <Plus className="w-4 h-4 shrink-0" aria-hidden />
                   Add Investment Account
                 </button>
-                <p className="mt-4 text-xs text-content-tertiary max-w-md mx-auto">
-                  Enter balances manually — we&apos;ll track changes over time
+                <p className="mt-5 text-xs text-content-tertiary max-w-md mx-auto leading-relaxed">
+                  Enter balances manually — we&apos;ll track changes over time and show them next to debt in{' '}
+                  <span className="text-content-secondary">Portfolio vs. debt</span>. Not synced via Plaid; Settings
+                  linking is for bank cash flow, not holdings.
                 </p>
               </div>
             )}
 
             {hasAccounts && (
               <>
-                {/* Summary row */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="rounded-lg border border-surface-border bg-surface-raised p-4 sm:p-5">
-                    <p className="text-xs font-medium text-content-tertiary uppercase tracking-wider">Total portfolio value</p>
+                  <div className="rounded-xl border border-surface-border bg-surface-raised p-4 sm:p-5">
+                    <p className="metric-label normal-case">Total portfolio value</p>
                     <p className="mt-2 text-2xl sm:text-3xl font-bold font-mono tabular-nums text-content-primary">
                       ${formatMoney(totalPortfolio)}
                     </p>
@@ -376,34 +406,34 @@ export default function Investments() {
                       {investmentAccounts.length} account{investmentAccounts.length !== 1 ? 's' : ''}
                     </p>
                   </div>
-                  <div className="rounded-lg border border-surface-border bg-surface-raised p-4 sm:p-5">
-                    <p className="text-xs font-medium text-content-tertiary uppercase tracking-wider">Today&apos;s change</p>
+                  <div className="rounded-xl border border-surface-border bg-surface-raised p-4 sm:p-5">
+                    <p className="metric-label normal-case">Today&apos;s change ($)</p>
                     <p
                       className={cn(
                         'mt-2 text-2xl sm:text-3xl font-bold font-mono tabular-nums',
                         todayPortfolioDelta > 0
-                          ? 'text-emerald-400'
+                          ? 'text-brand-profit'
                           : todayPortfolioDelta < 0
-                            ? 'text-rose-400'
+                            ? 'text-brand-expense'
                             : 'text-content-primary'
                       )}
                     >
                       {formatSignedMoney(todayPortfolioDelta)}
                     </p>
-                    <p className="text-xs text-content-tertiary mt-1">Since first visit today (manual balances)</p>
+                    <p className="text-xs text-content-tertiary mt-1">Since first load today · manual balances</p>
                   </div>
-                  <div className="rounded-lg border border-surface-border bg-surface-raised p-4 sm:p-5">
-                    <p className="text-xs font-medium text-content-tertiary uppercase tracking-wider">Total return</p>
+                  <div className="rounded-xl border border-surface-border bg-surface-raised p-4 sm:p-5">
+                    <p className="metric-label normal-case">Total return (%)</p>
                     <p className="mt-2 text-2xl sm:text-3xl font-bold font-mono tabular-nums text-content-tertiary">
                       —
                     </p>
-                    <p className="text-xs text-content-tertiary mt-1">Cost basis tracking coming soon</p>
+                    <p className="text-xs text-content-tertiary mt-1">Needs cost basis — coming later</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="lg:col-span-2 space-y-3">
-                    <h2 className="text-xs font-medium uppercase tracking-wider text-content-tertiary">Your accounts</h2>
+                    <h2 className="section-label">Your accounts</h2>
                     <ul className="space-y-3">
                       {investmentAccounts.map((account) => {
                         const delta = accountDeltas[account.id];
@@ -411,7 +441,7 @@ export default function Investments() {
                         return (
                           <li
                             key={account.id}
-                            className="rounded-lg border border-surface-border bg-surface-raised p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                            className="rounded-xl border border-surface-border bg-surface-raised p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                           >
                             <div className="flex items-start gap-4 min-w-0">
                               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-surface-border bg-surface-base">
@@ -452,9 +482,9 @@ export default function Investments() {
                                     deltaUnknown
                                       ? 'text-content-tertiary'
                                       : delta > 0
-                                        ? 'text-emerald-400'
+                                        ? 'text-brand-profit'
                                         : delta < 0
-                                          ? 'text-rose-400'
+                                          ? 'text-brand-expense'
                                           : 'text-content-tertiary'
                                   )}
                                 >
@@ -500,10 +530,10 @@ export default function Investments() {
       <Dialog open={modalOpen} onClose={closeModal} className="relative z-50">
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="w-full max-w-lg rounded-lg border border-surface-border bg-surface-raised shadow-xl">
+          <Dialog.Panel className="w-full max-w-lg rounded-xl border border-surface-border bg-surface-raised shadow-xl">
             <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border">
               <Dialog.Title className="text-base font-semibold text-content-primary">
-                {editingId ? 'Edit Account' : 'Add Investment Account'}
+                {editingId ? 'Edit account' : 'Add investment account'}
               </Dialog.Title>
               <button
                 type="button"
@@ -515,6 +545,10 @@ export default function Investments() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              <p className="text-xs text-content-tertiary leading-relaxed -mt-1">
+                Enter your current balance and update it anytime. Values stay in Oweable only — not pulled from your
+                broker or Plaid.
+              </p>
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-medium text-content-secondary mb-1.5">
