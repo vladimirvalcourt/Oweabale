@@ -10,6 +10,7 @@ import {
   type OweAiMode,
 } from '../lib/oweAi';
 import { cn } from '../lib/utils';
+import { supabase } from '../lib/supabase';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 import { FullSuiteGateCard } from '../components/FullSuiteGate';
 import { AppLoader } from '../components/PageSkeleton';
@@ -58,6 +59,7 @@ export default function OweAi() {
   const [levelHint, setLevelHint] = useState<OweAiFamiliarity | null>(null);
   const [learningProfile, setLearningProfile] = useState<OweAiLearningProfile | null>(null);
   const [nextLessonPrompt, setNextLessonPrompt] = useState<string>('');
+  const [historyLoading, setHistoryLoading] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
   /** Must match `messages` — used so invoke runs with the real thread (setState updaters are not synchronous). */
   const messagesRef = useRef<OweAiChatMessage[]>([]);
@@ -67,6 +69,35 @@ export default function OweAi() {
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+
+  // Load persisted chat history on mount and when mode changes
+  useEffect(() => {
+    let cancelled = false;
+    setHistoryLoading(true);
+    void (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user || cancelled) { setHistoryLoading(false); return; }
+      const { data } = await supabase
+        .from('chat_messages')
+        .select('role,content')
+        .eq('user_id', user.id)
+        .eq('mode', mode)
+        .order('created_at', { ascending: true })
+        .limit(40);
+      if (cancelled) return;
+      if (data && data.length > 0) {
+        const loaded: OweAiChatMessage[] = data.map(r => ({
+          role: r.role as 'user' | 'assistant',
+          content: r.content as string,
+        }));
+        startTransition(() => setMessages(loaded));
+      } else {
+        startTransition(() => setMessages([]));
+      }
+      setHistoryLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [mode]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -146,9 +177,15 @@ export default function OweAi() {
   );
 
   const clearChat = useCallback(() => {
-    setMessages([]);
+    startTransition(() => setMessages([]));
     setNextLessonPrompt('');
-  }, []);
+    // Delete persisted history for this mode
+    void (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      await supabase.from('chat_messages').delete().eq('user_id', user.id).eq('mode', mode);
+    })();
+  }, [mode]);
 
   const sendQuickPrompt = useCallback(
     (prompt: string) => {

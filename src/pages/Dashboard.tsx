@@ -12,7 +12,7 @@ import { motion } from 'motion/react';
 import { animate } from 'motion/react';
 import { useStore } from '../store/useStore';
 import { sanitizeUrl } from '../lib/security';
-import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting, computeSafeToSpend } from '../lib/finance';
+import { projectNetWorth, calcMonthlyCashFlow, calcSurplusRouting, computeSafeToSpend, forecast30DayCashFlow, detectSpendingAnomalies } from '../lib/finance';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { AppPageShell } from '../components/AppPageShell';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
@@ -279,6 +279,24 @@ export default function Dashboard() {
     [citations],
   );
 
+  const cashFlowForecast = useMemo(() => {
+    const liquidCash = assets.filter(a => a.type === 'Cash').reduce((s, a) => s + a.value, 0);
+    const cashFlow = calcMonthlyCashFlow(incomes, bills, debts, subscriptions);
+    return forecast30DayCashFlow({
+      liquidCash,
+      bills: bills.map(b => ({ dueDate: b.dueDate, amount: b.amount, status: b.status })),
+      subscriptions: subscriptions.map(s => ({ nextBillingDate: s.nextBillingDate, amount: s.amount, status: s.status })),
+      debts: debts.map(d => ({ minPayment: d.minPayment, remaining: d.remaining, paymentDueDate: d.paymentDueDate })),
+      citations: citations.map(c => ({ status: c.status, daysLeft: c.daysLeft, amount: c.amount })),
+      dailySurplus: cashFlow.surplus / 30,
+    });
+  }, [assets, bills, subscriptions, debts, citations, incomes]);
+
+  const spendingAnomalies = useMemo(() =>
+    detectSpendingAnomalies(transactions),
+    [transactions]
+  );
+
   const hasBillsSidebar = upcomingBills.length > 0;
   const hasCitationsSidebar = openCitations.length > 0;
   const hasLowerSidebar = hasBillsSidebar || hasCitationsSidebar;
@@ -483,6 +501,54 @@ export default function Dashboard() {
           .
         </p>
       </div>
+
+      {/* Spending Anomaly Callout */}
+      {spendingAnomalies.length > 0 && (
+        <div className="rounded-sm border border-amber-500/20 bg-amber-500/5 px-4 py-3">
+          <p className="text-xs font-semibold text-amber-400 mb-1.5">Spending Anomalies Detected</p>
+          <div className="flex flex-wrap gap-x-5 gap-y-1">
+            {spendingAnomalies.slice(0, 3).map(a => (
+              <span key={a.category} className="text-xs text-content-secondary">
+                <span className="font-medium text-amber-300">{a.category}</span>
+                {' '}is {a.overagePercent.toFixed(0)}% above your usual ${a.threeMonthAvg.toFixed(0)}/mo
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 30-Day Cash Flow Forecast */}
+      {cashFlowForecast.length > 0 && (
+        <div className="rounded-sm border border-surface-border bg-surface-elevated p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-content-primary">30-Day Cash Flow Forecast</h3>
+            {(() => {
+              const lowest = cashFlowForecast.reduce((min, d) => d.balance < min.balance ? d : min, cashFlowForecast[0]);
+              return lowest.balance < 0 ? (
+                <span className="text-xs text-amber-400 font-medium">⚠ Balance may dip on {lowest.label}</span>
+              ) : null;
+            })()}
+          </div>
+          <SafeResponsiveContainer width="100%" height={100}>
+            <AreaChart data={cashFlowForecast} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
+              <defs>
+                <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <XAxis dataKey="label" tick={{ fontSize: 9, fill: '#6b7280' }} tickLine={false} axisLine={false} interval={6} />
+              <YAxis hide />
+              <Tooltip
+                {...rechartsTooltipStableProps}
+                formatter={(value: number) => [`$${value.toLocaleString()}`, 'Balance']}
+                contentStyle={{ background: 'var(--surface-elevated)', border: '1px solid var(--surface-border)', borderRadius: '4px', fontSize: '11px' }}
+              />
+              <Area type="monotone" dataKey="balance" stroke="#6366f1" fill="url(#forecastGrad)" strokeWidth={1.5} dot={false} />
+            </AreaChart>
+          </SafeResponsiveContainer>
+        </div>
+      )}
 
       <h2 className="section-label pl-1 mb-3">Core Financials</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

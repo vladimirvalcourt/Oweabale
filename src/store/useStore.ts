@@ -221,6 +221,29 @@ export interface Notification {
   read: boolean;
 }
 
+export interface InvestmentAccount {
+  id: string;
+  name: string;
+  type: 'brokerage' | 'ira' | 'roth_ira' | '401k' | '403b' | 'hsa' | 'other';
+  institution: string;
+  balance: number;
+  notes: string;
+  lastUpdated: string;
+}
+
+export interface InsurancePolicy {
+  id: string;
+  type: 'health' | 'life' | 'auto' | 'renters' | 'homeowners' | 'disability' | 'umbrella' | 'dental' | 'vision' | 'other';
+  provider: string;
+  premium: number;
+  frequency: string;
+  coverageAmount?: number;
+  deductible?: number;
+  expirationDate?: string;
+  status: 'active' | 'expired' | 'cancelled';
+  notes: string;
+}
+
 interface AppState {
   bills: Bill[];
   debts: Debt[];
@@ -261,6 +284,14 @@ interface AppState {
     factors: CreditFactor[];
     fixes: CreditFix[];
   };
+  investmentAccounts: InvestmentAccount[];
+  insurancePolicies: InsurancePolicy[];
+  addInvestmentAccount: (account: Omit<InvestmentAccount, 'id' | 'lastUpdated'>) => Promise<boolean>;
+  editInvestmentAccount: (id: string, updates: Partial<InvestmentAccount>) => Promise<boolean>;
+  deleteInvestmentAccount: (id: string) => Promise<boolean>;
+  addInsurancePolicy: (policy: Omit<InsurancePolicy, 'id'>) => Promise<boolean>;
+  editInsurancePolicy: (id: string, updates: Partial<InsurancePolicy>) => Promise<boolean>;
+  deleteInsurancePolicy: (id: string) => Promise<boolean>;
   setTaxSettings: (state: string, rate: number) => void;
   bankConnected: boolean;
   /** Display name from last Plaid Link completion (profile). */
@@ -388,6 +419,8 @@ const initialData = {
     factors: [],
     fixes: [],
   },
+  investmentAccounts: [],
+  insurancePolicies: [],
 };
 
 export const useStore = create<AppState>()(
@@ -1270,7 +1303,8 @@ export const useStore = create<AppState>()(
       const tables = [
         'bills', 'debts', 'transactions', 'assets', 'subscriptions',
         'goals', 'incomes', 'budgets', 'categories', 'citations',
-        'deductions', 'freelance_entries', 'pending_ingestions', 'credit_fixes'
+        'deductions', 'freelance_entries', 'pending_ingestions', 'credit_fixes',
+        'investment_accounts', 'insurance_policies'
       ];
 
       await Promise.all(tables.map(table =>
@@ -1420,6 +1454,147 @@ export const useStore = create<AppState>()(
       await supabase.from('credit_fixes').delete().eq('id', id).eq('user_id', userId);
     }
     set(state => ({ credit: { ...state.credit, fixes: state.credit.fixes.filter(f => f.id !== id) } }));
+  },
+
+  // ── Investment Accounts ───────────────────────────────────────
+  addInvestmentAccount: async (account) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) { toast.error('You must be signed in.'); return false; }
+      let newId = crypto.randomUUID();
+      const now = new Date().toISOString();
+      const { data, error } = await supabase
+        .from('investment_accounts')
+        .insert({
+          user_id: userId,
+          name: account.name,
+          type: account.type,
+          institution: account.institution,
+          balance: account.balance,
+          notes: account.notes,
+          last_updated: now,
+        })
+        .select('id')
+        .single();
+      if (error) { toast.error('Failed to save investment account.'); return false; }
+      if (data?.id) newId = data.id;
+      set(state => ({ investmentAccounts: [...state.investmentAccounts, { ...account, id: newId, lastUpdated: now }] }));
+      return true;
+    } catch (err) {
+      console.error('[addInvestmentAccount]', err);
+      toast.error('Failed to save investment account.');
+      return false;
+    }
+  },
+  editInvestmentAccount: async (id, updates) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) return false;
+      const dbUpdate: Record<string, unknown> = {};
+      if (updates.name !== undefined) dbUpdate.name = updates.name;
+      if (updates.type !== undefined) dbUpdate.type = updates.type;
+      if (updates.institution !== undefined) dbUpdate.institution = updates.institution;
+      if (updates.balance !== undefined) dbUpdate.balance = updates.balance;
+      if (updates.notes !== undefined) dbUpdate.notes = updates.notes;
+      dbUpdate.last_updated = new Date().toISOString();
+      const { error } = await supabase.from('investment_accounts').update(dbUpdate).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to update investment account.'); return false; }
+      set(state => ({ investmentAccounts: state.investmentAccounts.map(a => a.id === id ? { ...a, ...updates, lastUpdated: dbUpdate.last_updated as string } : a) }));
+      return true;
+    } catch (err) {
+      console.error('[editInvestmentAccount]', err);
+      return false;
+    }
+  },
+  deleteInvestmentAccount: async (id) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (userId) {
+        const { error } = await supabase.from('investment_accounts').delete().eq('id', id).eq('user_id', userId);
+        if (error) { toast.error('Failed to delete investment account.'); return false; }
+      }
+      set(state => ({ investmentAccounts: state.investmentAccounts.filter(a => a.id !== id) }));
+      return true;
+    } catch (err) {
+      console.error('[deleteInvestmentAccount]', err);
+      return false;
+    }
+  },
+
+  // ── Insurance Policies ────────────────────────────────────────
+  addInsurancePolicy: async (policy) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) { toast.error('You must be signed in.'); return false; }
+      let newId = crypto.randomUUID();
+      const { data, error } = await supabase
+        .from('insurance_policies')
+        .insert({
+          user_id: userId,
+          type: policy.type,
+          provider: policy.provider,
+          premium: policy.premium,
+          frequency: policy.frequency,
+          coverage_amount: policy.coverageAmount ?? null,
+          deductible: policy.deductible ?? null,
+          expiration_date: policy.expirationDate ?? null,
+          status: policy.status,
+          notes: policy.notes,
+        })
+        .select('id')
+        .single();
+      if (error) { toast.error('Failed to save insurance policy.'); return false; }
+      if (data?.id) newId = data.id;
+      set(state => ({ insurancePolicies: [...state.insurancePolicies, { ...policy, id: newId }] }));
+      return true;
+    } catch (err) {
+      console.error('[addInsurancePolicy]', err);
+      toast.error('Failed to save insurance policy.');
+      return false;
+    }
+  },
+  editInsurancePolicy: async (id, updates) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (!userId) return false;
+      const dbUpdate: Record<string, unknown> = {};
+      if (updates.type !== undefined) dbUpdate.type = updates.type;
+      if (updates.provider !== undefined) dbUpdate.provider = updates.provider;
+      if (updates.premium !== undefined) dbUpdate.premium = updates.premium;
+      if (updates.frequency !== undefined) dbUpdate.frequency = updates.frequency;
+      if (updates.coverageAmount !== undefined) dbUpdate.coverage_amount = updates.coverageAmount;
+      if (updates.deductible !== undefined) dbUpdate.deductible = updates.deductible;
+      if (updates.expirationDate !== undefined) dbUpdate.expiration_date = updates.expirationDate;
+      if (updates.status !== undefined) dbUpdate.status = updates.status;
+      if (updates.notes !== undefined) dbUpdate.notes = updates.notes;
+      const { error } = await supabase.from('insurance_policies').update(dbUpdate).eq('id', id).eq('user_id', userId);
+      if (error) { toast.error('Failed to update insurance policy.'); return false; }
+      set(state => ({ insurancePolicies: state.insurancePolicies.map(p => p.id === id ? { ...p, ...updates } : p) }));
+      return true;
+    } catch (err) {
+      console.error('[editInsurancePolicy]', err);
+      return false;
+    }
+  },
+  deleteInsurancePolicy: async (id) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id;
+      if (userId) {
+        const { error } = await supabase.from('insurance_policies').delete().eq('id', id).eq('user_id', userId);
+        if (error) { toast.error('Failed to delete insurance policy.'); return false; }
+      }
+      set(state => ({ insurancePolicies: state.insurancePolicies.filter(p => p.id !== id) }));
+      return true;
+    } catch (err) {
+      console.error('[deleteInsurancePolicy]', err);
+      return false;
+    }
   },
 
   applyRulesToExistingTransactions: async () => {
@@ -1718,6 +1893,8 @@ export const useStore = create<AppState>()(
       supabase.from('platform_settings').select('*').maybeSingle(),
       supabase.from('net_worth_snapshots').select('*').eq('user_id', resolvedUserId).order('date', { ascending: true }).limit(90),
       supabase.from('credit_factors').select('*').eq('user_id', resolvedUserId),
+      supabase.from('investment_accounts').select('id,name,type,institution,balance,notes,last_updated').eq('user_id', resolvedUserId),
+      supabase.from('insurance_policies').select('id,type,provider,premium,frequency,coverage_amount,deductible,expiration_date,status,notes').eq('user_id', resolvedUserId),
     ]);
 
     try {
@@ -1871,6 +2048,8 @@ export const useStore = create<AppState>()(
           { data: platformSettings },
           { data: netWorthSnapshots },
           { data: creditFactors },
+          { data: investmentAccountsData },
+          { data: insurancePoliciesData },
         ] = await phase2Promise;
 
         set({
@@ -1984,6 +2163,27 @@ export const useStore = create<AppState>()(
             netWorth: s.net_worth as number,
             assets: s.assets as number,
             debts: s.debts as number,
+          })),
+          investmentAccounts: (investmentAccountsData ?? []).map((a: Record<string, unknown>) => ({
+            id: a.id as string,
+            name: a.name as string,
+            type: a.type as InvestmentAccount['type'],
+            institution: (a.institution as string) ?? '',
+            balance: Number(a.balance) || 0,
+            notes: (a.notes as string) ?? '',
+            lastUpdated: (a.last_updated as string) ?? '',
+          })),
+          insurancePolicies: (insurancePoliciesData ?? []).map((p: Record<string, unknown>) => ({
+            id: p.id as string,
+            type: p.type as InsurancePolicy['type'],
+            provider: p.provider as string,
+            premium: Number(p.premium) || 0,
+            frequency: (p.frequency as string) ?? 'Monthly',
+            coverageAmount: p.coverage_amount != null ? Number(p.coverage_amount) : undefined,
+            deductible: p.deductible != null ? Number(p.deductible) : undefined,
+            expirationDate: (p.expiration_date as string) ?? undefined,
+            status: (p.status as InsurancePolicy['status']) ?? 'active',
+            notes: (p.notes as string) ?? '',
           })),
         });
 

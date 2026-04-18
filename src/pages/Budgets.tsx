@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Plus, MoreHorizontal, X, PieChart, Edit2, Trash2, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useStore, Budget } from '../store/useStore';
+import { detectSpendingAnomalies } from '../lib/finance';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
@@ -18,6 +19,15 @@ export default function Budgets() {
   });
 
   const expenseCategories = categories.filter(c => c.type === 'expense').map(c => c.name);
+
+  const spendingAnomalies = useMemo(() =>
+    detectSpendingAnomalies(transactions),
+    [transactions]
+  );
+  const anomalyMap = useMemo(() =>
+    Object.fromEntries(spendingAnomalies.map(a => [a.category, a])),
+    [spendingAnomalies]
+  );
 
   // Calculate spending per category — scoped to the correct period
   const currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
@@ -148,7 +158,14 @@ export default function Budgets() {
                 >
                   <div className="flex justify-between items-start mb-6">
                     <div>
-                      <h3 className="text-sm font-semibold text-content-primary">{budget.category}</h3>
+                      <h3 className="text-sm font-semibold text-content-primary flex items-center gap-1.5">
+                        {budget.category}
+                        {anomalyMap[budget.category] && (
+                          <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400">
+                            ↑{anomalyMap[budget.category].overagePercent.toFixed(0)}%
+                          </span>
+                        )}
+                      </h3>
                       <p className="metric-label mt-1.5 normal-case">{budget.period} limit</p>
                     </div>
                     

@@ -26,6 +26,8 @@ const Transactions   = lazy(() => import('./pages/Transactions'));
 const Freelance      = lazy(() => import('./pages/Freelance'));
 const Goals          = lazy(() => import('./pages/Goals'));
 const Income         = lazy(() => import('./pages/Income'));
+const Investments    = lazy(() => import('./pages/Investments'));
+const Insurance      = lazy(() => import('./pages/Insurance'));
 const Budgets        = lazy(() => import('./pages/Budgets'));
 const NetWorth       = lazy(() => import('./pages/NetWorth'));
 const Calendar       = lazy(() => import('./pages/Calendar'));
@@ -267,6 +269,26 @@ function AppRoutes() {
               <ErrorBoundary>
                 <FullSuiteRouteGuard featureName="Analytics">
                   <Analytics />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="investments"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Investments">
+                  <Investments />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="insurance"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Insurance">
+                  <Insurance />
                 </FullSuiteRouteGuard>
               </ErrorBoundary>
             }

@@ -575,3 +575,218 @@ export function projectNetWorth(
 
   return rows;
 }
+
+// ---------------------------------------------------------------------------
+// forecast30DayCashFlow
+// ---------------------------------------------------------------------------
+
+export interface CashFlowForecastDay {
+  date: string;       // ISO date "2026-04-19"
+  balance: number;    // projected end-of-day balance
+  outflows: number;   // outflows due on this specific day
+  label: string;      // "Apr 19"
+}
+
+export function forecast30DayCashFlow(args: {
+  liquidCash: number;
+  bills: Array<{ dueDate: string; amount: number; status?: string }>;
+  subscriptions: Array<{ nextBillingDate: string; amount: number; status: string }>;
+  debts: Array<{ minPayment: number; remaining: number; paymentDueDate?: string | null }>;
+  citations: Array<{ status: string; daysLeft: number; amount: number }>;
+  dailySurplus: number;
+  now?: Date;
+}): CashFlowForecastDay[] {
+  const now = args.now ?? new Date();
+  const days: CashFlowForecastDay[] = [];
+  let balance = args.liquidCash;
+
+  // Build a map of outflows by ISO date string
+  const outflowByDate: Record<string, number> = {};
+
+  const addOutflow = (isoDate: string | null | undefined, amount: number) => {
+    if (!isoDate) return;
+    const raw = isoDate.includes('T') ? isoDate : `${isoDate}T12:00:00`;
+    const d = new Date(raw);
+    if (Number.isNaN(d.getTime())) return;
+    const key = d.toISOString().slice(0, 10);
+    outflowByDate[key] = (outflowByDate[key] ?? 0) + amount;
+  };
+
+  for (const b of args.bills) {
+    if (b.status === 'paid') continue;
+    addOutflow(b.dueDate, b.amount);
+  }
+  for (const s of args.subscriptions) {
+    if (s.status !== 'active') continue;
+    addOutflow(s.nextBillingDate, s.amount);
+  }
+  for (const d of args.debts) {
+    if ((d.remaining ?? 0) <= 0) continue;
+    addOutflow(d.paymentDueDate ?? null, d.minPayment);
+  }
+  for (const c of args.citations) {
+    if (c.status !== 'open') continue;
+    const dueDate = new Date(now.getTime() + c.daysLeft * 86400000);
+    const key = dueDate.toISOString().slice(0, 10);
+    outflowByDate[key] = (outflowByDate[key] ?? 0) + c.amount;
+  }
+
+  for (let i = 0; i < 30; i++) {
+    const day = new Date(now);
+    day.setDate(day.getDate() + i);
+    const key = day.toISOString().slice(0, 10);
+    const outflows = outflowByDate[key] ?? 0;
+    balance = balance - outflows + args.dailySurplus;
+    days.push({
+      date: key,
+      balance: parseFloat(balance.toFixed(2)),
+      outflows: parseFloat(outflows.toFixed(2)),
+      label: day.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+    });
+  }
+
+  return days;
+}
+
+// ---------------------------------------------------------------------------
+// detectSpendingAnomalies
+// ---------------------------------------------------------------------------
+
+export interface SpendingAnomaly {
+  category: string;
+  currentMonth: number;
+  threeMonthAvg: number;
+  overagePercent: number;
+  overageAmount: number;
+}
+
+export function detectSpendingAnomalies(
+  transactions: Array<{ date: string; category: string; amount: number; type: string }>,
+  thresholdPercent = 25,
+): SpendingAnomaly[] {
+  const now = new Date();
+  const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOf3MonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+
+  const currentByCategory: Record<string, number> = {};
+  const historicalByCategory: Record<string, number[]> = {};
+
+  for (const tx of transactions) {
+    if (tx.type !== 'expense') continue;
+    const d = new Date(tx.date.includes('T') ? tx.date : `${tx.date}T12:00:00`);
+    if (Number.isNaN(d.getTime())) continue;
+
+    if (d >= startOfCurrentMonth) {
+      currentByCategory[tx.category] = (currentByCategory[tx.category] ?? 0) + tx.amount;
+    } else if (d >= startOf3MonthsAgo && d < startOfCurrentMonth) {
+      const monthKey = `${d.getFullYear()}-${d.getMonth()}`;
+      if (!historicalByCategory[tx.category]) historicalByCategory[tx.category] = [];
+      // Accumulate into monthly buckets — simplified: sum all 3 months then divide
+      // We track total per category for the 3-month window, then divide by 3
+      const existing = historicalByCategory[tx.category];
+      // Use index 0 as running total
+      existing[0] = (existing[0] ?? 0) + tx.amount;
+      void monthKey;
+    }
+  }
+
+  const anomalies: SpendingAnomaly[] = [];
+  for (const [category, currentMonth] of Object.entries(currentByCategory)) {
+    const totalHistorical = historicalByCategory[category]?.[0] ?? 0;
+    if (totalHistorical === 0) continue;
+    const threeMonthAvg = totalHistorical / 3;
+    if (threeMonthAvg < 10) continue; // ignore trivially small categories
+    const overageAmount = currentMonth - threeMonthAvg;
+    if (overageAmount <= 0) continue;
+    const overagePercent = (overageAmount / threeMonthAvg) * 100;
+    if (overagePercent < thresholdPercent) continue;
+    anomalies.push({
+      category,
+      currentMonth: parseFloat(currentMonth.toFixed(2)),
+      threeMonthAvg: parseFloat(threeMonthAvg.toFixed(2)),
+      overagePercent: parseFloat(overagePercent.toFixed(1)),
+      overageAmount: parseFloat(overageAmount.toFixed(2)),
+    });
+  }
+
+  return anomalies.sort((a, b) => b.overagePercent - a.overagePercent);
+}
+
+// ---------------------------------------------------------------------------
+// detectUnusedSubscriptions
+// ---------------------------------------------------------------------------
+
+export interface UnusedSubscription {
+  id: string;
+  name: string;
+  amount: number;
+  frequency: string;
+  monthlyEquivalent: number;
+  daysWithoutCharge: number;
+  hasPriceHike: boolean;
+  previousAmount?: number;
+}
+
+export function detectUnusedSubscriptions(
+  subscriptions: Array<{
+    id: string;
+    name: string;
+    amount: number;
+    frequency: string;
+    status: string;
+    priceHistory?: { date: string; amount: number }[];
+  }>,
+  transactions: Array<{ name: string; date: string; amount: number; type: string }>,
+  windowDays = 35,
+): UnusedSubscription[] {
+  const now = Date.now();
+  const windowMs = windowDays * 86400000;
+  const cutoff = now - windowMs;
+
+  const unused: UnusedSubscription[] = [];
+
+  for (const sub of subscriptions) {
+    if (sub.status !== 'active') continue;
+
+    const subNameLower = sub.name.toLowerCase().replace(/\s+/g, '');
+
+    // Check for a matching transaction in the window
+    const hasRecentCharge = transactions.some((tx) => {
+      if (tx.type !== 'expense') return false;
+      const txMs = new Date(tx.date.includes('T') ? tx.date : `${tx.date}T12:00:00`).getTime();
+      if (txMs < cutoff) return false;
+      const txNameLower = tx.name.toLowerCase().replace(/\s+/g, '');
+      return (
+        txNameLower.includes(subNameLower) ||
+        subNameLower.includes(txNameLower) ||
+        (subNameLower.length > 4 && txNameLower.includes(subNameLower.slice(0, 5)))
+      );
+    });
+
+    if (hasRecentCharge) continue;
+
+    // Detect price hike from priceHistory
+    let hasPriceHike = false;
+    let previousAmount: number | undefined;
+    if (sub.priceHistory && sub.priceHistory.length >= 2) {
+      const sorted = [...sub.priceHistory].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      if (sorted[0].amount > sorted[1].amount) {
+        hasPriceHike = true;
+        previousAmount = sorted[1].amount;
+      }
+    }
+
+    unused.push({
+      id: sub.id,
+      name: sub.name,
+      amount: sub.amount,
+      frequency: sub.frequency,
+      monthlyEquivalent: parseFloat(normalizeToMonthly(sub.amount, sub.frequency).toFixed(2)),
+      daysWithoutCharge: windowDays,
+      hasPriceHike,
+      previousAmount,
+    });
+  }
+
+  return unused.sort((a, b) => b.monthlyEquivalent - a.monthlyEquivalent);
+}

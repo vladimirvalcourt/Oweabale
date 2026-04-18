@@ -21,7 +21,11 @@ export const DEFAULT_NOTIF_PREFS: Record<
   | 'sniper-increase'
   | 'sniper-renewal'
   | 'detonator-milestone'
-  | 'detonator-rate',
+  | 'detonator-rate'
+  | 'alert-bill-due'
+  | 'alert-over-budget'
+  | 'alert-low-cash'
+  | 'alert-debt-due',
   boolean
 > = {
   'bill-reminders': true,
@@ -33,6 +37,10 @@ export const DEFAULT_NOTIF_PREFS: Record<
   'sniper-renewal': true,
   'detonator-milestone': true,
   'detonator-rate': true,
+  'alert-bill-due': true,
+  'alert-over-budget': true,
+  'alert-low-cash': true,
+  'alert-debt-due': true,
 };
 
 export type NotifPrefKey = keyof typeof DEFAULT_NOTIF_PREFS;
