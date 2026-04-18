@@ -18,8 +18,18 @@ interface QuickAddModalProps {
 type ObligationKind = 'bill-weekly' | 'bill-biweekly' | 'bill-monthly' | 'debt-card' | 'debt-loan';
 
 export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
-  const { quickAddTab, addTransaction, addBill, addDebt, addIncome, addCitation } = useStore();
+  const {
+    quickAddTab,
+    addTransaction,
+    addBill,
+    addDebt,
+    addIncome,
+    addCitation,
+    lastBudgetGuardrail,
+    clearLastBudgetGuardrail,
+  } = useStore();
   const [activeTab, setActiveTab] = useState<'transaction' | 'obligation' | 'income' | 'citation'>('transaction');
+  const [allowBudgetOverride, setAllowBudgetOverride] = useState(false);
 
   // Form states
   const [amount, setAmount] = useState('');
@@ -217,8 +227,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       setDaysLeft('30');
       setCitationDueDate('');
       setPaymentUrl('');
+      setAllowBudgetOverride(false);
+      clearLastBudgetGuardrail();
     }
-  }, [isOpen, quickAddTab]);
+  }, [isOpen, quickAddTab, clearLastBudgetGuardrail]);
 
   useEffect(() => {
     if (activeTab === 'obligation' && vendor.length > 2) {
@@ -308,7 +320,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
           category: category,
           date: date,
           type: 'expense'
-        });
+        }, { allowBudgetOverride });
         if (!ok) return;
         toast.success(`Transaction saved`);
       } else if (activeTab === 'obligation') {
@@ -599,6 +611,33 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     {/* EXPENSE FIELDS */}
                     {activeTab === 'transaction' && (
                       <>
+                        {lastBudgetGuardrail && (
+                          <div
+                            className={`rounded-lg border px-3 py-2 text-xs ${
+                              lastBudgetGuardrail.type === 'hard'
+                                ? 'border-red-500/35 bg-red-500/10 text-red-200'
+                                : 'border-amber-500/35 bg-amber-500/10 text-amber-100'
+                            }`}
+                          >
+                            <p className="font-medium">{lastBudgetGuardrail.message}</p>
+                            <p className="mt-1 text-content-secondary">
+                              Allowed ${lastBudgetGuardrail.allowed.toFixed(2)} this {lastBudgetGuardrail.period.toLowerCase()},
+                              attempted ${lastBudgetGuardrail.attempted.toFixed(2)}.
+                            </p>
+                            {lastBudgetGuardrail.type === 'soft' && (
+                              <label className="mt-2 inline-flex items-center gap-2 text-xs cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={allowBudgetOverride}
+                                  onChange={(e) => setAllowBudgetOverride(e.target.checked)}
+                                  className="h-3.5 w-3.5 rounded border-surface-border bg-surface-base text-amber-400 focus-app"
+                                />
+                                Save anyway for this one transaction
+                              </label>
+                            )}
+                          </div>
+                        )}
+
                         <div>
                           <label htmlFor="description" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Description</label>
                           <div className="flex gap-3">

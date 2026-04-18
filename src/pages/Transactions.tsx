@@ -1,15 +1,18 @@
 import { useState, useMemo, useDeferredValue } from 'react';
 import { useStore } from '../store/useStore';
 import { useShallow } from 'zustand/react/shallow';
-import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, Hash, Tag, Download, TrendingUp } from 'lucide-react';
+import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, Hash, Tag, Download, TrendingUp, Ban } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 export default function Transactions() {
-  const { transactions, subscriptions, openQuickAdd } = useStore(
+  const { transactions, subscriptions, openQuickAdd, categorizationExclusions, addCategorizationExclusion, deleteCategorizationExclusion } = useStore(
     useShallow((s) => ({
       transactions: s.transactions,
       subscriptions: s.subscriptions,
       openQuickAdd: s.openQuickAdd,
+      categorizationExclusions: s.categorizationExclusions,
+      addCategorizationExclusion: s.addCategorizationExclusion,
+      deleteCategorizationExclusion: s.deleteCategorizationExclusion,
     }))
   );
   const [searchTerm, setSearchTerm] = useState('');
@@ -56,6 +59,21 @@ export default function Transactions() {
     for (const s of subscriptions) m.set(s.name.toLowerCase(), s);
     return m;
   }, [subscriptions]);
+
+  const exclusionByTxId = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const e of categorizationExclusions) {
+      if (e.scope === 'transaction' && e.transaction_id) m.set(e.transaction_id, e.id);
+    }
+    return m;
+  }, [categorizationExclusions]);
+  const exclusionByMerchantKey = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const e of categorizationExclusions) {
+      if (e.scope === 'merchant' && e.merchant_name) m.set(e.merchant_name.toLowerCase().trim(), e.id);
+    }
+    return m;
+  }, [categorizationExclusions]);
 
   return (
     <div className="space-y-6">
@@ -271,6 +289,8 @@ export default function Transactions() {
                   {pagedTransactions.map((transaction) => {
                     const subData = subscriptionByNameLower.get(transaction.name.toLowerCase());
                     const isPriceHike = subData && transaction.type === 'expense' && transaction.amount > subData.amount;
+                    const txExclusionId = exclusionByTxId.get(transaction.id);
+                    const merchantExclusionId = exclusionByMerchantKey.get(transaction.name.toLowerCase().trim());
                     
                     return (
                       <tr 
@@ -296,6 +316,58 @@ export default function Transactions() {
                                   <span className="flex items-center gap-1 text-[8px] bg-rose-500 text-black px-1.5 font-black uppercase tracking-tighter animate-pulse">
                                     <TrendingUp className="w-2 h-2" /> Price Hike
                                   </span>
+                                )}
+                              </div>
+                              <div className="mt-1.5 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {txExclusionId ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => void deleteCategorizationExclusion(txExclusionId)}
+                                    className="inline-flex items-center gap-1 rounded border border-surface-border bg-surface-base px-2 py-0.5 text-[10px] font-medium text-content-secondary hover:text-content-primary"
+                                  >
+                                    <Ban className="w-3 h-3" />
+                                    Re-enable this tx
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      void addCategorizationExclusion({
+                                        scope: 'transaction',
+                                        transaction_id: transaction.id,
+                                        merchant_name: null,
+                                      })
+                                    }
+                                    className="inline-flex items-center gap-1 rounded border border-surface-border bg-surface-base px-2 py-0.5 text-[10px] font-medium text-content-secondary hover:text-content-primary"
+                                  >
+                                    <Ban className="w-3 h-3" />
+                                    Exclude this tx
+                                  </button>
+                                )}
+                                {merchantExclusionId ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => void deleteCategorizationExclusion(merchantExclusionId)}
+                                    className="inline-flex items-center gap-1 rounded border border-surface-border bg-surface-base px-2 py-0.5 text-[10px] font-medium text-content-secondary hover:text-content-primary"
+                                  >
+                                    <Ban className="w-3 h-3" />
+                                    Re-enable merchant
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      void addCategorizationExclusion({
+                                        scope: 'merchant',
+                                        transaction_id: null,
+                                        merchant_name: transaction.name,
+                                      })
+                                    }
+                                    className="inline-flex items-center gap-1 rounded border border-surface-border bg-surface-base px-2 py-0.5 text-[10px] font-medium text-content-secondary hover:text-content-primary"
+                                  >
+                                    <Ban className="w-3 h-3" />
+                                    Exclude merchant
+                                  </button>
                                 )}
                               </div>
                             </div>

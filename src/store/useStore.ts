@@ -2,9 +2,9 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
-import { type CategorizationRule, applyCategorizationRules } from '../lib/categorizationRules';
+import { type CategorizationRule, type CategorizationExclusion, applyCategorizationRules, merchantKey } from '../lib/categorizationRules';
 import { disconnectPlaid, syncPlaidTransactions as invokePlaidSync } from '../lib/plaid';
-export type { CategorizationRule };
+export type { CategorizationRule, CategorizationExclusion };
 
 /** Mobile capture stores under `incoming/` in `scans`; desktop uploads use `ingestion-files`. */
 async function removeIngestionStoragePath(storagePath: string) {
@@ -95,7 +95,9 @@ export interface Budget {
   id: string;
   category: string;
   amount: number;
-  period: 'Monthly' | 'Yearly';
+  period: 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Quarterly' | 'Yearly';
+  rolloverEnabled?: boolean;
+  lockMode?: 'none' | 'soft' | 'hard';
 }
 
 export interface Category {
@@ -260,6 +262,7 @@ interface AppState {
   notifications: Notification[];
   pendingIngestions: PendingIngestion[];
   categorizationRules: CategorizationRule[];
+  categorizationExclusions: CategorizationExclusion[];
   adminBroadcasts: AdminBroadcast[];
   platformSettings: PlatformSettings | null;
   netWorthSnapshots: NetWorthSnapshot[];
@@ -301,7 +304,17 @@ interface AppState {
   connectBank: () => Promise<void>;
   disconnectBank: () => Promise<void>;
   syncPlaidTransactions: (opts?: { quiet?: boolean }) => Promise<boolean>;
-  addTransaction: (transaction: Omit<Transaction, 'id'>) => Promise<boolean>;
+  addTransaction: (transaction: Omit<Transaction, 'id'>, opts?: { allowBudgetOverride?: boolean }) => Promise<boolean>;
+  lastBudgetGuardrail: {
+    type: 'soft' | 'hard';
+    category: string;
+    attempted: number;
+    allowed: number;
+    overBy: number;
+    period: Budget['period'];
+    message: string;
+  } | null;
+  clearLastBudgetGuardrail: () => void;
   addBill: (bill: Omit<Bill, 'id'>) => Promise<boolean>;
   editBill: (id: string, bill: Partial<Bill>) => void;
   deleteBill: (id: string) => void;
@@ -346,6 +359,21 @@ interface AppState {
   addCategorizationRule: (rule: Omit<CategorizationRule, 'id'>) => Promise<void>;
   deleteCategorizationRule: (id: string) => Promise<void>;
   applyRulesToExistingTransactions: () => Promise<number>;
+  addCategorizationExclusion: (exclusion: Omit<CategorizationExclusion, 'id'>) => Promise<boolean>;
+  deleteCategorizationExclusion: (id: string) => Promise<boolean>;
+  undoLastRuleApplication: () => Promise<boolean>;
+  lastRuleApplication: {
+    appliedAt: string;
+    changes: Array<{ id: string; from: string; to: string }>;
+  } | null;
+  lastAutoCategorization: {
+    transactionId: string;
+    name: string;
+    from: string;
+    to: string;
+    at: string;
+  } | null;
+  undoLastAutoCategorization: () => Promise<boolean>;
   
   // Credit Actions
   updateCreditScore: (score: number) => Promise<void>;
@@ -407,11 +435,15 @@ const initialData = {
   plaidInstitutionName: null,
   plaidLastSyncAt: null,
   plaidNeedsRelink: false,
+  lastBudgetGuardrail: null,
   pendingIngestions: [],
   notifications: [],
   categorizationRules: [],
+  categorizationExclusions: [],
   adminBroadcasts: [],
   platformSettings: null,
+  lastRuleApplication: null,
+  lastAutoCategorization: null,
   netWorthSnapshots: [],
   credit: {
     score: 0,
@@ -480,11 +512,78 @@ export const useStore = create<AppState>()(
     }
     return true;
   },
-  addTransaction: async (transaction) => {
+  clearLastBudgetGuardrail: () => set({ lastBudgetGuardrail: null }),
+  addTransaction: async (transaction, opts) => {
     // Auto-apply categorization rules before saving
     const rules = get().categorizationRules;
-    const autoCategory = applyCategorizationRules(transaction.name, rules);
+    const exclusions = get().categorizationExclusions;
+    const originalCategory = transaction.category;
+    const merchantExcluded = exclusions.some(
+      (e) => e.scope === 'merchant' && merchantKey(e.merchant_name ?? '') === merchantKey(transaction.name),
+    );
+    const autoCategory = merchantExcluded ? null : applyCategorizationRules(transaction.name, rules);
     if (autoCategory) transaction = { ...transaction, category: autoCategory };
+
+    if (transaction.type === 'expense') {
+      const expenseDate = new Date(transaction.date.includes('T') ? transaction.date : `${transaction.date}T12:00:00`);
+      if (!Number.isNaN(expenseDate.getTime())) {
+        const { budgets, transactions } = get();
+        const categoryBudget = budgets.find((b) => b.category === transaction.category);
+        if (categoryBudget && (categoryBudget.lockMode ?? 'none') !== 'none') {
+          const { startOfBudgetPeriod, shiftBudgetPeriod } = await import('../lib/budgetPeriods');
+          const currentStart = startOfBudgetPeriod(expenseDate, categoryBudget.period);
+          const nextStart = shiftBudgetPeriod(currentStart, categoryBudget.period, 1);
+          const prevStart = shiftBudgetPeriod(currentStart, categoryBudget.period, -1);
+          const prevEnd = new Date(currentStart.getTime() - 1);
+
+          const parseTxMs = (iso: string) => new Date(iso.includes('T') ? iso : `${iso}T12:00:00`).getTime();
+          const sumCategoryBetween = (startMs: number, endMs: number) =>
+            transactions.reduce((sum, tx) => {
+              if (tx.type !== 'expense' || tx.category !== transaction.category) return sum;
+              const ms = parseTxMs(tx.date);
+              if (!Number.isFinite(ms) || ms < startMs || ms > endMs) return sum;
+              return sum + tx.amount;
+            }, 0);
+
+          const spentCurrent = sumCategoryBetween(currentStart.getTime(), nextStart.getTime() - 1);
+          const spentPrev = sumCategoryBetween(prevStart.getTime(), prevEnd.getTime());
+          const rolloverCredit = categoryBudget.rolloverEnabled ? Math.max(0, categoryBudget.amount - spentPrev) : 0;
+          const allowed = categoryBudget.amount + rolloverCredit;
+          const attempted = spentCurrent + transaction.amount;
+          const overBy = Math.max(0, attempted - allowed);
+          const lockMode = categoryBudget.lockMode ?? 'none';
+
+          if (overBy > 0) {
+            const message = `${transaction.category} exceeds your ${categoryBudget.period.toLowerCase()} budget by $${overBy.toFixed(2)}.`;
+            set({
+              lastBudgetGuardrail: {
+                type: lockMode === 'hard' ? 'hard' : 'soft',
+                category: transaction.category,
+                attempted: parseFloat(attempted.toFixed(2)),
+                allowed: parseFloat(allowed.toFixed(2)),
+                overBy: parseFloat(overBy.toFixed(2)),
+                period: categoryBudget.period,
+                message,
+              },
+            });
+            if (lockMode === 'hard') {
+              toast.error(`${message} This category is locked.`);
+              return false;
+            }
+            if (!opts?.allowBudgetOverride) {
+              toast.warning(`${message} Tap "Save anyway" to override.`);
+              return false;
+            }
+          } else {
+            set({ lastBudgetGuardrail: null });
+          }
+        } else {
+          set({ lastBudgetGuardrail: null });
+        }
+      }
+    } else {
+      set({ lastBudgetGuardrail: null });
+    }
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -511,6 +610,19 @@ export const useStore = create<AppState>()(
       set((state) => ({
         transactions: [{ ...transaction, id: newId }, ...state.transactions].slice(0, 100)
       }));
+      if (autoCategory && autoCategory !== originalCategory) {
+        set({
+          lastAutoCategorization: {
+            transactionId: newId,
+            name: transaction.name,
+            from: originalCategory,
+            to: autoCategory,
+            at: new Date().toISOString(),
+          },
+        });
+      } else {
+        set({ lastAutoCategorization: null });
+      }
       return true;
     } catch (error) {
       console.error('[addTransaction] Sync failed:', error);
@@ -1062,7 +1174,14 @@ export const useStore = create<AppState>()(
       let newId = crypto.randomUUID();
       const { data, error } = await supabase
         .from('budgets')
-        .insert({ category: budget.category, amount: budget.amount, period: budget.period, user_id: userId })
+        .insert({
+          category: budget.category,
+          amount: budget.amount,
+          period: budget.period,
+          rollover_enabled: Boolean(budget.rolloverEnabled),
+          lock_mode: budget.lockMode ?? 'none',
+          user_id: userId,
+        })
         .select('id')
         .single();
         
@@ -1080,7 +1199,16 @@ export const useStore = create<AppState>()(
     try {
       const userId = (await supabase.auth.getUser()).data.user?.id;
       if (!userId) { toast.error('You must be signed in to edit budgets.'); return false; }
-      const { error } = await supabase.from('budgets').update(updatedBudget).eq('id', id).eq('user_id', userId);
+      const payload: Record<string, unknown> = { ...updatedBudget };
+      if (Object.prototype.hasOwnProperty.call(payload, 'rolloverEnabled')) {
+        payload.rollover_enabled = Boolean(payload.rolloverEnabled);
+        delete payload.rolloverEnabled;
+      }
+      if (Object.prototype.hasOwnProperty.call(payload, 'lockMode')) {
+        payload.lock_mode = payload.lockMode ?? 'none';
+        delete payload.lockMode;
+      }
+      const { error } = await supabase.from('budgets').update(payload).eq('id', id).eq('user_id', userId);
       if (error) { toast.error('Failed to update budget'); return false; }
       set((state) => ({ budgets: state.budgets.map((b) => b.id === id ? { ...b, ...updatedBudget } : b) }));
       return true;
@@ -1303,7 +1431,7 @@ export const useStore = create<AppState>()(
       const tables = [
         'bills', 'debts', 'transactions', 'assets', 'subscriptions',
         'goals', 'incomes', 'budgets', 'categories', 'citations',
-        'deductions', 'freelance_entries', 'pending_ingestions', 'credit_fixes',
+        'deductions', 'freelance_entries', 'pending_ingestions', 'credit_fixes', 'categorization_exclusions',
         'investment_accounts', 'insurance_policies'
       ];
 
@@ -1367,6 +1495,7 @@ export const useStore = create<AppState>()(
         supabase.from('citations').delete().eq('user_id', userId),
         supabase.from('deductions').delete().eq('user_id', userId),
         supabase.from('freelance_entries').delete().eq('user_id', userId),
+        supabase.from('categorization_exclusions').delete().eq('user_id', userId),
       ]);
 
       // Delete the auth.users record via a privileged Postgres RPC.
@@ -1415,6 +1544,41 @@ export const useStore = create<AppState>()(
       await supabase.from('categorization_rules').delete().eq('id', id).eq('user_id', userId);
     }
     set(state => ({ categorizationRules: state.categorizationRules.filter(r => r.id !== id) }));
+  },
+  addCategorizationExclusion: async (exclusion) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return false;
+    const payload: Record<string, unknown> = {
+      user_id: userId,
+      scope: exclusion.scope,
+      transaction_id: exclusion.transaction_id ?? null,
+      merchant_name: exclusion.merchant_name ?? null,
+    };
+    const { data, error } = await supabase.from('categorization_exclusions').insert(payload).select('*').single();
+    if (error) {
+      toast.error('Failed to add exclusion.');
+      return false;
+    }
+    const created: CategorizationExclusion = {
+      id: data.id as string,
+      scope: data.scope as CategorizationExclusion['scope'],
+      transaction_id: (data.transaction_id ?? null) as string | null,
+      merchant_name: (data.merchant_name ?? null) as string | null,
+    };
+    set((state) => ({ categorizationExclusions: [created, ...state.categorizationExclusions] }));
+    toast.success('Exclusion added. Future rules will skip this target.');
+    return true;
+  },
+  deleteCategorizationExclusion: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return false;
+    const { error } = await supabase.from('categorization_exclusions').delete().eq('id', id).eq('user_id', userId);
+    if (error) {
+      toast.error('Failed to remove exclusion.');
+      return false;
+    }
+    set((state) => ({ categorizationExclusions: state.categorizationExclusions.filter((e) => e.id !== id) }));
+    return true;
   },
   
   // ── Credit Management ──────────────────────────────────────────
@@ -1601,14 +1765,22 @@ export const useStore = create<AppState>()(
     const userId = (await supabase.auth.getUser()).data.user?.id;
     if (!userId) return 0;
     const rules = get().categorizationRules;
+    const exclusions = get().categorizationExclusions;
     if (rules.length === 0) return 0;
     const txs = get().transactions;
     let count = 0;
+    const changes: Array<{ id: string; from: string; to: string }> = [];
     const updates: PromiseLike<any>[] = [];
     const updated = txs.map(tx => {
+      const txExcluded = exclusions.some((e) => e.scope === 'transaction' && e.transaction_id === tx.id);
+      const merchantExcluded = exclusions.some(
+        (e) => e.scope === 'merchant' && merchantKey(e.merchant_name ?? '') === merchantKey(tx.name),
+      );
+      if (txExcluded || merchantExcluded) return tx;
       const matched = applyCategorizationRules(tx.name, rules);
       if (matched && matched !== tx.category) {
         count++;
+        changes.push({ id: tx.id, from: tx.category, to: matched });
         updates.push(
           supabase.from('transactions').update({ category: matched }).eq('id', tx.id).eq('user_id', userId)
         );
@@ -1618,9 +1790,70 @@ export const useStore = create<AppState>()(
     });
     if (count > 0) {
       await Promise.all(updates);
-      set({ transactions: updated });
+      set({
+        transactions: updated,
+        lastRuleApplication: {
+          appliedAt: new Date().toISOString(),
+          changes,
+        },
+      });
     }
     return count;
+  },
+  undoLastRuleApplication: async () => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return false;
+    const last = get().lastRuleApplication;
+    if (!last || last.changes.length === 0) return false;
+    try {
+      await Promise.all(
+        last.changes.map((c) =>
+          supabase.from('transactions').update({ category: c.from }).eq('id', c.id).eq('user_id', userId),
+        ),
+      );
+      set((state) => ({
+        transactions: state.transactions.map((tx) => {
+          const change = last.changes.find((c) => c.id === tx.id);
+          return change ? { ...tx, category: change.from } : tx;
+        }),
+        lastRuleApplication: null,
+      }));
+      toast.success('Last bulk categorization was undone.');
+      return true;
+    } catch (err) {
+      console.error('[undoLastRuleApplication] failed:', err);
+      toast.error('Could not undo the last rule application.');
+      return false;
+    }
+  },
+  undoLastAutoCategorization: async () => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return false;
+    const last = get().lastAutoCategorization;
+    if (!last) return false;
+    try {
+      const { error } = await supabase
+        .from('transactions')
+        .update({ category: last.from })
+        .eq('id', last.transactionId)
+        .eq('user_id', userId);
+      if (error) {
+        toast.error('Could not undo the auto-category.');
+        return false;
+      }
+      set((state) => ({
+        transactions: state.transactions.map((tx) =>
+          tx.id === last.transactionId ? { ...tx, category: last.from } : tx,
+        ),
+        lastAutoCategorization: null,
+      }));
+      toast.success('Auto-category undone.');
+      return true;
+    } catch (err) {
+      console.error('[undoLastAutoCategorization] failed:', err);
+      toast.error('Could not undo the auto-category.');
+      return false;
+    }
   },
 
   // Ingestion Implementation
@@ -1888,6 +2121,7 @@ export const useStore = create<AppState>()(
       supabase.from('freelance_entries').select('*').eq('user_id', resolvedUserId),
       supabase.from('pending_ingestions').select('*').eq('user_id', resolvedUserId),
       supabase.from('categorization_rules').select('*').eq('user_id', resolvedUserId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
+      supabase.from('categorization_exclusions').select('*').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
       supabase.from('credit_fixes').select('*').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
       supabase.from('admin_broadcasts').select('*').order('created_at', { ascending: false }).limit(10),
       supabase.from('platform_settings').select('*').order('created_at', { ascending: true }).limit(1).maybeSingle(),
@@ -2043,6 +2277,7 @@ export const useStore = create<AppState>()(
           { data: freelanceEntries },
           { data: pendingIngestions },
           { data: categorizationRules },
+          { data: categorizationExclusions },
           { data: creditFixes },
           { data: adminBroadcasts },
           { data: platformSettings },
@@ -2067,6 +2302,8 @@ export const useStore = create<AppState>()(
             category: b.category as string,
             amount: b.amount as number,
             period: b.period as Budget['period'],
+            rolloverEnabled: Boolean(b.rollover_enabled ?? b.rolloverEnabled),
+            lockMode: ((b.lock_mode ?? b.lockMode ?? 'none') as Budget['lockMode']),
           })),
           categories: (categories || []).map((c: Record<string, unknown>) => ({
             id: c.id as string,
@@ -2123,6 +2360,12 @@ export const useStore = create<AppState>()(
             match_value: r.match_value as string,
             category:    r.category as string,
             priority:    r.priority as number,
+          })),
+          categorizationExclusions: (categorizationExclusions || []).map((e: Record<string, unknown>) => ({
+            id: e.id as string,
+            scope: e.scope as CategorizationExclusion['scope'],
+            transaction_id: (e.transaction_id ?? null) as string | null,
+            merchant_name: (e.merchant_name ?? null) as string | null,
           })),
           credit: {
             ...get().credit,

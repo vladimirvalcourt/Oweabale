@@ -6,6 +6,17 @@ export interface CategorizationRule {
   priority: number;
 }
 
+export interface CategorizationExclusion {
+  id: string;
+  scope: 'transaction' | 'merchant';
+  transaction_id?: string | null;
+  merchant_name?: string | null;
+}
+
+export function merchantKey(name: string): string {
+  return name.toLowerCase().trim().replace(/\s+/g, ' ');
+}
+
 /**
  * Given a transaction name and a set of user rules, returns the first matching
  * category (highest priority wins, then most recently created).

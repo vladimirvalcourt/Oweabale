@@ -384,7 +384,9 @@ export interface Database {
           user_id: string
           category: string
           amount: number
-          period: 'Monthly' | 'Yearly' | null
+          period: 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Quarterly' | 'Yearly' | null
+          rollover_enabled: boolean
+          lock_mode: 'none' | 'soft' | 'hard'
           created_at: string
           updated_at: string
         }
@@ -393,7 +395,9 @@ export interface Database {
           user_id: string
           category: string
           amount: number
-          period?: 'Monthly' | 'Yearly' | null
+          period?: 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Quarterly' | 'Yearly' | null
+          rollover_enabled?: boolean
+          lock_mode?: 'none' | 'soft' | 'hard'
           created_at?: string
           updated_at?: string
         }
@@ -402,7 +406,9 @@ export interface Database {
           user_id?: string
           category?: string
           amount?: number
-          period?: 'Monthly' | 'Yearly' | null
+          period?: 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Quarterly' | 'Yearly' | null
+          rollover_enabled?: boolean
+          lock_mode?: 'none' | 'soft' | 'hard'
           created_at?: string
           updated_at?: string
         }
@@ -613,6 +619,35 @@ export interface Database {
           category?: string
           priority?: number
           created_at?: string
+        }
+      }
+      categorization_exclusions: {
+        Row: {
+          id: string
+          user_id: string
+          scope: 'transaction' | 'merchant'
+          transaction_id: string | null
+          merchant_name: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          scope: 'transaction' | 'merchant'
+          transaction_id?: string | null
+          merchant_name?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          scope?: 'transaction' | 'merchant'
+          transaction_id?: string | null
+          merchant_name?: string | null
+          created_at?: string
+          updated_at?: string
         }
       }
       credit_fixes: {

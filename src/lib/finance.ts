@@ -327,8 +327,8 @@ export function computeSafeToSpend(args: {
 
   const activeIncomes = args.incomes.filter((i) => i.status === 'active' && i.nextDate?.trim());
   const futurePaydays = activeIncomes
-    .map((i) => ({ ms: parseDueMs(i.nextDate)!, raw: i.nextDate }))
-    .filter((x) => x.ms >= todayMs)
+    .map((i) => ({ ms: parseDueMs(i.nextDate), raw: i.nextDate }))
+    .filter((x): x is { ms: number; raw: string } => x.ms !== null && x.ms >= todayMs)
     .sort((a, b) => a.ms - b.ms);
 
   let windowEndMs: number;
@@ -658,6 +658,79 @@ export interface SpendingAnomaly {
   threeMonthAvg: number;
   overagePercent: number;
   overageAmount: number;
+}
+
+export interface SpendingRecap {
+  periodLabel: string;
+  totalSpent: number;
+  previousTotalSpent: number;
+  changePercent: number;
+  topCategory: string | null;
+  topCategoryAmount: number;
+  topCategoryChangePercent: number;
+  isIncrease: boolean;
+}
+
+function sumByCategory(
+  transactions: Array<{ date: string; category: string; amount: number; type: string }>,
+  start: Date,
+  end: Date,
+): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const tx of transactions) {
+    if (tx.type !== 'expense') continue;
+    const d = new Date(tx.date.includes('T') ? tx.date : `${tx.date}T12:00:00`);
+    if (Number.isNaN(d.getTime()) || d < start || d > end) continue;
+    out[tx.category] = (out[tx.category] ?? 0) + tx.amount;
+  }
+  return out;
+}
+
+function pctDelta(current: number, prev: number): number {
+  if (prev <= 0) return current > 0 ? 100 : 0;
+  return ((current - prev) / prev) * 100;
+}
+
+export function buildSpendingRecap(
+  transactions: Array<{ date: string; category: string; amount: number; type: string }>,
+  mode: 'monthly' | 'yearly',
+  now: Date = new Date(),
+): SpendingRecap {
+  const year = now.getFullYear();
+  const month = now.getMonth();
+
+  const currentStart = mode === 'monthly' ? new Date(year, month, 1) : new Date(year, 0, 1);
+  const currentEnd = mode === 'monthly' ? new Date(year, month + 1, 0, 23, 59, 59, 999) : new Date(year, 11, 31, 23, 59, 59, 999);
+  const prevStart = mode === 'monthly' ? new Date(year, month - 1, 1) : new Date(year - 1, 0, 1);
+  const prevEnd = mode === 'monthly' ? new Date(year, month, 0, 23, 59, 59, 999) : new Date(year - 1, 11, 31, 23, 59, 59, 999);
+
+  const currentByCategory = sumByCategory(transactions, currentStart, currentEnd);
+  const prevByCategory = sumByCategory(transactions, prevStart, prevEnd);
+
+  const totalSpent = Object.values(currentByCategory).reduce((s, n) => s + n, 0);
+  const previousTotalSpent = Object.values(prevByCategory).reduce((s, n) => s + n, 0);
+
+  const [topCategory, topCategoryAmount] = Object.entries(currentByCategory).sort((a, b) => b[1] - a[1])[0] ?? [null, 0];
+  const prevTopCategoryAmount = topCategory ? (prevByCategory[topCategory] ?? 0) : 0;
+  const topCategoryChangePercent = pctDelta(topCategoryAmount, prevTopCategoryAmount);
+
+  const periodLabel =
+    mode === 'monthly'
+      ? now.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+      : `${year}`;
+
+  const changePercent = pctDelta(totalSpent, previousTotalSpent);
+
+  return {
+    periodLabel,
+    totalSpent: parseFloat(totalSpent.toFixed(2)),
+    previousTotalSpent: parseFloat(previousTotalSpent.toFixed(2)),
+    changePercent: parseFloat(changePercent.toFixed(1)),
+    topCategory,
+    topCategoryAmount: parseFloat(topCategoryAmount.toFixed(2)),
+    topCategoryChangePercent: parseFloat(topCategoryChangePercent.toFixed(1)),
+    isIncrease: totalSpent >= previousTotalSpent,
+  };
 }
 
 export function detectSpendingAnomalies(

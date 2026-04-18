@@ -2,10 +2,14 @@ import React, { useState, useMemo } from 'react';
 import { Plus, MoreHorizontal, X, PieChart, Edit2, Trash2, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useStore, Budget } from '../store/useStore';
 import { detectSpendingAnomalies } from '../lib/finance';
+import { startOfBudgetPeriod, shiftBudgetPeriod } from '../lib/budgetPeriods';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { toast } from 'sonner';
+
+const BUDGET_PERIODS: Budget['period'][] = ['Weekly', 'Bi-weekly', 'Monthly', 'Quarterly', 'Yearly'];
+
 export default function Budgets() {
   const { budgets, transactions, addBudget, editBudget, deleteBudget, categories } = useStore();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -15,7 +19,9 @@ export default function Budgets() {
   const [formData, setFormData] = useState({
     category: '',
     amount: '',
-    period: 'Monthly' as 'Monthly' | 'Yearly'
+    period: 'Monthly' as Budget['period'],
+    rolloverEnabled: false,
+    lockMode: 'none' as NonNullable<Budget['lockMode']>,
   });
 
   const expenseCategories = categories.filter(c => c.type === 'expense').map(c => c.name);
@@ -29,29 +35,35 @@ export default function Budgets() {
     [spendingAnomalies]
   );
 
-  // Calculate spending per category — scoped to the correct period
-  const currentMonthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
-  const currentYearKey = `${new Date().getFullYear()}`;
+  const parsedExpenses = useMemo(
+    () =>
+      transactions
+        .filter((t) => t.type === 'expense')
+        .map((t) => {
+          const ms = new Date(t.date.includes('T') ? t.date : `${t.date}T12:00:00`).getTime();
+          return { category: t.category, amount: t.amount, ms };
+        })
+        .filter((t) => Number.isFinite(t.ms)),
+    [transactions],
+  );
 
-  const currentMonthSpending = useMemo(() => {
-    const spending: Record<string, { monthly: number; yearly: number }> = {};
-
-    transactions.forEach(t => {
-      if (t.type === 'expense') {
-        if (!spending[t.category]) spending[t.category] = { monthly: 0, yearly: 0 };
-        if (t.date.startsWith(currentMonthKey)) spending[t.category].monthly += t.amount;
-        if (t.date.startsWith(currentYearKey))  spending[t.category].yearly  += t.amount;
-      }
-    });
-    return spending;
-  }, [transactions, currentMonthKey, currentYearKey]);
+  const sumCategoryBetween = useMemo(() => {
+    return (category: string, startMs: number, endMs: number) =>
+      parsedExpenses.reduce((sum, tx) => {
+        if (tx.category !== category) return sum;
+        if (tx.ms < startMs || tx.ms > endMs) return sum;
+        return sum + tx.amount;
+      }, 0);
+  }, [parsedExpenses]);
 
 
   const openAddModal = () => {
     setFormData({
       category: expenseCategories[0] || '',
       amount: '',
-      period: 'Monthly'
+      period: 'Monthly',
+      rolloverEnabled: false,
+      lockMode: 'none',
     });
     setIsAddModalOpen(true);
   };
@@ -61,7 +73,9 @@ export default function Budgets() {
     setFormData({
       category: budget.category,
       amount: budget.amount.toString(),
-      period: budget.period
+      period: budget.period,
+      rolloverEnabled: Boolean(budget.rolloverEnabled),
+      lockMode: budget.lockMode ?? 'none',
     });
     setIsEditModalOpen(true);
   };
@@ -71,7 +85,9 @@ export default function Budgets() {
     const ok = await addBudget({
       category: formData.category,
       amount: parseFloat(formData.amount),
-      period: formData.period
+      period: formData.period,
+      rolloverEnabled: formData.rolloverEnabled,
+      lockMode: formData.lockMode,
     });
     if (!ok) return;
     setIsAddModalOpen(false);
@@ -84,7 +100,9 @@ export default function Budgets() {
       const ok = await editBudget(selectedBudget.id, {
         category: formData.category,
         amount: parseFloat(formData.amount),
-        period: formData.period
+        period: formData.period,
+        rolloverEnabled: formData.rolloverEnabled,
+        lockMode: formData.lockMode,
       });
       if (!ok) return;
       setIsEditModalOpen(false);
@@ -139,12 +157,26 @@ export default function Budgets() {
         >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 -mx-6 -my-6 p-6">
             {budgets.map((budget) => {
-              const spendRecord = currentMonthSpending[budget.category];
-              const spent = budget.period === 'Yearly'
-                ? (spendRecord?.yearly ?? 0)
-                : (spendRecord?.monthly ?? 0);
-              const percentage = Math.min(100, (spent / budget.amount) * 100);
-              const isOverBudget = spent > budget.amount;
+              const now = new Date();
+              const currentStart = startOfBudgetPeriod(now, budget.period);
+              const nextStart = shiftBudgetPeriod(currentStart, budget.period, 1);
+              const prevStart = shiftBudgetPeriod(currentStart, budget.period, -1);
+              const prevEnd = new Date(currentStart.getTime() - 1);
+
+              const spent = sumCategoryBetween(
+                budget.category,
+                currentStart.getTime(),
+                nextStart.getTime() - 1,
+              );
+              const prevSpent = sumCategoryBetween(
+                budget.category,
+                prevStart.getTime(),
+                prevEnd.getTime(),
+              );
+              const rolloverCredit = budget.rolloverEnabled ? Math.max(0, budget.amount - prevSpent) : 0;
+              const effectiveBudget = budget.amount + rolloverCredit;
+              const percentage = Math.min(100, effectiveBudget > 0 ? (spent / effectiveBudget) * 100 : 0);
+              const isOverBudget = spent > effectiveBudget;
               const isNearLimit = percentage >= 80 && !isOverBudget;
 
               let progressColor = 'bg-white';
@@ -167,6 +199,16 @@ export default function Budgets() {
                         )}
                       </h3>
                       <p className="metric-label mt-1.5 normal-case">{budget.period} limit</p>
+                      {(budget.lockMode ?? 'none') !== 'none' && (
+                        <p className="mt-1 text-[11px] font-medium text-amber-400 uppercase tracking-wide">
+                          {(budget.lockMode ?? 'none') === 'hard' ? 'Hard lock' : 'Soft lock'}
+                        </p>
+                      )}
+                      {budget.rolloverEnabled && rolloverCredit > 0 && (
+                        <p className="mt-1 text-[11px] font-medium text-emerald-400">
+                          Rollover +${rolloverCredit.toFixed(0)}
+                        </p>
+                      )}
                     </div>
                     
                     <Menu as="div" className="relative inline-block text-left">
@@ -221,7 +263,7 @@ export default function Budgets() {
                       ${spent.toLocaleString('en-US', { minimumFractionDigits: 0 })}
                     </p>
                     <p className="text-xs font-sans text-content-tertiary mb-1">
-                      Target ${budget.amount.toLocaleString()}
+                      Target ${effectiveBudget.toLocaleString()}
                     </p>
                   </div>
 
@@ -300,11 +342,42 @@ export default function Budgets() {
                 <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Period</label>
                 <select 
                   value={formData.period}
-                  onChange={(e) => setFormData({...formData, period: e.target.value as 'Monthly' | 'Yearly'})}
+                  onChange={(e) => setFormData({...formData, period: e.target.value as Budget['period']})}
                   className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                 >
-                  <option value="Monthly">Monthly</option>
-                  <option value="Yearly">Yearly</option>
+                  {BUDGET_PERIODS.map((period) => (
+                    <option key={period} value={period}>{period}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="rounded-lg border border-surface-border bg-surface-base p-3">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.rolloverEnabled}
+                    onChange={(e) => setFormData({ ...formData, rolloverEnabled: e.target.checked })}
+                    className="mt-0.5 h-4 w-4 cursor-pointer rounded border-surface-border bg-surface-base text-emerald-500 focus-app"
+                  />
+                  <span>
+                    <span className="block text-sm font-medium text-content-primary">Enable rollover</span>
+                    <span className="block text-xs text-content-tertiary mt-0.5">
+                      Carry forward unused budget from the previous period into this one.
+                    </span>
+                  </span>
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-xs font-sans font-medium text-content-tertiary mb-2">Overspend guardrail</label>
+                <select
+                  value={formData.lockMode}
+                  onChange={(e) => setFormData({ ...formData, lockMode: e.target.value as NonNullable<Budget['lockMode']> })}
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
+                >
+                  <option value="none">No lock</option>
+                  <option value="soft">Soft lock (warn + allow override)</option>
+                  <option value="hard">Hard lock (block overspend)</option>
                 </select>
               </div>
 

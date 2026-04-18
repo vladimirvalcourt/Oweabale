@@ -6,12 +6,13 @@ import React, { useState, useMemo } from 'react';
 import { Download, BarChart3, PieChart, TrendingUp, CreditCard, Calendar } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, PieChart as RechartsPie, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend
+  XAxis, YAxis, CartesianGrid, Tooltip
 } from 'recharts';
 import { useStore } from '../store/useStore';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
+import { buildSpendingRecap } from '../lib/finance';
 
 type DateRange = '30d' | '90d' | '1y';
 
@@ -38,6 +39,8 @@ function exportCSV(data: { date: string; name: string; category: string; amount:
 export default function Reports() {
   const { transactions, debts, assets } = useStore();
   const [dateRange, setDateRange] = useState<DateRange>('30d');
+  const monthlyRecap = useMemo(() => buildSpendingRecap(transactions, 'monthly'), [transactions]);
+  const yearlyRecap = useMemo(() => buildSpendingRecap(transactions, 'yearly'), [transactions]);
 
   const cutoffDate = useMemo(() => {
     const now = new Date();
@@ -184,6 +187,35 @@ export default function Reports() {
             <div key={card.label} className="bg-surface-elevated border border-surface-border rounded-lg p-5">
               <p className="metric-label normal-case text-content-tertiary mb-2">{card.label}</p>
               <p className={`text-2xl font-mono font-bold tabular-nums data-numeric ${card.color}`}>{card.value}</p>
+            </div>
+          ))}
+        </div>
+      </CollapsibleModule>
+
+      <CollapsibleModule title="Spending Recaps" icon={Calendar}>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 -mx-6 -my-6 p-6">
+          {[
+            { label: 'Monthly recap', recap: monthlyRecap, compareTo: 'last month' },
+            { label: 'Yearly recap', recap: yearlyRecap, compareTo: 'last year' },
+          ].map(({ label, recap, compareTo }) => (
+            <div key={label} className="bg-surface-elevated border border-surface-border rounded-lg p-5">
+              <p className="metric-label normal-case text-content-tertiary mb-2">{label}</p>
+              <p className="text-lg font-semibold text-content-primary">{recap.periodLabel}</p>
+              <p className="mt-2 text-3xl font-bold font-mono tabular-nums text-content-primary data-numeric">
+                ${recap.totalSpent.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              </p>
+              <p className={`mt-1 text-xs font-medium ${recap.isIncrease ? 'text-amber-400' : 'text-emerald-400'}`}>
+                {recap.isIncrease ? 'Up' : 'Down'} {Math.abs(recap.changePercent).toFixed(1)}% vs {compareTo}
+              </p>
+              {recap.topCategory ? (
+                <p className="mt-3 text-xs text-content-secondary">
+                  Top category: <span className="text-content-primary font-medium">{recap.topCategory}</span> (${recap.topCategoryAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })})
+                  {' · '}
+                  {recap.topCategoryChangePercent >= 0 ? 'up' : 'down'} {Math.abs(recap.topCategoryChangePercent).toFixed(1)}%
+                </p>
+              ) : (
+                <p className="mt-3 text-xs text-content-tertiary">No expense activity in this period yet.</p>
+              )}
             </div>
           ))}
         </div>
