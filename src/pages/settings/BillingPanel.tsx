@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Dialog } from '@headlessui/react';
 import { Building2, Download, CreditCard as CreditCardIcon, RefreshCw } from 'lucide-react';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
@@ -43,6 +44,7 @@ function BillingPanelInner() {
   const [isWorking, setIsWorking] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'trialing' | 'canceled' | 'incomplete' | null>(null);
   const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
+  const [immediateCancelOpen, setImmediateCancelOpen] = useState(false);
 
   const loadBillingState = useCallback(async (opts?: { stripeSyncFirst?: boolean }): Promise<boolean> => {
     setIsLoading(true);
@@ -215,17 +217,15 @@ function BillingPanelInner() {
     window.location.href = result.url;
   };
 
-  const onCancelSubscription = async (immediate: boolean) => {
+  const onCancelAtPeriodEnd = async () => {
     if (isWorking) return;
     const confirmed = window.confirm(
-      immediate
-        ? 'Cancel now and end your paid access immediately? Proration will be handled by Stripe.'
-        : 'Cancel at the end of this billing period?',
+      'Cancel at the end of your current billing period? You keep Full Suite access until then.',
     );
     if (!confirmed) return;
     setIsWorking(true);
     await yieldForPaint();
-    const result = await cancelStripeSubscription({ immediate });
+    const result = await cancelStripeSubscription({ immediate: false });
     if ('error' in result) {
       toast.error(result.error);
       setIsWorking(false);
@@ -237,7 +237,28 @@ function BillingPanelInner() {
       return;
     }
     await loadBillingState({ stripeSyncFirst: true });
-    toast.success(immediate ? 'Subscription canceled immediately.' : 'Cancellation scheduled for period end.');
+    toast.success('Cancellation scheduled for period end.');
+    setIsWorking(false);
+  };
+
+  const onCancelImmediatelyConfirmed = async () => {
+    if (isWorking) return;
+    setIsWorking(true);
+    setImmediateCancelOpen(false);
+    await yieldForPaint();
+    const result = await cancelStripeSubscription({ immediate: true });
+    if ('error' in result) {
+      toast.error(result.error);
+      setIsWorking(false);
+      return;
+    }
+    if (!result.cancelled) {
+      toast.info(result.message ?? 'No active subscription found.');
+      setIsWorking(false);
+      return;
+    }
+    await loadBillingState({ stripeSyncFirst: true });
+    toast.success('Subscription canceled immediately.');
     setIsWorking(false);
   };
 
@@ -280,7 +301,7 @@ function BillingPanelInner() {
                 </p>
               )}
             </div>
-            <div className="flex flex-wrap justify-end gap-2">
+            <div className="flex w-full min-w-0 flex-col items-stretch gap-3 sm:w-auto sm:items-end">
               <button
                 type="button"
                 onClick={onManageBilling}
@@ -289,22 +310,35 @@ function BillingPanelInner() {
               >
                 {isWorking ? 'Working...' : 'Manage billing'}
               </button>
+              <p className="max-w-sm text-left text-[11px] text-content-tertiary sm:text-right">
+                Manage billing opens Stripe&apos;s customer portal to update payment methods and invoices.
+              </p>
               <button
                 type="button"
-                onClick={() => void onCancelSubscription(false)}
+                onClick={() => void onCancelAtPeriodEnd()}
                 disabled={isWorking}
-                className="shrink-0 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2.5 text-sm font-medium text-rose-200 transition-colors hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                className="shrink-0 rounded-lg border border-surface-border bg-surface-raised px-4 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Cancel plan
+                Cancel at period end
               </button>
+              {currentPeriodEnd && (
+                <p className="max-w-sm text-left text-[11px] text-content-tertiary sm:text-right">
+                  Access continues until{' '}
+                  {new Date(currentPeriodEnd).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', year: 'numeric' })}
+                  .
+                </p>
+              )}
               <button
                 type="button"
-                onClick={() => void onCancelSubscription(true)}
+                onClick={() => setImmediateCancelOpen(true)}
                 disabled={isWorking}
-                className="shrink-0 rounded-lg border border-rose-400/60 bg-rose-500/20 px-4 py-2.5 text-sm font-medium text-rose-100 transition-colors hover:bg-rose-500/30 disabled:cursor-not-allowed disabled:opacity-60"
+                className="shrink-0 rounded-lg border border-rose-500/40 bg-rose-500/15 px-4 py-2.5 text-sm font-medium text-rose-100 transition-colors hover:bg-rose-500/25 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Cancel now
+                Cancel immediately
               </button>
+              <p className="max-w-sm text-left text-[11px] text-content-tertiary sm:text-right">
+                Immediate cancel ends paid access today. Your data is retained for 30 days per policy.
+              </p>
             </div>
           </div>
         ) : (
@@ -378,10 +412,42 @@ function BillingPanelInner() {
         </button>
       </CollapsibleModule>
 
+      <Dialog open={immediateCancelOpen} onClose={() => setImmediateCancelOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="mx-auto max-w-md rounded-lg border border-surface-border bg-surface-raised p-6 shadow-xl">
+            <Dialog.Title className="text-lg font-semibold text-content-primary">Cancel immediately?</Dialog.Title>
+            <Dialog.Description className="mt-2 text-sm text-content-tertiary">
+              Your Full Suite access ends today. Your data will be retained for 30 days. This is separate from canceling at
+              period end.
+            </Dialog.Description>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setImmediateCancelOpen(false)}
+                className="rounded-lg border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary hover:bg-surface-elevated"
+              >
+                Keep subscription
+              </button>
+              <button
+                type="button"
+                onClick={() => void onCancelImmediatelyConfirmed()}
+                disabled={isWorking}
+                className="rounded-lg bg-[#EF4444] px-4 py-2 text-sm font-medium text-white hover:bg-[#DC2626] disabled:opacity-60"
+              >
+                {isWorking ? 'Working…' : 'End access today'}
+              </button>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
+
       <CollapsibleModule title="Billing Transparency Center" icon={Building2} defaultOpen={false}>
         <div className="space-y-3 text-sm text-content-secondary">
           <p>
-            Cancel from this app in one step. You can choose period-end cancel or immediate cancel from the subscription card above.
+            Cancel from this app: use <strong className="font-medium text-content-primary">Cancel at period end</strong> to keep
+            access until the date shown, or <strong className="font-medium text-content-primary">Cancel immediately</strong> to end
+            paid access today.
           </p>
           <p>
             Trial reminders are sent before first charge when enabled in Notifications (`Trial-to-paid reminder`).

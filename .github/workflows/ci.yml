@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  node:
+    name: Lint + Typecheck + Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint (tsc + eslint)
+        run: npm run lint
+
+      - name: Tests
+        run: npm test -- --reporter=default
+
+      - name: Build
+        run: npm run build
+
+      - name: Audit (high + critical)
+        run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true
+
+  deno:
+    name: Edge Functions (deno check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Type-check edge functions
+        run: |
+          shopt -s nullglob
+          for f in supabase/functions/*/index.ts; do
+            echo "::group::deno check $f"
+            deno check --no-lock "$f" || exit 1
+            echo "::endgroup::"
+          done

@@ -359,6 +359,8 @@ interface AppState {
   addCategorizationRule: (rule: Omit<CategorizationRule, 'id'>) => Promise<void>;
   deleteCategorizationRule: (id: string) => Promise<void>;
   applyRulesToExistingTransactions: () => Promise<number>;
+  /** Bulk-update expense categories (e.g. raw Plaid key → readable label). */
+  retagTransactionsByCategory: (fromCategory: string, toCategory: string) => Promise<number>;
   addCategorizationExclusion: (exclusion: Omit<CategorizationExclusion, 'id'>) => Promise<boolean>;
   deleteCategorizationExclusion: (id: string) => Promise<boolean>;
   undoLastRuleApplication: () => Promise<boolean>;
@@ -1763,6 +1765,33 @@ export const useStore = create<AppState>()(
     }
   },
 
+  retagTransactionsByCategory: async (fromCategory, toCategory) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId || !fromCategory.trim() || fromCategory === toCategory) return 0;
+    try {
+      const { data, error } = await supabase
+        .from('transactions')
+        .update({ category: toCategory })
+        .eq('user_id', userId)
+        .eq('category', fromCategory)
+        .select('id');
+      if (error) throw error;
+      const n = data?.length ?? 0;
+      if (n > 0) {
+        set((s) => ({
+          transactions: s.transactions.map((tx) =>
+            tx.category === fromCategory ? { ...tx, category: toCategory } : tx,
+          ),
+        }));
+      }
+      return n;
+    } catch (err) {
+      console.error('[retagTransactionsByCategory]', err);
+      toast.error('Could not update categories.');
+      return 0;
+    }
+  },
+
   applyRulesToExistingTransactions: async () => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
     if (!userId) return 0;
@@ -2362,7 +2391,7 @@ export const useStore = create<AppState>()(
             storagePath: pi.storage_path,
             storageUrl: pi.storage_url,
           })),
-          categorizationRules: (categorizationRules || []).map((r: any) => ({
+          categorizationRules: (categorizationRules || []).map((r: Record<string, unknown>) => ({
             id:          r.id as string,
             match_type:  r.match_type as CategorizationRule['match_type'],
             match_value: r.match_value as string,
@@ -2459,8 +2488,20 @@ export const useStore = create<AppState>()(
 
       // Upsert today's net worth snapshot for historical trending.
       try {
-        const totalAssets = (assets || []).reduce((s: number, a: any) => s + ((a.value as number) || 0), 0);
-        const totalDebts  = (debts  || []).reduce((s: number, d: any) => s + ((d.remaining as number) || 0), 0);
+        type AssetRow = { value?: number | string | null };
+        type DebtRow = { remaining?: number | string | null };
+        const toNum = (v: unknown): number => {
+          const n = typeof v === 'number' ? v : Number(v);
+          return Number.isFinite(n) ? n : 0;
+        };
+        const totalAssets = ((assets ?? []) as AssetRow[]).reduce(
+          (s, a) => s + toNum(a?.value),
+          0,
+        );
+        const totalDebts = ((debts ?? []) as DebtRow[]).reduce(
+          (s, d) => s + toNum(d?.remaining),
+          0,
+        );
         const today = new Date().toISOString().split('T')[0];
         await supabase
           .from('net_worth_snapshots')

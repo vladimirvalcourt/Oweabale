@@ -233,6 +233,20 @@ function BankConnectionPlaid() {
           Sync runs automatically and you can refresh on demand.
         </p>
       </div>
+      {bankConnected && plaidEnabledForUser && (
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={() => void handleConnectClick()}
+            disabled={plaidFlow.isBusy}
+            className="inline-flex items-center gap-2 rounded-lg border border-content-primary/20 bg-content-primary/[0.06] px-4 py-2 text-sm font-medium text-content-primary transition-colors hover:bg-content-primary/10 disabled:opacity-60"
+          >
+            {plaidFlow.isBusy ? <Loader2 className="h-4 w-4 animate-spin shrink-0" aria-hidden /> : null}
+            + Add bank account
+          </button>
+          <p className="mt-2 text-xs text-content-tertiary">Link another institution; each connection stays on this list.</p>
+        </div>
+      )}
       {bankConnected && (
         <div className="mb-4 rounded-lg border border-surface-border bg-surface-base p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -377,7 +391,7 @@ function BankConnectionPlaid() {
                   type="button"
                   onClick={handleSyncClick}
                   disabled={isSyncing || !plaidEnabledForUser}
-                  className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-primary transition-colors hover:border-content-muted hover:bg-surface-elevated disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover disabled:opacity-60"
                 >
                   {isSyncing ? <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" aria-hidden /> : <RefreshCw className="h-3.5 w-3.5 shrink-0" aria-hidden />}
                   Sync now
@@ -390,21 +404,22 @@ function BankConnectionPlaid() {
                 >
                   Reconnect
                 </button>
-                <button
-                  type="button"
-                  onClick={handleDisconnectClick}
-                  disabled={isDisconnecting}
-                  className="inline-flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-700 transition-colors hover:bg-rose-500/20 disabled:opacity-60 dark:text-rose-300"
-                >
-                  {isDisconnecting ? <Loader2 className="h-3.5 w-3.5 animate-spin shrink-0" aria-hidden /> : <Unplug className="h-3.5 w-3.5 shrink-0" aria-hidden />}
-                  Disconnect
-                </button>
               </div>
             </div>
             <div className="mt-3 text-xs font-medium text-content-tertiary">
               {lastSyncLabel
                 ? `Last transaction sync: ${lastSyncLabel}`
                 : 'No sync yet — use Sync now or wait for automatic updates.'}
+            </div>
+            <div className="mt-2">
+              <button
+                type="button"
+                onClick={() => void handleDisconnectClick()}
+                disabled={isDisconnecting}
+                className="text-xs font-medium text-content-muted underline-offset-2 hover:text-rose-400 hover:underline disabled:opacity-60"
+              >
+                {isDisconnecting ? 'Disconnecting…' : 'Disconnect this bank'}
+              </button>
             </div>
             {plaidFlow.stage === 'error' && plaidFlow.errorMessage && (
               <div className="mt-3 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-800 dark:text-rose-200">

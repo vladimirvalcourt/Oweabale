@@ -73,6 +73,7 @@ export default function Settings() {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  const [resetConfirmText, setResetConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [isResettingData, setIsResettingData] = useState(false);
   const [deletionReceipt, setDeletionReceipt] = useState<{
@@ -144,10 +145,12 @@ export default function Settings() {
   }, [deletionReceipt]);
 
   const handleResetData = async () => {
+    if (resetConfirmText.trim() !== 'RESET') return;
     setIsResettingData(true);
     await yieldForPaint();
     await resetData();
     setIsResettingData(false);
+    setResetConfirmText('');
     setIsResetDialogOpen(false);
   };
 
@@ -202,15 +205,29 @@ export default function Settings() {
               </div>
               <Dialog.Title className="text-lg font-semibold tracking-tight text-content-primary">Reset Data?</Dialog.Title>
             </div>
-            <Dialog.Description className="text-sm text-content-tertiary mb-6">
+            <Dialog.Description className="text-sm text-content-tertiary mb-4">
               This will permanently delete all your bills, debts, assets, and transactions. Your account will remain active, but you
               will be sent back to the onboarding setup.
             </Dialog.Description>
+            <label className="block text-xs font-medium text-content-secondary mb-1" htmlFor="reset-confirm">
+              Type RESET to confirm
+            </label>
+            <input
+              id="reset-confirm"
+              value={resetConfirmText}
+              onChange={(e) => setResetConfirmText(e.target.value)}
+              autoComplete="off"
+              className="mb-6 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+              placeholder="RESET"
+            />
 
             <div className="flex justify-end gap-3">
               <button
                 type="button"
-                onClick={() => setIsResetDialogOpen(false)}
+                onClick={() => {
+                  setResetConfirmText('');
+                  setIsResetDialogOpen(false);
+                }}
                 className={BUTTON_SECONDARY_CLASS}
               >
                 Cancel
@@ -218,8 +235,8 @@ export default function Settings() {
               <button
                 type="button"
                 onClick={handleResetData}
-                disabled={isResettingData}
-                className={`${BUTTON_WARNING_CLASS} gap-2`}
+                disabled={isResettingData || resetConfirmText.trim() !== 'RESET'}
+                className={`${BUTTON_DESTRUCTIVE_CLASS} gap-2`}
               >
                 {isResettingData && <Loader2 className="w-3 h-3 animate-spin" />}
                 {isResettingData ? 'Resetting...' : 'Reset Everything'}

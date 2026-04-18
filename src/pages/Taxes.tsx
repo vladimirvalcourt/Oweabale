@@ -5,7 +5,7 @@ import { CollapsibleModule } from '../components/CollapsibleModule';
 import { toast } from 'sonner';
 
 // Common State Tax Rates for Gig Workers (Estimates)
-const STATE_TAX_MAP: Record<string, { name: string, rate: number }> = {
+export const STATE_TAX_MAP: Record<string, { name: string; rate: number }> = {
   'NY': { name: 'New York', rate: 6.25 },
   'CA': { name: 'California', rate: 9.3 },
   'TX': { name: 'Texas', rate: 0 },

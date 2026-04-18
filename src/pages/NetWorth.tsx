@@ -9,6 +9,7 @@ import { motion, animate, useMotionValue, useTransform } from 'motion/react';
 import { useState, useEffect } from 'react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
+import { TransitionLink } from '../components/TransitionLink';
 
 function AnimatedValue({ value, prefix = "", suffix = "", decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
   const mv = useMotionValue(0);
@@ -116,6 +117,13 @@ export default function NetWorth() {
             <span className="text-xs font-sans text-content-secondary ml-2">Accelerated payoff</span>
           )}
         </div>
+        <p className="mb-2 text-xs text-content-secondary leading-relaxed">
+          Try adding extra monthly savings in the control above to see your trajectory improve — small increases lift the whole
+          curve.{' '}
+          <TransitionLink to="/dashboard#cash-flow" className="text-content-primary underline underline-offset-2">
+            View cash flow
+          </TransitionLink>
+        </p>
         <div className="h-[260px] w-full">
           <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={120}>
             <AreaChart data={projectionData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>

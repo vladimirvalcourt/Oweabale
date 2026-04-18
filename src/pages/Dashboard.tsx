@@ -65,6 +65,10 @@ export default function Dashboard() {
   const location = useLocation();
   const bills = useStore(state => state.bills);
   const debts = useStore(state => state.debts);
+  const debtsMissingDueDate = useMemo(
+    () => (debts || []).filter((d) => (d?.remaining || 0) > 0 && !String(d?.paymentDueDate ?? '').trim()),
+    [debts],
+  );
   const transactions = useStore(state => state.transactions);
   const assets = useStore(state => state.assets);
   const subscriptions = useStore(state => state.subscriptions);
@@ -442,7 +446,8 @@ export default function Dashboard() {
     );
   }
 
-  const hasActionableAlerts = pendingIngestions.length > 0 || isOverdraftRisk || showLowTaxReserveAlert;
+  const hasActionableAlerts =
+    pendingIngestions.length > 0 || isOverdraftRisk || showLowTaxReserveAlert || debtsMissingDueDate.length > 0;
 
   return (
     <AppPageShell>
@@ -529,6 +534,31 @@ export default function Dashboard() {
             )}
 
             {/* Tax Insolvency Action */}
+            {debtsMissingDueDate.length > 0 && (
+              <TransitionLink to="/bills#due-soon" className="block focus-app rounded-lg">
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-surface-raised border border-amber-500/30 p-5 rounded-lg flex items-center justify-between hover:bg-content-primary/[0.03] transition-all shadow-none group"
+                >
+                  <div className="flex items-center gap-5">
+                    <div className="relative w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center shrink-0 border border-amber-500/25">
+                      <ShieldAlert className="w-5 h-5 text-amber-400" aria-hidden />
+                    </div>
+                    <div>
+                      <p className="text-sm font-sans font-medium text-content-primary">Due dates missing</p>
+                      <p className="text-xs font-sans text-content-secondary mt-0.5">
+                        {debtsMissingDueDate.length} credit{' '}
+                        {debtsMissingDueDate.length === 1 ? 'account has' : 'accounts have'} no due date — add them to avoid
+                        missing payments.
+                      </p>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-content-tertiary group-hover:translate-x-1 transition-transform" />
+                </motion.div>
+              </TransitionLink>
+            )}
+
             {showLowTaxReserveAlert && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -770,6 +800,17 @@ export default function Dashboard() {
                 <AnimatedValue value={survivalMonths} decimals={1} />
                 <span className="text-2xl font-sans text-content-tertiary font-medium ml-3 uppercase tracking-wide">Months</span>
               </h2>
+              {survivalMonths < 3 && (
+                <p className="mt-4 text-sm text-content-secondary leading-relaxed max-w-md">
+                  Add income or reduce expenses to extend your runway.{' '}
+                  <TransitionLink
+                    to="/dashboard#cash-flow"
+                    className="text-content-primary font-medium underline underline-offset-2 hover:text-content-secondary"
+                  >
+                    View cash flow
+                  </TransitionLink>
+                </p>
+              )}
             </div>
           </div>
           
@@ -789,7 +830,17 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
               <p className="metric-label mb-3">Net Worth</p>
-              <p className="text-2xl sm:text-4xl font-mono text-content-primary font-bold tabular-nums data-numeric">$<AnimatedValue value={netWorth} /></p>
+              <p className={`text-2xl sm:text-4xl font-mono font-bold tabular-nums data-numeric ${netWorth < 0 ? 'text-rose-400' : 'text-content-primary'}`}>
+                $<AnimatedValue value={netWorth} />
+              </p>
+              {netWorth < 0 && (
+                <p className="mt-2 text-xs text-content-secondary leading-relaxed">
+                  Net worth reflects assets minus debts — focus on cash flow and payoff plans to improve trajectory.{' '}
+                  <TransitionLink to="/net-worth" className="text-content-primary underline underline-offset-2">
+                    Explore projection
+                  </TransitionLink>
+                </p>
+              )}
             </div>
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
               <p className="metric-label mb-3">Total Assets</p>
@@ -827,7 +878,22 @@ export default function Dashboard() {
             </div>
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
               <p className="metric-label mb-3">Monthly Surplus</p>
-              <p className="text-2xl sm:text-4xl font-mono text-brand-profit font-bold tabular-nums data-numeric">+$<AnimatedValue value={cashFlow.surplus} /></p>
+              <p
+                className={`text-2xl sm:text-4xl font-mono font-bold tabular-nums data-numeric ${
+                  cashFlow.surplus >= 0 ? 'text-brand-profit' : 'text-rose-400'
+                }`}
+              >
+                {cashFlow.surplus >= 0 ? '+' : '−'}$
+                <AnimatedValue value={Math.abs(cashFlow.surplus)} />
+              </p>
+              {cashFlow.surplus < 0 && (
+                <p className="mt-2 text-xs text-content-secondary leading-relaxed">
+                  You&apos;re spending more than income this month on paper — trim subscriptions or align bill due dates.{' '}
+                  <TransitionLink to="/budgets" className="text-content-primary underline underline-offset-2">
+                    Review budgets
+                  </TransitionLink>
+                </p>
+              )}
             </div>
         </div>
       </div>

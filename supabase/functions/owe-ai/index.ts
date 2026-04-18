@@ -97,6 +97,17 @@ function normalizeLevelHint(v: unknown): FamiliarityLevel | null {
   return v === 'beginner' || v === 'intermediate' || v === 'advanced' ? v : null;
 }
 
+function parseSessionId(v: unknown): string | null {
+  if (typeof v !== 'string') return null;
+  const s = v.trim();
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(s)
+  ) {
+    return null;
+  }
+  return s;
+}
+
 function sanitizeMessages(raw: unknown): ChatMessage[] {
   if (!Array.isArray(raw)) return [];
   const out: ChatMessage[] = [];
@@ -603,7 +614,9 @@ Conversation style (must follow):
 - Keep formatting light by default. Avoid long numbered lists unless the user asks for a step-by-step plan.
 - If this is your first reply in the thread (there is no earlier assistant message in the chat), open with a warm greeting. If USER_FINANCIAL_CONTEXT.userProfile.firstName is present, greet them by first name naturally (for example "Hi John"). Keep this opener to 1 short sentence, then continue with help.
 - If the user sends a social opener like "hello" or "how are you", respond warmly in a human way first, then gently pivot to how you can help with their money today.
-- On every substantive answer, end with a single actionable line exactly in this form: **Next step:** followed by one clear sentence they can do today. If they only said thanks, okay, or a tiny acknowledgment, you may skip **Next step:** and reply warmly in one or two sentences.
+- Never give generic financial advice that could apply to anyone. Every substantive answer must tie recommendations to the user’s actual Oweable data (named bills, debts, subscriptions, categories, amounts, or dates from USER_FINANCIAL_CONTEXT).
+- On every substantive answer, end with exactly ONE line in this form: **Next step:** followed by a single sentence that names a specific item from their data (for example a biller, debt, subscription, or budget category) and a concrete action. Forbidden examples: “review transactions”, “cut subscriptions”, “pay bills on time” without naming which bill or subscription. Required style: “Pay your [Biller X] ($123) before [date]…” or “Pause [Subscription Y] ($Z/mo)…” using real names from the snapshot.
+- If they only said thanks, okay, or a tiny acknowledgment, you may skip **Next step:** and reply warmly in one or two sentences.
 - Prefer “you” and plain English over jargon. If you use a finance term, add a quick plain-English gloss the first time.
 - Sound reassuring when money feels stressful; stay honest when the numbers are tight.
 - When sharing numbers, explain what they mean in everyday terms before giving recommendations.
@@ -901,6 +914,21 @@ function executeWhatIfTool(
  * Hugging Face Inference Providers — chat completions on the HF router (OpenAI-compatible JSON shape only; not the OpenAI API).
  * @see https://huggingface.co/docs/api-inference/en/tasks/chat-completion
  */
+function buildSystemContentForChat(
+  userContextJson: string,
+  mode: ChatMode,
+  levelHint: FamiliarityLevel | null,
+): string {
+  const runtimeDirective =
+    mode === 'academy'
+      ? `MODE: academy\n- The user explicitly selected learning mode. Teach with lesson structure and progressive coaching.\n`
+      : `MODE: advisor\n- The user did not select learning mode. Prioritize concise financial guidance. Only switch to lesson-style teaching if the user explicitly asks to learn a concept.\n`;
+  const levelDirective = levelHint
+    ? `\nUSER_LEVEL_HINT: ${levelHint}\n- Respect this hint for explanation depth in this response.`
+    : '';
+  return `${SYSTEM_PROMPT}\n\n${runtimeDirective}${levelDirective}\n\nUSER_FINANCIAL_CONTEXT (JSON):\n${userContextJson}`;
+}
+
 async function callHuggingFaceChat(
   hfToken: string,
   modelId: string,
@@ -909,15 +937,7 @@ async function callHuggingFaceChat(
   mode: ChatMode,
   levelHint: FamiliarityLevel | null,
 ): Promise<string> {
-  const runtimeDirective =
-    mode === 'academy'
-      ? `MODE: academy\n- The user explicitly selected learning mode. Teach with lesson structure and progressive coaching.\n`
-      : `MODE: advisor\n- The user did not select learning mode. Prioritize concise financial guidance. Only switch to lesson-style teaching if the user explicitly asks to learn a concept.\n`;
-  const levelDirective = levelHint
-    ? `\nUSER_LEVEL_HINT: ${levelHint}\n- Respect this hint for explanation depth in this response.`
-    : '';
-
-  const systemContent = `${SYSTEM_PROMPT}\n\n${runtimeDirective}${levelDirective}\n\nUSER_FINANCIAL_CONTEXT (JSON):\n${userContextJson}`;
+  const systemContent = buildSystemContentForChat(userContextJson, mode, levelHint);
 
   const useTools = oweAiToolsEnabled();
   const body: Record<string, unknown> = {
@@ -1085,6 +1105,93 @@ function isModelNotFoundError(msg: string): boolean {
   return t.includes('model_not_found') || (t.includes('does not exist') && t.includes('model'));
 }
 
+/** OpenAI-compatible SSE from HF router (`stream: true`). Tools are not supported on this path. */
+async function* hfChatCompletionDeltas(
+  hfToken: string,
+  modelId: string,
+  systemContent: string,
+  messages: ChatMessage[],
+): AsyncGenerator<string, void, unknown> {
+  const body = {
+    model: modelId,
+    temperature: 0.35,
+    max_tokens: 1024,
+    stream: true,
+    messages: [
+      { role: 'system', content: systemContent },
+      ...messages.map((m) => ({ role: m.role, content: m.content })),
+    ],
+  };
+  const res = await fetch('https://router.huggingface.co/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${hfToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(HF_CHAT_TIMEOUT_MS),
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(() => '');
+    throw new Error(`Hugging Face inference error ${res.status}: ${t.slice(0, 400)}`);
+  }
+  const reader = res.body?.getReader();
+  if (!reader) throw new Error('Empty inference stream');
+  const dec = new TextDecoder();
+  let buffer = '';
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += dec.decode(value, { stream: true });
+      for (;;) {
+        const sep = buffer.indexOf('\n\n');
+        if (sep === -1) break;
+        const block = buffer.slice(0, sep);
+        buffer = buffer.slice(sep + 2);
+        for (const rawLine of block.split('\n')) {
+          const line = rawLine.trim();
+          if (!line.startsWith('data:')) continue;
+          const payload = line.slice(5).trim();
+          if (payload === '[DONE]') return;
+          try {
+            const j = JSON.parse(payload) as {
+              choices?: Array<{ delta?: { content?: string } }>;
+            };
+            const piece = j.choices?.[0]?.delta?.content;
+            if (typeof piece === 'string' && piece.length > 0) yield piece;
+          } catch {
+            /* ignore malformed chunk */
+          }
+        }
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+async function* hfChatStreamWithModelFallback(
+  hfToken: string,
+  requestedModel: string,
+  systemContent: string,
+  messages: ChatMessage[],
+): AsyncGenerator<string, void, unknown> {
+  try {
+    yield* hfChatCompletionDeltas(hfToken, requestedModel, systemContent, messages);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (requestedModel !== DEFAULT_OWE_AI_MODEL && isModelNotFoundError(msg)) {
+      console.warn(
+        `[owe-ai] stream: model '${requestedModel}' not found, retrying with default '${DEFAULT_OWE_AI_MODEL}'`,
+      );
+      yield* hfChatCompletionDeltas(hfToken, DEFAULT_OWE_AI_MODEL, systemContent, messages);
+    } else {
+      throw e;
+    }
+  }
+}
+
 async function callHuggingFaceWithFallback(
   hfToken: string,
   requestedModel: string,
@@ -1179,10 +1286,19 @@ Deno.serve(async (req: Request) => {
       messages?: unknown;
       mode?: unknown;
       levelHint?: unknown;
+      sessionId?: unknown;
+      stream?: unknown;
     };
     const messages = sanitizeMessages(body.messages);
     const mode = normalizeMode(body.mode);
     const levelHint = normalizeLevelHint(body.levelHint);
+    const sessionId = parseSessionId(body.sessionId);
+    if (!sessionId) {
+      return new Response(
+        JSON.stringify({ error: 'SESSION_REQUIRED', message: 'Missing or invalid chat session.' }),
+        { status: 400, headers: { ...ch, 'Content-Type': 'application/json' } },
+      );
+    }
     if (messages.length === 0) {
       return new Response(JSON.stringify({ error: 'Send at least one message.' }), {
         status: 400,
@@ -1239,6 +1355,7 @@ Deno.serve(async (req: Request) => {
         .select('role,content')
         .eq('user_id', user.id)
         .eq('mode', mode)
+        .eq('session_id', sessionId)
         .order('created_at', { ascending: false })
         .limit(10);
       if (histRows && histRows.length > 0) {
@@ -1257,6 +1374,92 @@ Deno.serve(async (req: Request) => {
     const mergedMessages = [...dedupedHistory, ...messages].slice(-20);
 
     const contextJson = await buildUserContextJson(supabaseAdmin, user.id, learningProfile);
+
+    const wantStream = body.stream === true && !oweAiToolsEnabled();
+    if (wantStream) {
+      const systemContent = buildSystemContentForChat(contextJson, mode, levelHint);
+      const encoder = new TextEncoder();
+      const uid = user.id;
+      const sid = sessionId;
+      const msgs = messages;
+      const lu = lastUser;
+      const lp = learningProfile;
+      const mm = mergedMessages;
+      const sseStream = new ReadableStream({
+        async start(controller) {
+          const send = (obj: unknown) => {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(obj)}\n\n`));
+          };
+          let fullText = '';
+          try {
+            for await (const delta of hfChatStreamWithModelFallback(hfToken, modelId, systemContent, mm)) {
+              fullText += delta;
+              send({ delta });
+            }
+            if (!fullText.trim()) {
+              send({ error: 'EMPTY_MODEL_REPLY' });
+              controller.close();
+              return;
+            }
+            const profileAfter = await upsertLearningProfile(
+              supabaseAdmin,
+              uid,
+              lp,
+              mm,
+              lu.content,
+              fullText,
+              levelHint,
+            );
+            const nextLesson =
+              mode === 'academy' ? nextLessonPromptFromProfile(profileAfter) : undefined;
+            try {
+              const lastMsg = msgs[msgs.length - 1];
+              if (lastMsg?.role === 'user') {
+                await supabaseAdmin.from('chat_messages').insert([
+                  {
+                    user_id: uid,
+                    role: 'user',
+                    content: lastMsg.content.slice(0, 10000),
+                    mode,
+                    session_id: sid,
+                  },
+                  {
+                    user_id: uid,
+                    role: 'assistant',
+                    content: fullText.slice(0, 10000),
+                    mode,
+                    session_id: sid,
+                  },
+                ]);
+              }
+            } catch (err) {
+              console.warn(
+                '[owe-ai] stream persist failed:',
+                err instanceof Error ? err.message : String(err),
+              );
+            }
+            send({ done: true, learningProfile: profileAfter, nextLessonPrompt: nextLesson });
+            controller.close();
+          } catch (e) {
+            console.error('[owe-ai] stream', e);
+            const msg = e instanceof Error ? e.message : String(e);
+            send({ error: msg.slice(0, 500) });
+            controller.close();
+          }
+        },
+      });
+      return new Response(sseStream, {
+        status: 200,
+        headers: {
+          ...ch,
+          'Content-Type': 'text/event-stream; charset=utf-8',
+          'Cache-Control': 'no-cache, no-transform',
+          Connection: 'keep-alive',
+          'X-Accel-Buffering': 'no',
+        },
+      });
+    }
+
     const reply = await callHuggingFaceWithFallback(hfToken, modelId, contextJson, mergedMessages, mode, levelHint);
 
     // Persist new messages to chat_messages table (fire and forget — don't block response)
@@ -1265,8 +1468,20 @@ Deno.serve(async (req: Request) => {
         const lastMsg = messages[messages.length - 1];
         if (lastMsg?.role === 'user') {
           await supabaseAdmin.from('chat_messages').insert([
-            { user_id: user.id, role: 'user', content: lastMsg.content.slice(0, 10000), mode },
-            { user_id: user.id, role: 'assistant', content: reply.slice(0, 10000), mode },
+            {
+              user_id: user.id,
+              role: 'user',
+              content: lastMsg.content.slice(0, 10000),
+              mode,
+              session_id: sessionId,
+            },
+            {
+              user_id: user.id,
+              role: 'assistant',
+              content: reply.slice(0, 10000),
+              mode,
+              session_id: sessionId,
+            },
           ]);
         }
       } catch (err) {

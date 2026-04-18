@@ -7,7 +7,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import {
   Receipt, CreditCard, AlertTriangle, ShieldAlert,
   FileText, CheckCircle2, Flame,
-  Calculator, ChevronDown, ChevronUp, Plus, Minus, Pencil, CalendarDays
+  Calculator, ChevronDown, ChevronUp, Plus, Minus, Pencil, CalendarDays, AlertCircle
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 import { toast } from 'sonner';
@@ -114,7 +114,7 @@ function monthsToDate(months: number): string {
 export default function Obligations() {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { bills, debts, citations, subscriptions, transactions, assets, resolveCitation, openQuickAdd, editBill, editDebt } = useStore(
+  const { bills, debts, citations, subscriptions, transactions, assets, resolveCitation, openQuickAdd, editBill, editDebt, markBillPaid } = useStore(
     useShallow((s) => ({
       bills: s.bills,
       debts: s.debts,
@@ -126,6 +126,7 @@ export default function Obligations() {
       openQuickAdd: s.openQuickAdd,
       editBill: s.editBill,
       editDebt: s.editDebt,
+      markBillPaid: s.markBillPaid,
     }))
   );
   const [activeTab, setActiveTab] = useState<FilterTab>(() => {
@@ -304,6 +305,17 @@ export default function Obligations() {
     extraPayment,
     strategy
   ), [debts, extraPayment, strategy]);
+
+  const payoffIfExtra50 = useMemo(
+    () =>
+      calcPayoff(
+        debts.map((d) => ({ remaining: d.remaining, apr: d.apr, minPayment: d.minPayment, name: d.name })),
+        extraPayment + 50,
+        strategy,
+      ),
+    [debts, extraPayment, strategy],
+  );
+  const monthsSavedBy50 = Math.max(0, payoffResult.months - payoffIfExtra50.months);
 
   const interestSaved = Math.max(0, payoffResult.minOnlyInterest - payoffResult.totalInterest);
   const overallDebtProgress = useMemo(() => {
@@ -534,10 +546,29 @@ export default function Obligations() {
                 <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Debt-Free Date</p>
                 <p className="text-lg font-mono font-bold text-content-primary">{payoffResult.months > 0 ? monthsToDate(payoffResult.months) : '—'}</p>
                 <p className="text-[10px] font-mono text-content-muted">{payoffResult.months} months</p>
+                {payoffResult.months > 12 && monthsSavedBy50 > 0 && (
+                  <p className="mt-2 text-[11px] text-content-secondary leading-relaxed">
+                    Add $50/month extra to cut{' '}
+                    <span className="font-mono font-medium text-content-primary">{monthsSavedBy50}</span> months off your payoff
+                    timeline — adjust &quot;Extra per month&quot; above to model it.{' '}
+                    <TransitionLink to="/dashboard#cash-flow" className="text-content-primary underline underline-offset-2">
+                      Tighten cash flow
+                    </TransitionLink>
+                  </p>
+                )}
               </div>
               <div className="bg-surface-elevated border border-surface-border rounded-lg p-4">
                 <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Paid</p>
                 <p className="text-lg font-mono font-bold text-red-400">${payoffResult.totalInterest.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                {payoffResult.totalInterest > 10_000 && (
+                  <p className="mt-2 text-[11px] text-content-secondary leading-relaxed">
+                    Interest is sensitive to APR and payoff order — even small extra payments compound. Use the slider above or{' '}
+                    <TransitionLink to="/analytics" className="text-content-primary underline underline-offset-2">
+                      review spending trends
+                    </TransitionLink>
+                    .
+                  </p>
+                )}
               </div>
               <div className="bg-surface-elevated border border-emerald-500/20 rounded-lg p-4">
                 <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Saved</p>
@@ -716,14 +747,29 @@ export default function Obligations() {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`text-sm font-mono ${
-                          isPastDue ? 'text-rose-400' : isDebtNoDue ? 'text-content-muted' : 'text-content-secondary'
-                        }`}
-                      >
-                        {ob.dueLabel}
-                        {isPastDue && <span className="ml-2 text-[10px] font-bold">OVERDUE</span>}
-                      </span>
+                      <div className="flex flex-col gap-1">
+                        <span
+                          className={`text-sm font-mono ${
+                            isPastDue ? 'text-rose-400' : isDebtNoDue ? 'text-content-muted' : 'text-content-secondary'
+                          }`}
+                        >
+                          {ob.dueLabel}
+                          {isPastDue && <span className="ml-2 text-[10px] font-bold">OVERDUE</span>}
+                        </span>
+                        {isDebtNoDue && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const d = debts.find((x) => x.id === ob.id);
+                              if (d) setEditDebtRow(d);
+                            }}
+                            className="inline-flex items-center gap-1 self-start text-[11px] font-medium text-amber-600 dark:text-amber-400 hover:underline"
+                          >
+                            <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                            Add due date
+                          </button>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <span className="text-sm font-mono text-content-primary">
@@ -731,47 +777,67 @@ export default function Obligations() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
-                      {ob.type === 'debt' && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const d = debts.find((x) => x.id === ob.id);
-                            if (d) setEditDebtRow(d);
-                          }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-surface-border hover:bg-content-primary/[0.05] active:scale-[0.98] text-content-secondary text-xs font-mono font-semibold rounded-lg transition-colors"
-                        >
-                          <Pencil className="w-3 h-3" aria-hidden />
-                          Edit
-                        </button>
-                      )}
-                      {ob.type === 'recurring' && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const b = bills.find((x) => x.id === ob.id);
-                            if (b) setEditBillRow(b);
-                          }}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 border border-surface-border hover:border-content-muted active:scale-[0.98] text-content-secondary text-xs font-mono rounded-lg transition-colors"
-                        >
-                          <Pencil className="w-3 h-3" aria-hidden />
-                          Edit
-                        </button>
-                      )}
-                      {ob.type === 'ambush' && (
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            const cit = citations.find(c => c.id === ob.id);
-                            if (cit) {
-                              const ok = await resolveCitation(cit.id);
-                              if (ok) toast.success(`${ob.name} resolved`);
-                            } else toast.error('Citation not found');
-                          }}
-                          className="px-3 py-1 border border-rose-500/50 hover:bg-rose-500/10 active:scale-[0.98] text-rose-400 text-xs font-mono font-bold rounded-lg transition-colors"
-                        >PAY</button>
-                      )}
+                      <div className="inline-flex flex-col items-end gap-2">
+                        {ob.type === 'recurring' && isPastDue && (
+                          <button
+                            type="button"
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              const b = bills.find((x) => x.id === ob.id);
+                              if (!b) return;
+                              await markBillPaid(b.id);
+                              toast.success(`✓ ${b.biller} marked as paid`);
+                            }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-cta text-surface-base text-xs font-mono font-semibold hover:bg-brand-cta-hover transition-colors"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" aria-hidden />
+                            Mark paid
+                          </button>
+                        )}
+                        {ob.type === 'debt' && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const d = debts.find((x) => x.id === ob.id);
+                              if (d) setEditDebtRow(d);
+                            }}
+                            className="inline-flex items-center gap-1.5 px-2 py-1 text-content-tertiary hover:text-content-secondary text-[11px] font-mono underline-offset-2 hover:underline"
+                          >
+                            <Pencil className="w-3 h-3" aria-hidden />
+                            Edit
+                          </button>
+                        )}
+                        {ob.type === 'recurring' && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const b = bills.find((x) => x.id === ob.id);
+                              if (b) setEditBillRow(b);
+                            }}
+                            className="inline-flex items-center gap-1.5 px-2 py-1 text-content-tertiary hover:text-content-secondary text-[11px] font-mono underline-offset-2 hover:underline"
+                          >
+                            <Pencil className="w-3 h-3" aria-hidden />
+                            Edit
+                          </button>
+                        )}
+                        {ob.type === 'ambush' && (
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              const cit = citations.find((c) => c.id === ob.id);
+                              if (cit) {
+                                const ok = await resolveCitation(cit.id);
+                                if (ok) toast.success(`${ob.name} resolved`);
+                              } else toast.error('Citation not found');
+                            }}
+                            className="px-3 py-1 border border-rose-500/50 hover:bg-rose-500/10 active:scale-[0.98] text-rose-400 text-xs font-mono font-bold rounded-lg transition-colors"
+                          >
+                            PAY
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 );

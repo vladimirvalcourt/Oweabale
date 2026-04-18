@@ -60,7 +60,12 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
 
   return (
     <div className="space-y-6">
-      <CollapsibleModule title="Privacy Mode" icon={EyeOff} defaultOpen={false}>
+      <CollapsibleModule
+        title="Privacy Mode"
+        icon={EyeOff}
+        defaultOpen
+        summaryWhenCollapsed="Privacy Mode — Blur sensitive financial numbers throughout the app"
+      >
         <p className="text-sm text-content-tertiary mb-6">Control visibility of sensitive information.</p>
         <div className="flex items-center justify-between border border-surface-border rounded-lg p-4 bg-surface-elevated/50">
           <div className="flex items-center gap-4">
@@ -93,26 +98,26 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
           <div className="border border-surface-border rounded-lg p-4 bg-surface-elevated/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h4 className="text-sm font-medium text-content-primary">Export your data</h4>
-              <p className="text-xs text-content-tertiary mt-1">Download a copy of all your financial data in CSV format.</p>
+              <p className="text-xs text-content-tertiary mt-1">Download a JSON copy of your Oweable records.</p>
             </div>
             <button
               type="button"
               onClick={handleExportData}
-              className="rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:text-content-primary focus-app"
+              className="rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app shrink-0"
             >
               Export data
             </button>
           </div>
 
-          <div className="border border-surface-border rounded-lg p-4 bg-surface-elevated/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="border border-rose-500/25 rounded-lg p-4 bg-rose-500/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h4 className="text-sm font-medium text-amber-500">Reset Account Data</h4>
-              <p className="text-xs text-content-tertiary mt-1">Wipe everything and start over from scratch.</p>
+              <h4 className="text-sm font-medium text-rose-200">Reset Account Data</h4>
+              <p className="text-xs text-content-tertiary mt-1">Wipe bills, debts, assets, and transactions — account stays open.</p>
             </div>
             <button
               type="button"
               onClick={onOpenResetDialog}
-              className="rounded-lg border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-600 transition-colors hover:bg-amber-500 hover:text-white focus-app dark:text-amber-500"
+              className="shrink-0 rounded-lg border border-rose-500/50 bg-rose-500/15 px-4 py-2 text-sm font-medium text-rose-200 transition-colors hover:bg-rose-500/25 focus-app"
             >
               Reset data
             </button>

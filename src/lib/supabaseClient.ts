@@ -16,6 +16,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+/** For streaming `fetch` to Edge Functions (`functions.invoke` buffers the full body). */
+export const SUPABASE_URL = supabaseUrl;
+export const SUPABASE_ANON_KEY = supabaseAnonKey;
+
 /** Single browser client — anon key is safe to expose; RLS enforces access. */
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {

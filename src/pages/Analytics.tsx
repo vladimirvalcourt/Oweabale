@@ -14,6 +14,7 @@ import { CollapsibleModule } from '../components/CollapsibleModule';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
+import { TransitionLink } from '../components/TransitionLink';
 
 type Period = '1M' | '3M' | '6M' | '1Y' | 'ALL';
 
@@ -187,6 +188,7 @@ export default function Analytics() {
   }, [transactions]);
 
   const isPositiveDelta = netWorthDelta !== null && netWorthDelta >= 0;
+  const savingsGoalPct = 20;
 
   return (
     <div className="space-y-6">
@@ -213,38 +215,79 @@ export default function Analytics() {
 
       {/* Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          {
-            label: 'Current Net Worth',
-            value: latestSnapshot ? fmt(latestSnapshot.net_worth) : '—',
-            sub: latestSnapshot ? `Assets ${fmt(latestSnapshot.assets)} · Debts ${fmt(latestSnapshot.debts)}` : 'No data yet',
-            color: latestSnapshot && latestSnapshot.net_worth >= 0 ? 'text-emerald-400' : 'text-red-400',
-          },
-          {
-            label: `Net Worth Δ (${period})`,
-            value: netWorthDelta !== null ? `${isPositiveDelta ? '+' : ''}${fmt(netWorthDelta)}` : '—',
-            sub: netWorthDelta !== null ? (isPositiveDelta ? 'Growing' : 'Declining') : 'Need 2+ data points',
-            color: isPositiveDelta ? 'text-emerald-400' : netWorthDelta !== null ? 'text-red-400' : 'text-content-tertiary',
-          },
-          {
-            label: 'YTD Saved',
-            value: fmt(ytdMetrics.saved),
-            sub: `Income ${fmt(ytdMetrics.income)} · Spend ${fmt(ytdMetrics.expenses)}`,
-            color: ytdMetrics.saved >= 0 ? 'text-content-primary' : 'text-red-400',
-          },
-          {
-            label: 'Avg Savings Rate',
-            value: `${ytdMetrics.rate.toFixed(1)}%`,
-            sub: 'Year to date',
-            color: ytdMetrics.rate >= 20 ? 'text-emerald-400' : ytdMetrics.rate >= 10 ? 'text-amber-400' : 'text-red-400',
-          },
-        ].map(card => (
-          <div key={card.label} className="bg-surface-elevated border border-surface-border rounded-lg p-5">
-            <p className="metric-label normal-case text-content-tertiary mb-2">{card.label}</p>
-            <p className={`text-2xl font-mono font-bold tabular-nums data-numeric ${card.color}`}>{card.value}</p>
-            <p className="text-xs text-content-tertiary mt-1 truncate">{card.sub}</p>
-          </div>
-        ))}
+        <div className="bg-surface-elevated border border-surface-border rounded-lg p-5">
+          <p className="metric-label normal-case text-content-tertiary mb-2">Current Net Worth</p>
+          <p
+            className={`text-2xl font-mono font-bold tabular-nums data-numeric ${
+              latestSnapshot && latestSnapshot.net_worth >= 0 ? 'text-emerald-400' : 'text-red-400'
+            }`}
+          >
+            {latestSnapshot ? fmt(latestSnapshot.net_worth) : '—'}
+          </p>
+          <p className="text-xs text-content-tertiary mt-1 truncate">
+            {latestSnapshot ? `Assets ${fmt(latestSnapshot.assets)} · Debts ${fmt(latestSnapshot.debts)}` : 'No data yet'}
+          </p>
+        </div>
+
+        <div className="bg-surface-elevated border border-surface-border rounded-lg p-5">
+          <p className="metric-label normal-case text-content-tertiary mb-2">Net Worth Δ ({period})</p>
+          <p
+            className={`text-2xl font-mono font-bold tabular-nums data-numeric ${
+              isPositiveDelta ? 'text-emerald-400' : netWorthDelta !== null ? 'text-red-400' : 'text-content-tertiary'
+            }`}
+          >
+            {netWorthDelta !== null ? `${isPositiveDelta ? '+' : ''}${fmt(netWorthDelta)}` : '—'}
+          </p>
+          <p className="text-xs text-content-tertiary mt-1">
+            {netWorthDelta !== null ? (isPositiveDelta ? 'Growing' : 'Declining') : 'Need 2+ data points'}
+          </p>
+          {netWorthDelta !== null && netWorthDelta < 0 && (
+            <p className="mt-2 text-[11px] text-content-secondary leading-relaxed">
+              Snapshots lag real-time — tighten spending or add assets to bend the curve.{' '}
+              <TransitionLink to="/net-worth" className="text-content-primary underline underline-offset-2">
+                Open projection
+              </TransitionLink>
+            </p>
+          )}
+        </div>
+
+        <div className="bg-surface-elevated border border-surface-border rounded-lg p-5">
+          <p className="metric-label normal-case text-content-tertiary mb-2">YTD Saved</p>
+          <p className={`text-2xl font-mono font-bold tabular-nums data-numeric ${ytdMetrics.saved >= 0 ? 'text-content-primary' : 'text-red-400'}`}>
+            {fmt(ytdMetrics.saved)}
+          </p>
+          <p className="text-xs text-content-tertiary mt-1">Income {fmt(ytdMetrics.income)} · Spend {fmt(ytdMetrics.expenses)}</p>
+          {ytdMetrics.saved < 0 && (
+            <p className="mt-2 text-[11px] text-content-secondary leading-relaxed">
+              <TransitionLink to="/budgets" className="text-content-primary underline underline-offset-2">
+                Review budgets
+              </TransitionLink>{' '}
+              to close the gap this year.
+            </p>
+          )}
+        </div>
+
+        <div className="bg-surface-elevated border border-surface-border rounded-lg p-5">
+          <p className="metric-label normal-case text-content-tertiary mb-2">Avg Savings Rate</p>
+          <p
+            className={`text-2xl font-mono font-bold tabular-nums data-numeric ${
+              ytdMetrics.rate >= savingsGoalPct ? 'text-emerald-400' : ytdMetrics.rate >= 10 ? 'text-amber-400' : 'text-red-400'
+            }`}
+          >
+            {ytdMetrics.rate.toFixed(1)}%
+          </p>
+          <p className="text-xs text-content-tertiary mt-1">
+            Goal: {savingsGoalPct}% · You&apos;re at {ytdMetrics.rate.toFixed(1)}%
+          </p>
+          {ytdMetrics.rate < savingsGoalPct && (
+            <p className="mt-2 text-[11px] text-content-secondary leading-relaxed">
+              Automate a transfer on payday and trim one recurring bill to move toward {savingsGoalPct}%.{' '}
+              <TransitionLink to="/subscriptions" className="text-content-primary underline underline-offset-2">
+                Audit subscriptions
+              </TransitionLink>
+            </p>
+          )}
+        </div>
       </div>
 
       {/* Net Worth Timeline */}

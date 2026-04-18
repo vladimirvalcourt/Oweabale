@@ -8,6 +8,8 @@ interface CollapsibleModuleProps {
   children: React.ReactNode;
   defaultOpen?: boolean;
   extraHeader?: React.ReactNode;
+  /** One-line status shown when the panel is collapsed (e.g. current setting summary). */
+  summaryWhenCollapsed?: string;
   className?: string;
 }
 
@@ -17,6 +19,7 @@ export function CollapsibleModule({
   children,
   defaultOpen = true,
   extraHeader,
+  summaryWhenCollapsed,
   className = '',
 }: CollapsibleModuleProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -32,9 +35,14 @@ export function CollapsibleModule({
         onClick={() => startTransition(() => setIsOpen((o) => !o))}
         className="w-full text-left px-6 py-3 bg-surface-elevated/80 border-b border-surface-border flex items-center justify-between cursor-pointer group active:translate-y-[1px] hover:bg-surface-highlight transition-all border-t border-t-content-primary/5 focus-app"
       >
-        <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
           {Icon && <Icon className="w-4 h-4 shrink-0 text-content-tertiary group-hover:text-content-secondary transition-colors" aria-hidden />}
-          <h3 className="section-label group-hover:text-content-secondary transition-colors truncate">{title}</h3>
+          <div className="min-w-0">
+            <h3 className="section-label group-hover:text-content-secondary transition-colors truncate">{title}</h3>
+            {!isOpen && summaryWhenCollapsed ? (
+              <p className="mt-0.5 text-xs font-medium text-content-tertiary truncate">{summaryWhenCollapsed}</p>
+            ) : null}
+          </div>
         </div>
         <div className="flex items-center gap-4">
           {!isOpen && extraHeader}

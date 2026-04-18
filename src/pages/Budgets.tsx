@@ -12,6 +12,7 @@ import { CollapsibleModule } from '../components/CollapsibleModule';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { toast } from 'sonner';
+import { formatCategoryLabel } from '../lib/categoryDisplay';
 
 const BUDGET_PERIODS: Budget['period'][] = ['Weekly', 'Bi-weekly', 'Monthly', 'Quarterly', 'Yearly'];
 const SAVINGS_TARGET_STORAGE_KEY = 'oweable_budget_monthly_savings_target';
@@ -394,7 +395,7 @@ export default function Budgets() {
                   <div className="flex justify-between items-start mb-6">
                     <div>
                       <h3 className="text-sm font-semibold text-content-primary flex items-center gap-1.5">
-                        {budget.category}
+                        {formatCategoryLabel(budget.category)}
                         {anomalyMap[budget.category] && (
                           <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400">
                             ↑{anomalyMap[budget.category].overagePercent.toFixed(0)}%

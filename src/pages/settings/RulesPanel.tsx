@@ -1,16 +1,26 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useMemo, useState } from 'react';
 import { Filter, Plus, Trash2, RefreshCw, Loader2, Undo2 } from 'lucide-react';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { useStore } from '../../store/useStore';
 import { applyCategorizationRules, type CategorizationRule } from '../../lib/categorizationRules';
+import { formatCategoryLabel } from '../../lib/categoryDisplay';
 
 type RuleScope = 'one' | 'merchant' | 'similar';
+
+function looksLikeRawApiCategory(cat: string): boolean {
+  const c = cat.trim();
+  if (!c || c.length < 4) return false;
+  if (!c.includes('_')) return false;
+  if (c !== c.toUpperCase()) return false;
+  return /^[A-Z0-9_]+$/.test(c);
+}
 
 function RulesPanelInner() {
   const categories = useStore((s) => s.categories);
   const transactions = useStore((s) => s.transactions);
   const categorizationRules = useStore((s) => s.categorizationRules);
+  const retagTransactionsByCategory = useStore((s) => s.retagTransactionsByCategory);
   const addCategorizationRule = useStore((s) => s.addCategorizationRule);
   const deleteCategorizationRule = useStore((s) => s.deleteCategorizationRule);
   const categorizationExclusions = useStore((s) => s.categorizationExclusions);
@@ -67,6 +77,20 @@ function RulesPanelInner() {
           .slice(0, 5)
       : [];
 
+  const categoryRenameSuggestions = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const tx of transactions) {
+      if (tx.type !== 'expense') continue;
+      const c = tx.category || '';
+      if (!looksLikeRawApiCategory(c)) continue;
+      counts.set(c, (counts.get(c) || 0) + 1);
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 24)
+      .map(([from]) => ({ from, to: formatCategoryLabel(from) }));
+  }, [transactions]);
+
   const runSimulation = () => {
     if (categorizationRules.length === 0) {
       toast.error('Add at least one rule first');
@@ -97,6 +121,53 @@ function RulesPanelInner() {
         }
       >
         <div className="-mx-6 -my-6">
+          {categoryRenameSuggestions.length > 0 && (
+            <div className="p-6 border-b border-surface-border bg-content-primary/[0.03]">
+              <p className="text-sm font-medium text-content-primary mb-1">Suggested renames from your transactions</p>
+              <p className="text-xs text-content-tertiary mb-4">
+                We found labels that look like raw bank categories — accept a friendlier name for all matching transactions.
+              </p>
+              <ul className="space-y-2">
+                {categoryRenameSuggestions.map((s) => (
+                  <li
+                    key={s.from}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-surface-border bg-surface-raised px-3 py-2"
+                  >
+                    <span className="text-xs font-mono text-content-secondary">
+                      {s.from} → <span className="text-emerald-400">{s.to}</span>
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const n = await retagTransactionsByCategory(s.from, s.to);
+                          if (n === 0) toast.info('No transactions needed updating.');
+                          else toast.success(`Renamed ${n} transaction${n === 1 ? '' : 's'}`);
+                        }}
+                        className="rounded-lg bg-brand-cta px-3 py-1.5 text-xs font-medium text-surface-base hover:bg-brand-cta-hover"
+                      >
+                        Accept
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setRuleForm((f) => ({
+                            ...f,
+                            scope: 'similar',
+                            match_value: s.from,
+                            category: s.to,
+                          }))
+                        }
+                        className="rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary hover:bg-surface-elevated"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="p-6 border-b border-surface-border bg-surface-base">
             <p className="mb-4 text-sm font-medium text-content-secondary">
               New auto-category — choose a safe scope before saving

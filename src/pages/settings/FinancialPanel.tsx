@@ -1,7 +1,9 @@
-import React, { memo, useState } from 'react';
-import { Globe, PieChart } from 'lucide-react';
+import React, { memo, useEffect, useState } from 'react';
+import { Globe, PieChart, MapPin } from 'lucide-react';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
+import { useStore } from '../../store/useStore';
+import { STATE_TAX_MAP } from '../Taxes';
 
 function deferToast(fn: () => void) {
   requestAnimationFrame(() => {
@@ -10,11 +12,22 @@ function deferToast(fn: () => void) {
 }
 
 function FinancialPanelInner() {
+  const taxState = useStore((s) => s.user.taxState ?? '');
+  const taxRate = useStore((s) => s.user.taxRate ?? 0);
+  const setTaxSettings = useStore((s) => s.setTaxSettings);
+
   const [prefCurrency, setPrefCurrency] = useState('USD ($)');
   const [prefDateFormat, setPrefDateFormat] = useState('MM/DD/YYYY');
   const [prefFiscalYear, setPrefFiscalYear] = useState('January');
-  const [prefDashboardView, setPrefDashboardView] = useState('Net Worth Overview');
+  const [prefDashboardView, setPrefDashboardView] = useState('Cash Flow');
   const [prefSpendingLimit, setPrefSpendingLimit] = useState('5000');
+  const [localTaxState, setLocalTaxState] = useState(taxState || '');
+  const [localTaxRate, setLocalTaxRate] = useState(String(taxRate || STATE_TAX_MAP.NY.rate));
+
+  useEffect(() => {
+    setLocalTaxState(taxState || '');
+    setLocalTaxRate(String(taxRate ?? STATE_TAX_MAP.NY.rate));
+  }, [taxState, taxRate]);
 
   return (
     <div className="space-y-6">
@@ -78,6 +91,8 @@ function FinancialPanelInner() {
               onChange={(e) => setPrefDashboardView(e.target.value)}
               className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
             >
+              <option>Cash Flow</option>
+              <option>Safe to Spend</option>
               <option>Net Worth Overview</option>
               <option>Upcoming Bills</option>
               <option>Debt Detonator Timeline</option>
@@ -92,6 +107,64 @@ function FinancialPanelInner() {
               Save preferences
             </button>
           </div>
+        </div>
+      </CollapsibleModule>
+
+      <CollapsibleModule title="Tax residence (freelance)" icon={MapPin} defaultOpen={false}>
+        <p id="tax-state-preference" className="mb-4 text-sm text-content-secondary">
+          Used for Freelance Vault state tax estimates. You can also adjust this from the Taxes page.
+        </p>
+        <div className="max-w-md space-y-4">
+          <div>
+            <label className="mb-2 block text-xs font-medium text-content-secondary" htmlFor="pref-tax-state">
+              State
+            </label>
+            <select
+              id="pref-tax-state"
+              value={localTaxState || 'NY'}
+              onChange={(e) => {
+                const code = e.target.value;
+                setLocalTaxState(code);
+                const r = STATE_TAX_MAP[code];
+                if (r) setLocalTaxRate(String(r.rate));
+              }}
+              className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
+            >
+              {Object.entries(STATE_TAX_MAP).map(([code, { name }]) => (
+                <option key={code} value={code}>
+                  {name} ({code})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-2 block text-xs font-medium text-content-secondary" htmlFor="pref-tax-rate">
+              Estimated state rate (%)
+            </label>
+            <input
+              id="pref-tax-rate"
+              type="number"
+              step="0.01"
+              value={localTaxRate}
+              onChange={(e) => setLocalTaxRate(e.target.value)}
+              className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={async () => {
+              const rate = parseFloat(localTaxRate);
+              if (!Number.isFinite(rate) || rate < 0) {
+                toast.error('Enter a valid tax rate.');
+                return;
+              }
+              await setTaxSettings(localTaxState || 'NY', rate);
+              toast.success('Tax settings saved');
+            }}
+            className="rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base hover:bg-brand-cta-hover"
+          >
+            Save tax settings
+          </button>
         </div>
       </CollapsibleModule>
 
@@ -120,10 +193,10 @@ function FinancialPanelInner() {
           <div className="pt-2">
             <button
               type="button"
-              onClick={() => deferToast(() => toast.success('Budget limits updated'))}
+              onClick={() => deferToast(() => toast.success('Budget limit saved'))}
               className="rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
             >
-              Update limits
+              Save limit
             </button>
           </div>
         </div>

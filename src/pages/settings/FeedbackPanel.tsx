@@ -10,7 +10,17 @@ function FeedbackPanelInner() {
   const [feedbacks, setFeedbacks] = useState<UserFeedback[]>([]);
   const [feedbacksLoading, setFeedbacksLoading] = useState(false);
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
-  const [feedbackForm, setFeedbackForm] = useState({ type: 'general', rating: 0, message: '' });
+  const [feedbackForm, setFeedbackForm] = useState<{
+    type: 'general' | 'feature_request' | 'bug';
+    rating: number;
+    message: string;
+  }>({ type: 'general', rating: 0, message: '' });
+
+  const FEEDBACK_TYPES: { id: typeof feedbackForm.type; label: string }[] = [
+    { id: 'general', label: 'General' },
+    { id: 'feature_request', label: 'Feature' },
+    { id: 'bug', label: 'Bug' },
+  ];
 
   useEffect(() => {
     setFeedbacksLoading(true);
@@ -76,34 +86,46 @@ function FeedbackPanelInner() {
           <form onSubmit={handleSubmitFeedback} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="mb-2 block text-xs font-medium text-content-secondary">
-                  Type
-                </label>
-                <select
-                  value={feedbackForm.type}
-                  onChange={(e) => setFeedbackForm((f) => ({ ...f, type: e.target.value }))}
-                  className="focus-app-field w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary"
-                >
-                  <option value="general">General Feedback</option>
-                  <option value="feature_request">Feature Request</option>
-                  <option value="bug">Bug Report</option>
-                </select>
+                <label className="mb-2 block text-xs font-medium text-content-secondary">Type</label>
+                <div className="flex flex-wrap gap-2">
+                  {FEEDBACK_TYPES.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => setFeedbackForm((f) => ({ ...f, type: t.id }))}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        feedbackForm.type === t.id
+                          ? 'border-content-primary/25 bg-content-primary/[0.08] text-content-primary'
+                          : 'border-surface-border bg-surface-raised text-content-tertiary hover:text-content-secondary'
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
               </div>
               <div>
                 <label className="mb-2 block text-xs font-medium text-content-secondary">
                   Rating (optional)
                 </label>
-                <div className="flex items-center gap-1.5 h-[38px]">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setFeedbackForm((f) => ({ ...f, rating: f.rating === star ? 0 : star }))}
-                      className="text-content-muted hover:text-amber-400 transition-colors"
-                    >
-                      <Star className={`w-5 h-5 ${feedbackForm.rating >= star ? 'fill-amber-400 text-amber-400' : ''}`} />
-                    </button>
-                  ))}
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1.5 h-[38px]">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        title={star === 1 ? 'Poor' : star === 5 ? 'Excellent' : `Rating ${star}`}
+                        onClick={() => setFeedbackForm((f) => ({ ...f, rating: f.rating === star ? 0 : star }))}
+                        className="text-content-muted hover:text-amber-400 transition-colors"
+                      >
+                        <Star className={`w-5 h-5 ${feedbackForm.rating >= star ? 'fill-amber-400 text-amber-400' : ''}`} />
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex justify-between text-[10px] font-medium text-content-muted px-0.5">
+                    <span>1 = Poor</span>
+                    <span>5 = Excellent</span>
+                  </div>
                 </div>
               </div>
             </div>

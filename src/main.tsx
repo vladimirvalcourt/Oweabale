@@ -53,7 +53,9 @@ if (!supabaseUrl || !supabaseKey) {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 30_000,
+      // Keep responses immediately stale so post-mutation refetches actually run.
+      // Cache is preserved (gcTime default 5min) so repeat views avoid round-trips.
+      staleTime: 0,
       refetchOnWindowFocus: false,
       retry: 1,
     },

@@ -19,7 +19,7 @@ npm run lint      # TypeScript + ESLint
 
 | Layer | Tool |
 |---|---|
-| Framework | React 19 + Vite 6 |
+| Framework | React 19 + Vite 8 |
 | Routing | React Router DOM v7 |
 | State | Zustand v5 |
 | Database | Supabase (PostgreSQL + Auth) |

@@ -1,5 +1,6 @@
 import React, { memo, useEffect, useState } from 'react';
 import { LifeBuoy, MessageSquare, Send, Loader2, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
@@ -17,7 +18,9 @@ function SupportPanelInner() {
     priority: 'Normal',
     description: '',
   });
-  const bankConnected = useStore((s) => s.bankConnected);
+  const { bankConnected, userEmail } = useStore(
+    useShallow((s) => ({ bankConnected: s.bankConnected, userEmail: s.user.email ?? '' })),
+  );
   const plaidNeedsRelink = useStore((s) => s.plaidNeedsRelink);
   const plaidLastSyncAt = useStore((s) => s.plaidLastSyncAt);
   const [isOnline, setIsOnline] = useState<boolean>(() =>
@@ -123,7 +126,7 @@ function SupportPanelInner() {
     };
     setTickets((prev) => [newTicket, ...prev]);
     setSupportForm({ subject: '', department: 'General Support', priority: 'Normal', description: '' });
-    toast.success(`Ticket ${data.ticket_number} submitted`);
+    toast.success(`Your request has been submitted (Ticket #${data.ticket_number}). Check your email for confirmation.`);
   };
 
   return (
@@ -201,7 +204,7 @@ function SupportPanelInner() {
                   className="focus-app-field w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary"
                 >
                   <option value="Low">Low — general question</option>
-                  <option value="Normal">Normal — something isn&apos;t working</option>
+                  <option value="Normal">Normal</option>
                   <option value="Urgent">Urgent — blocking me completely</option>
                 </select>
               </div>
@@ -219,7 +222,7 @@ function SupportPanelInner() {
               />
             </div>
 
-            <div className="flex justify-end pt-2">
+            <div className="flex flex-col items-end gap-2 pt-2">
               <button
                 type="submit"
                 disabled={isSubmittingTicket}
@@ -228,6 +231,12 @@ function SupportPanelInner() {
                 {isSubmittingTicket ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                 {isSubmittingTicket ? 'Sending...' : 'Submit Request'}
               </button>
+              <p className="max-w-md text-right text-[11px] text-content-tertiary leading-relaxed">
+                We typically respond within 24 hours.
+                {userEmail
+                  ? ` You'll receive a confirmation at ${userEmail}.`
+                  : ' You will receive a confirmation email at your account address.'}
+              </p>
             </div>
           </form>
         </div>

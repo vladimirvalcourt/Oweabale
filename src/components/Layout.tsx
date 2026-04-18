@@ -505,7 +505,8 @@ export default function Layout() {
                         const Icon = item.icon;
                         const isActive = item.isActive;
                         const isOweAi = item.name === 'Owe-AI';
-                        const isDueSoonItem = item.name === 'Due soon' && ((item as { count?: number }).count ?? 0) > 0;
+                        const navCount = (item as { count?: number }).count;
+                        const isDueSoonItem = item.name === 'Due soon' && (navCount ?? 0) > 0;
                         return (
                           <div
                             key={item.name}
@@ -556,11 +557,11 @@ export default function Layout() {
                                       AI
                                     </span>
                                   )}
-                                  {(item as { count?: number }).count !== undefined && (item as { count?: number }).count! > 0 && (
+                                  {navCount !== undefined && navCount > 0 && (
                                     <span className="relative flex items-center gap-1.5 shrink-0 px-1">
                                       <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
                                       <span className="text-[10px] font-mono text-content-secondary tabular-nums">
-                                        {(item as { count?: number }).count}
+                                        {navCount}
                                       </span>
                                     </span>
                                   )}
@@ -702,7 +703,7 @@ export default function Layout() {
                     </ul>
                   ) : (
                     <div className="px-4 py-3 text-sm text-content-tertiary text-center">
-                      No results found for "{searchQuery}"
+                      {`No results found for "${searchQuery}"`}
                     </div>
                   )}
                 </div>

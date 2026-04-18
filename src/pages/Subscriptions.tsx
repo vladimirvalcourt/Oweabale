@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useStore, type Subscription } from '../store/useStore';
 import { normalizeToMonthly, detectUnusedSubscriptions } from '../lib/finance';
+import { detectSubscriptionCandidates, type SubscriptionCandidate } from '../lib/subscriptionCandidates';
 import { Repeat, Plus, Edit2, Trash2, TrendingUp, X, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
@@ -13,6 +14,23 @@ const CANCELLATION_REVIEW_STORAGE_KEY = 'oweable_subscription_cancellation_revie
 
 function toSubFrequency(value: string): SubFrequency {
   return SUB_FREQUENCIES.includes(value as SubFrequency) ? (value as SubFrequency) : 'Monthly';
+}
+
+function candidateToSubFrequency(label: string): SubFrequency {
+  if (label === 'Weekly') return 'Weekly';
+  if (label === 'Bi-weekly') return 'Bi-weekly';
+  if (label === 'Yearly') return 'Yearly';
+  return 'Monthly';
+}
+
+function nextBillingFromCandidate(c: SubscriptionCandidate): string {
+  const last = c.sampleDates[c.sampleDates.length - 1] ?? new Date().toISOString().split('T')[0];
+  const d = new Date(last.includes('T') ? last : `${last}T12:00:00`);
+  if (c.frequencyLabel === 'Weekly') d.setDate(d.getDate() + 7);
+  else if (c.frequencyLabel === 'Bi-weekly') d.setDate(d.getDate() + 14);
+  else if (c.frequencyLabel === 'Yearly') d.setFullYear(d.getFullYear() + 1);
+  else d.setMonth(d.getMonth() + 1);
+  return d.toISOString().split('T')[0];
 }
 
 export default function Subscriptions() {
@@ -127,6 +145,11 @@ export default function Subscriptions() {
     0
   );
 
+  const subscriptionCandidates = useMemo(() => {
+    const existing = new Set(subscriptions.map((s) => s.name.trim().toLowerCase()));
+    return detectSubscriptionCandidates(transactions, existing);
+  }, [transactions, subscriptions]);
+
   const unusedSubs = useMemo(() =>
     detectUnusedSubscriptions(subscriptions, transactions),
     [subscriptions, transactions]
@@ -211,6 +234,68 @@ export default function Subscriptions() {
           Add subscription
         </button>
       </div>
+
+      {activeSubscriptions.length === 0 && subscriptionCandidates.length > 0 && (
+        <div className="rounded-lg border border-brand-cta/25 bg-brand-cta/10 p-4">
+          <p className="text-sm font-medium text-content-primary">
+            We detected {subscriptionCandidates.length} possible subscription{subscriptionCandidates.length === 1 ? '' : 's'} from
+            your transactions —{' '}
+            <button
+              type="button"
+              onClick={() => {
+                const el = document.getElementById('suggested-subscriptions');
+                el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              className="text-content-primary underline underline-offset-2 font-semibold"
+            >
+              Review suggestions
+            </button>
+          </p>
+        </div>
+      )}
+
+      {subscriptionCandidates.length > 0 && (
+        <div id="suggested-subscriptions" className="scroll-mt-24 rounded-lg border border-surface-border bg-surface-raised p-5">
+          <h2 className="text-sm font-semibold text-content-primary mb-3">Suggested subscriptions</h2>
+          <p className="text-xs text-content-tertiary mb-4">
+            Based on repeating charges in your transactions. Confirm amount and next date after adding.
+          </p>
+          <ul className="space-y-3">
+            {subscriptionCandidates.map((c) => (
+              <li
+                key={c.id}
+                className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-surface-border bg-surface-base px-4 py-3"
+              >
+                <div>
+                  <p className="text-sm font-medium text-content-primary">{c.name}</p>
+                  <p className="text-xs text-content-tertiary mt-0.5">
+                    ~${c.typicalAmount.toFixed(2)} · {c.frequencyLabel}
+                    {c.confidence === 'high' ? ' · High confidence' : ''}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await yieldForPaint();
+                    const ok = await addSubscription({
+                      name: c.name,
+                      amount: c.typicalAmount,
+                      frequency: candidateToSubFrequency(c.frequencyLabel),
+                      nextBillingDate: nextBillingFromCandidate(c),
+                      status: 'active',
+                    });
+                    if (!ok) return;
+                    toast.success(`${c.name} added`);
+                  }}
+                  className="shrink-0 rounded-lg bg-brand-cta px-4 py-2 text-xs font-semibold text-surface-base hover:bg-brand-cta-hover"
+                >
+                  Add
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Subscription Optimizer */}
       {unusedSubs.length > 0 && (
