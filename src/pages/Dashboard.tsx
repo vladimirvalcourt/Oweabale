@@ -541,7 +541,7 @@ export default function Dashboard() {
               <YAxis hide />
               <Tooltip
                 {...rechartsTooltipStableProps}
-                formatter={(value: number) => [`$${value.toLocaleString()}`, 'Balance']}
+                formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Balance']}
                 contentStyle={{ background: 'var(--surface-elevated)', border: '1px solid var(--surface-border)', borderRadius: '4px', fontSize: '11px' }}
               />
               <Area type="monotone" dataKey="balance" stroke="#6366f1" fill="url(#forecastGrad)" strokeWidth={1.5} dot={false} />
