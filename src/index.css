@@ -26,6 +26,11 @@
 
   --font-sans: "Geist Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Vercel-like UI scale: 14px body, comfortable line height */
+  --text-ui-body: 0.875rem;
+  --leading-ui-body: 1.5;
+  --leading-ui-tight: 1.25;
   
   --shadow-tactile: 0 1px 0 rgba(255, 255, 255, 0.06);
   --shadow-tactile-hover: 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -71,22 +76,23 @@
     box-shadow: var(--shadow-tactile-hover);
     filter: brightness(1.1);
   }
-  /* Wordmark: sans + weight, not monospace “terminal” styling */
+  /* Wordmark — Vercel-style tight uppercase label */
   .brand-header-text {
-    @apply font-sans font-semibold text-sm uppercase tracking-tight text-content-primary;
+    @apply font-sans text-sm font-semibold uppercase tracking-[-0.02em] text-content-primary;
   }
 
-  /* Section titles — read in sans; reserve mono for numeric data */
+  /* Section chrome — sans micro-labels (not monospace) */
   .section-label {
-    @apply text-[11px] font-sans font-semibold uppercase tracking-wide text-content-tertiary;
+    @apply font-sans text-[11px] font-medium uppercase tracking-[0.08em] text-content-tertiary;
   }
 
   .metric-label {
-    @apply text-[12px] font-sans font-medium uppercase tracking-[0.06em] text-content-tertiary;
+    @apply font-sans text-[12px] font-medium uppercase tracking-[0.06em] text-content-tertiary;
   }
 
   .data-numeric {
     @apply font-mono tabular-nums;
+    letter-spacing: 0;
   }
 
   /* Focus — visible keyboard focus (WCAG 2.4.7) + border cues on fields. */
@@ -257,6 +263,10 @@
 
 html {
   min-height: 100dvh;
+  /* Crisp Geist/Inter rendering (Vercel dashboard–style) */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 #root {
@@ -264,10 +274,36 @@ html {
 }
 
 body {
-  @apply bg-surface-base text-content-primary antialiased tabular-nums selection:bg-white/15;
-  font-feature-settings: "cv01" 1, "ss03" 1;
-  letter-spacing: normal;
+  @apply bg-surface-base font-sans text-content-primary antialiased selection:bg-white/15;
+  /* 14px / 1.5 — matches Vercel marketing & dashboard body copy */
+  font-size: var(--text-ui-body);
+  line-height: var(--leading-ui-body);
+  font-weight: 400;
+  letter-spacing: -0.006em;
+  /* OpenType: Geist ligatures + contextual alternates (not tabular figures on prose) */
+  font-feature-settings: "rlig" 1, "calt" 1, "cv01" 1, "ss03" 1;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@layer base {
+  /* Lucide — Vercel-style UI icons: consistent thin stroke + round caps */
+  svg.lucide {
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* Headings: tight tracking + balance (Vercel-style display type) */
+  :where(h1, h2, h3, h4) {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: var(--leading-ui-tight);
+    text-wrap: balance;
+  }
+  :where(h1) {
+    letter-spacing: -0.025em;
+  }
 }
 
 /* Theme Variants */

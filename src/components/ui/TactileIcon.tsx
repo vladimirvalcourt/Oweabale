@@ -24,6 +24,7 @@ function TactileIconStatic({
     <span className={cn('relative inline-flex shrink-0 items-center justify-center', className)} aria-hidden>
       <Icon
         size={size}
+        strokeWidth={1.5}
         className={cn(
           'transition-colors duration-300',
           active ? 'text-content-primary' : 'text-content-tertiary group-hover:text-content-primary',
@@ -88,6 +89,7 @@ function TactileIconInteractive({
       >
         <Icon
           size={size}
+          strokeWidth={1.5}
           className={cn(
             'transition-colors duration-300',
             active ? 'text-content-primary' : 'text-content-tertiary group-hover:text-content-primary',

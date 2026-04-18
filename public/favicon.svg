@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <!-- Pitch Black background -->
-  <rect width="32" height="32" fill="#09090b"/>
-  
-  <!-- Brutalist 'O' -->
-  <rect x="5" y="8" width="10" height="16" fill="#ffffff"/>
-  <!-- Cutout for the O to make it exactly 3px thick on all sides -->
-  <rect x="8" y="11" width="4" height="10" fill="#09090b"/>
-  
-  <!-- Brutalist 'E' -->
-  <!-- Mapped perfectly to integer pixels: 3px top bar, 3px middle gap, 4px middle bar, 3px bottom gap, 3px bottom bar -->
-  <path d="M17 8 h10 v3 h-7 v3 h5 v4 h-5 v3 h7 v3 h-10 v-16 z" fill="#a855f7" />
+  <rect width="32" height="32" fill="#000000"/>
+  <!-- O — rounded stroke frame (Vercel-like geometric mark) -->
+  <rect x="4.75" y="7.75" width="12.5" height="16.5" rx="2.5" stroke="#ffffff" stroke-width="1.5"/>
+  <!-- E — spine + arms -->
+  <path
+    d="M19 8h8.25M19 16h7M19 24h8.25M19 8v16"
+    stroke="#a855f7"
+    stroke-width="1.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
 </svg>
