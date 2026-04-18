@@ -1,10 +1,11 @@
 import React, { useState, startTransition } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, Shield, Vault, Receipt, Activity, Flame, Wallet, TrendingUp, FileSearch, Target } from 'lucide-react';
+import { ArrowRight, Shield, Vault, Receipt, Activity, Flame, Wallet, FileSearch, Target, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 import { PrivacyScreenWhenHidden } from '../components/PrivacyScreenWhenHidden';
+import { cn } from '../lib/utils';
 
 type Step = {
   id: string;
@@ -16,35 +17,91 @@ type Step = {
 const STEPS: Step[] = [
   {
     id: 'assets',
-    title: 'Your Cash & Bank',
-    subtitle: 'Checking, Savings, and Petty Cash',
-    description: 'Tell us how much money you have available right now.'
+    title: 'Your cash & bank',
+    subtitle: 'Checking, savings, and cash on hand',
+    description: 'Tell us how much you have available right now.',
   },
   {
     id: 'obligations',
-    title: 'Monthly Bills',
-    subtitle: 'Rent, Utilities, and Fixed Costs',
-    description: 'We need to know your regular monthly expenses.'
+    title: 'Monthly bills',
+    subtitle: 'Rent, utilities, and fixed costs',
+    description: 'Rough total of regular monthly expenses.',
   },
   {
     id: 'velocity',
-    title: 'Spending Limit',
-    subtitle: 'Daily Spending Target',
-    description: 'Optional rough cap — we turn it into a monthly budget line you can edit anytime.'
+    title: 'Daily spending comfort',
+    subtitle: 'Optional daily target',
+    description: 'We turn this into a monthly “Flexible spending” budget you can edit anytime.',
   },
   {
     id: 'strategy',
-    title: 'Your Main Goal',
-    subtitle: 'What are we working on first?',
-    description: 'Choose whether you want to save more or pay off debt faster.'
+    title: 'What should we optimize first?',
+    subtitle: 'Pick a starting focus',
+    description: 'You can change this later in settings.',
   },
   {
     id: 'freelance',
-    title: 'Gig Work Mode',
-    subtitle: 'Are you a freelancer?',
-    description: 'Enable high-precision tax shielding and statement scanning.'
-  }
+    title: 'How do you earn?',
+    subtitle: 'Contractor vs W-2',
+    description: 'This tunes tax and income workflows. You can update it later.',
+  },
 ];
+
+function SubtleGrid() {
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 opacity-[0.04]"
+      style={{
+        backgroundImage:
+          'linear-gradient(var(--color-content-primary) 1px, transparent 1px), linear-gradient(90deg, var(--color-content-primary) 1px, transparent 1px)',
+        backgroundSize: '48px 48px',
+      }}
+      aria-hidden
+    />
+  );
+}
+
+type ChoiceCardProps = {
+  selected: boolean;
+  onSelect: () => void;
+  title: string;
+  description: string;
+  accent?: 'neutral' | 'rose';
+  className?: string;
+};
+
+function ChoiceCard({ selected, onSelect, title, description, accent = 'neutral', className }: ChoiceCardProps) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      aria-pressed={selected}
+      className={cn(
+        'relative flex min-h-[7.5rem] flex-col rounded-xl border p-5 text-left transition-colors focus-app sm:min-h-[8.25rem]',
+        selected
+          ? accent === 'rose'
+            ? 'border-rose-500/50 bg-surface-elevated ring-2 ring-rose-500/35'
+            : 'border-white/25 bg-surface-elevated ring-2 ring-white/20'
+          : 'border-surface-border bg-surface-base hover:border-white/15 hover:bg-surface-raised/80',
+        className,
+      )}
+    >
+      <span className="flex items-start justify-between gap-3">
+        <span className="text-sm font-semibold text-content-primary">{title}</span>
+        <span
+          className={cn(
+            'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors',
+            selected ? 'border-white/40 bg-white/10 text-content-primary' : 'border-surface-border bg-transparent text-transparent',
+          )}
+          aria-hidden
+        >
+          <Check className="h-3.5 w-3.5" strokeWidth={2.5} />
+        </span>
+      </span>
+      <p className="mt-3 text-xs leading-relaxed text-content-secondary">{description}</p>
+    </button>
+  );
+}
 
 export default function Onboarding() {
   const [showWelcome, setShowWelcome] = useState(true);
@@ -55,7 +112,7 @@ export default function Onboarding() {
     bills: '',
     dailyLimit: '',
     focus: 'stacking',
-    freelance: null as boolean | null
+    freelance: null as boolean | null,
   });
 
   const navigate = useNavigate();
@@ -63,12 +120,10 @@ export default function Onboarding() {
   const currentStep = STEPS[currentStepIndex];
 
   const persistOnboardingData = async (): Promise<boolean> => {
-    // Step 1 — cash becomes a "Checking Account" asset
     const assetPromises: Promise<boolean>[] = [];
     if (formData.cash && parseFloat(formData.cash) > 0) {
       assetPromises.push(addAsset({ name: 'Primary Checking', value: parseFloat(formData.cash), type: 'Cash' }));
     }
-    // Step 2 — monthly bills total becomes a General budget ceiling
     if (formData.bills && parseFloat(formData.bills) > 0) {
       assetPromises.push(addBudget({ category: 'General', amount: parseFloat(formData.bills), period: 'Monthly' }));
     }
@@ -79,23 +134,22 @@ export default function Onboarding() {
           category: 'Flexible spending',
           amount: Math.round(daily * 30 * 100) / 100,
           period: 'Monthly',
-        })
+        }),
       );
     }
     await Promise.all(assetPromises);
     const freelanceOn = formData.freelance === true;
-    // Step 3/4/5 — strategy stored on profile; must finish before navigation or the next load will re-show onboarding.
     const saved = await updateUser({
       theme: formData.focus === 'detonation' ? 'Detonation' : 'Dark',
       hasCompletedOnboarding: true,
     });
     if (!saved) return false;
-    // freelance === true only for contractors; null/false → standard household messaging
     addNotification({
-      title: freelanceOn ? 'Independent Contractor Mode Active' : 'Standard Mode Active',
-      message: formData.focus === 'detonation'
-        ? 'Debt Detonation strategy selected. Highest APR targets prioritized.'
-        : 'Wealth Stacking strategy selected. Growth trajectory enabled.',
+      title: freelanceOn ? 'Independent contractor mode' : 'Standard household mode',
+      message:
+        formData.focus === 'detonation'
+          ? 'Debt payoff focus is on. Highest-cost debt gets priority in your plan.'
+          : 'Wealth-building focus is on. We’ll emphasize savings and growth where it helps.',
       type: 'info',
     });
     return true;
@@ -104,7 +158,7 @@ export default function Onboarding() {
   const handleNext = async () => {
     if (currentStepIndex < STEPS.length - 1) {
       setDirection(1);
-      setCurrentStepIndex(prev => prev + 1);
+      setCurrentStepIndex((prev) => prev + 1);
     } else {
       const ok = await persistOnboardingData();
       if (!ok) return;
@@ -116,13 +170,13 @@ export default function Onboarding() {
   const handleBack = () => {
     if (currentStepIndex > 0) {
       setDirection(-1);
-      setCurrentStepIndex(prev => prev - 1);
+      setCurrentStepIndex((prev) => prev - 1);
     }
   };
 
   const variants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 10 : -10,
+    enter: (d: number) => ({
+      x: d > 0 ? 12 : -12,
       opacity: 0,
     }),
     center: {
@@ -130,360 +184,326 @@ export default function Onboarding() {
       x: 0,
       opacity: 1,
     },
-    exit: (direction: number) => ({
+    exit: (d: number) => ({
       zIndex: 0,
-      x: direction < 0 ? 10 : -10,
+      x: d < 0 ? 12 : -12,
       opacity: 0,
-    })
+    }),
   };
 
   const firstName = user.firstName || 'there';
+  const progress = (currentStepIndex + 1) / STEPS.length;
+
+  const skipSetup = async () => {
+    const ok = await updateUser({ hasCompletedOnboarding: true });
+    if (!ok) return;
+    toast.success('Setup skipped.');
+    startTransition(() => navigate('/dashboard'));
+  };
 
   if (showWelcome) {
     return (
       <>
-      <PrivacyScreenWhenHidden />
-      <div className="fixed inset-0 bg-[#08090A] flex flex-col items-center justify-center p-6 overflow-hidden selection:bg-white/10 font-sans">
-        {/* Background HUD Grid */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '64px 64px' }} />
-          <div className="absolute top-0 left-0 w-full h-[1px] bg-surface-border opacity-20" />
-          <div className="absolute top-0 left-0 w-[1px] h-full bg-surface-border opacity-20" />
-          <div className="absolute bottom-0 right-0 w-full h-[1px] bg-surface-border opacity-20" />
-          <div className="absolute bottom-0 right-0 w-[1px] h-full bg-surface-border opacity-20" />
-        </div>
+        <PrivacyScreenWhenHidden />
+        <div className="fixed inset-0 flex flex-col bg-surface-base font-sans text-content-primary selection:bg-white/10">
+          <SubtleGrid />
 
-        {/* Top bar */}
-        <div className="absolute left-0 right-0 top-0 z-20 flex h-12 items-center justify-between border-b border-surface-border bg-surface-base/90 px-6">
-          <div className="text-sm font-medium tracking-tight text-content-primary">Oweable</div>
-          <div className="flex items-center gap-4">
+          <header className="relative z-20 flex h-14 shrink-0 items-center justify-between border-b border-surface-border bg-surface-base/90 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/75 sm:px-6">
+            <span className="text-sm font-semibold tracking-tight">Oweable</span>
             <button
               type="button"
-              onClick={async () => {
-                const ok = await updateUser({ hasCompletedOnboarding: true });
-                if (!ok) return;
-                toast.success('Setup skipped.');
-                startTransition(() => navigate('/dashboard'));
-              }}
-              className="rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-elevated hover:text-content-primary"
+              onClick={() => void skipSetup()}
+              className="min-h-10 rounded-lg border border-surface-border px-4 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-raised hover:text-content-primary focus-app"
             >
               Skip setup
             </button>
-            <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-          </div>
-        </div>
+          </header>
 
-        {/* Welcome content */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-          className="w-full max-w-xl relative z-10"
-        >
-          {/* Status badge */}
-          <div className="mb-8 flex items-center gap-2">
-            <div className="h-1 w-1 animate-pulse rounded-full bg-emerald-500" />
-            <span className="text-xs font-medium text-zinc-400">Secure connection</span>
-          </div>
+          <main className="relative z-10 flex flex-1 flex-col items-center overflow-y-auto px-4 py-10 sm:px-6 sm:py-14">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.45, ease: [0.19, 1, 0.22, 1] }}
+              className="w-full max-w-lg"
+            >
+              <p className="mb-4 text-[11px] font-mono font-medium uppercase tracking-[0.14em] text-content-tertiary">
+                Quick setup · ~2 min
+              </p>
 
-          {/* Headline */}
-          <h1 className="mb-2 text-3xl font-medium tracking-tight text-white md:text-4xl">
-            Welcome,
-            <br />
-            <span className="text-zinc-200">{firstName}.</span>
-          </h1>
-          <p className="mb-4 max-w-md text-sm font-medium leading-relaxed text-zinc-400">
-            In a couple of minutes you will have a working dashboard: cash, bills, and a default strategy. Everything you enter here is optional — add or edit the rest anytime.
-          </p>
-          <p className="mb-10 text-sm font-medium text-zinc-500">
-            Your financial command center is ready to be configured.
-          </p>
+              <h1 className="mb-3 text-balance text-3xl font-semibold tracking-tight text-content-primary sm:text-4xl">
+                Welcome, {firstName}
+              </h1>
+              <p className="mb-8 max-w-md text-pretty text-sm leading-relaxed text-content-secondary">
+                We’ll set up a working dashboard: cash snapshot, bills ceiling, and a default strategy. Everything is optional — skip anytime or refine later in the app.
+              </p>
 
-          {/* Feature grid */}
-          <div className="grid grid-cols-2 gap-3 mb-10">
-            {[
-              { icon: Wallet,     label: 'Cash & Assets',    desc: 'Track net worth in real time' },
-              { icon: Receipt,    label: 'Bills & Debts',     desc: 'Never miss a payment again' },
-              { icon: FileSearch, label: 'Document Scanning', desc: 'OCR receipts and statements' },
-              { icon: Target,     label: 'Goals & Budgets',   desc: 'Build wealth systematically' },
-            ].map(({ icon: Icon, label, desc }) => (
-              <div key={label} className="group flex items-start gap-3 rounded-lg border border-surface-border bg-surface-raised p-4">
-                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-surface-border bg-surface-elevated">
-                  <Icon className="h-3.5 w-3.5 text-content-primary" />
-                </div>
-                <div>
-                  <p className="mb-0.5 text-xs font-medium text-content-primary">{label}</p>
-                  <p className="text-[11px] leading-relaxed text-content-secondary">{desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Setup info + CTA */}
-          <div className="relative rounded-lg border border-surface-border bg-surface-raised p-6">
-            <div className="absolute left-0 top-0 h-1.5 w-1.5 border-l border-t border-white/25" />
-            <div className="absolute right-0 top-0 h-1.5 w-1.5 border-r border-t border-white/25" />
-            <p className="mb-5 text-xs font-medium leading-relaxed text-content-secondary">
-              <span className="text-content-primary">Five short steps</span>
-              {' '}· about two minutes · leave fields blank and continue, or use{' '}
-              <span className="text-content-primary">Skip setup</span> anytime.
-            </p>
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex h-2 items-end gap-1">
-                {STEPS.map((_, idx) => (
-                  <div key={idx} className="h-full w-3 bg-surface-border" />
+              <div className="mb-10 grid gap-3 sm:grid-cols-2">
+                {[
+                  { icon: Wallet, label: 'Cash & assets', desc: 'See liquidity and net worth in one place.' },
+                  { icon: Receipt, label: 'Bills & debt', desc: 'Due dates, subscriptions, and paydown order.' },
+                  { icon: FileSearch, label: 'Documents', desc: 'Scan statements and receipts when you need them.' },
+                  { icon: Target, label: 'Goals & budgets', desc: 'Targets you can adjust as life changes.' },
+                ].map(({ icon: Icon, label, desc }) => (
+                  <div
+                    key={label}
+                    className="flex gap-3 rounded-xl border border-surface-border bg-surface-raised/90 p-4 transition-colors hover:border-white/10"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-surface-border bg-surface-elevated">
+                      <Icon className="h-4 w-4 text-content-secondary" aria-hidden />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-content-primary">{label}</p>
+                      <p className="mt-1 text-xs leading-relaxed text-content-tertiary">{desc}</p>
+                    </div>
+                  </div>
                 ))}
               </div>
-              <button
-                type="button"
-                onClick={() => setShowWelcome(false)}
-                className="btn-tactile flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition-colors hover:bg-neutral-200"
-              >
-                Get started
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-              </button>
-            </div>
-          </div>
-        </motion.div>
 
-        {/* Decorative Corner Label */}
-        <div className="fixed bottom-6 right-6 opacity-20 flex flex-col items-end">
-          <div className="font-mono text-[8px] uppercase tracking-[0.5em] mb-1">Oweable Collective</div>
-          <div className="w-12 h-[1px] bg-white" />
+              <div className="rounded-xl border border-surface-border bg-surface-raised p-6 sm:p-8">
+                <div className="mb-6 flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden />
+                  <p className="text-xs text-content-tertiary">Encrypted session · you control your data</p>
+                </div>
+                <p className="mb-6 text-sm text-content-secondary">
+                  <span className="font-medium text-content-primary">Five short steps.</span> Leave fields blank and tap continue, or use Skip setup.
+                </p>
+                <div className="mb-6 h-1 w-full overflow-hidden rounded-full bg-surface-border">
+                  <div
+                    className="h-full rounded-full bg-content-primary/90"
+                    style={{ width: `${(1 / STEPS.length) * 100}%` }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowWelcome(false)}
+                  className="btn-tactile flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-white px-6 text-sm font-semibold text-black transition-colors hover:bg-neutral-200 focus-app sm:w-auto"
+                >
+                  Get started
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </button>
+              </div>
+            </motion.div>
+          </main>
         </div>
-      </div>
       </>
     );
   }
 
   return (
     <>
-    <PrivacyScreenWhenHidden />
-    <div className="fixed inset-0 bg-[#08090A] flex flex-col items-center justify-center p-6 overflow-hidden selection:bg-white/10 font-sans">
-      {/* Background HUD Grid */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '64px 64px' }} />
-        <div className="absolute top-0 left-0 w-full h-[1px] bg-surface-border opacity-20"></div>
-        <div className="absolute top-0 left-0 w-[1px] h-full bg-surface-border opacity-20"></div>
-        <div className="absolute bottom-0 right-0 w-full h-[1px] bg-surface-border opacity-20"></div>
-        <div className="absolute bottom-0 right-0 w-[1px] h-full bg-surface-border opacity-20"></div>
-      </div>
+      <PrivacyScreenWhenHidden />
+      <div className="fixed inset-0 flex flex-col bg-surface-base font-sans text-content-primary selection:bg-white/10">
+        <SubtleGrid />
 
-      {/* Header */}
-        <div className="absolute left-0 right-0 top-0 z-20 flex h-12 items-center justify-between gap-2 border-b border-surface-border bg-surface-base/90 px-4 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3 sm:gap-6">
-          <div className="shrink-0 text-sm font-medium tracking-tight text-content-primary">Getting started</div>
-          <div className="shrink-0 text-xs font-medium text-content-tertiary md:hidden">
-            {currentStepIndex + 1}/{STEPS.length}
-          </div>
-          <div className="hidden md:flex gap-1 h-2 items-end">
-            {STEPS.map((_, idx) => (
-              <div 
-                key={idx} 
-                className={`w-3 h-full transition-all duration-300 ${idx <= currentStepIndex ? 'bg-white' : 'bg-surface-border'}`}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
-          <button 
-            type="button"
-            onClick={async () => {
-              const ok = await updateUser({ hasCompletedOnboarding: true });
-              if (!ok) return;
-              toast.success('Setup skipped. Welcome to your dashboard.');
-              startTransition(() => navigate('/dashboard'));
-            }}
-            className="rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-elevated hover:text-content-primary"
-          >
-            Skip setup
-          </button>
-          <div className="hidden text-xs font-medium text-content-tertiary sm:block">
-            Step {currentStepIndex + 1} of {STEPS.length}
-          </div>
-          <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse hidden sm:block" />
-        </div>
-      </div>
-
-      {/* Main Container - Optimized Density */}
-      <div className="w-full max-w-xl relative pt-12">
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
-            key={currentStep.id}
-            custom={direction}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{ duration: 0.3, ease: [0.19, 1, 0.22, 1] }}
-            className="w-full"
-          >
-            <div className="flex flex-col items-start text-left">
-              <div className="mb-4 flex h-7 w-7 items-center justify-center rounded-md border border-surface-border bg-surface-raised">
-                {currentStepIndex === 0 && <Vault className="h-3.5 w-3.5 text-content-primary" />}
-                {currentStepIndex === 1 && <Receipt className="h-3.5 w-3.5 text-content-primary" />}
-                {currentStepIndex === 2 && <Activity className="h-3.5 w-3.5 text-content-primary" />}
-                {currentStepIndex === 3 && <Flame className="h-3.5 w-3.5 text-content-primary" />}
-                {currentStepIndex === 4 && <Shield className="h-3.5 w-3.5 text-content-primary" />}
-              </div>
-
-              <h1 className="mb-1 text-2xl font-medium tracking-tight text-white md:text-3xl">
-                {currentStep.title}
-              </h1>
-              <p className="mb-2 text-sm font-medium text-zinc-400">{currentStep.subtitle}</p>
-              {currentStepIndex <= 2 && (
-                <p className="mb-8 text-xs font-medium text-zinc-500">
-                  Optional — leave blank and continue, or add from the dashboard later.
-                </p>
-              )}
-              {currentStepIndex > 2 && <div className="mb-8" />}
-
-              {/* Input Control Area - Refined Padding */}
-              <div className="group relative w-full rounded-lg border border-surface-border bg-surface-raised p-6 shadow-none md:p-10">
-                <div className="absolute left-0 top-0 h-1.5 w-1.5 border-l border-t border-white/25"></div>
-                <div className="absolute right-0 top-0 h-1.5 w-1.5 border-r border-t border-white/25"></div>
-                
-                {currentStep.id === 'assets' && (
-                  <div className="space-y-4">
-                    <div className="flex items-end border-b border-surface-border group-focus-within:border-white/30 transition-all">
-                      <span className="text-content-tertiary font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
-                      <input 
-                        autoFocus
-                        type="text"
-                        inputMode="decimal"
-                        placeholder="0.00"
-                        value={formData.cash}
-                        onChange={e => setFormData({...formData, cash: e.target.value})}
-                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder:text-content-muted focus-app-field tnum leading-none"
-                      />
-                    </div>
-                    <p className="pt-2 text-xs font-medium text-content-tertiary">Current balances · liquid assets only</p>
-                  </div>
-                )}
-
-                {currentStep.id === 'obligations' && (
-                  <div className="space-y-4">
-                    <div className="flex items-end border-b border-surface-border group-focus-within:border-white/30 transition-all">
-                      <span className="text-content-tertiary font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
-                      <input 
-                        autoFocus
-                        type="text"
-                        inputMode="decimal"
-                        placeholder="0.00"
-                        value={formData.bills}
-                        onChange={e => setFormData({...formData, bills: e.target.value})}
-                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder:text-content-muted focus-app-field tnum leading-none"
-                      />
-                    </div>
-                    <p className="pt-2 text-xs font-medium text-content-tertiary">Monthly fixed outflow · rent, subscriptions, minimums</p>
-                  </div>
-                )}
-
-                {currentStep.id === 'velocity' && (
-                  <div className="space-y-6">
-                    <div className="flex items-end border-b border-surface-border group-focus-within:border-white/30 transition-all">
-                      <span className="text-content-tertiary font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
-                      <input 
-                        autoFocus
-                        type="text"
-                        inputMode="decimal"
-                        placeholder="0.00"
-                        value={formData.dailyLimit}
-                        onChange={e => setFormData({...formData, dailyLimit: e.target.value})}
-                        className="w-full bg-transparent pt-3 pb-2 text-5xl font-mono text-white placeholder:text-content-muted focus-app-field tnum leading-none"
-                      />
-                    </div>
-                    <div className="rounded-lg border border-surface-border bg-black/40 p-4">
-                       <span className="mb-1 block text-xs font-medium text-amber-500">What we do with this</span>
-                       <p className="text-xs font-medium leading-relaxed text-zinc-400">We create a monthly &quot;Flexible spending&quot; budget (~30× your daily number) so you see it on the Budgets page. Tune it anytime as real transactions come in.</p>
-                    </div>
-                  </div>
-                )}
-
-                {currentStep.id === 'strategy' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <button 
-                      onClick={() => setFormData({...formData, focus: 'stacking'})}
-                      className={`p-5 border transition-all text-left group ${formData.focus === 'stacking' ? 'bg-surface-elevated text-white border-white/25' : 'bg-surface-base border-surface-border hover:border-white/15 text-content-tertiary'}`}
-                    >
-                      <h3 className="mb-2 text-xs font-semibold text-content-primary">Save &amp; grow</h3>
-                      <p className="text-[11px] font-medium leading-relaxed text-content-secondary">Focus on growth trajectory and asset accumulation.</p>
-                    </button>
-
-                    <button 
-                      onClick={() => setFormData({...formData, focus: 'detonation'})}
-                      className={`p-5 border transition-all text-left group ${formData.focus === 'detonation' ? 'bg-surface-elevated text-white border-rose-500' : 'bg-surface-base border-surface-border hover:border-white/15 text-content-tertiary'}`}
-                    >
-                      <h3 className="mb-2 text-xs font-semibold text-content-primary">Pay off debt fast</h3>
-                      <p className="text-[11px] font-medium leading-relaxed text-content-secondary">Focus on highest APR targets and accelerated repayment.</p>
-                    </button>
-                  </div>
-                )}
-
-                {currentStep.id === 'freelance' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <button 
-                      onClick={() => setFormData({...formData, freelance: true})}
-                      className={`p-5 border transition-all text-left group ${formData.freelance === true ? 'bg-surface-elevated text-white border-white/25' : 'bg-surface-base border-surface-border hover:border-white/15 text-content-tertiary'}`}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-xs font-semibold text-content-primary">Independent contractor</h3>
-                        <Shield className="w-3 h-3 text-content-tertiary" />
-                      </div>
-                      <p className="text-[11px] font-medium leading-relaxed text-content-secondary">Activates tax tracking for freelancers, automatically sets aside your tax amount, and lets you scan income statements.</p>
-                    </button>
-
-                    <button 
-                      onClick={() => setFormData({...formData, freelance: false})}
-                      className={`p-5 border transition-all text-left group ${formData.freelance === false ? 'bg-surface-elevated text-white border-surface-border' : 'bg-surface-base border-surface-border hover:border-white/15 text-content-tertiary'}`}
-                    >
-                      <h3 className="mb-2 text-xs font-semibold text-content-primary">Traditional (W-2)</h3>
-                      <p className="text-[11px] font-medium leading-relaxed text-content-secondary">Standard household budgeting and debt elimination.</p>
-                    </button>
-                    <div className="mt-2 rounded-lg border border-surface-border bg-black/40 p-3 sm:col-span-2">
-                       <span className="mb-1 block text-xs font-medium text-emerald-500">Note for gig work</span>
-                       <p className="text-[11px] font-medium leading-relaxed text-content-secondary">Gig workers are subject to 15.3% self-employment tax. Oweable will automatically reserve this from every payout.</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Action Controls - Refined Layout */}
-        <div className="mt-8 flex items-center justify-between gap-4 border-t border-surface-border pt-6">
-          <button 
-            type="button"
-            onClick={handleBack}
-            disabled={currentStepIndex === 0}
-            className={`text-sm font-medium transition-colors ${currentStepIndex === 0 ? 'pointer-events-none opacity-0' : 'text-zinc-400 hover:text-white'}`}
-          >
-            Back
-          </button>
-          
-          <div className="flex items-center gap-4">
-             <div className="hidden text-xs font-medium text-zinc-500 sm:block">
-               Secure setup
-             </div>
-            <button 
-              type="button"
-              onClick={handleNext}
-              className="btn-tactile flex items-center gap-2 rounded-lg bg-white px-6 py-2.5 text-sm font-medium text-black transition-colors hover:bg-neutral-200"
+        <header className="relative z-20 flex h-14 shrink-0 items-center gap-3 border-b border-surface-border bg-surface-base/90 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/75 sm:gap-4 sm:px-6">
+          <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
+            <span className="shrink-0 text-sm font-semibold tracking-tight text-content-primary">Getting started</span>
+            <div
+              className="h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-surface-border sm:max-w-[280px]"
+              role="progressbar"
+              aria-valuenow={currentStepIndex + 1}
+              aria-valuemin={1}
+              aria-valuemax={STEPS.length}
+              aria-label={`Step ${currentStepIndex + 1} of ${STEPS.length}`}
             >
-              {currentStepIndex === STEPS.length - 1 ? 'Go to dashboard' : 'Continue'}
-              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+              <div
+                className="h-full rounded-full bg-content-primary transition-[width] duration-300 ease-out"
+                style={{ width: `${progress * 100}%` }}
+              />
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <span className="hidden text-xs tabular-nums text-content-tertiary sm:inline">
+              {currentStepIndex + 1} / {STEPS.length}
+            </span>
+            <button
+              type="button"
+              onClick={() => void skipSetup()}
+              className="min-h-10 whitespace-nowrap rounded-lg border border-surface-border px-3 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-raised hover:text-content-primary focus-app sm:px-4"
+            >
+              Skip
             </button>
           </div>
-        </div>
-      </div>
+        </header>
 
-      {/* Decorative Corner Label */}
-      <div className="fixed bottom-6 right-6 opacity-20 flex flex-col items-end pointer-events-none" aria-hidden>
-         <div className="font-mono text-[8px] uppercase tracking-[0.5em] mb-1">Oweable Collective</div>
-         <div className="w-12 h-[1px] bg-white"></div>
+        <main className="relative z-10 flex flex-1 flex-col overflow-hidden">
+          <div className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 py-8 sm:px-6 sm:py-10">
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.div
+                key={currentStep.id}
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.28, ease: [0.19, 1, 0.22, 1] }}
+                className="flex flex-1 flex-col"
+                role="group"
+                aria-labelledby="onboarding-step-title"
+              >
+                <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl border border-surface-border bg-surface-raised">
+                  {currentStepIndex === 0 && <Vault className="h-5 w-5 text-content-secondary" aria-hidden />}
+                  {currentStepIndex === 1 && <Receipt className="h-5 w-5 text-content-secondary" aria-hidden />}
+                  {currentStepIndex === 2 && <Activity className="h-5 w-5 text-content-secondary" aria-hidden />}
+                  {currentStepIndex === 3 && <Flame className="h-5 w-5 text-content-secondary" aria-hidden />}
+                  {currentStepIndex === 4 && <Shield className="h-5 w-5 text-content-secondary" aria-hidden />}
+                </div>
+
+                <h1 id="onboarding-step-title" className="mb-2 text-balance text-2xl font-semibold tracking-tight text-content-primary sm:text-3xl">
+                  {currentStep.title}
+                </h1>
+                <p className="mb-1 text-sm font-medium text-content-secondary">{currentStep.subtitle}</p>
+                <p className="mb-6 text-xs leading-relaxed text-content-tertiary sm:text-sm sm:text-content-tertiary">
+                  {currentStep.description}
+                  {currentStepIndex <= 2 ? (
+                    <span className="mt-2 block text-content-tertiary">Optional — leave blank and continue.</span>
+                  ) : null}
+                </p>
+
+                <div className="rounded-xl border border-surface-border bg-surface-raised p-5 sm:p-8">
+                  {currentStep.id === 'assets' && (
+                    <div className="space-y-3">
+                      <label className="sr-only" htmlFor="onboard-cash">
+                        Cash and bank balance
+                      </label>
+                      <div className="flex items-end border-b border-surface-border pb-1 transition-colors focus-within:border-white/25">
+                        <span className="select-none pb-2 pr-1 font-sans text-3xl leading-none text-content-tertiary sm:text-5xl">$</span>
+                        <input
+                          id="onboard-cash"
+                          autoFocus
+                          type="text"
+                          inputMode="decimal"
+                          placeholder="0.00"
+                          value={formData.cash}
+                          onChange={(e) => setFormData({ ...formData, cash: e.target.value })}
+                          className="focus-app-field w-full bg-transparent py-2 font-mono text-3xl text-content-primary placeholder:text-content-muted tnum leading-none focus:outline-none sm:text-5xl sm:py-3"
+                        />
+                      </div>
+                      <p className="text-xs text-content-tertiary">Liquid balances only (checking, savings, cash).</p>
+                    </div>
+                  )}
+
+                  {currentStep.id === 'obligations' && (
+                    <div className="space-y-3">
+                      <label className="sr-only" htmlFor="onboard-bills">
+                        Monthly bills total
+                      </label>
+                      <div className="flex items-end border-b border-surface-border pb-1 transition-colors focus-within:border-white/25">
+                        <span className="select-none pb-2 pr-1 font-sans text-3xl leading-none text-content-tertiary sm:text-5xl">$</span>
+                        <input
+                          id="onboard-bills"
+                          autoFocus
+                          type="text"
+                          inputMode="decimal"
+                          placeholder="0.00"
+                          value={formData.bills}
+                          onChange={(e) => setFormData({ ...formData, bills: e.target.value })}
+                          className="focus-app-field w-full bg-transparent py-2 font-mono text-3xl text-content-primary placeholder:text-content-muted tnum leading-none focus:outline-none sm:text-5xl sm:py-3"
+                        />
+                      </div>
+                      <p className="text-xs text-content-tertiary">Rent, utilities, subscriptions, loan minimums — one monthly total is fine.</p>
+                    </div>
+                  )}
+
+                  {currentStep.id === 'velocity' && (
+                    <div className="space-y-5">
+                      <label className="sr-only" htmlFor="onboard-daily">
+                        Daily spending target
+                      </label>
+                      <div className="flex items-end border-b border-surface-border pb-1 transition-colors focus-within:border-white/25">
+                        <span className="select-none pb-2 pr-1 font-sans text-3xl leading-none text-content-tertiary sm:text-5xl">$</span>
+                        <input
+                          id="onboard-daily"
+                          autoFocus
+                          type="text"
+                          inputMode="decimal"
+                          placeholder="0.00"
+                          value={formData.dailyLimit}
+                          onChange={(e) => setFormData({ ...formData, dailyLimit: e.target.value })}
+                          className="focus-app-field w-full bg-transparent py-2 font-mono text-3xl text-content-primary placeholder:text-content-muted tnum leading-none focus:outline-none sm:text-5xl sm:py-3"
+                        />
+                      </div>
+                      <div className="rounded-lg border border-surface-border bg-surface-base/80 p-4">
+                        <p className="text-xs font-medium text-amber-400/95">How we use this</p>
+                        <p className="mt-2 text-xs leading-relaxed text-content-secondary">
+                          We add a monthly <span className="text-content-primary">Flexible spending</span> budget (~30× this number). Adjust it anytime as real spending shows up.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {currentStep.id === 'strategy' && (
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <ChoiceCard
+                        selected={formData.focus === 'stacking'}
+                        onSelect={() => setFormData({ ...formData, focus: 'stacking' })}
+                        title="Save & grow"
+                        description="Prioritize building reserves and long-term growth."
+                        accent="neutral"
+                      />
+                      <ChoiceCard
+                        selected={formData.focus === 'detonation'}
+                        onSelect={() => setFormData({ ...formData, focus: 'detonation' })}
+                        title="Pay off debt fast"
+                        description="Prioritize high-cost debt and faster payoff order."
+                        accent="rose"
+                      />
+                    </div>
+                  )}
+
+                  {currentStep.id === 'freelance' && (
+                    <div className="flex flex-col gap-4">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <ChoiceCard
+                          selected={formData.freelance === true}
+                          onSelect={() => setFormData({ ...formData, freelance: true })}
+                          title="Independent contractor"
+                          description="1099-friendly flows: estimates, tax set-aside, and income docs."
+                        />
+                        <ChoiceCard
+                          selected={formData.freelance === false}
+                          onSelect={() => setFormData({ ...formData, freelance: false })}
+                          title="W-2 / household"
+                          description="Standard budgeting and bills for salaried or mixed households."
+                        />
+                      </div>
+                      <div className="rounded-lg border border-surface-border bg-surface-base/80 p-4">
+                        <p className="text-xs font-medium text-emerald-400/95">1099 note</p>
+                        <p className="mt-2 text-xs leading-relaxed text-content-secondary">
+                          Self-employment taxes apply to net gig income. Oweable can help you set aside a realistic reserve; tune rates with your tax pro if needed.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            <div className="mt-auto flex shrink-0 items-center justify-between gap-4 border-t border-surface-border pt-6">
+              {currentStepIndex > 0 ? (
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  className="min-h-11 text-sm font-medium text-content-secondary transition-colors hover:text-content-primary focus-app rounded-lg px-2 -ml-2"
+                >
+                  Back
+                </button>
+              ) : (
+                <span className="min-h-11 w-16 sm:w-20" aria-hidden />
+              )}
+
+              <button
+                type="button"
+                onClick={() => void handleNext()}
+                className="btn-tactile flex min-h-11 items-center gap-2 rounded-lg bg-white px-6 text-sm font-semibold text-black transition-colors hover:bg-neutral-200 focus-app"
+              >
+                {currentStepIndex === STEPS.length - 1 ? 'Go to dashboard' : 'Continue'}
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </button>
+            </div>
+          </div>
+        </main>
       </div>
-    </div>
     </>
   );
 }

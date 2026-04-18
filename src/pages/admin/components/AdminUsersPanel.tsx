@@ -54,7 +54,11 @@ export function AdminUsersPanel({
   const toggleOne = (id: string) => {
     setSelected(prev => {
       const n = new Set(prev);
-      n.has(id) ? n.delete(id) : n.add(id);
+      if (n.has(id)) {
+        n.delete(id);
+      } else {
+        n.add(id);
+      }
       return n;
     });
   };
@@ -69,7 +73,7 @@ export function AdminUsersPanel({
   };
 
   return (
-    <div className="lg:col-span-2 border border-surface-border rounded-lg bg-surface-raised p-5">
+    <div className="border border-surface-border rounded-lg bg-surface-raised p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-sm font-semibold text-content-primary flex items-center gap-2">
