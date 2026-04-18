@@ -5,6 +5,14 @@ import { guardOweAiMessage } from '../_shared/owe_ai_guard.ts';
 import { hasPaidFullSuiteAccess } from '../_shared/plaidAccess.ts';
 import { fetchWithTimeout } from '../_shared/fetchWithTimeout.ts';
 
+/**
+ * Owe-AI — inference is Hugging Face only (open models on the Hub).
+ *
+ * - Every LLM request uses `https://router.huggingface.co/v1/chat/completions` with Edge secret `HF_TOKEN`.
+ * - Default and recommended path: open-weight instruct models (e.g. `Qwen/Qwen2.5-7B-Instruct`); set `OWE_AI_MODEL` / `HF_INFERENCE_MODEL` to any HF router-supported model id.
+ * - Do not add OpenAI, Anthropic/Claude, or other non-HF inference endpoints here. The payload follows an OpenAI-*compatible* JSON shape because the HF router exposes that API; the provider remains HF only.
+ */
+
 function num(v: unknown, fallback = 0): number {
   const n = typeof v === 'number' ? v : Number(v);
   return Number.isFinite(n) ? n : fallback;
@@ -649,6 +657,42 @@ Cash flow forecast:
 /** Open-weight instruct model on Hugging Face Inference (router). Override with OWE_AI_MODEL. */
 const DEFAULT_OWE_AI_MODEL = 'Qwen/Qwen2.5-7B-Instruct';
 
+/** HF router + smaller models often mishandle JSON `tools` / function-calling (empty replies, bad follow-ups). Opt in with Edge secret OWE_AI_ENABLE_TOOLS=true. */
+function oweAiToolsEnabled(): boolean {
+  return Deno.env.get('OWE_AI_ENABLE_TOOLS')?.trim().toLowerCase() === 'true';
+}
+
+const HF_CHAT_TIMEOUT_MS = 55_000;
+const HF_CHAT_RETRIES = 2;
+
+function messageTextContent(message: { content?: unknown } | undefined): string {
+  if (!message) return '';
+  const c = message.content;
+  if (c == null) return '';
+  if (typeof c === 'string') return c.trim();
+  if (Array.isArray(c)) {
+    const parts: string[] = [];
+    for (const item of c) {
+      if (typeof item === 'object' && item !== null) {
+        const o = item as Record<string, unknown>;
+        if (typeof o.text === 'string') parts.push(o.text);
+        else if (o.type === 'text' && typeof o.text === 'string') parts.push(o.text);
+      }
+    }
+    return parts.join('').trim();
+  }
+  return String(c).trim();
+}
+
+function choiceAssistantText(choice: unknown): string {
+  if (!choice || typeof choice !== 'object') return '';
+  const ch = choice as Record<string, unknown>;
+  const fromMessage = messageTextContent(ch.message as { content?: unknown } | undefined);
+  if (fromMessage) return fromMessage;
+  if (typeof ch.text === 'string') return ch.text.trim();
+  return '';
+}
+
 function huggingFaceToken(): string | undefined {
   const a = Deno.env.get('HF_TOKEN')?.trim();
   const b = Deno.env.get('HUGGING_FACE_HUB_TOKEN')?.trim();
@@ -854,7 +898,7 @@ function executeWhatIfTool(
 // ---------------------------------------------------------------------------
 
 /**
- * Hugging Face Inference Providers — OpenAI-compatible chat completions.
+ * Hugging Face Inference Providers — chat completions on the HF router (OpenAI-compatible JSON shape only; not the OpenAI API).
  * @see https://huggingface.co/docs/api-inference/en/tasks/chat-completion
  */
 async function callHuggingFaceChat(
@@ -875,17 +919,20 @@ async function callHuggingFaceChat(
 
   const systemContent = `${SYSTEM_PROMPT}\n\n${runtimeDirective}${levelDirective}\n\nUSER_FINANCIAL_CONTEXT (JSON):\n${userContextJson}`;
 
-  const body = {
+  const useTools = oweAiToolsEnabled();
+  const body: Record<string, unknown> = {
     model: modelId,
     temperature: 0.35,
-    max_tokens: 900,
-    tools: WHAT_IF_TOOLS,
-    tool_choice: 'auto',
+    max_tokens: 1024,
     messages: [
       { role: 'system', content: systemContent },
       ...messages.map((m) => ({ role: m.role, content: m.content })),
     ],
   };
+  if (useTools) {
+    body.tools = WHAT_IF_TOOLS;
+    body.tool_choice = 'auto';
+  }
 
   const res = await fetchWithTimeout('https://router.huggingface.co/v1/chat/completions', {
     method: 'POST',
@@ -894,8 +941,8 @@ async function callHuggingFaceChat(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
-    timeoutMs: 30_000,
-    retries: 1,
+    timeoutMs: HF_CHAT_TIMEOUT_MS,
+    retries: HF_CHAT_RETRIES,
   });
 
   if (!res.ok) {
@@ -917,13 +964,46 @@ async function callHuggingFaceChat(
     throw new Error(json.error.message.slice(0, 400));
   }
 
-  const firstChoice = json.choices?.[0]?.message;
+  const rawChoice = json.choices?.[0];
+  const firstChoice = rawChoice?.message;
   if (!firstChoice) throw new Error('Empty model response');
 
   // If no tool calls, return content directly
-  if (!firstChoice.tool_calls || firstChoice.tool_calls.length === 0) {
-    const text = firstChoice.content?.trim();
-    if (!text) throw new Error('Empty model response');
+  if (!useTools || !firstChoice.tool_calls || firstChoice.tool_calls.length === 0) {
+    let text = choiceAssistantText(rawChoice);
+    if (!text && firstChoice.tool_calls?.length) {
+      console.warn('[owe-ai] model returned tool_calls without text; tools disabled — retrying plain completion');
+      const retryBody: Record<string, unknown> = {
+        model: modelId,
+        temperature: 0.4,
+        max_tokens: 1024,
+        messages: [
+          {
+            role: 'system',
+            content: `${systemContent}\n\nYou must answer in plain text only. Do not use tools or function calls.`,
+          },
+          ...messages.map((m) => ({ role: m.role, content: m.content })),
+        ],
+      };
+      const res2 = await fetchWithTimeout('https://router.huggingface.co/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${hfToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(retryBody),
+        timeoutMs: HF_CHAT_TIMEOUT_MS,
+        retries: HF_CHAT_RETRIES,
+      });
+      if (res2.ok) {
+        const j2 = (await res2.json()) as typeof json;
+        text = choiceAssistantText(j2.choices?.[0]);
+      }
+    }
+    if (!text) {
+      const hint = firstChoice.tool_calls?.length ? ' (model tried to call tools)' : '';
+      throw new Error(`Empty model response${hint}`);
+    }
     return text;
   }
 
@@ -935,7 +1015,7 @@ async function callHuggingFaceChat(
     toolArgs = JSON.parse(toolCall.function.arguments) as Record<string, unknown>;
   } catch {
     // If args fail to parse, fall back to any text content
-    const fallback = firstChoice.content?.trim();
+    const fallback = messageTextContent(firstChoice);
     if (fallback) return fallback;
     throw new Error('Tool call args parse failed and no fallback content');
   }
@@ -969,13 +1049,13 @@ async function callHuggingFaceChat(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(followUpBody),
-    timeoutMs: 30_000,
-    retries: 1,
+    timeoutMs: HF_CHAT_TIMEOUT_MS,
+    retries: HF_CHAT_RETRIES,
   });
 
   if (!followUpRes.ok) {
     // Tool follow-up failed — fall back to any initial text content
-    const fallback = firstChoice.content?.trim();
+    const fallback = messageTextContent(firstChoice);
     if (fallback) return fallback;
     const t = await followUpRes.text().catch(() => '');
     throw new Error(`Hugging Face tool follow-up error ${followUpRes.status}: ${t.slice(0, 400)}`);
@@ -986,14 +1066,14 @@ async function callHuggingFaceChat(
     error?: { message?: string };
   };
   if (followUpJson.error?.message) {
-    const fallback = firstChoice.content?.trim();
+    const fallback = messageTextContent(firstChoice);
     if (fallback) return fallback;
     throw new Error(followUpJson.error.message.slice(0, 400));
   }
-  const finalText = followUpJson.choices?.[0]?.message?.content?.trim();
+  const finalText = messageTextContent(followUpJson.choices?.[0]?.message);
   if (!finalText) {
     // Last resort: return any content from the first response
-    const fallback = firstChoice.content?.trim();
+    const fallback = messageTextContent(firstChoice);
     if (fallback) return fallback;
     throw new Error('Empty model response after tool call');
   }

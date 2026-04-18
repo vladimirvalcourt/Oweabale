@@ -146,7 +146,7 @@ export default function Dashboard() {
   }, [cashFlow.fixedExpenses, cashFlow.subscriptions, monthlyIncome]);
   const spendingBenchmark = useMemo(() => {
     if (spendingShareOfIncome === null) return null;
-    if (spendingShareOfIncome <= 30) return { label: 'Well under budget', emoji: '🟢', tone: 'text-emerald-400' };
+    if (spendingShareOfIncome <= 30) return { label: 'Well under budget', emoji: '🟢', tone: 'text-brand-profit' };
     if (spendingShareOfIncome <= 50) return { label: 'On track', emoji: '🟡', tone: 'text-amber-300' };
     if (spendingShareOfIncome <= 75) return { label: 'Approaching limit', emoji: '🟠', tone: 'text-amber-400' };
     if (spendingShareOfIncome <= 100) return { label: 'At limit', emoji: '🔴', tone: 'text-rose-400' };
@@ -599,7 +599,7 @@ export default function Dashboard() {
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" aria-hidden />
+                  <span className="h-1.5 w-1.5 rounded-full bg-brand-profit shrink-0" aria-hidden />
                   <Wallet className="h-4 w-4 shrink-0 text-content-secondary" aria-hidden />
                   <p className="metric-label normal-case text-content-secondary">Safe to spend (estimate)</p>
                 </div>
@@ -798,10 +798,10 @@ export default function Dashboard() {
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
               {taxReservePosition > 0 ? (
                 <>
-                  <p className="metric-label mb-3 flex items-center gap-2 text-emerald-400">
-                    Tax Reserve <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <p className="metric-label mb-3 flex items-center gap-2 text-brand-profit">
+                    Tax Reserve <ShieldCheck className="w-3.5 h-3.5 text-brand-profit" />
                   </p>
-                  <p className="text-2xl sm:text-4xl font-mono text-emerald-400 font-bold tabular-nums data-numeric">
+                  <p className="text-2xl sm:text-4xl font-mono text-brand-profit font-bold tabular-nums data-numeric">
                     $<AnimatedValue value={taxReservePosition} />
                   </p>
                 </>
@@ -867,7 +867,7 @@ export default function Dashboard() {
                       <ShieldCheck className="w-5 h-5" />
                     </div>
                     <span className="inline-flex items-center gap-2 text-[10px] font-sans uppercase tracking-wide text-content-secondary">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+                      <span className="h-1.5 w-1.5 rounded-full bg-brand-profit" aria-hidden />
                       Active
                     </span>
                   </div>
@@ -903,7 +903,7 @@ export default function Dashboard() {
                     <span className="inline-flex items-center gap-2 text-[10px] font-sans uppercase tracking-wide text-content-secondary">
                       <span
                         className={`h-1.5 w-1.5 rounded-full ${
-                          burnVelocity.isHighVelocity ? 'bg-red-500' : burnVelocity.isModerateVelocity ? 'bg-amber-500' : 'bg-emerald-500'
+                          burnVelocity.isHighVelocity ? 'bg-brand-expense' : burnVelocity.isModerateVelocity ? 'bg-amber-500' : 'bg-brand-profit'
                         }`}
                         aria-hidden
                       />

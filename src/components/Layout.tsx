@@ -516,14 +516,10 @@ export default function Layout() {
                             <TransitionLink
                               to={item.linkTo}
                               className={cn(
-                                "relative flex min-h-10 items-center gap-3 rounded-lg px-4 py-2.5 transition-colors duration-200 group",
-                                isOweAi
-                                  ? isActive
-                                    ? "bg-emerald-500/15 text-content-primary border border-emerald-400/35"
-                                    : "bg-emerald-500/8 text-content-secondary border border-emerald-400/20 hover:bg-emerald-500/15"
-                                  : isActive
-                                    ? "bg-content-primary/[0.06] text-content-primary"
-                                    : "text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary"
+                                "relative flex min-h-10 items-center gap-3 rounded-lg px-4 py-2.5 transition-colors duration-200 group border border-transparent",
+                                isActive
+                                  ? "bg-content-primary/[0.06] text-content-primary border-surface-border/80"
+                                  : "text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary",
                               )}
                               title={sidebarCollapsed ? item.name : undefined}
                               onClick={(e) => {
@@ -537,34 +533,32 @@ export default function Layout() {
                                 setShowDueSoonPreview(false);
                               }}
                             >
-                              {isActive && !isOweAi && (
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] rounded-r-sm h-4 bg-brand-cta" />
+                              {isActive && (
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] rounded-r-sm h-4 bg-content-primary" />
                               )}
-                              <div className={cn(isOweAi && "rounded-md bg-emerald-500/20 p-1")}>
-                                <TactileIcon
-                                  icon={Icon}
-                                  size={16}
-                                  active={isActive}
-                                  variant="static"
-                                  className={cn(
-                                    "shrink-0",
-                                    !isActive && "group-hover:translate-x-0.5"
-                                  )}
-                                />
-                              </div>
+                              <TactileIcon
+                                icon={Icon}
+                                size={16}
+                                active={isActive}
+                                variant="static"
+                                className={cn(
+                                  "shrink-0",
+                                  !isActive && "group-hover:translate-x-0.5"
+                                )}
+                              />
                               {!sidebarCollapsed && (
                                 <>
-                                  <span className={cn("pointer-events-none flex-1 tracking-normal", isOweAi ? "text-[14px] font-semibold" : "text-[13px] font-medium")}>
+                                  <span className={cn("pointer-events-none flex-1 tracking-normal", isOweAi ? "text-[13px] font-semibold" : "text-[13px] font-medium")}>
                                     {item.name}
                                   </span>
                                   {isOweAi && (
-                                    <span className="rounded border border-emerald-400/25 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-widest text-emerald-200/90">
+                                    <span className="rounded border border-surface-border bg-surface-raised px-1.5 py-0.5 text-[9px] font-mono font-medium uppercase tracking-[0.12em] text-content-tertiary">
                                       AI
                                     </span>
                                   )}
                                   {(item as { count?: number }).count !== undefined && (item as { count?: number }).count! > 0 && (
                                     <span className="relative flex items-center gap-1.5 shrink-0 px-1">
-                                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
+                                      <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
                                       <span className="text-[10px] font-mono text-content-secondary tabular-nums">
                                         {(item as { count?: number }).count}
                                       </span>

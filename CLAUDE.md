@@ -13,6 +13,11 @@
 - Always push to `main`
 - Never push to a different branch without explicit permission
 
+## Owe-AI inference (product)
+
+- **Hugging Face open models only** — `supabase/functions/owe-ai` calls `router.huggingface.co` with `HF_TOKEN`. Default model is Qwen2.5 instruct on the Hub; override with `OWE_AI_MODEL` / `HF_INFERENCE_MODEL`.
+- **Do not** wire Owe-AI to OpenAI, Anthropic/Claude, or other closed APIs unless the product owner explicitly changes that policy.
+
 ## Cursor — Hugging Face MCP (developer only)
 
 - **End users of Oweable never sign in to Hugging Face.** Owe-AI uses a server-side `HF_TOKEN` in Supabase Edge Function secrets only. Do not add in-app Hugging Face login, token, or “connect HF” flows for customers.

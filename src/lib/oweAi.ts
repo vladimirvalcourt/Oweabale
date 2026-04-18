@@ -1,6 +1,8 @@
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
+/** Client for Owe-AI; the `owe-ai` Edge Function calls Hugging Face Inference only (open Hub models), not OpenAI/Anthropic. */
+
 export type OweAiChatMessage = { role: 'user' | 'assistant'; content: string };
 export type OweAiMode = 'advisor' | 'academy';
 export type OweAiFamiliarity = 'beginner' | 'intermediate' | 'advanced';
@@ -205,6 +207,9 @@ export async function invokeOweAi(
       learningProfile: d.learningProfile,
       nextLessonPrompt: typeof d.nextLessonPrompt === 'string' ? d.nextLessonPrompt : undefined,
     };
+  }
+  if (typeof d?.reply === 'string' && !d.reply.trim()) {
+    throw new Error('Owe-AI returned an empty answer. Please try again.');
   }
   if (typeof d?.error === 'string') {
     if (/jwt|invalid.*token/i.test(d.error)) {
