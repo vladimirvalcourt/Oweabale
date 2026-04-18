@@ -102,7 +102,7 @@ export default function Taxes() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-content-primary flex items-center gap-3">
-            <ShieldAlert className="w-7 h-7 text-brand-violet" /> Freelance Tax Guide
+            <ShieldAlert className="w-7 h-7 text-content-secondary" /> Freelance Tax Guide
           </h1>
           <p className="text-sm text-content-tertiary mt-1">Estimates and quarterly reminders based on your ledger.</p>
         </div>
@@ -156,7 +156,7 @@ export default function Taxes() {
                 </div>
                 <div className="flex flex-col items-center px-6">
                   <span className="text-xs text-content-tertiary">Monthly set-aside</span>
-                  <span className="text-lg font-mono tabular-nums text-brand-indigo data-numeric">${(totalLiability / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                  <span className="text-lg font-mono tabular-nums text-content-primary data-numeric">${(totalLiability / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                 </div>
               </div>
             </div>
@@ -187,11 +187,11 @@ export default function Taxes() {
                  <div className="p-6 bg-surface-elevated border-b border-surface-border flex gap-3 items-end">
                     <div className="flex-1">
                       <p className="text-xs text-content-tertiary mb-1">Expense label</p>
-                      <input type="text" placeholder="e.g. Adobe Suite" value={newDeduction.name} onChange={e => setNewDeduction({...newDeduction, name: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-white focus-app-field-brand-indigo transition-colors" />
+                      <input type="text" placeholder="e.g. Adobe Suite" value={newDeduction.name} onChange={e => setNewDeduction({...newDeduction, name: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-white focus-app-field transition-colors" />
                     </div>
                     <div className="w-24">
                       <p className="text-xs text-content-tertiary mb-1">Amount</p>
-                      <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm font-mono tabular-nums text-white focus-app-field-brand-indigo transition-colors" />
+                      <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm font-mono tabular-nums text-white focus-app-field transition-colors" />
                     </div>
                     <button type="button" onClick={async () => {
                       if (!newDeduction.name.trim()) { toast.error('Enter an expense label'); return; }
@@ -234,7 +234,7 @@ export default function Taxes() {
                   <div className="flex items-center justify-between gap-4">
                     <p className="text-xs text-content-tertiary">Due {q.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
                     {!q.overdue && (
-                      <a href={q.portal} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-brand-indigo hover:text-brand-violet text-xs font-sans font-semibold transition-colors">
+                      <a href={q.portal} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-content-secondary hover:text-content-primary text-xs font-sans font-semibold transition-colors">
                         IRS Direct Pay <ExternalLink className="w-3 h-3 shrink-0" aria-hidden />
                       </a>
                     )}
@@ -246,10 +246,10 @@ export default function Taxes() {
 
           <div className="bg-surface-raised border border-surface-border p-6 rounded-lg space-y-6">
              <div>
-               <h3 className="text-sm font-sans font-semibold text-brand-indigo mb-4">Smart freelance tips</h3>
+               <h3 className="text-sm font-sans font-semibold text-content-primary mb-4">Smart freelance tips</h3>
                <div className="space-y-4">
                  <div className="flex gap-3">
-                   <div className="w-1.5 h-1.5 bg-brand-violet mt-1.5 shrink-0" />
+                   <div className="w-1.5 h-1.5 bg-white/50 mt-1.5 shrink-0 rounded-full" />
                    <div>
                      <p className="text-sm font-sans font-medium text-content-primary">Check your real pay</p>
                      <p className="text-xs text-content-tertiary mt-1 leading-normal">
@@ -258,7 +258,7 @@ export default function Taxes() {
                    </div>
                  </div>
                  <div className="flex gap-3">
-                   <div className="w-1.5 h-1.5 bg-brand-violet mt-1.5 shrink-0" />
+                   <div className="w-1.5 h-1.5 bg-white/50 mt-1.5 shrink-0 rounded-full" />
                    <div>
                      <p className="text-sm font-sans font-medium text-content-primary">Audit for deductions</p>
                      <p className="text-xs text-content-tertiary mt-1 leading-normal">
@@ -267,7 +267,7 @@ export default function Taxes() {
                    </div>
                  </div>
                  <div className="flex gap-3">
-                   <div className="w-1.5 h-1.5 bg-brand-violet mt-1.5 shrink-0" />
+                   <div className="w-1.5 h-1.5 bg-white/50 mt-1.5 shrink-0 rounded-full" />
                    <div>
                      <p className="text-sm font-sans font-medium text-content-primary">Quarterly discipline</p>
                      <p className="text-xs text-content-tertiary mt-1 leading-normal">

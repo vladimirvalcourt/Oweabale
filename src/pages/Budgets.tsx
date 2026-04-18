@@ -250,7 +250,7 @@ export default function Budgets() {
                   required
                   value={formData.category}
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                 >
                   <option value="" disabled>Select category</option>
                   {expenseCategories.map(c => (
@@ -273,7 +273,7 @@ export default function Budgets() {
                     min="0"
                     value={formData.amount}
                     onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field transition-colors"
                     placeholder="0.00"
                   />
                 </div>
@@ -284,7 +284,7 @@ export default function Budgets() {
                 <select 
                   value={formData.period}
                   onChange={(e) => setFormData({...formData, period: e.target.value as 'Monthly' | 'Yearly'})}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                 >
                   <option value="Monthly">Monthly</option>
                   <option value="Yearly">Yearly</option>

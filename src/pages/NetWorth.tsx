@@ -51,7 +51,7 @@ export default function NetWorth() {
   }, [assets, debts, incomes, bills, subscriptions, extraMonthly]);
 
   // Asset allocation by type
-  const ASSET_COLORS = ['#6366F1', '#34D399', '#F59E0B', '#8B5CF6', '#06B6D4', '#EC4899'];
+  const ASSET_COLORS = ['#d4d4d4', '#34D399', '#F59E0B', '#737373', '#06B6D4', '#EC4899'];
   const assetAllocation = useMemo(() => {
     const map = new Map<string, number>();
     assets.forEach(a => map.set(a.type, (map.get(a.type) || 0) + a.value));
@@ -117,7 +117,7 @@ export default function NetWorth() {
             className="text-content-tertiary hover:text-white text-sm font-mono transition-colors"
           >+</button>
           {extraMonthly > 0 && (
-            <span className="text-xs font-sans text-brand-indigo ml-2">Accelerated payoff</span>
+            <span className="text-xs font-sans text-content-secondary ml-2">Accelerated payoff</span>
           )}
         </div>
         <div className="h-[260px] w-full">
@@ -125,8 +125,8 @@ export default function NetWorth() {
             <AreaChart data={projectionData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2}/>
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#d4d4d4" stopOpacity={0.2}/>
+                  <stop offset="95%" stopColor="#d4d4d4" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" vertical={false} />
@@ -137,7 +137,7 @@ export default function NetWorth() {
                 contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '2px', color: '#FAFAFA', fontFamily: 'monospace', fontSize: '12px' }}
                 formatter={(value) => [`$${Number(value ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`, 'Net Worth']}
               />
-              <Area type="monotone" dataKey="value" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" dot={{ fill: '#6366f1', strokeWidth: 0, r: 3 }} />
+              <Area type="monotone" dataKey="value" stroke="#d4d4d4" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" dot={{ fill: '#d4d4d4', strokeWidth: 0, r: 3 }} />
             </AreaChart>
           </SafeResponsiveContainer>
         </div>

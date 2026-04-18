@@ -29,7 +29,7 @@ export default function Goals() {
       currentAmount: Number(newGoal.currentAmount) || 0,
       deadline: newGoal.deadline,
       type: newGoal.type,
-      color: newGoal.type === 'debt' ? '#dc3545' : newGoal.type === 'emergency' ? '#f59e0b' : '#6366f1',
+      color: newGoal.type === 'debt' ? '#dc3545' : newGoal.type === 'emergency' ? '#f59e0b' : '#d4d4d4',
     });
     if (!ok) return;
 
@@ -89,7 +89,7 @@ export default function Goals() {
                   required
                   value={newGoal.name}
                   onChange={(e) => setNewGoal({ ...newGoal, name: e.target.value })}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                   placeholder="e.g., EMERGENCY FUND"
                 />
               </div>
@@ -98,7 +98,7 @@ export default function Goals() {
                 <select
                   value={newGoal.type}
                   onChange={(e) => setNewGoal({ ...newGoal, type: e.target.value as Goal['type'] })}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                 >
                   <option value="savings">Savings</option>
                   <option value="debt">Debt payoff</option>
@@ -116,7 +116,7 @@ export default function Goals() {
                     step="0.01"
                     value={newGoal.targetAmount}
                     onChange={(e) => setNewGoal({ ...newGoal, targetAmount: e.target.value })}
-                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field transition-colors"
                   />
                 </div>
               </div>
@@ -130,7 +130,7 @@ export default function Goals() {
                     step="0.01"
                     value={newGoal.currentAmount}
                     onChange={(e) => setNewGoal({ ...newGoal, currentAmount: e.target.value })}
-                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field transition-colors"
                   />
                 </div>
               </div>
@@ -141,7 +141,7 @@ export default function Goals() {
                   required
                   value={newGoal.deadline}
                   onChange={(e) => setNewGoal({ ...newGoal, deadline: e.target.value })}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                 />
               </div>
             </div>
@@ -251,7 +251,7 @@ export default function Goals() {
                           value={progressInput.value}
                           onChange={(e) => setProgressInput({ id: goal.id, value: e.target.value })}
                           placeholder="Amount (+/-)"
-                          className="flex-1 bg-surface-base border border-surface-border rounded-lg px-3 py-1.5 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
+                          className="flex-1 bg-surface-base border border-surface-border rounded-lg px-3 py-1.5 text-sm font-mono text-content-primary focus-app-field transition-colors"
                         />
                         <button type="submit" className="px-3 py-1.5 bg-white text-black hover:bg-neutral-200 rounded-lg text-xs font-bold transition-colors">
                           Save

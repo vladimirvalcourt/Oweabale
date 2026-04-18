@@ -179,8 +179,8 @@ export default function OweAi() {
     <div className="min-h-[calc(100dvh-12rem)] max-w-3xl mx-auto w-full flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
-          <div className="mt-0.5 h-9 w-9 rounded-full bg-violet-500/12 border border-violet-500/30 inline-flex items-center justify-center">
-            <Sparkles className="w-4.5 h-4.5 text-violet-400" aria-hidden />
+          <div className="mt-0.5 h-9 w-9 rounded-full bg-white/10 border border-white/15 inline-flex items-center justify-center">
+            <Sparkles className="w-4.5 h-4.5 text-content-secondary" aria-hidden />
           </div>
           <div>
             <h1 className="text-xl font-semibold tracking-tight text-content-primary leading-none">Owe-AI</h1>
@@ -209,7 +209,7 @@ export default function OweAi() {
             Chat mode: <span className="text-content-secondary font-medium">{MODE_LABEL[mode]}</span>
           </p>
           {learningProfile && mode === 'academy' && (
-            <span className="text-[11px] rounded-full border border-violet-400/35 bg-violet-500/10 text-violet-200 px-2.5 py-1">
+            <span className="text-[11px] rounded-full border border-white/20 bg-white/[0.06] text-content-secondary px-2.5 py-1">
               Level: {learningProfile.familiarityLevel}
             </span>
           )}
@@ -224,7 +224,7 @@ export default function OweAi() {
               className={cn(
                 'text-xs rounded-full border px-3 py-1.5 transition-colors',
                 mode === m
-                  ? 'border-brand-indigo/60 bg-brand-indigo/20 text-content-primary'
+                  ? 'border-white/30 bg-white/[0.08] text-content-primary'
                   : 'border-surface-border bg-surface-base text-content-secondary hover:bg-surface-elevated',
               )}
             >
@@ -249,7 +249,7 @@ export default function OweAi() {
                 className={cn(
                   'text-[11px] rounded-full border px-3 py-1 transition-colors',
                   levelHint === option.value
-                    ? 'border-violet-400/55 bg-violet-500/15 text-violet-100'
+                    ? 'border-white/25 bg-white/[0.08] text-content-primary'
                     : 'border-surface-border bg-surface-base text-content-tertiary hover:text-content-secondary',
                 )}
               >
@@ -327,7 +327,7 @@ export default function OweAi() {
         <label htmlFor="owe-ai-input" className="sr-only">
           Message to Owe-AI
         </label>
-        <div className="rounded-full border border-surface-border bg-surface-raised px-2 py-1.5 flex items-end gap-2 transition-colors focus-within:border-brand-indigo/35 focus-within:ring-1 focus-within:ring-brand-indigo/25">
+        <div className="rounded-full border border-surface-border bg-surface-raised px-2 py-1.5 flex items-end gap-2 transition-colors focus-within:border-white/35 focus-within:ring-1 focus-within:ring-white/20">
           <textarea
             id="owe-ai-input"
             rows={2}

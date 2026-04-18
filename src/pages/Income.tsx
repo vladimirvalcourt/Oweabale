@@ -407,7 +407,7 @@ export default function Income() {
                     type="checkbox"
                     checked={formData.isTaxWithheld}
                     onChange={(e) => setFormData({...formData, isTaxWithheld: e.target.checked})}
-                    className="w-4 h-4 rounded-lg border-surface-border text-brand-indigo focus-app bg-surface-raised cursor-pointer"
+                    className="w-4 h-4 rounded-lg border-surface-border text-content-primary focus-app bg-surface-raised cursor-pointer"
                   />
                   <div className="flex-1">
                     <p className="text-sm font-sans font-medium text-content-primary">Taxes already withheld</p>

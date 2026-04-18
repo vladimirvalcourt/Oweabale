@@ -62,7 +62,7 @@ export function AdminRevenueChart({ data }: Props) {
             <Line
               type="monotone"
               dataKey="revenue_cents"
-              stroke="#818cf8"
+              stroke="#d4d4d4"
               strokeWidth={2}
               dot={false}
             />

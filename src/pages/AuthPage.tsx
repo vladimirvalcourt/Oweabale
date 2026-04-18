@@ -57,8 +57,8 @@ export default function AuthPage() {
         {/* Logo / wordmark */}
         <div className="mb-10">
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-5 h-5 border-2 border-brand-violet flex items-center justify-center">
-              <div className="w-2 h-2 bg-brand-violet" />
+            <div className="w-5 h-5 border-2 border-white/25 flex items-center justify-center">
+              <div className="w-2 h-2 bg-content-secondary" />
             </div>
             <span className="font-mono text-xs text-content-tertiary tracking-[0.2em] uppercase">
               Oweable

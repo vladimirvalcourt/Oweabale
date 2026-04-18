@@ -83,10 +83,10 @@ export function AppLoader() {
   return (
     <div className="fixed inset-0 bg-[#08090A] z-50 flex flex-col items-center justify-center">
       <div className="relative mb-6">
-        <div className="w-8 h-8 border border-brand-violet/30 flex items-center justify-center">
-          <div className="w-1.5 h-1.5 bg-brand-violet animate-ping" />
+        <div className="w-8 h-8 border border-white/20 flex items-center justify-center">
+          <div className="w-1.5 h-1.5 bg-content-secondary animate-ping" />
         </div>
-        <div className="absolute -inset-2 border border-brand-violet/10 animate-pulse" />
+        <div className="absolute -inset-2 border border-white/10 animate-pulse" />
       </div>
       <p className="text-[9px] font-mono text-content-muted uppercase tracking-[0.4em]">
         Syncing Financial Data

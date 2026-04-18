@@ -143,7 +143,7 @@ export default function Onboarding() {
     return (
       <>
       <PrivacyScreenWhenHidden />
-      <div className="fixed inset-0 bg-[#08090A] flex flex-col items-center justify-center p-6 overflow-hidden selection:bg-brand-violet/20 font-sans">
+      <div className="fixed inset-0 bg-[#08090A] flex flex-col items-center justify-center p-6 overflow-hidden selection:bg-white/10 font-sans">
         {/* Background HUD Grid */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '64px 64px' }} />
@@ -188,7 +188,7 @@ export default function Onboarding() {
           {/* Headline */}
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white uppercase mb-2">
             Welcome,<br />
-            <span className="text-brand-violet">{firstName}.</span>
+            <span className="text-content-primary">{firstName}.</span>
           </h1>
           <p className="text-content-tertiary font-mono text-[12px] normal-case tracking-normal mb-4 max-w-md leading-relaxed">
             In a couple of minutes you will have a working dashboard: cash, bills, and a default strategy. Everything you enter here is optional — add or edit the rest anytime.
@@ -207,7 +207,7 @@ export default function Onboarding() {
             ].map(({ icon: Icon, label, desc }) => (
               <div key={label} className="bg-surface-raised border border-surface-border p-4 flex items-start gap-3 group">
                 <div className="w-7 h-7 border border-white/10 flex items-center justify-center bg-surface-elevated flex-shrink-0 mt-0.5">
-                  <Icon className="w-3.5 h-3.5 text-brand-violet" />
+                  <Icon className="w-3.5 h-3.5 text-content-primary" />
                 </div>
                 <div>
                   <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-white mb-0.5">{label}</p>
@@ -219,8 +219,8 @@ export default function Onboarding() {
 
           {/* Setup info + CTA */}
           <div className="bg-surface-raised border border-surface-border p-6 relative">
-            <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-brand-violet" />
-            <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-brand-violet" />
+            <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-white/25" />
+            <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-white/25" />
             <p className="text-[11px] font-mono text-content-tertiary uppercase tracking-widest mb-5">
               <span className="text-white font-bold">5 short steps</span> &nbsp;·&nbsp; ~2 minutes &nbsp;·&nbsp; Leave fields blank and continue, or use <span className="text-content-secondary">Skip Setup</span> anytime
             </p>
@@ -254,7 +254,7 @@ export default function Onboarding() {
   return (
     <>
     <PrivacyScreenWhenHidden />
-    <div className="fixed inset-0 bg-[#08090A] flex flex-col items-center justify-center p-6 overflow-hidden selection:bg-brand-violet/20 font-sans">
+    <div className="fixed inset-0 bg-[#08090A] flex flex-col items-center justify-center p-6 overflow-hidden selection:bg-white/10 font-sans">
       {/* Background HUD Grid */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '64px 64px' }} />
@@ -314,11 +314,11 @@ export default function Onboarding() {
           >
             <div className="flex flex-col items-start text-left">
               <div className="mb-4 h-7 w-7 border border-white/10 flex items-center justify-center bg-surface-raised">
-                {currentStepIndex === 0 && <Vault className="w-3.5 h-3.5 text-brand-violet" />}
-                {currentStepIndex === 1 && <Receipt className="w-3.5 h-3.5 text-brand-violet" />}
-                {currentStepIndex === 2 && <Activity className="w-3.5 h-3.5 text-brand-violet" />}
-                {currentStepIndex === 3 && <Flame className="w-3.5 h-3.5 text-brand-violet" />}
-                {currentStepIndex === 4 && <Shield className="w-3.5 h-3.5 text-brand-violet" />}
+                {currentStepIndex === 0 && <Vault className="w-3.5 h-3.5 text-content-primary" />}
+                {currentStepIndex === 1 && <Receipt className="w-3.5 h-3.5 text-content-primary" />}
+                {currentStepIndex === 2 && <Activity className="w-3.5 h-3.5 text-content-primary" />}
+                {currentStepIndex === 3 && <Flame className="w-3.5 h-3.5 text-content-primary" />}
+                {currentStepIndex === 4 && <Shield className="w-3.5 h-3.5 text-content-primary" />}
               </div>
 
               <h1 className="text-3xl md:text-4xl font-sans font-bold tracking-tight text-white mb-1 uppercase">
@@ -334,12 +334,12 @@ export default function Onboarding() {
 
               {/* Input Control Area - Refined Padding */}
               <div className="w-full bg-surface-raised border border-surface-border p-6 md:p-10 shadow-2xl relative group">
-                <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-brand-violet"></div>
-                <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-brand-violet"></div>
+                <div className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t border-white/25"></div>
+                <div className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t border-white/25"></div>
                 
                 {currentStep.id === 'assets' && (
                   <div className="space-y-4">
-                    <div className="flex items-end border-b border-surface-border group-focus-within:border-brand-violet transition-all">
+                    <div className="flex items-end border-b border-surface-border group-focus-within:border-white/30 transition-all">
                       <span className="text-content-tertiary font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
                       <input 
                         autoFocus
@@ -357,7 +357,7 @@ export default function Onboarding() {
 
                 {currentStep.id === 'obligations' && (
                   <div className="space-y-4">
-                    <div className="flex items-end border-b border-surface-border group-focus-within:border-brand-violet transition-all">
+                    <div className="flex items-end border-b border-surface-border group-focus-within:border-white/30 transition-all">
                       <span className="text-content-tertiary font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
                       <input 
                         autoFocus
@@ -375,7 +375,7 @@ export default function Onboarding() {
 
                 {currentStep.id === 'velocity' && (
                   <div className="space-y-6">
-                    <div className="flex items-end border-b border-surface-border group-focus-within:border-brand-violet transition-all">
+                    <div className="flex items-end border-b border-surface-border group-focus-within:border-white/30 transition-all">
                       <span className="text-content-tertiary font-sans text-5xl leading-none pb-2 pr-0.5">$</span>
                       <input 
                         autoFocus
@@ -398,7 +398,7 @@ export default function Onboarding() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button 
                       onClick={() => setFormData({...formData, focus: 'stacking'})}
-                      className={`p-5 border transition-all text-left group ${formData.focus === 'stacking' ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-white/15 text-content-tertiary'}`}
+                      className={`p-5 border transition-all text-left group ${formData.focus === 'stacking' ? 'bg-surface-elevated text-white border-white/25' : 'bg-surface-base border-surface-border hover:border-white/15 text-content-tertiary'}`}
                     >
                       <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest mb-2">Save & Grow</h3>
                       <p className="text-[9px] font-mono uppercase leading-relaxed text-content-tertiary">Focus on growth trajectory and asset accumulation.</p>
@@ -418,7 +418,7 @@ export default function Onboarding() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <button 
                       onClick={() => setFormData({...formData, freelance: true})}
-                      className={`p-5 border transition-all text-left group ${formData.freelance === true ? 'bg-surface-elevated text-white border-brand-violet' : 'bg-surface-base border-surface-border hover:border-white/15 text-content-tertiary'}`}
+                      className={`p-5 border transition-all text-left group ${formData.freelance === true ? 'bg-surface-elevated text-white border-white/25' : 'bg-surface-base border-surface-border hover:border-white/15 text-content-tertiary'}`}
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="font-sans font-bold text-[10px] uppercase tracking-widest">Independent Contractor</h3>

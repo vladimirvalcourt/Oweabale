@@ -348,7 +348,7 @@ ${user.firstName} ${user.lastName}
                           value={fixItem}
                           onChange={e => setFixItem(e.target.value)}
                           placeholder="e.g., Inaccurate Medical Collection"
-                          className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-white focus-app-field-indigo placeholder:text-content-muted"
+                          className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-white focus-app-field placeholder:text-content-muted"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
@@ -359,7 +359,7 @@ ${user.firstName} ${user.lastName}
                             value={fixAmount}
                             onChange={e => setFixAmount(e.target.value)}
                             placeholder="0.00"
-                            className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-white focus-app-field-indigo"
+                            className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-white focus-app-field"
                           />
                         </div>
                         <div>
@@ -367,7 +367,7 @@ ${user.firstName} ${user.lastName}
                           <select 
                             value={fixBureau}
                             onChange={e => setFixBureau(e.target.value)}
-                            className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-white focus-app-field-indigo h-[46px]"
+                            className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-white focus-app-field h-[46px]"
                           >
                             <option>Experian</option>
                             <option>Equifax</option>
@@ -382,7 +382,7 @@ ${user.firstName} ${user.lastName}
                           value={fixNotes}
                           onChange={e => setFixNotes(e.target.value)}
                           placeholder="Explain why this is incorrect..."
-                          className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-white focus-app-field-indigo h-24 resize-none placeholder:text-content-muted"
+                          className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-white focus-app-field h-24 resize-none placeholder:text-content-muted"
                         />
                       </div>
                       <div className="flex gap-3 pt-4">

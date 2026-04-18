@@ -222,7 +222,7 @@ export default function MobileCapture() {
         <div className="flex flex-col gap-3 w-full max-w-xs">
           <button 
             onClick={() => { setPreviewUrl(null); setStatus('idle'); }}
-            className="w-full py-5 bg-brand-violet text-white font-mono text-[10px] font-bold uppercase tracking-[0.3em] shadow-lg shadow-brand-violet/20 active:scale-95 transition-all"
+            className="w-full py-5 bg-white text-black font-mono text-[10px] font-bold uppercase tracking-[0.3em] shadow-none hover:bg-neutral-200 active:scale-95 transition-all"
           >
             Capture Another
           </button>
@@ -262,8 +262,8 @@ export default function MobileCapture() {
               {/* Instructions Section */}
               <div className="space-y-8 mt-4">
                  <div className="flex gap-5 group">
-                    <div className="shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
-                       <Sun className="w-4 h-4 text-content-tertiary group-hover:text-brand-violet" />
+                    <div className="shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
+                       <Sun className="w-4 h-4 text-content-tertiary group-hover:text-content-primary" />
                     </div>
                     <div className="space-y-1">
                        <p className="text-[10px] font-mono font-bold text-white uppercase tracking-widest">1. Position</p>
@@ -271,8 +271,8 @@ export default function MobileCapture() {
                     </div>
                  </div>
                  <div className="flex gap-5 group text-left">
-                    <div className="shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
-                       <Maximize className="w-4 h-4 text-content-tertiary group-hover:text-brand-violet" />
+                    <div className="shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
+                       <Maximize className="w-4 h-4 text-content-tertiary group-hover:text-content-primary" />
                     </div>
                     <div className="space-y-1">
                        <p className="text-[10px] font-mono font-bold text-white uppercase tracking-widest">2. Align</p>
@@ -280,8 +280,8 @@ export default function MobileCapture() {
                     </div>
                  </div>
                  <div className="flex gap-5 group text-left">
-                    <div className="shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-brand-violet/50 transition-colors">
-                       <MousePointer2 className="w-4 h-4 text-content-tertiary group-hover:text-brand-violet" />
+                    <div className="shrink-0 w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
+                       <MousePointer2 className="w-4 h-4 text-content-tertiary group-hover:text-content-primary" />
                     </div>
                     <div className="space-y-1">
                        <p className="text-[10px] font-mono font-bold text-white uppercase tracking-widest">3. Capture</p>
@@ -302,15 +302,15 @@ export default function MobileCapture() {
                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                   />
                   <div className="flex items-center gap-5 relative z-1">
-                    <div className="w-14 h-14 rounded-full bg-brand-indigo/5 border border-brand-violet/20 flex items-center justify-center group-hover:border-brand-violet/40 transition-all shrink-0">
-                      <Camera className="w-6 h-6 text-brand-violet" />
+                    <div className="w-14 h-14 rounded-full bg-white/[0.05] border border-white/20 flex items-center justify-center group-hover:border-white/35 transition-all shrink-0">
+                      <Camera className="w-6 h-6 text-content-primary" />
                     </div>
                     <div>
                       <p className="text-[11px] font-mono font-bold text-white uppercase tracking-widest">Take Photo</p>
                       <p className="text-[9px] font-mono text-content-muted uppercase tracking-widest mt-1">Open camera and snap the document</p>
                     </div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-violet/[0.03] to-transparent animate-scan-y opacity-50 pointer-events-none" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-content-primary/[0.03] to-transparent animate-scan-y opacity-50 pointer-events-none" />
                 </div>
 
                 {/* Option 2: Upload from Gallery or Files */}
@@ -337,7 +337,7 @@ export default function MobileCapture() {
             <div className="space-y-10 animate-in slide-in-from-bottom-8 duration-700 h-full flex flex-col py-4">
               {/* Guidance HUD */}
               <div className="text-center">
-                 <p className="text-[10px] font-mono text-brand-violet font-bold uppercase tracking-[0.3em] animate-pulse">
+                 <p className="text-[10px] font-mono text-content-primary font-bold uppercase tracking-[0.3em] animate-pulse">
                     [ {guidanceText} ]
                  </p>
               </div>
@@ -345,8 +345,8 @@ export default function MobileCapture() {
                <div className="relative aspect-[3/4] w-full bg-surface-raised border border-white/[0.12] p-1.5 rounded-lg overflow-hidden shadow-2xl flex-1">
                  {capturedFileType === 'application/pdf' ? (
                    <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-surface-base">
-                     <div className="w-20 h-20 rounded-lg border border-brand-violet/30 bg-brand-violet/5 flex items-center justify-center">
-                       <FolderOpen className="w-10 h-10 text-brand-violet" />
+                     <div className="w-20 h-20 rounded-lg border border-content-primary/30 bg-content-primary/5 flex items-center justify-center">
+                       <FolderOpen className="w-10 h-10 text-content-primary" />
                      </div>
                      <p className="text-[11px] font-mono text-content-tertiary uppercase tracking-widest">PDF Ready to Send</p>
                    </div>
@@ -356,14 +356,14 @@ export default function MobileCapture() {
                  
                  {/* Visual Viewfinder Overlay */}
                  <div className="absolute inset-8 border border-white/20 pointer-events-none">
-                    <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-brand-violet"></div>
-                    <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-brand-violet"></div>
-                    <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-brand-violet"></div>
-                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-brand-violet"></div>
+                    <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-content-primary"></div>
+                    <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-content-primary"></div>
+                    <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-content-primary"></div>
+                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-content-primary"></div>
                  </div>
 
                  {status === 'uploading' && (
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-brand-violet shadow-[0_0_20px_#7c3aed] animate-scan-y z-20"></div>
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-white shadow-[0_0_20px_rgba(255,255,255,0.2)] animate-scan-y z-20"></div>
                  )}
                </div>
 

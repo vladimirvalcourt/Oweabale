@@ -119,8 +119,8 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
             <div className="w-full md:w-2/5 p-8 border-r border-surface-border bg-surface-base flex flex-col justify-between">
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 rounded-full border border-brand-violet/30 flex items-center justify-center bg-brand-violet/5">
-                    <Smartphone className="w-4 h-4 text-brand-violet" />
+                  <div className="w-8 h-8 rounded-full border border-white/15 flex items-center justify-center bg-white/[0.05]">
+                    <Smartphone className="w-4 h-4 text-content-secondary" />
                   </div>
                   <Dialog.Title className="text-sm font-bold text-white uppercase tracking-widest font-mono">Mobile Sync</Dialog.Title>
                 </div>
@@ -151,7 +151,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                     <span className="text-[9px] font-mono text-content-muted uppercase tracking-widest">Secure connection</span>
                  </div>
                  <div className="w-full h-0.5 bg-surface-border rounded-full overflow-hidden">
-                    <div className={cn("h-full bg-brand-violet transition-all duration-300", status === 'waiting' ? 'w-1/3' : status === 'active' ? 'w-2/3' : status === 'completed' ? 'w-full' : 'w-0')} />
+                    <div className={cn("h-full bg-white/60 transition-all duration-300", status === 'waiting' ? 'w-1/3' : status === 'active' ? 'w-2/3' : status === 'completed' ? 'w-full' : 'w-0')} />
                  </div>
               </div>
             </div>
@@ -165,7 +165,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                <AnimatePresence mode="wait">
                   {status === 'generating' ? (
                     <motion.div key="generating" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center gap-4">
-                      <Loader2 className="w-8 h-8 text-brand-violet animate-spin" />
+                      <Loader2 className="w-8 h-8 text-content-secondary animate-spin" />
                       <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">Preparing secure link…</p>
                     </motion.div>
                   ) : (
@@ -174,24 +174,24 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                           {status === 'waiting' ? (
                              qrDataUrl
                                ? <img src={qrDataUrl} alt="QR Code" className="w-[200px] h-[200px] rounded-lg" />
-                               : <div className="w-[200px] h-[200px] flex items-center justify-center"><Loader2 className="w-6 h-6 text-brand-violet animate-spin" /></div>
+                               : <div className="w-[200px] h-[200px] flex items-center justify-center"><Loader2 className="w-6 h-6 text-content-secondary animate-spin" /></div>
                           ) : (
-                             <div className="w-[200px] h-[200px] flex flex-col items-center justify-center bg-brand-violet/5 gap-3 border-4 border-brand-violet/20 animate-pulse">
-                                <Zap className={`w-8 h-8 ${status === 'completed' ? 'text-brand-violet' : 'text-emerald-400'}`} />
-                                <span className={`text-[9px] font-mono font-bold uppercase tracking-widest text-center ${status === 'completed' ? 'text-brand-violet' : 'text-emerald-400'}`}>
+                             <div className="w-[200px] h-[200px] flex flex-col items-center justify-center bg-white/[0.04] gap-3 border-4 border-white/15 animate-pulse">
+                                <Zap className={`w-8 h-8 ${status === 'completed' ? 'text-content-primary' : 'text-emerald-400'}`} />
+                                <span className={`text-[9px] font-mono font-bold uppercase tracking-widest text-center ${status === 'completed' ? 'text-content-primary' : 'text-emerald-400'}`}>
                                    {status === 'completed' ? 'RECEIVING DATA' : 'SESSION ACTIVE'}
                                 </span>
                              </div>
                           )}
                           
-                          <div className="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-brand-violet"></div>
-                          <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-brand-violet"></div>
+                          <div className="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-white/40"></div>
+                          <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-white/40"></div>
                        </div>
                        
                        <div className="mt-8 text-center min-h-[50px] flex flex-col items-center justify-center">
                           {status === 'waiting' && <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest leading-relaxed">Scan to upload document.</p>}
                           {status === 'active' && <p className="text-[10px] font-mono text-emerald-400 animate-pulse uppercase tracking-[0.2em] leading-relaxed">📱 Phone connected... waiting for photo.</p>}
-                          {status === 'completed' && <p className="text-[10px] font-mono text-brand-violet animate-pulse uppercase tracking-[0.2em] leading-relaxed">Receiving document...</p>}
+                          {status === 'completed' && <p className="text-[10px] font-mono text-content-secondary animate-pulse uppercase tracking-[0.2em] leading-relaxed">Receiving document...</p>}
                        </div>
                     </motion.div>
                   )}

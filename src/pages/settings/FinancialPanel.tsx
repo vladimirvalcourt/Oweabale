@@ -26,7 +26,7 @@ function FinancialPanelInner() {
             <select
               value={prefCurrency}
               onChange={(e) => setPrefCurrency(e.target.value)}
-              className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+              className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
             >
               <option>USD ($)</option>
               <option>EUR (€)</option>
@@ -39,7 +39,7 @@ function FinancialPanelInner() {
             <select
               value={prefDateFormat}
               onChange={(e) => setPrefDateFormat(e.target.value)}
-              className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+              className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
             >
               <option>MM/DD/YYYY</option>
               <option>DD/MM/YYYY</option>
@@ -51,7 +51,7 @@ function FinancialPanelInner() {
             <select
               value={prefFiscalYear}
               onChange={(e) => setPrefFiscalYear(e.target.value)}
-              className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+              className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
             >
               <option>January</option>
               <option>April</option>
@@ -64,7 +64,7 @@ function FinancialPanelInner() {
             <select
               value={prefDashboardView}
               onChange={(e) => setPrefDashboardView(e.target.value)}
-              className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+              className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
             >
               <option>Net Worth Overview</option>
               <option>Upcoming Bills</option>
@@ -98,7 +98,7 @@ function FinancialPanelInner() {
                 type="number"
                 value={prefSpendingLimit}
                 onChange={(e) => setPrefSpendingLimit(e.target.value)}
-                className="focus-app-field-indigo block w-full pl-7 sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg py-2 border transition-colors"
+                className="focus-app-field block w-full pl-7 sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg py-2 border transition-colors"
               />
             </div>
           </div>

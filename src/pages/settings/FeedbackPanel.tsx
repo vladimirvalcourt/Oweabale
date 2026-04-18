@@ -80,7 +80,7 @@ function FeedbackPanelInner() {
                 <select
                   value={feedbackForm.type}
                   onChange={(e) => setFeedbackForm((f) => ({ ...f, type: e.target.value }))}
-                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field-indigo appearance-none"
+                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field appearance-none"
                 >
                   <option value="general">General Feedback</option>
                   <option value="feature_request">Feature Request</option>
@@ -112,7 +112,7 @@ function FeedbackPanelInner() {
               <textarea
                 value={feedbackForm.message}
                 onChange={(e) => setFeedbackForm((f) => ({ ...f, message: e.target.value }))}
-                className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-lg px-3 py-2 focus-app-field-indigo h-28 resize-none placeholder:text-content-muted"
+                className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-lg px-3 py-2 focus-app-field h-28 resize-none placeholder:text-content-muted"
                 placeholder="Tell us what's working, what's not, or what you'd like to see..."
               />
             </div>

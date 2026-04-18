@@ -100,9 +100,10 @@
     @apply focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
+  /* Legacy name: same neutral focus as .focus-app-field (no indigo ring). */
   .focus-app-field-indigo {
-    @apply outline-none focus:outline-none transition-colors focus:border-indigo-500;
-    @apply focus-visible:ring-2 focus-visible:ring-indigo-500/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply outline-none focus:outline-none transition-colors focus:border-white/35;
+    @apply focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .focus-app-field-rose {
@@ -116,8 +117,8 @@
   }
 
   .focus-app-field-indigo-600 {
-    @apply outline-none focus:outline-none transition-colors focus:border-indigo-600;
-    @apply focus-visible:ring-2 focus-visible:ring-indigo-600/80 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply outline-none focus:outline-none transition-colors focus:border-white/35;
+    @apply focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .focus-app-field-zinc {
@@ -191,7 +192,7 @@
   }
   @keyframes pulse-highlight {
     0%, 100% { background-color: transparent; }
-    50% { background-color: rgba(113, 112, 255, 0.08); }
+    50% { background-color: rgba(255, 255, 255, 0.06); }
   }
   .animate-scan-y {
     animation: scan-y-full 2.5s ease-in-out infinite;

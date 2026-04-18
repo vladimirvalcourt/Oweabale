@@ -169,8 +169,8 @@ export default function Freelance() {
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Hero: The Vault Status */}
       <div className="bg-surface-raised border border-surface-border p-8 md:p-12 relative overflow-hidden group shadow-2xl">
-        <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-brand-violet"></div>
-        <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-brand-violet"></div>
+        <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-white/25"></div>
+        <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-white/25"></div>
         
         <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-12">
           <div>
@@ -207,7 +207,7 @@ export default function Freelance() {
                 disabled={isScanning}
                 className="border border-surface-border hover:bg-surface-elevated text-content-secondary text-sm font-sans font-medium px-6 py-3 rounded-lg transition-all flex items-center gap-2 group"
               >
-                {isScanning ? <Loader2 className="w-4 h-4 animate-spin text-brand-indigo" /> : <UploadCloud className="w-4 h-4 group-hover:text-brand-indigo shrink-0" aria-hidden />}
+                {isScanning ? <Loader2 className="w-4 h-4 animate-spin text-content-primary" /> : <UploadCloud className="w-4 h-4 group-hover:text-content-primary shrink-0" aria-hidden />}
                 Scan statement (PDF)
               </button>
               <button 
@@ -250,7 +250,7 @@ export default function Freelance() {
                                  <span className="text-[10px] font-mono tabular-nums text-rose-500 border border-rose-500/20 px-1.5 py-0.5 rounded-lg">Tax −${entry.totalLiability.toFixed(0)}</span>
                                  <span className="text-[10px] font-mono tabular-nums text-emerald-400 border border-emerald-400/20 px-1.5 py-0.5 rounded-lg">You keep +${entry.profit.toFixed(0)}</span>
                                  {entry.scouredWriteOffs && entry.scouredWriteOffs > 0 && (
-                                   <span className="text-[10px] font-sans bg-brand-indigo/20 text-brand-indigo border border-brand-indigo/30 px-1.5 py-0.5 rounded-lg flex items-center gap-1">
+                                   <span className="text-[10px] font-sans bg-white/[0.08] text-content-primary border border-white/15 px-1.5 py-0.5 rounded-lg flex items-center gap-1">
                                      <ShieldCheck className="w-3 h-3 shrink-0" aria-hidden /> Deductions ${entry.scouredWriteOffs.toFixed(0)}
                                    </span>
                                  )}
@@ -262,7 +262,7 @@ export default function Freelance() {
                            <div className="text-right">
                               <p className="text-xs text-content-tertiary mb-1">% you keep</p>
                               <div className="w-24 bg-surface-base h-1 rounded-none overflow-hidden">
-                                 <div className="bg-brand-violet h-full" style={{ width: `${(entry.profit / entry.amount) * 100}%` }} />
+                                 <div className="bg-white/50 h-full" style={{ width: `${(entry.profit / entry.amount) * 100}%` }} />
                               </div>
                            </div>
                            <button 
@@ -284,17 +284,17 @@ export default function Freelance() {
         <div className="space-y-6">
            <div className="bg-surface-raised border border-surface-border p-6 rounded-none">
               <div className="flex items-center gap-2 text-content-tertiary mb-4">
-                 <Zap className="w-4 h-4 text-brand-violet" />
+                 <Zap className="w-4 h-4 text-content-secondary" />
                  <h3 className="text-sm font-sans font-semibold text-content-primary">Freelance tips</h3>
               </div>
               <div className="space-y-6">
-                 <div className="border-l-2 border-brand-violet pl-4">
+                 <div className="border-l-2 border-white/20 pl-4">
                     <p className="text-sm font-sans font-medium text-white mb-1">Self-employment tax (15.3%)</p>
                     <p className="text-xs text-content-tertiary leading-relaxed">
                       We set aside 15.3% from each payment toward self-employment tax.
                     </p>
                  </div>
-                 <div className="border-l-2 border-brand-violet pl-4">
+                 <div className="border-l-2 border-white/20 pl-4">
                     <p className="text-sm font-sans font-medium text-white mb-1">State tax · {taxState}</p>
                     <p className="text-xs text-content-tertiary leading-relaxed">
                       Save an extra {stateRate}% for state. Suggested total rate about {(stateRate + 15.3 + 12).toFixed(1)}%.
@@ -352,11 +352,11 @@ export default function Freelance() {
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div>
                       <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Who paid you?</label>
-                      <input autoFocus type="text" value={formData.client} onChange={e => setFormData({ ...formData, client: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white focus-app-field-brand-indigo transition-colors rounded-lg" placeholder="e.g. Acme Studio" />
+                      <input autoFocus type="text" value={formData.client} onChange={e => setFormData({ ...formData, client: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white focus-app-field transition-colors rounded-lg" placeholder="e.g. Acme Studio" />
                     </div>
                     <div>
                       <label className="block text-sm font-sans font-medium text-content-secondary mb-2">Payment amount</label>
-                      <input type="number" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white font-mono tabular-nums focus-app-field-brand-indigo transition-colors rounded-lg" placeholder="0.00" />
+                      <input type="number" value={formData.amount} onChange={e => setFormData({ ...formData, amount: e.target.value })} className="w-full bg-surface-base border border-surface-border h-12 px-4 text-white font-mono tabular-nums focus-app-field transition-colors rounded-lg" placeholder="0.00" />
                     </div>
                     <p className="text-xs text-content-muted leading-relaxed">If this row came from a PDF scan, double-check the amount matches your statement.</p>
                     <div className="pt-4 flex gap-3">

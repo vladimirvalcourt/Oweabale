@@ -20,7 +20,7 @@ type Props = {
 };
 
 const PLAN_STYLES: Record<string, string> = {
-  Lifetime: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
+  Lifetime: 'bg-white/10 text-content-secondary border-white/15',
   Pro: 'bg-white/[0.06] text-content-secondary border-surface-border',
 };
 

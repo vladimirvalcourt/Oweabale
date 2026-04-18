@@ -26,7 +26,7 @@ function TactileIconStatic({
         size={size}
         className={cn(
           'transition-colors duration-300',
-          active ? 'text-brand-violet' : 'text-content-tertiary group-hover:text-content-primary',
+          active ? 'text-content-primary' : 'text-content-tertiary group-hover:text-content-primary',
           iconClassName
         )}
       />
@@ -90,14 +90,14 @@ function TactileIconInteractive({
           size={size}
           className={cn(
             'transition-colors duration-300',
-            active ? 'text-brand-violet' : 'text-content-tertiary group-hover:text-content-primary',
+            active ? 'text-content-primary' : 'text-content-tertiary group-hover:text-content-primary',
             iconClassName
           )}
         />
       </motion.div>
 
       <motion.div
-        className="absolute inset-0 rounded-full bg-brand-violet/10 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100"
+        className="absolute inset-0 rounded-full bg-white/10 opacity-0 blur-md transition-opacity duration-300 group-hover:opacity-100"
         style={{ translateZ: -5 }}
       />
     </motion.div>

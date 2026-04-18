@@ -26,7 +26,7 @@ export default function Changelog() {
     <div className="space-y-8 max-w-2xl">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-content-primary mb-1 flex items-center gap-2">
-          <ScrollText className="w-7 h-7 text-brand-indigo shrink-0" aria-hidden />
+          <ScrollText className="w-7 h-7 text-content-primary shrink-0" aria-hidden />
           Changelog
         </h1>
         <p className="text-sm text-content-tertiary">Product updates and notable changes.</p>

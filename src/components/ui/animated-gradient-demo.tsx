@@ -121,22 +121,22 @@ function StopOnHover() {
     >
       <div className="text-white text-center space-y-4">
         <div className="flex justify-center mb-4">
-          <User className="w-8 h-8 text-purple-400" />
+          <User className="w-8 h-8 text-content-secondary" />
         </div>
         <h3 className="text-xl font-semibold mb-2 italic">User Identity</h3>
-        <p className="text-content-tertiary mb-4 text-xs font-mono">Animation pauses on hover - purple theme</p>
+        <p className="text-content-tertiary mb-4 text-xs font-mono">Animation pauses on hover — neutral chrome</p>
         <div className="space-y-3">
           <div className="flex gap-2 justify-center">
-            <button className="px-3 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg transition-colors text-[10px] font-bold uppercase tracking-widest">
+            <button className="px-3 py-2 bg-white hover:bg-neutral-200 text-black rounded-lg transition-colors text-[10px] font-bold uppercase tracking-widest">
               <Mail className="w-4 h-4 inline mr-1" />
               Message
             </button>
-            <button className="px-3 py-2 bg-purple-600 hover:bg-purple-500 rounded-lg transition-colors text-[10px] font-bold uppercase tracking-widest">
+            <button className="px-3 py-2 bg-white hover:bg-neutral-200 text-black rounded-lg transition-colors text-[10px] font-bold uppercase tracking-widest">
               <Phone className="w-4 h-4 inline mr-1" />
               Call
             </button>
           </div>
-          <div className="text-[10px] font-mono text-purple-300 tracking-wider">
+          <div className="text-[10px] font-mono text-content-tertiary tracking-wider">
             PREMIUM MEMBER — 2026
           </div>
         </div>

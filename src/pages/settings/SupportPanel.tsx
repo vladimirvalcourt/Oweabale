@@ -105,7 +105,7 @@ function SupportPanelInner() {
                 type="text"
                 value={supportForm.subject}
                 onChange={(e) => setSupportForm((f) => ({ ...f, subject: e.target.value }))}
-                className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field-indigo placeholder:text-content-muted"
+                className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field placeholder:text-content-muted"
                 placeholder="Brief summary of your issue or question..."
               />
             </div>
@@ -118,7 +118,7 @@ function SupportPanelInner() {
                 <select
                   value={supportForm.department}
                   onChange={(e) => setSupportForm((f) => ({ ...f, department: e.target.value }))}
-                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field-indigo appearance-none"
+                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field appearance-none"
                 >
                   <option>General Support</option>
                   <option>Integrations</option>
@@ -133,7 +133,7 @@ function SupportPanelInner() {
                 <select
                   value={supportForm.priority}
                   onChange={(e) => setSupportForm((f) => ({ ...f, priority: e.target.value }))}
-                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field-indigo appearance-none"
+                  className="w-full bg-surface-raised border border-surface-border text-white text-sm rounded-lg px-3 py-2 focus-app-field appearance-none"
                 >
                   <option value="Low">Low — general question</option>
                   <option value="Normal">Normal — something isn&apos;t working</option>
@@ -149,7 +149,7 @@ function SupportPanelInner() {
               <textarea
                 value={supportForm.description}
                 onChange={(e) => setSupportForm((f) => ({ ...f, description: e.target.value }))}
-                className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-lg px-3 py-2 focus-app-field-indigo min-h-[8rem] resize-y placeholder:text-content-muted"
+                className="w-full bg-surface-raised border border-surface-border text-white text-sm font-mono rounded-lg px-3 py-2 focus-app-field min-h-[8rem] resize-y placeholder:text-content-muted"
                 placeholder="Include steps to reproduce, what you expected vs what happened, and any relevant details..."
               />
             </div>

@@ -190,7 +190,7 @@ export default function Subscriptions() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                   placeholder="e.g., Netflix"
                 />
               </div>
@@ -205,7 +205,7 @@ export default function Subscriptions() {
                     step="0.01"
                     value={formData.amount}
                     onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field-indigo transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field transition-colors"
                     placeholder="0.00"
                   />
                 </div>
@@ -215,7 +215,7 @@ export default function Subscriptions() {
                 <select
                   value={formData.frequency}
                   onChange={(e) => setFormData({ ...formData, frequency: e.target.value as SubFrequency })}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                 >
                   <option value="Weekly">Weekly</option>
                   <option value="Bi-weekly">Bi-weekly</option>
@@ -230,7 +230,7 @@ export default function Subscriptions() {
                   required
                   value={formData.nextBillingDate}
                   onChange={(e) => setFormData({ ...formData, nextBillingDate: e.target.value })}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field-indigo transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                 />
               </div>
             </div>

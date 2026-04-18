@@ -299,7 +299,7 @@ export default function Obligations() {
         extraHeader={
           <TransitionLink
             to="/calendar#calendar-view"
-            className="text-[10px] font-sans font-medium text-brand-violet hover:text-brand-violet/90 border border-brand-violet/30 rounded-lg px-2 py-0.5"
+            className="text-[10px] font-sans font-medium text-content-primary hover:text-content-secondary border border-white/20 rounded-lg px-2 py-0.5"
           >
             Month view →
           </TransitionLink>
@@ -309,7 +309,7 @@ export default function Obligations() {
           <p className="text-xs text-content-tertiary leading-relaxed">
             Totals include unpaid bills, active subscriptions, minimum debt payments with a due date, and open fines — same buckets as
             the list below, grouped by days from today. The{' '}
-            <TransitionLink to="/calendar#calendar-view" className="text-brand-violet hover:underline">
+            <TransitionLink to="/calendar#calendar-view" className="text-content-primary hover:underline">
               Calendar
             </TransitionLink>{' '}
             shows the same items on specific dates.
@@ -672,7 +672,7 @@ function EditBillDialog({
             <input
               value={biller}
               onChange={(e) => setBiller(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">Amount ($)</label>
             <input
@@ -680,13 +680,13 @@ function EditBillDialog({
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">Category</label>
             <input
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">Due date</label>
             <input
@@ -784,14 +784,14 @@ function EditDebtDialog({
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">Type</label>
             <input
               value={type}
               onChange={(e) => setType(e.target.value)}
               placeholder="Credit Card, Loan, …"
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">Balance owed ($)</label>
             <input
@@ -799,7 +799,7 @@ function EditDebtDialog({
               step="0.01"
               value={remaining}
               onChange={(e) => setRemaining(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">APR (%)</label>
             <input
@@ -807,7 +807,7 @@ function EditDebtDialog({
               step="0.01"
               value={apr}
               onChange={(e) => setApr(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">Minimum payment ($/mo)</label>
             <input
@@ -815,7 +815,7 @@ function EditDebtDialog({
               step="0.01"
               value={minPayment}
               onChange={(e) => setMinPayment(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field-indigo"
+              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="flex items-center gap-2 text-sm text-content-secondary cursor-pointer">
               <input

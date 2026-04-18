@@ -64,7 +64,7 @@ function SecurityPanelInner() {
               type="password"
               required
               minLength={8}
-              className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+              className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
             />
           </div>
           <div>
@@ -73,7 +73,7 @@ function SecurityPanelInner() {
               name="confirmPassword"
               type="password"
               required
-              className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+              className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
             />
           </div>
           <div className="pt-2">

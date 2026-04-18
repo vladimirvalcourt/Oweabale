@@ -10,7 +10,7 @@ export default function Categories() {
   const [formData, setFormData] = useState({
     name: '',
     type: 'expense' as 'income' | 'expense',
-    color: '#6366F1',
+    color: '#737373',
   });
 
   const handleAdd = (e: React.FormEvent) => {
@@ -28,7 +28,7 @@ export default function Categories() {
 
     toast.success('Category added successfully');
     setIsAdding(false);
-    setFormData({ name: '', type: 'expense', color: '#6366F1' });
+    setFormData({ name: '', type: 'expense', color: '#737373' });
   };
 
   const handleUpdate = (e: React.FormEvent) => {
@@ -43,7 +43,7 @@ export default function Categories() {
 
     toast.success('Category updated');
     setEditingId(null);
-    setFormData({ name: '', type: 'expense', color: '#6366F1' });
+    setFormData({ name: '', type: 'expense', color: '#737373' });
   };
 
   const startEdit = (category: any) => {
@@ -51,14 +51,14 @@ export default function Categories() {
     setFormData({
       name: category.name,
       type: category.type,
-      color: category.color || '#6366F1',
+      color: category.color || '#737373',
     });
     setIsAdding(false);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setFormData({ name: '', type: 'expense', color: '#6366F1' });
+    setFormData({ name: '', type: 'expense', color: '#737373' });
   };
 
   const handleDelete = (id: string) => {
@@ -79,7 +79,7 @@ export default function Categories() {
           onClick={() => {
             setIsAdding(true);
             setEditingId(null);
-            setFormData({ name: '', type: 'expense', color: '#6366F1' });
+            setFormData({ name: '', type: 'expense', color: '#737373' });
           }}
           className="px-4 py-2 bg-content-primary hover:bg-content-tertiary/25 text-surface-base rounded-lg text-xs font-mono font-bold uppercase tracking-widest transition-colors flex items-center gap-2 focus-app"
         >
@@ -108,7 +108,7 @@ export default function Categories() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+                  className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
                   placeholder="e.g., Groceries"
                 />
               </div>
@@ -117,7 +117,7 @@ export default function Categories() {
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                  className="mt-1 focus-app-field-indigo block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+                  className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
                 >
                   <option value="expense">Expense</option>
                   <option value="income">Income</option>
@@ -189,9 +189,9 @@ export default function Categories() {
                   <div className="flex items-center gap-4">
                     <div
                       className="w-10 h-10 rounded-lg flex items-center justify-center text-white border border-surface-border bg-surface-base group-hover:border-white/15 transition-colors"
-                      style={{ borderLeftColor: category.color || '#6366F1', borderLeftWidth: '3px' }}
+                      style={{ borderLeftColor: category.color || '#737373', borderLeftWidth: '3px' }}
                     >
-                      <Tag className="w-5 h-5" style={{ color: category.color || '#6366F1' }} />
+                      <Tag className="w-5 h-5" style={{ color: category.color || '#737373' }} />
                     </div>
                     <div>
                       <h4 className="text-sm font-mono font-bold uppercase tracking-widest text-content-primary">{category.name}</h4>

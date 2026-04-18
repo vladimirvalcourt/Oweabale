@@ -16,7 +16,7 @@ import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveCont
 type DateRange = '30d' | '90d' | '1y';
 
 const CATEGORY_COLORS = [
-  '#6366F1', '#34D399', '#F59E0B', '#EF4444', '#8B5CF6',
+  '#d4d4d4', '#34D399', '#F59E0B', '#EF4444', '#737373',
   '#06B6D4', '#F97316', '#10B981', '#EC4899', '#84CC16',
 ];
 
@@ -257,15 +257,15 @@ export default function Reports() {
           <AreaChart data={netWorthHistory} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="nwGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6366F1" stopOpacity={0.15} />
-                <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                <stop offset="5%" stopColor="#d4d4d4" stopOpacity={0.15} />
+                <stop offset="95%" stopColor="#d4d4d4" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
             <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} />
             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
             <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Net Worth']} />
-            <Area type="monotone" dataKey="netWorth" stroke="#6366F1" strokeWidth={2} fillOpacity={1} fill="url(#nwGradient)" dot={{ fill: '#6366F1', strokeWidth: 0, r: 3 }} />
+            <Area type="monotone" dataKey="netWorth" stroke="#d4d4d4" strokeWidth={2} fillOpacity={1} fill="url(#nwGradient)" dot={{ fill: '#d4d4d4', strokeWidth: 0, r: 3 }} />
           </AreaChart>
         </SafeResponsiveContainer>
       </CollapsibleModule>

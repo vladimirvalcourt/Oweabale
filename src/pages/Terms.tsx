@@ -14,14 +14,14 @@ export default function Terms() {
 
   return (
     <>
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-brand-violet/30">
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-white/15">
       <div className="max-w-3xl mx-auto">
-        <TransitionLink to="/" className="inline-flex items-center gap-2 text-sm text-content-tertiary hover:text-brand-violet transition-colors mb-12 font-sans">
+        <TransitionLink to="/" className="inline-flex items-center gap-2 text-sm text-content-tertiary hover:text-content-primary transition-colors mb-12 font-sans">
           <ChevronLeft className="w-4 h-4 shrink-0" aria-hidden /> Back to home
         </TransitionLink>
         
-        <header className="mb-16 border-l-4 border-brand-violet pl-8">
-          <div className="flex items-center gap-3 text-brand-violet mb-4">
+        <header className="mb-16 border-l-4 border-white/25 pl-8">
+          <div className="flex items-center gap-3 text-content-secondary mb-4">
             <Scale className="w-6 h-6 shrink-0" aria-hidden />
             <span className="text-xs font-sans font-medium">Legal</span>
           </div>
@@ -49,7 +49,7 @@ export default function Terms() {
 
           <section>
             <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">3. Not financial advice</h2>
-            <p className="p-6 bg-surface-raised border border-brand-violet/20 text-sm text-brand-violet-shade leading-relaxed mb-4 rounded-lg">
+            <p className="p-6 bg-surface-raised border border-surface-border text-sm text-content-secondary leading-relaxed mb-4 rounded-lg">
               Oweable and its software are not a certified financial planner, legal counsel, or tax advisor.
             </p>
             <p>

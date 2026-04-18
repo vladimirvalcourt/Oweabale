@@ -41,7 +41,7 @@ function RulesPanelInner() {
                 onChange={(e) =>
                   setRuleForm((f) => ({ ...f, match_type: e.target.value as CategorizationRule['match_type'] }))
                 }
-                className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-lg px-3 py-2 focus-app-field-indigo appearance-none w-full sm:w-36"
+                className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-lg px-3 py-2 focus-app-field appearance-none w-full sm:w-36"
               >
                 <option value="contains">Contains</option>
                 <option value="exact">Exact Match</option>
@@ -53,12 +53,12 @@ function RulesPanelInner() {
                 placeholder="e.g. STARBUCKS"
                 value={ruleForm.match_value}
                 onChange={(e) => setRuleForm((f) => ({ ...f, match_value: e.target.value }))}
-                className="flex-1 bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-lg px-3 py-2 focus-app-field-indigo placeholder:text-content-muted"
+                className="flex-1 bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-lg px-3 py-2 focus-app-field placeholder:text-content-muted"
               />
               <select
                 value={ruleForm.category}
                 onChange={(e) => setRuleForm((f) => ({ ...f, category: e.target.value }))}
-                className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-lg px-3 py-2 focus-app-field-indigo appearance-none w-full sm:w-44"
+                className="bg-surface-raised border border-surface-border text-white text-xs font-mono rounded-lg px-3 py-2 focus-app-field appearance-none w-full sm:w-44"
               >
                 <option value="">— Select category —</option>
                 {categories.map((c) => (

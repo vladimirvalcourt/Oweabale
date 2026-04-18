@@ -14,14 +14,14 @@ export default function Security() {
 
   return (
     <>
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-brand-violet/30">
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-white/15">
       <div className="max-w-3xl mx-auto">
-        <TransitionLink to="/" className="inline-flex items-center gap-2 text-sm text-content-tertiary hover:text-brand-violet transition-colors mb-12 font-sans">
+        <TransitionLink to="/" className="inline-flex items-center gap-2 text-sm text-content-tertiary hover:text-content-primary transition-colors mb-12 font-sans">
           <ChevronLeft className="w-4 h-4 shrink-0" aria-hidden /> Back to home
         </TransitionLink>
         
-        <header className="mb-16 border-l-4 border-brand-violet pl-8">
-          <div className="flex items-center gap-3 text-brand-violet mb-4">
+        <header className="mb-16 border-l-4 border-white/25 pl-8">
+          <div className="flex items-center gap-3 text-content-secondary mb-4">
             <ShieldCheck className="w-6 h-6 shrink-0" aria-hidden />
             <span className="text-xs font-sans font-medium">Security</span>
           </div>
@@ -32,14 +32,14 @@ export default function Security() {
         <div className="space-y-12 text-content-secondary leading-relaxed">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             <div className="p-6 bg-surface-raised border border-surface-border flex flex-col gap-4 rounded-lg">
-              <Database className="w-8 h-8 text-brand-violet shrink-0" aria-hidden />
+              <Database className="w-8 h-8 text-content-secondary shrink-0" aria-hidden />
               <h3 className="text-base font-sans font-semibold text-content-primary">Strong encryption in transit and at rest</h3>
               <p className="text-sm">
                 Sensitive identifiers are encrypted before they reach our primary storage, using industry-standard algorithms and key management practices.
               </p>
             </div>
             <div className="p-6 bg-surface-raised border border-surface-border flex flex-col gap-4 rounded-lg">
-              <Key className="w-8 h-8 text-brand-violet shrink-0" aria-hidden />
+              <Key className="w-8 h-8 text-content-secondary shrink-0" aria-hidden />
               <h3 className="text-base font-sans font-semibold text-content-primary">Validated cryptography</h3>
               <p className="text-sm">
                 Cryptographic operations use FIPS-validated modules where applicable for key management and secure operations.

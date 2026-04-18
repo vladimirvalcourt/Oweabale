@@ -125,7 +125,7 @@ function ProfilePanelInner() {
                 value={formData.firstName}
                 onChange={handleChange}
                 required
-                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors"
+                className="focus-app-field block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors"
               />
             </div>
 
@@ -139,7 +139,7 @@ function ProfilePanelInner() {
                 value={formData.lastName}
                 onChange={handleChange}
                 required
-                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors"
+                className="focus-app-field block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors"
               />
             </div>
 
@@ -167,7 +167,7 @@ function ProfilePanelInner() {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="+1 (555) 000-0000"
-                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors"
+                className="focus-app-field block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors"
               />
             </div>
 
@@ -179,7 +179,7 @@ function ProfilePanelInner() {
                 id="timezone"
                 value={formData.timezone}
                 onChange={handleChange}
-                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors appearance-none"
+                className="focus-app-field block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors appearance-none"
               >
                 <option value="Pacific Time (PT)">Pacific Time (PT)</option>
                 <option value="Eastern Time (ET)">Eastern Time (ET)</option>
@@ -196,7 +196,7 @@ function ProfilePanelInner() {
                 id="language"
                 value={formData.language}
                 onChange={handleChange}
-                className="focus-app-field-indigo block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors appearance-none"
+                className="focus-app-field block w-full text-[13px] font-mono border-surface-border bg-surface-raised text-content-primary rounded-lg px-3 py-2 border transition-colors appearance-none"
               >
                 <option value="English (US)">English (US)</option>
                 <option value="Spanish">Spanish</option>

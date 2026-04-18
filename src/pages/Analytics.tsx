@@ -24,8 +24,8 @@ interface Snapshot {
 }
 
 const CHART_COLORS = [
-  '#6366F1', '#34D399', '#F59E0B', '#EF4444',
-  '#8B5CF6', '#06B6D4', '#F97316', '#EC4899',
+  '#d4d4d4', '#34D399', '#F59E0B', '#EF4444',
+  '#737373', '#06B6D4', '#F97316', '#EC4899',
 ];
 
 const tooltipStyle = {
@@ -264,8 +264,8 @@ export default function Analytics() {
             <AreaChart data={chartSnapshots} margin={{ top: 5, right: 5, left: 5, bottom: 0 }}>
               <defs>
                 <linearGradient id="nwGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#6366F1" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                  <stop offset="5%"  stopColor="#d4d4d4" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#d4d4d4" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="assetsGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%"  stopColor="#34D399" stopOpacity={0.15} />
@@ -277,7 +277,7 @@ export default function Analytics() {
               <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={fmt} width={58} />
               <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v: any, name: any) => [fmt(Number(v)), name === 'net_worth' ? 'Net Worth' : name === 'assets' ? 'Assets' : 'Debts']} labelFormatter={(l) => l} />
               <Area type="monotone" dataKey="assets"    stroke="#34D399" strokeWidth={1.5} fill="url(#assetsGrad)" dot={false} />
-              <Area type="monotone" dataKey="net_worth" stroke="#6366F1" strokeWidth={2}   fill="url(#nwGrad)"     dot={false} />
+              <Area type="monotone" dataKey="net_worth" stroke="#d4d4d4" strokeWidth={2}   fill="url(#nwGrad)"     dot={false} />
             </AreaChart>
           </SafeResponsiveContainer>
         )}
@@ -327,7 +327,7 @@ export default function Analytics() {
             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `${v}%`} width={42} />
             <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v: any) => [`${Number(v).toFixed(1)}%`, 'Savings Rate']} />
             <ReferenceLine y={20} stroke="#3f3f46" strokeWidth={1} strokeDasharray="4 4" />
-            <Line type="monotone" dataKey="rate" stroke="#6366F1" strokeWidth={2} dot={{ r: 3, fill: '#6366F1' }} />
+            <Line type="monotone" dataKey="rate" stroke="#d4d4d4" strokeWidth={2} dot={{ r: 3, fill: '#d4d4d4' }} />
           </LineChart>
         </SafeResponsiveContainer>
         <div className="flex gap-5 mt-3">
