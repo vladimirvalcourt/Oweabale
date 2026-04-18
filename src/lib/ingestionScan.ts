@@ -2,8 +2,18 @@
  * Review Inbox — extract text from images and PDFs (text layer + raster OCR fallback).
  * Scanned PDFs have no text layer; we render pages to canvas and run Tesseract.
  */
-import Tesseract from 'tesseract.js';
+// Heavy OCR libs (~7MB gzipped combined) are loaded on-demand so they stay out of the
+// initial bundle and only reach users who actually scan a document.
 import type { PDFDocumentProxy } from 'pdfjs-dist';
+type TesseractModule = typeof import('tesseract.js');
+
+let tesseractModPromise: Promise<TesseractModule> | null = null;
+async function loadTesseract(): Promise<TesseractModule> {
+  if (!tesseractModPromise) {
+    tesseractModPromise = import('tesseract.js');
+  }
+  return tesseractModPromise;
+}
 
 async function loadPdfJs() {
   const pdfjsLib = await import('pdfjs-dist');
@@ -58,6 +68,7 @@ async function ocrPdfPagesRaster(
     canvas.height = viewport.height;
     const task = page.render({ canvasContext: ctx, viewport, canvas });
     await task.promise;
+    const Tesseract = await loadTesseract();
     const result = await Tesseract.recognize(canvas, 'eng');
     parts.push(result.data.text);
   }
@@ -85,6 +96,7 @@ export async function extractDocumentText(
 
   if (file.type.startsWith('image/')) {
     onStatus?.('scanning');
+    const Tesseract = await loadTesseract();
     const result = await Tesseract.recognize(file, 'eng');
     return { text: result.data.text, usedRasterPdfOcr: false };
   }
