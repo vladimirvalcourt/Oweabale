@@ -16,7 +16,11 @@ import { useShallow } from 'zustand/react/shallow';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 import { Dialog } from '@headlessui/react';
-import { generateAmortizationSchedule, groupOutflowsByHorizon } from '../lib/finance';
+import {
+  buildBillNegotiationSuggestions,
+  generateAmortizationSchedule,
+  groupOutflowsByHorizon,
+} from '../lib/finance';
 import { TransitionLink } from '../components/TransitionLink';
 import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
@@ -274,6 +278,20 @@ export default function Obligations() {
     }
     return changes;
   }, [bills, transactions]);
+  const billNegotiationSuggestions = useMemo(
+    () =>
+      buildBillNegotiationSuggestions({
+        bills: bills.map((b) => ({
+          id: b.id,
+          biller: b.biller,
+          category: b.category,
+          amount: b.amount,
+          frequency: b.frequency,
+          status: b.status,
+        })),
+      }),
+    [bills],
+  );
 
   const today = new Date();
   const urgentCitations = citations.filter(c => c.status === 'open' && c.daysLeft <= 7);
@@ -392,6 +410,32 @@ export default function Obligations() {
             Review these line items below before the next due date.
           </p>
         </div>
+      )}
+
+      {billNegotiationSuggestions.length > 0 && (
+        <CollapsibleModule title="Bill Negotiation Suggestions" icon={Receipt} defaultOpen={false}>
+          <div className="space-y-3">
+            {billNegotiationSuggestions.map((suggestion) => (
+              <div key={suggestion.id} className="rounded-lg border border-surface-border bg-surface-base p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-semibold text-content-primary">{suggestion.provider}</p>
+                    <p className="mt-1 text-xs text-content-secondary">
+                      Current spend is about ${suggestion.currentMonthlyCost.toFixed(0)}/mo in {suggestion.category}.
+                    </p>
+                    <p className="mt-1 text-xs text-content-tertiary">
+                      Users who renegotiate similar bills often save around ${suggestion.benchmarkMonthlySavings.toFixed(0)}/mo.
+                    </p>
+                    <p className="mt-1 text-xs text-content-tertiary">{suggestion.action}</p>
+                  </div>
+                  <span className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-mono text-emerald-300">
+                    Est. save ${suggestion.estimatedMonthlySavings.toFixed(0)}/mo
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CollapsibleModule>
       )}
 
       <CollapsibleModule

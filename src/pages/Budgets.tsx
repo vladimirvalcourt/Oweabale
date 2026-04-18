@@ -1,7 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Plus, MoreHorizontal, X, PieChart, Edit2, Trash2, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useStore, Budget } from '../store/useStore';
-import { detectSpendingAnomalies } from '../lib/finance';
+import {
+  buildMonthlySavingsTargetSnapshot,
+  buildPersonalizedSavingsSuggestions,
+  detectSpendingAnomalies,
+} from '../lib/finance';
 import { startOfBudgetPeriod, shiftBudgetPeriod } from '../lib/budgetPeriods';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { Dialog, Menu, Transition } from '@headlessui/react';
@@ -9,13 +13,22 @@ import { Fragment } from 'react';
 import { toast } from 'sonner';
 
 const BUDGET_PERIODS: Budget['period'][] = ['Weekly', 'Bi-weekly', 'Monthly', 'Quarterly', 'Yearly'];
+const SAVINGS_TARGET_STORAGE_KEY = 'oweable_budget_monthly_savings_target';
+
+function loadMonthlySavingsTarget(): number {
+  if (typeof window === 'undefined') return 0;
+  const raw = window.localStorage.getItem(SAVINGS_TARGET_STORAGE_KEY);
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
 
 export default function Budgets() {
-  const { budgets, transactions, addBudget, editBudget, deleteBudget, categories } = useStore();
+  const { budgets, transactions, addBudget, editBudget, deleteBudget, categories, subscriptions } = useStore();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
   const [budgetNowMs] = useState(() => Date.now());
+  const [monthlySavingsTarget, setMonthlySavingsTarget] = useState<number>(() => loadMonthlySavingsTarget());
   
   const [formData, setFormData] = useState({
     category: '',
@@ -136,6 +149,39 @@ export default function Budgets() {
     [budgetSnapshots],
   );
 
+  const monthlySavingsSnapshot = useMemo(() => {
+    const now = new Date(budgetNowMs);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    const netSavedSoFar = transactions.reduce((sum, tx) => {
+      const ms = new Date(tx.date.includes('T') ? tx.date : `${tx.date}T12:00:00`).getTime();
+      if (!Number.isFinite(ms) || ms < monthStart) return sum;
+      if (tx.type === 'income') return sum + tx.amount;
+      if (tx.type === 'expense') return sum - tx.amount;
+      return sum;
+    }, 0);
+    return buildMonthlySavingsTargetSnapshot({
+      targetMonthlySavings: monthlySavingsTarget,
+      netSavedSoFar,
+      now,
+    });
+  }, [monthlySavingsTarget, transactions, budgetNowMs]);
+
+  const personalizedSavingsSuggestions = useMemo(
+    () =>
+      buildPersonalizedSavingsSuggestions({
+        transactions,
+        subscriptions,
+        now: new Date(budgetNowMs),
+      }),
+    [transactions, subscriptions, budgetNowMs],
+  );
+
+  const saveMonthlySavingsTarget = (value: number) => {
+    setMonthlySavingsTarget(value);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(SAVINGS_TARGET_STORAGE_KEY, String(value));
+    }
+  };
 
   const openAddModal = () => {
     setFormData({
@@ -231,6 +277,77 @@ export default function Budgets() {
         </div>
       ) : (
         <>
+          <CollapsibleModule title="Savings Target" icon={CheckCircle2}>
+            <div className="space-y-4">
+              <div className="rounded-lg border border-surface-border bg-surface-elevated p-4">
+                <label className="block text-xs font-medium text-content-tertiary mb-2">Monthly savings target</label>
+                <div className="flex items-center gap-3">
+                  <div className="relative w-full max-w-xs">
+                    <span className="absolute left-3 top-2.5 text-xs font-mono text-content-muted">$</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="1"
+                      value={monthlySavingsTarget}
+                      onChange={(e) => saveMonthlySavingsTarget(Math.max(0, Number(e.target.value) || 0))}
+                      className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field"
+                    />
+                  </div>
+                  <span className="text-xs text-content-tertiary">per month</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                <div className="rounded-lg border border-surface-border bg-surface-elevated p-3">
+                  <p className="text-xs text-content-tertiary">Saved so far</p>
+                  <p className="mt-1 font-mono text-content-primary">${monthlySavingsSnapshot.netSavedSoFar.toFixed(0)}</p>
+                </div>
+                <div className="rounded-lg border border-surface-border bg-surface-elevated p-3">
+                  <p className="text-xs text-content-tertiary">Projected end-of-month</p>
+                  <p className="mt-1 font-mono text-content-primary">${monthlySavingsSnapshot.projectedEndOfMonthSavings.toFixed(0)}</p>
+                </div>
+                <div className="rounded-lg border border-surface-border bg-surface-elevated p-3">
+                  <p className="text-xs text-content-tertiary">Status</p>
+                  <p
+                    className={`mt-1 font-medium ${
+                      monthlySavingsSnapshot.status === 'ahead'
+                        ? 'text-emerald-300'
+                        : monthlySavingsSnapshot.status === 'behind'
+                          ? 'text-rose-300'
+                          : 'text-amber-300'
+                    }`}
+                  >
+                    {monthlySavingsSnapshot.status === 'ahead'
+                      ? 'Ahead of pace'
+                      : monthlySavingsSnapshot.status === 'behind'
+                        ? 'Behind pace'
+                        : 'On track'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CollapsibleModule>
+
+          {personalizedSavingsSuggestions.length > 0 && (
+            <CollapsibleModule title="Personalized Savings Suggestions" icon={AlertTriangle} defaultOpen={false}>
+              <div className="space-y-3">
+                {personalizedSavingsSuggestions.map((suggestion) => (
+                  <div key={suggestion.id} className="rounded-lg border border-surface-border bg-surface-elevated p-4">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-content-primary">{suggestion.headline}</p>
+                        <p className="mt-1 text-xs text-content-secondary">{suggestion.rationale}</p>
+                        <p className="mt-1 text-xs text-content-tertiary">{suggestion.action}</p>
+                      </div>
+                      <span className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-mono text-emerald-300">
+                        Save ~${suggestion.estimatedMonthlySavings.toFixed(0)}/mo
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleModule>
+          )}
+
           {projectedRiskBudgets.length > 0 && (
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
               <p className="text-sm font-medium text-amber-300">

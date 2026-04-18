@@ -671,6 +671,35 @@ export interface SpendingRecap {
   isIncrease: boolean;
 }
 
+export type SavingsTargetStatus = 'ahead' | 'on_track' | 'behind';
+
+export interface MonthlySavingsTargetSnapshot {
+  targetMonthlySavings: number;
+  netSavedSoFar: number;
+  projectedEndOfMonthSavings: number;
+  elapsedRatio: number;
+  paceTargetByNow: number;
+  status: SavingsTargetStatus;
+}
+
+export interface PersonalizedSavingsSuggestion {
+  id: string;
+  headline: string;
+  rationale: string;
+  action: string;
+  estimatedMonthlySavings: number;
+}
+
+export interface BillNegotiationSuggestion {
+  id: string;
+  provider: string;
+  category: string;
+  currentMonthlyCost: number;
+  estimatedMonthlySavings: number;
+  benchmarkMonthlySavings: number;
+  action: string;
+}
+
 function sumByCategory(
   transactions: Array<{ date: string; category: string; amount: number; type: string }>,
   start: Date,
@@ -783,6 +812,108 @@ export function detectSpendingAnomalies(
   }
 
   return anomalies.sort((a, b) => b.overagePercent - a.overagePercent);
+}
+
+export function buildMonthlySavingsTargetSnapshot(args: {
+  targetMonthlySavings: number;
+  netSavedSoFar: number;
+  now?: Date;
+}): MonthlySavingsTargetSnapshot {
+  const now = args.now ?? new Date();
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const dayOfMonth = now.getDate();
+  const elapsedRatio = Math.min(1, Math.max(1 / daysInMonth, dayOfMonth / daysInMonth));
+  const netSavedSoFar = args.netSavedSoFar || 0;
+  const projectedEndOfMonthSavings = netSavedSoFar / elapsedRatio;
+  const paceTargetByNow = (args.targetMonthlySavings || 0) * elapsedRatio;
+  const aheadCutoff = paceTargetByNow * 1.1;
+  const behindCutoff = paceTargetByNow * 0.9;
+
+  let status: SavingsTargetStatus = 'on_track';
+  if (netSavedSoFar >= aheadCutoff) status = 'ahead';
+  else if (netSavedSoFar < behindCutoff) status = 'behind';
+
+  return {
+    targetMonthlySavings: parseFloat((args.targetMonthlySavings || 0).toFixed(2)),
+    netSavedSoFar: parseFloat(netSavedSoFar.toFixed(2)),
+    projectedEndOfMonthSavings: parseFloat(projectedEndOfMonthSavings.toFixed(2)),
+    elapsedRatio: parseFloat(elapsedRatio.toFixed(4)),
+    paceTargetByNow: parseFloat(paceTargetByNow.toFixed(2)),
+    status,
+  };
+}
+
+export function buildPersonalizedSavingsSuggestions(args: {
+  transactions: Array<{ date: string; category: string; amount: number; type: string }>;
+  subscriptions: Array<{ id: string; name: string; amount: number; frequency: string; status: string }>;
+  now?: Date;
+}): PersonalizedSavingsSuggestion[] {
+  const now = args.now ?? new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const currentByCategory = new Map<string, number>();
+  for (const tx of args.transactions) {
+    if (tx.type !== 'expense') continue;
+    const ms = parseDueMs(tx.date);
+    if (ms === null || ms < monthStart.getTime()) continue;
+    currentByCategory.set(tx.category, (currentByCategory.get(tx.category) || 0) + tx.amount);
+  }
+
+  const suggestions: PersonalizedSavingsSuggestion[] = [];
+  const [topCategory, topSpend] =
+    [...currentByCategory.entries()].sort((a, b) => b[1] - a[1])[0] ?? [null, 0];
+
+  if (topCategory && topSpend >= 120) {
+    const est = topSpend * 0.15;
+    suggestions.push({
+      id: `category-${topCategory.toLowerCase()}`,
+      headline: `Trim ${topCategory} spend by 15%`,
+      rationale: `You have spent about $${topSpend.toFixed(0)} in ${topCategory} so far this month.`,
+      action: `Set a tighter cap in ${topCategory} and move the saved amount to savings.`,
+      estimatedMonthlySavings: parseFloat(est.toFixed(2)),
+    });
+  }
+
+  const topSub = [...args.subscriptions]
+    .filter((s) => s.status === 'active')
+    .map((s) => ({ ...s, monthly: normalizeToMonthly(s.amount, s.frequency) }))
+    .sort((a, b) => b.monthly - a.monthly)[0];
+
+  if (topSub && topSub.monthly >= 20) {
+    const est = topSub.monthly * 0.25;
+    suggestions.push({
+      id: `subscription-${topSub.id}`,
+      headline: `Review ${topSub.name} plan`,
+      rationale: `${topSub.name} is one of your highest recurring costs at about $${topSub.monthly.toFixed(0)}/mo.`,
+      action: 'Ask for a promo, switch to annual/basic, or pause if underused.',
+      estimatedMonthlySavings: parseFloat(est.toFixed(2)),
+    });
+  }
+
+  return suggestions.sort((a, b) => b.estimatedMonthlySavings - a.estimatedMonthlySavings).slice(0, 4);
+}
+
+export function buildBillNegotiationSuggestions(args: {
+  bills: Array<{ id: string; biller: string; category: string; amount: number; frequency: string; status?: string }>;
+}): BillNegotiationSuggestion[] {
+  return args.bills
+    .filter((b) => b.status !== 'paid')
+    .map((b) => {
+      const monthlyCost = normalizeToMonthly(b.amount, b.frequency);
+      const benchmarkMonthlySavings = Math.max(8, monthlyCost * 0.12);
+      const estimatedMonthlySavings = Math.max(5, monthlyCost * 0.1);
+      return {
+        id: b.id,
+        provider: b.biller,
+        category: b.category || 'Recurring bill',
+        currentMonthlyCost: parseFloat(monthlyCost.toFixed(2)),
+        estimatedMonthlySavings: parseFloat(estimatedMonthlySavings.toFixed(2)),
+        benchmarkMonthlySavings: parseFloat(benchmarkMonthlySavings.toFixed(2)),
+        action: 'Call retention and request a loyalty or competitor-rate match.',
+      };
+    })
+    .filter((row) => row.currentMonthlyCost >= 25)
+    .sort((a, b) => b.estimatedMonthlySavings - a.estimatedMonthlySavings)
+    .slice(0, 6);
 }
 
 // ---------------------------------------------------------------------------
