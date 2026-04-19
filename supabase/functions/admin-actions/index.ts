@@ -69,7 +69,8 @@ async function buildAdminContext(
   userId: string,
   callerEmail: string | null,
 ): Promise<AdminContext> {
-  const [{ data: roleRows }, { data: rolePermRows }] = await Promise.all([
+  const [{ data: profile }, { data: roleRows }, { data: rolePermRows }] = await Promise.all([
+    supabaseAdmin.from('profiles').select('is_admin').eq('id', userId).maybeSingle(),
     supabaseAdmin
       .from('admin_user_roles')
       .select('admin_roles(key)')
@@ -101,8 +102,12 @@ async function buildAdminContext(
 
   const primaryAdminEmail = Deno.env.get('ADMIN_ALLOWED_EMAIL')?.trim().toLowerCase() ?? null
   const isPrimaryAdmin = !!callerEmail && !!primaryAdminEmail && callerEmail === primaryAdminEmail
-  const isAdmin = permissionKeys.size > 0 || roleKeys.has('super_admin') || isPrimaryAdmin
-  const isSuperAdmin = roleKeys.has('super_admin') || isPrimaryAdmin
+  // Legacy: profiles.is_admin was the only gate before RBAC rows existed. Keep parity so
+  // bulk_action / platform controls keep working until admin_user_roles is fully backfilled.
+  const legacyProfileSuper = profile?.is_admin === true
+  const isAdmin =
+    legacyProfileSuper || permissionKeys.size > 0 || roleKeys.has('super_admin') || isPrimaryAdmin
+  const isSuperAdmin = roleKeys.has('super_admin') || isPrimaryAdmin || legacyProfileSuper
 
   return { isAdmin, isSuperAdmin, roleKeys, permissionKeys }
 }
