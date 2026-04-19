@@ -3,7 +3,7 @@
  * Duplicate of `src/lib/plaidCategoryLabels.ts` — update both when adding Plaid enums.
  */
 export const PLAID_CATEGORY_LABELS: Record<string, string> = {
-  RENT_AND_UTILITIES_TELEPHONE: 'Rent & Phone',
+  RENT_AND_UTILITIES_TELEPHONE: 'Phone & Utilities',
   RENT_AND_UTILITIES: 'Rent & Utilities',
   RENT_AND_UTILITIES_RENT: 'Rent',
   RENT_AND_UTILITIES_GAS_AND_ELECTRICITY: 'Gas & Electricity',
@@ -29,7 +29,7 @@ export const PLAID_CATEGORY_LABELS: Record<string, string> = {
   GOVERNMENT_AND_NON_PROFIT: 'Government & Nonprofit',
   GOVERNMENT_AND_NON_PROFIT_TAX_PAYMENT: 'Tax Payment',
   GOVERNMENT_AND_NON_PROFIT_DONATIONS: 'Donations',
-  FOOD_AND_DRINK: 'Food & Drink',
+  FOOD_AND_DRINK: 'Food & Dining',
   FOOD_AND_DRINK_GROCERIES: 'Groceries',
   FOOD_AND_DRINK_RESTAURANTS: 'Restaurants',
   FOOD_AND_DRINK_COFFEE: 'Coffee',

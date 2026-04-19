@@ -4,6 +4,7 @@
  */
 
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import type { User } from '@supabase/supabase-js';
 import { lazy, Suspense } from 'react';
 import Layout from './components/Layout';
 import DeviceGuard from './components/DeviceGuard';
@@ -47,15 +48,27 @@ const Education      = lazy(() => import('./pages/Education'));
 const HelpDesk       = lazy(() => import('./pages/HelpDesk'));
 const Changelog      = lazy(() => import('./pages/Changelog'));
 const Analytics      = lazy(() => import('./pages/Analytics'));
-const OweAi          = lazy(() => import('./pages/OweAi'));
 const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
 import AuthCallback from './pages/AuthCallback';
+import GoogleEmailCallback from './pages/GoogleEmailCallback';
 import PlaidCallback from './pages/PlaidCallback';
 const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
+const EmailInboxReview = lazy(() => import('./pages/EmailInboxReview'));
 const NotFound         = lazy(() => import('./pages/NotFound'));
 
 import { useDataSync } from './hooks/useDataSync';
 import { ThemedToaster } from './components/ThemedToaster';
+
+function SignInRoute({ authUser }: { authUser: User | null }) {
+  const location = useLocation();
+  if (!authUser) {
+    return <AuthPage mode="signin" />;
+  }
+  const raw = new URLSearchParams(location.search).get('redirect');
+  const to =
+    raw && raw.startsWith('/') && !raw.startsWith('//') && !raw.includes(':') ? raw : '/dashboard';
+  return <Navigate to={to} replace />;
+}
 
 function AppRoutes() {
   const { user: authUser, showWarning, timeLeft, extendSession, authLoading } = useAuth();
@@ -94,11 +107,8 @@ function AppRoutes() {
       <Route path="/support" element={<Support />} />
       <Route path="/onboarding" element={<AuthPage mode="signup" />} />
 
-      {/* ── Auth route — redirect to dashboard if already signed in ── */}
-      <Route
-        path="/auth"
-        element={authUser ? <Navigate to="/dashboard" replace /> : <AuthPage mode="signin" />}
-      />
+      {/* ── Auth route — preserve ?redirect= when already signed in ── */}
+      <Route path="/auth" element={<SignInRoute authUser={authUser} />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/plaid/callback" element={<PlaidCallback />} />
       <Route path="/capture" element={<MobileCapture />} />
@@ -113,7 +123,8 @@ function AppRoutes() {
 
         {/* Onboarding doesn't need Layout sidebar/topbar */}
         <Route path="/onboarding/setup" element={<Onboarding />} />
-        
+        <Route path="/auth/google-email/callback" element={<GoogleEmailCallback />} />
+
         <Route element={<DeviceGuard><Layout /></DeviceGuard>}>
           <Route
             path="dashboard"
@@ -121,16 +132,6 @@ function AppRoutes() {
               <ErrorBoundary>
                 <FullSuiteRouteGuard featureName="Dashboard">
                   <Dashboard />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="owe-ai"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Owe-AI">
-                  <OweAi />
                 </FullSuiteRouteGuard>
               </ErrorBoundary>
             }
@@ -327,6 +328,7 @@ function AppRoutes() {
             }
           />
           <Route path="settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
+          <Route path="email-inbox" element={<ErrorBoundary><EmailInboxReview /></ErrorBoundary>} />
         </Route>
         </Route>
       </Route>

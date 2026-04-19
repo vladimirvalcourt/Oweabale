@@ -120,7 +120,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
               </h1>
               <p className="mt-3 max-w-md text-base font-medium leading-relaxed text-content-secondary">
                 {isSignupMode
-                  ? 'Start your financial OS - no credit card required'
+                  ? 'Start your financial OS — no credit card required'
                   : 'Sign in to manage debt, bills, and your full financial picture in one place.'}
               </p>
 
@@ -161,10 +161,17 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
                 <p className="mt-4 text-center text-xs text-content-tertiary">
                   Already have an account?{' '}
                   <TransitionLink to="/auth" className="underline underline-offset-2 hover:text-content-primary">
-                    Sign in
+                    Sign in →
                   </TransitionLink>
                 </p>
-              ) : null}
+              ) : (
+                <p className="mt-4 text-center text-xs text-content-tertiary">
+                  New to Oweable?{' '}
+                  <TransitionLink to="/onboarding" className="underline underline-offset-2 hover:text-content-primary">
+                    Sign up free →
+                  </TransitionLink>
+                </p>
+              )}
 
               <p className="mt-8 text-center text-xs leading-relaxed text-content-tertiary">
                 Authentication is handled by Google Identity. Oweable does not receive your Google password.

@@ -1,0 +1,37 @@
+name: DAST
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  zap-baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Start preview server
+        run: npm run preview -- --host 127.0.0.1 --port 4173 &
+
+      - name: Wait for preview
+        run: npx wait-on http://127.0.0.1:4173
+
+      - name: Run ZAP baseline
+        run: |
+          docker run --rm --network=host ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+            -t http://127.0.0.1:4173 \
+            -m 5 \
+            -I

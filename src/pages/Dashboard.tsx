@@ -77,6 +77,7 @@ export default function Dashboard() {
   const freelanceEntries = useStore(state => state.freelanceEntries);
   const pendingIngestions = useStore(state => state.pendingIngestions);
   const citations = useStore(state => state.citations);
+  const emailScanFindings = useStore((state) => state.emailScanFindings);
   
   /** Global fetch flag from Zustand — true while `fetchData` runs after login/refresh. */
   const isLoading = useStore((state) => state.isLoading);
@@ -294,6 +295,17 @@ export default function Dashboard() {
     setLowTaxReserveSnoozeUntil(nextReminderAt);
   }, []);
 
+  /** HIGH-severity acknowledgment — shorter snooze than full “remind in 3 days”. */
+  const acknowledgeLowTaxReserveForNow = useCallback(() => {
+    const nextReminderAt = Date.now() + 24 * 60 * 60 * 1000;
+    try {
+      localStorage.setItem(LOW_TAX_RESERVE_SNOOZE_UNTIL_KEY, String(nextReminderAt));
+    } catch {
+      /* ignore */
+    }
+    setLowTaxReserveSnoozeUntil(nextReminderAt);
+  }, []);
+
   const toggleCalmMode = useCallback(() => {
     setCalmMode((prev) => {
       const next = !prev;
@@ -431,6 +443,12 @@ export default function Dashboard() {
   const hasCitationsSidebar = openCitations.length > 0;
   const hasLowerSidebar = hasBillsSidebar || hasCitationsSidebar;
 
+  const urgentEmailFindings = useMemo(
+    () =>
+      emailScanFindings.filter((f) => f.reviewStatus === 'pending' && f.urgency === 'high'),
+    [emailScanFindings],
+  );
+
   // Full-page skeleton until Supabase data has been merged into the store.
   if (isLoading) {
     return (
@@ -447,7 +465,11 @@ export default function Dashboard() {
   }
 
   const hasActionableAlerts =
-    pendingIngestions.length > 0 || isOverdraftRisk || showLowTaxReserveAlert || debtsMissingDueDate.length > 0;
+    pendingIngestions.length > 0 ||
+    isOverdraftRisk ||
+    showLowTaxReserveAlert ||
+    debtsMissingDueDate.length > 0 ||
+    urgentEmailFindings.length > 0;
 
   return (
     <AppPageShell>
@@ -502,6 +524,30 @@ export default function Dashboard() {
                     <div>
                       <p className="text-sm font-sans font-medium text-content-primary">Requires Review</p>
                       <p className="text-xs font-sans text-content-secondary mt-0.5">{pendingIngestions.length} document{pendingIngestions.length === 1 ? '' : 's'} waiting for approval.</p>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-content-tertiary group-hover:translate-x-1 transition-transform" />
+                </motion.div>
+              </TransitionLink>
+            )}
+
+            {urgentEmailFindings.length > 0 && (
+              <TransitionLink to="/email-inbox" className="block focus-app rounded-lg">
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-surface-raised border border-amber-500/35 p-5 rounded-lg flex items-center justify-between hover:bg-content-primary/[0.03] transition-all shadow-none group"
+                >
+                  <div className="flex items-center gap-5">
+                    <div className="relative w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center shrink-0 border border-amber-500/25">
+                      <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-amber-400 ring-2 ring-[#0a0a0a]" aria-hidden />
+                      <Inbox className="w-5 h-5 text-amber-200" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-sans font-medium text-content-primary">Urgent email notice</p>
+                      <p className="text-xs font-sans text-content-secondary mt-0.5">
+                        A collections, final notice, or tax message may need review — open New from email to confirm.
+                      </p>
                     </div>
                   </div>
                   <ArrowRight className="w-5 h-5 text-content-tertiary group-hover:translate-x-1 transition-transform" />
@@ -583,19 +629,26 @@ export default function Dashboard() {
                   </div>
                   <ArrowRight className="w-5 h-5 text-content-tertiary shrink-0 group-hover:translate-x-1 transition-transform" aria-hidden />
                 </TransitionLink>
-                <div className="flex border-t border-surface-border sm:border-t-0 sm:border-l sm:border-surface-border">
+                <div className="flex flex-col border-t border-surface-border sm:border-t-0 sm:border-l sm:border-surface-border sm:min-w-[11rem]">
                   <TransitionLink
                     to="/taxes"
-                    className="inline-flex min-h-10 w-full items-center justify-center px-4 py-2 text-sm font-medium text-content-primary hover:bg-content-primary/[0.04] transition-colors focus-app sm:w-auto"
+                    className="inline-flex min-h-10 w-full items-center justify-center px-4 py-2 text-sm font-semibold text-content-primary hover:bg-content-primary/[0.04] transition-colors focus-app"
                   >
                     Go to Taxes →
                   </TransitionLink>
                   <button
                     type="button"
                     onClick={snoozeLowTaxReserveAlert}
-                    className="inline-flex min-h-10 w-full items-center justify-center px-4 py-2 text-sm font-medium text-content-secondary hover:bg-content-primary/[0.04] transition-colors focus-app sm:w-auto"
+                    className="inline-flex min-h-10 w-full items-center justify-center px-4 py-2 text-sm font-medium text-content-secondary hover:bg-content-primary/[0.04] transition-colors focus-app border-t border-surface-border"
                   >
                     Remind me in 3 days
+                  </button>
+                  <button
+                    type="button"
+                    onClick={acknowledgeLowTaxReserveForNow}
+                    className="inline-flex min-h-10 w-full items-center justify-center px-4 py-2 text-xs font-medium text-content-tertiary hover:bg-content-primary/[0.04] transition-colors focus-app border-t border-surface-border"
+                  >
+                    I&apos;ll handle this later
                   </button>
                 </div>
               </motion.div>
@@ -672,16 +725,6 @@ export default function Dashboard() {
             </details>
           </>
         )}
-        <p className="mt-4 text-xs text-content-tertiary">
-          Wondering if you can afford a specific purchase?{' '}
-          <TransitionLink
-            to="/owe-ai"
-            className="text-content-primary hover:text-content-secondary underline underline-offset-2 font-medium focus-app rounded-lg"
-          >
-            Ask Owe-AI
-          </TransitionLink>
-          .
-        </p>
       </div>
 
       {/* Spending Anomaly Callout */}
@@ -752,39 +795,69 @@ export default function Dashboard() {
               ) : null;
             })()}
           </div>
-          <p className="text-xs text-content-secondary mb-2">Balance ($)</p>
-          <SafeResponsiveContainer width="100%" height={100}>
-            <AreaChart data={cashFlowForecast} margin={{ top: 4, right: 4, left: 4, bottom: 0 }}>
+          <SafeResponsiveContainer width="100%" height={120}>
+            <AreaChart data={cashFlowForecast} margin={{ top: 8, right: 8, left: 8, bottom: 4 }}>
               <defs>
                 <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <XAxis dataKey="label" tick={{ fontSize: 9, fill: '#6b7280' }} tickLine={false} axisLine={false} interval={6} />
-              <YAxis tick={{ fontSize: 9, fill: '#6b7280' }} tickLine={false} axisLine={false} width={36} />
+              <XAxis
+                dataKey="label"
+                tick={{ fontSize: 9, fill: '#6b7280' }}
+                tickLine={false}
+                axisLine={false}
+                interval={6}
+                tickFormatter={(v) => String(v)}
+              />
+              <YAxis
+                tick={{ fontSize: 9, fill: '#6b7280' }}
+                tickLine={false}
+                axisLine={false}
+                width={40}
+                label={{
+                  value: 'Balance ($)',
+                  angle: -90,
+                  position: 'insideLeft',
+                  offset: 4,
+                  style: { fill: '#6b7280', fontSize: 9, textAnchor: 'middle' },
+                }}
+              />
               <Tooltip
                 {...rechartsTooltipStableProps}
                 formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Balance']}
                 contentStyle={{ background: 'var(--surface-elevated)', border: '1px solid var(--surface-border)', borderRadius: '4px', fontSize: '11px' }}
               />
               {Math.min(...cashFlowForecast.map((d) => d.balance)) < 0 && (
-                <ReferenceArea y1={0} y2={Math.min(...cashFlowForecast.map((d) => d.balance))} fill="rgba(244,63,94,0.2)" />
+                <ReferenceArea
+                  y1={0}
+                  y2={Math.min(...cashFlowForecast.map((d) => d.balance))}
+                  fill="var(--color-error-highlight)"
+                  fillOpacity={0.2}
+                />
               )}
               <ReferenceLine y={0} stroke="#6b7280" strokeDasharray="3 3" />
-              <ReferenceLine x={cashFlowForecast[0]?.label} stroke="#9ca3af" strokeDasharray="2 2" label={{ value: 'Today', position: 'insideTopLeft', fill: '#9ca3af', fontSize: 9 }} />
-              <Area type="monotone" dataKey="balance" stroke="#6366f1" fill="url(#forecastGrad)" strokeWidth={1.5} dot={false} />
+              <ReferenceLine
+                x={cashFlowForecast[0]?.label}
+                stroke="#9ca3af"
+                strokeDasharray="2 2"
+                label={{ value: 'Today', position: 'top', fill: '#9ca3af', fontSize: 9 }}
+              />
+              <Area type="monotone" dataKey="balance" name="Projected Balance" stroke="#6366f1" fill="url(#forecastGrad)" strokeWidth={1.5} dot={false} />
             </AreaChart>
           </SafeResponsiveContainer>
           <div className="mt-2 flex flex-wrap items-center gap-4 text-[11px] text-content-tertiary">
-            <span>— Projected Balance</span>
-            <span>--- Safe to Spend floor</span>
+            <span className="inline-flex items-center gap-2">
+              <span className="inline-block h-px w-6 bg-[#6366f1]" aria-hidden />
+              Projected Balance
+            </span>
           </div>
           <p className="mt-1 text-[11px] text-content-secondary">
             If current patterns continue, your projected balance could reach $
             {cashFlowForecast[cashFlowForecast.length - 1]?.balance.toFixed(0)} by {cashFlowForecast[cashFlowForecast.length - 1]?.label}.
           </p>
-          <p className="mt-1 text-[11px] text-content-tertiary">Dates shown on X-axis (e.g., Apr 18, Apr 25, May 2).</p>
+          <p className="mt-1 text-[11px] text-content-tertiary">Dates on the X-axis use short month + day (e.g., Apr 18, Apr 25, May 2).</p>
         </div>
       )}
 
@@ -899,7 +972,7 @@ export default function Dashboard() {
       </div>
       {showLowRunwayCoach && (
         <div className="rounded-lg border border-surface-border bg-surface-raised p-5">
-          <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary mb-2">Your Next Best Move · Owe-AI</p>
+          <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary mb-2">Your Next Best Move</p>
           <p className="text-sm text-content-secondary mb-3">
             Your runway is critically short. Focus on the highest-impact moves first:
           </p>

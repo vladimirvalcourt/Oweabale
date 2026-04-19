@@ -7,7 +7,6 @@ interface Props {
 }
 
 const GLOBAL_FLAGS = [
-  { key: 'owe_ai_enabled', label: 'Owe-AI Assistant' },
   { key: 'goals_enabled', label: 'Goals' },
   { key: 'budgets_enabled', label: 'Budgets' },
   { key: 'credit_workshop_enabled', label: 'Credit Workshop' },

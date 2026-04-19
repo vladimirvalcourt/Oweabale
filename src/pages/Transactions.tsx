@@ -1,7 +1,7 @@
 import { useState, useMemo, useDeferredValue } from 'react';
 import { useStore } from '../store/useStore';
 import { useShallow } from 'zustand/react/shallow';
-import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, Hash, Tag, Download, TrendingUp, Ban } from 'lucide-react';
+import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, Hash, Tag, Download, TrendingUp, Ban, ShoppingBag } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
@@ -12,7 +12,15 @@ const BUTTON_SECONDARY_CLASS = `${BUTTON_BASE_CLASS} border border-surface-borde
 const BUTTON_PRIMARY_CLASS = `${BUTTON_BASE_CLASS} bg-brand-cta text-surface-base hover:bg-brand-cta-hover`;
 
 export default function Transactions() {
-  const { transactions, subscriptions, openQuickAdd, categorizationExclusions, addCategorizationExclusion, deleteCategorizationExclusion } = useStore(
+  const {
+    transactions,
+    subscriptions,
+    openQuickAdd,
+    categorizationExclusions,
+    addCategorizationExclusion,
+    deleteCategorizationExclusion,
+    updateTransaction,
+  } = useStore(
     useShallow((s) => ({
       transactions: s.transactions,
       subscriptions: s.subscriptions,
@@ -20,11 +28,14 @@ export default function Transactions() {
       categorizationExclusions: s.categorizationExclusions,
       addCategorizationExclusion: s.addCategorizationExclusion,
       deleteCategorizationExclusion: s.deleteCategorizationExclusion,
+      updateTransaction: s.updateTransaction,
     }))
   );
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterPlatform, setFilterPlatform] = useState<string>('all');
+  const [editingPlatform, setEditingPlatform] = useState<{ id: string; value: string } | null>(null);
   const [dateRange, setDateRange] = useState<{start: string, end: string}>({start: '', end: ''});
   const [amountRange, setAmountRange] = useState<{min: string, max: string}>({min: '', max: ''});
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -44,10 +55,18 @@ export default function Transactions() {
   const filteredTransactions = useMemo(() => {
     const q = deferredSearchTerm.toLowerCase();
     return scopedTransactions.filter((transaction) => {
-      const matchesSearch = transaction.name.toLowerCase().includes(q);
+      const plat = (transaction.platformTag || '').toLowerCase();
+      const matchesSearch =
+        transaction.name.toLowerCase().includes(q) || (q.length > 0 && plat.includes(q));
       const matchesType = filterType === 'all' || transaction.type === filterType;
       const matchesCategory = filterCategory === 'all' || transaction.category === filterCategory;
-      
+      const tag = (transaction.platformTag || '').trim();
+      let matchesPlatform = true;
+      if (filterPlatform !== 'all') {
+        if (filterPlatform === '__untagged') matchesPlatform = !tag;
+        else matchesPlatform = tag === filterPlatform;
+      }
+
       let matchesDate = true;
       if (dateRange.start) matchesDate = matchesDate && transaction.date >= dateRange.start;
       if (dateRange.end) matchesDate = matchesDate && transaction.date <= dateRange.end;
@@ -56,9 +75,9 @@ export default function Transactions() {
       if (amountRange.min) matchesAmount = matchesAmount && transaction.amount >= parseFloat(amountRange.min);
       if (amountRange.max) matchesAmount = matchesAmount && transaction.amount <= parseFloat(amountRange.max);
 
-      return matchesSearch && matchesType && matchesCategory && matchesDate && matchesAmount;
+      return matchesSearch && matchesType && matchesCategory && matchesPlatform && matchesDate && matchesAmount;
     });
-  }, [scopedTransactions, deferredSearchTerm, filterType, filterCategory, dateRange, amountRange]);
+  }, [scopedTransactions, deferredSearchTerm, filterType, filterCategory, filterPlatform, dateRange, amountRange]);
 
   const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -67,6 +86,15 @@ export default function Transactions() {
   const uniqueCategories = useMemo(() => {
     const cats = new Set(transactions.map(t => t.category));
     return Array.from(cats).sort();
+  }, [transactions]);
+
+  const uniquePlatforms = useMemo(() => {
+    const s = new Set<string>();
+    for (const t of transactions) {
+      const p = (t.platformTag || '').trim();
+      if (p) s.add(p);
+    }
+    return Array.from(s).sort((a, b) => a.localeCompare(b));
   }, [transactions]);
 
   const subscriptionByNameLower = useMemo(() => {
@@ -103,11 +131,12 @@ export default function Transactions() {
           onClick={() => {
             const rowsSource = filteredTransactions;
             requestAnimationFrame(() => {
-              const headers = ['Date', 'Name', 'Category', 'Type', 'Amount'];
+              const headers = ['Date', 'Name', 'Category', 'Platform', 'Type', 'Amount'];
               const rows = rowsSource.map((t) => [
                 t.date,
                 `"${t.name}"`,
                 formatCategoryLabel(t.category),
+                (t.platformTag || '').trim(),
                 t.type,
                 t.amount.toFixed(2),
               ]);
@@ -174,7 +203,7 @@ export default function Transactions() {
           </div>
 
           {showAdvancedFilters && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-6 border-t border-surface-border">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 pt-6 border-t border-surface-border">
               <div>
                 <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
                   <Activity className="w-3 h-3" /> Type
@@ -202,6 +231,26 @@ export default function Transactions() {
                   <option value="all">All Categories</option>
                   {uniqueCategories.map(cat => (
                     <option key={cat} value={cat}>{formatCategoryLabel(cat)}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
+                  <ShoppingBag className="w-3 h-3" /> Platform
+                </label>
+                <select
+                  value={filterPlatform}
+                  onChange={(e) => {
+                    setFilterPlatform(e.target.value);
+                    setPage(1);
+                  }}
+                  className="block w-full px-3 py-2 border border-surface-border rounded-lg bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus-app-field transition-colors"
+                >
+                  <option value="all">All platforms</option>
+                  <option value="__untagged">Untagged</option>
+                  {uniquePlatforms.map((p) => (
+                    <option key={p} value={p}>{p}</option>
                   ))}
                 </select>
               </div>
@@ -269,6 +318,7 @@ export default function Transactions() {
               !searchTerm &&
               filterType === 'all' &&
               filterCategory === 'all' &&
+              filterPlatform === 'all' &&
               !dateRange.start &&
               !dateRange.end &&
               !amountRange.min &&
@@ -281,13 +331,14 @@ export default function Transactions() {
                   Add your first transaction
                 </button>
               )}
-            {(searchTerm || filterType !== 'all' || filterCategory !== 'all' || dateRange.start || dateRange.end || amountRange.min || amountRange.max) && (
+            {(searchTerm || filterType !== 'all' || filterCategory !== 'all' || filterPlatform !== 'all' || dateRange.start || dateRange.end || amountRange.min || amountRange.max) && (
               <button
                 type="button"
                 onClick={() => { 
                   setSearchTerm(''); 
                   setFilterType('all'); 
                   setFilterCategory('all');
+                  setFilterPlatform('all');
                   setDateRange({start: '', end: ''});
                   setAmountRange({min: '', max: ''});
                 }}
@@ -312,6 +363,9 @@ export default function Transactions() {
                   </th>
                   <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
                     Category
+                  </th>
+                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
+                    Platform
                   </th>
                   <th scope="col" className="px-6 py-4 text-right text-[10px] font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
                     Amount
@@ -431,6 +485,52 @@ export default function Transactions() {
                               </span>
                             )}
                           </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap align-top">
+                          {editingPlatform?.id === transaction.id ? (
+                            <form
+                              className="flex flex-col gap-1 min-w-[8rem]"
+                              onSubmit={(e) => {
+                                e.preventDefault();
+                                void (async () => {
+                                  const ok = await updateTransaction(transaction.id, {
+                                    platformTag: editingPlatform.value.trim(),
+                                  });
+                                  if (ok) {
+                                    setEditingPlatform(null);
+                                  }
+                                })();
+                              }}
+                            >
+                              <input
+                                value={editingPlatform.value}
+                                onChange={(e) =>
+                                  setEditingPlatform({ id: transaction.id, value: e.target.value })
+                                }
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Escape') setEditingPlatform(null);
+                                }}
+                                className="w-full rounded border border-surface-border bg-surface-base px-2 py-1 text-[10px] font-mono text-content-primary focus-app-field"
+                                placeholder="Uber, DoorDash…"
+                                autoFocus
+                              />
+                              <span className="text-[9px] text-content-muted">Enter to save · Esc cancel</span>
+                            </form>
+                          ) : (
+                            <button
+                              type="button"
+                              title="Edit platform tag"
+                              onClick={() =>
+                                setEditingPlatform({
+                                  id: transaction.id,
+                                  value: transaction.platformTag || '',
+                                })
+                              }
+                              className="inline-flex max-w-[10rem] truncate text-left text-[10px] font-mono uppercase tracking-widest text-content-tertiary hover:text-content-secondary border border-transparent hover:border-surface-border rounded-lg px-2 py-1 transition-colors"
+                            >
+                              {(transaction.platformTag || '').trim() || '—'}
+                            </button>
+                          )}
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold font-mono tabular-nums text-right ${
                           transaction.type === 'income' ? 'text-emerald-500' : 'text-content-primary'

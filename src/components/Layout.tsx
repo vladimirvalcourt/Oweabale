@@ -4,7 +4,7 @@ import { TransitionLink } from './TransitionLink';
 import { 
   Bell, Search, Home, FileText, Target, Activity,
   Settings, Repeat, BarChart2, BarChart, Plus, X, ChevronDown, Inbox,
-  DollarSign, PieChart, Layers, Calendar as CalendarIcon, Percent, Briefcase, BookOpen, Shield, Clock, CreditCard, Zap, AlertTriangle,
+  DollarSign, PieChart, Layers, Calendar as CalendarIcon, Percent, Briefcase, BookOpen, Shield, Clock, CreditCard, AlertTriangle,
   RefreshCw,
 } from '@geist-ui/icons';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
@@ -82,6 +82,7 @@ export default function Layout() {
     markNotificationsRead,
     clearNotifications,
     citations,
+    emailScanFindings,
   } = useStore(
     useShallow((s) => ({
       bills: s.bills,
@@ -97,6 +98,7 @@ export default function Layout() {
       closeQuickAdd: s.closeQuickAdd,
       resetData: s.resetData,
       pendingIngestions: s.pendingIngestions,
+      emailScanFindings: s.emailScanFindings,
       notifications: s.notifications,
       markNotificationsRead: s.markNotificationsRead,
       clearNotifications: s.clearNotifications,
@@ -107,6 +109,7 @@ export default function Layout() {
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const { hasFullSuite, isLoading: checkingFullSuite } = useFullSuiteAccess();
+  const pendingEmailFindings = emailScanFindings.filter((f) => f.reviewStatus === 'pending').length;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -261,7 +264,6 @@ export default function Layout() {
         results.push({ type, name, detail, path });
       }
     };
-    pushNavShortcut(['owe-ai', 'owe ai', 'oweable ai', 'assistant', 'chat about my money'], 'Navigation', 'Owe-AI', 'Your data only', '/owe-ai');
     pushNavShortcut(['support', 'help desk', 'help', 'ticket'], 'Navigation', 'Help & Support', 'Contact support', '/support');
 
     return results.slice(0, 8); // Limit to 8 results
@@ -353,17 +355,24 @@ export default function Layout() {
   const navGroups = useMemo(
     (): {
       label: string;
-      items: { name: string; path: string; icon: typeof Home; count?: number; hash?: string }[];
+      items: {
+        name: string;
+        path: string;
+        icon: typeof Home;
+        count?: number;
+        hash?: string;
+        nested?: boolean;
+      }[];
     }[] => [
       {
         label: 'Overview',
         items: [
-          { name: 'Owe-AI', path: '/owe-ai', icon: Zap },
           { name: 'Dashboard', path: '/dashboard', icon: Home },
           { name: 'Cash flow', path: '/dashboard', icon: RefreshCw, hash: 'cash-flow' },
           { name: 'Income', path: '/income', icon: DollarSign },
           { name: 'Freelance Vault', path: '/freelance', icon: Briefcase },
           { name: 'Regular Bills', path: '/bills', icon: FileText },
+          { name: 'Tickets & Fines', path: '/bills?tab=ambush', icon: AlertTriangle, nested: true },
           { name: 'Debts & loans', path: '/bills?tab=debt', icon: CreditCard },
           { name: 'Due soon', path: '/bills', icon: Clock, hash: 'due-soon', count: dueSoonCount },
           { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },
@@ -510,7 +519,7 @@ export default function Layout() {
                       {group.items.map((item) => {
                         const Icon = item.icon;
                         const isActive = item.isActive;
-                        const isOweAi = item.name === 'Owe-AI';
+                        const nested = 'nested' in item && item.nested;
                         const navCount = (item as { count?: number }).count;
                         const isDueSoonItem = item.name === 'Due soon' && (navCount ?? 0) > 0;
                         return (
@@ -523,7 +532,8 @@ export default function Layout() {
                             <TransitionLink
                               to={item.linkTo}
                               className={cn(
-                                "relative flex min-h-10 items-center gap-3 rounded-lg px-4 py-2.5 transition-colors duration-200 group border border-transparent",
+                                "relative flex min-h-10 items-center gap-3 rounded-lg py-2.5 transition-colors duration-200 group border border-transparent",
+                                nested ? "pl-7 pr-4" : "px-4",
                                 isActive
                                   ? "bg-content-primary/[0.06] text-content-primary border-surface-border/80"
                                   : "text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary",
@@ -555,14 +565,9 @@ export default function Layout() {
                               />
                               {!sidebarCollapsed && (
                                 <>
-                                  <span className={cn("pointer-events-none flex-1 tracking-normal", isOweAi ? "text-[13px] font-semibold" : "text-[13px] font-medium")}>
+                                  <span className="pointer-events-none flex-1 tracking-normal text-[13px] font-medium">
                                     {item.name}
                                   </span>
-                                  {isOweAi && (
-                                    <span className="rounded border border-surface-border bg-surface-raised px-1.5 py-0.5 text-[9px] font-mono font-medium uppercase tracking-[0.12em] text-content-tertiary">
-                                      AI
-                                    </span>
-                                  )}
                                   {navCount !== undefined && navCount > 0 && (
                                     <span className="relative flex items-center gap-1.5 shrink-0 px-1">
                                       <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
@@ -755,6 +760,16 @@ export default function Layout() {
             >
               <Plus className="w-3.5 h-3.5" aria-hidden />
             </button>
+
+            {pendingEmailFindings > 0 && (
+              <TransitionLink
+                to="/email-inbox"
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-secondary hover:border-content-primary/20 hover:text-content-primary"
+              >
+                <Inbox className="w-4 h-4 shrink-0 text-content-tertiary" aria-hidden />
+                <span className="tabular-nums">{pendingEmailFindings} from email</span>
+              </TransitionLink>
+            )}
 
             {/* Notifications */}
             <div className="relative">

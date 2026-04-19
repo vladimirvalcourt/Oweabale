@@ -196,7 +196,7 @@ export default function Landing() {
               </button>
             )}
             <TransitionLink 
-              to={user?.id ? "/dashboard" : "/auth"} 
+              to={user?.id ? "/dashboard" : "/onboarding"} 
               className="px-6 py-2 rounded-lg bg-brand-cta text-surface-base hover:bg-brand-cta-hover text-sm font-sans font-medium shadow-none transition-colors"
             >
               {user?.id ? "Open dashboard" : "Sign in"}
@@ -230,7 +230,7 @@ export default function Landing() {
             
             <div className="w-full max-w-xl">
               <TransitionLink
-                to={user?.id ? "/dashboard" : "/auth"}
+                to={user?.id ? "/dashboard" : "/onboarding"}
                 className="group inline-flex items-center gap-4 bg-brand-cta text-surface-base hover:bg-brand-cta-hover px-8 py-4 text-sm font-sans font-medium shadow-none rounded-lg transition-colors"
               >
                 {user?.id ? "Open dashboard" : "Get started for free"}

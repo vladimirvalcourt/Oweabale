@@ -95,7 +95,10 @@ Deno.serve(async (req: Request) => {
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Server error';
-    return new Response(JSON.stringify({ error: msg }), {
+    const safe = /unauthorized|missing authorization|method not allowed/i.test(msg)
+      ? msg
+      : 'Request failed';
+    return new Response(JSON.stringify({ error: safe }), {
       status: 400,
       headers: { ...corsHeaders(req.headers.get('origin')), 'Content-Type': 'application/json' },
     });

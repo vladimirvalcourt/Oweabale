@@ -20,9 +20,17 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const SUPABASE_URL = supabaseUrl;
 export const SUPABASE_ANON_KEY = supabaseAnonKey;
 
-/** Single browser client — anon key is safe to expose; RLS enforces access. */
+/**
+ * Single browser client — anon key is safe to expose; RLS enforces access.
+ *
+ * Host note: sessions live in localStorage per origin. Use a single canonical host
+ * (e.g. always `https://www.oweable.com` or always apex) in production so refresh
+ * and deep links share one storage bucket. Cookie `domain` for Supabase Auth is
+ * configured in the Supabase dashboard (set to `.oweable.com` if using both www and apex).
+ */
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
+    flowType: 'pkce',
     persistSession: true,
     // Persistent storage keeps deep links and bookmarked routes usable across browser restarts.
     storage: window.localStorage,

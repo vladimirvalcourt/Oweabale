@@ -87,9 +87,11 @@ export function validatePdfFile(file: File): FileValidationResult {
   return { ok: true };
 }
 
+const AVATAR_TYPES = new Set(['image/jpeg', 'image/png']);
+
 export function validateAvatarFile(file: File): FileValidationResult {
-  if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
-    return { ok: false, error: 'Avatar must be a JPEG, PNG, GIF, or WEBP image.' };
+  if (!AVATAR_TYPES.has(file.type)) {
+    return { ok: false, error: 'Avatar must be a JPG or PNG image (max 2 MB).' };
   }
   if (file.size > MAX_AVATAR_BYTES) {
     return { ok: false, error: 'Avatar image must be smaller than 2 MB.' };

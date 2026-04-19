@@ -41,11 +41,16 @@ interface AlertPreferences {
   over_budget?: boolean;
   low_cash?: boolean;
   debt_due?: boolean;
+  invoice_due?: boolean;
 }
 
 interface ProcessResult {
   sent: number;
   alerts: string[];
+}
+
+function redactId(value: string): string {
+  return value.length > 8 ? `${value.slice(0, 4)}...${value.slice(-4)}` : 'redacted';
 }
 
 // ---------------------------------------------------------------------------
@@ -76,6 +81,7 @@ async function processUser(
     subsR,
     pushSubsR,
     profileR,
+    invoicesR,
   ] = await Promise.all([
     supabaseAdmin
       .from('bills')
@@ -117,18 +123,24 @@ async function processUser(
       .select('alert_preferences')
       .eq('id', uid)
       .maybeSingle(),
+    supabaseAdmin
+      .from('client_invoices')
+      .select('id, client_name, amount, due_date, status')
+      .eq('user_id', uid),
   ]);
 
   // Surface data errors loudly in logs but don't crash the whole cron run
-  if (billsR.error) console.error(`[financial-alerts] bills fetch for ${uid}:`, billsR.error);
-  if (debtsR.error) console.error(`[financial-alerts] debts fetch for ${uid}:`, debtsR.error);
-  if (budgetsR.error) console.error(`[financial-alerts] budgets fetch for ${uid}:`, budgetsR.error);
-  if (assetsR.error) console.error(`[financial-alerts] assets fetch for ${uid}:`, assetsR.error);
-  if (txnsR.error) console.error(`[financial-alerts] transactions fetch for ${uid}:`, txnsR.error);
-  if (incomesR.error) console.error(`[financial-alerts] incomes fetch for ${uid}:`, incomesR.error);
-  if (subsR.error) console.error(`[financial-alerts] subscriptions fetch for ${uid}:`, subsR.error);
-  if (pushSubsR.error) console.error(`[financial-alerts] push_subscriptions fetch for ${uid}:`, pushSubsR.error);
-  if (profileR.error) console.error(`[financial-alerts] profile fetch for ${uid}:`, profileR.error);
+  const uidRef = redactId(uid);
+  if (billsR.error) console.error(`[financial-alerts] bills fetch failed for user=${uidRef}`);
+  if (debtsR.error) console.error(`[financial-alerts] debts fetch failed for user=${uidRef}`);
+  if (budgetsR.error) console.error(`[financial-alerts] budgets fetch failed for user=${uidRef}`);
+  if (assetsR.error) console.error(`[financial-alerts] assets fetch failed for user=${uidRef}`);
+  if (txnsR.error) console.error(`[financial-alerts] transactions fetch failed for user=${uidRef}`);
+  if (incomesR.error) console.error(`[financial-alerts] incomes fetch failed for user=${uidRef}`);
+  if (subsR.error) console.error(`[financial-alerts] subscriptions fetch failed for user=${uidRef}`);
+  if (pushSubsR.error) console.error(`[financial-alerts] push_subscriptions fetch failed for user=${uidRef}`);
+  if (profileR.error) console.error(`[financial-alerts] profile fetch failed for user=${uidRef}`);
+  if (invoicesR.error) console.error(`[financial-alerts] client_invoices fetch failed for user=${uidRef}`);
 
   const bills = (billsR.data ?? []) as Record<string, unknown>[];
   const debts = (debtsR.data ?? []) as Record<string, unknown>[];
@@ -142,6 +154,7 @@ async function processUser(
     p256dh: string;
     auth: string;
   }[];
+  const invoices = (invoicesR.data ?? []) as Record<string, unknown>[];
 
   // No push subscriptions — nothing to do
   if (pushSubs.length === 0) return { sent: 0, alerts: [] };
@@ -153,6 +166,7 @@ async function processUser(
     over_budget: rawPrefs.over_budget !== false,
     low_cash: rawPrefs.low_cash !== false,
     debt_due: rawPrefs.debt_due !== false,
+    invoice_due: rawPrefs.invoice_due !== false,
   };
 
   // ---------------------------------------------------------------------------
@@ -262,6 +276,24 @@ async function processUser(
     }
   }
 
+  // 5. Client invoices (AR)
+  if (prefs.invoice_due) {
+    for (const inv of invoices) {
+      const st = str(inv.status);
+      if (st === 'paid' || st === 'void') continue;
+      const due = str(inv.due_date);
+      if (!due) continue;
+      const days = daysUntil(due);
+      const client = str(inv.client_name) || 'Client';
+      const amt = num(inv.amount);
+      if (days !== null && days < 0) {
+        alertMessages.push(`Invoice for ${client} ($${amt.toFixed(2)}) is overdue.`);
+      } else if (days !== null && st === 'sent' && prefs.bill_due_days.includes(days)) {
+        alertMessages.push(`Invoice for ${client} ($${amt.toFixed(2)}) is due in ${days} day${days === 1 ? '' : 's'}.`);
+      }
+    }
+  }
+
   // No alerts triggered — nothing to send
   if (alertMessages.length === 0) return { sent: 0, alerts: [] };
 
@@ -282,7 +314,7 @@ async function processUser(
       sent++;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.error(`[financial-alerts] push send failed for ${uid} endpoint ${sub.endpoint}:`, msg);
+      console.error(`[financial-alerts] push send failed for user=${uidRef}`);
       // 410 Gone: subscription is expired — remove it
       if (/410|Gone|not found/i.test(msg)) {
         try {
@@ -291,9 +323,9 @@ async function processUser(
             .delete()
             .eq('user_id', uid)
             .eq('endpoint', sub.endpoint);
-          console.info(`[financial-alerts] removed stale subscription for ${uid}`);
+          console.info(`[financial-alerts] removed stale subscription for user=${uidRef}`);
         } catch (delErr) {
-          console.error(`[financial-alerts] failed to delete stale subscription:`, delErr);
+          console.error(`[financial-alerts] failed to delete stale subscription for user=${uidRef}`);
         }
       }
     }
@@ -356,7 +388,7 @@ Deno.serve(async (req: Request) => {
       const results = await Promise.all(
         userIds.map((uid) =>
           processUser(supabaseAdmin, uid).catch((err) => {
-            console.error(`[financial-alerts] processUser failed for ${uid}:`, err);
+            console.error(`[financial-alerts] processUser failed for user=${redactId(uid)}`);
             return { sent: 0, alerts: [] } as ProcessResult;
           }),
         ),
@@ -407,7 +439,10 @@ Deno.serve(async (req: Request) => {
           ? String((e as { message: unknown }).message)
           : String(e);
     const status = msg === 'Unauthorized' ? 401 : msg === 'Server misconfiguration' ? 503 : 500;
-    return new Response(JSON.stringify({ error: msg }), {
+    const safe = /unauthorized|missing or invalid authorization header|method not allowed/i.test(msg)
+      ? msg
+      : 'Request failed';
+    return new Response(JSON.stringify({ error: safe }), {
       status,
       headers: { ...corsHeaders(req.headers.get('origin')), 'Content-Type': 'application/json' },
     });

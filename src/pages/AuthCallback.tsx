@@ -4,12 +4,25 @@ import { supabase } from '../lib/supabase';
 import { AppLoader } from '../components/PageSkeleton';
 import { toast } from 'sonner';
 
+async function waitForSession(maxMs: number) {
+  const deadline = Date.now() + maxMs;
+  while (Date.now() < deadline) {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (session) return session;
+    await new Promise((r) => setTimeout(r, 120));
+  }
+  return null;
+}
+
 /**
  * Handle Supabase OAuth callback and ensure session is hydrated before redirect.
  */
 export default function AuthCallback() {
   const navigate = useNavigate();
   const handledOAuthErrorRef = useRef(false);
+  const navigatedRef = useRef(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -29,17 +42,27 @@ export default function AuthCallback() {
       return;
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const go = (path: string) => {
+      if (navigatedRef.current) return;
+      navigatedRef.current = true;
+      navigate(path, { replace: true });
+    };
+
+    void (async () => {
+      const session = await waitForSession(20_000);
       if (session) {
-        navigate(finalRedirect, { replace: true });
+        go(finalRedirect);
+        return;
       }
-    });
+      toast.error('Could not restore your session. Try signing in again.');
+      go('/auth');
+    })();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
-        navigate(finalRedirect, { replace: true });
+        go(finalRedirect);
       } else if (event === 'SIGNED_OUT') {
-        navigate('/auth', { replace: true });
+        go('/auth');
       }
     });
 

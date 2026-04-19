@@ -40,6 +40,9 @@ export interface Database {
           plaid_last_sync_at: string | null
           plaid_needs_relink: boolean
           completed_lessons: string[]
+          tax_reserve_percent: number
+          steady_salary_target: number
+          alert_preferences: Json
           created_at: string
           updated_at: string
         }
@@ -65,6 +68,9 @@ export interface Database {
           plaid_last_sync_at?: string | null
           plaid_needs_relink?: boolean
           completed_lessons?: string[]
+          tax_reserve_percent?: number
+          steady_salary_target?: number
+          alert_preferences?: Json
           created_at?: string
           updated_at?: string
         }
@@ -90,6 +96,9 @@ export interface Database {
           plaid_last_sync_at?: string | null
           plaid_needs_relink?: boolean
           completed_lessons?: string[]
+          tax_reserve_percent?: number
+          steady_salary_target?: number
+          alert_preferences?: Json
           created_at?: string
           updated_at?: string
         }
@@ -194,6 +203,7 @@ export interface Database {
           source: 'manual' | 'plaid'
           plaid_transaction_id: string | null
           plaid_account_id: string | null
+          platform_tag: string
           created_at: string
         }
         Insert: {
@@ -207,6 +217,7 @@ export interface Database {
           source?: 'manual' | 'plaid'
           plaid_transaction_id?: string | null
           plaid_account_id?: string | null
+          platform_tag?: string
           created_at?: string
         }
         Update: {
@@ -220,6 +231,7 @@ export interface Database {
           source?: 'manual' | 'plaid'
           plaid_transaction_id?: string | null
           plaid_account_id?: string | null
+          platform_tag?: string
           created_at?: string
         }
       }
@@ -548,6 +560,199 @@ export interface Database {
           scoured_write_offs?: number | null
           created_at?: string
           updated_at?: string
+        }
+      }
+      mileage_log: {
+        Row: {
+          id: string
+          user_id: string
+          trip_date: string
+          start_location: string
+          end_location: string
+          miles: number
+          purpose: 'business' | 'medical' | 'charity'
+          platform: string
+          irs_rate_per_mile: number
+          deduction_amount: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          trip_date: string
+          start_location?: string
+          end_location?: string
+          miles: number
+          purpose: 'business' | 'medical' | 'charity'
+          platform?: string
+          irs_rate_per_mile?: number
+          deduction_amount: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          trip_date?: string
+          start_location?: string
+          end_location?: string
+          miles?: number
+          purpose?: 'business' | 'medical' | 'charity'
+          platform?: string
+          irs_rate_per_mile?: number
+          deduction_amount?: number
+          created_at?: string
+        }
+      }
+      client_invoices: {
+        Row: {
+          id: string
+          user_id: string
+          client_name: string
+          amount: number
+          issued_date: string
+          due_date: string
+          status: 'draft' | 'sent' | 'paid' | 'void'
+          notes: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          client_name: string
+          amount: number
+          issued_date: string
+          due_date: string
+          status?: 'draft' | 'sent' | 'paid' | 'void'
+          notes?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          client_name?: string
+          amount?: number
+          issued_date?: string
+          due_date?: string
+          status?: 'draft' | 'sent' | 'paid' | 'void'
+          notes?: string
+          created_at?: string
+        }
+      }
+      email_connections: {
+        Row: {
+          id: string
+          user_id: string
+          provider: string
+          email_address: string
+          encrypted_refresh_token: string
+          created_at: string
+          updated_at: string
+          last_scan_at: string | null
+          last_scan_after: string | null
+          google_refresh_token_fp_hash: string | null
+          google_refresh_token_fp_prefix: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          provider?: string
+          email_address: string
+          encrypted_refresh_token: string
+          created_at?: string
+          updated_at?: string
+          last_scan_at?: string | null
+          last_scan_after?: string | null
+          google_refresh_token_fp_hash?: string | null
+          google_refresh_token_fp_prefix?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          provider?: string
+          email_address?: string
+          encrypted_refresh_token?: string
+          created_at?: string
+          updated_at?: string
+          last_scan_at?: string | null
+          last_scan_after?: string | null
+          google_refresh_token_fp_hash?: string | null
+          google_refresh_token_fp_prefix?: string | null
+        }
+      }
+      risc_google_events: {
+        Row: {
+          jti: string
+          received_at: string
+        }
+        Insert: {
+          jti: string
+          received_at?: string
+        }
+        Update: {
+          jti?: string
+          received_at?: string
+        }
+      }
+      email_scan_findings: {
+        Row: {
+          id: string
+          user_id: string
+          connection_id: string
+          provider_message_id: string
+          subject_snapshot: string
+          sender_domain: string
+          biller_name: string
+          amount_due: number | null
+          due_date: string | null
+          account_last4: string | null
+          extracted_status: string
+          action_required: boolean
+          extracted_category: string
+          confidence_score: number
+          suggested_destination: string
+          urgency: string
+          review_status: string
+          scanned_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          connection_id: string
+          provider_message_id: string
+          subject_snapshot?: string
+          sender_domain?: string
+          biller_name?: string
+          amount_due?: number | null
+          due_date?: string | null
+          account_last4?: string | null
+          extracted_status: string
+          action_required?: boolean
+          extracted_category: string
+          confidence_score: number
+          suggested_destination: string
+          urgency?: string
+          review_status?: string
+          scanned_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          connection_id?: string
+          provider_message_id?: string
+          subject_snapshot?: string
+          sender_domain?: string
+          biller_name?: string
+          amount_due?: number | null
+          due_date?: string | null
+          account_last4?: string | null
+          extracted_status?: string
+          action_required?: boolean
+          extracted_category?: string
+          confidence_score?: number
+          suggested_destination?: string
+          urgency?: string
+          review_status?: string
+          scanned_at?: string
         }
       }
       pending_ingestions: {
@@ -1065,6 +1270,14 @@ export interface Database {
       }
       flip_overdue_bills: {
         Args: Record<PropertyKey, never>
+        Returns: void
+      }
+      find_user_id_by_google_sub: {
+        Args: { lookup_sub: string }
+        Returns: string | null
+      }
+      risc_revoke_user_sessions: {
+        Args: { target_user: string }
         Returns: void
       }
     }

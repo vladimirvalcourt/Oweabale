@@ -13,6 +13,11 @@ import { z } from "zod";
 // Initialize Supabase client using environment variables
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const mcpAllowedUserIds = (process.env.MCP_ALLOWED_USER_IDS ?? '')
+  .split(',')
+  .map((id) => id.trim())
+  .filter(Boolean);
+const enforceAllowlist = process.env.MCP_ENFORCE_ALLOWLIST !== 'false';
 
 if (!supabaseUrl || !supabaseServiceRoleKey) {
   console.error('Missing Supabase credentials. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in your environment.');
@@ -26,6 +31,16 @@ if (supabase) {
   console.error(
     '[owebale-mcp] Service role client active. Treat this process as highly privileged; restrict who can execute it.'
   );
+}
+
+function assertAllowedUserId(userId: string): void {
+  if (!enforceAllowlist) return;
+  if (mcpAllowedUserIds.length === 0) {
+    throw new Error('MCP allowlist is empty. Set MCP_ALLOWED_USER_IDS or MCP_ENFORCE_ALLOWLIST=false for local testing only.');
+  }
+  if (!mcpAllowedUserIds.includes(userId)) {
+    throw new Error('Requested user is not in MCP_ALLOWED_USER_IDS allowlist.');
+  }
 }
 
 // 🚀 Create the High-Performance MCP Server
@@ -42,39 +57,27 @@ server.tool(
   { userId: z.string().uuid().describe("The UUID of the user") },
   async ({ userId }) => {
     try {
-      console.error(`🛡️ MCP TOOL: Loading summary for user ${userId}`);
-      
-      // If Supabase client is available, fetch real data; otherwise return mock
-      if (supabase) {
-        // Fetch actual data from Supabase
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('financial_data')
-          .eq('id', userId)
-          .single();
-        
-        if (error) {
-          console.error("Supabase error:", error);
-          throw error;
-        }
-        
-        return {
-          content: [{ type: "text", text: JSON.stringify(data?.financial_data || {}, null, 2) }],
-        };
-      } else {
-        // Fallback to mock data if Supabase isn't configured
-        console.warn("Supabase not configured, using mock data");
-        const mockSummary = {
-          total_assets: 125000,
-          total_liabilities: 45000,
-          net_worth: 80000,
-          status: "Healthy",
-        };
-
-        return {
-          content: [{ type: "text", text: JSON.stringify(mockSummary, null, 2) }],
-        };
+      console.error("🛡️ MCP TOOL: Loading account summary");
+      if (!supabase) {
+        throw new Error('Supabase is not configured for MCP server.');
       }
+
+      assertAllowedUserId(userId);
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('financial_data')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error("Supabase error while loading account summary");
+        throw error;
+      }
+
+      return {
+        content: [{ type: "text", text: JSON.stringify(data?.financial_data || {}, null, 2) }],
+      };
     } catch (err) {
       const error = err as Error;
       console.error("🛡️ TOOL FAULT:", error.message);

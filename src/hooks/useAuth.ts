@@ -23,9 +23,8 @@ function authDevLog(...args: unknown[]) {
 }
 
 /**
- * Auth state is driven by `onAuthStateChange` (INITIAL_SESSION, SIGNED_IN,
- * TOKEN_REFRESHED, SIGNED_OUT). A delayed `getSession()` fallback covers edge
- * cases where INITIAL_SESSION is slow to emit.
+ * Hydrate from `getSession()` first so redirect guards never run before storage is read,
+ * then subscribe for sign-in/out and token refresh.
  */
 export function useAuth(): AuthState {
   const [user, setUser] = useState<User | null>(null);
@@ -33,31 +32,26 @@ export function useAuth(): AuthState {
   const [authLoading, setAuthLoading] = useState(true);
   const [showWarning, setShowWarning] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
-  const initialResolveRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
 
-    const applySession = (s: Session | null, source: string) => {
+    void (async () => {
+      const { data: { session: initial } } = await supabase.auth.getSession();
       if (cancelled) return;
-      setSession(s);
-      setUser(s?.user ?? null);
+      setSession(initial);
+      setUser(initial?.user ?? null);
       setAuthLoading(false);
-      if (source === 'INITIAL_SESSION' || source === 'getSession-fallback') {
-        authDevLog('[useAuth] session resolved, user:', s?.user?.id ?? 'none');
-        if (source === 'getSession-fallback') {
-          authDevLog('[useAuth] (via getSession fallback — INITIAL_SESSION was slow)');
-        }
-      }
-    };
+      authDevLog('[useAuth] getSession resolved, user:', initial?.user?.id ?? 'none');
+    })();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event: AuthChangeEvent, newSession: Session | null) => {
         if (cancelled) return;
 
+        // First paint already used `getSession()`; this avoids double-firing INITIAL_SESSION
+        // before the async read completes.
         if (event === 'INITIAL_SESSION') {
-          initialResolveRef.current = true;
-          applySession(newSession, 'INITIAL_SESSION');
           return;
         }
 
@@ -66,7 +60,6 @@ export function useAuth(): AuthState {
           setSession(null);
           setUser(null);
           setAuthLoading(false);
-          initialResolveRef.current = false;
           return;
         }
 
@@ -83,12 +76,6 @@ export function useAuth(): AuthState {
         setAuthLoading(false);
       }
     );
-
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      if (cancelled || initialResolveRef.current) return;
-      initialResolveRef.current = true;
-      applySession(s, 'getSession-fallback');
-    });
 
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) window.location.reload();

@@ -12,6 +12,12 @@ type AlertPayload = {
 Deno.serve(async (req: Request) => {
   const c = corsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') return new Response('ok', { headers: c });
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...c, 'Content-Type': 'application/json' },
+    });
+  }
   const jsonHeaders = { ...c, 'Content-Type': 'application/json' as const };
 
   try {
@@ -57,7 +63,7 @@ Deno.serve(async (req: Request) => {
       if (!resendApiKey || !alertsEmail) {
         throw new Error('Missing RESEND_API_KEY or ADMIN_ALERTS_TO_EMAIL');
       }
-      const fromEmail = Deno.env.get('ADMIN_ALERTS_FROM_EMAIL') ?? 'alerts@owebale.com';
+      const fromEmail = Deno.env.get('ADMIN_ALERTS_FROM_EMAIL') ?? 'alerts@oweable.com';
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -79,8 +85,12 @@ Deno.serve(async (req: Request) => {
 
     return new Response(JSON.stringify({ ok: true, id: inserted.id }), { headers: jsonHeaders });
   } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Request failed';
+    const safe = /unauthorized|forbidden|required|missing|method not allowed/i.test(msg)
+      ? msg
+      : 'Request failed';
     return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : 'Unknown error' }),
+      JSON.stringify({ error: safe }),
       { status: 400, headers: jsonHeaders },
     );
   }

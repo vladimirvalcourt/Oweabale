@@ -2,6 +2,8 @@ import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Mail, BellRing, BrainCircuit, Loader2, Zap } from 'lucide-react';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
+import { useShallow } from 'zustand/react/shallow';
+import { useStore } from '../../store/useStore';
 import { NOTIF_PREFS_STORAGE_KEY, type NotifPrefKey, loadNotifPrefs } from './constants';
 import { useFullSuiteAccess } from '../../hooks/useFullSuiteAccess';
 import { FullSuiteGateCard } from '../../components/FullSuiteGate';
@@ -23,6 +25,12 @@ function deferToast(fn: () => void) {
 function NotificationsPanelInner() {
   const [notifPrefs, setNotifPrefs] = useState(loadNotifPrefs);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { financialAlertPrefs, updateUser } = useStore(
+    useShallow((s) => ({
+      financialAlertPrefs: s.user.financialAlertPrefs,
+      updateUser: s.updateUser,
+    })),
+  );
   const { hasFullSuite, isAdmin } = useFullSuiteAccess();
   const [webPushReady, setWebPushReady] = useState<boolean | null>(null);
   const [webPushBusy, setWebPushBusy] = useState(false);
@@ -230,14 +238,73 @@ function NotificationsPanelInner() {
 
       <CollapsibleModule title="Financial Alerts" icon={Zap} defaultOpen={false}>
         <p className="text-sm text-content-tertiary mb-6">
-          Get push alerts when your finances need attention. Requires browser push to be enabled above.
+          Push rules stored on your profile for the Oweable alert runner. Requires browser push to be enabled above.
         </p>
         <div className="space-y-6">
           {[
-            { id: 'alert-bill-due' as const, label: 'Bill due soon', desc: 'Alert 1–3 days before a bill is due.' },
-            { id: 'alert-over-budget' as const, label: 'Over budget', desc: 'Alert when a budget category is exceeded this month.' },
-            { id: 'alert-low-cash' as const, label: 'Low cash warning', desc: 'Alert when your liquid cash drops below one week of safe-to-spend.' },
-            { id: 'alert-debt-due' as const, label: 'Debt payment due', desc: 'Alert 2 days before a debt minimum payment is due.' },
+            {
+              id: 'alert-bill-due',
+              label: 'Bill due soon',
+              desc: 'Alert 1–3 days before a bill is due.',
+              checked: financialAlertPrefs.billDueDays.length > 0,
+              onChange: async (checked: boolean) => {
+                const ok = await updateUser({
+                  financialAlertPrefs: {
+                    ...financialAlertPrefs,
+                    billDueDays: checked ? [1, 3] : [],
+                  },
+                });
+                if (ok) deferToast(() => toast.success(`Bill due alerts ${checked ? 'enabled' : 'disabled'}`));
+              },
+            },
+            {
+              id: 'alert-over-budget',
+              label: 'Over budget',
+              desc: 'Alert when a budget category is exceeded this month.',
+              checked: financialAlertPrefs.overBudget,
+              onChange: async (checked: boolean) => {
+                const ok = await updateUser({
+                  financialAlertPrefs: { ...financialAlertPrefs, overBudget: checked },
+                });
+                if (ok) deferToast(() => toast.success(`Over-budget alerts ${checked ? 'enabled' : 'disabled'}`));
+              },
+            },
+            {
+              id: 'alert-low-cash',
+              label: 'Low cash warning',
+              desc: 'Alert when liquid cash drops below one week of safe-to-spend.',
+              checked: financialAlertPrefs.lowCash,
+              onChange: async (checked: boolean) => {
+                const ok = await updateUser({
+                  financialAlertPrefs: { ...financialAlertPrefs, lowCash: checked },
+                });
+                if (ok) deferToast(() => toast.success(`Low cash alerts ${checked ? 'enabled' : 'disabled'}`));
+              },
+            },
+            {
+              id: 'alert-debt-due',
+              label: 'Debt payment due',
+              desc: 'Alert 2 days before a debt minimum payment is due.',
+              checked: financialAlertPrefs.debtDue,
+              onChange: async (checked: boolean) => {
+                const ok = await updateUser({
+                  financialAlertPrefs: { ...financialAlertPrefs, debtDue: checked },
+                });
+                if (ok) deferToast(() => toast.success(`Debt due alerts ${checked ? 'enabled' : 'disabled'}`));
+              },
+            },
+            {
+              id: 'alert-invoice-due',
+              label: 'Client invoice due',
+              desc: 'Alert when a freelance invoice is due (same day windows as bills) or overdue.',
+              checked: financialAlertPrefs.invoiceDue,
+              onChange: async (checked: boolean) => {
+                const ok = await updateUser({
+                  financialAlertPrefs: { ...financialAlertPrefs, invoiceDue: checked },
+                });
+                if (ok) deferToast(() => toast.success(`Invoice alerts ${checked ? 'enabled' : 'disabled'}`));
+              },
+            },
           ].map((item) => (
             <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
               <div className="pr-4">
@@ -248,12 +315,8 @@ function NotificationsPanelInner() {
                 <input
                   id={item.id}
                   type="checkbox"
-                  checked={notifPrefs[item.id]}
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    setPref(item.id, checked);
-                    deferToast(() => toast.success(`${item.label} ${checked ? 'enabled' : 'disabled'}`));
-                  }}
+                  checked={item.checked}
+                  onChange={(e) => void item.onChange(e.target.checked)}
                   className="h-4 w-4 cursor-pointer rounded border-surface-border bg-surface-base text-emerald-500 transition-colors focus-app"
                 />
               </div>

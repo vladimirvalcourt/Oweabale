@@ -1,7 +1,7 @@
-import React, { memo, startTransition, useCallback, useState } from 'react';
+import React, { memo, startTransition, useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Dialog } from '@headlessui/react';
-import { AlertTriangle, Shield, Loader2 } from 'lucide-react';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
@@ -72,6 +72,7 @@ export default function Settings() {
   const deleteAccount = useStore((state) => state.deleteAccount);
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
   const [resetConfirmText, setResetConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -100,6 +101,12 @@ export default function Settings() {
     tabFromUrl && SETTINGS_TAB_IDS.includes(tabFromUrl as SettingsTab)
       ? (tabFromUrl as SettingsTab)
       : 'profile';
+
+  useEffect(() => {
+    if (!tabFromUrl) {
+      setSearchParams({ tab: 'profile' }, { replace: true });
+    }
+  }, [tabFromUrl, setSearchParams]);
 
   const selectTab = useCallback((tabId: SettingsTab) => {
     startTransition(() => {
@@ -161,10 +168,6 @@ export default function Settings() {
           <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Settings</h1>
           <p className="mt-1 text-sm font-medium text-content-secondary">Account, billing, security, and preferences.</p>
         </div>
-        <div className="flex items-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-xs font-medium text-content-secondary">
-          <Shield className="w-3.5 h-3.5 mr-1.5 text-content-secondary" />
-          Secure connection
-        </div>
       </div>
 
       <div className="flex flex-col md:flex-row gap-8">
@@ -185,6 +188,7 @@ export default function Settings() {
               onOpenDeleteDialog={() => {
                 setDeletionReceipt(null);
                 setIsDeleting(false);
+                setDeleteConfirmText('');
                 setIsDeleteDialogOpen(true);
               }}
             />
@@ -194,6 +198,10 @@ export default function Settings() {
           {activeTab === 'feedback' && <FeedbackPanel />}
         </div>
       </div>
+
+      <p className="max-w-5xl mx-auto text-center text-[11px] font-mono text-content-muted">
+        Settings apply to this browser session and your Oweable profile on the server.
+      </p>
 
       <Dialog open={isResetDialogOpen} onClose={() => setIsResetDialogOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
@@ -284,14 +292,28 @@ export default function Settings() {
               </>
             ) : (
               <>
-                <Dialog.Description className="text-sm text-content-tertiary mb-6">
+                <Dialog.Description className="text-sm text-content-tertiary mb-4">
                   Are you sure you want to delete your account? All of your data will be permanently removed. This action cannot be
                   undone.
                 </Dialog.Description>
+                <label className="block text-xs font-medium text-content-secondary mb-1" htmlFor="delete-account-confirm">
+                  Type DELETE to confirm
+                </label>
+                <input
+                  id="delete-account-confirm"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  autoComplete="off"
+                  className="mb-6 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+                  placeholder="DELETE"
+                />
                 <div className="flex justify-end gap-3">
                   <button
                     type="button"
-                    onClick={() => setIsDeleteDialogOpen(false)}
+                    onClick={() => {
+                      setDeleteConfirmText('');
+                      setIsDeleteDialogOpen(false);
+                    }}
                     className={BUTTON_SECONDARY_CLASS}
                   >
                     Cancel
@@ -299,11 +321,11 @@ export default function Settings() {
                   <button
                     type="button"
                     onClick={handleDeleteAccount}
-                    disabled={isDeleting}
+                    disabled={isDeleting || deleteConfirmText.trim() !== 'DELETE'}
                     className={`${BUTTON_DESTRUCTIVE_CLASS} gap-2`}
                   >
                     {isDeleting && <Loader2 className="w-3 h-3 animate-spin" />}
-                    {isDeleting ? 'Deleting...' : 'Delete'}
+                    {isDeleting ? 'Deleting...' : 'Delete account'}
                   </button>
                 </div>
               </>

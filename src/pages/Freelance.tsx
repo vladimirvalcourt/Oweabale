@@ -20,10 +20,28 @@ const FED_INCOME_ESTIMATE_RATE = 0.12;
 const SE_TAX_RATE = 0.153;
 
 export default function Freelance() {
-  const { freelanceEntries, addFreelanceEntry, deleteFreelanceEntry, toggleFreelanceVault, user, addDeduction } = useStore();
+  const {
+    freelanceEntries,
+    addFreelanceEntry,
+    deleteFreelanceEntry,
+    toggleFreelanceVault,
+    user,
+    addDeduction,
+    clientInvoices,
+    addClientInvoice,
+    updateClientInvoice,
+    deleteClientInvoice,
+  } = useStore();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [formData, setFormData] = useState({ client: '', amount: '', date: new Date().toISOString().split('T')[0], scouredWriteOffs: 0 });
+  const [invForm, setInvForm] = useState({
+    clientName: '',
+    amount: '',
+    issuedDate: new Date().toISOString().split('T')[0],
+    dueDate: '',
+    notes: '',
+  });
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,6 +143,11 @@ export default function Freelance() {
   const stateRate = user.taxRate ?? 0;
   const hasTaxState = Boolean(user.taxState?.trim());
 
+  const sortedInvoices = useMemo(
+    () => [...clientInvoices].sort((a, b) => a.dueDate.localeCompare(b.dueDate)),
+    [clientInvoices],
+  );
+
   const entriesWithMath = useMemo(() => {
     return freelanceEntries.map(entry => {
       const fedEstimate = entry.amount * FED_INCOME_ESTIMATE_RATE;
@@ -168,6 +191,41 @@ export default function Freelance() {
     setFormData({ client: '', amount: '', date: new Date().toISOString().split('T')[0], scouredWriteOffs: 0 });
     setIsAddModalOpen(false);
     toast.success('Payment saved successfully');
+  };
+
+  const handleAddInvoice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!invForm.clientName.trim()) {
+      toast.error('Enter the client name');
+      return;
+    }
+    const amt = parseFloat(invForm.amount);
+    if (!invForm.amount || !Number.isFinite(amt) || amt <= 0) {
+      toast.error('Enter a valid invoice amount');
+      return;
+    }
+    if (!invForm.dueDate) {
+      toast.error('Pick a due date');
+      return;
+    }
+    await yieldForPaint();
+    const ok = await addClientInvoice({
+      clientName: invForm.clientName.trim(),
+      amount: amt,
+      issuedDate: invForm.issuedDate,
+      dueDate: invForm.dueDate,
+      status: 'draft',
+      notes: invForm.notes.trim(),
+    });
+    if (!ok) return;
+    setInvForm({
+      clientName: '',
+      amount: '',
+      issuedDate: new Date().toISOString().split('T')[0],
+      dueDate: '',
+      notes: '',
+    });
+    toast.success('Invoice saved');
   };
 
   return (
@@ -382,6 +440,146 @@ export default function Freelance() {
            </div>
         </div>
       </div>
+
+      <CollapsibleModule title="Client invoices (accounts receivable)" icon={FileText} defaultOpen={false}>
+        <p className="text-sm text-content-tertiary mb-6 max-w-2xl">
+          Track what you&apos;re owed. Mark an invoice <span className="text-content-secondary">Sent</span> when it goes out —
+          we can nudge you before the due date if invoice alerts are on in Notifications.
+        </p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <form onSubmit={handleAddInvoice} className="lg:col-span-1 space-y-4 rounded-lg border border-surface-border bg-surface-base p-5">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-content-secondary">New invoice</h3>
+            <div>
+              <label className="block text-xs text-content-tertiary mb-1">Client</label>
+              <input
+                value={invForm.clientName}
+                onChange={(e) => setInvForm({ ...invForm, clientName: e.target.value })}
+                className="w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary focus-app-field"
+                placeholder="e.g. Acme Studio"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-content-tertiary mb-1">Amount</label>
+              <input
+                type="number"
+                step="0.01"
+                value={invForm.amount}
+                onChange={(e) => setInvForm({ ...invForm, amount: e.target.value })}
+                className="w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm font-mono text-content-primary focus-app-field"
+                placeholder="0.00"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-content-tertiary mb-1">Issued</label>
+                <input
+                  type="date"
+                  value={invForm.issuedDate}
+                  onChange={(e) => setInvForm({ ...invForm, issuedDate: e.target.value })}
+                  className="w-full rounded-lg border border-surface-border bg-surface-raised px-2 py-2 text-xs text-content-primary focus-app-field"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-content-tertiary mb-1">Due</label>
+                <input
+                  type="date"
+                  value={invForm.dueDate}
+                  onChange={(e) => setInvForm({ ...invForm, dueDate: e.target.value })}
+                  className="w-full rounded-lg border border-surface-border bg-surface-raised px-2 py-2 text-xs text-content-primary focus-app-field"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs text-content-tertiary mb-1">Notes (optional)</label>
+              <input
+                value={invForm.notes}
+                onChange={(e) => setInvForm({ ...invForm, notes: e.target.value })}
+                className="w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary focus-app-field"
+                placeholder="PO #, project…"
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-brand-cta py-2.5 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover"
+            >
+              Save invoice
+            </button>
+          </form>
+          <div className="lg:col-span-2 space-y-3">
+            {sortedInvoices.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-surface-border p-10 text-center text-sm text-content-tertiary">
+                No invoices yet — add one to see due dates and payment status here.
+              </div>
+            ) : (
+              <ul className="divide-y divide-surface-border rounded-lg border border-surface-border bg-surface-base overflow-hidden">
+                {sortedInvoices.map((inv) => (
+                  <li key={inv.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 hover:bg-surface-elevated/40">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-medium text-content-primary">{inv.clientName}</span>
+                        <span
+                          className={`text-[10px] font-mono uppercase tracking-wide px-1.5 py-0.5 rounded border ${
+                            inv.status === 'paid'
+                              ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/5'
+                              : inv.status === 'sent'
+                                ? 'border-amber-500/40 text-amber-300 bg-amber-500/5'
+                                : inv.status === 'void'
+                                  ? 'border-surface-border text-content-muted'
+                                  : 'border-surface-border text-content-tertiary'
+                          }`}
+                        >
+                          {inv.status}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-content-tertiary">
+                        Due {inv.dueDate} · ${inv.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {inv.notes ? ` · ${inv.notes}` : ''}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      {inv.status === 'draft' && (
+                        <button
+                          type="button"
+                          onClick={() => void updateClientInvoice(inv.id, { status: 'sent' })}
+                          className="rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary hover:bg-surface-elevated"
+                        >
+                          Mark sent
+                        </button>
+                      )}
+                      {(inv.status === 'draft' || inv.status === 'sent') && (
+                        <button
+                          type="button"
+                          onClick={() => void updateClientInvoice(inv.id, { status: 'paid' })}
+                          className="rounded-lg bg-emerald-600/90 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600"
+                        >
+                          Mark paid
+                        </button>
+                      )}
+                      {inv.status !== 'paid' && (
+                        <button
+                          type="button"
+                          onClick={() => void updateClientInvoice(inv.id, { status: 'void' })}
+                          className="rounded-lg px-3 py-1.5 text-xs text-content-muted hover:text-content-secondary"
+                        >
+                          Void
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => void deleteClientInvoice(inv.id)}
+                        className="p-2 text-content-muted hover:text-rose-500"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </CollapsibleModule>
 
       {/* Add Entry Modal */}
       <AnimatePresence>

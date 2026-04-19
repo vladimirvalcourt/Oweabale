@@ -3,7 +3,7 @@
  * Real net worth timeline from DB snapshots + spending trends from transactions.
  */
 import React, { useState, useEffect, useMemo } from 'react';
-import { TrendingUp, TrendingDown, Activity, PieChart, Minus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Activity, PieChart, Target } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine,
@@ -187,6 +187,56 @@ export default function Analytics() {
     return { income, expenses, saved, rate };
   }, [transactions]);
 
+  /** Compare last closed calendar month vs the month before (expense totals + biggest category swings). */
+  const spendingBenchmark = useMemo(() => {
+    const anchor = new Date();
+    anchor.setDate(1);
+    anchor.setMonth(anchor.getMonth() - 1);
+    const lastFull = `${anchor.getFullYear()}-${String(anchor.getMonth() + 1).padStart(2, '0')}`;
+    anchor.setMonth(anchor.getMonth() - 1);
+    const priorFull = `${anchor.getFullYear()}-${String(anchor.getMonth() + 1).padStart(2, '0')}`;
+
+    const expensesFor = (mk: string) =>
+      transactions.filter((t) => t.type === 'expense' && t.date.startsWith(mk));
+    const lastTx = expensesFor(lastFull);
+    const priorTx = expensesFor(priorFull);
+    const lastTotal = lastTx.reduce((s, t) => s + t.amount, 0);
+    const priorTotal = priorTx.reduce((s, t) => s + t.amount, 0);
+
+    const sumCat = (txs: typeof transactions) => {
+      const m = new Map<string, number>();
+      for (const t of txs) m.set(t.category, (m.get(t.category) || 0) + t.amount);
+      return m;
+    };
+    const lastMap = sumCat(lastTx);
+    const priorMap = sumCat(priorTx);
+    const allCats = new Set([...lastMap.keys(), ...priorMap.keys()]);
+    const topDeltas = [...allCats]
+      .map((cat) => {
+        const a = lastMap.get(cat) || 0;
+        const b = priorMap.get(cat) || 0;
+        return { cat, last: a, prior: b, delta: a - b };
+      })
+      .sort((x, y) => Math.abs(y.delta) - Math.abs(x.delta))
+      .slice(0, 5);
+
+    const monthLabel = (mk: string) =>
+      new Date(`${mk}-01`).toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    return {
+      lastFull,
+      priorFull,
+      lastLabel: monthLabel(lastFull),
+      priorLabel: monthLabel(priorFull),
+      lastTotal,
+      priorTotal,
+      totalDelta: lastTotal - priorTotal,
+      totalPct: priorTotal > 0 ? ((lastTotal - priorTotal) / priorTotal) * 100 : null,
+      topDeltas,
+      hasData: lastTotal > 0 || priorTotal > 0,
+    };
+  }, [transactions]);
+
   const isPositiveDelta = netWorthDelta !== null && netWorthDelta >= 0;
   const savingsGoalPct = 20;
 
@@ -359,6 +409,76 @@ export default function Analytics() {
               ))}
             </div>
           </>
+        )}
+      </CollapsibleModule>
+
+      <CollapsibleModule title="Spending benchmarks" icon={Target} defaultOpen={false}>
+        {!spendingBenchmark.hasData ? (
+          <p className="text-sm text-content-tertiary py-6 text-center">
+            Need expense history in two consecutive months to compare spending month over month.
+          </p>
+        ) : (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="rounded-lg border border-surface-border bg-surface-base p-4">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-content-muted mb-1">
+                  {spendingBenchmark.priorLabel}
+                </p>
+                <p className="text-xl font-mono font-bold tabular-nums text-content-primary">
+                  {fmt(spendingBenchmark.priorTotal)}
+                </p>
+                <p className="text-xs text-content-tertiary mt-1">Total spend</p>
+              </div>
+              <div className="rounded-lg border border-surface-border bg-surface-base p-4">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-content-muted mb-1">
+                  {spendingBenchmark.lastLabel}
+                </p>
+                <p className="text-xl font-mono font-bold tabular-nums text-content-primary">
+                  {fmt(spendingBenchmark.lastTotal)}
+                </p>
+                <p className="text-xs text-content-tertiary mt-1">Total spend</p>
+              </div>
+              <div className="rounded-lg border border-surface-border bg-surface-base p-4">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-content-muted mb-1">Change</p>
+                <p
+                  className={`text-xl font-mono font-bold tabular-nums ${
+                    spendingBenchmark.totalDelta <= 0 ? 'text-emerald-400' : 'text-amber-400'
+                  }`}
+                >
+                  {spendingBenchmark.totalDelta === 0
+                    ? '—'
+                    : `${spendingBenchmark.totalDelta > 0 ? '+' : ''}${fmt(spendingBenchmark.totalDelta)}`}
+                </p>
+                <p className="text-xs text-content-tertiary mt-1">
+                  {spendingBenchmark.totalPct !== null
+                    ? `${spendingBenchmark.totalPct >= 0 ? '+' : ''}${spendingBenchmark.totalPct.toFixed(1)}% vs prior month`
+                    : 'Prior month had no spend'}
+                </p>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-medium text-content-secondary mb-3">Largest category moves</p>
+              <ul className="space-y-2">
+                {spendingBenchmark.topDeltas.map((row) => (
+                  <li
+                    key={row.cat}
+                    className="flex items-center justify-between gap-4 rounded-lg border border-surface-border bg-surface-base px-3 py-2"
+                  >
+                    <span className="text-sm text-content-primary">{formatCategoryLabel(row.cat)}</span>
+                    <span
+                      className={`text-sm font-mono tabular-nums ${
+                        row.delta > 0 ? 'text-amber-400' : row.delta < 0 ? 'text-emerald-400' : 'text-content-tertiary'
+                      }`}
+                    >
+                      {row.delta === 0
+                        ? '—'
+                        : `${row.delta > 0 ? '+' : ''}${fmt(row.delta)}`}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         )}
       </CollapsibleModule>
 

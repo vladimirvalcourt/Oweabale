@@ -23,6 +23,19 @@ interface SyncPage {
   has_more: boolean;
 }
 
+function inferPlatformTag(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes('uber')) return 'Uber';
+  if (n.includes('lyft')) return 'Lyft';
+  if (n.includes('doordash') || n.includes('door dash')) return 'DoorDash';
+  if (n.includes('grubhub')) return 'Grubhub';
+  if (n.includes('instacart')) return 'Instacart';
+  if (n.includes('stripe')) return 'Stripe';
+  if (n.includes('upwork')) return 'Upwork';
+  if (n.includes('fiverr')) return 'Fiverr';
+  return '';
+}
+
 function mapPlaidRow(tx: PlaidTx, userId: string, rules: RuleRow[]) {
   const nameRaw = (tx.merchant_name || tx.name || 'Transaction').trim();
   const name = nameRaw.slice(0, 500);
@@ -34,6 +47,7 @@ function mapPlaidRow(tx: PlaidTx, userId: string, rules: RuleRow[]) {
   const defaultCat = pfc?.detailed || pfc?.primary || null;
   const ruleCat = applyCategorizationRules(name, rules);
   const category = ruleCat ?? defaultCat;
+  const platformTag = inferPlatformTag(name);
 
   return {
     user_id: userId,
@@ -45,6 +59,7 @@ function mapPlaidRow(tx: PlaidTx, userId: string, rules: RuleRow[]) {
     source: 'plaid' as const,
     plaid_transaction_id: tx.transaction_id,
     plaid_account_id: tx.account_id,
+    platform_tag: platformTag,
   };
 }
 

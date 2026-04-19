@@ -28,6 +28,7 @@ import type { Bill, Debt } from '../store/useStore';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 import { FullSuiteGateCard } from '../components/FullSuiteGate';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
+import { cn } from '../lib/utils';
 
 type ObligationType = 'recurring' | 'debt' | 'ambush';
 type Strategy = 'avalanche' | 'snowball';
@@ -723,11 +724,30 @@ export default function Obligations() {
               {filteredObligations.map(ob => {
                 const Icon = ob.icon;
                 const isDebtNoDue = ob.type === 'debt' && ob.dueLabel === 'No due date';
-                const isPastDue = !isDebtNoDue && new Date(ob.dueDate) < today;
+                const dueNorm = new Date(ob.dueDate.includes('T') ? ob.dueDate : `${ob.dueDate}T12:00:00`);
+                const todayNorm = new Date(today);
+                todayNorm.setHours(0, 0, 0, 0);
+                dueNorm.setHours(0, 0, 0, 0);
+                const isPastDue = !isDebtNoDue && !Number.isNaN(dueNorm.getTime()) && dueNorm < todayNorm;
+                const overdueDays = isPastDue
+                  ? Math.max(1, Math.floor((todayNorm.getTime() - dueNorm.getTime()) / 86400000))
+                  : 0;
+                const overdueBand: 'none' | 'warn' | 'critical' = !isPastDue
+                  ? 'none'
+                  : overdueDays <= 7
+                    ? 'warn'
+                    : 'critical';
+                const tollHint =
+                  ob.type === 'ambush' &&
+                  /toll|violation|ez-?pass|fastrak|sunpass/i.test(`${ob.name} ${ob.subType}`);
                 return (
                   <tr 
                     key={ob.id} 
-                    className="hover:bg-surface-highlight transition-colors"
+                    className={cn(
+                      'hover:bg-surface-highlight transition-colors',
+                      overdueBand === 'warn' && 'bg-amber-500/[0.08] border-l-[3px] border-l-amber-500',
+                      overdueBand === 'critical' && 'bg-rose-500/[0.1] border-l-[3px] border-l-rose-500',
+                    )}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
@@ -751,12 +771,37 @@ export default function Obligations() {
                       <div className="flex flex-col gap-1">
                         <span
                           className={`text-sm font-mono ${
-                            isPastDue ? 'text-rose-400' : isDebtNoDue ? 'text-content-muted' : 'text-content-secondary'
+                            overdueBand === 'critical'
+                              ? 'text-rose-400'
+                              : overdueBand === 'warn'
+                                ? 'text-amber-400'
+                                : isDebtNoDue
+                                  ? 'text-content-muted'
+                                  : 'text-content-secondary'
                           }`}
                         >
                           {ob.dueLabel}
-                          {isPastDue && <span className="ml-2 text-[10px] font-bold">OVERDUE</span>}
+                          {overdueBand === 'warn' && (
+                            <span className="ml-2 inline-flex items-center gap-1 rounded border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
+                              ⚠️ OVERDUE {overdueDays} {overdueDays === 1 ? 'day' : 'days'}
+                            </span>
+                          )}
+                          {overdueBand === 'critical' && (
+                            <span className="ml-2 inline-flex items-center gap-1 rounded border border-rose-500/40 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-bold text-rose-300">
+                              ⚠️ OVERDUE {overdueDays} days
+                            </span>
+                          )}
                         </span>
+                        {tollHint && overdueBand !== 'none' && (
+                          <p className="max-w-xs text-[11px] text-content-tertiary leading-snug">
+                            Toll violations may accrue penalties after 30 days.
+                          </p>
+                        )}
+                        {overdueBand === 'critical' && !tollHint && ob.type === 'ambush' && (
+                          <p className="max-w-xs text-[11px] text-rose-300/90 leading-snug">
+                            Unpaid fines can add late fees and collection risk — resolve as soon as you can.
+                          </p>
+                        )}
                         {isDebtNoDue && (
                           <button
                             type="button"
@@ -789,10 +834,15 @@ export default function Obligations() {
                               await markBillPaid(b.id);
                               toast.success(`✓ ${b.biller} marked as paid`);
                             }}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-cta text-surface-base text-xs font-mono font-semibold hover:bg-brand-cta-hover transition-colors"
+                            className={cn(
+                              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-colors',
+                              overdueBand === 'critical'
+                                ? 'bg-rose-600 text-white hover:bg-rose-500'
+                                : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover',
+                            )}
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" aria-hidden />
-                            Mark paid
+                            Resolve Now →
                           </button>
                         )}
                         {ob.type === 'debt' && (
@@ -833,9 +883,14 @@ export default function Obligations() {
                                 if (ok) toast.success(`${ob.name} resolved`);
                               } else toast.error('Citation not found');
                             }}
-                            className="px-3 py-1 border border-rose-500/50 hover:bg-rose-500/10 active:scale-[0.98] text-rose-400 text-xs font-mono font-bold rounded-lg transition-colors"
+                            className={cn(
+                              'px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-colors active:scale-[0.98]',
+                              isPastDue
+                                ? 'border border-rose-500 bg-rose-600 text-white hover:bg-rose-500'
+                                : 'border border-rose-500/50 hover:bg-rose-500/10 text-rose-400',
+                            )}
                           >
-                            PAY
+                            {isPastDue ? 'Resolve Now →' : 'PAY'}
                           </button>
                         )}
                       </div>

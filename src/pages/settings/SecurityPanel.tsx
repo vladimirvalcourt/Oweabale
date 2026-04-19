@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useState } from 'react';
-import { Lock, Shield, Smartphone, CheckCircle2, Loader2, Fingerprint } from 'lucide-react';
+import { Lock, Shield, Smartphone, CheckCircle2, Loader2, Fingerprint, ShieldCheck } from 'lucide-react';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
@@ -32,6 +32,11 @@ function SecurityPanelInner() {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-secondary">
+        <ShieldCheck className="w-3.5 h-3.5 shrink-0 text-content-tertiary" aria-hidden />
+        <span>Secure connection — your session is encrypted in transit (HTTPS).</span>
+      </div>
+
       <div className="rounded-lg border border-surface-border bg-surface-elevated/50 px-4 py-3">
         <p className="text-sm font-medium text-content-primary">
           Security score: {securityScore}/{securityScoreMax}

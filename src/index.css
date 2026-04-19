@@ -25,6 +25,8 @@
   --color-brand-profit: #22c55e;
   --color-brand-expense: #ef4444;
   --color-brand-tax: #a3a3a3;
+  /** Negative cash / error shading (e.g. chart below-zero fill at 20% opacity) */
+  --color-error-highlight: #f43f5e;
 
   --font-sans: "Geist Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;

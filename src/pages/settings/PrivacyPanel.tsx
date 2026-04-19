@@ -1,14 +1,41 @@
 import React, { memo, useState } from 'react';
-import { EyeOff, Download, AlertTriangle } from 'lucide-react';
+import { EyeOff, Download, AlertTriangle, Mail } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { useStore } from '../../store/useStore';
+import { TransitionLink } from '../../components/TransitionLink';
 
 function deferToast(fn: () => void) {
   requestAnimationFrame(() => {
     queueMicrotask(fn);
   });
+}
+
+function escapeCsvCell(v: unknown): string {
+  const s = String(v ?? '');
+  if (/[",\r\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+function rowsToCsv(headers: string[], rows: Record<string, unknown>[]): string {
+  const lines = [headers.join(',')];
+  for (const row of rows) {
+    lines.push(headers.map((h) => escapeCsvCell(row[h])).join(','));
+  }
+  return lines.join('\n');
+}
+
+function downloadTextFile(filename: string, content: string, mime: string) {
+  const blob = new Blob([content], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
 }
 
 type PrivacyPanelProps = {
@@ -35,8 +62,12 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
       citations: s.citations,
       deductions: s.deductions,
       freelanceEntries: s.freelanceEntries,
+      mileageLog: s.mileageLog,
+      clientInvoices: s.clientInvoices,
     })),
   );
+  const emailConnections = useStore((s) => s.emailConnections);
+  const deleteAllEmailScanData = useStore((s) => s.deleteAllEmailScanData);
 
   const handleExportData = () => {
     const exportedAt = new Date().toISOString();
@@ -46,16 +77,119 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
       source: 'oweable-settings-export',
       ...exportPayload,
     };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `oweable-export-${exportedAt.slice(0, 10)}.json`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(url);
+    downloadTextFile(
+      `oweable-export-${exportedAt.slice(0, 10)}.json`,
+      JSON.stringify(payload, null, 2),
+      'application/json',
+    );
     toast.success('Data export downloaded.');
+  };
+
+  const handleExportCsv = () => {
+    const exportedAt = new Date().toISOString();
+    const { transactions, bills, debts, incomes, freelanceEntries, mileageLog, clientInvoices } = exportPayload;
+    const txCsv = rowsToCsv(
+      ['date', 'name', 'amount', 'type', 'category', 'platformTag'],
+      transactions.map((t) => ({
+        date: t.date,
+        name: t.name,
+        amount: t.amount,
+        type: t.type,
+        category: t.category,
+        platformTag: (t.platformTag || '').trim(),
+      })),
+    );
+    const billsCsv = rowsToCsv(
+      ['biller', 'dueDate', 'amount', 'frequency', 'status'],
+      bills.map((b) => ({
+        biller: b.biller,
+        dueDate: b.dueDate,
+        amount: b.amount,
+        frequency: b.frequency,
+        status: b.status,
+      })),
+    );
+    const debtsCsv = rowsToCsv(
+      ['name', 'remaining', 'apr', 'minPayment', 'type'],
+      debts.map((d) => ({
+        name: d.name,
+        remaining: d.remaining,
+        apr: d.apr,
+        minPayment: d.minPayment,
+        type: d.type,
+      })),
+    );
+    const incomeCsv = rowsToCsv(
+      ['name', 'amount', 'frequency', 'nextDate', 'status', 'category'],
+      incomes.map((i) => ({
+        name: i.name,
+        amount: i.amount,
+        frequency: i.frequency,
+        nextDate: i.nextDate,
+        status: i.status,
+        category: i.category,
+      })),
+    );
+    const freelanceCsv = rowsToCsv(
+      ['client', 'amount', 'date', 'isVaulted'],
+      freelanceEntries.map((f) => ({
+        client: f.client,
+        amount: f.amount,
+        date: f.date,
+        isVaulted: f.isVaulted,
+      })),
+    );
+    const mileageCsv = rowsToCsv(
+      ['tripDate', 'startLocation', 'endLocation', 'miles', 'purpose', 'platform', 'irsRatePerMile', 'deductionAmount'],
+      mileageLog.map((m) => ({
+        tripDate: m.tripDate,
+        startLocation: m.startLocation,
+        endLocation: m.endLocation,
+        miles: m.miles,
+        purpose: m.purpose,
+        platform: m.platform,
+        irsRatePerMile: m.irsRatePerMile,
+        deductionAmount: m.deductionAmount,
+      })),
+    );
+    const invoicesCsv = rowsToCsv(
+      ['clientName', 'amount', 'issuedDate', 'dueDate', 'status', 'notes'],
+      clientInvoices.map((inv) => ({
+        clientName: inv.clientName,
+        amount: inv.amount,
+        issuedDate: inv.issuedDate,
+        dueDate: inv.dueDate,
+        status: inv.status,
+        notes: inv.notes,
+      })),
+    );
+    const combined = [
+      '# Oweable CSV export',
+      `# exportedAt: ${exportedAt}`,
+      '',
+      '# Transactions',
+      txCsv,
+      '',
+      '# Bills',
+      billsCsv,
+      '',
+      '# Debts',
+      debtsCsv,
+      '',
+      '# Income sources',
+      incomeCsv,
+      '',
+      '# Freelance entries',
+      freelanceCsv,
+      '',
+      '# Mileage log',
+      mileageCsv,
+      '',
+      '# Client invoices',
+      invoicesCsv,
+    ].join('\n');
+    downloadTextFile(`oweable-export-${exportedAt.slice(0, 10)}.csv`, combined, 'text/csv;charset=utf-8');
+    toast.success('CSV summary downloaded.');
   };
 
   return (
@@ -98,15 +232,26 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
           <div className="border border-surface-border rounded-lg p-4 bg-surface-elevated/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h4 className="text-sm font-medium text-content-primary">Export your data</h4>
-              <p className="text-xs text-content-tertiary mt-1">Download a JSON copy of your Oweable records.</p>
+              <p className="text-xs text-content-tertiary mt-1">
+                Full JSON archive or a CSV summary (transactions, bills, debts, income, freelance, mileage).
+              </p>
             </div>
-            <button
-              type="button"
-              onClick={handleExportData}
-              className="rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app shrink-0"
-            >
-              Export data
-            </button>
+            <div className="flex flex-col gap-2 shrink-0 sm:flex-row">
+              <button
+                type="button"
+                onClick={handleExportData}
+                className="rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app"
+              >
+                Download JSON
+              </button>
+              <button
+                type="button"
+                onClick={handleExportCsv}
+                className="rounded-lg border border-surface-border bg-surface-base px-5 py-2.5 text-sm font-semibold text-content-primary transition-colors hover:bg-surface-elevated focus-app"
+              >
+                Download CSV
+              </button>
+            </div>
           </div>
 
           <div className="border border-rose-500/25 rounded-lg p-4 bg-rose-500/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -123,6 +268,42 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
             </button>
           </div>
         </div>
+      </CollapsibleModule>
+
+      <CollapsibleModule title="Email scanning" icon={Mail} defaultOpen={false}>
+        <p className="text-sm text-content-tertiary mb-4">
+          Gmail connections and extracted obligation summaries (never raw email bodies). Manage connections in{' '}
+          <TransitionLink to="/settings?tab=integrations" className="underline underline-offset-2 text-content-secondary">
+            Integrations
+          </TransitionLink>
+          .
+        </p>
+        {emailConnections.length > 0 ? (
+          <ul className="text-xs text-content-secondary space-y-2 mb-4 border border-surface-border rounded-lg p-3 bg-surface-elevated/40">
+            {emailConnections.map((c) => (
+              <li key={c.id} className="font-mono">
+                {c.emailAddress}
+                {c.lastScanAt
+                  ? ` · last scan ${new Date(c.lastScanAt).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}`
+                  : ''}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs text-content-muted mb-4">No Gmail accounts connected.</p>
+        )}
+        <button
+          type="button"
+          onClick={() => {
+            void deleteAllEmailScanData();
+          }}
+          className="rounded-lg border border-surface-border bg-surface-base px-4 py-2 text-sm font-medium text-content-primary hover:bg-surface-elevated"
+        >
+          Delete all email-extracted data
+        </button>
+        <p className="text-[11px] text-content-muted mt-2">
+          Removes OAuth tokens and structured scan results. Does not delete bills or debts you already confirmed.
+        </p>
       </CollapsibleModule>
 
       <CollapsibleModule title="Danger Zone" icon={AlertTriangle} defaultOpen={false} className="border-[#7F1D1D]/50 bg-red-500/5">

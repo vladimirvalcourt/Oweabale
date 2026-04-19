@@ -211,7 +211,10 @@ Deno.serve(async (req: Request) => {
           : String(e);
     const status =
       msg === 'Unauthorized' || msg === 'Missing Authorization header' ? 401 : 500;
-    return new Response(JSON.stringify({ error: msg }), {
+    const safe = /unauthorized|missing authorization header|method not allowed/i.test(msg)
+      ? msg
+      : 'Request failed';
+    return new Response(JSON.stringify({ error: safe }), {
       status,
       headers: { ...corsHeaders(req.headers.get('origin')), 'Content-Type': 'application/json' },
     });

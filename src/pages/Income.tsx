@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
-import { Plus, MoreHorizontal, X, Vault, Edit2, Trash2, ArrowDownCircle, TrendingUp } from 'lucide-react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { Plus, MoreHorizontal, X, Vault, Edit2, Trash2, ArrowDownCircle, TrendingUp, PiggyBank, Save } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
+import { TransitionLink } from '../components/TransitionLink';
 import { useStore, IncomeSource } from '../store/useStore';
 import { Dialog, Menu, Transition } from '@headlessui/react';
-import { Fragment, useEffect } from 'react';
+import { Fragment } from 'react';
 import { toast } from 'sonner';
 import { guessCategory } from '../lib/categorizer';
 import { yieldForPaint } from '../lib/interaction';
+import { cn } from '../lib/utils';
 
 export default function Income() {
-  const { incomes, addIncome, editIncome, deleteIncome, recordIncomeDeposit } = useStore();
+  const { incomes, addIncome, editIncome, deleteIncome, recordIncomeDeposit, user, updateUser } = useStore();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDepositModalOpen, setIsDepositModalOpen] = useState(false);
@@ -27,6 +29,30 @@ export default function Income() {
   });
 
   const [depositAmount, setDepositAmount] = useState('');
+  const [draftReserve, setDraftReserve] = useState('30');
+  const [draftSalary, setDraftSalary] = useState('0');
+  const [planSaving, setPlanSaving] = useState(false);
+
+  useEffect(() => {
+    setDraftReserve(String(user.taxReservePercent ?? 30));
+    setDraftSalary(String(user.steadySalaryTarget ?? 0));
+  }, [user.id, user.taxReservePercent, user.steadySalaryTarget]);
+
+  const selfEmployedMonthly = useMemo(() => {
+    return incomes.reduce((sum, inc) => {
+      if (inc.status !== 'active' || inc.isTaxWithheld) return sum;
+      let m = inc.amount;
+      if (inc.frequency === 'Weekly') m *= 4.33;
+      else if (inc.frequency === 'Bi-weekly') m *= 2.16;
+      else if (inc.frequency === 'Yearly') m /= 12;
+      return sum + m;
+    }, 0);
+  }, [incomes]);
+
+  const reservePct = Math.min(100, Math.max(0, parseFloat(draftReserve) || 0));
+  const salaryNum = Math.max(0, parseFloat(draftSalary) || 0);
+  const taxBucket = selfEmployedMonthly * (reservePct / 100);
+  const leftInBusiness = selfEmployedMonthly - taxBucket - salaryNum;
 
   useEffect(() => {
     if (formData.name.length > 2 && !isEditModalOpen) {
@@ -164,6 +190,9 @@ export default function Income() {
           </div>
           <h2 className="text-lg font-sans font-semibold text-content-primary mb-2">No income yet</h2>
           <p className="text-sm text-content-tertiary max-w-md">Add salary or freelance sources to forecast cash flow and tax set-aside.</p>
+          <p className="text-xs text-content-tertiary max-w-md mt-3">
+            For gig or 1099 pay, use <strong className="text-content-secondary">Self-employed</strong> (no tax withheld) so we can suggest a reserve and steady salary once sources exist.
+          </p>
           <button 
             type="button"
             onClick={openAddModal}
@@ -204,6 +233,104 @@ export default function Income() {
                   {activeSourcesCount} <span className="text-sm text-content-tertiary font-normal font-sans">/ {incomes.length}</span>
                 </p>
               </div>
+            </div>
+          </CollapsibleModule>
+
+          <CollapsibleModule title="Steady salary & tax reserve" icon={PiggyBank} defaultOpen>
+            <div className="px-6 py-5 space-y-5 -mx-6 -my-6">
+              {selfEmployedMonthly <= 0 ? (
+                <p className="text-sm text-content-tertiary leading-relaxed">
+                  Add at least one <strong className="text-content-secondary">active</strong> income source without W-2 withholding to estimate how much to park for taxes and how much to pay yourself each month.
+                </p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="rounded-lg border border-surface-border bg-surface-elevated p-4">
+                      <p className="text-xs text-content-tertiary">Self-employed (est. / mo)</p>
+                      <p className="mt-1 text-xl font-bold font-mono tabular-nums text-content-primary data-numeric">
+                        ${selfEmployedMonthly.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-surface-border bg-surface-elevated p-4">
+                      <p className="text-xs text-content-tertiary">Tax reserve ({reservePct}%)</p>
+                      <p className="mt-1 text-xl font-bold font-mono tabular-nums text-amber-400 data-numeric">
+                        ${taxBucket.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-surface-border bg-surface-elevated p-4">
+                      <p className="text-xs text-content-tertiary">Left for ops / buffer</p>
+                      <p
+                        className={cn(
+                          'mt-1 text-xl font-bold font-mono tabular-nums data-numeric',
+                          leftInBusiness < 0 ? 'text-rose-400' : 'text-emerald-400',
+                        )}
+                      >
+                        ${leftInBusiness.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                  </div>
+                  {leftInBusiness < 0 && (
+                    <p className="text-xs text-rose-400/90">
+                      Reserve plus steady salary exceeds expected gig deposits—lower one of the targets or check income amounts.
+                    </p>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label htmlFor="income-reserve-pct" className="text-xs text-content-tertiary block mb-1">
+                        Tax reserve (% of gig gross)
+                      </label>
+                      <input
+                        id="income-reserve-pct"
+                        type="number"
+                        min={0}
+                        max={100}
+                        step={1}
+                        value={draftReserve}
+                        onChange={(e) => setDraftReserve(e.target.value)}
+                        className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm font-mono tabular-nums text-content-primary focus-app-field"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="income-steady-salary" className="text-xs text-content-tertiary block mb-1">
+                        Steady salary target ($ / month)
+                      </label>
+                      <input
+                        id="income-steady-salary"
+                        type="number"
+                        min={0}
+                        step={50}
+                        value={draftSalary}
+                        onChange={(e) => setDraftSalary(e.target.value)}
+                        className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm font-mono tabular-nums text-content-primary focus-app-field"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      disabled={planSaving}
+                      onClick={async () => {
+                        setPlanSaving(true);
+                        const r = Math.min(100, Math.max(0, parseFloat(draftReserve) || 0));
+                        const s = Math.max(0, parseFloat(draftSalary) || 0);
+                        const ok = await updateUser({ taxReservePercent: r, steadySalaryTarget: s });
+                        setPlanSaving(false);
+                        if (ok) toast.success('Pay-yourself plan saved');
+                      }}
+                      className="inline-flex items-center gap-2 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base px-4 py-2 text-sm font-sans font-semibold disabled:opacity-50 transition-colors focus-app"
+                    >
+                      <Save className="h-4 w-4 shrink-0" aria-hidden />
+                      {planSaving ? 'Saving…' : 'Save plan'}
+                    </button>
+                    <TransitionLink
+                      to="/taxes"
+                      className="text-xs text-content-tertiary hover:text-content-primary underline underline-offset-2 focus-app rounded"
+                    >
+                      Open tax planner
+                    </TransitionLink>
+                  </div>
+                </>
+              )}
             </div>
           </CollapsibleModule>
 

@@ -22,6 +22,27 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Edge auth gate (verify_jwt=false must have in-code auth)
+        run: npm run security:edge-auth-gate
+
+      - name: Edge log hygiene (no sensitive logging)
+        run: npm run security:edge-log-hygiene
+
+      - name: Edge error leakage checks
+        run: npm run security:edge-error-leakage
+
+      - name: Edge baseline hardening checks
+        run: npm run security:edge-baseline
+
+      - name: Edge CORS hardening checks
+        run: npm run security:edge-cors
+
+      - name: Supabase migration RLS gate
+        run: npm run security:migrations-rls
+
+      - name: Security readiness gate
+        run: npm run security:readiness
+
       - name: Lint (tsc + eslint)
         run: npm run lint
 
@@ -33,7 +54,6 @@ jobs:
 
       - name: Audit (high + critical)
         run: npm audit --omit=dev --audit-level=high
-        continue-on-error: true
 
   deno:
     name: Edge Functions (deno check)

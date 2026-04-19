@@ -5,7 +5,14 @@ import { toast } from 'sonner';
 import { type CategorizationRule, type CategorizationExclusion, applyCategorizationRules, merchantKey } from '../lib/categorizationRules';
 import { disconnectPlaid, syncPlaidTransactions as invokePlaidSync } from '../lib/plaid';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
+import {
+  type FinancialAlertPrefs,
+  DEFAULT_FINANCIAL_ALERT_PREFS,
+  normalizeFinancialAlertPrefs,
+} from '../lib/financialAlertPrefs';
+import { suggestPlatformFromMerchant } from '../lib/platformTag';
 export type { CategorizationRule, CategorizationExclusion };
+export type { FinancialAlertPrefs };
 
 /** Mobile capture stores under `incoming/` in `scans`; desktop uploads use `ingestion-files`. */
 async function removeIngestionStoragePath(storagePath: string) {
@@ -48,6 +55,8 @@ export interface Transaction {
   date: string;
   amount: number;
   type: 'income' | 'expense';
+  /** Gig platform or custom label (optional). */
+  platformTag?: string;
 }
 
 export interface Asset {
@@ -136,6 +145,57 @@ export interface FreelanceEntry {
   date: string;
   isVaulted: boolean;
   scouredWriteOffs?: number;
+}
+
+export interface MileageLogEntry {
+  id: string;
+  tripDate: string;
+  startLocation: string;
+  endLocation: string;
+  miles: number;
+  purpose: 'business' | 'medical' | 'charity';
+  platform: string;
+  irsRatePerMile: number;
+  deductionAmount: number;
+}
+
+export interface ClientInvoice {
+  id: string;
+  clientName: string;
+  amount: number;
+  issuedDate: string;
+  dueDate: string;
+  status: 'draft' | 'sent' | 'paid' | 'void';
+  notes: string;
+}
+
+export interface EmailConnection {
+  id: string;
+  provider: 'gmail';
+  emailAddress: string;
+  lastScanAt: string | null;
+  lastScanAfter: string | null;
+  createdAt: string;
+}
+
+export interface EmailScanFinding {
+  id: string;
+  connectionId: string;
+  providerMessageId: string;
+  subjectSnapshot: string;
+  senderDomain: string;
+  billerName: string;
+  amountDue: number | null;
+  dueDate: string | null;
+  accountLast4: string | null;
+  extractedStatus: string;
+  actionRequired: boolean;
+  extractedCategory: string;
+  confidenceScore: number;
+  suggestedDestination: 'bills' | 'debts' | 'subscriptions' | 'citations' | 'taxes';
+  urgency: 'normal' | 'high';
+  reviewStatus: 'pending' | 'confirmed' | 'skipped';
+  scannedAt: string;
 }
 
 export interface PendingIngestion {
@@ -260,6 +320,10 @@ interface AppState {
   citations: Citation[];
   deductions: Deduction[];
   freelanceEntries: FreelanceEntry[];
+  mileageLog: MileageLogEntry[];
+  clientInvoices: ClientInvoice[];
+  emailConnections: EmailConnection[];
+  emailScanFindings: EmailScanFinding[];
   notifications: Notification[];
   pendingIngestions: PendingIngestion[];
   categorizationRules: CategorizationRule[];
@@ -276,6 +340,11 @@ interface AppState {
     theme?: string;
     taxState?: string;
     taxRate?: number;
+    /** % of self-employed gross to set aside for taxes (planning). */
+    taxReservePercent?: number;
+    /** Target monthly pay-yourself transfer (planning). */
+    steadySalaryTarget?: number;
+    financialAlertPrefs: FinancialAlertPrefs;
     phone?: string;
     timezone?: string;
     language?: string;
@@ -306,6 +375,7 @@ interface AppState {
   disconnectBank: () => Promise<void>;
   syncPlaidTransactions: (opts?: { quiet?: boolean }) => Promise<boolean>;
   addTransaction: (transaction: Omit<Transaction, 'id'>, opts?: { allowBudgetOverride?: boolean }) => Promise<boolean>;
+  updateTransaction: (id: string, patch: Partial<Pick<Transaction, 'category' | 'platformTag' | 'name'>>) => Promise<boolean>;
   lastBudgetGuardrail: {
     type: 'soft' | 'hard';
     category: string;
@@ -352,6 +422,26 @@ interface AppState {
   addFreelanceEntry: (entry: Omit<FreelanceEntry, 'id'>) => Promise<boolean>;
   toggleFreelanceVault: (id: string) => Promise<void>;
   deleteFreelanceEntry: (id: string) => Promise<void>;
+  addMileageLogEntry: (entry: Omit<MileageLogEntry, 'id' | 'deductionAmount'> & { deductionAmount?: number }) => Promise<boolean>;
+  deleteMileageLogEntry: (id: string) => Promise<void>;
+  addClientInvoice: (inv: Omit<ClientInvoice, 'id'>) => Promise<boolean>;
+  updateClientInvoice: (id: string, patch: Partial<ClientInvoice>) => Promise<boolean>;
+  deleteClientInvoice: (id: string) => Promise<void>;
+  /** Gmail OAuth + scan (Edge Functions). */
+  runEmailIntelligenceScan: () => Promise<{ ok: boolean; message?: string }>;
+  disconnectGmail: (connectionId?: string) => Promise<boolean>;
+  deleteAllEmailScanData: () => Promise<boolean>;
+  confirmEmailScanFinding: (
+    id: string,
+    edits?: Partial<{
+      billerName: string;
+      amountDue: number | null;
+      dueDate: string | null;
+      suggestedDestination: EmailScanFinding['suggestedDestination'];
+    }>,
+  ) => Promise<boolean>;
+  skipEmailScanFinding: (id: string) => Promise<boolean>;
+  skipAllPendingEmailScanFindings: () => Promise<boolean>;
   updateUser: (user: Partial<AppState['user']>) => Promise<boolean>;
   signOut: () => Promise<void>;
   clearLocalData: () => void;
@@ -421,6 +511,10 @@ const initialData = {
   citations: [],
   deductions: [],
   freelanceEntries: [],
+  mileageLog: [],
+  clientInvoices: [],
+  emailConnections: [],
+  emailScanFindings: [],
   user: {
     id: '',
     firstName: '',
@@ -430,8 +524,11 @@ const initialData = {
     theme: 'Dark',
     taxState: '',
     taxRate: 0,
+    taxReservePercent: 30,
+    steadySalaryTarget: 0,
+    financialAlertPrefs: DEFAULT_FINANCIAL_ALERT_PREFS,
     phone: '',
-    timezone: 'Eastern Time (ET)',
+    timezone: 'America/New_York',
     language: 'English (US)',
     hasCompletedOnboarding: false,
     isAdmin: false,
@@ -597,6 +694,12 @@ export const useStore = create<AppState>()(
       if (!userId) { toast.error('You must be signed in to save transactions.'); return false; }
       
       let newId = crypto.randomUUID();
+      let platformTag = '';
+      if (transaction.platformTag !== undefined) {
+        platformTag = transaction.platformTag.trim();
+      } else {
+        platformTag = suggestPlatformFromMerchant(transaction.name);
+      }
       const { data, error } = await supabase
         .from('transactions')
         .insert({ 
@@ -605,6 +708,7 @@ export const useStore = create<AppState>()(
           date: transaction.date,
           amount: transaction.amount,
           type: transaction.type,
+          platform_tag: platformTag,
           user_id: userId 
         })
         .select('id')
@@ -614,7 +718,10 @@ export const useStore = create<AppState>()(
       if (data?.id) newId = data.id;
 
       set((state) => ({
-        transactions: [{ ...transaction, id: newId }, ...state.transactions].slice(0, 100)
+        transactions: [
+          { ...transaction, id: newId, platformTag: platformTag ? platformTag : undefined },
+          ...state.transactions,
+        ].slice(0, 100)
       }));
       if (autoCategory && autoCategory !== originalCategory) {
         set({
@@ -633,6 +740,36 @@ export const useStore = create<AppState>()(
     } catch (error) {
       console.error('[addTransaction] Sync failed:', error);
       toast.error('Failed to save transaction to database.');
+      return false;
+    }
+  },
+  updateTransaction: async (id, patch) => {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) {
+        toast.error('You must be signed in.');
+        return false;
+      }
+      const db: Record<string, unknown> = {};
+      if (patch.name !== undefined) db.name = patch.name;
+      if (patch.category !== undefined) db.category = patch.category;
+      if (patch.platformTag !== undefined) db.platform_tag = patch.platformTag.trim();
+      if (Object.keys(db).length === 0) return true;
+      const { error } = await supabase.from('transactions').update(db).eq('id', id).eq('user_id', userId);
+      if (error) {
+        console.error('[updateTransaction]', error.message);
+        toast.error('Failed to update transaction.');
+        return false;
+      }
+      set((state) => ({
+        transactions: state.transactions.map((t) =>
+          t.id === id ? { ...t, ...patch, platformTag: patch.platformTag !== undefined ? patch.platformTag.trim() || undefined : t.platformTag } : t,
+        ),
+      }));
+      return true;
+    } catch (e) {
+      console.error('[updateTransaction]', e);
+      toast.error('Failed to update transaction.');
       return false;
     }
   },
@@ -751,6 +888,7 @@ export const useStore = create<AppState>()(
           date: newTransaction.date,
           amount: newTransaction.amount,
           type: newTransaction.type,
+          platform_tag: '',
           user_id: userId,
         });
       }
@@ -849,7 +987,7 @@ export const useStore = create<AppState>()(
       type: 'expense',
     };
     if (userId) {
-      await supabase.from('transactions').insert({ name: newTx.name, category: newTx.category, date: newTx.date, amount: newTx.amount, type: newTx.type, user_id: userId });
+      await supabase.from('transactions').insert({ name: newTx.name, category: newTx.category, date: newTx.date, amount: newTx.amount, type: newTx.type, platform_tag: '', user_id: userId });
     }
     set((state) => ({
       debts: state.debts.map((d) => d.id === id ? { ...d, remaining: newRemaining, paid: newPaid } : d),
@@ -1159,7 +1297,7 @@ export const useStore = create<AppState>()(
         amount: depositAmount,
         type: 'income',
       };
-      const { error } = await supabase.from('transactions').insert({ name: newTx.name, category: newTx.category, date: newTx.date, amount: newTx.amount, type: newTx.type, user_id: userId });
+      const { error } = await supabase.from('transactions').insert({ name: newTx.name, category: newTx.category, date: newTx.date, amount: newTx.amount, type: newTx.type, platform_tag: '', user_id: userId });
       if (error) { toast.error('Failed to record deposit'); return false; }
       set((state) => ({ transactions: [newTx, ...state.transactions].slice(0, 50) }));
       return true;
@@ -1363,6 +1501,18 @@ export const useStore = create<AppState>()(
     if (user.language !== undefined) patch.language = user.language;
     if (user.taxState !== undefined) patch.tax_state = user.taxState;
     if (user.taxRate !== undefined)  patch.tax_rate = user.taxRate;
+    if (user.taxReservePercent !== undefined) patch.tax_reserve_percent = user.taxReservePercent;
+    if (user.steadySalaryTarget !== undefined) patch.steady_salary_target = user.steadySalaryTarget;
+    if (user.financialAlertPrefs !== undefined) {
+      const fp = user.financialAlertPrefs;
+      patch.alert_preferences = {
+        bill_due_days: fp.billDueDays,
+        over_budget: fp.overBudget,
+        low_cash: fp.lowCash,
+        debt_due: fp.debtDue,
+        invoice_due: fp.invoiceDue,
+      };
+    }
     if (user.hasCompletedOnboarding !== undefined) patch.has_completed_onboarding = user.hasCompletedOnboarding;
 
     if (Object.keys(patch).length > 0) {
@@ -1420,6 +1570,383 @@ export const useStore = create<AppState>()(
     }
     set((state) => ({ freelanceEntries: state.freelanceEntries.filter((e) => e.id !== id) }));
   },
+  addMileageLogEntry: async (entry) => {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) {
+        toast.error('You must be signed in to save mileage.');
+        return false;
+      }
+      const miles = Number(entry.miles);
+      const rate = Number(entry.irsRatePerMile);
+      if (!Number.isFinite(miles) || miles <= 0 || miles > 99999) {
+        toast.error('Enter a valid mileage amount.');
+        return false;
+      }
+      if (!Number.isFinite(rate) || rate < 0) {
+        toast.error('Enter a valid IRS rate per mile.');
+        return false;
+      }
+      const deductionAmount =
+        entry.deductionAmount !== undefined
+          ? Math.round(Number(entry.deductionAmount) * 100) / 100
+          : Math.round(miles * rate * 100) / 100;
+
+      let newId = crypto.randomUUID();
+      const { data, error } = await supabase
+        .from('mileage_log')
+        .insert({
+          user_id: userId,
+          trip_date: entry.tripDate,
+          start_location: entry.startLocation,
+          end_location: entry.endLocation,
+          miles,
+          purpose: entry.purpose,
+          platform: entry.platform ?? '',
+          irs_rate_per_mile: rate,
+          deduction_amount: deductionAmount,
+        })
+        .select('id')
+        .single();
+      if (error) {
+        console.error('[addMileageLogEntry]', error.message);
+        toast.error('Failed to save mileage entry.');
+        return false;
+      }
+      if (data?.id) newId = data.id;
+      set((state) => ({
+        mileageLog: [
+          ...state.mileageLog,
+          {
+            id: newId,
+            tripDate: entry.tripDate,
+            startLocation: entry.startLocation,
+            endLocation: entry.endLocation,
+            miles,
+            purpose: entry.purpose,
+            platform: entry.platform ?? '',
+            irsRatePerMile: rate,
+            deductionAmount,
+          },
+        ],
+      }));
+      return true;
+    } catch (err) {
+      console.error('[addMileageLogEntry] failed:', err);
+      toast.error('Failed to save mileage entry.');
+      return false;
+    }
+  },
+  deleteMileageLogEntry: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      await supabase.from('mileage_log').delete().eq('id', id).eq('user_id', userId);
+    }
+    set((state) => ({ mileageLog: state.mileageLog.filter((e) => e.id !== id) }));
+  },
+  addClientInvoice: async (inv) => {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) {
+        toast.error('You must be signed in.');
+        return false;
+      }
+      let newId = crypto.randomUUID();
+      const { data, error } = await supabase
+        .from('client_invoices')
+        .insert({
+          user_id: userId,
+          client_name: inv.clientName,
+          amount: inv.amount,
+          issued_date: inv.issuedDate,
+          due_date: inv.dueDate,
+          status: inv.status,
+          notes: inv.notes ?? '',
+        })
+        .select('id')
+        .single();
+      if (error) {
+        console.error('[addClientInvoice]', error.message);
+        toast.error('Failed to save invoice.');
+        return false;
+      }
+      if (data?.id) newId = data.id;
+      set((state) => ({
+        clientInvoices: [
+          ...state.clientInvoices,
+          { ...inv, id: newId },
+        ],
+      }));
+      return true;
+    } catch (e) {
+      console.error('[addClientInvoice]', e);
+      toast.error('Failed to save invoice.');
+      return false;
+    }
+  },
+  updateClientInvoice: async (id, patch) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return false;
+    const db: Record<string, unknown> = {};
+    if (patch.clientName !== undefined) db.client_name = patch.clientName;
+    if (patch.amount !== undefined) db.amount = patch.amount;
+    if (patch.issuedDate !== undefined) db.issued_date = patch.issuedDate;
+    if (patch.dueDate !== undefined) db.due_date = patch.dueDate;
+    if (patch.status !== undefined) db.status = patch.status;
+    if (patch.notes !== undefined) db.notes = patch.notes;
+    if (Object.keys(db).length > 0) {
+      const { error } = await supabase.from('client_invoices').update(db).eq('id', id).eq('user_id', userId);
+      if (error) {
+        toast.error('Failed to update invoice.');
+        return false;
+      }
+    }
+    set((state) => ({
+      clientInvoices: state.clientInvoices.map((c) => (c.id === id ? { ...c, ...patch } : c)),
+    }));
+    return true;
+  },
+  deleteClientInvoice: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (userId) {
+      await supabase.from('client_invoices').delete().eq('id', id).eq('user_id', userId);
+    }
+    set((state) => ({ clientInvoices: state.clientInvoices.filter((c) => c.id !== id) }));
+  },
+
+  runEmailIntelligenceScan: async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        return { ok: false, message: 'Sign in to scan email.' };
+      }
+      const { data, error } = await supabase.functions.invoke('email-intelligence-scan', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+        body: {},
+      });
+      if (error) {
+        console.error('[runEmailIntelligenceScan]', error.message);
+        return { ok: false, message: error.message };
+      }
+      const payload = data as { ok?: boolean; error?: string };
+      if (payload?.error) return { ok: false, message: payload.error };
+      void get().fetchData(undefined, { background: true });
+      return { ok: true };
+    } catch (e) {
+      console.error('[runEmailIntelligenceScan]', e);
+      return { ok: false, message: e instanceof Error ? e.message : 'Scan failed' };
+    }
+  },
+
+  disconnectGmail: async (connectionId) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        toast.error('Sign in to disconnect.');
+        return false;
+      }
+      const { error } = await supabase.functions.invoke('gmail-disconnect', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session.access_token}` },
+        body: connectionId ? { connection_id: connectionId } : {},
+      });
+      if (error) {
+        toast.error('Could not disconnect Gmail.');
+        return false;
+      }
+      set((s) => ({
+        emailConnections: connectionId
+          ? s.emailConnections.filter((c) => c.id !== connectionId)
+          : [],
+        emailScanFindings: connectionId
+          ? s.emailScanFindings.filter((f) => f.connectionId !== connectionId)
+          : [],
+      }));
+      void get().fetchData(undefined, { background: true });
+      toast.success('Email disconnected.');
+      return true;
+    } catch (e) {
+      console.error('[disconnectGmail]', e);
+      toast.error('Disconnect failed.');
+      return false;
+    }
+  },
+
+  deleteAllEmailScanData: async () => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return false;
+    await supabase.from('email_connections').delete().eq('user_id', userId);
+    set((s) => ({ ...s, emailConnections: [], emailScanFindings: [] }));
+    toast.success('Email scan data removed.');
+    return true;
+  },
+
+  confirmEmailScanFinding: async (id, edits) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    const finding = get().emailScanFindings.find((f) => f.id === id && f.reviewStatus === 'pending');
+    if (!userId || !finding) {
+      toast.error('Item not found or already processed.');
+      return false;
+    }
+    const biller = (edits?.billerName ?? finding.billerName).trim() || 'Unknown';
+    const amt = edits?.amountDue !== undefined ? edits!.amountDue : finding.amountDue;
+    const fallbackDue = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
+    let due: string;
+    if (edits?.dueDate !== undefined) {
+      const d = edits.dueDate?.trim();
+      due = d && d.length > 0 ? d : fallbackDue;
+    } else {
+      due = finding.dueDate?.trim() || fallbackDue;
+    }
+    const dest =
+      edits?.suggestedDestination !== undefined ? edits!.suggestedDestination : finding.suggestedDestination;
+
+    const billStatus: Bill['status'] =
+      finding.extractedStatus === 'overdue' ||
+      finding.extractedStatus === 'final_notice' ||
+      finding.extractedStatus === 'collections'
+        ? 'overdue'
+        : 'upcoming';
+
+    let ok = false;
+    if (dest === 'bills') {
+      let category = 'Utilities';
+      if (finding.extractedCategory === 'insurance') category = 'Insurance';
+      else if (finding.extractedCategory === 'tax') category = 'Taxes';
+      else if (finding.extractedCategory === 'subscription') category = 'Subscriptions';
+      else if (finding.extractedCategory === 'loan' || finding.extractedCategory === 'debt') {
+        category = 'Loans';
+      } else if (
+        finding.subjectSnapshot.toLowerCase().includes('afterpay') ||
+        finding.subjectSnapshot.toLowerCase().includes('klarna') ||
+        finding.subjectSnapshot.toLowerCase().includes('affirm') ||
+        finding.extractedCategory === 'bill'
+      ) {
+        const bnpl =
+          /afterpay|klarna|affirm|sezzle|zip/i.test(finding.subjectSnapshot + finding.senderDomain);
+        if (bnpl) category = 'BNPL';
+      }
+      ok = await get().addBill({
+        biller,
+        amount: amt ?? 0,
+        category,
+        dueDate: due,
+        frequency: 'Monthly',
+        status: billStatus,
+        autoPay: false,
+      });
+    } else if (dest === 'debts') {
+      const isColl =
+        finding.extractedStatus === 'collections' || finding.subjectSnapshot.toLowerCase().includes('collection');
+      const remaining = amt ?? 0;
+      ok = await get().addDebt({
+        name: isColl ? `[Collections] ${biller}` : biller,
+        type: isColl ? 'Collections' : 'Loan',
+        apr: 0,
+        remaining: Math.max(remaining, 0.01),
+        minPayment: Math.max(25, Math.min(remaining || 100, (remaining || 100) * 0.02)),
+        paid: 0,
+        paymentDueDate: due,
+      });
+    } else if (dest === 'subscriptions') {
+      const subs = get().subscriptions;
+      const match = subs.find(
+        (s) =>
+          s.name.toLowerCase().includes(biller.slice(0, 6).toLowerCase()) ||
+          biller.toLowerCase().includes(s.name.toLowerCase().slice(0, 5)),
+      );
+      if (match) {
+        ok = await get().editSubscription(match.id, {
+          amount: amt ?? match.amount,
+          nextBillingDate: due,
+        });
+      } else {
+        ok = await get().addSubscription({
+          name: biller,
+          amount: amt ?? 0,
+          frequency: 'Monthly',
+          nextBillingDate: due,
+          status: 'active',
+        });
+      }
+    } else if (dest === 'citations') {
+      const dueD = new Date(due.includes('T') ? due : `${due}T12:00:00`);
+      const daysLeft = Number.isNaN(dueD.getTime())
+        ? 14
+        : Math.ceil((dueD.getTime() - Date.now()) / 86400000);
+      ok = await get().addCitation({
+        type: 'Toll / citation',
+        jurisdiction: finding.senderDomain || 'Unknown',
+        daysLeft,
+        amount: amt ?? 0,
+        penaltyFee: 0,
+        date: due,
+        citationNumber: finding.accountLast4 || '—',
+        paymentUrl: '',
+        status: 'open',
+      });
+    } else if (dest === 'taxes') {
+      ok = await get().addBill({
+        biller,
+        amount: amt ?? 0,
+        category: 'Taxes',
+        dueDate: due,
+        frequency: 'Yearly',
+        status: billStatus,
+        autoPay: false,
+      });
+      if (ok) {
+        get().addNotification({
+          title: 'Tax notice from email',
+          message: `Review "${biller}" on Taxes — due ${due}.`,
+          type: 'warning',
+        });
+      }
+    }
+
+    if (!ok) {
+      toast.error('Could not add this item. Check amounts and try Edit.');
+      return false;
+    }
+    await supabase.from('email_scan_findings').update({ review_status: 'confirmed' }).eq('id', id).eq('user_id', userId);
+    set((state) => ({
+      emailScanFindings: state.emailScanFindings.map((f) =>
+        f.id === id ? { ...f, reviewStatus: 'confirmed' as const } : f,
+      ),
+    }));
+    toast.success('Added to Oweable');
+    return true;
+  },
+
+  skipEmailScanFinding: async (id) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return false;
+    await supabase.from('email_scan_findings').update({ review_status: 'skipped' }).eq('id', id).eq('user_id', userId);
+    set((state) => ({
+      emailScanFindings: state.emailScanFindings.map((f) =>
+        f.id === id ? { ...f, reviewStatus: 'skipped' as const } : f,
+      ),
+    }));
+    return true;
+  },
+
+  skipAllPendingEmailScanFindings: async () => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return false;
+    await supabase
+      .from('email_scan_findings')
+      .update({ review_status: 'skipped' })
+      .eq('user_id', userId)
+      .eq('review_status', 'pending');
+    set((state) => ({
+      emailScanFindings: state.emailScanFindings.map((f) =>
+        f.reviewStatus === 'pending' ? { ...f, reviewStatus: 'skipped' as const } : f,
+      ),
+    }));
+    return true;
+  },
+
   signOut: async () => {
     await supabase.auth.signOut();
     set({ ...initialData });
@@ -1437,8 +1964,8 @@ export const useStore = create<AppState>()(
       const tables = [
         'bills', 'debts', 'transactions', 'assets', 'subscriptions',
         'goals', 'incomes', 'budgets', 'categories', 'citations',
-        'deductions', 'freelance_entries', 'pending_ingestions', 'credit_fixes', 'categorization_exclusions',
-        'investment_accounts', 'insurance_policies'
+        'deductions', 'freelance_entries', 'mileage_log', 'client_invoices', 'pending_ingestions', 'credit_fixes', 'categorization_exclusions',
+        'investment_accounts', 'insurance_policies', 'email_connections',
       ];
 
       await Promise.all(tables.map(table =>
@@ -1501,7 +2028,10 @@ export const useStore = create<AppState>()(
         supabase.from('citations').delete().eq('user_id', userId),
         supabase.from('deductions').delete().eq('user_id', userId),
         supabase.from('freelance_entries').delete().eq('user_id', userId),
+        supabase.from('mileage_log').delete().eq('user_id', userId),
+        supabase.from('client_invoices').delete().eq('user_id', userId),
         supabase.from('categorization_exclusions').delete().eq('user_id', userId),
+        supabase.from('email_connections').delete().eq('user_id', userId),
       ]);
 
       // Delete the auth.users record via a privileged Postgres RPC.
@@ -1988,19 +2518,22 @@ export const useStore = create<AppState>()(
 
     if (item.type === 'transaction') {
       if (!requirePositiveAmount()) return false;
+      const pt = suggestPlatformFromMerchant(merchantName);
       const newTransaction: Transaction = {
         id: commonId,
         name: merchantName,
         amount: amt,
         category: data.category || autoCategory,
         date: data.date || new Date().toISOString().split('T')[0],
-        type: 'expense'
+        type: 'expense',
+        platformTag: pt || undefined,
       };
       if (userId) {
         const { error } = await supabase.from('transactions').insert({
           name: newTransaction.name, category: newTransaction.category,
           date: newTransaction.date, amount: newTransaction.amount,
-          type: newTransaction.type, user_id: userId,
+          type: newTransaction.type, platform_tag: pt,
+          user_id: userId,
         });
         if (error) { toast.error('Failed to save transaction. Please try again.'); return false; }
       }
@@ -2158,6 +2691,12 @@ export const useStore = create<AppState>()(
       supabase.from('citations').select('*').eq('user_id', resolvedUserId),
       supabase.from('deductions').select('*').eq('user_id', resolvedUserId),
       supabase.from('freelance_entries').select('*').eq('user_id', resolvedUserId),
+      supabase
+        .from('mileage_log')
+        .select('*')
+        .eq('user_id', resolvedUserId)
+        .order('trip_date', { ascending: false }),
+      supabase.from('client_invoices').select('*').eq('user_id', resolvedUserId).order('due_date', { ascending: false }),
       supabase.from('pending_ingestions').select('*').eq('user_id', resolvedUserId),
       supabase.from('categorization_rules').select('*').eq('user_id', resolvedUserId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
       supabase.from('categorization_exclusions').select('*').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
@@ -2168,6 +2707,11 @@ export const useStore = create<AppState>()(
       supabase.from('credit_factors').select('*').eq('user_id', resolvedUserId),
       supabase.from('investment_accounts').select('id,name,type,institution,balance,notes,last_updated').eq('user_id', resolvedUserId),
       supabase.from('insurance_policies').select('id,type,provider,premium,frequency,coverage_amount,deductible,expiration_date,status,notes').eq('user_id', resolvedUserId),
+      supabase
+        .from('email_connections')
+        .select('id,provider,email_address,created_at,last_scan_at,last_scan_after')
+        .eq('user_id', resolvedUserId),
+      supabase.from('email_scan_findings').select('*').eq('user_id', resolvedUserId).order('scanned_at', { ascending: false }),
     ]);
 
     try {
@@ -2236,6 +2780,11 @@ export const useStore = create<AppState>()(
           date: t.date as string,
           amount: t.amount as number,
           type: (t.type ?? 'expense') as Transaction['type'],
+          platformTag: (() => {
+            const pt = t.platform_tag ?? t.platformTag;
+            const s = typeof pt === 'string' ? pt.trim() : '';
+            return s || undefined;
+          })(),
         })),
         assets: (assets || []).map((a: Record<string, unknown>) => ({
           id: a.id as string,
@@ -2288,11 +2837,18 @@ export const useStore = create<AppState>()(
           avatar: profile.avatar ?? '',
           theme: profile.theme ?? 'Dark',
           phone: profile.phone ?? '',
-          timezone: profile.timezone ?? 'Eastern Time (ET)',
+          timezone: profile.timezone ?? 'America/New_York',
           language: profile.language || 'English (US)',
           hasCompletedOnboarding: profile.has_completed_onboarding === true,
           taxState: profile.tax_state ?? '',
           taxRate: profile.tax_rate ?? 0,
+          taxReservePercent:
+            (profile as { tax_reserve_percent?: number }).tax_reserve_percent ?? 30,
+          steadySalaryTarget:
+            (profile as { steady_salary_target?: number }).steady_salary_target ?? 0,
+          financialAlertPrefs: normalizeFinancialAlertPrefs(
+            (profile as { alert_preferences?: unknown }).alert_preferences,
+          ),
           isAdmin: profile.is_admin === true,
         } : { ...get().user, id: resolvedUserId },
       });
@@ -2314,6 +2870,8 @@ export const useStore = create<AppState>()(
           { data: citations },
           { data: deductions },
           { data: freelanceEntries },
+          { data: mileageLogRows },
+          { data: clientInvoicesRows },
           { data: pendingIngestions },
           { data: categorizationRules },
           { data: categorizationExclusions },
@@ -2324,6 +2882,8 @@ export const useStore = create<AppState>()(
           { data: creditFactors },
           { data: investmentAccountsData },
           { data: insurancePoliciesData },
+          { data: emailConnectionsRows },
+          { data: emailScanFindingsRows },
         ] = await phase2Promise;
 
         set({
@@ -2382,6 +2942,30 @@ export const useStore = create<AppState>()(
             date: f.date as string,
             isVaulted: (f.is_vaulted ?? f.isVaulted ?? false) as boolean,
             scouredWriteOffs: (f.scoured_write_offs ?? f.scouredWriteOffs ?? 0) as number,
+          })),
+          mileageLog: (mileageLogRows || []).map((m: Record<string, unknown>) => {
+            const rawDate = m.trip_date as string;
+            const tripDate = typeof rawDate === 'string' ? rawDate.slice(0, 10) : '';
+            return {
+              id: m.id as string,
+              tripDate,
+              startLocation: String(m.start_location ?? ''),
+              endLocation: String(m.end_location ?? ''),
+              miles: Number(m.miles) || 0,
+              purpose: m.purpose as MileageLogEntry['purpose'],
+              platform: String(m.platform ?? ''),
+              irsRatePerMile: Number(m.irs_rate_per_mile) || 0,
+              deductionAmount: Number(m.deduction_amount) || 0,
+            };
+          }),
+          clientInvoices: (clientInvoicesRows || []).map((r: Record<string, unknown>) => ({
+            id: r.id as string,
+            clientName: String(r.client_name ?? ''),
+            amount: Number(r.amount) || 0,
+            issuedDate: typeof r.issued_date === 'string' ? r.issued_date.slice(0, 10) : '',
+            dueDate: typeof r.due_date === 'string' ? r.due_date.slice(0, 10) : '',
+            status: r.status as ClientInvoice['status'],
+            notes: String(r.notes ?? ''),
           })),
           pendingIngestions: (pendingIngestions || []).map((pi: Record<string, any>) => ({
             id: pi.id,
@@ -2467,6 +3051,39 @@ export const useStore = create<AppState>()(
             status: (p.status as InsurancePolicy['status']) ?? 'active',
             notes: (p.notes as string) ?? '',
           })),
+          emailConnections: (emailConnectionsRows || []).map((r: Record<string, unknown>) => ({
+            id: r.id as string,
+            provider: 'gmail' as const,
+            emailAddress: String(r.email_address ?? ''),
+            lastScanAt: r.last_scan_at != null ? String(r.last_scan_at) : null,
+            lastScanAfter: r.last_scan_after != null ? String(r.last_scan_after).slice(0, 10) : null,
+            createdAt: String(r.created_at ?? ''),
+          })),
+          emailScanFindings: (emailScanFindingsRows || []).map((r: Record<string, unknown>) => ({
+            id: r.id as string,
+            connectionId: String(r.connection_id ?? ''),
+            providerMessageId: String(r.provider_message_id ?? ''),
+            subjectSnapshot: String(r.subject_snapshot ?? ''),
+            senderDomain: String(r.sender_domain ?? ''),
+            billerName: String(r.biller_name ?? ''),
+            amountDue: r.amount_due != null ? Number(r.amount_due) : null,
+            dueDate: r.due_date != null ? String(r.due_date).slice(0, 10) : null,
+            accountLast4: r.account_last4 != null ? String(r.account_last4) : null,
+            extractedStatus: String(r.extracted_status ?? ''),
+            actionRequired: Boolean(r.action_required),
+            extractedCategory: String(r.extracted_category ?? ''),
+            confidenceScore: Number(r.confidence_score) || 0,
+            suggestedDestination: (['bills', 'debts', 'subscriptions', 'citations', 'taxes'].includes(
+              String(r.suggested_destination),
+            )
+              ? r.suggested_destination
+              : 'bills') as EmailScanFinding['suggestedDestination'],
+            urgency: r.urgency === 'high' ? 'high' : 'normal',
+            reviewStatus: (['pending', 'confirmed', 'skipped'].includes(String(r.review_status))
+              ? r.review_status
+              : 'pending') as EmailScanFinding['reviewStatus'],
+            scannedAt: String(r.scanned_at ?? ''),
+          })),
         });
 
         phase2RecordCount =
@@ -2476,6 +3093,8 @@ export const useStore = create<AppState>()(
           (citations?.length ?? 0) +
           (deductions?.length ?? 0) +
           (freelanceEntries?.length ?? 0) +
+          (mileageLogRows?.length ?? 0) +
+          (clientInvoicesRows?.length ?? 0) +
           (pendingIngestions?.length ?? 0) +
           (categorizationRules?.length ?? 0) +
           (creditFixes?.length ?? 0) +

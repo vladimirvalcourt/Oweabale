@@ -112,28 +112,6 @@ export interface AdminBroadcastRow {
   created_at: string;
 }
 
-export interface AdminChatMessage {
-  id: string;
-  user_id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  mode: 'advisor' | 'academy';
-  created_at: string;
-  userEmail: string;
-}
-
-export interface AdminAiLearningProfile {
-  user_id: string;
-  familiarity_level: 'beginner' | 'intermediate' | 'advanced';
-  preferred_style: 'plain_language' | 'step_by_step' | 'concise';
-  topics_covered: string[];
-  recent_focus: string[];
-  total_lessons: number;
-  total_messages: number;
-  updated_at: string;
-  userEmail: string;
-}
-
 export interface AdminInvestmentAccount {
   id: string;
   user_id: string;

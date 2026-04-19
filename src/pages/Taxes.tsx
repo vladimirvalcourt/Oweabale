@@ -1,8 +1,52 @@
-import React, { useMemo, useState } from 'react';
-import { useStore } from '../store/useStore';
-import { Calculator, Hash, AlertCircle, Info, Clock, Plus, Trash2, ChevronRight, Map, ShieldAlert, Zap, ExternalLink } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { useStore, type MileageLogEntry } from '../store/useStore';
+import {
+  Calculator,
+  Clock,
+  Plus,
+  Trash2,
+  Map,
+  ShieldAlert,
+  Zap,
+  ExternalLink,
+  Download,
+  ListChecks,
+  BookOpen,
+  Landmark,
+} from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
+import { TransitionLink } from '../components/TransitionLink';
 import { toast } from 'sonner';
+import { cn } from '../lib/utils';
+
+function defaultIrsRateForPurpose(purpose: MileageLogEntry['purpose']): number {
+  switch (purpose) {
+    case 'business':
+      return 0.7;
+    case 'medical':
+      return 0.21;
+    case 'charity':
+      return 0.14;
+    default:
+      return 0.7;
+  }
+}
+
+function quarterKeyFromTripDate(dateStr: string): string {
+  const d = new Date(dateStr.includes('T') ? dateStr : `${dateStr}T12:00:00`);
+  if (Number.isNaN(d.getTime())) return '';
+  const y = d.getFullYear();
+  const m = d.getMonth();
+  const q = m < 3 ? 1 : m < 6 ? 2 : m < 9 ? 3 : 4;
+  return `${y}-Q${q}`;
+}
+
+function escapeCsvCell(v: unknown): string {
+  const s = String(v ?? '');
+  if (/[",\r\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
 
 // Common State Tax Rates for Gig Workers (Estimates)
 export const STATE_TAX_MAP: Record<string, { name: string; rate: number }> = {
@@ -18,10 +62,41 @@ export const STATE_TAX_MAP: Record<string, { name: string; rate: number }> = {
 };
 
 export default function Taxes() {
-  const { incomes, deductions, addDeduction, deleteDeduction, user, setTaxSettings } = useStore();
+  const {
+    incomes,
+    deductions,
+    addDeduction,
+    deleteDeduction,
+    user,
+    setTaxSettings,
+    mileageLog,
+    addMileageLogEntry,
+    deleteMileageLogEntry,
+  } = useStore();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [taxTab, setTaxTab] = useState<'overview' | 'mileage'>('overview');
+
+  const applyTaxTab = (tab: 'overview' | 'mileage') => {
+    setTaxTab(tab);
+    if (tab === 'mileage') setSearchParams({ view: 'mileage' }, { replace: true });
+    else setSearchParams({}, { replace: true });
+  };
+
+  useEffect(() => {
+    if (searchParams.get('view') === 'mileage') setTaxTab('mileage');
+  }, [searchParams]);
   const [filingStatus, setFilingStatus] = useState<'single' | 'married'>('single');
   const [newDeduction, setNewDeduction] = useState({ name: '', category: '', amount: '' });
   const [showAddForm, setShowAddForm] = useState(false);
+  const [mileageForm, setMileageForm] = useState({
+    tripDate: new Date().toISOString().slice(0, 10),
+    startLocation: '',
+    endLocation: '',
+    miles: '',
+    purpose: 'business' as MileageLogEntry['purpose'],
+    platform: '',
+    irsRatePerMile: String(defaultIrsRateForPurpose('business')),
+  });
 
   const taxState = user.taxState || 'NY';
   const stateRate = user.taxRate ?? 6.25;
@@ -97,6 +172,72 @@ export default function Taxes() {
   const stateTax = incomeStats.total * (stateRate / 100);
   const totalLiability = fedTax + seTax + stateTax;
 
+  const ytdMileageEntries = useMemo(
+    () => mileageLog.filter((e) => e.tripDate.startsWith(String(currentYear))),
+    [mileageLog, currentYear],
+  );
+  const totalMileageDeductionYtd = useMemo(
+    () => ytdMileageEntries.reduce((s, e) => s + e.deductionAmount, 0),
+    [ytdMileageEntries],
+  );
+  const mileageByQuarter = useMemo(() => {
+    const m: Record<string, { miles: number; deduction: number }> = {};
+    for (const e of ytdMileageEntries) {
+      const k = quarterKeyFromTripDate(e.tripDate);
+      if (!k.startsWith(String(currentYear))) continue;
+      if (!m[k]) m[k] = { miles: 0, deduction: 0 };
+      m[k].miles += e.miles;
+      m[k].deduction += e.deductionAmount;
+    }
+    return m;
+  }, [ytdMileageEntries, currentYear]);
+
+  const approxFedMarginalRate = incomeStats.total > 0 ? Math.min(0.37, fedTax / incomeStats.total) : 0;
+  const estFedReductionFromMileage = totalMileageDeductionYtd * approxFedMarginalRate;
+
+  const exportMileageCsv = () => {
+    const headers = [
+      'tripDate',
+      'startLocation',
+      'endLocation',
+      'miles',
+      'purpose',
+      'platform',
+      'irsRatePerMile',
+      'deductionAmount',
+    ];
+    const lines = [headers.join(',')];
+    const sorted = [...mileageLog].sort((a, b) => (a.tripDate < b.tripDate ? 1 : -1));
+    for (const row of sorted) {
+      lines.push(
+        headers
+          .map((h) =>
+            escapeCsvCell(
+              row[h as keyof MileageLogEntry] as unknown,
+            ),
+          )
+          .join(','),
+      );
+    }
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `oweable-mileage-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast.success('Mileage log exported.');
+  };
+
+  const quarterCards = [
+    { key: `${currentYear}-Q1`, label: 'Q1' },
+    { key: `${currentYear}-Q2`, label: 'Q2' },
+    { key: `${currentYear}-Q3`, label: 'Q3' },
+    { key: `${currentYear}-Q4`, label: 'Q4' },
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -104,7 +245,38 @@ export default function Taxes() {
           <h1 className="flex items-center gap-3 text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">
             <ShieldAlert className="h-7 w-7 shrink-0 text-content-secondary" aria-hidden /> Freelance tax guide
           </h1>
-          <p className="mt-1 text-sm font-medium text-content-secondary">Estimates and quarterly reminders based on your ledger.</p>
+          <p className="mt-1 text-sm font-medium text-content-secondary">
+            {taxTab === 'overview'
+              ? 'Estimates and quarterly reminders based on your ledger.'
+              : 'Manual mileage log for planning — consult a tax pro before filing.'}
+          </p>
+          <div className="mt-3 inline-flex rounded-lg border border-surface-border bg-surface-raised p-1">
+            <button
+              type="button"
+              onClick={() => applyTaxTab('overview')}
+              className={cn(
+                'rounded-md px-3 py-1.5 text-xs font-sans font-semibold transition-colors',
+                taxTab === 'overview'
+                  ? 'bg-brand-cta text-surface-base'
+                  : 'text-content-tertiary hover:text-content-secondary',
+              )}
+            >
+              Overview
+            </button>
+            <button
+              type="button"
+              onClick={() => applyTaxTab('mileage')}
+              className={cn(
+                'rounded-md px-3 py-1.5 text-xs font-sans font-semibold transition-colors inline-flex items-center gap-1.5',
+                taxTab === 'mileage'
+                  ? 'bg-brand-cta text-surface-base'
+                  : 'text-content-tertiary hover:text-content-secondary',
+              )}
+            >
+              <Map className="h-3.5 w-3.5" aria-hidden />
+              Mileage log
+            </button>
+          </div>
         </div>
         
         <div className="flex flex-wrap gap-2">
@@ -130,6 +302,239 @@ export default function Taxes() {
         </div>
       </div>
 
+      {taxTab === 'mileage' ? (
+        <div className="space-y-6">
+          <div className="bg-surface-raised border border-surface-border rounded-lg p-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div>
+              <p className="text-sm font-sans font-semibold text-content-primary">Mileage deduction planning</p>
+              <p className="text-xs text-content-tertiary mt-1 max-w-xl leading-relaxed">
+                Log trips with the IRS standard rate for your purpose. Rates are defaults for {currentYear} planning — adjust per your situation. Deduction totals here are separate from the write-off tracker on Overview.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={exportMileageCsv}
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-xs font-sans font-semibold text-content-primary hover:bg-surface-elevated/80 transition-colors shrink-0"
+            >
+              <Download className="h-4 w-4" aria-hidden />
+              Export CSV
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {quarterCards.map(({ key, label }) => {
+              const agg = mileageByQuarter[key] ?? { miles: 0, deduction: 0 };
+              return (
+                <div
+                  key={key}
+                  className="rounded-lg border border-surface-border bg-surface-elevated p-4"
+                >
+                  <p className="text-xs font-sans font-semibold text-content-tertiary">{label} {currentYear}</p>
+                  <p className="mt-2 text-lg font-mono tabular-nums text-content-primary data-numeric">
+                    {agg.miles.toLocaleString(undefined, { maximumFractionDigits: 1 })} mi
+                  </p>
+                  <p className="text-xs font-mono tabular-nums text-emerald-400 mt-1 data-numeric">
+                    ${agg.deduction.toFixed(2)}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="rounded-lg border border-surface-border bg-surface-elevated/50 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <p className="text-xs font-sans font-semibold text-content-tertiary">Year-to-date mileage deduction (logged)</p>
+              <p className="text-2xl font-mono font-bold tabular-nums text-content-primary data-numeric mt-1">
+                ${totalMileageDeductionYtd.toFixed(2)}
+              </p>
+            </div>
+            <div className="text-sm text-content-secondary max-w-md">
+              <span className="text-content-tertiary">Rough federal tax offset (planning): </span>
+              <span className="font-mono tabular-nums text-content-primary data-numeric">
+                ~${estFedReductionFromMileage.toFixed(0)}
+              </span>
+              <span className="text-content-tertiary">
+                {' '}
+                at ~{(approxFedMarginalRate * 100).toFixed(1)}% of income (simplified; not tax advice).
+              </span>
+            </div>
+          </div>
+
+          <CollapsibleModule title="Add trip" icon={Plus} defaultOpen>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div>
+                <p className="text-xs text-content-tertiary mb-1">Date</p>
+                <input
+                  type="date"
+                  value={mileageForm.tripDate}
+                  onChange={(e) => setMileageForm((f) => ({ ...f, tripDate: e.target.value }))}
+                  className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-content-primary focus-app-field"
+                />
+              </div>
+              <div>
+                <p className="text-xs text-content-tertiary mb-1">Purpose</p>
+                <select
+                  value={mileageForm.purpose}
+                  onChange={(e) => {
+                    const purpose = e.target.value as MileageLogEntry['purpose'];
+                    setMileageForm((f) => ({
+                      ...f,
+                      purpose,
+                      irsRatePerMile: String(defaultIrsRateForPurpose(purpose)),
+                    }));
+                  }}
+                  className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-content-primary focus-app-field"
+                >
+                  <option value="business">Business</option>
+                  <option value="medical">Medical</option>
+                  <option value="charity">Charity</option>
+                </select>
+              </div>
+              <div>
+                <p className="text-xs text-content-tertiary mb-1">Miles</p>
+                <input
+                  type="number"
+                  min={0.01}
+                  step={0.1}
+                  placeholder="0"
+                  value={mileageForm.miles}
+                  onChange={(e) => setMileageForm((f) => ({ ...f, miles: e.target.value }))}
+                  className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm font-mono tabular-nums text-content-primary focus-app-field"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <p className="text-xs text-content-tertiary mb-1">Start → end</p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Start"
+                    value={mileageForm.startLocation}
+                    onChange={(e) => setMileageForm((f) => ({ ...f, startLocation: e.target.value }))}
+                    className="flex-1 bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-content-primary focus-app-field"
+                  />
+                  <input
+                    type="text"
+                    placeholder="End"
+                    value={mileageForm.endLocation}
+                    onChange={(e) => setMileageForm((f) => ({ ...f, endLocation: e.target.value }))}
+                    className="flex-1 bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-content-primary focus-app-field"
+                  />
+                </div>
+              </div>
+              <div>
+                <p className="text-xs text-content-tertiary mb-1">Platform / client (optional)</p>
+                <input
+                  type="text"
+                  placeholder="e.g. DoorDash"
+                  value={mileageForm.platform}
+                  onChange={(e) => setMileageForm((f) => ({ ...f, platform: e.target.value }))}
+                  className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-content-primary focus-app-field"
+                />
+              </div>
+              <div>
+                <p className="text-xs text-content-tertiary mb-1">IRS rate ($/mi)</p>
+                <input
+                  type="number"
+                  min={0}
+                  step={0.01}
+                  value={mileageForm.irsRatePerMile}
+                  onChange={(e) => setMileageForm((f) => ({ ...f, irsRatePerMile: e.target.value }))}
+                  className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm font-mono tabular-nums text-content-primary focus-app-field"
+                />
+              </div>
+              <div className="md:col-span-2 lg:col-span-3 flex justify-end">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const miles = parseFloat(mileageForm.miles);
+                    const rate = parseFloat(mileageForm.irsRatePerMile);
+                    if (!mileageForm.tripDate) {
+                      toast.error('Pick a trip date.');
+                      return;
+                    }
+                    if (!Number.isFinite(miles) || miles <= 0) {
+                      toast.error('Enter valid miles.');
+                      return;
+                    }
+                    if (!Number.isFinite(rate) || rate < 0) {
+                      toast.error('Enter a valid IRS rate.');
+                      return;
+                    }
+                    const ok = await addMileageLogEntry({
+                      tripDate: mileageForm.tripDate,
+                      startLocation: mileageForm.startLocation.trim(),
+                      endLocation: mileageForm.endLocation.trim(),
+                      miles,
+                      purpose: mileageForm.purpose,
+                      platform: mileageForm.platform.trim(),
+                      irsRatePerMile: rate,
+                    });
+                    if (!ok) return;
+                    toast.success('Trip saved');
+                    setMileageForm((f) => ({
+                      ...f,
+                      startLocation: '',
+                      endLocation: '',
+                      miles: '',
+                      platform: '',
+                    }));
+                  }}
+                  className="bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold px-4 py-2 rounded-lg transition-colors"
+                >
+                  Save trip
+                </button>
+              </div>
+            </div>
+          </CollapsibleModule>
+
+          <CollapsibleModule title="Logged trips" icon={Map} defaultOpen>
+            <div className="divide-y divide-surface-border max-h-[min(480px,50vh)] overflow-y-auto">
+              {mileageLog.length === 0 ? (
+                <p className="p-6 text-sm text-content-tertiary">No trips yet — add one above.</p>
+              ) : (
+                [...mileageLog]
+                  .sort((a, b) => (a.tripDate < b.tripDate ? 1 : -1))
+                  .map((row) => (
+                    <div
+                      key={row.id}
+                      className="px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 hover:bg-surface-elevated/60 group"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-content-primary font-sans">
+                          {row.tripDate}{' '}
+                          <span className="text-content-tertiary font-normal">
+                            · {row.startLocation || '—'} → {row.endLocation || '—'}
+                          </span>
+                        </p>
+                        <p className="text-xs text-content-tertiary mt-0.5">
+                          {row.purpose}
+                          {row.platform ? ` · ${row.platform}` : ''} · {row.miles.toLocaleString(undefined, { maximumFractionDigits: 1 })} mi @ $
+                          {row.irsRatePerMile.toFixed(2)}/mi
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className="text-sm font-mono tabular-nums text-emerald-400 data-numeric">
+                          ${row.deductionAmount.toFixed(2)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await deleteMileageLogEntry(row.id);
+                          }}
+                          className="text-content-muted hover:text-rose-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                          aria-label="Delete trip"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+              )}
+            </div>
+          </CollapsibleModule>
+        </div>
+      ) : (
+        <>
       {/* Gig Worker Education Banner */}
       <div className="bg-amber-500/10 border border-amber-500/40 rounded-lg p-4 flex items-start gap-3 shadow-[0_0_20px_rgba(245,158,11,0.05)]">
         <Zap className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
@@ -140,6 +545,81 @@ export default function Taxes() {
           </p>
         </div>
       </div>
+
+      <CollapsibleModule title="Tax reduction playbook" icon={ListChecks} defaultOpen>
+        <div className="px-6 py-5 space-y-4">
+          <p className="text-sm text-content-secondary leading-relaxed">
+            High-impact moves freelancers use to lower taxable income and stay compliant. Not tax advice—use this as a checklist with your CPA.
+          </p>
+          <ul className="space-y-3">
+            <li className="flex gap-3 items-start">
+              <Map className="h-4 w-4 shrink-0 text-content-tertiary mt-0.5" aria-hidden />
+              <div>
+                <p className="text-sm font-medium text-content-primary">Log business miles</p>
+                <p className="text-xs text-content-tertiary mt-0.5">
+                  Standard mileage adds up fast.{' '}
+                  <button
+                    type="button"
+                    onClick={() => applyTaxTab('mileage')}
+                    className="text-content-primary font-semibold underline underline-offset-2 hover:no-underline focus-app"
+                  >
+                    Open mileage log
+                  </button>
+                </p>
+              </div>
+            </li>
+            <li className="flex gap-3 items-start">
+              <Plus className="h-4 w-4 shrink-0 text-content-tertiary mt-0.5" aria-hidden />
+              <div>
+                <p className="text-sm font-medium text-content-primary">Track write-offs</p>
+                <p className="text-xs text-content-tertiary mt-0.5">
+                  Add gear, software, and business expenses in the tracker below—Oweable folds them into your estimate.
+                </p>
+              </div>
+            </li>
+            <li className="flex gap-3 items-start">
+              <Landmark className="h-4 w-4 shrink-0 text-content-tertiary mt-0.5" aria-hidden />
+              <div>
+                <p className="text-sm font-medium text-content-primary">Pay yourself on purpose</p>
+                <p className="text-xs text-content-tertiary mt-0.5">
+                  Set a steady salary and tax reserve on{' '}
+                  <TransitionLink
+                    to="/income"
+                    className="text-content-primary font-semibold underline underline-offset-2 hover:no-underline focus-app"
+                  >
+                    Income
+                  </TransitionLink>{' '}
+                  so gig cash doesn&apos;t feel like spendable income.
+                </p>
+              </div>
+            </li>
+            <li className="flex gap-3 items-start">
+              <Clock className="h-4 w-4 shrink-0 text-content-tertiary mt-0.5" aria-hidden />
+              <div>
+                <p className="text-sm font-medium text-content-primary">Stay ahead of quarterly deadlines</p>
+                <p className="text-xs text-content-tertiary mt-0.5">
+                  Use the reminders in the sidebar panel and IRS Direct Pay when a quarter is due.
+                </p>
+              </div>
+            </li>
+            <li className="flex gap-3 items-start">
+              <BookOpen className="h-4 w-4 shrink-0 text-content-tertiary mt-0.5" aria-hidden />
+              <div>
+                <p className="text-sm font-medium text-content-primary">Go deeper in Academy</p>
+                <p className="text-xs text-content-tertiary mt-0.5">
+                  <TransitionLink
+                    to="/education"
+                    className="text-content-primary font-semibold underline underline-offset-2 hover:no-underline focus-app"
+                  >
+                    Financial Academy
+                  </TransitionLink>{' '}
+                  has 1099 survival and quarterly tax lessons.
+                </p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </CollapsibleModule>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
@@ -287,6 +767,8 @@ export default function Taxes() {
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }

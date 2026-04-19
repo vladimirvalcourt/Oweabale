@@ -17,6 +17,7 @@ import { AppPageShell } from '../components/AppPageShell';
 import { Dialog } from '@headlessui/react';
 import { yieldForPaint } from '../lib/interaction';
 import { cn } from '../lib/utils';
+import { TransitionLink } from '../components/TransitionLink';
 
 const TYPE_LABELS: Record<InvestmentAccount['type'], string> = {
   brokerage: 'Brokerage',
@@ -389,7 +390,11 @@ export default function Investments() {
                 <p className="mt-5 text-xs text-content-tertiary max-w-md mx-auto leading-relaxed">
                   Enter balances manually — we&apos;ll track changes over time and show them next to debt in{' '}
                   <span className="text-content-secondary">Portfolio vs. debt</span>. Not synced via Plaid; Settings
-                  linking is for bank cash flow, not holdings.
+                  linking is for bank cash flow, not holdings.{' '}
+                  <TransitionLink to="/net-worth" className="text-content-secondary underline underline-offset-2">
+                    Open net worth
+                  </TransitionLink>{' '}
+                  to see the full picture once you add accounts.
                 </p>
               </div>
             )}

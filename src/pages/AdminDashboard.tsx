@@ -22,15 +22,12 @@ import { AdminFeatureFlagsPanel } from './admin/components/AdminFeatureFlagsPane
 import { AdminExportBar } from './admin/components/AdminExportBar';
 import { AdminFeedbackPanel } from './admin/components/AdminFeedbackPanel';
 import { AdminBroadcastsPanel } from './admin/components/AdminBroadcastsPanel';
-import { AdminChatMessagesPanel } from './admin/components/AdminChatMessagesPanel';
 import { AdminUserDataPanel } from './admin/components/AdminUserDataPanel';
 import { AdminIngestionQueuesPanel } from './admin/components/AdminIngestionQueuesPanel';
 import type {
-  AdminAiLearningProfile,
   AdminAuditEntry,
   AdminBroadcastRow,
   AdminCaptureSession,
-  AdminChatMessage,
   AdminFeedbackEntry,
   AdminInsurancePolicy,
   AdminInvestmentAccount,
@@ -90,9 +87,6 @@ export default function AdminDashboard() {
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [adminBroadcasts, setAdminBroadcasts] = useState<AdminBroadcastRow[]>([]);
   const [broadcastsLoading, setBroadcastsLoading] = useState(false);
-  const [chatMessages, setChatMessages] = useState<AdminChatMessage[]>([]);
-  const [chatLoading, setChatLoading] = useState(false);
-  const [learningProfiles, setLearningProfiles] = useState<AdminAiLearningProfile[]>([]);
   const [investmentAccounts, setInvestmentAccounts] = useState<AdminInvestmentAccount[]>([]);
   const [insurancePolicies, setInsurancePolicies] = useState<AdminInsurancePolicy[]>([]);
   const [userDataLoading, setUserDataLoading] = useState(false);
@@ -234,7 +228,6 @@ export default function AdminDashboard() {
     setTicketsLoading(true);
     setFeedbackLoading(true);
     setBroadcastsLoading(true);
-    setChatLoading(true);
     setUserDataLoading(true);
     setQueuesLoading(true);
     const [
@@ -242,8 +235,6 @@ export default function AdminDashboard() {
       { data: ticketsResolved, error: ticketResolvedErr },
       { data: feedbackRows, error: feedbackErr },
       { data: broadcastRows, error: broadcastErr },
-      { data: chatRows, error: chatErr },
-      { data: aiProfilesRows, error: aiProfilesErr },
       { data: investmentRows, error: investmentErr },
       { data: insuranceRows, error: insuranceErr },
       { data: pendingRows, error: pendingErr },
@@ -266,16 +257,6 @@ export default function AdminDashboard() {
         .order('created_at', { ascending: false })
         .limit(100),
       supabase.from('admin_broadcasts').select('*').order('created_at', { ascending: false }).limit(50),
-      supabase
-        .from('chat_messages')
-        .select('id, user_id, role, content, mode, created_at')
-        .order('created_at', { ascending: false })
-        .limit(80),
-      supabase
-        .from('ai_learning_profiles')
-        .select('user_id, familiarity_level, preferred_style, topics_covered, recent_focus, total_lessons, total_messages, updated_at')
-        .order('updated_at', { ascending: false })
-        .limit(80),
       supabase
         .from('investment_accounts')
         .select('id, user_id, name, type, institution, balance, last_updated')
@@ -300,7 +281,6 @@ export default function AdminDashboard() {
     setTicketsLoading(false);
     setFeedbackLoading(false);
     setBroadcastsLoading(false);
-    setChatLoading(false);
     setUserDataLoading(false);
     setQueuesLoading(false);
 
@@ -316,12 +296,10 @@ export default function AdminDashboard() {
     collectUserIds((ticketsOpen ?? []) as Array<{ user_id: string }>);
     collectUserIds((ticketsResolved ?? []) as Array<{ user_id: string }>);
     collectUserIds((feedbackRows ?? []) as Array<{ user_id: string }>);
-    collectUserIds((chatRows ?? []) as Array<{ user_id: string }>);
     collectUserIds((investmentRows ?? []) as Array<{ user_id: string }>);
     collectUserIds((insuranceRows ?? []) as Array<{ user_id: string }>);
     collectUserIds((pendingRows ?? []) as Array<{ user_id: string }>);
     collectUserIds((captureRows ?? []) as Array<{ user_id: string }>);
-    (aiProfilesRows ?? []).forEach((row: { user_id: string }) => allUserIds.add(row.user_id));
 
     const missingUserIds = [...allUserIds].filter((id) => !profileMap[id]);
     if (missingUserIds.length > 0) {
@@ -357,30 +335,6 @@ export default function AdminDashboard() {
       setAdminBroadcasts([]);
     } else {
       setAdminBroadcasts((broadcastRows ?? []) as AdminBroadcastRow[]);
-    }
-
-    if (chatErr) {
-      toast.error(`Chat messages load failed: ${chatErr.message}`);
-      setChatMessages([]);
-    } else {
-      setChatMessages(
-        ((chatRows ?? []) as Omit<AdminChatMessage, 'userEmail'>[]).map((row) => ({
-          ...row,
-          userEmail: profileMap[row.user_id] || `${row.user_id.slice(0, 8)}…`,
-        })),
-      );
-    }
-
-    if (aiProfilesErr) {
-      toast.error(`AI profiles load failed: ${aiProfilesErr.message}`);
-      setLearningProfiles([]);
-    } else {
-      setLearningProfiles(
-        ((aiProfilesRows ?? []) as Omit<AdminAiLearningProfile, 'userEmail'>[]).map((row) => ({
-          ...row,
-          userEmail: profileMap[row.user_id] || `${row.user_id.slice(0, 8)}…`,
-        })),
-      );
     }
 
     if (investmentErr) {
@@ -516,12 +470,6 @@ export default function AdminDashboard() {
         void loadAll();
       })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'admin_broadcasts' }, () => {
-        void loadAll();
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'chat_messages' }, () => {
-        void loadAll();
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'ai_learning_profiles' }, () => {
         void loadAll();
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'investment_accounts' }, () => {
@@ -823,10 +771,8 @@ export default function AdminDashboard() {
                 onResolveTicket={(ticketId) => void resolveTicket(ticketId)}
               />
               <AdminFeedbackPanel loading={feedbackLoading} items={feedbackEntries} />
-              <AdminChatMessagesPanel loading={chatLoading} items={chatMessages} />
               <AdminUserDataPanel
                 loading={userDataLoading}
-                learningProfiles={learningProfiles}
                 investmentAccounts={investmentAccounts}
                 insurancePolicies={insurancePolicies}
               />

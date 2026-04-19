@@ -335,7 +335,7 @@ export default function Pricing() {
               ['Bank connection (Plaid)', 'Not included', 'Included'],
               ['Transactions/analytics/reports', 'Not included', 'Included'],
               ['Debt payoff planner', 'Not included', 'Avalanche + snowball planner'],
-              ['Owe-AI and advanced tools', 'Not included', 'Included'],
+              ['Advanced planning tools', 'Not included', 'Included'],
               ['Freelancer tax tools', 'Not included', 'Included'],
             ].map(([feature, freeTier, paidTier]) => (
               <div key={feature} className="grid grid-cols-3 text-sm border-b border-surface-border last:border-b-0">

@@ -74,6 +74,13 @@ Deno.serve(async (req: Request) => {
     return new Response('ok', { headers: c })
   }
 
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...c, 'Content-Type': 'application/json' },
+    })
+  }
+
   const jsonHeaders = { ...c, 'Content-Type': 'application/json' as const }
 
   try {
@@ -872,7 +879,12 @@ Deno.serve(async (req: Request) => {
     } catch {
       // best effort logging only
     }
-    return new Response(JSON.stringify({ error: err.message }), {
+    const msg = err instanceof Error ? err.message : 'Request failed'
+    const safe =
+      /unauthorized|forbidden|missing|invalid|unknown action|rate limit|cannot/i.test(msg)
+        ? msg
+        : 'Request failed'
+    return new Response(JSON.stringify({ error: safe }), {
       status: 400,
       headers: jsonHeaders,
     })
