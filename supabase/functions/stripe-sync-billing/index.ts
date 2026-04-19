@@ -6,7 +6,7 @@ import { getStripeSecretKey } from '../_shared/stripeEnv.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
-  const ch = corsHeaders(origin);
+  const ch = corsHeaders(origin, req.headers);
 
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: ch });

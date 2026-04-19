@@ -17,6 +17,17 @@ const DEFAULT_ORIGINS = [
   'http://127.0.0.1:8080',
   'http://localhost:8888',
   'http://127.0.0.1:8888',
+  // mkcert / dev HTTPS
+  'https://localhost:3000',
+  'https://127.0.0.1:3000',
+  'https://localhost:5173',
+  'https://127.0.0.1:5173',
+  'https://localhost:5174',
+  'https://127.0.0.1:5174',
+  'https://localhost:4173',
+  'https://127.0.0.1:4173',
+  'https://localhost:4174',
+  'https://127.0.0.1:4174',
 ];
 
 function parseAllowedOrigins(): string[] {
@@ -25,8 +36,14 @@ function parseAllowedOrigins(): string[] {
   return [...DEFAULT_ORIGINS, ...raw.split(',').map((s) => s.trim()).filter(Boolean)];
 }
 
+/** Extra exact origins (e.g. preview URLs) — comma-separated, merged with PLAID_ALLOWED_ORIGINS. */
+function parseEdgeCorsExtraOrigins(): string[] {
+  const raw = Deno.env.get('EDGE_CORS_EXTRA_ORIGINS')?.trim();
+  if (!raw) return [];
+  return raw.split(',').map((s) => s.trim()).filter(Boolean);
+}
+
 function parseVercelProjectAllowlist(): string[] {
-  // Explicit project subdomains, e.g. "oweable-foo.vercel.app,oweable-bar.vercel.app".
   const raw = Deno.env.get('VERCEL_PREVIEW_ALLOWLIST');
   if (!raw?.trim()) return [];
   return raw.split(',').map((s) => s.trim()).filter(Boolean);
@@ -35,7 +52,7 @@ function parseVercelProjectAllowlist(): string[] {
 function isLocalDevOrigin(url: URL): boolean {
   const host = url.hostname.toLowerCase();
   if (host !== 'localhost' && host !== '127.0.0.1') return false;
-  if (url.protocol !== 'http:') return false;
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
   const port = url.port;
   const allowedPorts = new Set([
     '',
@@ -68,48 +85,76 @@ function isTrustedVercelPreview(hostname: string): boolean {
  * Origin when credentials-like headers are used, or the browser will reject the fetch).
  */
 function resolveAllowedOrigin(origin: string | null): string {
-  const list = parseAllowedOrigins()
-  if (!origin?.trim()) return list[0] ?? 'https://www.oweable.com'
+  const list = parseAllowedOrigins();
+  const extras = parseEdgeCorsExtraOrigins();
+  if (!origin?.trim()) return list[0] ?? 'https://www.oweable.com';
 
-  const trimmed = origin.trim()
-  // Opaque / sandboxed contexts send the literal string "null"; ACAO must echo it.
-  if (trimmed === 'null') return 'null'
-  if (list.includes(trimmed)) return trimmed
+  const trimmed = origin.trim();
+  if (trimmed === 'null') return 'null';
+  if (list.includes(trimmed) || extras.includes(trimmed)) return trimmed;
 
   try {
-    const url = new URL(trimmed)
-    if (isLocalDevOrigin(url)) return trimmed
-    if (url.protocol === 'https:' && isOweableHostedOrigin(url.hostname)) return trimmed
-    if (url.protocol === 'https:' && isTrustedVercelPreview(url.hostname)) return trimmed
+    const url = new URL(trimmed);
+    if (isLocalDevOrigin(url)) return trimmed;
+    if (url.protocol === 'https:' && isOweableHostedOrigin(url.hostname)) return trimmed;
+    if (url.protocol === 'https:' && isTrustedVercelPreview(url.hostname)) return trimmed;
   } catch {
     /* ignore */
   }
 
-  return list[0] ?? 'https://www.oweable.com'
+  return list[0] ?? 'https://www.oweable.com';
 }
 
-export function corsHeaders(origin: string | null) {
-  const allowedOrigin = resolveAllowedOrigin(origin)
+/** Base allow-list; preflight may request more — merged below. */
+const STATIC_ALLOW_HEADERS = [
+  'authorization',
+  'x-client-info',
+  'apikey',
+  'content-type',
+  'x-region',
+  'prefer',
+  'accept-profile',
+  'content-profile',
+  'sentry-trace',
+  'baggage',
+  'traceparent',
+  'tracestate',
+  'b3',
+  'priority',
+  'x-datadog-origin',
+  'x-datadog-parent-id',
+  'x-datadog-trace-id',
+  'x-datadog-sampling-priority',
+  'x-vercel-id',
+  'x-vercel-ip-country',
+];
+
+function buildAllowHeaders(requestHeaders: Headers | null | undefined): string {
+  const set = new Set(STATIC_ALLOW_HEADERS.map((h) => h.toLowerCase()));
+  const requested = requestHeaders?.get('access-control-request-headers');
+  if (requested?.trim()) {
+    for (const part of requested.split(',')) {
+      const h = part.trim().toLowerCase();
+      if (!h || h.length > 64) continue;
+      if (!/^[a-z0-9_-]+$/.test(h)) continue;
+      set.add(h);
+      if (set.size >= 56) break;
+    }
+  }
+  return [...set].join(', ');
+}
+
+/**
+ * @param requestHeaders Pass `req.headers` so OPTIONS preflight can merge `Access-Control-Request-Headers`
+ *        (APM / future SDK headers) without editing this file for every new header name.
+ */
+export function corsHeaders(origin: string | null, requestHeaders?: Headers | null) {
+  const allowedOrigin = resolveAllowedOrigin(origin);
   return {
     'Access-Control-Allow-Origin': allowedOrigin,
-    'Access-Control-Allow-Headers':
-      [
-        'authorization',
-        'x-client-info',
-        'apikey',
-        'content-type',
-        'x-region',
-        'prefer',
-        'accept-profile',
-        'content-profile',
-        // Sentry browser SDK adds these when `tracePropagationTargets` matches the function URL.
-        'sentry-trace',
-        'baggage',
-        'traceparent',
-        'tracestate',
-      ].join(', '),
+    'Access-Control-Allow-Headers': buildAllowHeaders(requestHeaders ?? null),
     'Access-Control-Allow-Methods': 'GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS',
     'Access-Control-Max-Age': '86400',
     Vary: 'Origin',
-  }
+  };
 }

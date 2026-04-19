@@ -125,7 +125,7 @@ function requireSuperAdmin(ctx: AdminContext) {
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin')
-  const c = corsHeaders(origin)
+  const c = corsHeaders(origin, req.headers)
   const requestMeta = {
     ip:
       req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??

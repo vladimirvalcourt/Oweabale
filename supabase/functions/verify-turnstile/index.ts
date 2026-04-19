@@ -2,7 +2,7 @@ import { corsHeaders } from '../_shared/cors.ts';
 
 Deno.serve(async (req) => {
   const origin = req.headers.get('origin');
-  const c = corsHeaders(origin);
+  const c = corsHeaders(origin, req.headers);
 
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: c });

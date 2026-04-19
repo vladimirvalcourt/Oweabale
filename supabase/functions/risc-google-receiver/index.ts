@@ -86,7 +86,7 @@ async function handleTokenRevoked(
 }
 
 Deno.serve(async (req: Request) => {
-  const c = corsHeaders(req.headers.get('origin'));
+  const c = corsHeaders(req.headers.get('origin'), req.headers);
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: c });
   }

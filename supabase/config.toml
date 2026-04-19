@@ -429,6 +429,33 @@ verify_jwt = false
 [functions.risc-google-register]
 verify_jwt = false
 
+# Browser-invoked functions: disable gateway JWT verification so expired/stale tokens
+# still reach function code (which returns JSON + CORS). Default verify_jwt=true would
+# reject at the edge without your CORS headers and surfaces as FunctionsFetchError.
+[functions.stripe-cancel-subscription]
+verify_jwt = false
+
+[functions.plaid-exchange]
+verify_jwt = false
+
+[functions.plaid-disconnect]
+verify_jwt = false
+
+[functions.admin-reports]
+verify_jwt = false
+
+[functions.admin-alerts]
+verify_jwt = false
+
+[functions.finance-insights]
+verify_jwt = false
+
+[functions.financial-alerts]
+verify_jwt = false
+
+[functions.verify-turnstile]
+verify_jwt = false
+
 [experimental]
 # Configures Postgres storage engine to use OrioleDB (S3)
 orioledb_version = ""

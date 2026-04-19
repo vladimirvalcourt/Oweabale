@@ -5,7 +5,7 @@ import { hasPaidFullSuiteAccess } from '../_shared/plaidAccess.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
-  const ch = corsHeaders(origin);
+  const ch = corsHeaders(origin, req.headers);
 
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: ch });
@@ -81,7 +81,7 @@ Deno.serve(async (req: Request) => {
       : 'Request failed';
     return new Response(JSON.stringify({ error: safe }), {
       status: 400,
-      headers: { ...corsHeaders(req.headers.get('origin')), 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders(req.headers.get('origin'), req.headers), 'Content-Type': 'application/json' },
     });
   }
 });

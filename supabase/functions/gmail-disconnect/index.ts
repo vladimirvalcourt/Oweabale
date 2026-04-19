@@ -3,10 +3,10 @@ import { corsHeaders } from '../_shared/cors.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
-  const ch = { ...corsHeaders(origin), 'Content-Type': 'application/json' };
+  const ch = { ...corsHeaders(origin, req.headers), 'Content-Type': 'application/json' };
 
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders(origin) });
+    return new Response('ok', { headers: corsHeaders(origin, req.headers) });
   }
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: ch });

@@ -3,7 +3,7 @@ import { PDFDocument, StandardFonts, rgb } from 'https://esm.sh/pdf-lib@1.17.1';
 import { corsHeaders } from '../_shared/cors.ts';
 
 Deno.serve(async (req: Request) => {
-  const c = corsHeaders(req.headers.get('origin'));
+  const c = corsHeaders(req.headers.get('origin'), req.headers);
   if (req.method === 'OPTIONS') return new Response('ok', { headers: c });
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
