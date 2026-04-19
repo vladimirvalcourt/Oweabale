@@ -563,7 +563,7 @@ export default function Layout() {
           </div>
         )}
 
-        <nav className={cn('flex-1 overflow-y-auto scrollbar-hide', sidebarCollapsed ? 'space-y-3 px-1.5 py-4' : 'space-y-4 px-3 py-6')} aria-label="App sections">
+        <nav className={cn('min-h-0 flex-1 overflow-y-auto scrollbar-hide', sidebarCollapsed ? 'space-y-3 px-1.5 py-4' : 'space-y-4 px-3 py-6')} aria-label="App sections">
           {processedSidebarNav.map((group, groupIndex) => {
             const isExpanded = expandedGroups[group.label];
             return (
@@ -612,7 +612,7 @@ export default function Layout() {
                                 sidebarCollapsed
                                   ? 'justify-center px-1.5'
                                   : nested
-                                    ? 'pl-7 pr-4'
+                                    ? 'ml-1 border-l-2 border-surface-border/90 pl-4 pr-3'
                                     : 'px-4',
                                 isActive
                                   ? 'bg-content-primary/[0.06] text-content-primary border-surface-border/80'
@@ -701,20 +701,23 @@ export default function Layout() {
           })}
         </nav>
 
-        {/* Settings (discoverable) + collapse — sign out lives only in the account menu to avoid duplicate destructive entry points */}
-        <div className="border-t border-surface-border/90 bg-transparent p-3 sm:p-4">
-          <div className={cn('flex flex-col gap-2', sidebarCollapsed ? 'px-0' : 'px-1')}>
+        {/* Account strip: always visible above the fold — Settings + collapse (sign out is profile menu only) */}
+        <div className="mt-auto shrink-0 border-t border-surface-border bg-surface-raised/50 backdrop-blur-sm">
+          {!sidebarCollapsed && (
+            <p className="chrome-micro-label px-4 pt-3 text-content-tertiary">Account</p>
+          )}
+          <div className={cn('flex flex-col gap-2 p-3 sm:p-4', sidebarCollapsed ? 'pt-3' : '')}>
             <TransitionLink
               to="/settings"
               onClick={closeSidebarMobile}
               title={sidebarCollapsed ? 'Settings' : undefined}
               aria-current={isSettingsRoute ? 'page' : undefined}
               className={cn(
-                'focus-app group flex min-h-10 w-full items-center rounded-lg border py-2 text-[12px] font-sans font-medium transition-all',
+                'focus-app group flex min-h-10 w-full items-center rounded-lg border py-2.5 text-[12px] font-sans font-medium transition-all',
                 sidebarCollapsed ? 'justify-center px-1.5' : 'justify-start gap-3 px-3',
                 isSettingsRoute
-                  ? 'border-content-primary/25 bg-content-primary/[0.08] text-content-primary'
-                  : 'border-surface-border bg-transparent text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary',
+                  ? 'border-content-primary/30 bg-content-primary/[0.1] text-content-primary shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]'
+                  : 'border-surface-border bg-surface-base/60 text-content-secondary hover:bg-content-primary/[0.06] hover:text-content-primary',
               )}
             >
               <div className="flex h-5 w-5 shrink-0 items-center justify-center">
@@ -729,7 +732,7 @@ export default function Layout() {
               aria-expanded={!sidebarCollapsed}
               aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               className={cn(
-                'focus-app group flex w-full items-center rounded-lg border border-surface-border bg-transparent py-2 text-[12px] font-sans font-medium text-content-secondary transition-all hover:bg-content-primary/[0.04] hover:text-content-primary',
+                'focus-app group flex w-full items-center rounded-lg border border-surface-border bg-surface-base/40 py-2.5 text-[12px] font-sans font-medium text-content-secondary transition-all hover:bg-content-primary/[0.06] hover:text-content-primary',
                 sidebarCollapsed ? 'justify-center px-0' : 'justify-start gap-3 px-3',
               )}
             >
