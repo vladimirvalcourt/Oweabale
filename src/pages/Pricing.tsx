@@ -5,6 +5,7 @@ import { Check, Plus, Minus } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
 import { toast } from 'sonner';
 import { createStripeCheckoutSession, type StripeCheckoutPlanKey } from '../lib/stripe';
+import { BrandWordmark } from '../components/BrandWordmark';
 
 function useInView(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
@@ -116,8 +117,8 @@ export default function Pricing() {
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-black/55 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40 border-surface-border' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <TransitionLink to="/" className="brand-header-text text-xl text-content-primary transition-colors duration-200">
-            Oweable
+          <TransitionLink to="/" className="text-content-primary transition-colors duration-200">
+            <BrandWordmark textClassName="brand-header-text" />
           </TransitionLink>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-content-tertiary">
             <TransitionLink to="/#features" className="hover:text-content-secondary transition-colors duration-200 text-content-primary">Features</TransitionLink>

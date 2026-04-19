@@ -7,6 +7,7 @@ import { useStore } from '../store/useStore';
 import { useSEO } from '../hooks/useSEO';
 import { isPlaidLinkUiEnabled } from '../lib/featureFlags';
 import HeroPreviewMedia from '../components/landing/HeroPreviewMedia';
+import { BrandWordmark } from '../components/BrandWordmark';
 
 function useInView(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
@@ -174,9 +175,8 @@ export default function Landing() {
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-black/55 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40 border-surface-border' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <TransitionLink to="/" className="brand-header-text flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" aria-hidden />
-            Oweable
+          <TransitionLink to="/" className="text-content-primary">
+            <BrandWordmark textClassName="brand-header-text" />
           </TransitionLink>
           <div className="hidden md:flex items-center gap-8 text-sm text-content-tertiary">
             <a href="#features" className="hover:text-content-primary transition-colors">Features</a>

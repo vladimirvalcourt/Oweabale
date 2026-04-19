@@ -18,6 +18,7 @@ import { TactileIcon, MorphingMenuIcon } from './ui/TactileIcon';
 import type { Notification } from '../store/useStore';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
+import { BrandWordmark } from './BrandWordmark';
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
 const NAV_ROUTE_HASHES: Record<string, string[]> = {
@@ -473,9 +474,7 @@ export default function Layout() {
           <div className="flex items-center gap-2 overflow-hidden">
             {!sidebarCollapsed && (
               <div className="flex items-center gap-2">
-                <span className="brand-header-text whitespace-nowrap">
-                  Oweable
-                </span>
+                <BrandWordmark textClassName="brand-header-text" />
               </div>
             )}
           </div>

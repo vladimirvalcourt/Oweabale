@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
 import { runAfterPaint } from '../lib/interaction';
+import { BrandWordmark } from '../components/BrandWordmark';
 
 type AuthPageProps = {
   mode?: 'signin' | 'signup';
@@ -73,9 +74,8 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
         }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 lg:px-8">
-          <TransitionLink to="/" className="brand-header-text flex items-center gap-2 text-content-primary">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" aria-hidden />
-            Oweable
+          <TransitionLink to="/" className="text-content-primary">
+            <BrandWordmark textClassName="brand-header-text" />
           </TransitionLink>
           <div className="flex items-center gap-6 text-sm text-content-tertiary">
             <TransitionLink to="/pricing" className="hover:text-content-primary transition-colors">

@@ -1,4 +1,5 @@
 import { TransitionLink } from './TransitionLink';
+import { BrandWordmark } from './BrandWordmark';
 
 export default function Footer() {
   return (
@@ -8,9 +9,8 @@ export default function Footer() {
 
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <TransitionLink to="/" className="brand-header-text flex items-center gap-2 mb-5">
-              <span className="h-1.5 w-1.5 rounded-full bg-brand-cta" aria-hidden />
-              Oweable
+            <TransitionLink to="/" className="mb-5 text-content-primary">
+              <BrandWordmark textClassName="brand-header-text" />
             </TransitionLink>
             <p className="text-sm text-content-tertiary max-w-sm leading-relaxed mb-8">
               The Financial OS for Gig Workers, Freelancers &amp; the Self-Employed.

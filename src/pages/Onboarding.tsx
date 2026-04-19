@@ -7,6 +7,7 @@ import { useStore } from '../store/useStore';
 import { PrivacyScreenWhenHidden } from '../components/PrivacyScreenWhenHidden';
 import { cn } from '../lib/utils';
 import { yieldForPaint } from '../lib/interaction';
+import { BrandWordmark } from '../components/BrandWordmark';
 
 type Step = {
   id: string;
@@ -217,7 +218,10 @@ export default function Onboarding() {
           <SubtleGrid />
 
           <header className="relative z-20 flex h-14 shrink-0 items-center justify-between border-b border-surface-border bg-surface-base/90 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/75 sm:px-6">
-            <span className="text-sm font-semibold tracking-tight">Oweable</span>
+            <BrandWordmark
+              textClassName="text-sm font-semibold tracking-tight text-content-primary"
+              logoClassName="h-4 w-4"
+            />
             <button
               type="button"
               onClick={() => void skipSetup()}

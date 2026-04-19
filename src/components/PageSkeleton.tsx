@@ -92,8 +92,13 @@ export function AppLoader({ message = 'Syncing financial data' }: { message?: st
         aria-hidden
       />
       <div className="relative mb-8">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-surface-border bg-surface-raised">
-          <span className="h-1.5 w-1.5 rounded-full bg-brand-cta animate-pulse" aria-hidden />
+        <div className="flex h-10 items-center justify-center rounded-lg border border-surface-border bg-surface-raised px-3 animate-pulse-highlight [animation-duration:2.8s]">
+          <span
+            className="text-[10px] font-semibold tracking-[0.24em] text-content-primary animate-pulse [animation-duration:2.8s] [text-shadow:0_0_16px_rgba(255,255,255,0.45)]"
+            aria-label="Oweable loading"
+          >
+            OWEABLE
+          </span>
         </div>
       </div>
       <p className="relative text-xs font-medium text-content-tertiary tracking-tight text-center max-w-[14rem]">
