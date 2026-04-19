@@ -1,0 +1,10 @@
+---
+description: Prefer Supabase CLI and MCP for database and Edge Functions
+alwaysApply: true
+---
+
+# Supabase operations
+
+For anything involving Postgres schema, RLS, RPCs, migrations, Edge Functions, or project secrets, **prefer the Supabase CLI** (`npm run supabase -- <args>`) and/or the **Supabase MCP** tools over manual dashboard-only steps. Use the dashboard when CLI/MCP is insufficient.
+
+After changing code under `supabase/functions/`, deploy affected functions to the linked project; do not leave fixes only local.
