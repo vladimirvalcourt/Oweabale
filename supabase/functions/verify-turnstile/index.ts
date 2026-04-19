@@ -1,45 +1,36 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { corsHeaders } from '../_shared/cors.ts';
 
-const ALLOWED_ORIGINS = [
-  'https://oweable.com',
-  'https://www.oweable.com',
-  'http://localhost:3000/auth',
-];
-
-serve(async (req) => {
-  const origin = req.headers.get('origin') ?? '';
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : '',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  };
+Deno.serve(async (req) => {
+  const origin = req.headers.get('origin');
+  const c = corsHeaders(origin);
 
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return new Response('ok', { headers: c });
   }
 
   if (req.method !== 'POST') {
-    return new Response(
-      JSON.stringify({ success: false, error: 'Method not allowed' }),
-      { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ success: false, error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...c, 'Content-Type': 'application/json' },
+    });
   }
 
   try {
-    const { token } = await req.json();
+    const { token } = (await req.json()) as { token?: string };
 
     if (!token) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'No token provided' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ success: false, error: 'No token provided' }), {
+        status: 400,
+        headers: { ...c, 'Content-Type': 'application/json' },
+      });
     }
 
     const secret = Deno.env.get('CF_TURNSTILE_SECRET_KEY');
     if (!secret) {
-      return new Response(
-        JSON.stringify({ success: false, error: 'Server misconfiguration' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ success: false, error: 'Server misconfiguration' }), {
+        status: 500,
+        headers: { ...c, 'Content-Type': 'application/json' },
+      });
     }
 
     const formData = new FormData();
@@ -51,16 +42,15 @@ serve(async (req) => {
       body: formData,
     });
 
-    const outcome = await cfRes.json();
+    const outcome = (await cfRes.json()) as { success?: boolean };
 
-    return new Response(
-      JSON.stringify({ success: outcome.success }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ success: outcome.success === true }), {
+      headers: { ...c, 'Content-Type': 'application/json' },
+    });
   } catch {
-    return new Response(
-      JSON.stringify({ success: false, error: 'Server error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ success: false, error: 'Server error' }), {
+      status: 500,
+      headers: { ...c, 'Content-Type': 'application/json' },
+    });
   }
 });

@@ -3,6 +3,7 @@ import {
   RISC_EVENT_TYPES,
   type GoogleServiceAccountJson,
 } from '../_shared/riscGoogleJwt.ts';
+import { corsHeaders } from '../_shared/cors.ts';
 
 function parseServiceAccount(raw: string | undefined): GoogleServiceAccountJson {
   const t = raw?.trim();
@@ -13,17 +14,18 @@ function parseServiceAccount(raw: string | undefined): GoogleServiceAccountJson 
 }
 
 Deno.serve(async (req: Request) => {
+  const c = corsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: { Allow: 'POST, OPTIONS' } });
+    return new Response('ok', { headers: c });
   }
   if (req.method !== 'POST') {
-    return new Response('Method Not Allowed', { status: 405 });
+    return new Response('Method Not Allowed', { status: 405, headers: c });
   }
 
   const adminSecret = Deno.env.get('RISC_REGISTER_SECRET')?.trim();
   const provided = req.headers.get('x-risc-register-secret')?.trim();
   if (!adminSecret || provided !== adminSecret) {
-    return new Response('Unauthorized', { status: 401 });
+    return new Response('Unauthorized', { status: 401, headers: c });
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')?.trim()?.replace(/\/$/, '');
@@ -35,7 +37,7 @@ Deno.serve(async (req: Request) => {
   if (!receiverUrl) {
     return new Response(JSON.stringify({ error: 'Set RISC_RECEIVER_URL or SUPABASE_URL' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...c, 'Content-Type': 'application/json' },
     });
   }
 
@@ -46,7 +48,7 @@ Deno.serve(async (req: Request) => {
     console.error('[risc-google-register] service account parse failed');
     return new Response(JSON.stringify({ error: 'Server configuration error' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...c, 'Content-Type': 'application/json' },
     });
   }
 
@@ -57,7 +59,7 @@ Deno.serve(async (req: Request) => {
     console.error('[risc-google-register] mint token', e);
     return new Response(JSON.stringify({ error: 'Failed to mint RISC bearer token' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...c, 'Content-Type': 'application/json' },
     });
   }
 
@@ -85,12 +87,12 @@ Deno.serve(async (req: Request) => {
       console.error('[risc-google-register] stream:verify', vres.status, vtext.slice(0, 800));
       return new Response(
         JSON.stringify({ error: 'RISC stream:verify failed', status: vres.status, body: vtext }),
-        { status: 502, headers: { 'Content-Type': 'application/json' } },
+        { status: 502, headers: { ...c, 'Content-Type': 'application/json' } },
       );
     }
     return new Response(JSON.stringify({ ok: true, action: 'verify', state, google_response: vtext || null }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...c, 'Content-Type': 'application/json' },
     });
   }
 
@@ -120,12 +122,12 @@ Deno.serve(async (req: Request) => {
     console.error('[risc-google-register] stream:update', res.status, text.slice(0, 800));
     return new Response(JSON.stringify({ error: 'RISC stream:update failed', status: res.status, body: text }), {
       status: 502,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...c, 'Content-Type': 'application/json' },
     });
   }
 
   return new Response(
     JSON.stringify({ ok: true, receiver_url: receiverUrl, events_requested: events, google_response: text || null }),
-    { status: 200, headers: { 'Content-Type': 'application/json' } },
+    { status: 200, headers: { ...c, 'Content-Type': 'application/json' } },
   );
 });

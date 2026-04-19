@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { verifyGoogleRiscSecurityEventJwt } from '../_shared/riscGoogleJwt.ts';
+import { corsHeaders } from '../_shared/cors.ts';
 
 const EVENT_SESSIONS_REVOKED = 'https://schemas.openid.net/secevent/risc/event-type/sessions-revoked';
 const EVENT_TOKENS_REVOKED = 'https://schemas.openid.net/secevent/oauth/event-type/tokens-revoked';
@@ -85,11 +86,12 @@ async function handleTokenRevoked(
 }
 
 Deno.serve(async (req: Request) => {
+  const c = corsHeaders(req.headers.get('origin'));
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: { Allow: 'POST, OPTIONS' } });
+    return new Response('ok', { headers: c });
   }
   if (req.method !== 'POST') {
-    return new Response('Method Not Allowed', { status: 405 });
+    return new Response('Method Not Allowed', { status: 405, headers: c });
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')?.trim();
@@ -98,17 +100,17 @@ Deno.serve(async (req: Request) => {
 
   if (!supabaseUrl || !serviceKey || !clientIdsRaw) {
     console.error('[risc-google-receiver] missing SUPABASE_URL, SERVICE_ROLE, or RISC_GOOGLE_OAUTH_CLIENT_IDS');
-    return new Response('Server misconfiguration', { status: 500 });
+    return new Response('Server misconfiguration', { status: 500, headers: c });
   }
 
   const allowedClientIds = parseClientIds(clientIdsRaw);
   if (!allowedClientIds.length) {
-    return new Response('Server misconfiguration', { status: 500 });
+    return new Response('Server misconfiguration', { status: 500, headers: c });
   }
 
   const bodyText = (await req.text()).trim();
   if (!bodyText.startsWith('ey')) {
-    return new Response('Bad Request', { status: 400 });
+    return new Response('Bad Request', { status: 400, headers: c });
   }
 
   let verified: Awaited<ReturnType<typeof verifyGoogleRiscSecurityEventJwt>>;
@@ -116,7 +118,7 @@ Deno.serve(async (req: Request) => {
     verified = await verifyGoogleRiscSecurityEventJwt(bodyText, allowedClientIds);
   } catch (e) {
     console.warn('[risc-google-receiver] jwt verify failed', e instanceof Error ? e.message : e);
-    return new Response('Bad Request', { status: 400 });
+    return new Response('Bad Request', { status: 400, headers: c });
   }
 
   const admin = createClient(supabaseUrl, serviceKey, {
@@ -126,9 +128,9 @@ Deno.serve(async (req: Request) => {
   const { error: dedupErr } = await admin.from('risc_google_events').insert({ jti: verified.jti });
   if (dedupErr) {
     const dup = dedupErr.code === '23505' || dedupErr.message?.includes('duplicate');
-    if (dup) return new Response(null, { status: 202 });
+    if (dup) return new Response(null, { status: 202, headers: c });
     console.error('[risc-google-receiver] dedup insert', dedupErr.message);
-    return new Response('Failed', { status: 500 });
+    return new Response('Failed', { status: 500, headers: c });
   }
 
   for (const [eventUri, rawPayload] of Object.entries(verified.events)) {
@@ -184,5 +186,5 @@ Deno.serve(async (req: Request) => {
     console.warn('[risc-google-receiver] unhandled event type', eventUri);
   }
 
-  return new Response(null, { status: 202 });
+  return new Response(null, { status: 202, headers: c });
 });
