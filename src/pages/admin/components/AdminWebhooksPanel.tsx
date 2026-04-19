@@ -47,7 +47,7 @@ export function AdminWebhooksPanel({ webhooks }: Props) {
       </h2>
 
       {webhooks.length === 0 ? (
-        <p className="text-[11px] text-content-tertiary">No webhook events recorded.</p>
+        <p className="min-h-[12rem] text-[11px] leading-relaxed text-content-tertiary">No webhook events recorded.</p>
       ) : (
         <div className="max-h-72 overflow-y-auto">
           <table className="w-full text-[11px]">

@@ -19,7 +19,7 @@ const navItems = [
 
 export function AdminLayout() {
   const envLabel = useMemo(() => (import.meta.env.PROD ? 'Production' : 'Staging'), []);
-  const { hasPermission } = useAdminPermissions();
+  const { hasPermission, isLoading: permissionsLoading } = useAdminPermissions();
 
   const { data: unreadCount = 0 } = useQuery({
     queryKey: ['admin', 'notifications', 'unread-count'],
@@ -37,16 +37,16 @@ export function AdminLayout() {
   return (
     <div className="min-h-screen bg-surface-base text-content-secondary">
       <header className="sticky top-0 z-20 border-b border-surface-border bg-surface-base/85 shadow-sm backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
+        <div className="mx-auto flex max-w-7xl min-h-[3.25rem] items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+          <div className="flex min-h-[3rem] items-center gap-3">
             <span className="rounded-lg border border-surface-border bg-surface-raised/80 p-2 shadow-sm">
               <Shield className="h-4 w-4 text-content-primary" />
             </span>
-            <div className="space-y-0.5">
-              <p className="text-sm font-semibold text-content-primary">Admin Console</p>
-              <p className="text-[11px] text-content-tertiary">Operations command center</p>
+            <div className="min-h-[2.5rem] space-y-0.5 leading-tight">
+              <p className="text-sm font-semibold leading-snug text-content-primary">Admin Console</p>
+              <p className="text-[11px] leading-snug text-content-tertiary">Operations command center</p>
             </div>
-            <span className="rounded-md border border-surface-border bg-surface-raised/80 px-2 py-0.5 text-[10px] uppercase tracking-wider text-content-tertiary">
+            <span className="shrink-0 rounded-md border border-surface-border bg-surface-raised/80 px-2 py-0.5 text-[10px] uppercase tracking-wider text-content-tertiary">
               {envLabel}
             </span>
           </div>
@@ -61,23 +61,39 @@ export function AdminLayout() {
             </div>
           </div>
         </div>
-        <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 pb-3 sm:px-6 lg:px-8" aria-label="Admin sections">
-          {navItems.filter((item) => hasPermission(item.requiredPermission)).map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) =>
-                `rounded-lg border px-3 py-1.5 text-xs interactive-hover interactive-press interactive-focus ${
-                  isActive
-                    ? 'border-brand-cta/40 bg-brand-cta text-surface-base shadow-sm'
-                    : 'border-surface-border bg-surface-raised/80 text-content-secondary hover:bg-surface-raised hover:text-content-primary'
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+        <nav
+          className="mx-auto flex min-h-10 max-w-7xl flex-nowrap items-center gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide sm:px-6 lg:px-8"
+          aria-label="Admin sections"
+        >
+          {permissionsLoading ? (
+            <div className="flex shrink-0 items-center gap-2 py-0.5" aria-hidden>
+              {navItems.map((item) => (
+                <div
+                  key={item.to}
+                  className="h-8 w-[5.5rem] shrink-0 animate-pulse rounded-lg bg-surface-elevated/70"
+                />
+              ))}
+            </div>
+          ) : (
+            navItems
+              .filter((item) => hasPermission(item.requiredPermission))
+              .map((item) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) =>
+                    `shrink-0 rounded-lg border px-3 py-1.5 text-xs interactive-hover interactive-press interactive-focus ${
+                      isActive
+                        ? 'border-brand-cta/40 bg-brand-cta text-surface-base shadow-sm'
+                        : 'border-surface-border bg-surface-raised/80 text-content-secondary hover:bg-surface-raised hover:text-content-primary'
+                    }`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              ))
+          )}
         </nav>
       </header>
 

@@ -111,10 +111,7 @@ export default function AdminDashboard() {
 
   const loadAll = useCallback(async () => {
     setIsRefreshing(true);
-    setChurnStats(null);
-    setGrowthChart([]);
-    setRevenueChart([]);
-    setWebhookRows([]);
+    // Keep prior chart/webhook data until replacements arrive to avoid CLS (panels collapsing then expanding).
 
     const { data: settings, error: settingsErr } = await supabase
       .from('platform_settings')
@@ -677,17 +674,17 @@ export default function AdminDashboard() {
       <PrivacyScreenWhenHidden />
 
       <div className="mx-auto w-full max-w-7xl space-y-6">
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-          <section className="glass-card rounded-2xl p-5 lg:col-span-8">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-stretch">
+          <section className="glass-card flex min-h-[9.5rem] flex-col rounded-2xl p-5 lg:col-span-8">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Command Center</p>
-            <h1 className="mt-1 text-xl font-semibold text-content-primary sm:text-2xl">Admin dashboard</h1>
-            <p className="mt-2 max-w-2xl text-xs text-content-tertiary sm:text-sm">
+            <h1 className="mt-1 text-xl font-semibold leading-tight text-content-primary sm:text-2xl">Admin dashboard</h1>
+            <p className="mt-2 max-w-2xl flex-1 text-xs leading-relaxed text-content-tertiary sm:text-sm">
               Scan platform health, triage user issues, and execute controls with clear separation between analytics and high-risk actions.
             </p>
           </section>
-          <section className="glass-card rounded-2xl p-4 lg:col-span-4">
+          <section className="glass-card flex min-h-[9.5rem] flex-col rounded-2xl p-4 lg:col-span-4">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Session Actions</p>
-            <div className="mt-3 flex flex-wrap items-center gap-3">
+            <div className="mt-auto flex flex-wrap items-center gap-3 pt-3">
               <button
                 type="button"
                 onClick={() => void loadAll()}

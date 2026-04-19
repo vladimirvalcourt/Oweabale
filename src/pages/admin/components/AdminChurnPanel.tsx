@@ -27,7 +27,7 @@ function formatDate(value: string | null): string {
 
 export function AdminChurnPanel({ stats }: Props) {
   return (
-    <div className="border border-surface-border rounded-lg bg-surface-raised p-5">
+    <div className="min-h-[248px] border border-surface-border rounded-lg bg-surface-raised p-5">
       <div className="text-sm font-semibold text-content-primary flex items-center gap-2 mb-4">
         <TrendingDown size={14} />
         Churn
