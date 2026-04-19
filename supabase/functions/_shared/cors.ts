@@ -72,6 +72,8 @@ function resolveAllowedOrigin(origin: string | null): string {
   if (!origin?.trim()) return list[0] ?? 'https://www.oweable.com'
 
   const trimmed = origin.trim()
+  // Opaque / sandboxed contexts send the literal string "null"; ACAO must echo it.
+  if (trimmed === 'null') return 'null'
   if (list.includes(trimmed)) return trimmed
 
   try {
@@ -91,7 +93,21 @@ export function corsHeaders(origin: string | null) {
   return {
     'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Headers':
-      'authorization, x-client-info, apikey, content-type, x-region, prefer, accept-profile, content-profile',
+      [
+        'authorization',
+        'x-client-info',
+        'apikey',
+        'content-type',
+        'x-region',
+        'prefer',
+        'accept-profile',
+        'content-profile',
+        // Sentry browser SDK adds these when `tracePropagationTargets` matches the function URL.
+        'sentry-trace',
+        'baggage',
+        'traceparent',
+        'tracestate',
+      ].join(', '),
     'Access-Control-Allow-Methods': 'GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS',
     'Access-Control-Max-Age': '86400',
     Vary: 'Origin',
