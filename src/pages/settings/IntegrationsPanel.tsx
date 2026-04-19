@@ -4,7 +4,7 @@ import { Dialog } from '@headlessui/react';
 import { useShallow } from 'zustand/react/shallow';
 import { useStore } from '../../store/useStore';
 import { toast } from 'sonner';
-import { buildGmailConnectUrl } from '../../lib/googleEmailOAuth';
+import { buildGmailConnectUrl, isGmailOAuthConfigured } from '../../lib/googleEmailOAuth';
 import { TransitionLink } from '../../components/TransitionLink';
 import { yieldForPaint } from '../../lib/interaction';
 
@@ -28,6 +28,7 @@ function IntegrationsPanelInner() {
   const [consentOpen, setConsentOpen] = useState(false);
   const [scanBusy, setScanBusy] = useState(false);
 
+  const gmailEnvReady = isGmailOAuthConfigured();
   const pendingCount = emailScanFindings.filter((f) => f.reviewStatus === 'pending').length;
 
   const startGmailOAuth = useCallback(() => {
@@ -89,11 +90,37 @@ function IntegrationsPanelInner() {
           </div>
         </div>
 
+        {!gmailEnvReady && (
+          <div
+            role="status"
+            className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-xs text-content-secondary leading-relaxed space-y-2"
+          >
+            <p className="font-medium text-amber-200">Google client ID is not configured in this build</p>
+            <p>
+              Add <code className="text-[11px] text-content-tertiary">VITE_GOOGLE_GMAIL_CLIENT_ID</code> to{' '}
+              <code className="text-[11px] text-content-tertiary">.env.local</code> (same Web Client ID as in Google Cloud
+              Console), restart the dev server, and set matching Edge Function secrets{' '}
+              <code className="text-[11px] text-content-tertiary">GOOGLE_GMAIL_CLIENT_ID</code> and{' '}
+              <code className="text-[11px] text-content-tertiary">GOOGLE_GMAIL_CLIENT_SECRET</code> in Supabase. See{' '}
+              <code className="text-[11px] text-content-tertiary">.env.example</code> and{' '}
+              <code className="text-[11px] text-content-tertiary">docs/GOOGLE_GMAIL_VERIFICATION.md</code>.
+            </p>
+            <p className="text-content-muted">
+              Authorized redirect URI must include{' '}
+              <code className="text-[11px] text-content-tertiary">
+                {typeof window !== 'undefined' ? `${window.location.origin}/auth/google-email/callback` : '…/auth/google-email/callback'}
+              </code>
+              .
+            </p>
+          </div>
+        )}
+
         {emailConnections.length === 0 ? (
           <button
             type="button"
+            disabled={!gmailEnvReady}
             onClick={() => setConsentOpen(true)}
-            className="inline-flex items-center gap-2 rounded-lg bg-content-primary px-4 py-2.5 text-sm font-medium text-surface-base hover:opacity-95"
+            className="inline-flex items-center gap-2 rounded-lg bg-content-primary px-4 py-2.5 text-sm font-medium text-surface-base hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Mail className="w-4 h-4 shrink-0" aria-hidden />
             Connect Gmail

@@ -18,7 +18,7 @@ export function KeyboardShortcutsDialog({ open, onClose }: Props) {
             Keyboard shortcuts
           </Dialog.Title>
           <Dialog.Description className="mt-2 font-sans text-sm text-content-tertiary">
-            Speed up navigation when you are not typing in a field.
+            Speed up navigation when you are not typing in a field. You can also open Settings from the sidebar (above Collapse) or from your profile menu.
           </Dialog.Description>
 
           <dl className="mt-6 space-y-4 font-sans text-sm">

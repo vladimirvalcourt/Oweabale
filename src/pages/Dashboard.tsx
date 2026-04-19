@@ -454,10 +454,13 @@ export default function Dashboard() {
   const hasCitationsSidebar = openCitations.length > 0;
   const hasLowerSidebar = hasBillsSidebar || hasCitationsSidebar;
 
-  const urgentEmailFindings = useMemo(
-    () =>
-      emailScanFindings.filter((f) => f.reviewStatus === 'pending' && f.urgency === 'high'),
+  const pendingEmailFindings = useMemo(
+    () => emailScanFindings.filter((f) => f.reviewStatus === 'pending'),
     [emailScanFindings],
+  );
+  const urgentEmailFindings = useMemo(
+    () => pendingEmailFindings.filter((f) => f.urgency === 'high'),
+    [pendingEmailFindings],
   );
 
   // Full-page skeleton until Supabase data has been merged into the store.
@@ -480,7 +483,7 @@ export default function Dashboard() {
     isOverdraftRisk ||
     showLowTaxReserveAlert ||
     debtsMissingDueDate.length > 0 ||
-    urgentEmailFindings.length > 0;
+    pendingEmailFindings.length > 0;
 
   return (
     <AppPageShell>
@@ -542,22 +545,43 @@ export default function Dashboard() {
               </TransitionLink>
             )}
 
-            {urgentEmailFindings.length > 0 && (
+            {pendingEmailFindings.length > 0 && (
               <TransitionLink to="/email-inbox" className="block focus-app rounded-lg">
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-surface-raised border border-amber-500/35 p-5 rounded-lg flex items-center justify-between hover:bg-content-primary/[0.03] transition-all shadow-none group"
+                  className={`bg-surface-raised border p-5 rounded-lg flex items-center justify-between hover:bg-content-primary/[0.03] transition-all shadow-none group ${
+                    urgentEmailFindings.length > 0 ? 'border-amber-500/35' : 'border-surface-border'
+                  }`}
                 >
                   <div className="flex items-center gap-5">
-                    <div className="relative w-10 h-10 bg-amber-500/10 rounded-full flex items-center justify-center shrink-0 border border-amber-500/25">
-                      <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-amber-400 ring-2 ring-[#0a0a0a]" aria-hidden />
-                      <Inbox className="w-5 h-5 text-amber-200" />
+                    <div
+                      className={`relative w-10 h-10 rounded-full flex items-center justify-center shrink-0 border ${
+                        urgentEmailFindings.length > 0
+                          ? 'bg-amber-500/10 border-amber-500/25'
+                          : 'bg-content-primary/[0.06] border-surface-border'
+                      }`}
+                    >
+                      {urgentEmailFindings.length > 0 && (
+                        <span
+                          className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-amber-400 ring-2 ring-[#0a0a0a]"
+                          aria-hidden
+                        />
+                      )}
+                      <Inbox
+                        className={`w-5 h-5 ${urgentEmailFindings.length > 0 ? 'text-amber-200' : 'text-content-primary'}`}
+                      />
                     </div>
                     <div>
-                      <p className="text-sm font-sans font-medium text-content-primary">Urgent email notice</p>
+                      <p className="text-sm font-sans font-medium text-content-primary">
+                        {urgentEmailFindings.length > 0 ? 'Urgent email notice' : 'New from email'}
+                      </p>
                       <p className="text-xs font-sans text-content-secondary mt-0.5">
-                        A collections, final notice, or tax message may need review — open New from email to confirm.
+                        {urgentEmailFindings.length > 0
+                          ? 'A collections, final notice, or tax message may need review — confirm in New from email.'
+                          : `${pendingEmailFindings.length} bill, subscription, toll, or other financial message${
+                              pendingEmailFindings.length === 1 ? '' : 's'
+                            } to review before syncing to your plan.`}
                       </p>
                     </div>
                   </div>

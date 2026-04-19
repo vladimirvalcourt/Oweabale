@@ -1,5 +1,11 @@
 const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
 
+/** True when the Vite bundle has a Google OAuth Web client ID (required for Connect Gmail). */
+export function isGmailOAuthConfigured(): boolean {
+  const id = import.meta.env.VITE_GOOGLE_GMAIL_CLIENT_ID as string | undefined;
+  return Boolean(id?.trim());
+}
+
 export function getGoogleEmailOAuthRedirectUri(): string {
   return `${window.location.origin}/auth/google-email/callback`;
 }

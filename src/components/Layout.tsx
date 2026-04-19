@@ -119,6 +119,19 @@ export default function Layout() {
   const searchModKey = useMemo(() => (isApplePointerPlatform() ? '⌘' : 'Ctrl'), []);
   const unreadNotifCount = useMemo(() => notifications.filter((n) => !n.read).length, [notifications]);
 
+  const accountDisplayName = useMemo(() => {
+    const u = user;
+    if (!u) return '';
+    const first = u.firstName.trim();
+    const last = u.lastName.trim();
+    if (first && last) return `${first} ${last}`;
+    if (first) return first;
+    return u.email?.split('@')[0] ?? 'Account';
+  }, [user]);
+
+  const planBadgeLabel = checkingFullSuite ? 'Checking plan…' : hasFullSuite ? 'Full Suite' : 'Tracker';
+  const isSettingsRoute = location.pathname.startsWith('/settings');
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -493,6 +506,7 @@ export default function Layout() {
 
       {/* Sidebar */}
       <aside 
+        aria-label="Primary navigation"
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex flex-col bg-black/55 backdrop-blur-xl transition-all duration-300 ease-in-out supports-[backdrop-filter]:bg-black/40",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
@@ -500,18 +514,34 @@ export default function Layout() {
           "border-r border-surface-border"
         )}
       >
-        <div className="shrink-0 flex items-center justify-between h-[4.5rem] px-4 border-b border-surface-border/90">
-          <div className="flex items-center gap-2 overflow-hidden">
-            {!sidebarCollapsed && (
-              <div className="flex items-center gap-2">
+        <div className="shrink-0 flex h-[4.5rem] items-center justify-between gap-2 border-b border-surface-border/90 px-3 sm:px-4">
+          <div className="flex min-w-0 flex-1 items-center overflow-hidden">
+            {!sidebarCollapsed ? (
+              <TransitionLink to="/dashboard" className="min-w-0 shrink focus-app rounded-lg">
                 <BrandWordmark textClassName="brand-header-text" />
+              </TransitionLink>
+            ) : (
+              <div className="flex w-full justify-center">
+                <TransitionLink
+                  to="/dashboard"
+                  aria-label="Oweable home"
+                  className="flex shrink-0 rounded-lg p-1 focus-app"
+                >
+                  <img
+                    src="/brand/oweable-logo-glyph.png"
+                    alt=""
+                    className="h-7 w-7 rounded-sm object-contain"
+                    width={28}
+                    height={28}
+                  />
+                </TransitionLink>
               </div>
             )}
           </div>
           <button 
             type="button"
             aria-label="Close navigation menu"
-            className="lg:hidden text-content-tertiary hover:text-content-secondary p-2 transition-colors focus-app rounded-lg"
+            className="shrink-0 p-2 text-content-tertiary transition-colors hover:text-content-secondary focus-app rounded-lg lg:hidden"
             onClick={closeSidebarMobile}
           >
             <MorphingMenuIcon isOpen={sidebarOpen} className="text-content-primary" />
@@ -533,8 +563,8 @@ export default function Layout() {
           </div>
         )}
 
-        <nav className="flex-1 px-3 py-6 overflow-y-auto scrollbar-hide space-y-4">
-          {processedSidebarNav.map((group) => {
+        <nav className={cn('flex-1 overflow-y-auto scrollbar-hide', sidebarCollapsed ? 'space-y-3 px-1.5 py-4' : 'space-y-4 px-3 py-6')} aria-label="App sections">
+          {processedSidebarNav.map((group, groupIndex) => {
             const isExpanded = expandedGroups[group.label];
             return (
               <div key={group.label} className="space-y-1">
@@ -549,8 +579,9 @@ export default function Layout() {
                     <ChevronDown className={cn("w-3 h-3 transition-transform duration-300", isExpanded ? "rotate-0" : "-rotate-90 text-content-tertiary")} />
                   </button>
                 )}
-                {/* Collapsed view line separator */}
-                {sidebarCollapsed && <div className="h-[1px] bg-surface-border mx-2 my-4 opacity-50" />}
+                {sidebarCollapsed && groupIndex > 0 && (
+                  <div className="mx-1 mb-2 h-px bg-surface-border opacity-50" role="separator" aria-hidden="true" />
+                )}
 
                 <div
                   className={cn(
@@ -576,13 +607,19 @@ export default function Layout() {
                             <TransitionLink
                               to={item.linkTo}
                               className={cn(
-                                "relative flex min-h-10 items-center gap-3 rounded-lg py-2.5 transition-colors duration-200 group border border-transparent",
-                                nested ? "pl-7 pr-4" : "px-4",
+                                'focus-app group relative flex min-h-10 items-center gap-3 rounded-lg border border-transparent py-2.5 transition-colors duration-200',
+                                // Collapsed rail: center icons; nested indent only when labels show
+                                sidebarCollapsed
+                                  ? 'justify-center px-1.5'
+                                  : nested
+                                    ? 'pl-7 pr-4'
+                                    : 'px-4',
                                 isActive
-                                  ? "bg-content-primary/[0.06] text-content-primary border-surface-border/80"
-                                  : "text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary",
+                                  ? 'bg-content-primary/[0.06] text-content-primary border-surface-border/80'
+                                  : 'text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary',
                               )}
                               title={sidebarCollapsed ? item.name : undefined}
+                              aria-current={isActive ? 'page' : undefined}
                               onClick={(e) => {
                                 if (!isDueSoonItem) return;
                                 const isMobile = window.matchMedia('(max-width: 1023px)').matches;
@@ -594,8 +631,17 @@ export default function Layout() {
                                 setShowDueSoonPreview(false);
                               }}
                             >
-                              {isActive && (
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[2px] rounded-r-sm h-4 bg-content-primary" />
+                              {isActive && !sidebarCollapsed && (
+                                <span
+                                  className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-r-sm bg-content-primary"
+                                  aria-hidden
+                                />
+                              )}
+                              {isActive && sidebarCollapsed && (
+                                <span
+                                  className="pointer-events-none absolute inset-x-1.5 bottom-1 h-0.5 rounded-full bg-brand-cta"
+                                  aria-hidden
+                                />
                               )}
                               <TactileIcon
                                 icon={Icon}
@@ -603,8 +649,8 @@ export default function Layout() {
                                 active={isActive}
                                 variant="static"
                                 className={cn(
-                                  "shrink-0",
-                                  !isActive && "group-hover:translate-x-0.5"
+                                  'relative z-[1] shrink-0',
+                                  !isActive && !sidebarCollapsed && 'group-hover:translate-x-0.5'
                                 )}
                               />
                               {!sidebarCollapsed && (
@@ -655,40 +701,42 @@ export default function Layout() {
           })}
         </nav>
 
-        {/* Collapse button (Desktop only) */}
-        <div className="p-4 border-t border-surface-border/90 bg-transparent">
-          <div className={cn("mb-4", sidebarCollapsed ? "px-0" : "px-2")}>
-            <button
-              type="button"
-              onClick={() => startTransition(() => setSidebarCollapsed((c) => !c))}
+        {/* Settings (discoverable) + collapse — sign out lives only in the account menu to avoid duplicate destructive entry points */}
+        <div className="border-t border-surface-border/90 bg-transparent p-3 sm:p-4">
+          <div className={cn('flex flex-col gap-2', sidebarCollapsed ? 'px-0' : 'px-1')}>
+            <TransitionLink
+              to="/settings"
+              onClick={closeSidebarMobile}
+              title={sidebarCollapsed ? 'Settings' : undefined}
+              aria-current={isSettingsRoute ? 'page' : undefined}
               className={cn(
-                "flex items-center w-full py-2 text-[12px] font-sans font-medium text-content-secondary bg-transparent border border-surface-border rounded-lg hover:text-content-primary hover:bg-content-primary/[0.04] transition-all group",
-                sidebarCollapsed ? "justify-center px-0" : "justify-start px-3 gap-3"
+                'focus-app group flex min-h-10 w-full items-center rounded-lg border py-2 text-[12px] font-sans font-medium transition-all',
+                sidebarCollapsed ? 'justify-center px-1.5' : 'justify-start gap-3 px-3',
+                isSettingsRoute
+                  ? 'border-content-primary/25 bg-content-primary/[0.08] text-content-primary'
+                  : 'border-surface-border bg-transparent text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary',
               )}
             >
-              <div className="w-5 h-5 flex items-center justify-center shrink-0">
-                <MorphingMenuIcon isOpen={!sidebarCollapsed} className="scale-75 text-content-tertiary group-hover:text-content-primary transition-colors" />
+              <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+                <Settings className="h-4 w-4 shrink-0 text-content-tertiary transition-colors group-hover:text-content-primary" aria-hidden />
               </div>
-              {!sidebarCollapsed && <span>Collapse</span>}
-            </button>
+              {!sidebarCollapsed && <span>Settings</span>}
+            </TransitionLink>
 
             <button
               type="button"
-              onClick={() => {
-                useStore.getState().signOut();
-                toast.success('Session Terminated');
-                startTransition(() => navigate('/auth'));
-              }}
+              onClick={() => startTransition(() => setSidebarCollapsed((c) => !c))}
+              aria-expanded={!sidebarCollapsed}
+              aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               className={cn(
-                "flex items-center w-full py-2 mt-2 text-[12px] font-sans font-medium text-content-secondary bg-transparent border border-surface-border rounded-lg hover:text-content-primary hover:bg-content-primary/[0.04] transition-all group",
-                sidebarCollapsed ? "justify-center px-0" : "justify-start px-3 gap-3"
+                'focus-app group flex w-full items-center rounded-lg border border-surface-border bg-transparent py-2 text-[12px] font-sans font-medium text-content-secondary transition-all hover:bg-content-primary/[0.04] hover:text-content-primary',
+                sidebarCollapsed ? 'justify-center px-0' : 'justify-start gap-3 px-3',
               )}
-              title={sidebarCollapsed ? "Sign Out" : undefined}
             >
-              <div className="w-5 h-5 flex items-center justify-center shrink-0">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="rotate-180 group-hover:-translate-x-0.5 transition-transform"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+              <div className="flex h-5 w-5 shrink-0 items-center justify-center">
+                <MorphingMenuIcon isOpen={!sidebarCollapsed} className="scale-75 text-content-tertiary transition-colors group-hover:text-content-primary" />
               </div>
-              {!sidebarCollapsed && <span>Sign Out</span>}
+              {!sidebarCollapsed && <span>Collapse</span>}
             </button>
           </div>
         </div>
@@ -912,7 +960,22 @@ export default function Layout() {
                 leaveFrom="opacity-100 scale-100 translate-y-0"
                 leaveTo="opacity-0 scale-[0.96] -translate-y-1"
               >
-                <HeadlessMenu.Items className="absolute right-0 z-50 mt-3 w-56 origin-top-right overflow-hidden rounded-lg border border-surface-border bg-black/92 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl focus-app">
+                <HeadlessMenu.Items className="absolute right-0 z-50 mt-3 w-64 origin-top-right overflow-hidden rounded-lg border border-surface-border bg-black/92 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl focus-app">
+                  <div className="border-b border-content-primary/10 px-3 py-3">
+                    <p className="text-[10px] font-mono uppercase tracking-wider text-content-muted">Signed in</p>
+                    <p className="mt-1 truncate text-sm font-medium text-content-primary" title={accountDisplayName}>
+                      {accountDisplayName || 'Account'}
+                    </p>
+                    {user?.email ? (
+                      <p className="mt-0.5 truncate text-xs text-content-tertiary" title={user.email}>
+                        {user.email}
+                      </p>
+                    ) : null}
+                    <p className="mt-2 inline-flex rounded-md border border-surface-border bg-surface-elevated/80 px-2 py-0.5 text-[10px] font-mono font-medium tracking-wide text-content-secondary">
+                      {planBadgeLabel}
+                    </p>
+                  </div>
+
                   <div className="py-1">
                     <HeadlessMenu.Item>
                       {({ active }) => (
@@ -937,7 +1000,7 @@ export default function Layout() {
                           to="/settings"
                           className={cn(
                             'flex items-center gap-3 px-3 py-2 text-sm transition-colors',
-                            active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary'
+                            active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary',
                           )}
                         >
                           <div className="flex h-4 w-4 items-center justify-center text-content-tertiary">
@@ -947,8 +1010,6 @@ export default function Layout() {
                         </TransitionLink>
                       )}
                     </HeadlessMenu.Item>
-
-
                   </div>
 
                   <div className="h-[1px] bg-content-primary/5 my-1" />
@@ -960,13 +1021,17 @@ export default function Layout() {
                           to="/"
                           className={cn(
                             'flex items-center gap-3 px-3 py-2 text-sm transition-colors',
-                            active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary'
+                            active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary',
                           )}
+                          title="Public marketing site"
                         >
-                          <div className="w-4 h-4 flex items-center justify-center">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                          <div className="flex h-4 w-4 shrink-0 items-center justify-center">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                            </svg>
                           </div>
-                          <span>Homepage</span>
+                          <span>Marketing site</span>
                         </TransitionLink>
                       )}
                     </HeadlessMenu.Item>
@@ -974,16 +1039,23 @@ export default function Layout() {
                     <HeadlessMenu.Item>
                       {({ active }) => (
                         <button
+                          type="button"
                           onClick={() => setIsResetOpen(true)}
+                          title="Opens confirmation — permanently deletes your bills, debts, and transactions"
                           className={cn(
-                            'w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors',
-                            active ? 'bg-amber-500/10 text-amber-500' : 'text-content-tertiary'
+                            'flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left text-sm transition-colors',
+                            active ? 'bg-amber-500/10 text-amber-200' : 'text-content-tertiary',
                           )}
                         >
-                          <div className="w-4 h-4 flex items-center justify-center text-amber-500/70">
-                            <Activity className="w-4 h-4" />
-                          </div>
-                          <span>Restart Protocol</span>
+                          <span className="flex w-full items-center gap-3">
+                            <span className="flex h-4 w-4 shrink-0 items-center justify-center text-amber-500/80">
+                              <Activity className="h-4 w-4" aria-hidden />
+                            </span>
+                            <span className="font-medium text-content-primary">Erase all data…</span>
+                          </span>
+                          <span className="pl-7 text-[11px] leading-snug text-content-muted">
+                            Removes bills, debts &amp; transactions — cannot be undone
+                          </span>
                         </button>
                       )}
                     </HeadlessMenu.Item>
@@ -993,14 +1065,21 @@ export default function Layout() {
                         <TransitionLink
                           to="/onboarding/setup"
                           className={cn(
-                            'w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors',
-                            active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary'
+                            'flex w-full flex-col items-start gap-0.5 px-3 py-2 text-sm transition-colors',
+                            active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary',
                           )}
                         >
-                          <div className="w-4 h-4 flex items-center justify-center">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 14 4-4-4-4"></path><path d="M3 3.412C3 3.185 3.184 3 3.412 3H16.48c0.04 0 0.16 0.04 0.16 0.16V10a1 1 0 0 1-1 1h-12a1 1 0 0 1-1-1V3.412Z"></path><path d="M3 21v-8a1 1 0 1 1 2 0v8a1 1 0 1 1-2 0Z"></path></svg>
-                          </div>
-                          <span>Onboarding</span>
+                          <span className="flex w-full items-center gap-3">
+                            <span className="flex h-4 w-4 shrink-0 items-center justify-center">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                                <path d="m12 14 4-4-4-4" />
+                                <path d="M3 3.412C3 3.185 3.184 3 3.412 3H16.48c0.04 0 0.16 0.04 0.16 0.16V10a1 1 0 0 1-1 1h-12a1 1 0 0 1-1-1V3.412Z" />
+                                <path d="M3 21v-8a1 1 0 1 1 2 0v8a1 1 0 1 1-2 0Z" />
+                              </svg>
+                            </span>
+                            <span className="font-medium text-content-primary">Setup wizard</span>
+                          </span>
+                          <span className="pl-7 text-[11px] leading-snug text-content-muted">Revisit money onboarding &amp; defaults</span>
                         </TransitionLink>
                       )}
                     </HeadlessMenu.Item>
@@ -1012,18 +1091,23 @@ export default function Layout() {
                     <HeadlessMenu.Item>
                       {({ active }) => (
                         <button
+                          type="button"
                           onClick={() => {
                             useStore.getState().signOut();
                             toast.success('Logged out');
                             startTransition(() => navigate('/auth'));
                           }}
                           className={cn(
-                            'w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors',
-                            active ? 'bg-content-primary/5 text-red-400' : 'text-content-tertiary'
+                            'flex w-full items-center gap-3 px-3 py-2 text-sm transition-colors',
+                            active ? 'bg-content-primary/5 text-red-400' : 'text-content-tertiary',
                           )}
                         >
-                          <div className="w-4 h-4 flex items-center justify-center">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                          <div className="flex h-4 w-4 items-center justify-center">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                              <polyline points="16 17 21 12 16 7" />
+                              <line x1="21" y1="12" x2="9" y2="12" />
+                            </svg>
                           </div>
                           <span>Log out</span>
                         </button>
@@ -1137,10 +1221,10 @@ export default function Layout() {
               <div className="flex-shrink-0 w-10 h-10 rounded-full border border-amber-500/30 flex items-center justify-center bg-amber-500/5">
                 <AlertTriangle className="w-5 h-5 text-amber-500" />
               </div>
-              <Dialog.Title className="text-lg font-semibold tracking-tight text-content-primary font-sans">Wipe All Data?</Dialog.Title>
+              <Dialog.Title className="text-lg font-semibold tracking-tight text-content-primary font-sans">Erase all data?</Dialog.Title>
             </div>
             <Dialog.Description className="text-[13px] text-content-tertiary mb-6 leading-relaxed font-sans">
-              This will permanently delete every bill, transaction, and financial link you've created. You will be sent back to the initial setup to start fresh.
+              This permanently deletes bills, debts, transactions, and links you created in Oweable. You will return to setup to start fresh. This cannot be undone.
             </Dialog.Description>
 
             <div className="flex justify-end gap-3">
@@ -1163,7 +1247,7 @@ export default function Layout() {
                 className="focus-app flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-widest text-surface-base transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isResetting && <Activity className="w-3 h-3 animate-spin" />}
-                {isResetting ? 'Wiping...' : 'Confirm Wipe'}
+                {isResetting ? 'Erasing…' : 'Erase everything'}
               </button>
             </div>
           </Dialog.Panel>
