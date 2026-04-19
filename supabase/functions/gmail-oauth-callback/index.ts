@@ -40,23 +40,30 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'Invalid session' }), { status: 401, headers: ch });
     }
 
-    const body = (await req.json()) as { code?: string; redirect_uri?: string };
+    const body = (await req.json()) as { code?: string; redirect_uri?: string; code_verifier?: string };
     const code = typeof body.code === 'string' ? body.code.trim() : '';
     const redirectUri = typeof body.redirect_uri === 'string' ? body.redirect_uri.trim() : '';
-    if (!code || !redirectUri) {
-      return new Response(JSON.stringify({ error: 'code and redirect_uri required' }), { status: 400, headers: ch });
+    const codeVerifier = typeof body.code_verifier === 'string' ? body.code_verifier.trim() : '';
+    if (!code || !redirectUri || !codeVerifier) {
+      return new Response(
+        JSON.stringify({ error: 'code, redirect_uri, and code_verifier (PKCE) required' }),
+        { status: 400, headers: ch },
+      );
     }
+
+    const tokenParams = new URLSearchParams({
+      code,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: redirectUri,
+      grant_type: 'authorization_code',
+      code_verifier: codeVerifier,
+    });
 
     const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        code,
-        client_id: clientId,
-        client_secret: clientSecret,
-        redirect_uri: redirectUri,
-        grant_type: 'authorization_code',
-      }),
+      body: tokenParams,
     });
     if (!tokenRes.ok) {
       const t = await tokenRes.text();

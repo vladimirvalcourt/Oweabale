@@ -58,6 +58,7 @@ const NotFound         = lazy(() => import('./pages/NotFound'));
 
 import { useDataSync } from './hooks/useDataSync';
 import { ThemedToaster } from './components/ThemedToaster';
+import { UnsupportedBrowserBanner } from './components/UnsupportedBrowserBanner';
 
 function SignInRoute({ authUser }: { authUser: User | null }) {
   const location = useLocation();
@@ -348,6 +349,7 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <UnsupportedBrowserBanner />
       <ThemedToaster />
       <ErrorBoundary>
         <AppRoutes />

@@ -4,6 +4,7 @@ import { Dialog } from '@headlessui/react';
 import { useShallow } from 'zustand/react/shallow';
 import { useStore } from '../../store/useStore';
 import { toast } from 'sonner';
+import { browserSupportsModernWebCrypto } from '../../lib/browserSupport';
 import { buildGmailConnectUrl, isGmailOAuthConfigured } from '../../lib/googleEmailOAuth';
 import { TransitionLink } from '../../components/TransitionLink';
 import { yieldForPaint } from '../../lib/interaction';
@@ -29,17 +30,20 @@ function IntegrationsPanelInner() {
   const [scanBusy, setScanBusy] = useState(false);
 
   const gmailEnvReady = isGmailOAuthConfigured();
+  const cryptoReady = browserSupportsModernWebCrypto();
   const pendingCount = emailScanFindings.filter((f) => f.reviewStatus === 'pending').length;
 
   const startGmailOAuth = useCallback(() => {
-    try {
-      const url = buildGmailConnectUrl();
-      window.location.assign(url);
-    } catch (e) {
-      toast.error(
-        e instanceof Error ? e.message : 'Google client ID missing. Add VITE_GOOGLE_GMAIL_CLIENT_ID.',
-      );
-    }
+    void (async () => {
+      try {
+        const url = await buildGmailConnectUrl();
+        window.location.assign(url);
+      } catch (e) {
+        toast.error(
+          e instanceof Error ? e.message : 'Google client ID missing. Add VITE_GOOGLE_GMAIL_CLIENT_ID.',
+        );
+      }
+    })();
   }, []);
 
   const onScanNow = async () => {
@@ -90,6 +94,19 @@ function IntegrationsPanelInner() {
           </div>
         </div>
 
+        {!cryptoReady && (
+          <div
+            role="status"
+            className="rounded-lg border border-rose-500/35 bg-rose-500/10 px-4 py-3 text-xs text-content-secondary leading-relaxed"
+          >
+            <p className="font-medium text-rose-200">Browser cannot run secure Google OAuth</p>
+            <p className="mt-1 text-content-muted">
+              Update your browser or open Oweable in Chrome, Safari, Firefox, or Edge. Embedded WebViews often lack
+              the cryptography required for PKCE (this reduces Google &quot;legacy browser&quot; warnings).
+            </p>
+          </div>
+        )}
+
         {!gmailEnvReady && (
           <div
             role="status"
@@ -118,7 +135,7 @@ function IntegrationsPanelInner() {
         {emailConnections.length === 0 ? (
           <button
             type="button"
-            disabled={!gmailEnvReady}
+            disabled={!gmailEnvReady || !cryptoReady}
             onClick={() => setConsentOpen(true)}
             className="inline-flex items-center gap-2 rounded-lg bg-content-primary px-4 py-2.5 text-sm font-medium text-surface-base hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
           >
