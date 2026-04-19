@@ -102,6 +102,7 @@ export const RISC_EVENT_TYPES = [
   'https://schemas.openid.net/secevent/oauth/event-type/token-revoked',
   'https://schemas.openid.net/secevent/risc/event-type/account-disabled',
   'https://schemas.openid.net/secevent/risc/event-type/account-enabled',
+  'https://schemas.openid.net/secevent/risc/event-type/account-purged',
   'https://schemas.openid.net/secevent/risc/event-type/account-credential-change-required',
   'https://schemas.openid.net/secevent/risc/event-type/verification',
 ] as const;

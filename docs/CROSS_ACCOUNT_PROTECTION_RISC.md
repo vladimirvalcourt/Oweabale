@@ -75,10 +75,14 @@ Check Edge logs for `[risc-google-receiver] verification event`.
 
 ## Event handling (current behavior)
 
-- **`sessions-revoked`**, **`tokens-revoked`**, **`account-disabled`** (not `bulk-account`): resolve Google `sub` → Supabase user, **revoke refresh tokens** (`risc_revoke_user_sessions`), **delete** all `email_connections` for that user (Gmail must be re-linked).
+- **`sessions-revoked`**, **`tokens-revoked`**, **`account-purged`**, **`account-credential-change-required`**: resolve Google `sub` → Supabase user, **`auth.admin.signOut(userId, 'global')`** (fallback: `risc_revoke_user_sessions` RPC), **delete** all `email_connections` for that user (Gmail must be re-linked).
+- **`account-disabled`** (not `bulk-account`): same as above — includes **`reason=hijacking`** and other non-bulk disables (Google does not use a separate “credential-compromised” URI in the standard RISC set; hijack/disable flows use these events).
 - **`account-disabled`** with `reason=bulk-account`: **log only** (no automatic mass sign-out).
-- **`token-revoked`** (refresh token): delete matching `email_connections` row by **hash** or **prefix** fingerprint.
-- **`verification`**, **`account-credential-change-required`**, **`account-enabled`**: log / no-op for now.
+- **`token-revoked`** (refresh token): delete matching `email_connections` row by **hash** or **prefix** fingerprint (no full user sign-out unless paired with account-level events).
+- **`verification`**: log (Google **Test** / stream verification).
+- **`account-enabled`**: log only (no automatic action).
+
+After adding **`account-purged`** to the subscribed list, **re-run** `risc-google-register` (`stream:update`) so Google delivers that event type (see [Register the stream](#register-the-stream-with-google)).
 
 ## Maintenance
 

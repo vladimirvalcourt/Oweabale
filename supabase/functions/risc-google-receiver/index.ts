@@ -7,6 +7,7 @@ const EVENT_TOKENS_REVOKED = 'https://schemas.openid.net/secevent/oauth/event-ty
 const EVENT_TOKEN_REVOKED = 'https://schemas.openid.net/secevent/oauth/event-type/token-revoked';
 const EVENT_ACCOUNT_DISABLED = 'https://schemas.openid.net/secevent/risc/event-type/account-disabled';
 const EVENT_ACCOUNT_ENABLED = 'https://schemas.openid.net/secevent/risc/event-type/account-enabled';
+const EVENT_ACCOUNT_PURGED = 'https://schemas.openid.net/secevent/risc/event-type/account-purged';
 const EVENT_CRED_CHANGE = 'https://schemas.openid.net/secevent/risc/event-type/account-credential-change-required';
 const EVENT_VERIFICATION = 'https://schemas.openid.net/secevent/risc/event-type/verification';
 
@@ -57,9 +58,16 @@ async function resolveUserId(
 async function revokeSessionsAndGmail(
   admin: ReturnType<typeof createClient>,
   userId: string,
+  reason: string,
 ): Promise<void> {
-  const { error: rpcErr } = await admin.rpc('risc_revoke_user_sessions', { target_user: userId });
-  if (rpcErr) console.warn('[risc-google-receiver] risc_revoke_user_sessions', rpcErr.message);
+  const { error: signOutErr } = await admin.auth.admin.signOut(userId, 'global');
+  if (signOutErr) {
+    console.warn('[risc-google-receiver] auth.admin.signOut', signOutErr.message, reason);
+    const { error: rpcErr } = await admin.rpc('risc_revoke_user_sessions', { target_user: userId });
+    if (rpcErr) console.warn('[risc-google-receiver] risc_revoke_user_sessions fallback', rpcErr.message);
+  } else {
+    console.log('[risc-google-receiver] sessions revoked (global)', userId.slice(0, 8), reason);
+  }
 
   const { error: delErr } = await admin.from('email_connections').delete().eq('user_id', userId);
   if (delErr) console.warn('[risc-google-receiver] email_connections delete', delErr.message);
@@ -141,11 +149,6 @@ Deno.serve(async (req: Request) => {
       continue;
     }
 
-    if (eventUri === EVENT_CRED_CHANGE) {
-      console.log('[risc-google-receiver] credential-change-required');
-      continue;
-    }
-
     if (eventUri === EVENT_ACCOUNT_ENABLED) {
       console.log('[risc-google-receiver] account-enabled (no automatic action)');
       continue;
@@ -169,7 +172,17 @@ Deno.serve(async (req: Request) => {
     }
 
     if (eventUri === EVENT_SESSIONS_REVOKED || eventUri === EVENT_TOKENS_REVOKED) {
-      await revokeSessionsAndGmail(admin, userId);
+      await revokeSessionsAndGmail(admin, userId, eventUri);
+      continue;
+    }
+
+    if (eventUri === EVENT_ACCOUNT_PURGED) {
+      await revokeSessionsAndGmail(admin, userId, EVENT_ACCOUNT_PURGED);
+      continue;
+    }
+
+    if (eventUri === EVENT_CRED_CHANGE) {
+      await revokeSessionsAndGmail(admin, userId, EVENT_CRED_CHANGE);
       continue;
     }
 
@@ -179,7 +192,7 @@ Deno.serve(async (req: Request) => {
         console.log('[risc-google-receiver] account-disabled bulk-account — logging only');
         continue;
       }
-      await revokeSessionsAndGmail(admin, userId);
+      await revokeSessionsAndGmail(admin, userId, `${EVENT_ACCOUNT_DISABLED}:${String(reason ?? 'unknown')}`);
       continue;
     }
 
