@@ -9,7 +9,10 @@ export const guessCategory = (text: string): string | null => {
   if (/(car payment|auto loan|honda|toyota|ford|subaru|bmw|tesla|vehicle|mechanic|jiffy lube|firestone|autozone|napa auto|advance auto|o'reilly|pep boys|dealership|car wash|oil change|dmv|registration)/.test(t)) return 'auto';
   if (/(medical|doctor|hospital|therapy|pharmacy|cvs|walgreens|health|dental|vision|optometrist|urgent care|clinic|lab corp|quest diagnostics|anthem|humana)/.test(t)) return 'health';
   if (/(student loan|college|university|tuition|school|education|sallie mae|navient|coursera|udemy|skillshare|khan academy|textbook)/.test(t)) return 'education';
-  if (/(daycare|child care|babysitter|nanny|preschool|kindergarten|after school)/.test(t)) return 'childcare';
+  if (/(daycare|day care|preschool|pre-k|kindergarten)/.test(t)) return 'daycare';
+  if (/(child care|babysitter|nanny|after school)/.test(t)) return 'childcare';
+  if (/(child support paid|paying child support|child support to)/.test(t)) return 'child_support';
+  if (/(alimony paid|spousal support paid)/.test(t)) return 'alimony';
   if (/(gym|planet fitness|hair|salon|barber|nails|nail salon|personal care|massage|spa|equinox|anytime fitness|la fitness|crunch|waxing|tattoo)/.test(t)) return 'personal';
   if (/(tax|irs|revenue|customs|h&r block|turbotax)/.test(t)) return 'taxes';
   if (/(aws|google cloud|azure|domain|hosting|github|figma|slack|notion|linear|vercel|software|saas|business|office 365|microsoft 365|zoom|hubspot|salesforce|quickbooks|stripe)/.test(t)) return 'business';

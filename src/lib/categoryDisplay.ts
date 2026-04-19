@@ -1,7 +1,9 @@
 import { PLAID_CATEGORY_LABELS } from './plaidCategoryLabels';
+import { EXPENSE_CATEGORY_LABELS } from './quickEntryCategories';
 
 const CATEGORY_LABEL_MAP: Record<string, string> = {
   ...PLAID_CATEGORY_LABELS,
+  ...EXPENSE_CATEGORY_LABELS,
 };
 
 const PLAID_PREFIXES = ['personal_finance_category_', 'pfc_'];

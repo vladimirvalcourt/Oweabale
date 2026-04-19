@@ -25,6 +25,7 @@ import { buildScanExtraction } from '../lib/ingestionExtraction';
 import { extractDocumentText } from '../lib/ingestionScan';
 import type { PendingIngestion } from '../store/useStore';
 import { yieldForPaint } from '../lib/interaction';
+import { EXPENSE_BILL_CATEGORY_OPTIONS, INCOME_CATEGORY_OPTIONS } from '../lib/quickEntryCategories';
 
 // Upload rate limiter — max 5 files per 60 seconds
 const uploadTimestamps: number[] = [];
@@ -763,20 +764,9 @@ export default function Ingestion() {
                                     }
                                     className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field transition-colors"
                                   >
-                                    <option value="utilities">Utilities</option>
-                                    <option value="housing">Housing</option>
-                                    <option value="food">Food</option>
-                                    <option value="transport">Transport</option>
-                                    <option value="shopping">Shopping</option>
-                                    <option value="entertainment">Entertainment</option>
-                                    <option value="health">Health</option>
-                                    <option value="subscriptions">Subscriptions</option>
-                                    <option value="insurance">Insurance</option>
-                                    <option value="auto">Auto</option>
-                                    <option value="business">Business</option>
-                                    <option value="taxes">Taxes</option>
-                                    <option value="debt">Debt</option>
-                                    <option value="other">Other</option>
+                                    {EXPENSE_BILL_CATEGORY_OPTIONS.map((o) => (
+                                      <option key={o.value} value={o.value}>{o.label}</option>
+                                    ))}
                                   </select>
                                 </div>
                               </div>
@@ -810,10 +800,9 @@ export default function Ingestion() {
                                     }
                                     className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field transition-colors"
                                   >
-                                    <option value="Salary">Salary</option>
-                                    <option value="Freelance">Freelance</option>
-                                    <option value="Bonus">Bonus</option>
-                                    <option value="Other">Other</option>
+                                    {INCOME_CATEGORY_OPTIONS.map((o) => (
+                                      <option key={o.value} value={o.value}>{o.label}</option>
+                                    ))}
                                   </select>
                                 </div>
                               </div>
@@ -884,18 +873,9 @@ export default function Ingestion() {
                                     onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, category: e.target.value } })}
                                     className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field transition-colors uppercase tracking-widest"
                                   >
-                                    <option value="utilities">Utilities</option>
-                                    <option value="housing">Housing</option>
-                                    <option value="food">Food</option>
-                                    <option value="transport">Transport</option>
-                                    <option value="shopping">Shopping</option>
-                                    <option value="subscriptions">Subscriptions</option>
-                                    <option value="insurance">Insurance</option>
-                                    <option value="health">Health</option>
-                                    <option value="auto">Auto</option>
-                                    <option value="business">Business</option>
-                                    <option value="taxes">Taxes</option>
-                                    <option value="other">Other</option>
+                                    {EXPENSE_BILL_CATEGORY_OPTIONS.map((o) => (
+                                      <option key={o.value} value={o.value}>{o.label}</option>
+                                    ))}
                                   </select>
                                 </div>
                               </div>

@@ -9,6 +9,7 @@ import { guessCategory } from '../lib/categorizer';
 import { validateIngestionFile } from '../lib/security';
 import { extractCitationFieldsFromText, looksLikeCitationDocument } from '../lib/citationFromDocument';
 import { yieldForPaint } from '../lib/interaction';
+import { EXPENSE_BILL_CATEGORY_OPTIONS, INCOME_CATEGORY_OPTIONS } from '../lib/quickEntryCategories';
 
 interface QuickAddModalProps {
   isOpen: boolean;
@@ -42,7 +43,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [debtNoPaymentDue, setDebtNoPaymentDue] = useState(false);
   const [dueDate, setDueDate] = useState('');
   const [vendor, setVendor] = useState('');
-  const [source, setSource] = useState('salary');
+  const [incomeCategory, setIncomeCategory] = useState('Salary');
   const [incomeFrequency, setIncomeFrequency] = useState<IncomeSource['frequency']>('Monthly');
   // Citation-specific states
   const [citationType, setCitationType] = useState('Toll Violation');
@@ -210,7 +211,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       setDate(new Date().toISOString().split('T')[0]);
       setObligationKind('bill-monthly');
       setDueDate('');
-      setSource('salary');
+      setIncomeCategory('Salary');
       setIncomeFrequency('Monthly');
       setNlpText('');
       setIsScanning(false);
@@ -233,6 +234,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       clearLastBudgetGuardrail();
     }
   }, [isOpen, quickAddTab, clearLastBudgetGuardrail]);
+
+  useEffect(() => {
+    setShowPreview(false);
+  }, [activeTab]);
 
   useEffect(() => {
     if (activeTab === 'obligation' && vendor.length > 2) {
@@ -362,10 +367,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         }
       } else if (activeTab === 'income') {
         const ok = await addIncome({
-          name: description.trim() || source,
+          name: description.trim() || incomeCategory,
           amount: numAmount,
           frequency: incomeFrequency,
-          category: 'Income',
+          category: incomeCategory,
           nextDate: date,
           status: 'active',
           isTaxWithheld: false
@@ -430,7 +435,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="w-full sm:max-w-md"
             >
-              <Dialog.Panel className="rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.55)] bg-surface-elevated border border-surface-border overflow-hidden flex flex-col max-h-[90vh]">
+              <Dialog.Panel className="flex max-h-[90vh] min-h-0 flex-col overflow-hidden rounded-lg border border-surface-border bg-surface-elevated shadow-[0_20px_50px_rgba(0,0,0,0.55)]">
                 
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border bg-surface-raised shrink-0">
@@ -446,7 +451,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   </button>
                 </div>
 
-                <div className="overflow-y-auto w-full">
+                <div className="min-h-0 flex-1 overflow-y-auto scrollbar-hide w-full">
                   {/* Scan Document Strip */}
                   <div className="bg-surface-base border-b border-surface-border">
                     <div className="px-6 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -526,11 +531,11 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           transition={{ duration: 0.15 }}
                           className="border-t border-surface-border"
                         >
-                          <div className="relative max-h-56 overflow-hidden bg-black flex items-center justify-center">
+                          <div className="relative flex min-h-[7rem] max-h-[min(14rem,42svh)] w-full items-center justify-center border-surface-border bg-[#0c0c0e] px-2 py-3">
                             <img
                               src={scannedPreviewUrl}
                               alt="Scanned document"
-                              className="max-h-56 w-auto object-contain"
+                              className="max-h-[min(14rem,42svh)] w-full object-contain object-center"
                             />
                           </div>
                         </motion.div>
@@ -678,22 +683,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               onChange={(e) => setCategory(e.target.value)}
                               className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer"
                             >
-                              <option value="housing">Housing & Rent</option>
-                              <option value="utilities">Utilities & Telecom</option>
-                              <option value="subscriptions">Subscriptions</option>
-                              <option value="insurance">Insurance</option>
-                              <option value="auto">Auto & Car Payment</option>
-                              <option value="health">Health & Medical</option>
-                              <option value="education">Education & Loans</option>
-                              <option value="childcare">Childcare</option>
-                              <option value="personal">Personal Care & Gym</option>
-                              <option value="taxes">Taxes</option>
-                              <option value="business">Business & Software</option>
-                              <option value="food">Food & Dining</option>
-                              <option value="transport">Transportation</option>
-                              <option value="shopping">Shopping</option>
-                              <option value="entertainment">Entertainment</option>
-                              <option value="debt">Debt Services</option>
+                              {EXPENSE_BILL_CATEGORY_OPTIONS.map((o) => (
+                                <option key={o.value} value={o.value}>{o.label}</option>
+                              ))}
                             </select>
                           </div>
                           <div>
@@ -799,21 +791,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               onChange={(e) => setCategory(e.target.value)}
                               className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary cursor-pointer"
                             >
-                              <option value="housing">Housing & Rent</option>
-                              <option value="utilities">Utilities & Telecom</option>
-                              <option value="subscriptions">Subscriptions</option>
-                              <option value="insurance">Insurance</option>
-                              <option value="auto">Auto & Car Payment</option>
-                              <option value="health">Health & Medical</option>
-                              <option value="education">Education & Loans</option>
-                              <option value="childcare">Childcare</option>
-                              <option value="personal">Personal Care & Gym</option>
-                              <option value="taxes">Taxes</option>
-                              <option value="business">Business & Software</option>
-                              <option value="food">Food & Dining</option>
-                              <option value="transport">Transportation</option>
-                              <option value="shopping">Shopping</option>
-                              <option value="debt">Debt Services</option>
+                              {EXPENSE_BILL_CATEGORY_OPTIONS.map((o) => (
+                                <option key={o.value} value={o.value}>{o.label}</option>
+                              ))}
                             </select>
                           </div>
                         </div>
@@ -964,16 +944,15 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Source</label>
+                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Income category</label>
                             <select
-                              value={source}
-                              onChange={(e) => setSource(e.target.value)}
+                              value={incomeCategory}
+                              onChange={(e) => setIncomeCategory(e.target.value)}
                               className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer"
                             >
-                              <option value="salary">Salary / Wages</option>
-                              <option value="freelance">Freelance</option>
-                              <option value="bonus">Bonus</option>
-                              <option value="other">Other</option>
+                              {INCOME_CATEGORY_OPTIONS.map((o) => (
+                                <option key={o.value} value={o.value}>{o.label}</option>
+                              ))}
                             </select>
                           </div>
                           <div>
