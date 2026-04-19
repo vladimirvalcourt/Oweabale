@@ -643,7 +643,6 @@ Deno.serve(async (req: Request) => {
         { data: plaidItems },
         { data: tickets },
         { data: compliance },
-        { data: emailConnections },
       ] = await Promise.all([
         supabaseAdmin
           .from('profiles')
@@ -681,12 +680,6 @@ Deno.serve(async (req: Request) => {
           .select('user_id, kyc_status, aml_status, pep_sanctions_hit, risk_score, last_checked_at, updated_at')
           .eq('user_id', targetUserId)
           .maybeSingle(),
-        supabaseAdmin
-          .from('email_connections')
-          .select('id, provider, email_address, last_scan_at, created_at')
-          .eq('user_id', targetUserId)
-          .order('created_at', { ascending: false })
-          .limit(8),
       ])
       return new Response(
         JSON.stringify({
@@ -698,7 +691,6 @@ Deno.serve(async (req: Request) => {
             plaid_items: plaidItems ?? [],
             tickets: tickets ?? [],
             compliance: compliance ?? null,
-            email_connections: emailConnections ?? [],
           },
         }),
         { headers: jsonHeaders },

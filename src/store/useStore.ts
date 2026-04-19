@@ -169,35 +169,6 @@ export interface ClientInvoice {
   notes: string;
 }
 
-export interface EmailConnection {
-  id: string;
-  provider: 'gmail';
-  emailAddress: string;
-  lastScanAt: string | null;
-  lastScanAfter: string | null;
-  createdAt: string;
-}
-
-export interface EmailScanFinding {
-  id: string;
-  connectionId: string;
-  providerMessageId: string;
-  subjectSnapshot: string;
-  senderDomain: string;
-  billerName: string;
-  amountDue: number | null;
-  dueDate: string | null;
-  accountLast4: string | null;
-  extractedStatus: string;
-  actionRequired: boolean;
-  extractedCategory: string;
-  confidenceScore: number;
-  suggestedDestination: 'bills' | 'debts' | 'subscriptions' | 'citations' | 'taxes';
-  urgency: 'normal' | 'high';
-  reviewStatus: 'pending' | 'confirmed' | 'skipped';
-  scannedAt: string;
-}
-
 export interface PendingIngestion {
   id: string;
   type: 'bill' | 'debt' | 'transaction' | 'income' | 'citation';
@@ -322,8 +293,6 @@ interface AppState {
   freelanceEntries: FreelanceEntry[];
   mileageLog: MileageLogEntry[];
   clientInvoices: ClientInvoice[];
-  emailConnections: EmailConnection[];
-  emailScanFindings: EmailScanFinding[];
   notifications: Notification[];
   pendingIngestions: PendingIngestion[];
   categorizationRules: CategorizationRule[];
@@ -427,21 +396,6 @@ interface AppState {
   addClientInvoice: (inv: Omit<ClientInvoice, 'id'>) => Promise<boolean>;
   updateClientInvoice: (id: string, patch: Partial<ClientInvoice>) => Promise<boolean>;
   deleteClientInvoice: (id: string) => Promise<void>;
-  /** Gmail OAuth + scan (Edge Functions). */
-  runEmailIntelligenceScan: () => Promise<{ ok: boolean; message?: string }>;
-  disconnectGmail: (connectionId?: string) => Promise<boolean>;
-  deleteAllEmailScanData: () => Promise<boolean>;
-  confirmEmailScanFinding: (
-    id: string,
-    edits?: Partial<{
-      billerName: string;
-      amountDue: number | null;
-      dueDate: string | null;
-      suggestedDestination: EmailScanFinding['suggestedDestination'];
-    }>,
-  ) => Promise<boolean>;
-  skipEmailScanFinding: (id: string) => Promise<boolean>;
-  skipAllPendingEmailScanFindings: () => Promise<boolean>;
   updateUser: (user: Partial<AppState['user']>) => Promise<boolean>;
   signOut: () => Promise<void>;
   clearLocalData: () => void;
@@ -513,8 +467,6 @@ const initialData = {
   freelanceEntries: [],
   mileageLog: [],
   clientInvoices: [],
-  emailConnections: [],
-  emailScanFindings: [],
   user: {
     id: '',
     firstName: '',
@@ -1714,239 +1666,6 @@ export const useStore = create<AppState>()(
     set((state) => ({ clientInvoices: state.clientInvoices.filter((c) => c.id !== id) }));
   },
 
-  runEmailIntelligenceScan: async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        return { ok: false, message: 'Sign in to scan email.' };
-      }
-      const { data, error } = await supabase.functions.invoke('email-intelligence-scan', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${session.access_token}` },
-        body: {},
-      });
-      if (error) {
-        console.error('[runEmailIntelligenceScan]', error.message);
-        return { ok: false, message: error.message };
-      }
-      const payload = data as { ok?: boolean; error?: string };
-      if (payload?.error) return { ok: false, message: payload.error };
-      void get().fetchData(undefined, { background: true });
-      return { ok: true };
-    } catch (e) {
-      console.error('[runEmailIntelligenceScan]', e);
-      return { ok: false, message: e instanceof Error ? e.message : 'Scan failed' };
-    }
-  },
-
-  disconnectGmail: async (connectionId) => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        toast.error('Sign in to disconnect.');
-        return false;
-      }
-      const { error } = await supabase.functions.invoke('gmail-disconnect', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${session.access_token}` },
-        body: connectionId ? { connection_id: connectionId } : {},
-      });
-      if (error) {
-        toast.error('Could not disconnect Gmail.');
-        return false;
-      }
-      set((s) => ({
-        emailConnections: connectionId
-          ? s.emailConnections.filter((c) => c.id !== connectionId)
-          : [],
-        emailScanFindings: connectionId
-          ? s.emailScanFindings.filter((f) => f.connectionId !== connectionId)
-          : [],
-      }));
-      void get().fetchData(undefined, { background: true });
-      toast.success('Email disconnected.');
-      return true;
-    } catch (e) {
-      console.error('[disconnectGmail]', e);
-      toast.error('Disconnect failed.');
-      return false;
-    }
-  },
-
-  deleteAllEmailScanData: async () => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (!userId) return false;
-    await supabase.from('email_connections').delete().eq('user_id', userId);
-    set((s) => ({ ...s, emailConnections: [], emailScanFindings: [] }));
-    toast.success('Email scan data removed.');
-    return true;
-  },
-
-  confirmEmailScanFinding: async (id, edits) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    const finding = get().emailScanFindings.find((f) => f.id === id && f.reviewStatus === 'pending');
-    if (!userId || !finding) {
-      toast.error('Item not found or already processed.');
-      return false;
-    }
-    const biller = (edits?.billerName ?? finding.billerName).trim() || 'Unknown';
-    const amt = edits?.amountDue !== undefined ? edits!.amountDue : finding.amountDue;
-    const fallbackDue = new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10);
-    let due: string;
-    if (edits?.dueDate !== undefined) {
-      const d = edits.dueDate?.trim();
-      due = d && d.length > 0 ? d : fallbackDue;
-    } else {
-      due = finding.dueDate?.trim() || fallbackDue;
-    }
-    const dest =
-      edits?.suggestedDestination !== undefined ? edits!.suggestedDestination : finding.suggestedDestination;
-
-    const billStatus: Bill['status'] =
-      finding.extractedStatus === 'overdue' ||
-      finding.extractedStatus === 'final_notice' ||
-      finding.extractedStatus === 'collections'
-        ? 'overdue'
-        : 'upcoming';
-
-    let ok = false;
-    if (dest === 'bills') {
-      let category = 'Utilities';
-      if (finding.extractedCategory === 'insurance') category = 'Insurance';
-      else if (finding.extractedCategory === 'tax') category = 'Taxes';
-      else if (finding.extractedCategory === 'subscription') category = 'Subscriptions';
-      else if (finding.extractedCategory === 'loan' || finding.extractedCategory === 'debt') {
-        category = 'Loans';
-      } else if (
-        finding.subjectSnapshot.toLowerCase().includes('afterpay') ||
-        finding.subjectSnapshot.toLowerCase().includes('klarna') ||
-        finding.subjectSnapshot.toLowerCase().includes('affirm') ||
-        finding.extractedCategory === 'bill'
-      ) {
-        const bnpl =
-          /afterpay|klarna|affirm|sezzle|zip/i.test(finding.subjectSnapshot + finding.senderDomain);
-        if (bnpl) category = 'BNPL';
-      }
-      ok = await get().addBill({
-        biller,
-        amount: amt ?? 0,
-        category,
-        dueDate: due,
-        frequency: 'Monthly',
-        status: billStatus,
-        autoPay: false,
-      });
-    } else if (dest === 'debts') {
-      const isColl =
-        finding.extractedStatus === 'collections' || finding.subjectSnapshot.toLowerCase().includes('collection');
-      const remaining = amt ?? 0;
-      ok = await get().addDebt({
-        name: isColl ? `[Collections] ${biller}` : biller,
-        type: isColl ? 'Collections' : 'Loan',
-        apr: 0,
-        remaining: Math.max(remaining, 0.01),
-        minPayment: Math.max(25, Math.min(remaining || 100, (remaining || 100) * 0.02)),
-        paid: 0,
-        paymentDueDate: due,
-      });
-    } else if (dest === 'subscriptions') {
-      const subs = get().subscriptions;
-      const match = subs.find(
-        (s) =>
-          s.name.toLowerCase().includes(biller.slice(0, 6).toLowerCase()) ||
-          biller.toLowerCase().includes(s.name.toLowerCase().slice(0, 5)),
-      );
-      if (match) {
-        ok = await get().editSubscription(match.id, {
-          amount: amt ?? match.amount,
-          nextBillingDate: due,
-        });
-      } else {
-        ok = await get().addSubscription({
-          name: biller,
-          amount: amt ?? 0,
-          frequency: 'Monthly',
-          nextBillingDate: due,
-          status: 'active',
-        });
-      }
-    } else if (dest === 'citations') {
-      const dueD = new Date(due.includes('T') ? due : `${due}T12:00:00`);
-      const daysLeft = Number.isNaN(dueD.getTime())
-        ? 14
-        : Math.ceil((dueD.getTime() - Date.now()) / 86400000);
-      ok = await get().addCitation({
-        type: 'Toll / citation',
-        jurisdiction: finding.senderDomain || 'Unknown',
-        daysLeft,
-        amount: amt ?? 0,
-        penaltyFee: 0,
-        date: due,
-        citationNumber: finding.accountLast4 || '—',
-        paymentUrl: '',
-        status: 'open',
-      });
-    } else if (dest === 'taxes') {
-      ok = await get().addBill({
-        biller,
-        amount: amt ?? 0,
-        category: 'Taxes',
-        dueDate: due,
-        frequency: 'Yearly',
-        status: billStatus,
-        autoPay: false,
-      });
-      if (ok) {
-        get().addNotification({
-          title: 'Tax notice from email',
-          message: `Review "${biller}" on Taxes — due ${due}.`,
-          type: 'warning',
-        });
-      }
-    }
-
-    if (!ok) {
-      toast.error('Could not add this item. Check amounts and try Edit.');
-      return false;
-    }
-    await supabase.from('email_scan_findings').update({ review_status: 'confirmed' }).eq('id', id).eq('user_id', userId);
-    set((state) => ({
-      emailScanFindings: state.emailScanFindings.map((f) =>
-        f.id === id ? { ...f, reviewStatus: 'confirmed' as const } : f,
-      ),
-    }));
-    toast.success('Added to Oweable');
-    return true;
-  },
-
-  skipEmailScanFinding: async (id) => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (!userId) return false;
-    await supabase.from('email_scan_findings').update({ review_status: 'skipped' }).eq('id', id).eq('user_id', userId);
-    set((state) => ({
-      emailScanFindings: state.emailScanFindings.map((f) =>
-        f.id === id ? { ...f, reviewStatus: 'skipped' as const } : f,
-      ),
-    }));
-    return true;
-  },
-
-  skipAllPendingEmailScanFindings: async () => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
-    if (!userId) return false;
-    await supabase
-      .from('email_scan_findings')
-      .update({ review_status: 'skipped' })
-      .eq('user_id', userId)
-      .eq('review_status', 'pending');
-    set((state) => ({
-      emailScanFindings: state.emailScanFindings.map((f) =>
-        f.reviewStatus === 'pending' ? { ...f, reviewStatus: 'skipped' as const } : f,
-      ),
-    }));
-    return true;
-  },
-
   signOut: async () => {
     await supabase.auth.signOut();
     set({ ...initialData });
@@ -1965,7 +1684,7 @@ export const useStore = create<AppState>()(
         'bills', 'debts', 'transactions', 'assets', 'subscriptions',
         'goals', 'incomes', 'budgets', 'categories', 'citations',
         'deductions', 'freelance_entries', 'mileage_log', 'client_invoices', 'pending_ingestions', 'credit_fixes', 'categorization_exclusions',
-        'investment_accounts', 'insurance_policies', 'email_connections',
+        'investment_accounts', 'insurance_policies',
       ];
 
       await Promise.all(tables.map(table =>
@@ -2031,7 +1750,6 @@ export const useStore = create<AppState>()(
         supabase.from('mileage_log').delete().eq('user_id', userId),
         supabase.from('client_invoices').delete().eq('user_id', userId),
         supabase.from('categorization_exclusions').delete().eq('user_id', userId),
-        supabase.from('email_connections').delete().eq('user_id', userId),
       ]);
 
       // Delete the auth.users record via a privileged Postgres RPC.
@@ -2707,11 +2425,6 @@ export const useStore = create<AppState>()(
       supabase.from('credit_factors').select('*').eq('user_id', resolvedUserId),
       supabase.from('investment_accounts').select('id,name,type,institution,balance,notes,last_updated').eq('user_id', resolvedUserId),
       supabase.from('insurance_policies').select('id,type,provider,premium,frequency,coverage_amount,deductible,expiration_date,status,notes').eq('user_id', resolvedUserId),
-      supabase
-        .from('email_connections')
-        .select('id,provider,email_address,created_at,last_scan_at,last_scan_after')
-        .eq('user_id', resolvedUserId),
-      supabase.from('email_scan_findings').select('*').eq('user_id', resolvedUserId).order('scanned_at', { ascending: false }),
     ]);
 
     try {
@@ -2882,8 +2595,6 @@ export const useStore = create<AppState>()(
           { data: creditFactors },
           { data: investmentAccountsData },
           { data: insurancePoliciesData },
-          { data: emailConnectionsRows },
-          { data: emailScanFindingsRows },
         ] = await phase2Promise;
 
         set({
@@ -3050,39 +2761,6 @@ export const useStore = create<AppState>()(
             expirationDate: (p.expiration_date as string) ?? undefined,
             status: (p.status as InsurancePolicy['status']) ?? 'active',
             notes: (p.notes as string) ?? '',
-          })),
-          emailConnections: (emailConnectionsRows || []).map((r: Record<string, unknown>) => ({
-            id: r.id as string,
-            provider: 'gmail' as const,
-            emailAddress: String(r.email_address ?? ''),
-            lastScanAt: r.last_scan_at != null ? String(r.last_scan_at) : null,
-            lastScanAfter: r.last_scan_after != null ? String(r.last_scan_after).slice(0, 10) : null,
-            createdAt: String(r.created_at ?? ''),
-          })),
-          emailScanFindings: (emailScanFindingsRows || []).map((r: Record<string, unknown>) => ({
-            id: r.id as string,
-            connectionId: String(r.connection_id ?? ''),
-            providerMessageId: String(r.provider_message_id ?? ''),
-            subjectSnapshot: String(r.subject_snapshot ?? ''),
-            senderDomain: String(r.sender_domain ?? ''),
-            billerName: String(r.biller_name ?? ''),
-            amountDue: r.amount_due != null ? Number(r.amount_due) : null,
-            dueDate: r.due_date != null ? String(r.due_date).slice(0, 10) : null,
-            accountLast4: r.account_last4 != null ? String(r.account_last4) : null,
-            extractedStatus: String(r.extracted_status ?? ''),
-            actionRequired: Boolean(r.action_required),
-            extractedCategory: String(r.extracted_category ?? ''),
-            confidenceScore: Number(r.confidence_score) || 0,
-            suggestedDestination: (['bills', 'debts', 'subscriptions', 'citations', 'taxes'].includes(
-              String(r.suggested_destination),
-            )
-              ? r.suggested_destination
-              : 'bills') as EmailScanFinding['suggestedDestination'],
-            urgency: r.urgency === 'high' ? 'high' : 'normal',
-            reviewStatus: (['pending', 'confirmed', 'skipped'].includes(String(r.review_status))
-              ? r.review_status
-              : 'pending') as EmailScanFinding['reviewStatus'],
-            scannedAt: String(r.scanned_at ?? ''),
           })),
         });
 

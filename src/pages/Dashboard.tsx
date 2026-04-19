@@ -88,8 +88,7 @@ export default function Dashboard() {
   const freelanceEntries = useStore(state => state.freelanceEntries);
   const pendingIngestions = useStore(state => state.pendingIngestions);
   const citations = useStore(state => state.citations);
-  const emailScanFindings = useStore((state) => state.emailScanFindings);
-  
+
   /** Global fetch flag from Zustand — true while `fetchData` runs after login/refresh. */
   const isLoading = useStore((state) => state.isLoading);
   const [isCitationModalOpen, setIsCitationModalOpen] = useState(false);
@@ -454,15 +453,6 @@ export default function Dashboard() {
   const hasCitationsSidebar = openCitations.length > 0;
   const hasLowerSidebar = hasBillsSidebar || hasCitationsSidebar;
 
-  const pendingEmailFindings = useMemo(
-    () => emailScanFindings.filter((f) => f.reviewStatus === 'pending'),
-    [emailScanFindings],
-  );
-  const urgentEmailFindings = useMemo(
-    () => pendingEmailFindings.filter((f) => f.urgency === 'high'),
-    [pendingEmailFindings],
-  );
-
   // Full-page skeleton until Supabase data has been merged into the store.
   if (isLoading) {
     return (
@@ -482,8 +472,7 @@ export default function Dashboard() {
     pendingIngestions.length > 0 ||
     isOverdraftRisk ||
     showLowTaxReserveAlert ||
-    debtsMissingDueDate.length > 0 ||
-    pendingEmailFindings.length > 0;
+    debtsMissingDueDate.length > 0;
 
   return (
     <AppPageShell>
@@ -538,51 +527,6 @@ export default function Dashboard() {
                     <div>
                       <p className="text-sm font-sans font-medium text-content-primary">Requires Review</p>
                       <p className="text-xs font-sans text-content-secondary mt-0.5">{pendingIngestions.length} document{pendingIngestions.length === 1 ? '' : 's'} waiting for approval.</p>
-                    </div>
-                  </div>
-                  <ArrowRight className="w-5 h-5 text-content-tertiary group-hover:translate-x-1 transition-transform" />
-                </motion.div>
-              </TransitionLink>
-            )}
-
-            {pendingEmailFindings.length > 0 && (
-              <TransitionLink to="/email-inbox" className="block focus-app rounded-lg">
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={`bg-surface-raised border p-5 rounded-lg flex items-center justify-between hover:bg-content-primary/[0.03] transition-all shadow-none group ${
-                    urgentEmailFindings.length > 0 ? 'border-amber-500/35' : 'border-surface-border'
-                  }`}
-                >
-                  <div className="flex items-center gap-5">
-                    <div
-                      className={`relative w-10 h-10 rounded-full flex items-center justify-center shrink-0 border ${
-                        urgentEmailFindings.length > 0
-                          ? 'bg-amber-500/10 border-amber-500/25'
-                          : 'bg-content-primary/[0.06] border-surface-border'
-                      }`}
-                    >
-                      {urgentEmailFindings.length > 0 && (
-                        <span
-                          className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-amber-400 ring-2 ring-[#0a0a0a]"
-                          aria-hidden
-                        />
-                      )}
-                      <Inbox
-                        className={`w-5 h-5 ${urgentEmailFindings.length > 0 ? 'text-amber-200' : 'text-content-primary'}`}
-                      />
-                    </div>
-                    <div>
-                      <p className="text-sm font-sans font-medium text-content-primary">
-                        {urgentEmailFindings.length > 0 ? 'Urgent email notice' : 'New from email'}
-                      </p>
-                      <p className="text-xs font-sans text-content-secondary mt-0.5">
-                        {urgentEmailFindings.length > 0
-                          ? 'A collections, final notice, or tax message may need review — confirm in New from email.'
-                          : `${pendingEmailFindings.length} bill, subscription, toll, or other financial message${
-                              pendingEmailFindings.length === 1 ? '' : 's'
-                            } to review before syncing to your plan.`}
-                      </p>
                     </div>
                   </div>
                   <ArrowRight className="w-5 h-5 text-content-tertiary group-hover:translate-x-1 transition-transform" />

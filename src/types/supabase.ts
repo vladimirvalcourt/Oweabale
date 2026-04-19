@@ -644,39 +644,45 @@ export interface Database {
           user_id: string
           provider: string
           email_address: string
-          encrypted_refresh_token: string
+          encrypted_refresh_token: string | null
           created_at: string
           updated_at: string
           last_scan_at: string | null
           last_scan_after: string | null
           google_refresh_token_fp_hash: string | null
           google_refresh_token_fp_prefix: string | null
+          zapier_ingest_secret_hash: string | null
+          zapier_ingest_enabled: boolean
         }
         Insert: {
           id?: string
           user_id: string
           provider?: string
           email_address: string
-          encrypted_refresh_token: string
+          encrypted_refresh_token?: string | null
           created_at?: string
           updated_at?: string
           last_scan_at?: string | null
           last_scan_after?: string | null
           google_refresh_token_fp_hash?: string | null
           google_refresh_token_fp_prefix?: string | null
+          zapier_ingest_secret_hash?: string | null
+          zapier_ingest_enabled?: boolean
         }
         Update: {
           id?: string
           user_id?: string
           provider?: string
           email_address?: string
-          encrypted_refresh_token?: string
+          encrypted_refresh_token?: string | null
           created_at?: string
           updated_at?: string
           last_scan_at?: string | null
           last_scan_after?: string | null
           google_refresh_token_fp_hash?: string | null
           google_refresh_token_fp_prefix?: string | null
+          zapier_ingest_secret_hash?: string | null
+          zapier_ingest_enabled?: boolean
         }
       }
       risc_google_events: {

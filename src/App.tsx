@@ -50,10 +50,8 @@ const Changelog      = lazy(() => import('./pages/Changelog'));
 const Analytics      = lazy(() => import('./pages/Analytics'));
 const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
 import AuthCallback from './pages/AuthCallback';
-import GoogleEmailCallback from './pages/GoogleEmailCallback';
 import PlaidCallback from './pages/PlaidCallback';
 const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
-const EmailInboxReview = lazy(() => import('./pages/EmailInboxReview'));
 const NotFound         = lazy(() => import('./pages/NotFound'));
 
 import { useDataSync } from './hooks/useDataSync';
@@ -124,7 +122,6 @@ function AppRoutes() {
 
         {/* Onboarding doesn't need Layout sidebar/topbar */}
         <Route path="/onboarding/setup" element={<Onboarding />} />
-        <Route path="/auth/google-email/callback" element={<GoogleEmailCallback />} />
 
         <Route element={<DeviceGuard><Layout /></DeviceGuard>}>
           <Route
@@ -329,7 +326,6 @@ function AppRoutes() {
             }
           />
           <Route path="settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
-          <Route path="email-inbox" element={<ErrorBoundary><EmailInboxReview /></ErrorBoundary>} />
         </Route>
         </Route>
       </Route>

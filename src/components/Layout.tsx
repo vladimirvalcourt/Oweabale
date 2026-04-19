@@ -86,7 +86,6 @@ export default function Layout() {
     markNotificationsRead,
     clearNotifications,
     citations,
-    emailScanFindings,
   } = useStore(
     useShallow((s) => ({
       bills: s.bills,
@@ -102,7 +101,6 @@ export default function Layout() {
       closeQuickAdd: s.closeQuickAdd,
       resetData: s.resetData,
       pendingIngestions: s.pendingIngestions,
-      emailScanFindings: s.emailScanFindings,
       notifications: s.notifications,
       markNotificationsRead: s.markNotificationsRead,
       clearNotifications: s.clearNotifications,
@@ -115,7 +113,6 @@ export default function Layout() {
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const { hasFullSuite, isLoading: checkingFullSuite } = useFullSuiteAccess();
-  const pendingEmailFindings = emailScanFindings.filter((f) => f.reviewStatus === 'pending').length;
   const searchModKey = useMemo(() => (isApplePointerPlatform() ? '⌘' : 'Ctrl'), []);
   const unreadNotifCount = useMemo(() => notifications.filter((n) => !n.read).length, [notifications]);
 
@@ -607,16 +604,26 @@ export default function Layout() {
                             <TransitionLink
                               to={item.linkTo}
                               className={cn(
-                                'focus-app group relative flex min-h-10 items-center gap-3 rounded-lg border border-transparent py-2.5 transition-colors duration-200',
-                                // Collapsed rail: center icons; nested indent only when labels show
+                                'focus-app group relative flex min-h-10 items-center gap-3 rounded-lg py-2.5 transition-colors duration-200',
+                                // Collapsed: centered icon. Nested: left gutter only (never a full rectangular border — that read as a “square”).
                                 sidebarCollapsed
-                                  ? 'justify-center px-1.5'
+                                  ? 'justify-center border border-transparent px-1.5'
                                   : nested
-                                    ? 'ml-1 border-l-2 border-surface-border/90 pl-4 pr-3'
-                                    : 'px-4',
+                                    ? 'ml-1 rounded-md border-b-0 border-l-2 border-r-0 border-t-0 border-l-surface-border/40 pl-3.5 pr-3'
+                                    : 'border border-transparent px-4',
                                 isActive
-                                  ? 'bg-content-primary/[0.06] text-content-primary border-surface-border/80'
-                                  : 'text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary',
+                                  ? cn(
+                                      'bg-content-primary/[0.07] text-content-primary',
+                                      nested && !sidebarCollapsed
+                                        ? 'border-b-0 border-l-2 border-l-brand-cta/50 border-r-0 border-t-0'
+                                        : 'border border-surface-border/50',
+                                    )
+                                  : cn(
+                                      'text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary',
+                                      nested && !sidebarCollapsed
+                                        ? ''
+                                        : 'border border-transparent',
+                                    ),
                               )}
                               title={sidebarCollapsed ? item.name : undefined}
                               aria-current={isActive ? 'page' : undefined}
@@ -631,7 +638,7 @@ export default function Layout() {
                                 setShowDueSoonPreview(false);
                               }}
                             >
-                              {isActive && !sidebarCollapsed && (
+                              {isActive && !sidebarCollapsed && !nested && (
                                 <span
                                   className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-r-sm bg-content-primary"
                                   aria-hidden
@@ -867,16 +874,6 @@ export default function Layout() {
             >
               <Plus className="w-3.5 h-3.5" aria-hidden />
             </button>
-
-            {pendingEmailFindings > 0 && (
-              <TransitionLink
-                to="/email-inbox"
-                className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-secondary hover:border-content-primary/20 hover:text-content-primary"
-              >
-                <Inbox className="w-4 h-4 shrink-0 text-content-tertiary" aria-hidden />
-                <span className="tabular-nums">{pendingEmailFindings} from email</span>
-              </TransitionLink>
-            )}
 
             {/* Notifications */}
             <div className="relative" ref={notifRef}>

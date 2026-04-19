@@ -55,7 +55,7 @@ async function resolveUserId(
   return null;
 }
 
-async function revokeSessionsAndGmail(
+async function revokeSessions(
   admin: ReturnType<typeof createClient>,
   userId: string,
   reason: string,
@@ -68,30 +68,10 @@ async function revokeSessionsAndGmail(
   } else {
     console.log('[risc-google-receiver] sessions revoked (global)', userId.slice(0, 8), reason);
   }
-
-  const { error: delErr } = await admin.from('email_connections').delete().eq('user_id', userId);
-  if (delErr) console.warn('[risc-google-receiver] email_connections delete', delErr.message);
 }
 
-async function handleTokenRevoked(
-  admin: ReturnType<typeof createClient>,
-  eventPayload: Record<string, unknown>,
-): Promise<void> {
-  const ref = extractTokenRef(eventPayload);
-  if (!ref) return;
-  if (ref.alg === 'hash_base64_sha512_sha512') {
-    const { error } = await admin.from('email_connections').delete().eq('google_refresh_token_fp_hash', ref.token);
-    if (error) console.warn('[risc-google-receiver] delete by hash', error.message);
-    return;
-  }
-  if (ref.alg === 'prefix' && ref.token.length >= 8) {
-    const { error } = await admin
-      .from('email_connections')
-      .delete()
-      .eq('google_refresh_token_fp_prefix', ref.token.slice(0, 16));
-    if (error) console.warn('[risc-google-receiver] delete by prefix', error.message);
-  }
-}
+/** OAuth token-revoked events (no app-side mailbox linkage). */
+async function handleTokenRevoked(): Promise<void> {}
 
 Deno.serve(async (req: Request) => {
   const c = corsHeaders(req.headers.get('origin'), req.headers);
@@ -155,7 +135,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (eventUri === EVENT_TOKEN_REVOKED) {
-      await handleTokenRevoked(admin, eventPayload);
+      await handleTokenRevoked();
       continue;
     }
 
@@ -172,17 +152,17 @@ Deno.serve(async (req: Request) => {
     }
 
     if (eventUri === EVENT_SESSIONS_REVOKED || eventUri === EVENT_TOKENS_REVOKED) {
-      await revokeSessionsAndGmail(admin, userId, eventUri);
+      await revokeSessions(admin, userId, eventUri);
       continue;
     }
 
     if (eventUri === EVENT_ACCOUNT_PURGED) {
-      await revokeSessionsAndGmail(admin, userId, EVENT_ACCOUNT_PURGED);
+      await revokeSessions(admin, userId, EVENT_ACCOUNT_PURGED);
       continue;
     }
 
     if (eventUri === EVENT_CRED_CHANGE) {
-      await revokeSessionsAndGmail(admin, userId, EVENT_CRED_CHANGE);
+      await revokeSessions(admin, userId, EVENT_CRED_CHANGE);
       continue;
     }
 
@@ -192,7 +172,7 @@ Deno.serve(async (req: Request) => {
         console.log('[risc-google-receiver] account-disabled bulk-account — logging only');
         continue;
       }
-      await revokeSessionsAndGmail(admin, userId, `${EVENT_ACCOUNT_DISABLED}:${String(reason ?? 'unknown')}`);
+      await revokeSessions(admin, userId, `${EVENT_ACCOUNT_DISABLED}:${String(reason ?? 'unknown')}`);
       continue;
     }
 

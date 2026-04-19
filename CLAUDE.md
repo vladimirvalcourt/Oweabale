@@ -13,9 +13,9 @@
 - Always push to `main`
 - Never push to a different branch without explicit permission
 
-## Hugging Face usage (product + developer)
+## Hugging Face usage (developer tooling only)
 
-- **End users of Oweable never sign in to Hugging Face.** Any Hugging Face usage stays server-side (`HF_TOKEN` in Supabase Edge Function secrets). Do not add in-app Hugging Face login, token, or “connect HF” flows for customers.
+- Email Intelligence uses **heuristic extraction** first, then an **optional** OpenAI-compatible LLM (`EMAIL_EXTRACTION_LLM_*` secrets on `email-zapier-webhook`). Do not add Hugging Face product secrets for email unless you explicitly wire them.
 - When a task needs the **Hugging Face MCP** (`hf-mcp-server` in `.cursor/mcp.json`), **ask the repo owner to authenticate in Cursor** (e.g. **Settings → MCP**, complete login for `hf-mcp-server`, or follow Cursor’s browser prompt / open `https://huggingface.co/mcp?login` if the IDE asks). That auth is for **you**, not for app users.
 
 ## Backend (Supabase / Postgres)

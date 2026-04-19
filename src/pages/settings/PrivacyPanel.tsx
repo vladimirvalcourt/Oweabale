@@ -1,10 +1,9 @@
 import React, { memo, useState } from 'react';
-import { EyeOff, Download, AlertTriangle, Mail } from 'lucide-react';
+import { EyeOff, Download, AlertTriangle } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { useStore } from '../../store/useStore';
-import { TransitionLink } from '../../components/TransitionLink';
 
 function deferToast(fn: () => void) {
   requestAnimationFrame(() => {
@@ -66,8 +65,6 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
       clientInvoices: s.clientInvoices,
     })),
   );
-  const emailConnections = useStore((s) => s.emailConnections);
-  const deleteAllEmailScanData = useStore((s) => s.deleteAllEmailScanData);
 
   const handleExportData = () => {
     const exportedAt = new Date().toISOString();
@@ -268,42 +265,6 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
             </button>
           </div>
         </div>
-      </CollapsibleModule>
-
-      <CollapsibleModule title="Email scanning" icon={Mail} defaultOpen={false}>
-        <p className="text-sm text-content-tertiary mb-4">
-          Gmail connections and extracted obligation summaries (never raw email bodies). Manage connections in{' '}
-          <TransitionLink to="/settings?tab=integrations" className="underline underline-offset-2 text-content-secondary">
-            Integrations
-          </TransitionLink>
-          .
-        </p>
-        {emailConnections.length > 0 ? (
-          <ul className="text-xs text-content-secondary space-y-2 mb-4 border border-surface-border rounded-lg p-3 bg-surface-elevated/40">
-            {emailConnections.map((c) => (
-              <li key={c.id} className="font-mono">
-                {c.emailAddress}
-                {c.lastScanAt
-                  ? ` · last scan ${new Date(c.lastScanAt).toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })}`
-                  : ''}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-xs text-content-muted mb-4">No Gmail accounts connected.</p>
-        )}
-        <button
-          type="button"
-          onClick={() => {
-            void deleteAllEmailScanData();
-          }}
-          className="rounded-lg border border-surface-border bg-surface-base px-4 py-2 text-sm font-medium text-content-primary hover:bg-surface-elevated"
-        >
-          Delete all email-extracted data
-        </button>
-        <p className="text-[11px] text-content-muted mt-2">
-          Removes OAuth tokens and structured scan results. Does not delete bills or debts you already confirmed.
-        </p>
       </CollapsibleModule>
 
       <CollapsibleModule title="Danger Zone" icon={AlertTriangle} defaultOpen={false} className="border-[#7F1D1D]/50 bg-red-500/5">

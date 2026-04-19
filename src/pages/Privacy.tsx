@@ -64,33 +64,7 @@ export default function Privacy() {
           </section>
 
           <section>
-            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">4. Email scanning (optional Gmail)</h2>
-            <p className="mb-4">
-              If you choose to connect Gmail, Oweable requests <strong className="text-content-primary">read-only</strong>{' '}
-              access (<code className="text-xs font-mono text-content-tertiary">gmail.readonly</code>) solely to detect
-              messages that look like bills, statements, payment reminders, subscription renewals, toll or citation
-              notices, collections letters, and similar financial correspondence.
-            </p>
-            <p className="mb-4">
-              We <strong className="text-content-primary">do not</strong> store full email bodies or raw MIME content.
-              Our systems extract a small set of structured fields (for example biller name, amount, due date, and
-              urgency hints) and discard message text after processing. We <strong className="text-content-primary">do not</strong>{' '}
-              use email contents for marketing, advertising profiling, or any purpose other than showing you your own
-              obligations inside Oweable.
-            </p>
-            <p className="mb-4">
-              OAuth refresh tokens are stored encrypted at rest. You can disconnect Gmail and delete all email-derived
-              structured data anytime from <strong className="text-content-primary">Settings → Data &amp; Privacy</strong>.
-              Disconnecting removes tokens and associated scan results from Oweable.
-            </p>
-            <p>
-              Gmail access in production requires Google API verification. Until your app passes Google&apos;s review,
-              restrict usage to test accounts configured in Google Cloud Console.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">5. Cookies and tracking</h2>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">4. Cookies and tracking</h2>
             <p>
               We use essential cookies for authentication, security, and core product functionality. We may also use limited analytics cookies to understand product performance and reliability.
             </p>
@@ -100,7 +74,7 @@ export default function Privacy() {
           </section>
 
           <section>
-            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">6. Data retention timeline</h2>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">5. Data retention timeline</h2>
             <p>
               We retain account and financial records while your account is active and for a limited period afterward to support legal, tax, anti-fraud, and dispute-resolution obligations.
             </p>
@@ -110,7 +84,7 @@ export default function Privacy() {
           </section>
 
           <section>
-            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">7. CCPA rights (California residents)</h2>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">6. CCPA rights (California residents)</h2>
             <p>
               California residents may request access to categories and specific pieces of personal information collected, request deletion of eligible data, and request correction of inaccurate information, subject to legal exceptions.
             </p>
@@ -120,14 +94,14 @@ export default function Privacy() {
           </section>
 
           <section>
-            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">8. Children&apos;s privacy</h2>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">7. Children&apos;s privacy</h2>
             <p>
               Oweable is not directed to children under 13 and we do not knowingly collect personal data from children. Users under the age of majority in their jurisdiction should use the service only with appropriate guardian consent where legally required.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">9. Your rights</h2>
+            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">8. Your rights</h2>
             <p>
               You may request export, correction, or deletion of your data at any time. We provide account controls for core privacy actions and honor verified requests in accordance with applicable law.
             </p>
