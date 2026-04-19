@@ -123,6 +123,47 @@ function requireSuperAdmin(ctx: AdminContext) {
   if (!ctx.isSuperAdmin) throw new Error('Forbidden: super admin required')
 }
 
+type AdminSupabase = ReturnType<typeof createClient>
+
+/** PostgREST upsert requires a UNIQUE on (user_id, feature_key); we keep one logical row via update-or-insert. */
+async function upsertEntitlementRow(
+  supabaseAdmin: AdminSupabase,
+  userId: string,
+  featureKey: string,
+  fields: { source: string; status: string; ends_at?: string | null },
+) {
+  const now = new Date().toISOString()
+  const updatePayload: Record<string, unknown> = {
+    source: fields.source,
+    status: fields.status,
+    updated_at: now,
+  }
+  if ('ends_at' in fields) {
+    updatePayload.ends_at = fields.ends_at
+  }
+  const { data: updatedRows, error: upErr } = await supabaseAdmin
+    .from('entitlements')
+    .update(updatePayload)
+    .eq('user_id', userId)
+    .eq('feature_key', featureKey)
+    .select('id')
+  if (upErr) throw upErr
+  if (updatedRows && updatedRows.length > 0) return
+
+  const insertPayload: Record<string, unknown> = {
+    user_id: userId,
+    feature_key: featureKey,
+    source: fields.source,
+    status: fields.status,
+    updated_at: now,
+  }
+  if ('ends_at' in fields) {
+    insertPayload.ends_at = fields.ends_at
+  }
+  const { error: insErr } = await supabaseAdmin.from('entitlements').insert(insertPayload)
+  if (insErr) throw insErr
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin')
   const c = corsHeaders(origin, req.headers)
@@ -201,14 +242,7 @@ Deno.serve(async (req: Request) => {
       'ban',
       'unban',
       'delete',
-      'grant_entitlement',
-      'revoke_entitlement',
-      'bulk_action',
-      'apply_coupon',
-      'extend_trial',
-      'set_feature_flag',
       'revoke_sessions',
-      'update_platform_controls',
       'impersonate',
     ])
     if (SUPER_ADMIN_ONLY_ACTIONS.has(action)) requireSuperAdmin(adminCtx)
@@ -691,6 +725,11 @@ Deno.serve(async (req: Request) => {
       if (typeof bulkAction !== 'string' || !validBulkActions.has(bulkAction)) {
         throw new Error('bulkAction must be one of: ban, unban, grant_entitlement, revoke_entitlement')
       }
+      if (bulkAction === 'ban' || bulkAction === 'unban') {
+        requireSuperAdmin(adminCtx)
+      } else {
+        requirePermission(adminCtx, 'billing.manage')
+      }
       await enforceRateLimit(supabaseAdmin, user.id, 'bulk_action')
       const now = new Date().toISOString()
       await Promise.all(
@@ -704,13 +743,11 @@ Deno.serve(async (req: Request) => {
             if (error) throw error
             await supabaseAdmin.from('profiles').update({ is_banned: false }).eq('id', uid)
           } else if (bulkAction === 'grant_entitlement') {
-            const { error } = await supabaseAdmin
-              .from('entitlements')
-              .upsert(
-                { user_id: uid, feature_key: 'full_suite', source: 'admin', status: 'active', ends_at: null, updated_at: now },
-                { onConflict: 'user_id,feature_key' },
-              )
-            if (error) throw error
+            await upsertEntitlementRow(supabaseAdmin, uid, 'full_suite', {
+              source: 'admin',
+              status: 'active',
+              ends_at: null,
+            })
           } else if (bulkAction === 'revoke_entitlement') {
             const { error } = await supabaseAdmin
               .from('entitlements')
@@ -862,6 +899,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'apply_coupon') {
+      requirePermission(adminCtx, 'billing.manage')
       if (!targetUserId || typeof targetUserId !== 'string') throw new Error('Missing targetUserId')
       const coupon_id = (body as { coupon_id?: unknown }).coupon_id
       if (typeof coupon_id !== 'string' || !coupon_id.trim()) throw new Error('coupon_id is required')
@@ -881,6 +919,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'extend_trial') {
+      requirePermission(adminCtx, 'billing.manage')
       if (!targetUserId || typeof targetUserId !== 'string') throw new Error('Missing targetUserId')
       const trial_end = (body as { trial_end?: unknown }).trial_end
       if (typeof trial_end !== 'string' || !trial_end.trim()) throw new Error('trial_end is required')
@@ -934,20 +973,10 @@ Deno.serve(async (req: Request) => {
         if (typeof flagTargetUserId !== 'string' || !UUID_RE.test(flagTargetUserId as string)) {
           throw new Error('targetUserId is required for scope="user"')
         }
-        const now = new Date().toISOString()
-        const { error } = await supabaseAdmin
-          .from('entitlements')
-          .upsert(
-            {
-              user_id: flagTargetUserId,
-              feature_key: flagKey,
-              source: 'admin',
-              status: flagValue ? 'active' : 'revoked',
-              updated_at: now,
-            },
-            { onConflict: 'user_id,feature_key' },
-          )
-        if (error) throw error
+        await upsertEntitlementRow(supabaseAdmin, flagTargetUserId, flagKey, {
+          source: 'admin',
+          status: flagValue ? 'active' : 'revoked',
+        })
       }
       await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'set_feature_flag', {
         flagScope,
@@ -1216,21 +1245,26 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'grant_entitlement') {
-      const endsAt = (body as { ends_at?: unknown }).ends_at ?? null
-      const now = new Date().toISOString()
+      requirePermission(adminCtx, 'billing.manage')
+      const rawEnds = (body as { ends_at?: unknown }).ends_at
+      const endsAt =
+        rawEnds === null || rawEnds === undefined
+          ? null
+          : typeof rawEnds === 'string'
+            ? rawEnds
+            : null
       await enforceRateLimit(supabaseAdmin, user.id, 'grant_entitlement')
-      const { error } = await supabaseAdmin
-        .from('entitlements')
-        .upsert(
-          { user_id: targetUserId, feature_key: 'full_suite', source: 'admin', status: 'active', ends_at: endsAt, updated_at: now },
-          { onConflict: 'user_id,feature_key' },
-        )
-      if (error) throw error
+      await upsertEntitlementRow(supabaseAdmin, targetUserId, 'full_suite', {
+        source: 'admin',
+        status: 'active',
+        ends_at: endsAt,
+      })
       await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'grant_entitlement', { targetUserId })
       return new Response(JSON.stringify({ message: 'Full Suite granted.' }), { headers: jsonHeaders })
     }
 
     if (action === 'revoke_entitlement') {
+      requirePermission(adminCtx, 'billing.manage')
       const now = new Date().toISOString()
       await enforceRateLimit(supabaseAdmin, user.id, 'revoke_entitlement')
       const { error } = await supabaseAdmin

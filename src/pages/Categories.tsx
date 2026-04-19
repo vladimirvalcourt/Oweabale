@@ -94,7 +94,7 @@ export default function Categories() {
             <h3 className="text-lg font-semibold tracking-tight text-content-primary">
               {editingId ? 'Edit Category' : 'Create New Category'}
             </h3>
-            <button onClick={() => { setIsAdding(false); cancelEdit(); }} className="text-content-tertiary hover:text-content-secondary transition-colors">
+            <button type="button" onClick={() => { setIsAdding(false); cancelEdit(); }} className="focus-app rounded text-content-tertiary hover:text-content-secondary transition-colors">
               <span className="sr-only">Close</span>
               &times;
             </button>

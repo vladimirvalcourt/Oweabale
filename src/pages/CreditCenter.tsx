@@ -10,6 +10,7 @@ import {
 import { useStore } from '../store/useStore';
 import { toast } from 'sonner';
 import { AppPageShell } from '../components/AppPageShell';
+import { TransitionLink } from '../components/TransitionLink';
 import { yieldForPaint } from '../lib/interaction';
 
 export default function CreditCenter() {
@@ -169,9 +170,12 @@ ${user.firstName} ${user.lastName}
             <section className="bg-surface-raised border border-surface-border rounded-lg overflow-hidden shadow-none">
               <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-raised/80">
                 <h2 className="text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest">Score Breakdown</h2>
-                <button className="text-[10px] font-mono text-content-primary hover:text-content-secondary uppercase tracking-widest flex items-center gap-1">
-                  Education <HelpCircle className="w-3 h-3" />
-                </button>
+                <TransitionLink
+                  to="/education"
+                  className="focus-app rounded text-[10px] font-mono uppercase tracking-widest text-content-primary flex items-center gap-1 hover:text-content-secondary"
+                >
+                  Education <HelpCircle className="w-3 h-3 shrink-0" aria-hidden />
+                </TransitionLink>
               </div>
               <div className="divide-y divide-surface-border">
                 {(credit?.factors || []).map(factor => (
@@ -233,8 +237,9 @@ ${user.firstName} ${user.lastName}
                   <ShieldCheck className="w-4 h-4 text-emerald-500" /> Dispute Hub
                 </h2>
                 <button 
+                  type="button"
                   onClick={() => setIsFixModalOpen(true)}
-                  className="p-1 px-3 bg-surface-elevated border border-surface-border rounded-lg hover:bg-surface-highlight text-[10px] font-mono font-bold uppercase text-content-primary transition-all"
+                  className="focus-app rounded border border-surface-border bg-surface-elevated p-1 px-3 text-[10px] font-mono font-bold uppercase text-content-primary transition-all hover:bg-surface-highlight"
                 >
                   New Case
                 </button>
@@ -276,25 +281,29 @@ ${user.firstName} ${user.lastName}
                       
                       <div className="flex items-center gap-2 pt-1 opacity-80 group-hover:opacity-100 transition-opacity">
                         <button 
+                          type="button"
                           onClick={() => {
                             setSelectedFixId(fix.id);
                             setIsLetterModalOpen(true);
                           }}
-                          className="flex-1 py-1.5 bg-content-primary/[0.06] hover:bg-content-primary/[0.08] text-content-primary border border-surface-border rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+                          className="focus-app flex flex-1 items-center justify-center gap-2 rounded-lg border border-surface-border bg-content-primary/[0.06] py-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-content-primary transition-all hover:bg-content-primary/[0.08]"
                         >
-                          <FileText className="w-3 h-3" /> Letter
+                          <FileText className="w-3 h-3" aria-hidden /> Letter
                         </button>
                         <button 
+                          type="button"
                           onClick={() => updateCreditFix(fix.id, { status: fix.status === 'resolved' ? 'todo' : 'resolved' })}
-                          className="flex-1 py-1.5 bg-surface-elevated hover:bg-surface-border text-content-secondary border border-content-primary/5 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-all"
+                          className="focus-app flex-1 rounded-lg border border-content-primary/5 bg-surface-elevated py-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary transition-all hover:bg-surface-border"
                         >
                           {fix.status === 'resolved' ? 'Undo' : 'Resolve'}
                         </button>
                         <button 
+                          type="button"
+                          aria-label={`Delete dispute case ${fix.item}`}
                           onClick={() => deleteCreditFix(fix.id)}
-                          className="p-1.5 text-content-muted hover:text-rose-500 transition-colors"
+                          className="focus-app rounded p-1.5 text-content-muted transition-colors hover:text-rose-500"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-3.5 h-3.5" aria-hidden />
                         </button>
                       </div>
                     </div>

@@ -9,6 +9,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, R
 import { toast } from 'sonner';
 import { Dialog } from '@headlessui/react';
 import { motion, animate, useMotionValue, useTransform } from 'motion/react';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useStore } from '../store/useStore';
 import { sanitizeUrl } from '../lib/security';
 import { projectNetWorth, calcMonthlyCashFlow, computeSafeToSpend, forecast30DayCashFlow, detectSpendingAnomalies } from '../lib/finance';
@@ -44,18 +45,28 @@ function parseLowTaxSnoozeUntil(): number {
 
 // Helper for animated numbers — uses MotionValue to avoid React re-renders per frame
 function AnimatedValue({ value, prefix = "", suffix = "", decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const mv = useMotionValue(0);
   const formatted = useTransform(mv, (val) =>
     `${prefix}${val.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}`
   );
 
   useEffect(() => {
+    if (prefersReducedMotion) {
+      mv.set(value);
+      return;
+    }
     const controls = animate(mv, value, {
       duration: 1.5,
       ease: [0.16, 1, 0.3, 1],
     });
     return () => controls.stop();
-  }, [value, mv]);
+  }, [value, mv, prefersReducedMotion]);
+
+  if (prefersReducedMotion) {
+    const text = `${prefix}${value.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}`;
+    return <span>{text}</span>;
+  }
 
   return <motion.span>{formatted}</motion.span>;
 }

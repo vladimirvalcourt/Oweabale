@@ -81,9 +81,14 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
 // App-level full screen loader (for initial data fetch)
 export function AppLoader({ message = 'Syncing financial data' }: { message?: string }) {
   return (
-    <div className="fixed inset-0 bg-surface-base z-50 flex flex-col items-center justify-center font-sans selection:bg-content-primary/15">
+    <main
+      id="main-content"
+      aria-busy="true"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-surface-base font-sans selection:bg-content-primary/15"
+    >
+      <h1 className="sr-only">{message}</h1>
       <div
-        className="absolute inset-0 opacity-[0.04] pointer-events-none"
+        className="pointer-events-none absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage:
             'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
@@ -95,15 +100,15 @@ export function AppLoader({ message = 'Syncing financial data' }: { message?: st
         <div className="flex h-10 items-center justify-center rounded-lg border border-surface-border bg-surface-raised px-3 animate-pulse-highlight [animation-duration:2.8s]">
           <span
             className="text-[10px] font-semibold tracking-[0.24em] text-content-primary animate-pulse [animation-duration:2.8s] [text-shadow:0_0_16px_rgba(255,255,255,0.45)]"
-            aria-label="Oweable loading"
+            aria-hidden
           >
             OWEABLE
           </span>
         </div>
       </div>
-      <p className="relative text-xs font-medium text-content-tertiary tracking-tight text-center max-w-[14rem]">
+      <p className="relative max-w-[14rem] text-center text-xs font-medium tracking-tight text-content-tertiary" aria-hidden>
         {message}
       </p>
-    </div>
+    </main>
   );
 }

@@ -325,6 +325,11 @@ body {
 }
 
 @layer base {
+  /* Keyboard / sequential focus: document scroll keeps targets clear of sticky marketing or admin chrome */
+  html {
+    scroll-padding-top: 5.5rem;
+  }
+
   /* Lucide — Vercel-style UI icons: consistent thin stroke + round caps */
   svg.lucide {
     stroke-width: 1.5;

@@ -88,7 +88,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
         </div>
       </nav>
 
-      <div className="relative flex flex-1 flex-col items-center justify-center px-4 pt-24 pb-16">
+      <main id="main-content" className="relative flex flex-1 flex-col items-center justify-center px-4 pt-24 pb-16">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.035]"
           style={{
@@ -197,7 +197,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

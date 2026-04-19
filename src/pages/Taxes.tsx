@@ -685,7 +685,7 @@ export default function Taxes() {
                       </div>
                       <div className="flex items-center gap-4">
                         <span className="text-sm font-mono tabular-nums text-emerald-400 data-numeric">-${d.amount.toFixed(2)}</span>
-                        <button onClick={async () => { await deleteDeduction(d.id); }} className="text-content-muted hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"><Trash2 className="w-4 h-4"/></button>
+                        <button type="button" aria-label={`Delete deduction ${d.name}`} onClick={async () => { await deleteDeduction(d.id); }} className="focus-app rounded text-content-muted opacity-0 transition-all group-hover:opacity-100 hover:text-rose-500"><Trash2 className="w-4 h-4" aria-hidden /></button>
                       </div>
                     </div>
                   ))}

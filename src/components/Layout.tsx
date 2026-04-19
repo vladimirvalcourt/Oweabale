@@ -6,6 +6,7 @@ import {
   Settings, Repeat, BarChart2, BarChart, Plus, X, ChevronDown, Inbox,
   DollarSign, PieChart, Layers, Calendar as CalendarIcon, Percent, Briefcase, BookOpen, Shield, Clock, CreditCard, AlertTriangle,
   RefreshCw,
+  Command,
 } from '@geist-ui/icons';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
@@ -19,6 +20,8 @@ import type { Notification } from '../store/useStore';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
 import { BrandWordmark } from './BrandWordmark';
+import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
+import { isApplePointerPlatform } from '../lib/platform';
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
 const NAV_ROUTE_HASHES: Record<string, string[]> = {
@@ -107,10 +110,14 @@ export default function Layout() {
     }))
   );
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
   const { hasFullSuite, isLoading: checkingFullSuite } = useFullSuiteAccess();
   const pendingEmailFindings = emailScanFindings.filter((f) => f.reviewStatus === 'pending').length;
+  const searchModKey = useMemo(() => (isApplePointerPlatform() ? '⌘' : 'Ctrl'), []);
+  const unreadNotifCount = useMemo(() => notifications.filter((n) => !n.read).length, [notifications]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -122,6 +129,24 @@ export default function Layout() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (!isNotifOpen) return;
+    const onDocMouse = (event: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setIsNotifOpen(false);
+      }
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsNotifOpen(false);
+    };
+    document.addEventListener('mousedown', onDocMouse);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDocMouse);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [isNotifOpen]);
 
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
@@ -265,7 +290,13 @@ export default function Layout() {
         results.push({ type, name, detail, path });
       }
     };
-    pushNavShortcut(['support', 'help desk', 'help', 'ticket'], 'Navigation', 'Help & Support', 'Contact support', '/support');
+    pushNavShortcut(
+      ['support', 'help desk', 'help', 'ticket'],
+      'Navigation',
+      'Help & Support',
+      'In-app help desk',
+      '/app/support',
+    );
 
     return results.slice(0, 8); // Limit to 8 results
   }, [deferredSearchQuery, bills, debts, transactions, subscriptions, goals, incomes, budgets]);
@@ -417,9 +448,8 @@ export default function Layout() {
       .filter((group) => group.items.length > 0);
   }, [checkingFullSuite, hasFullSuite, navGroups]);
 
-  // Defer location values so active-state recalculation doesn't block the
-  // click-to-paint frame. The sidebar briefly keeps the previous active item
-  // highlighted (one frame), then updates — a fair trade for fast INP.
+  /* Defer location so active-nav recalculation does not block the click→paint frame (INP).
+     Tradeoff: active highlight can lag one frame after navigation — intentional. */
   const deferredPathname = useDeferredValue(location.pathname);
   const deferredSearch = useDeferredValue(location.search);
   const deferredHash = useDeferredValue(location.hash);
@@ -488,6 +518,21 @@ export default function Layout() {
           </button>
         </div>
 
+        {!checkingFullSuite && !hasFullSuite && !sidebarCollapsed && (
+          <div className="mx-3 mt-2 rounded-lg border border-amber-500/25 bg-amber-500/[0.07] px-3 py-2.5">
+            <p className="chrome-micro-label text-amber-200/90">Free plan</p>
+            <p className="mt-1 font-sans text-xs leading-snug text-content-tertiary">
+              Bills and core tools are included. Upgrade to unlock dashboard, income, reports, and the full suite.
+            </p>
+            <TransitionLink
+              to="/pricing"
+              className="mt-2 inline-flex font-sans text-xs font-medium text-content-primary hover:text-content-secondary"
+            >
+              View plans →
+            </TransitionLink>
+          </div>
+        )}
+
         <nav className="flex-1 px-3 py-6 overflow-y-auto scrollbar-hide space-y-4">
           {processedSidebarNav.map((group) => {
             const isExpanded = expandedGroups[group.label];
@@ -498,7 +543,7 @@ export default function Layout() {
                     type="button"
                     onClick={() => toggleGroup(group.label)}
                     aria-expanded={isExpanded}
-                    className="w-full flex items-center justify-between px-4 py-2 text-[12px] font-sans font-semibold text-content-secondary hover:text-content-primary transition-colors group/header focus-app"
+                    className="chrome-nav-group-trigger group/header flex w-full items-center justify-between px-4 py-2 transition-colors focus-app"
                   >
                     <span>{group.label}</span>
                     <ChevronDown className={cn("w-3 h-3 transition-transform duration-300", isExpanded ? "rotate-0" : "-rotate-90 text-content-tertiary")} />
@@ -564,7 +609,7 @@ export default function Layout() {
                               />
                               {!sidebarCollapsed && (
                                 <>
-                                  <span className="pointer-events-none flex-1 tracking-normal text-[13px] font-medium">
+                                  <span className="chrome-nav-row pointer-events-none flex-1">
                                     {item.name}
                                   </span>
                                   {navCount !== undefined && navCount > 0 && (
@@ -580,7 +625,7 @@ export default function Layout() {
                             </TransitionLink>
                             {isDueSoonItem && showDueSoonPreview && !sidebarCollapsed && (
                               <div className="absolute left-0 top-full z-50 mt-2 w-64 rounded-lg border border-surface-border bg-black/95 p-3 shadow-[0_20px_50px_rgba(0,0,0,0.55)] lg:left-full lg:top-1/2 lg:ml-2 lg:mt-0 lg:-translate-y-1/2">
-                                <p className="text-[10px] font-mono uppercase tracking-widest text-content-tertiary mb-2">Due Soon Preview</p>
+                                <p className="chrome-micro-label mb-2 text-content-tertiary">Due Soon Preview</p>
                                 <div className="space-y-1.5">
                                   {dueSoonPreview.length === 0 ? (
                                     <p className="text-xs text-content-tertiary">No upcoming bills in next 7 days.</p>
@@ -652,7 +697,8 @@ export default function Layout() {
       {/* Main Content Wrapper */}
       <div 
         className={cn(
-          "flex-1 flex flex-col h-[100dvh] overflow-y-auto scrollbar-hide transition-all duration-300 ease-in-out",
+          /* scroll-padding: sticky app header (h-[4.5rem]) — keyboard focus stays clear of chrome (WCAG 2.4.11) */
+          "flex h-[100dvh] flex-1 flex-col overflow-y-auto scroll-pt-[4.5rem] scrollbar-hide transition-all duration-300 ease-in-out",
           /* pl must match aside width (240px), not pl-64 (256px), or the top hairline gaps under the search */
           sidebarCollapsed ? "lg:pl-20" : "lg:pl-[240px]"
         )}
@@ -680,7 +726,7 @@ export default function Layout() {
                 id="layout-global-search"
                 ref={searchInputRef}
                 type="text" 
-                placeholder="Search (⌘K)" 
+                placeholder={searchModKey === '⌘' ? 'Search (⌘K)' : 'Search (Ctrl+K)'}
                 autoComplete="off"
                 value={searchQuery}
                 onChange={(e) => {
@@ -688,7 +734,7 @@ export default function Layout() {
                   setIsSearchOpen(true);
                 }}
                 onFocus={() => setIsSearchOpen(true)}
-                className="w-full min-h-10 rounded-lg border border-surface-border bg-surface-raised/80 py-2.5 pl-9 pr-4 font-sans text-[13px] text-content-primary outline-none transition-all placeholder:text-content-tertiary focus:border-content-primary/25 focus:bg-surface-elevated/90 focus:outline-none focus-visible:outline-none focus-visible:ring-0"
+                className="focus-app-field w-full min-h-10 rounded-lg border border-surface-border bg-surface-raised/80 py-2.5 pl-9 pr-4 font-sans text-sm text-content-primary transition-all placeholder:text-content-tertiary focus:border-content-primary/25 focus:bg-surface-elevated/90"
               />
               
               {/* Search Dropdown */}
@@ -699,8 +745,9 @@ export default function Layout() {
                       {searchResults.map((result, index) => (
                         <li key={index}>
                           <button
+                            type="button"
                             onClick={() => handleSearchSelect(result.path)}
-                            className="flex w-full flex-col px-4 py-2.5 text-left transition-colors hover:bg-content-primary/[0.04]"
+                            className="focus-app flex w-full flex-col px-4 py-2.5 text-left transition-colors hover:bg-content-primary/[0.04]"
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-sm font-medium text-content-primary">{result.name}</span>
@@ -719,12 +766,22 @@ export default function Layout() {
                 </div>
               )}
               </div>
-              <p className="mt-1.5 pl-1 text-[10px] font-sans text-content-muted leading-none hidden lg:block">
-                <kbd className="px-1 py-0.5 rounded bg-surface-elevated border border-surface-border font-mono text-[9px]">⌘K</kbd>
+              <p className="mt-1.5 pl-1 text-xs font-sans text-content-muted leading-none hidden lg:block">
+                <kbd className="rounded border border-surface-border bg-surface-elevated px-1 py-0.5 font-mono text-[10px]">
+                  {searchModKey === '⌘' ? '⌘K' : 'Ctrl+K'}
+                </kbd>
                 <span className="mx-1.5">search</span>
                 <span className="text-content-tertiary">·</span>
-                <kbd className="px-1 py-0.5 rounded bg-surface-elevated border border-surface-border font-mono text-[9px] ml-1.5">Q</kbd>
+                <kbd className="ml-1.5 rounded border border-surface-border bg-surface-elevated px-1 py-0.5 font-mono text-[10px]">Q</kbd>
                 <span className="ml-1">quick add</span>
+                <span className="text-content-tertiary"> · </span>
+                <button
+                  type="button"
+                  className="text-content-secondary underline-offset-2 hover:text-content-primary hover:underline focus-app rounded"
+                  onClick={() => setIsShortcutsOpen(true)}
+                >
+                  All shortcuts
+                </button>
               </p>
             </div>
           </div>
@@ -771,25 +828,35 @@ export default function Layout() {
             )}
 
             {/* Notifications */}
-            <div className="relative">
+            <div className="relative" ref={notifRef}>
               <button
                 type="button"
-                aria-label="Notifications"
+                aria-label={
+                  unreadNotifCount > 0
+                    ? `Notifications, ${unreadNotifCount} unread`
+                    : 'Notifications, no unread'
+                }
                 aria-expanded={isNotifOpen}
                 aria-haspopup="true"
                 onClick={() => { setIsNotifOpen(v => !v); if (!isNotifOpen) markNotificationsRead(); }}
                 className="relative p-1 overflow-visible group min-w-11 min-h-11 flex items-center justify-center focus-app rounded-lg"
               >
                 <TactileIcon icon={Bell} size={16} className="text-content-tertiary group-hover:text-content-primary" />
-                {notifications.filter(n => !n.read).length > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                {unreadNotifCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
                 )}
               </button>
               {isNotifOpen && (
-                <div className="absolute right-0 top-full mt-2 w-80 bg-black/90 backdrop-blur-xl border border-surface-border rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.55)] z-50 overflow-hidden">
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-content-primary/5">
-                    <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-content-secondary">Notifications</span>
-                    <button onClick={() => clearNotifications()} className="text-[10px] font-mono text-content-muted hover:text-content-tertiary uppercase tracking-widest transition-colors">Clear all</button>
+                <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-lg border border-surface-border bg-black/90 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+                  <div className="flex items-center justify-between border-b border-content-primary/5 px-4 py-3">
+                    <span className="chrome-micro-label text-content-secondary">Notifications</span>
+                    <button
+                      type="button"
+                      onClick={() => clearNotifications()}
+                      className="focus-app rounded font-mono text-[10px] uppercase tracking-widest text-content-muted transition-colors hover:text-content-tertiary"
+                    >
+                      Clear all
+                    </button>
                   </div>
                   <div className="max-h-80 overflow-y-auto scrollbar-hide">
                     {notifications.length === 0 ? (
@@ -845,19 +912,36 @@ export default function Layout() {
                 leaveFrom="opacity-100 scale-100 translate-y-0"
                 leaveTo="opacity-0 scale-[0.96] -translate-y-1"
               >
-                <HeadlessMenu.Items className="absolute right-0 mt-3 w-56 origin-top-right bg-black/92 backdrop-blur-xl border border-surface-border rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.55)] focus-app overflow-hidden z-50">
+                <HeadlessMenu.Items className="absolute right-0 z-50 mt-3 w-56 origin-top-right overflow-hidden rounded-lg border border-surface-border bg-black/92 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl focus-app">
                   <div className="py-1">
+                    <HeadlessMenu.Item>
+                      {({ active }) => (
+                        <button
+                          type="button"
+                          onClick={() => setIsShortcutsOpen(true)}
+                          className={cn(
+                            'flex w-full items-center gap-3 px-3 py-2 text-left text-sm transition-colors',
+                            active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary',
+                          )}
+                        >
+                          <div className="flex h-4 w-4 shrink-0 items-center justify-center text-content-tertiary">
+                            <Command className="h-4 w-4" />
+                          </div>
+                          <span>Keyboard shortcuts</span>
+                        </button>
+                      )}
+                    </HeadlessMenu.Item>
                     <HeadlessMenu.Item>
                       {({ active }) => (
                         <TransitionLink
                           to="/settings"
                           className={cn(
-                            'flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
+                            'flex items-center gap-3 px-3 py-2 text-sm transition-colors',
                             active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary'
                           )}
                         >
-                          <div className="w-4 h-4 flex items-center justify-center text-content-tertiary">
-                            <Settings className="w-4 h-4" />
+                          <div className="flex h-4 w-4 items-center justify-center text-content-tertiary">
+                            <Settings className="h-4 w-4" />
                           </div>
                           <span>Settings</span>
                         </TransitionLink>
@@ -875,7 +959,7 @@ export default function Layout() {
                         <TransitionLink
                           to="/"
                           className={cn(
-                            'flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
+                            'flex items-center gap-3 px-3 py-2 text-sm transition-colors',
                             active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary'
                           )}
                         >
@@ -892,7 +976,7 @@ export default function Layout() {
                         <button
                           onClick={() => setIsResetOpen(true)}
                           className={cn(
-                            'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
+                            'w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors',
                             active ? 'bg-amber-500/10 text-amber-500' : 'text-content-tertiary'
                           )}
                         >
@@ -909,7 +993,7 @@ export default function Layout() {
                         <TransitionLink
                           to="/onboarding/setup"
                           className={cn(
-                            'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
+                            'w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors',
                             active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary'
                           )}
                         >
@@ -934,7 +1018,7 @@ export default function Layout() {
                             startTransition(() => navigate('/auth'));
                           }}
                           className={cn(
-                            'w-full flex items-center gap-3 px-3 py-2 text-[13px] transition-colors',
+                            'w-full flex items-center gap-3 px-3 py-2 text-sm transition-colors',
                             active ? 'bg-content-primary/5 text-red-400' : 'text-content-tertiary'
                           )}
                         >
@@ -953,7 +1037,7 @@ export default function Layout() {
         </header>
 
         {/* Main Content Area */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full relative">
+        <main id="main-content" className="relative mx-auto w-full max-w-7xl flex-1 p-4 sm:p-6 lg:p-8">
           {/* Plain Outlet: motion/AnimatePresence here ran in the same interaction window as
               route commits and hurt INP; lazy route JS + page paint are already the heavy work. */}
           <Outlet />
@@ -990,7 +1074,7 @@ export default function Layout() {
               autoComplete="off"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 bg-transparent border-none text-base text-content-primary placeholder:text-content-muted rounded-lg px-1 outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:bg-surface-base/35"
+              className="focus-app flex-1 rounded-lg border border-transparent bg-transparent px-1 text-base text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-surface-border focus:bg-surface-base/35"
             />
             <button 
               type="button"
@@ -1014,8 +1098,9 @@ export default function Layout() {
                   {searchResults.map((result, index) => (
                     <li key={index}>
                       <button
+                        type="button"
                         onClick={() => handleSearchSelect(result.path)}
-                        className="w-full text-left px-4 py-3 hover:bg-surface-elevated transition-colors flex flex-col border-b border-surface-border/50"
+                        className="focus-app w-full border-b border-surface-border/50 px-4 py-3 text-left transition-colors hover:bg-surface-elevated flex flex-col"
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-base font-medium text-content-primary">{result.name}</span>
@@ -1060,12 +1145,14 @@ export default function Layout() {
 
             <div className="flex justify-end gap-3">
               <button
+                type="button"
                 onClick={() => setIsResetOpen(false)}
-                className="px-4 py-2 bg-transparent border border-surface-border rounded-lg text-[11px] font-mono font-bold uppercase tracking-widest text-content-tertiary hover:text-content-primary transition-colors"
+                className="focus-app rounded-lg border border-surface-border bg-transparent px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-widest text-content-tertiary transition-colors hover:text-content-primary"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 disabled={isResetting}
                 onClick={async () => {
                   setIsResetting(true);
@@ -1073,7 +1160,7 @@ export default function Layout() {
                   setIsResetting(false);
                   setIsResetOpen(false);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-brand-cta text-surface-base hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-[11px] font-mono font-bold uppercase tracking-widest transition-colors"
+                className="focus-app flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-widest text-surface-base transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isResetting && <Activity className="w-3 h-3 animate-spin" />}
                 {isResetting ? 'Wiping...' : 'Confirm Wipe'}
@@ -1082,6 +1169,8 @@ export default function Layout() {
           </Dialog.Panel>
         </div>
       </Dialog>
+
+      <KeyboardShortcutsDialog open={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
     </div>
   );
 }

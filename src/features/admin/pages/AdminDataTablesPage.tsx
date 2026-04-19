@@ -2,6 +2,8 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Download } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { getAdminActionErrorMessage } from '../../../lib/adminActionsInvoke';
 import { supabase } from '../../../lib/supabase';
 
 type EntityConfig = {
@@ -169,12 +171,19 @@ export default function AdminDataTablesPage() {
     const {
       data: { session },
     } = await supabase.auth.getSession();
-    if (!session?.access_token) return;
-    const { error } = await supabase.functions.invoke('admin-actions', {
+    if (!session?.access_token) {
+      toast.error('Not signed in.');
+      return;
+    }
+    const res = await supabase.functions.invoke('admin-actions', {
       body: { action: 'bulk_action', bulkAction, targetUserIds: selectedIds },
       headers: { Authorization: `Bearer ${session.access_token}` },
     });
-    if (error) return;
+    if (res.error) {
+      toast.error(`Bulk action failed: ${getAdminActionErrorMessage(res)}`);
+      return;
+    }
+    toast.success(typeof res.data?.message === 'string' ? res.data.message : 'Bulk action completed.');
     setSelectedIds([]);
     await qc.invalidateQueries({ queryKey: ['admin', 'entity-table'] });
   };

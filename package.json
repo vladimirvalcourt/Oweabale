@@ -20,7 +20,17 @@
     "secrets:scan": "gitleaks detect --source . --config .gitleaks.toml --redact --verbose",
     "test": "vitest run",
     "test:watch": "vitest",
-    "generate:hero-loop": "node scripts/generate-hero-loop.mjs"
+    "generate:hero-loop": "node scripts/generate-hero-loop.mjs",
+    "supabase": "supabase",
+    "db:push": "supabase db push",
+    "db:pull": "supabase db pull",
+    "db:reset": "supabase db reset",
+    "db:diff": "supabase db diff",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "functions:deploy": "supabase functions deploy",
+    "functions:deploy:admin-actions": "supabase functions deploy admin-actions"
   },
   "dependencies": {
     "@fontsource/geist-mono": "^5.2.7",
@@ -71,6 +81,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.4.0",
     "rollup-plugin-visualizer": "^7.0.1",
+    "supabase": "^2.92.1",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",

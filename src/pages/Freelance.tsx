@@ -339,12 +339,13 @@ export default function Freelance() {
                               </div>
                            </div>
                            <button 
+                             type="button"
                              onClick={() => toggleFreelanceVault(entry.id)}
-                             className={`px-4 py-2 border text-xs font-sans font-semibold transition-all rounded-lg ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-surface-border bg-brand-cta text-surface-base hover:bg-brand-cta-hover'}`}
+                             className={`focus-app px-4 py-2 border text-xs font-sans font-semibold transition-all rounded-lg ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-surface-border bg-brand-cta text-surface-base hover:bg-brand-cta-hover'}`}
                            >
                              {entry.isVaulted ? 'Saved' : 'Move to tax reserve'}
                            </button>
-                           <button onClick={() => deleteFreelanceEntry(entry.id)} className="text-content-muted hover:text-rose-500 transition-colors p-2"><Trash2 className="w-4 h-4"/></button>
+                           <button type="button" aria-label={`Delete freelance entry for ${entry.client}`} onClick={() => deleteFreelanceEntry(entry.id)} className="focus-app rounded p-2 text-content-muted transition-colors hover:text-rose-500"><Trash2 className="w-4 h-4" aria-hidden /></button>
                         </div>
                       </div>
                     ))

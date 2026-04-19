@@ -21,8 +21,8 @@
 ## Backend (Supabase / Postgres)
 
 - If a task touches the database, RLS, RPCs, Edge Functions, storage policies, or webhooks, **ship the backend change**, not only app code or a local migration file.
-- Apply migrations to the linked project (e.g. Supabase MCP `apply_migration` for DDL, or `supabase db push` when local migration history matches remote).
-- After changing any Edge Function under `supabase/functions/`, **deploy it** to the linked project (e.g. `supabase functions deploy <name> --project-ref <ref>`). Resolve the project ref from the Supabase dashboard, `get_project_url` (MCP), or `VITE_SUPABASE_URL` (`https://<ref>.supabase.co`). Do not leave function-only fixes un-deployed.
+- Apply migrations to the linked project (e.g. Supabase MCP `apply_migration` for DDL, or `npm run db:push` / `supabase db push` when local migration history matches remote). The Supabase CLI is a dev dependency (`npm install`); run arbitrary CLI commands with `npm run supabase -- <args>`.
+- After changing any Edge Function under `supabase/functions/`, **deploy it** to the linked project (e.g. `npm run functions:deploy` for all functions, or `npm run functions:deploy:admin-actions` for one). You can also use `supabase functions deploy <name> --project-ref <ref>`. Resolve the project ref from the Supabase dashboard, `get_project_url` (MCP), or `VITE_SUPABASE_URL` (`https://<ref>.supabase.co`). Do not leave function-only fixes un-deployed.
 
 ## Code Standards
 

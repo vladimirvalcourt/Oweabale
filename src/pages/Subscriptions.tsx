@@ -420,7 +420,7 @@ export default function Subscriptions() {
             <h3 className="text-base font-sans font-semibold text-content-primary">
               {editingId ? 'Edit subscription' : 'Add subscription'}
             </h3>
-            <button onClick={() => { setIsAdding(false); cancelEdit(); }} className="text-content-tertiary hover:text-content-secondary transition-colors">
+            <button type="button" onClick={() => { setIsAdding(false); cancelEdit(); }} className="focus-app rounded text-content-tertiary hover:text-content-secondary transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>

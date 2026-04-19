@@ -158,7 +158,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
 
             {/* Right Panel: QR Display */}
             <div className="flex-1 p-10 flex flex-col items-center justify-center bg-surface-raised relative">
-               <button onClick={onClose} className="absolute top-4 right-4 text-content-muted hover:text-content-primary transition-colors">
+               <button type="button" aria-label="Close mobile sync" onClick={onClose} className="focus-app absolute right-4 top-4 rounded text-content-muted transition-colors hover:text-content-primary">
                  <X className="w-5 h-5" />
                </button>
 

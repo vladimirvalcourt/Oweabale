@@ -205,6 +205,7 @@ export default function Landing() {
         </div>
       </nav>
 
+      <main id="main-content" className="flex flex-1 flex-col">
       {/* Hero Section */}
       <section className="pt-24 sm:pt-32 lg:pt-40 pb-12 sm:pb-20 px-6 lg:px-8 max-w-7xl mx-auto w-full flex-1 flex flex-col justify-center">
         <div ref={heroRef} className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-32 items-center">
@@ -439,6 +440,7 @@ export default function Landing() {
       </section>
 
       <Footer />
+      </main>
     </div>
   );
 }

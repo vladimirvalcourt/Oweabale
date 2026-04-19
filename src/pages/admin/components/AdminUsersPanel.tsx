@@ -20,6 +20,10 @@ type Props = {
   onViewUser: (userId: string) => void;
   onGrantRevoke: (action: 'grant' | 'revoke', userId: string) => void;
   onBulkAction: (action: 'ban' | 'unban' | 'grant_entitlement' | 'revoke_entitlement', userIds: string[]) => void;
+  /** Super admin: ban/unban/delete, promote/demote admin */
+  isSuperAdmin: boolean;
+  /** Grant/revoke Full Suite and bulk grant/revoke (includes support_agent with billing.manage) */
+  canBillingManage: boolean;
 };
 
 const PLAN_STYLES: Record<string, string> = {
@@ -48,6 +52,8 @@ export function AdminUsersPanel({
   onViewUser,
   onGrantRevoke,
   onBulkAction,
+  isSuperAdmin,
+  canBillingManage,
 }: Props) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const selectedIds = [...selected];
@@ -119,8 +125,12 @@ export function AdminUsersPanel({
           )}
         </div>
         <div className="relative">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-content-muted" />
+          <label htmlFor="admin-users-search" className="sr-only">
+            Search users by email or id
+          </label>
+          <Search className="pointer-events-none absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-content-muted" aria-hidden />
           <input
+            id="admin-users-search"
             type="text"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
@@ -136,28 +146,36 @@ export function AdminUsersPanel({
           <button
             type="button"
             onClick={() => confirmBulkAction('ban')}
-            className="danger-button px-2 py-1 rounded-lg text-xs bg-rose-500/15 border border-rose-500/35 text-rose-300 hover:bg-rose-500/25"
+            disabled={!isSuperAdmin}
+            title={!isSuperAdmin ? 'Requires super admin' : undefined}
+            className="danger-button px-2 py-1 rounded-lg text-xs bg-rose-500/15 border border-rose-500/35 text-rose-300 hover:bg-rose-500/25 disabled:opacity-40"
           >
             Ban
           </button>
           <button
             type="button"
             onClick={() => confirmBulkAction('unban')}
-            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+            disabled={!isSuperAdmin}
+            title={!isSuperAdmin ? 'Requires super admin' : undefined}
+            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 disabled:opacity-40"
           >
             Unban
           </button>
           <button
             type="button"
             onClick={() => confirmBulkAction('grant_entitlement')}
-            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+            disabled={!canBillingManage}
+            title={!canBillingManage ? 'Requires billing access permission' : undefined}
+            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 disabled:opacity-40"
           >
             Grant Suite
           </button>
           <button
             type="button"
             onClick={() => confirmBulkAction('revoke_entitlement')}
-            className="danger-button px-2 py-1 rounded-lg text-xs bg-amber-500/15 border border-amber-500/35 text-amber-300 hover:bg-amber-500/25"
+            disabled={!canBillingManage}
+            title={!canBillingManage ? 'Requires billing access permission' : undefined}
+            className="danger-button px-2 py-1 rounded-lg text-xs bg-amber-500/15 border border-amber-500/35 text-amber-300 hover:bg-amber-500/25 disabled:opacity-40"
           >
             Revoke Suite
           </button>
@@ -260,7 +278,8 @@ export function AdminUsersPanel({
                           <button
                             type="button"
                             onClick={() => onDemoteAdmin(user.id)}
-                            disabled={isPrimary}
+                            disabled={isPrimary || !isSuperAdmin}
+                            title={!isSuperAdmin ? 'Requires super admin' : undefined}
                             className="interactive-press interactive-focus px-2 py-1 rounded-lg text-[11px] bg-content-primary/[0.06] text-content-secondary disabled:opacity-40"
                           >
                             Demote
@@ -269,7 +288,9 @@ export function AdminUsersPanel({
                           <button
                             type="button"
                             onClick={() => onPromoteAdmin(user.id)}
-                            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-[11px] bg-content-primary/[0.05] text-content-primary hover:bg-content-primary/[0.08]"
+                            disabled={!isSuperAdmin}
+                            title={!isSuperAdmin ? 'Requires super admin' : undefined}
+                            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-[11px] bg-content-primary/[0.05] text-content-primary hover:bg-content-primary/[0.08] disabled:opacity-40"
                           >
                             Promote
                           </button>
@@ -278,7 +299,8 @@ export function AdminUsersPanel({
                           <button
                             type="button"
                             onClick={() => confirmRevokeSuite(user.id, user.email ?? user.id)}
-                            disabled={isPrimary}
+                            disabled={isPrimary || !canBillingManage}
+                            title={!canBillingManage ? 'Requires billing access permission' : undefined}
                             className="danger-button px-2 py-1 rounded-lg text-[11px] bg-amber-500/15 border border-amber-500/35 text-amber-300 hover:bg-amber-500/25 disabled:opacity-40"
                           >
                             Revoke Suite
@@ -287,7 +309,9 @@ export function AdminUsersPanel({
                           <button
                             type="button"
                             onClick={() => onGrantRevoke('grant', user.id)}
-                            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-[11px] bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+                            disabled={!canBillingManage}
+                            title={!canBillingManage ? 'Requires billing access permission' : undefined}
+                            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-[11px] bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25 disabled:opacity-40"
                           >
                             Grant Suite
                           </button>
@@ -298,7 +322,9 @@ export function AdminUsersPanel({
                           <button
                             type="button"
                             onClick={() => confirmSingleAction('unban', user.id, user.email ?? user.id)}
-                            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-[11px] bg-emerald-500/15 text-emerald-300"
+                            disabled={!isSuperAdmin}
+                            title={!isSuperAdmin ? 'Requires super admin' : undefined}
+                            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-[11px] bg-emerald-500/15 text-emerald-300 disabled:opacity-40"
                           >
                             Unban
                           </button>
@@ -306,7 +332,8 @@ export function AdminUsersPanel({
                           <button
                             type="button"
                             onClick={() => confirmSingleAction('ban', user.id, user.email ?? user.id)}
-                            disabled={isPrimary}
+                            disabled={isPrimary || !isSuperAdmin}
+                            title={!isSuperAdmin ? 'Requires super admin' : undefined}
                             className="danger-button px-2 py-1 rounded-lg text-[11px] bg-rose-500/15 border border-rose-500/35 text-rose-300 disabled:opacity-40"
                           >
                             Ban
@@ -315,7 +342,8 @@ export function AdminUsersPanel({
                         <button
                           type="button"
                           onClick={() => confirmSingleAction('delete', user.id, user.email ?? user.id)}
-                          disabled={isPrimary}
+                          disabled={isPrimary || !isSuperAdmin}
+                          title={!isSuperAdmin ? 'Requires super admin' : undefined}
                           className="danger-button px-2 py-1 rounded-lg text-[11px] font-semibold bg-red-500/20 border border-red-500/40 text-red-300 disabled:opacity-40"
                         >
                           Delete

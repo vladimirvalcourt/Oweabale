@@ -536,9 +536,9 @@ export default function Obligations() {
               <div className="flex items-center gap-3 bg-surface-base border border-surface-border rounded-lg px-3 py-1.5">
                 <Calculator className="w-3.5 h-3.5 text-content-tertiary" />
                 <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Extra per month:</span>
-                <button onClick={() => setExtraPayment(e => Math.max(0, e - 100))} className="text-content-tertiary hover:text-content-primary"><Minus className="w-3 h-3" /></button>
+                <button type="button" aria-label="Decrease extra monthly payment by 100" onClick={() => setExtraPayment(e => Math.max(0, e - 100))} className="focus-app rounded text-content-tertiary hover:text-content-primary"><Minus className="w-3 h-3" aria-hidden /></button>
                 <span className="text-sm font-mono text-content-primary w-16 text-center">${extraPayment}</span>
-                <button onClick={() => setExtraPayment(e => e + 100)} className="text-content-tertiary hover:text-content-primary"><Plus className="w-3 h-3" /></button>
+                <button type="button" aria-label="Increase extra monthly payment by 100" onClick={() => setExtraPayment(e => e + 100)} className="focus-app rounded text-content-tertiary hover:text-content-primary"><Plus className="w-3 h-3" aria-hidden /></button>
               </div>
             </div>
 

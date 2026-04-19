@@ -445,7 +445,7 @@ export default function Income() {
               <Dialog.Title className="text-base font-sans font-semibold text-content-primary">
                 {isEditModalOpen ? 'Edit income source' : 'New income source'}
               </Dialog.Title>
-              <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-content-tertiary hover:text-content-primary transition-colors">
+              <button type="button" onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="focus-app rounded text-content-tertiary hover:text-content-primary transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -568,7 +568,7 @@ export default function Income() {
           <Dialog.Panel className="mx-auto max-w-sm w-full rounded-lg bg-surface-raised border border-surface-border shadow-2xl">
             <div className="flex items-center justify-between p-4 border-b border-surface-border bg-surface-elevated">
               <Dialog.Title className="text-base font-sans font-semibold text-content-primary">Log deposit</Dialog.Title>
-              <button onClick={() => setIsDepositModalOpen(false)} className="text-content-tertiary hover:text-content-primary transition-colors">
+              <button type="button" onClick={() => setIsDepositModalOpen(false)} className="focus-app rounded text-content-tertiary hover:text-content-primary transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>

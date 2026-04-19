@@ -197,7 +197,7 @@ export default function Goals() {
         <div className="bg-surface-raised rounded-lg border border-surface-border p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-base font-sans font-semibold text-content-primary">New goal</h3>
-            <button onClick={() => setIsAddingGoal(false)} className="text-content-tertiary hover:text-content-secondary transition-colors">
+            <button type="button" onClick={() => setIsAddingGoal(false)} className="focus-app rounded text-content-tertiary hover:text-content-secondary transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>

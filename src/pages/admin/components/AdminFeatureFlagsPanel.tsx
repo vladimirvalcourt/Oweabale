@@ -4,6 +4,8 @@ import { ToggleRight } from 'lucide-react';
 interface Props {
   platformSettings: { feature_flags?: Record<string, boolean> } | null;
   onSetFeatureFlag: (scope: 'global', key: string, value: boolean) => Promise<void>;
+  /** settings.platform permission (or super admin) */
+  canManagePlatform?: boolean;
 }
 
 const GLOBAL_FLAGS = [
@@ -13,7 +15,11 @@ const GLOBAL_FLAGS = [
   { key: 'academy_enabled', label: 'Academy' },
 ];
 
-export function AdminFeatureFlagsPanel({ platformSettings, onSetFeatureFlag }: Props) {
+export function AdminFeatureFlagsPanel({
+  platformSettings,
+  onSetFeatureFlag,
+  canManagePlatform = true,
+}: Props) {
   const [loadingFlag, setLoadingFlag] = useState<string | null>(null);
 
   async function handleToggle(key: string, currentValue: boolean) {
@@ -52,7 +58,8 @@ export function AdminFeatureFlagsPanel({ platformSettings, onSetFeatureFlag }: P
                   <span className="text-xs text-content-primary">{flag.label}</span>
                   <button
                     type="button"
-                    disabled={isLoading}
+                    disabled={isLoading || !canManagePlatform}
+                    title={!canManagePlatform ? 'Requires platform settings permission' : undefined}
                     onClick={() => handleToggle(flag.key, currentValue)}
                     className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus-visible:outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
                       currentValue ? 'bg-neutral-500' : 'bg-surface-elevated'

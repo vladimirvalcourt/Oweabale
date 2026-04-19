@@ -7,23 +7,34 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart as Rech
 import { toast } from 'sonner';
 import { motion, animate, useMotionValue, useTransform } from 'motion/react';
 import { useState, useEffect } from 'react';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 import { TransitionLink } from '../components/TransitionLink';
 
 function AnimatedValue({ value, prefix = "", suffix = "", decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const mv = useMotionValue(0);
   const formatted = useTransform(mv, (val) =>
     `${prefix}${val.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}`
   );
 
   useEffect(() => {
+    if (prefersReducedMotion) {
+      mv.set(value);
+      return;
+    }
     const controls = animate(mv, value, {
       duration: 1.5,
       ease: [0.16, 1, 0.3, 1],
     });
     return () => controls.stop();
-  }, [value, mv]);
+  }, [value, mv, prefersReducedMotion]);
+
+  if (prefersReducedMotion) {
+    const text = `${prefix}${value.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}`;
+    return <span>{text}</span>;
+  }
 
   return <motion.span>{formatted}</motion.span>;
 }
@@ -204,8 +215,8 @@ export default function NetWorth() {
                   </div>
                   <div className="flex items-center gap-3">
                     <p className="text-sm font-mono font-medium text-emerald-400">+${asset.value.toLocaleString()}</p>
-                    <button onClick={async () => { const ok = await deleteAsset(asset.id); if (ok) toast.success('Asset removed'); }} className="opacity-0 group-hover:opacity-100 text-content-muted hover:text-red-400 transition-all">
-                      <Trash2 className="w-3.5 h-3.5" />
+                    <button type="button" aria-label={`Remove asset ${asset.name}`} onClick={async () => { const ok = await deleteAsset(asset.id); if (ok) toast.success('Asset removed'); }} className="focus-app rounded opacity-0 transition-all group-hover:opacity-100 text-content-muted hover:text-red-400">
+                      <Trash2 className="w-3.5 h-3.5" aria-hidden />
                     </button>
                   </div>
                 </div>

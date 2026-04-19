@@ -51,10 +51,20 @@ export function AdminLayout() {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="relative rounded-lg border border-surface-border bg-surface-raised/80 p-2 shadow-sm transition-colors duration-200 hover:border-content-secondary/40">
-              <Bell className="h-4 w-4 text-content-secondary" />
+            <div
+              className="relative rounded-lg border border-surface-border bg-surface-raised/80 p-2 shadow-sm transition-colors duration-200 hover:border-content-secondary/40"
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              <Bell className="h-4 w-4 text-content-secondary" aria-hidden />
+              <span className="sr-only">
+                {unreadCount > 0
+                  ? `${unreadCount > 99 ? '99 plus' : unreadCount} unread system notifications`
+                  : 'No unread system notifications'}
+              </span>
               {unreadCount > 0 ? (
-                <span className="absolute -right-1 -top-1 rounded-full bg-rose-500 px-1.5 text-[10px] text-white">
+                <span className="absolute -right-1 -top-1 rounded-full bg-rose-500 px-1.5 text-[10px] text-white" aria-hidden>
                   {unreadCount > 99 ? '99+' : unreadCount}
                 </span>
               ) : null}

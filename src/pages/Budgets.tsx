@@ -506,7 +506,7 @@ export default function Budgets() {
               <Dialog.Title className="text-base font-sans font-semibold text-content-primary">
                 {isEditModalOpen ? 'Edit budget' : 'New budget'}
               </Dialog.Title>
-              <button onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="text-content-tertiary hover:text-content-secondary transition-colors">
+              <button type="button" onClick={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="focus-app rounded text-content-tertiary hover:text-content-secondary transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>

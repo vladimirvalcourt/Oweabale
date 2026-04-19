@@ -25,6 +25,7 @@ import { AdminBroadcastsPanel } from './admin/components/AdminBroadcastsPanel';
 import { AdminUserDataPanel } from './admin/components/AdminUserDataPanel';
 import { AdminIngestionQueuesPanel } from './admin/components/AdminIngestionQueuesPanel';
 import { useAdminPermissions } from '../features/admin/shared/useAdminPermissions';
+import { getAdminActionErrorMessage } from '../lib/adminActionsInvoke';
 import type {
   AdminAuditEntry,
   AdminBroadcastRow,
@@ -49,7 +50,9 @@ const STRIPE_DASHBOARD_URL = (import.meta.env.VITE_STRIPE_DASHBOARD_URL ?? '').t
 const PROFILE_PAGE_SIZE = 200;
 
 export default function AdminDashboard() {
-  const { isSuperAdmin } = useAdminPermissions();
+  const { isSuperAdmin, hasPermission } = useAdminPermissions();
+  const canBillingManage = isSuperAdmin || hasPermission('billing.manage');
+  const canManagePlatform = isSuperAdmin || hasPermission('settings.platform');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [isPlaidEnabled, setIsPlaidEnabled] = useState(true);
@@ -184,38 +187,38 @@ export default function AdminDashboard() {
       invokeAdminActions({ action: 'webhook_list' }),
     ]);
 
-    if (enrichedRes.error) toast.error(`Auth enrichment failed: ${enrichedRes.error.message}`);
+    if (enrichedRes.error) toast.error(`Auth enrichment failed: ${getAdminActionErrorMessage(enrichedRes)}`);
     else if (enrichedRes.data?.users) setEnrichedUsers(enrichedRes.data.users as EnrichedUser[]);
 
-    if (plaidStatsRes.error) toast.error(`Plaid stats failed: ${plaidStatsRes.error.message}`);
+    if (plaidStatsRes.error) toast.error(`Plaid stats failed: ${getAdminActionErrorMessage(plaidStatsRes)}`);
     else if (plaidStatsRes.data?.plaid_stats) setPlaidStats(plaidStatsRes.data.plaid_stats as PlaidHealthStats);
 
-    if (healthRes.error) toast.error(`Billing health failed: ${healthRes.error.message}`);
+    if (healthRes.error) toast.error(`Billing health failed: ${getAdminActionErrorMessage(healthRes)}`);
     else if (healthRes.data?.stripe_health) setStripeHealth(healthRes.data.stripe_health as StripeHealthStats);
 
-    if (auditRes.error) toast.error(`Audit feed failed: ${auditRes.error.message}`);
+    if (auditRes.error) toast.error(`Audit feed failed: ${getAdminActionErrorMessage(auditRes)}`);
     else if (Array.isArray(auditRes.data?.audit_feed)) setAuditFeed(auditRes.data.audit_feed as AdminAuditEntry[]);
 
-    if (billingStatsRes.error) toast.error(`Billing stats failed: ${billingStatsRes.error.message}`);
+    if (billingStatsRes.error) toast.error(`Billing stats failed: ${getAdminActionErrorMessage(billingStatsRes)}`);
     else if (billingStatsRes.data?.billing_stats) setBillingStats(billingStatsRes.data.billing_stats as BillingStats);
 
-    if (billingByUserRes.error) toast.error(`Billing by user failed: ${billingByUserRes.error.message}`);
+    if (billingByUserRes.error) toast.error(`Billing by user failed: ${getAdminActionErrorMessage(billingByUserRes)}`);
     else if (billingByUserRes.data?.billing_by_user) setSubMap(billingByUserRes.data.billing_by_user as Record<string, UserSubscription>);
 
-    if (plaidItemsRes.error) toast.error(`Plaid items failed: ${plaidItemsRes.error.message}`);
+    if (plaidItemsRes.error) toast.error(`Plaid items failed: ${getAdminActionErrorMessage(plaidItemsRes)}`);
     else if (Array.isArray(plaidItemsRes.data?.plaid_items)) setPlaidItems(plaidItemsRes.data.plaid_items as PlaidItemRow[]);
 
-    if (churnRes.error) toast.error(`Churn stats failed: ${churnRes.error.message}`);
+    if (churnRes.error) toast.error(`Churn stats failed: ${getAdminActionErrorMessage(churnRes)}`);
     else if (churnRes.data?.churn_stats) setChurnStats(churnRes.data.churn_stats as ChurnStats);
 
-    if (growthRes.error) toast.error(`Growth chart failed: ${growthRes.error.message}`);
+    if (growthRes.error) toast.error(`Growth chart failed: ${getAdminActionErrorMessage(growthRes)}`);
     else if (Array.isArray(growthRes.data?.growth_chart)) setGrowthChart(growthRes.data.growth_chart as { week: string; signups: number }[]);
 
-    if (revenueRes.error) toast.error(`Revenue chart failed: ${revenueRes.error.message}`);
+    if (revenueRes.error) toast.error(`Revenue chart failed: ${getAdminActionErrorMessage(revenueRes)}`);
     else if (Array.isArray(revenueRes.data?.revenue_chart))
       setRevenueChart(revenueRes.data.revenue_chart as { month: string; revenue_cents: number }[]);
 
-    if (webhookRes.error) toast.error(`Webhooks failed: ${webhookRes.error.message}`);
+    if (webhookRes.error) toast.error(`Webhooks failed: ${getAdminActionErrorMessage(webhookRes)}`);
     else if (Array.isArray(webhookRes.data?.webhooks))
       setWebhookRows(
         webhookRes.data.webhooks as { id: string; stripe_event_id: string; event_type: string; processed_at: string }[],
@@ -424,14 +427,14 @@ export default function AdminDashboard() {
 
   const handleSetFeatureFlag = useCallback(
     async (scope: 'global', key: string, value: boolean) => {
-      const { error } = await invokeAdminActions({
+      const res = await invokeAdminActions({
         action: 'set_feature_flag',
         flagScope: scope,
         flagKey: key,
         flagValue: value,
       });
-      if (error) {
-        toast.error(`Feature flag failed: ${error.message}`);
+      if (res.error) {
+        toast.error(`Feature flag failed: ${getAdminActionErrorMessage(res)}`);
         return;
       }
       setPlatformSettingsForFlags((prev) => ({
@@ -521,21 +524,23 @@ export default function AdminDashboard() {
 
   const handleAdminAction = async (action: 'ban' | 'unban' | 'delete', targetUserId: string) => {
     toast.loading(`Executing ${action}...`, { id: 'admin-action' });
-    const { data, error } = await invokeAdminActions({ action, targetUserId });
-    if (error) {
-      toast.error(`Admin action failed: ${error.message}`, { id: 'admin-action' });
+    const res = await invokeAdminActions({ action, targetUserId });
+    if (res.error) {
+      toast.error(`Admin action failed: ${getAdminActionErrorMessage(res)}`, { id: 'admin-action' });
       return;
     }
+    const { data } = res;
     toast.success(data?.message || `Successfully executed ${action}.`, { id: 'admin-action' });
     void loadAll();
   };
 
   const handleDemoteAdmin = async (userId: string) => {
-    const { data, error } = await invokeAdminActions({ action: 'set_admin', targetUserId: userId, isAdmin: false });
-    if (error) {
-      toast.error(`Failed to remove admin status: ${error.message}`);
+    const res = await invokeAdminActions({ action: 'set_admin', targetUserId: userId, isAdmin: false });
+    if (res.error) {
+      toast.error(`Failed to remove admin status: ${getAdminActionErrorMessage(res)}`);
       return;
     }
+    const { data } = res;
     toast.success(typeof data?.message === 'string' ? data.message : 'Admin access removed.');
     track('admin_role_changed', { granted: false });
     void loadAll();
@@ -543,11 +548,12 @@ export default function AdminDashboard() {
 
   const handlePromoteAdmin = async (userId: string) => {
     toast.loading('Granting admin access…', { id: 'promote-admin' });
-    const { data, error } = await invokeAdminActions({ action: 'promote_admin', targetUserId: userId });
-    if (error) {
-      toast.error(`Failed to grant admin: ${error.message}`, { id: 'promote-admin' });
+    const res = await invokeAdminActions({ action: 'promote_admin', targetUserId: userId });
+    if (res.error) {
+      toast.error(`Failed to grant admin: ${getAdminActionErrorMessage(res)}`, { id: 'promote-admin' });
       return;
     }
+    const { data } = res;
     toast.success(typeof data?.message === 'string' ? data.message : 'Admin access granted.', { id: 'promote-admin' });
     track('admin_role_changed', { granted: true });
     void loadAll();
@@ -556,11 +562,12 @@ export default function AdminDashboard() {
   const handleGrantRevoke = async (action: 'grant' | 'revoke', userId: string) => {
     const adminAction = action === 'grant' ? 'grant_entitlement' : 'revoke_entitlement';
     toast.loading(action === 'grant' ? 'Granting Full Suite…' : 'Revoking Full Suite…', { id: 'grant-revoke' });
-    const { data, error } = await invokeAdminActions({ action: adminAction, targetUserId: userId });
-    if (error) {
-      toast.error(`Failed: ${error.message}`, { id: 'grant-revoke' });
+    const res = await invokeAdminActions({ action: adminAction, targetUserId: userId });
+    if (res.error) {
+      toast.error(`Failed: ${getAdminActionErrorMessage(res)}`, { id: 'grant-revoke' });
       return;
     }
+    const { data } = res;
     toast.success(typeof data?.message === 'string' ? data.message : 'Done.', { id: 'grant-revoke' });
     void loadAll();
   };
@@ -570,11 +577,12 @@ export default function AdminDashboard() {
     userIds: string[],
   ) => {
     toast.loading(`Applying bulk ${action} to ${userIds.length} user(s)…`, { id: 'bulk-action' });
-    const { data, error } = await invokeAdminActions({ action: 'bulk_action', bulkAction: action, targetUserIds: userIds });
-    if (error) {
-      toast.error(`Bulk action failed: ${error.message}`, { id: 'bulk-action' });
+    const bulkRes = await invokeAdminActions({ action: 'bulk_action', bulkAction: action, targetUserIds: userIds });
+    if (bulkRes.error) {
+      toast.error(`Bulk action failed: ${getAdminActionErrorMessage(bulkRes)}`, { id: 'bulk-action' });
       return;
     }
+    const { data } = bulkRes;
     toast.success(typeof data?.message === 'string' ? data.message : 'Bulk action completed.', { id: 'bulk-action' });
     void loadAll();
   };
@@ -623,15 +631,15 @@ export default function AdminDashboard() {
   };
 
   const toggleMaintenance = async () => {
-    if (!isSuperAdmin) return toast.error('Only Super Admin can change maintenance mode.');
+    if (!canManagePlatform) return toast.error('You do not have permission to change maintenance mode.');
     const newValue = !isMaintenance;
     if (!window.confirm(`${newValue ? 'Enable' : 'Disable'} maintenance mode? This affects all users.`)) return;
-    const { error } = await invokeAdminActions({
+    const res = await invokeAdminActions({
       action: 'update_platform_controls',
       maintenanceMode: newValue,
     });
-    if (error) {
-      toast.error('Failed to update maintenance mode.');
+    if (res.error) {
+      toast.error(`Failed to update maintenance mode: ${getAdminActionErrorMessage(res)}`);
       return;
     }
     setIsMaintenance(newValue);
@@ -639,15 +647,15 @@ export default function AdminDashboard() {
   };
 
   const togglePlaid = async () => {
-    if (!isSuperAdmin) return toast.error('Only Super Admin can change bank syncing.');
+    if (!canManagePlatform) return toast.error('You do not have permission to change bank syncing.');
     const newValue = !isPlaidEnabled;
     if (!window.confirm(`${newValue ? 'Enable' : 'Disable'} bank syncing globally?`)) return;
-    const { error } = await invokeAdminActions({
+    const res = await invokeAdminActions({
       action: 'update_platform_controls',
       plaidEnabled: newValue,
     });
-    if (error) {
-      toast.error('Failed to update bank syncing.');
+    if (res.error) {
+      toast.error(`Failed to update bank syncing: ${getAdminActionErrorMessage(res)}`);
       return;
     }
     setIsPlaidEnabled(newValue);
@@ -655,15 +663,15 @@ export default function AdminDashboard() {
   };
 
   const handleSendBroadcast = async () => {
-    if (!isSuperAdmin) return toast.error('Only Super Admin can update broadcast.');
+    if (!canManagePlatform) return toast.error('You do not have permission to update the broadcast.');
     setIsSavingBroadcast(true);
-    const { error } = await invokeAdminActions({
+    const res = await invokeAdminActions({
       action: 'update_platform_controls',
       broadcastMessage: broadcastMsg.trim() === '' ? null : broadcastMsg,
     });
     setIsSavingBroadcast(false);
-    if (error) {
-      toast.error('Failed to update broadcast message.');
+    if (res.error) {
+      toast.error(`Failed to update broadcast message: ${getAdminActionErrorMessage(res)}`);
       return;
     }
     toast.success(broadcastMsg.trim() ? 'Broadcast updated.' : 'Broadcast cleared.');
@@ -743,6 +751,8 @@ export default function AdminDashboard() {
                   onViewUser={setViewingUserId}
                   onGrantRevoke={(action, userId) => void handleGrantRevoke(action, userId)}
                   onBulkAction={(action, userIds) => void handleBulkAction(action, userIds)}
+                  isSuperAdmin={isSuperAdmin}
+                  canBillingManage={canBillingManage}
                 />
               </CollapsibleModule>
             </div>
@@ -759,7 +769,11 @@ export default function AdminDashboard() {
               <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Operations</p>
               <div className="space-y-6">
                 <AdminBillingPanel stats={billingStats} stripeDashboardUrl={STRIPE_DASHBOARD_URL || undefined} />
-                <AdminFeatureFlagsPanel platformSettings={platformSettingsForFlags} onSetFeatureFlag={handleSetFeatureFlag} />
+                <AdminFeatureFlagsPanel
+                  platformSettings={platformSettingsForFlags}
+                  onSetFeatureFlag={handleSetFeatureFlag}
+                  canManagePlatform={canManagePlatform}
+                />
                 <AdminReliabilityPanel stripeHealth={stripeHealth} auditFeed={auditFeed} />
               </div>
             </section>
@@ -772,7 +786,7 @@ export default function AdminDashboard() {
                   isPlaidEnabled={isPlaidEnabled}
                   broadcastMsg={broadcastMsg}
                   isSavingBroadcast={isSavingBroadcast}
-                  canManagePlatform={isSuperAdmin}
+                  canManagePlatform={canManagePlatform}
                   onToggleMaintenance={() => void toggleMaintenance()}
                   onTogglePlaid={() => void togglePlaid()}
                   onBroadcastChange={setBroadcastMsg}
