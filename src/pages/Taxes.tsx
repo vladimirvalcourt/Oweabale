@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useStore, type MileageLogEntry } from '../store/useStore';
 import {
@@ -74,17 +74,12 @@ export default function Taxes() {
     deleteMileageLogEntry,
   } = useStore();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [taxTab, setTaxTab] = useState<'overview' | 'mileage'>('overview');
+  const taxTab: 'overview' | 'mileage' = searchParams.get('view') === 'mileage' ? 'mileage' : 'overview';
 
   const applyTaxTab = (tab: 'overview' | 'mileage') => {
-    setTaxTab(tab);
     if (tab === 'mileage') setSearchParams({ view: 'mileage' }, { replace: true });
     else setSearchParams({}, { replace: true });
   };
-
-  useEffect(() => {
-    if (searchParams.get('view') === 'mileage') setTaxTab('mileage');
-  }, [searchParams]);
   const [filingStatus, setFilingStatus] = useState<'single' | 'married'>('single');
   const [newDeduction, setNewDeduction] = useState({ name: '', category: '', amount: '' });
   const [showAddForm, setShowAddForm] = useState(false);
@@ -172,15 +167,12 @@ export default function Taxes() {
   const stateTax = incomeStats.total * (stateRate / 100);
   const totalLiability = fedTax + seTax + stateTax;
 
-  const ytdMileageEntries = useMemo(
-    () => mileageLog.filter((e) => e.tripDate.startsWith(String(currentYear))),
-    [mileageLog, currentYear],
-  );
+  const ytdMileageEntries = mileageLog.filter((e) => e.tripDate.startsWith(String(currentYear)));
   const totalMileageDeductionYtd = useMemo(
     () => ytdMileageEntries.reduce((s, e) => s + e.deductionAmount, 0),
     [ytdMileageEntries],
   );
-  const mileageByQuarter = useMemo(() => {
+  const mileageByQuarter = (() => {
     const m: Record<string, { miles: number; deduction: number }> = {};
     for (const e of ytdMileageEntries) {
       const k = quarterKeyFromTripDate(e.tripDate);
@@ -190,7 +182,7 @@ export default function Taxes() {
       m[k].deduction += e.deductionAmount;
     }
     return m;
-  }, [ytdMileageEntries, currentYear]);
+  })();
 
   const approxFedMarginalRate = incomeStats.total > 0 ? Math.min(0.37, fedTax / incomeStats.total) : 0;
   const estFedReductionFromMileage = totalMileageDeductionYtd * approxFedMarginalRate;

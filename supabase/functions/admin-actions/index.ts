@@ -57,6 +57,67 @@ async function enforceRateLimit(
   }
 }
 
+type AdminContext = {
+  isAdmin: boolean
+  isSuperAdmin: boolean
+  roleKeys: Set<string>
+  permissionKeys: Set<string>
+}
+
+async function buildAdminContext(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  userId: string,
+  callerEmail: string | null,
+): Promise<AdminContext> {
+  const [{ data: roleRows }, { data: rolePermRows }] = await Promise.all([
+    supabaseAdmin
+      .from('admin_user_roles')
+      .select('admin_roles(key)')
+      .eq('user_id', userId),
+    supabaseAdmin
+      .from('admin_user_roles')
+      .select('admin_roles(admin_role_permissions(admin_permissions(key)))')
+      .eq('user_id', userId),
+  ])
+
+  const roleKeys = new Set<string>()
+  for (const row of roleRows ?? []) {
+    const key = (row as { admin_roles?: { key?: string } | null }).admin_roles?.key
+    if (typeof key === 'string' && key.length > 0) roleKeys.add(key)
+  }
+
+  const permissionKeys = new Set<string>()
+  for (const row of rolePermRows ?? []) {
+    const role = (row as {
+      admin_roles?: {
+        admin_role_permissions?: Array<{ admin_permissions?: { key?: string } | null }> | null
+      } | null
+    }).admin_roles
+    for (const rp of role?.admin_role_permissions ?? []) {
+      const key = rp.admin_permissions?.key
+      if (typeof key === 'string' && key.length > 0) permissionKeys.add(key)
+    }
+  }
+
+  const primaryAdminEmail = Deno.env.get('ADMIN_ALLOWED_EMAIL')?.trim().toLowerCase() ?? null
+  const isPrimaryAdmin = !!callerEmail && !!primaryAdminEmail && callerEmail === primaryAdminEmail
+  const isAdmin = permissionKeys.size > 0 || roleKeys.has('super_admin') || isPrimaryAdmin
+  const isSuperAdmin = roleKeys.has('super_admin') || isPrimaryAdmin
+
+  return { isAdmin, isSuperAdmin, roleKeys, permissionKeys }
+}
+
+function requirePermission(ctx: AdminContext, permission: string) {
+  if (ctx.isSuperAdmin) return
+  if (!ctx.permissionKeys.has(permission)) {
+    throw new Error(`Forbidden: missing permission ${permission}`)
+  }
+}
+
+function requireSuperAdmin(ctx: AdminContext) {
+  if (!ctx.isSuperAdmin) throw new Error('Forbidden: super admin required')
+}
+
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin')
   const c = corsHeaders(origin)
@@ -97,20 +158,10 @@ Deno.serve(async (req: Request) => {
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
     if (authError || !user) throw new Error('Unauthorized')
 
-    const { data: profile } = await supabaseAdmin
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single()
-    if (!profile?.is_admin) throw new Error('Forbidden: Admin access required')
-
-    const allowedEmail = Deno.env.get('ADMIN_ALLOWED_EMAIL')?.trim().toLowerCase()
-    if (!allowedEmail) throw new Error('Server misconfiguration: ADMIN_ALLOWED_EMAIL')
     const callerEmail = user.email?.trim().toLowerCase()
     callerEmailForAudit = callerEmail ?? null
-    if (!callerEmail || callerEmail !== allowedEmail) {
-      throw new Error('Forbidden: primary admin only')
-    }
+    const adminCtx = await buildAdminContext(supabaseAdmin, user.id, callerEmailForAudit)
+    if (!adminCtx.isAdmin) throw new Error('Forbidden: Admin access required')
 
     const ALLOWED_ACTIONS = new Set([
       'list', 'health', 'audit_feed', 'billing_stats', 'billing_by_user',
@@ -119,6 +170,8 @@ Deno.serve(async (req: Request) => {
       'grant_entitlement', 'revoke_entitlement', 'user_detail', 'impersonate', 'bulk_action',
       'revenue_chart', 'growth_chart', 'churn_stats', 'webhook_list', 'apply_coupon', 'extend_trial', 'set_feature_flag',
       'admin_roles_permissions', 'revoke_sessions',
+      'rbac_context', 'users_query', 'user_timeline', 'compliance_overview', 'compliance_update_status',
+      'compliance_force_refresh_plaid', 'telemetry_overview', 'update_platform_controls',
     ]);
     const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -135,9 +188,139 @@ Deno.serve(async (req: Request) => {
     if (targetUserId !== undefined && (typeof targetUserId !== 'string' || !UUID_RE.test(targetUserId))) {
       throw new Error('Invalid targetUserId format');
     }
+    const primaryAdminEmail = Deno.env.get('ADMIN_ALLOWED_EMAIL')?.trim().toLowerCase() ?? ''
+
+    const SUPER_ADMIN_ONLY_ACTIONS = new Set([
+      'set_admin',
+      'promote_admin',
+      'ban',
+      'unban',
+      'delete',
+      'grant_entitlement',
+      'revoke_entitlement',
+      'bulk_action',
+      'apply_coupon',
+      'extend_trial',
+      'set_feature_flag',
+      'revoke_sessions',
+      'update_platform_controls',
+      'impersonate',
+    ])
+    if (SUPER_ADMIN_ONLY_ACTIONS.has(action)) requireSuperAdmin(adminCtx)
+
+    if (action === 'rbac_context') {
+      return new Response(
+        JSON.stringify({
+          is_admin: adminCtx.isAdmin,
+          is_super_admin: adminCtx.isSuperAdmin,
+          roles: [...adminCtx.roleKeys],
+          permissions: [...adminCtx.permissionKeys],
+        }),
+        { headers: jsonHeaders },
+      )
+    }
+
+    if (action === 'users_query') {
+      requirePermission(adminCtx, 'users.read')
+      const {
+        page = 1,
+        pageSize = 25,
+        search = '',
+        plan = 'any',
+        plaidStatus = 'any',
+      } = body as {
+        page?: number
+        pageSize?: number
+        search?: string
+        plan?: 'any' | 'free' | 'pro' | 'lifetime'
+        plaidStatus?: 'any' | 'healthy' | 'error' | 'relink'
+      }
+
+      const safePage = Math.max(1, Math.floor(Number(page) || 1))
+      const safePageSize = Math.min(100, Math.max(10, Math.floor(Number(pageSize) || 25)))
+      const from = (safePage - 1) * safePageSize
+      const to = from + safePageSize - 1
+
+      let q = supabaseAdmin
+        .from('profiles')
+        .select('id,email,is_admin,is_banned,has_completed_onboarding,created_at', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(from, to)
+
+      const searchText = String(search ?? '').trim()
+      if (searchText) q = q.ilike('email', `%${searchText}%`)
+
+      const { data: rows, count, error } = await q
+      if (error) throw error
+
+      const userIds = [...new Set((rows ?? []).map((r: { id: string }) => r.id))]
+      const [{ data: entRows }, { data: subRows }, { data: plaidRows }, authUsersRes] = await Promise.all([
+        supabaseAdmin
+          .from('entitlements')
+          .select('user_id, source, status')
+          .in('user_id', userIds)
+          .eq('feature_key', 'full_suite')
+          .eq('status', 'active'),
+        supabaseAdmin
+          .from('billing_subscriptions')
+          .select('user_id, status')
+          .in('user_id', userIds),
+        supabaseAdmin
+          .from('plaid_items')
+          .select('user_id, item_login_required, last_sync_error')
+          .in('user_id', userIds),
+        supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
+      ])
+
+      const authMap = new Map(((authUsersRes.data?.users ?? []) as Array<{ id: string; last_sign_in_at: string | null }>).map((u) => [u.id, u]))
+      const planMap = new Map<string, 'free' | 'pro' | 'lifetime'>()
+      for (const row of subRows ?? []) {
+        if (row.status === 'active' || row.status === 'trialing') planMap.set(row.user_id, 'pro')
+      }
+      for (const row of entRows ?? []) {
+        if (row.source === 'one_time') planMap.set(row.user_id, 'lifetime')
+        else if (!planMap.has(row.user_id)) planMap.set(row.user_id, 'pro')
+      }
+      for (const id of userIds) if (!planMap.has(id)) planMap.set(id, 'free')
+
+      const plaidMap = new Map<string, { hasError: boolean; needsRelink: boolean }>()
+      for (const row of plaidRows ?? []) {
+        const prev = plaidMap.get(row.user_id) ?? { hasError: false, needsRelink: false }
+        plaidMap.set(row.user_id, {
+          hasError: prev.hasError || !!row.last_sync_error,
+          needsRelink: prev.needsRelink || row.item_login_required === true,
+        })
+      }
+
+      const filtered = (rows ?? []).filter((row: { id: string }) => {
+        const p = planMap.get(row.id) ?? 'free'
+        const ps = plaidMap.get(row.id) ?? { hasError: false, needsRelink: false }
+        if (plan !== 'any' && p !== plan) return false
+        if (plaidStatus === 'error' && !ps.hasError) return false
+        if (plaidStatus === 'relink' && !ps.needsRelink) return false
+        if (plaidStatus === 'healthy' && (ps.hasError || ps.needsRelink)) return false
+        return true
+      }).map((row: { id: string; email: string | null; is_admin: boolean; is_banned: boolean; has_completed_onboarding: boolean; created_at: string | null }) => ({
+        ...row,
+        plan: planMap.get(row.id) ?? 'free',
+        plaid_health: plaidMap.get(row.id) ?? { hasError: false, needsRelink: false },
+        last_sign_in_at: authMap.get(row.id)?.last_sign_in_at ?? null,
+      }))
+
+      return new Response(
+        JSON.stringify({
+          page: safePage,
+          pageSize: safePageSize,
+          total: count ?? 0,
+          rows: filtered,
+        }),
+        { headers: jsonHeaders },
+      )
+    }
 
     // list: return enriched user data with last_sign_in_at
     if (action === 'list') {
+      requirePermission(adminCtx, 'users.read')
       const { data: { users }, error } = await supabaseAdmin.auth.admin.listUsers({ perPage: 500 })
       if (error) throw error
       const enriched = users.map(u => ({
@@ -153,6 +336,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'health') {
+      requirePermission(adminCtx, 'telemetry.read')
       const oneDayAgo = new Date(Date.now() - 24 * 3600 * 1000).toISOString()
       const [{ count: events24h }, { count: webhookErrors24h }, { count: activeSubs }, { data: latestEvent }] =
         await Promise.all([
@@ -190,6 +374,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'audit_feed') {
+      requirePermission(adminCtx, 'audit.read')
       const { data, error } = await supabaseAdmin
         .from('audit_log')
         .select('id, user_id, action, new_data, created_at')
@@ -203,6 +388,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'billing_stats') {
+      requirePermission(adminCtx, 'dashboard.view')
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString()
       const [
         { data: subStatuses },
@@ -261,6 +447,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'billing_by_user') {
+      requirePermission(adminCtx, 'users.read')
       const [{ data: subs }, { data: oneTime }] = await Promise.all([
         supabaseAdmin
           .from('billing_subscriptions')
@@ -288,6 +475,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'plaid_items_list') {
+      requirePermission(adminCtx, 'telemetry.read')
       const { data: items, error } = await supabaseAdmin
         .from('plaid_items')
         .select(
@@ -329,7 +517,7 @@ Deno.serve(async (req: Request) => {
         .eq('id', targetUserId)
         .maybeSingle()
       const targetEmail = targetRow?.email?.trim().toLowerCase() ?? ''
-      if (targetEmail === allowedEmail) {
+      if (targetEmail === primaryAdminEmail) {
         throw new Error('Forbidden: cannot remove primary admin')
       }
       await enforceRateLimit(supabaseAdmin, user.id, 'set_admin')
@@ -371,6 +559,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'plaid_stats') {
+      requirePermission(adminCtx, 'telemetry.read')
       const { data: items, error } = await supabaseAdmin
         .from('plaid_items')
         .select(
@@ -405,6 +594,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'user_detail') {
+      requirePermission(adminCtx, 'users.read')
       if (!targetUserId || typeof targetUserId !== 'string') throw new Error('Missing targetUserId')
       const [
         { data: userProfile },
@@ -522,6 +712,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'revenue_chart') {
+      requirePermission(adminCtx, 'dashboard.view')
       const twelveMonthsAgo = new Date(Date.now() - 365 * 24 * 3600 * 1000).toISOString()
       const { data: payments, error } = await supabaseAdmin
         .from('billing_payments')
@@ -549,6 +740,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'growth_chart') {
+      requirePermission(adminCtx, 'dashboard.view')
       const twelveWeeksAgo = new Date(Date.now() - 84 * 24 * 3600 * 1000).toISOString()
       const { data: signups, error } = await supabaseAdmin
         .from('profiles')
@@ -584,6 +776,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'churn_stats') {
+      requirePermission(adminCtx, 'dashboard.view')
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString()
       const [
         { data: canceledRows, count: totalCanceled },
@@ -638,6 +831,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'webhook_list') {
+      requirePermission(adminCtx, 'telemetry.read')
       const { data, error } = await supabaseAdmin
         .from('stripe_events')
         .select('id, stripe_event_id, event_type, processed_at')
@@ -689,6 +883,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'set_feature_flag') {
+      requirePermission(adminCtx, 'settings.platform')
       const { flagScope, flagKey, flagValue, targetUserId: flagTargetUserId } = body as {
         flagScope?: unknown
         flagKey?: unknown
@@ -744,6 +939,7 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'admin_roles_permissions') {
+      requirePermission(adminCtx, 'audit.read')
       const [{ data: roles }, { data: permissions }, { data: rolePermissions }, { data: userRoles }] = await Promise.all([
         supabaseAdmin.from('admin_roles').select('id, key, label'),
         supabaseAdmin.from('admin_permissions').select('id, key, label'),
@@ -759,6 +955,204 @@ Deno.serve(async (req: Request) => {
         }),
         { headers: jsonHeaders },
       )
+    }
+
+    if (action === 'user_timeline') {
+      requirePermission(adminCtx, 'users.read')
+      if (!targetUserId || typeof targetUserId !== 'string') throw new Error('Missing targetUserId')
+      const [{ data: plaidRows }, { data: billingRows }] = await Promise.all([
+        supabaseAdmin
+          .from('plaid_items')
+          .select('item_id, institution_name, last_sync_at, last_sync_error, item_login_required, last_webhook_at, updated_at')
+          .eq('user_id', targetUserId)
+          .order('updated_at', { ascending: false })
+          .limit(50),
+        supabaseAdmin
+          .from('billing_payments')
+          .select('id, status, amount_total, currency, product_key, created_at')
+          .eq('user_id', targetUserId)
+          .order('created_at', { ascending: false })
+          .limit(50),
+      ])
+
+      const timeline = [
+        ...(plaidRows ?? []).map((row) => ({
+          source: 'plaid',
+          at: row.last_webhook_at ?? row.last_sync_at ?? row.updated_at,
+          label: row.last_sync_error ? `Plaid sync error: ${row.last_sync_error}` : 'Plaid sync event',
+          detail: row,
+        })),
+        ...(billingRows ?? []).map((row) => ({
+          source: 'stripe_billing',
+          at: row.created_at,
+          label: `Stripe payment ${row.status}`,
+          detail: row,
+        })),
+      ]
+        .filter((row) => !!row.at)
+        .sort((a, b) => String(b.at).localeCompare(String(a.at)))
+        .slice(0, 150)
+
+      return new Response(JSON.stringify({ timeline }), { headers: jsonHeaders })
+    }
+
+    if (action === 'compliance_overview') {
+      requirePermission(adminCtx, 'compliance.read')
+      const [{ data: statuses }, { data: flagged }] = await Promise.all([
+        supabaseAdmin
+          .from('user_compliance_status')
+          .select('user_id, kyc_status, aml_status, pep_sanctions_hit, risk_score, last_checked_at, updated_at')
+          .order('updated_at', { ascending: false })
+          .limit(500),
+        supabaseAdmin
+          .from('flagged_transactions')
+          .select('id, user_id, transaction_id, source, reason, severity, status, created_at, updated_at, resolved_at')
+          .order('created_at', { ascending: false })
+          .limit(500),
+      ])
+      return new Response(JSON.stringify({ compliance: { statuses: statuses ?? [], flagged: flagged ?? [] } }), {
+        headers: jsonHeaders,
+      })
+    }
+
+    if (action === 'compliance_update_status') {
+      requirePermission(adminCtx, 'compliance.manage')
+      if (!targetUserId || typeof targetUserId !== 'string') throw new Error('Missing targetUserId')
+      const {
+        kycStatus,
+        amlStatus,
+        pepSanctionsHit,
+        riskScore,
+      } = body as {
+        kycStatus?: 'pending' | 'verified' | 'rejected' | 'manual_review'
+        amlStatus?: 'pending' | 'clear' | 'flagged' | 'manual_review'
+        pepSanctionsHit?: boolean
+        riskScore?: number
+      }
+      const now = new Date().toISOString()
+      const { error } = await supabaseAdmin.from('user_compliance_status').upsert(
+        {
+          user_id: targetUserId,
+          kyc_status: kycStatus ?? 'pending',
+          aml_status: amlStatus ?? 'pending',
+          pep_sanctions_hit: pepSanctionsHit ?? false,
+          risk_score: typeof riskScore === 'number' ? riskScore : 0,
+          last_checked_at: now,
+          updated_at: now,
+        },
+        { onConflict: 'user_id' },
+      )
+      if (error) throw error
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'compliance_update_status', {
+        targetUserId,
+        kycStatus,
+        amlStatus,
+      })
+      return new Response(JSON.stringify({ message: 'Compliance status updated.' }), { headers: jsonHeaders })
+    }
+
+    if (action === 'compliance_force_refresh_plaid') {
+      requirePermission(adminCtx, 'compliance.manage')
+      const staleHours = Number((body as { staleHours?: unknown }).staleHours ?? 1)
+      const cronSecret = Deno.env.get('PLAID_CRON_SECRET')
+      const projectUrl = Deno.env.get('SUPABASE_URL')
+      if (!cronSecret || !projectUrl) throw new Error('Server misconfiguration')
+      const resp = await fetch(`${projectUrl}/functions/v1/plaid-sync`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${cronSecret}` },
+      })
+      if (!resp.ok) throw new Error('Failed to trigger plaid sync')
+      const data = await resp.json()
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'compliance_force_refresh_plaid', {
+        staleHours,
+      })
+      return new Response(JSON.stringify({ message: 'Plaid force refresh triggered.', result: data }), {
+        headers: jsonHeaders,
+      })
+    }
+
+    if (action === 'telemetry_overview') {
+      requirePermission(adminCtx, 'telemetry.read')
+      const oneHourAgo = new Date(Date.now() - 3600_000).toISOString()
+      const oneDayAgo = new Date(Date.now() - 24 * 3600_000).toISOString()
+      const [{ count: plaidErrorsHour }, { count: plaidRelink }, { data: stripeRecent }, { data: edgeMetrics }] =
+        await Promise.all([
+          supabaseAdmin
+            .from('plaid_items')
+            .select('item_id', { count: 'exact', head: true })
+            .not('last_sync_error', 'is', null),
+          supabaseAdmin
+            .from('plaid_items')
+            .select('item_id', { count: 'exact', head: true })
+            .eq('item_login_required', true),
+          supabaseAdmin
+            .from('stripe_events')
+            .select('event_type, processed_at')
+            .gte('processed_at', oneDayAgo)
+            .order('processed_at', { ascending: false })
+            .limit(100),
+          supabaseAdmin
+            .from('audit_log')
+            .select('action, created_at, new_data')
+            .eq('table_name', 'admin_actions')
+            .gte('created_at', oneHourAgo)
+            .order('created_at', { ascending: false })
+            .limit(200),
+        ])
+
+      const stripeLatencyMs = (() => {
+        const rows = stripeRecent ?? []
+        if (rows.length < 2) return null
+        const newest = new Date(rows[0].processed_at).getTime()
+        const oldest = new Date(rows[rows.length - 1].processed_at).getTime()
+        const span = Math.max(1, newest - oldest)
+        return Math.round(span / rows.length)
+      })()
+
+      return new Response(
+        JSON.stringify({
+          telemetry: {
+            plaid: {
+              rate_limit_near: false,
+              error_items: plaidErrorsHour ?? 0,
+              relink_items: plaidRelink ?? 0,
+            },
+            stripe: {
+              webhook_events_24h: stripeRecent?.length ?? 0,
+              avg_webhook_spacing_ms: stripeLatencyMs,
+            },
+            edge: {
+              admin_actions_last_hour: edgeMetrics?.length ?? 0,
+            },
+          },
+        }),
+        { headers: jsonHeaders },
+      )
+    }
+
+    if (action === 'update_platform_controls') {
+      requirePermission(adminCtx, 'settings.platform')
+      const { maintenanceMode, plaidEnabled, broadcastMessage } = body as {
+        maintenanceMode?: boolean
+        plaidEnabled?: boolean
+        broadcastMessage?: string | null
+      }
+      const { data: settingsRow, error: settingsErr } = await supabaseAdmin
+        .from('platform_settings')
+        .select('id')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle()
+      if (settingsErr || !settingsRow?.id) throw new Error('platform_settings row missing')
+      const patch: Record<string, unknown> = {}
+      if (typeof maintenanceMode === 'boolean') patch.maintenance_mode = maintenanceMode
+      if (typeof plaidEnabled === 'boolean') patch.plaid_enabled = plaidEnabled
+      if (broadcastMessage !== undefined) patch.broadcast_message = broadcastMessage
+      if (Object.keys(patch).length === 0) throw new Error('No platform control values provided')
+      const { error } = await supabaseAdmin.from('platform_settings').update(patch).eq('id', settingsRow.id)
+      if (error) throw error
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'update_platform_controls', patch)
+      return new Response(JSON.stringify({ message: 'Platform controls updated.' }), { headers: jsonHeaders })
     }
 
     // All other actions require a targetUserId
@@ -830,15 +1224,69 @@ Deno.serve(async (req: Request) => {
     }
 
     if (action === 'impersonate') {
+      requirePermission(adminCtx, 'users.impersonate')
+      if (!targetUserId || typeof targetUserId !== 'string') throw new Error('Missing targetUserId')
+      const reason = String((body as { reason?: unknown }).reason ?? '').trim()
+      if (reason.length < 8) throw new Error('Impersonation reason must be at least 8 characters')
       await enforceRateLimit(supabaseAdmin, user.id, 'impersonate')
       const { data: targetUser, error: getUserError } = await supabaseAdmin.auth.admin.getUserById(targetUserId)
       if (getUserError || !targetUser?.user) throw new Error('User not found')
       const userEmail = targetUser.user.email
       if (!userEmail) throw new Error('Target user has no email address')
-      const { data, error } = await supabaseAdmin.auth.admin.generateLink({ type: 'magiclink', email: userEmail })
+      const targetEmail = userEmail.trim().toLowerCase()
+      if (targetEmail === primaryAdminEmail) {
+        throw new Error('Forbidden: cannot impersonate primary admin')
+      }
+      const [{ data: targetProfile }, { data: targetRoles }] = await Promise.all([
+        supabaseAdmin
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', targetUserId)
+          .maybeSingle(),
+        supabaseAdmin
+          .from('admin_user_roles')
+          .select('admin_roles(key)')
+          .eq('user_id', targetUserId),
+      ])
+      const targetRoleKeys = new Set(
+        (targetRoles ?? [])
+          .map((row) => (row as { admin_roles?: { key?: string } | null }).admin_roles?.key)
+          .filter((k): k is string => typeof k === 'string' && k.length > 0),
+      )
+      if (targetProfile?.is_admin === true || targetRoleKeys.size > 0) {
+        throw new Error('Forbidden: cannot impersonate privileged admin account')
+      }
+      const { error } = await supabaseAdmin.auth.admin.generateLink({ type: 'magiclink', email: userEmail })
       if (error) throw error
-      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'impersonate', { targetUserId })
-      return new Response(JSON.stringify({ magic_link: data.properties.action_link }), { headers: jsonHeaders })
+      const { data: impSession, error: impErr } = await supabaseAdmin
+        .from('admin_impersonation_sessions')
+        .insert({
+          admin_user_id: user.id,
+          target_user_id: targetUserId,
+          reason,
+          status: 'active',
+          expires_at: new Date(Date.now() + 15 * 60_000).toISOString(),
+          audit_context: {
+            actorEmail: callerEmailForAudit,
+            requestIp: requestMeta.ip,
+            userAgent: requestMeta.userAgent,
+          },
+        })
+        .select('id, issued_at, expires_at')
+        .single()
+      if (impErr) throw impErr
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'impersonate', {
+        targetUserId,
+        reason,
+        impersonationSessionId: impSession.id,
+      })
+      return new Response(
+        JSON.stringify({
+          impersonation_session: impSession,
+          secure_handoff: true,
+        }),
+        { headers: jsonHeaders },
+      )
     }
 
     if (action === 'revoke_sessions') {

@@ -53,6 +53,35 @@ export function useAdminPermissions() {
     staleTime: 60_000,
   });
 
+  const contextQuery = useQuery({
+    queryKey: ['admin', 'rbac', 'context'],
+    queryFn: async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        return { is_admin: false, is_super_admin: false, roles: [], permissions: [] } as {
+          is_admin: boolean;
+          is_super_admin: boolean;
+          roles: string[];
+          permissions: string[];
+        };
+      }
+      const { data, error } = await supabase.functions.invoke('admin-actions', {
+        body: { action: 'rbac_context' },
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (error) throw error;
+      return (data ?? { is_admin: false, is_super_admin: false, roles: [], permissions: [] }) as {
+        is_admin: boolean;
+        is_super_admin: boolean;
+        roles: string[];
+        permissions: string[];
+      };
+    },
+    staleTime: 30_000,
+  });
+
   const permissionSet = useMemo(() => {
     const payload = query.data;
     const userId = currentUserQuery.data;
@@ -62,7 +91,24 @@ export function useAdminPermissions() {
     return new Set(payload.permissions.filter((p) => permissionIds.has(p.id)).map((p) => p.key));
   }, [query.data, currentUserQuery.data]);
 
-  const hasPermission = (permissionKey: string) => isAdminProfileQuery.data === true || permissionSet.has(permissionKey);
+  const contextPermissionSet = useMemo(
+    () => new Set(contextQuery.data?.permissions ?? []),
+    [contextQuery.data?.permissions],
+  );
 
-  return { ...query, permissionSet, hasPermission, isAdminProfile: isAdminProfileQuery.data === true };
+  const hasPermission = (permissionKey: string) => {
+    if (contextQuery.data?.is_super_admin) return true;
+    if (contextPermissionSet.has(permissionKey)) return true;
+    return permissionSet.has(permissionKey);
+  };
+
+  return {
+    ...query,
+    permissionSet,
+    hasPermission,
+    isAdminProfile: isAdminProfileQuery.data === true,
+    isSuperAdmin: contextQuery.data?.is_super_admin === true,
+    contextPermissions: contextPermissionSet,
+    isLoading: query.isLoading || isAdminProfileQuery.isLoading || contextQuery.isLoading,
+  };
 }

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { TransitionLink } from '../components/TransitionLink';
-import { ArrowLeft, RefreshCw, LayoutDashboard, LineChart, Users, SlidersHorizontal, Landmark } from 'lucide-react';
+import { ArrowLeft, RefreshCw, LayoutDashboard, LineChart, Users, Landmark } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { supabase } from '../lib/supabase';
 import { PrivacyScreenWhenHidden } from '../components/PrivacyScreenWhenHidden';
@@ -24,6 +24,7 @@ import { AdminFeedbackPanel } from './admin/components/AdminFeedbackPanel';
 import { AdminBroadcastsPanel } from './admin/components/AdminBroadcastsPanel';
 import { AdminUserDataPanel } from './admin/components/AdminUserDataPanel';
 import { AdminIngestionQueuesPanel } from './admin/components/AdminIngestionQueuesPanel';
+import { useAdminPermissions } from '../features/admin/shared/useAdminPermissions';
 import type {
   AdminAuditEntry,
   AdminBroadcastRow,
@@ -48,6 +49,7 @@ const STRIPE_DASHBOARD_URL = (import.meta.env.VITE_STRIPE_DASHBOARD_URL ?? '').t
 const PROFILE_PAGE_SIZE = 200;
 
 export default function AdminDashboard() {
+  const { isSuperAdmin } = useAdminPermissions();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isMaintenance, setIsMaintenance] = useState(false);
   const [isPlaidEnabled, setIsPlaidEnabled] = useState(true);
@@ -71,7 +73,6 @@ export default function AdminDashboard() {
   const [stripeHealth, setStripeHealth] = useState<StripeHealthStats | null>(null);
   const [auditFeed, setAuditFeed] = useState<AdminAuditEntry[]>([]);
   const [billingStats, setBillingStats] = useState<BillingStats | null>(null);
-  const [platformSettingsId, setPlatformSettingsId] = useState<string | null>(null);
   const [platformSettingsForFlags, setPlatformSettingsForFlags] = useState<{
     feature_flags?: Record<string, boolean>;
   } | null>(null);
@@ -125,7 +126,6 @@ export default function AdminDashboard() {
       toast.error(`Platform settings failed: ${settingsErr.message}`);
     }
     if (settings) {
-      setPlatformSettingsId(settings.id);
       setBroadcastMsg(settings.broadcast_message || '');
       setIsMaintenance(settings.maintenance_mode || false);
       setIsPlaidEnabled(settings.plaid_enabled !== false);
@@ -141,7 +141,6 @@ export default function AdminDashboard() {
           : {};
       setPlatformSettingsForFlags({ feature_flags: flags });
     } else {
-      setPlatformSettingsId(null);
       setPlatformSettingsForFlags({ feature_flags: {} });
       if (!settingsErr) {
         toast.error('No platform_settings row found. Add one or run migrations.', { id: 'no-platform-settings' });
@@ -447,6 +446,7 @@ export default function AdminDashboard() {
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadAll();
 
     const ticketSub = supabase
@@ -626,15 +626,13 @@ export default function AdminDashboard() {
   };
 
   const toggleMaintenance = async () => {
-    if (!platformSettingsId) {
-      toast.error('Platform settings row not found.');
-      return;
-    }
+    if (!isSuperAdmin) return toast.error('Only Super Admin can change maintenance mode.');
     const newValue = !isMaintenance;
-    const { error } = await supabase
-      .from('platform_settings')
-      .update({ maintenance_mode: newValue })
-      .eq('id', platformSettingsId);
+    if (!window.confirm(`${newValue ? 'Enable' : 'Disable'} maintenance mode? This affects all users.`)) return;
+    const { error } = await invokeAdminActions({
+      action: 'update_platform_controls',
+      maintenanceMode: newValue,
+    });
     if (error) {
       toast.error('Failed to update maintenance mode.');
       return;
@@ -644,15 +642,13 @@ export default function AdminDashboard() {
   };
 
   const togglePlaid = async () => {
-    if (!platformSettingsId) {
-      toast.error('Platform settings row not found.');
-      return;
-    }
+    if (!isSuperAdmin) return toast.error('Only Super Admin can change bank syncing.');
     const newValue = !isPlaidEnabled;
-    const { error } = await supabase
-      .from('platform_settings')
-      .update({ plaid_enabled: newValue })
-      .eq('id', platformSettingsId);
+    if (!window.confirm(`${newValue ? 'Enable' : 'Disable'} bank syncing globally?`)) return;
+    const { error } = await invokeAdminActions({
+      action: 'update_platform_controls',
+      plaidEnabled: newValue,
+    });
     if (error) {
       toast.error('Failed to update bank syncing.');
       return;
@@ -662,15 +658,12 @@ export default function AdminDashboard() {
   };
 
   const handleSendBroadcast = async () => {
-    if (!platformSettingsId) {
-      toast.error('Platform settings row not found.');
-      return;
-    }
+    if (!isSuperAdmin) return toast.error('Only Super Admin can update broadcast.');
     setIsSavingBroadcast(true);
-    const { error } = await supabase
-      .from('platform_settings')
-      .update({ broadcast_message: broadcastMsg.trim() === '' ? null : broadcastMsg })
-      .eq('id', platformSettingsId);
+    const { error } = await invokeAdminActions({
+      action: 'update_platform_controls',
+      broadcastMessage: broadcastMsg.trim() === '' ? null : broadcastMsg,
+    });
     setIsSavingBroadcast(false);
     if (error) {
       toast.error('Failed to update broadcast message.');
@@ -680,114 +673,155 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-secondary p-4 sm:p-8">
+    <div className="min-h-screen bg-surface-base p-4 text-content-secondary sm:p-8">
       <PrivacyScreenWhenHidden />
 
-      <div className="w-full space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-surface-border pb-5">
-          <div>
-            <h1 className="text-xl font-medium text-content-primary sm:text-2xl">Admin dashboard</h1>
-            <p className="text-xs text-content-tertiary mt-1">Lean operator view: users, support, and platform controls</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => void loadAll()}
-              disabled={isRefreshing}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-surface-border text-xs text-content-secondary hover:text-content-primary hover:bg-surface-raised disabled:opacity-50"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} /> Refresh
-            </button>
-            <TransitionLink to="/" className="inline-flex items-center gap-1 text-xs text-content-tertiary hover:text-content-primary">
-              <ArrowLeft className="w-3 h-3" /> Back
-            </TransitionLink>
-          </div>
-        </div>
-
-        <CollapsibleModule title="At a glance" icon={LayoutDashboard} defaultOpen>
-          <AdminMetricsBar metrics={metricData} />
-        </CollapsibleModule>
-
-        <CollapsibleModule title="Exports & analytics" icon={LineChart} defaultOpen>
-          <div className="space-y-6">
-            <AdminExportBar profiles={profiles} billingStats={billingStats} />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <AdminRevenueChart data={revenueChart} />
-              <AdminGrowthChart data={growthChart} />
-              <AdminChurnPanel stats={churnStats} />
-              <AdminWebhooksPanel webhooks={webhookRows} />
+      <div className="mx-auto w-full max-w-7xl space-y-6">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+          <section className="glass-card rounded-2xl p-5 lg:col-span-8">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Command Center</p>
+            <h1 className="mt-1 text-xl font-semibold text-content-primary sm:text-2xl">Admin dashboard</h1>
+            <p className="mt-2 max-w-2xl text-xs text-content-tertiary sm:text-sm">
+              Scan platform health, triage user issues, and execute controls with clear separation between analytics and high-risk actions.
+            </p>
+          </section>
+          <section className="glass-card rounded-2xl p-4 lg:col-span-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Session Actions</p>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => void loadAll()}
+                disabled={isRefreshing}
+                className="interactive-press interactive-focus inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-base/80 px-3 py-2 text-xs text-content-secondary transition hover:bg-surface-raised hover:text-content-primary disabled:opacity-50"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} /> Refresh
+              </button>
+              <TransitionLink
+                to="/"
+                className="interactive-press interactive-focus inline-flex items-center gap-1 rounded-lg border border-surface-border bg-surface-base/80 px-3 py-2 text-xs text-content-tertiary transition hover:text-content-primary"
+              >
+                <ArrowLeft className="h-3 w-3" /> Back
+              </TransitionLink>
             </div>
-          </div>
-        </CollapsibleModule>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <CollapsibleModule title="Users & roles" icon={Users} defaultOpen className="lg:col-span-2">
-            <AdminUsersPanel
-              users={filteredProfiles}
-              search={userSearch}
-              onSearchChange={setUserSearch}
-              getEnrichedProfile={getEnrichedProfile}
-              primaryAdminEmail={PRIMARY_ADMIN_EMAIL}
-              subMap={subMap}
-              profilesTotalCount={profilesTotalCount}
-              profilesLoadingMore={profilesLoadingMore}
-              onLoadMoreProfiles={() => void loadMoreProfiles()}
-              onPromoteAdmin={(userId) => void handlePromoteAdmin(userId)}
-              onDemoteAdmin={(userId) => void handleDemoteAdmin(userId)}
-              onAdminAction={(action, userId) => void handleAdminAction(action, userId)}
-              onViewUser={setViewingUserId}
-              onGrantRevoke={(action, userId) => void handleGrantRevoke(action, userId)}
-              onBulkAction={(action, userIds) => void handleBulkAction(action, userIds)}
-            />
-          </CollapsibleModule>
-
-          <CollapsibleModule title="Billing, flags & support" icon={SlidersHorizontal} defaultOpen className="min-w-0">
-            <div className="space-y-6">
-              <AdminBillingPanel stats={billingStats} stripeDashboardUrl={STRIPE_DASHBOARD_URL || undefined} />
-              <AdminFeatureFlagsPanel platformSettings={platformSettingsForFlags} onSetFeatureFlag={handleSetFeatureFlag} />
-              <AdminReliabilityPanel stripeHealth={stripeHealth} auditFeed={auditFeed} />
-              <AdminControlsPanel
-                isMaintenance={isMaintenance}
-                isPlaidEnabled={isPlaidEnabled}
-                broadcastMsg={broadcastMsg}
-                isSavingBroadcast={isSavingBroadcast}
-                onToggleMaintenance={() => void toggleMaintenance()}
-                onTogglePlaid={() => void togglePlaid()}
-                onBroadcastChange={setBroadcastMsg}
-                onSaveBroadcast={() => void handleSendBroadcast()}
-              />
-              <AdminBroadcastsPanel
-                loading={broadcastsLoading}
-                items={adminBroadcasts}
-                onCreate={(payload) => createAdminBroadcast(payload)}
-                onDelete={(id) => deleteAdminBroadcast(id)}
-              />
-              <AdminSupportPanel
-                ticketsLoading={ticketsLoading}
-                tickets={openTickets}
-                resolvedTickets={resolvedTickets}
-                resolvingTicketId={resolvingTicketId}
-                plaidStats={plaidStats}
-                onResolveTicket={(ticketId) => void resolveTicket(ticketId)}
-              />
-              <AdminFeedbackPanel loading={feedbackLoading} items={feedbackEntries} />
-              <AdminUserDataPanel
-                loading={userDataLoading}
-                investmentAccounts={investmentAccounts}
-                insurancePolicies={insurancePolicies}
-              />
-              <AdminIngestionQueuesPanel
-                loading={queuesLoading}
-                pendingIngestions={pendingIngestions}
-                captureSessions={captureSessions}
-              />
-          </div>
-          </CollapsibleModule>
+          </section>
         </div>
 
-        <CollapsibleModule title="Plaid connections" icon={Landmark} defaultOpen={false}>
-          <AdminPlaidDrilldown items={plaidItems} />
-        </CollapsibleModule>
+        <section className="glass-card rounded-2xl p-4">
+          <CollapsibleModule title="At a glance" icon={LayoutDashboard} defaultOpen>
+            <AdminMetricsBar metrics={metricData} />
+          </CollapsibleModule>
+        </section>
+
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+          <section className="space-y-6 xl:col-span-8">
+            <div className="glass-card rounded-2xl p-4">
+              <CollapsibleModule title="Exports & analytics" icon={LineChart} defaultOpen>
+                <div className="space-y-6">
+                  <AdminExportBar profiles={profiles} billingStats={billingStats} />
+                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                    <AdminRevenueChart data={revenueChart} />
+                    <AdminGrowthChart data={growthChart} />
+                    <AdminChurnPanel stats={churnStats} />
+                    <AdminWebhooksPanel webhooks={webhookRows} />
+                  </div>
+                </div>
+              </CollapsibleModule>
+            </div>
+
+            <div className="glass-card rounded-2xl p-4">
+              <CollapsibleModule title="Users & roles" icon={Users} defaultOpen>
+                <AdminUsersPanel
+                  users={filteredProfiles}
+                  search={userSearch}
+                  onSearchChange={setUserSearch}
+                  getEnrichedProfile={getEnrichedProfile}
+                  primaryAdminEmail={PRIMARY_ADMIN_EMAIL}
+                  subMap={subMap}
+                  profilesTotalCount={profilesTotalCount}
+                  profilesLoadingMore={profilesLoadingMore}
+                  onLoadMoreProfiles={() => void loadMoreProfiles()}
+                  onPromoteAdmin={(userId) => void handlePromoteAdmin(userId)}
+                  onDemoteAdmin={(userId) => void handleDemoteAdmin(userId)}
+                  onAdminAction={(action, userId) => void handleAdminAction(action, userId)}
+                  onViewUser={setViewingUserId}
+                  onGrantRevoke={(action, userId) => void handleGrantRevoke(action, userId)}
+                  onBulkAction={(action, userIds) => void handleBulkAction(action, userIds)}
+                />
+              </CollapsibleModule>
+            </div>
+
+            <div className="glass-card rounded-2xl p-4">
+              <CollapsibleModule title="Plaid connections" icon={Landmark} defaultOpen={false}>
+                <AdminPlaidDrilldown items={plaidItems} />
+              </CollapsibleModule>
+            </div>
+          </section>
+
+          <aside className="space-y-6 xl:col-span-4">
+            <section className="glass-card rounded-2xl p-4">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Operations</p>
+              <div className="space-y-6">
+                <AdminBillingPanel stats={billingStats} stripeDashboardUrl={STRIPE_DASHBOARD_URL || undefined} />
+                <AdminFeatureFlagsPanel platformSettings={platformSettingsForFlags} onSetFeatureFlag={handleSetFeatureFlag} />
+                <AdminReliabilityPanel stripeHealth={stripeHealth} auditFeed={auditFeed} />
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-rose-200/70 bg-rose-50/40 p-4 shadow-sm backdrop-blur transition-colors duration-200 hover:border-rose-300/80 dark:border-rose-500/30 dark:bg-rose-950/20">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-rose-700 dark:text-rose-300">Control Zone</p>
+              <div className="space-y-6">
+                <AdminControlsPanel
+                  isMaintenance={isMaintenance}
+                  isPlaidEnabled={isPlaidEnabled}
+                  broadcastMsg={broadcastMsg}
+                  isSavingBroadcast={isSavingBroadcast}
+                  canManagePlatform={isSuperAdmin}
+                  onToggleMaintenance={() => void toggleMaintenance()}
+                  onTogglePlaid={() => void togglePlaid()}
+                  onBroadcastChange={setBroadcastMsg}
+                  onSaveBroadcast={() => void handleSendBroadcast()}
+                />
+                <AdminBroadcastsPanel
+                  loading={broadcastsLoading}
+                  items={adminBroadcasts}
+                  onCreate={(payload) => createAdminBroadcast(payload)}
+                  onDelete={(id) => deleteAdminBroadcast(id)}
+                />
+              </div>
+            </section>
+
+            <section className="glass-card rounded-2xl p-4">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Support & Feedback</p>
+              <div className="space-y-6">
+                <AdminSupportPanel
+                  ticketsLoading={ticketsLoading}
+                  tickets={openTickets}
+                  resolvedTickets={resolvedTickets}
+                  resolvingTicketId={resolvingTicketId}
+                  plaidStats={plaidStats}
+                  onResolveTicket={(ticketId) => void resolveTicket(ticketId)}
+                />
+                <AdminFeedbackPanel loading={feedbackLoading} items={feedbackEntries} />
+              </div>
+            </section>
+
+            <section className="glass-card rounded-2xl p-4">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Data Pipelines</p>
+              <div className="space-y-6">
+                <AdminUserDataPanel
+                  loading={userDataLoading}
+                  investmentAccounts={investmentAccounts}
+                  insurancePolicies={insurancePolicies}
+                />
+                <AdminIngestionQueuesPanel
+                  loading={queuesLoading}
+                  pendingIngestions={pendingIngestions}
+                  captureSessions={captureSessions}
+                />
+              </div>
+            </section>
+          </aside>
+        </div>
       </div>
 
       <AdminUserModal

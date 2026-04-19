@@ -60,103 +60,107 @@ interface PlaidWebhookBody {
   item_id?: string;
 }
 
-Deno.serve(async (req: Request) => {
-  if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
-  }
-
-  const rawBody = await req.text();
-  const jwtHeader = req.headers.get('plaid-verification') ?? req.headers.get('Plaid-Verification');
-
-  const ok = await verifyPlaidWebhook(rawBody, jwtHeader);
-  if (!ok) {
-    return new Response(JSON.stringify({ error: 'Invalid webhook signature' }), {
-      status: 401,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  let body: PlaidWebhookBody;
-  try {
-    body = JSON.parse(rawBody) as PlaidWebhookBody;
-  } catch {
-    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  const itemId = body.item_id;
-  if (!itemId) {
-    return new Response(JSON.stringify({ ok: true, ignored: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  const supabaseUrl = Deno.env.get('SUPABASE_URL');
-  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-  if (!supabaseUrl || !serviceKey) {
-    return new Response(JSON.stringify({ error: 'Server misconfiguration' }), { status: 500 });
-  }
-
-  const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-
-  const now = new Date().toISOString();
-  await supabaseAdmin
-    .from('plaid_items')
-    .update({ last_webhook_at: now, updated_at: now })
-    .eq('item_id', itemId);
-
-  const code = body.webhook_code ?? '';
-  const wtype = body.webhook_type ?? '';
-
-  if (wtype === 'ITEM' && code === 'ITEM_LOGIN_REQUIRED') {
-    const { data: row } = await supabaseAdmin
-      .from('plaid_items')
-      .select('user_id')
-      .eq('item_id', itemId)
-      .maybeSingle();
-    if (row?.user_id) {
-      await supabaseAdmin
-        .from('plaid_items')
-        .update({
-          item_login_required: true,
-          last_sync_error: 'ITEM_LOGIN_REQUIRED',
-          updated_at: now,
-        })
-        .eq('item_id', itemId);
-      await supabaseAdmin
-        .from('profiles')
-        .update({ plaid_needs_relink: true, updated_at: now })
-        .eq('id', row.user_id);
-    }
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  const syncCodes = new Set([
-    'SYNC_UPDATES_AVAILABLE',
-    'DEFAULT_UPDATE',
-    'INITIAL_UPDATE',
-    'HISTORICAL_UPDATE',
-    'TRANSACTIONS_REMOVED',
-  ]);
-
-  if (syncCodes.has(code)) {
-    await runSyncForItemId(supabaseAdmin, itemId);
-    return new Response(JSON.stringify({ ok: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
-  }
-
-  return new Response(JSON.stringify({ ok: true, ignored: code || wtype }), {
-    status: 200,
+function json(body: Record<string, unknown>, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
     headers: { 'Content-Type': 'application/json' },
   });
+}
+
+Deno.serve(async (req: Request) => {
+  if (req.method !== 'POST') {
+    return json({ error: 'Method not allowed' }, 405);
+  }
+
+  try {
+    const rawBody = await req.text();
+    const jwtHeader = req.headers.get('plaid-verification') ?? req.headers.get('Plaid-Verification');
+
+    const signed = await verifyPlaidWebhook(rawBody, jwtHeader);
+    if (!signed) return json({ error: 'Invalid webhook signature' }, 401);
+
+    let body: PlaidWebhookBody;
+    try {
+      body = JSON.parse(rawBody) as PlaidWebhookBody;
+    } catch {
+      return json({ error: 'Invalid JSON payload' }, 400);
+    }
+
+    const wtype = typeof body.webhook_type === 'string' ? body.webhook_type : '';
+    const code = typeof body.webhook_code === 'string' ? body.webhook_code : '';
+    const itemId = typeof body.item_id === 'string' ? body.item_id : '';
+    if (!wtype || !code) return json({ error: 'Missing webhook_type or webhook_code' }, 400);
+    if (!itemId) return json({ error: 'Missing item_id' }, 400);
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    if (!supabaseUrl || !serviceKey) return json({ error: 'Server misconfiguration' }, 500);
+
+    const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+
+    const now = new Date().toISOString();
+    const { error: touchErr } = await supabaseAdmin
+      .from('plaid_items')
+      .update({ last_webhook_at: now, updated_at: now })
+      .eq('item_id', itemId);
+    if (touchErr) {
+      console.error('[plaid-webhook] failed to update webhook timestamp');
+      return json({ error: 'Webhook processing failed' }, 500);
+    }
+
+    const routeKey = `${wtype}:${code}`;
+    const syncRouteKeys = new Set([
+      'TRANSACTIONS:SYNC_UPDATES_AVAILABLE',
+      'TRANSACTIONS:DEFAULT_UPDATE',
+      'TRANSACTIONS:INITIAL_UPDATE',
+      'TRANSACTIONS:HISTORICAL_UPDATE',
+      'TRANSACTIONS:TRANSACTIONS_REMOVED',
+    ]);
+
+    if (routeKey === 'ITEM:ITEM_LOGIN_REQUIRED') {
+      const { data: row, error: rowErr } = await supabaseAdmin
+        .from('plaid_items')
+        .select('user_id')
+        .eq('item_id', itemId)
+        .maybeSingle();
+      if (rowErr) {
+        console.error('[plaid-webhook] failed to resolve plaid item owner');
+        return json({ error: 'Webhook processing failed' }, 500);
+      }
+      const userId = row?.user_id;
+      if (!userId) return json({ ok: true, ignored: 'unknown_item_id' }, 200);
+
+      const { error: itemErr } = await supabaseAdmin
+        .from('plaid_items')
+        .update({ item_login_required: true, last_sync_error: 'ITEM_LOGIN_REQUIRED', updated_at: now })
+        .eq('item_id', itemId);
+      if (itemErr) {
+        console.error('[plaid-webhook] failed to mark item_login_required');
+        return json({ error: 'Webhook processing failed' }, 500);
+      }
+
+      const { error: profileErr } = await supabaseAdmin
+        .from('profiles')
+        .update({ plaid_needs_relink: true, updated_at: now })
+        .eq('id', userId);
+      if (profileErr) {
+        console.error('[plaid-webhook] failed to update profile relink flag');
+        return json({ error: 'Webhook processing failed' }, 500);
+      }
+
+      return json({ ok: true }, 200);
+    }
+
+    if (syncRouteKeys.has(routeKey)) {
+      await runSyncForItemId(supabaseAdmin, itemId);
+      return json({ ok: true }, 200);
+    }
+
+    return json({ ok: true, ignored: routeKey }, 200);
+  } catch {
+    console.error('[plaid-webhook] unhandled processing error');
+    return json({ error: 'Webhook processing failed' }, 500);
+  }
 });

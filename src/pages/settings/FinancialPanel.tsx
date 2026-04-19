@@ -25,7 +25,9 @@ function FinancialPanelInner() {
   const [localTaxRate, setLocalTaxRate] = useState(String(taxRate || STATE_TAX_MAP.NY.rate));
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalTaxState(taxState || '');
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalTaxRate(String(taxRate ?? STATE_TAX_MAP.NY.rate));
   }, [taxState, taxRate]);
 

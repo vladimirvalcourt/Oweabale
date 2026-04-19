@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -89,37 +89,48 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdminEmail }: Props) {
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const [detail, setDetail] = useState<UserDetail | null>(null);
+  const [timeline, setTimeline] = useState<Array<{ source: string; at: string; label: string }>>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [impersonating, setImpersonating] = useState(false);
+  const [impersonationReason, setImpersonationReason] = useState('');
 
   useEffect(() => {
     if (!userId) {
-      setDetail(null);
-      setError(null);
       return;
     }
     let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setError(null);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDetail(null);
-    invokeAdminActions({ action: 'user_detail', targetUserId: userId }).then(({ data, error: err }) => {
+    Promise.all([
+      invokeAdminActions({ action: 'user_detail', targetUserId: userId }),
+      invokeAdminActions({ action: 'user_timeline', targetUserId: userId }),
+    ]).then(([detailRes, timelineRes]) => {
       if (cancelled) return;
       setLoading(false);
-      if (err) {
-        setError(typeof err === 'string' ? err : (err as any)?.message ?? 'Failed to load user.');
+      if (detailRes.error) {
+        setError(typeof detailRes.error === 'string' ? detailRes.error : (detailRes.error as any)?.message ?? 'Failed to load user.');
       } else {
-        setDetail((data?.user_detail ?? data) as UserDetail);
+        setDetail((detailRes.data?.user_detail ?? detailRes.data) as UserDetail);
+      }
+      if (!timelineRes.error) {
+        setTimeline(((timelineRes.data?.timeline ?? []) as Array<{ source: string; at: string; label: string }>).slice(0, 50));
       }
     });
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, invokeAdminActions]);
 
   useEffect(() => {
     if (!userId) return;
+    closeButtonRef.current?.focus();
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
@@ -131,19 +142,26 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
 
   const handleImpersonate = async () => {
     if (!userId) return;
+    if (impersonationReason.trim().length < 8) {
+      toast.error('Please add an impersonation reason (at least 8 characters).');
+      return;
+    }
+    if (!window.confirm('Start impersonation session for this user in a new tab?')) return;
     setImpersonating(true);
-    const { data, error: err } = await invokeAdminActions({ action: 'impersonate', targetUserId: userId });
+    const { data, error: err } = await invokeAdminActions({
+      action: 'impersonate',
+      targetUserId: userId,
+      reason: impersonationReason.trim(),
+    });
     setImpersonating(false);
     if (err) {
       toast.error(typeof err === 'string' ? err : (err as any)?.message ?? 'Impersonation failed.');
       return;
     }
-    const link = data?.magic_link as string | undefined;
-    if (link) {
-      window.open(link, '_blank', 'noopener');
-      toast.success('Magic link opened in new tab.');
+    if (data?.secure_handoff) {
+      toast.success('Impersonation session recorded. Secure handoff is enforced server-side.');
     } else {
-      toast.error('No magic link returned.');
+      toast.error('Impersonation handoff is not available.');
     }
   };
 
@@ -156,14 +174,18 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-surface-raised rounded-lg border border-surface-border p-6 mx-4"
+        className="glass-card relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg p-6 mx-4"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="admin-user-modal-title"
       >
         {/* Close button */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-4 right-4 text-content-muted hover:text-content-primary transition-colors"
+          ref={closeButtonRef}
+          className="interactive-press interactive-focus absolute top-4 right-4 rounded-md p-1 text-content-muted hover:bg-surface-elevated hover:text-content-primary"
           aria-label="Close"
         >
           <X className="w-4 h-4" />
@@ -188,7 +210,7 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
             {/* Header */}
             <div className="pr-6">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-bold text-content-primary text-sm">
+                <span id="admin-user-modal-title" className="font-bold text-content-primary text-sm">
                   {detail.profile.email ?? '(no email)'}
                 </span>
                 {detail.profile.is_admin && (
@@ -209,12 +231,23 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
             </div>
 
             {/* Impersonate */}
-            <div className="mt-4">
+            <div className="mt-4 rounded-lg border border-amber-500/35 bg-amber-500/10 p-3">
+              <p className="text-[10px] uppercase tracking-wide text-amber-300 font-semibold mb-2">
+                Sensitive Action
+              </p>
+              <textarea
+                value={impersonationReason}
+                onChange={(e) => setImpersonationReason(e.target.value)}
+                rows={2}
+                placeholder="Reason for impersonation (required for audit log)"
+                aria-label="Reason for impersonation"
+                className="w-full mb-2 rounded-lg border border-surface-border bg-surface-base p-2 text-xs text-content-secondary focus-app-field"
+              />
               <button
                 type="button"
                 onClick={handleImpersonate}
                 disabled={isOwnAccount || impersonating}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs bg-amber-500/15 text-amber-300 border border-amber-500/30 hover:bg-amber-500/25 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="danger-button inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/15 text-amber-300 border border-amber-500/40 hover:bg-amber-500/25 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {impersonating && <Loader2 className="w-3 h-3 animate-spin" />}
                 Impersonate User
@@ -380,6 +413,23 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
                   </tbody>
                 </table>
               </div>
+            )}
+
+            <p className={SECTION_HEADER}>Unified Timeline (Plaid + Stripe)</p>
+            {timeline.length === 0 ? (
+              <p className="text-xs text-content-muted">No timeline events.</p>
+            ) : (
+              <ul className="space-y-1.5">
+                {timeline.map((evt, idx) => (
+                  <li key={`${evt.source}-${evt.at}-${idx}`} className="rounded-lg border border-surface-border bg-surface-elevated p-2 text-xs">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-content-primary">{evt.label}</span>
+                      <span className="text-content-muted">{new Date(evt.at).toLocaleString()}</span>
+                    </div>
+                    <div className="text-[10px] text-content-tertiary mt-0.5">{evt.source}</div>
+                  </li>
+                ))}
+              </ul>
             )}
           </>
         )}

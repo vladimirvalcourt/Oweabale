@@ -156,6 +156,28 @@
     @apply focus-visible:ring-2 focus-visible:ring-content-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
+  .interactive-press {
+    @apply transition-[transform,box-shadow,background-color,color,border-color,opacity] duration-200 ease-out active:translate-y-[1px] active:scale-[0.995];
+  }
+
+  .interactive-hover {
+    @apply transition-[transform,box-shadow,background-color,color,border-color] duration-200 ease-out hover:-translate-y-[1px];
+  }
+
+  .interactive-focus {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-content-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+  }
+
+  .danger-button {
+    @apply transition-[transform,box-shadow,background-color,color,border-color,opacity] duration-200 ease-out active:translate-y-[1px] active:scale-[0.995];
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-content-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply font-medium tracking-[0.01em] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)];
+  }
+
+  .glass-card {
+    @apply border border-surface-border bg-surface-raised/70 backdrop-blur shadow-sm;
+  }
+
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-3px); }

@@ -18,6 +18,13 @@ function payloadJson(event: Stripe.Event): Record<string, unknown> {
   return JSON.parse(JSON.stringify(event.data.object)) as Record<string, unknown>;
 }
 
+function json(body: Record<string, unknown>, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 /**
  * Claim this event id before running handlers so Stripe retries do not double-apply.
  * Returns duplicate_completed when a prior delivery finished; duplicate_pending when
@@ -62,10 +69,11 @@ async function markStripeWebhookEventComplete(
 
 Deno.serve(async (req: Request) => {
   if (req.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
+    return json({ error: 'Method not allowed' }, 405);
   }
 
   try {
+    const startedAt = Date.now();
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     if (!supabaseUrl || !serviceKey) {
@@ -75,21 +83,25 @@ Deno.serve(async (req: Request) => {
     const webhookSecret = getStripeWebhookSecret();
 
     const signature = req.headers.get('stripe-signature');
-    if (!signature) throw new Error('Missing stripe-signature');
+    if (!signature) {
+      console.error('[stripe-webhook] missing stripe-signature header');
+      return json({ error: 'Invalid webhook signature' }, 400);
+    }
 
     const rawBody = await req.text();
     const stripe = new Stripe(stripeSecret, { apiVersion: STRIPE_API_VERSION });
     const event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+    if (!event?.id || !event?.type) {
+      console.error('[stripe-webhook] invalid event envelope');
+      return json({ error: 'Invalid webhook payload' }, 400);
+    }
     const supabaseAdmin = createClient(supabaseUrl, serviceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
     const claim = await claimStripeWebhookEvent(supabaseAdmin, event);
     if (claim === 'duplicate_completed') {
-      return new Response(JSON.stringify({ received: true, duplicate: true }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return json({ received: true, duplicate: true }, 200);
     }
 
     switch (event.type) {
@@ -99,9 +111,10 @@ Deno.serve(async (req: Request) => {
           typeof session.customer === 'string' ? session.customer : null;
         const userId = session.metadata?.user_id;
         if (customerId && userId) {
-          await supabaseAdmin
+          const { error: profileErr } = await supabaseAdmin
             .from('profiles')
             .upsert({ id: userId, stripe_customer_id: customerId }, { onConflict: 'id' });
+          if (profileErr) throw new Error('Failed to upsert stripe customer profile');
         }
 
         if (session.mode === 'payment' && session.payment_status === 'paid') {
@@ -142,6 +155,7 @@ Deno.serve(async (req: Request) => {
         break;
       }
       default:
+        console.log('[stripe-webhook] ignored event type', event.type);
         break;
     }
 
@@ -150,24 +164,21 @@ Deno.serve(async (req: Request) => {
     if (claim === 'duplicate_pending') {
       console.log('[stripe-webhook] completed retry for event', event.id);
     }
+    console.log('[stripe-webhook] processed event', event.id, event.type, 'in_ms', Date.now() - startedAt);
 
-    return new Response(JSON.stringify({ received: true }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return json({ received: true }, 200);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Webhook error';
     const isSignature =
       /signature|No signatures found|timestamp/i.test(message) ||
       message.includes('Missing stripe-signature');
-    const hint = isSignature ? 'stripe_webhook_signature_mismatch' : 'stripe_webhook_handler_error';
-    console.error(`[stripe-webhook] ${hint}:`, message);
+    const hint = isSignature
+      ? 'stripe_webhook_signature_mismatch'
+      : 'stripe_webhook_handler_error';
+    console.error(`[stripe-webhook] ${hint}`);
     // 400: malformed / bad signature (Stripe should not retry the same body blindly).
     // 500: handler / DB errors so Stripe retries; claim row stays processing_completed=false.
     const status = isSignature ? 400 : 500;
-    return new Response(JSON.stringify({ error: message }), {
-      status,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return json({ error: isSignature ? 'Invalid webhook signature' : 'Webhook processing failed' }, status);
   }
 });

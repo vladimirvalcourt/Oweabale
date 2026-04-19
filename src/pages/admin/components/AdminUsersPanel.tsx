@@ -50,6 +50,38 @@ export function AdminUsersPanel({
   onBulkAction,
 }: Props) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const selectedIds = [...selected];
+
+  const confirmBulkAction = (action: 'ban' | 'unban' | 'grant_entitlement' | 'revoke_entitlement') => {
+    if (selectedIds.length === 0) return;
+    if (action === 'ban') {
+      if (!window.confirm(`Ban ${selectedIds.length} selected ${selectedIds.length === 1 ? 'user' : 'users'}?`)) return;
+    }
+    if (action === 'revoke_entitlement') {
+      if (!window.confirm(`Revoke suite access for ${selectedIds.length} selected ${selectedIds.length === 1 ? 'user' : 'users'}?`)) return;
+    }
+    onBulkAction(action, selectedIds);
+  };
+
+  const confirmSingleAction = (
+    action: 'ban' | 'unban' | 'delete',
+    userId: string,
+    emailOrId: string,
+  ) => {
+    if (action === 'ban' && !window.confirm(`Ban ${emailOrId}?`)) return;
+    if (
+      action === 'delete' &&
+      !window.confirm(`Delete ${emailOrId}? This action is permanent.`)
+    ) {
+      return;
+    }
+    onAdminAction(action, userId);
+  };
+
+  const confirmRevokeSuite = (userId: string, emailOrId: string) => {
+    if (!window.confirm(`Revoke suite access for ${emailOrId}?`)) return;
+    onGrantRevoke('revoke', userId);
+  };
 
   const toggleOne = (id: string) => {
     setSelected(prev => {
@@ -93,7 +125,7 @@ export function AdminUsersPanel({
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search email or id"
-            className="pl-7 pr-2 py-1.5 text-xs bg-surface-base border border-surface-border rounded-lg focus-app"
+            className="pl-7 pr-2 py-1.5 text-xs bg-surface-base border border-surface-border rounded-lg focus-app-field"
           />
         </div>
       </div>
@@ -103,36 +135,36 @@ export function AdminUsersPanel({
           <span className="text-xs text-content-tertiary">{selected.size} selected</span>
           <button
             type="button"
-            onClick={() => onBulkAction('ban', [...selected])}
-            className="px-2 py-1 rounded-lg text-xs bg-rose-500/15 text-rose-300 hover:bg-rose-500/25"
+            onClick={() => confirmBulkAction('ban')}
+            className="danger-button px-2 py-1 rounded-lg text-xs bg-rose-500/15 border border-rose-500/35 text-rose-300 hover:bg-rose-500/25"
           >
             Ban
           </button>
           <button
             type="button"
-            onClick={() => onBulkAction('unban', [...selected])}
-            className="px-2 py-1 rounded-lg text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+            onClick={() => confirmBulkAction('unban')}
+            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
           >
             Unban
           </button>
           <button
             type="button"
-            onClick={() => onBulkAction('grant_entitlement', [...selected])}
-            className="px-2 py-1 rounded-lg text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+            onClick={() => confirmBulkAction('grant_entitlement')}
+            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-xs bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
           >
             Grant Suite
           </button>
           <button
             type="button"
-            onClick={() => onBulkAction('revoke_entitlement', [...selected])}
-            className="px-2 py-1 rounded-lg text-xs bg-amber-500/15 text-amber-300 hover:bg-amber-500/25"
+            onClick={() => confirmBulkAction('revoke_entitlement')}
+            className="danger-button px-2 py-1 rounded-lg text-xs bg-amber-500/15 border border-amber-500/35 text-amber-300 hover:bg-amber-500/25"
           >
             Revoke Suite
           </button>
           <button
             type="button"
             onClick={() => setSelected(new Set())}
-            className="ml-auto px-2 py-1 rounded-lg text-xs bg-surface-base text-content-tertiary hover:text-content-secondary"
+            className="interactive-press interactive-focus ml-auto px-2 py-1 rounded-lg text-xs bg-surface-base text-content-tertiary hover:text-content-secondary"
           >
             Clear
           </button>
@@ -148,6 +180,7 @@ export function AdminUsersPanel({
                   type="checkbox"
                   checked={allChecked}
                   onChange={toggleAll}
+                  aria-label="Select all users"
                   className="accent-content-primary"
                 />
               </th>
@@ -185,12 +218,13 @@ export function AdminUsersPanel({
               }
 
               return (
-                <tr key={user.id} className="border-b border-surface-border/60">
+                <tr key={user.id} className="border-b border-surface-border/60 hover:bg-surface-elevated/50">
                   <td className="py-2 pr-2">
                     <input
                       type="checkbox"
                       checked={selected.has(user.id)}
                       onChange={() => toggleOne(user.id)}
+                      aria-label={`Select ${user.email ?? user.id}`}
                       className="accent-content-primary"
                     />
                   </td>
@@ -212,76 +246,82 @@ export function AdminUsersPanel({
                       <span className="text-emerald-400">Active</span>
                     )}
                   </td>
-                  <td className="py-2 text-right space-x-1">
-                    <button
-                      type="button"
-                      onClick={() => onViewUser(user.id)}
-                      className="px-2 py-1 rounded-lg text-[11px] bg-surface-elevated text-content-secondary hover:text-content-primary"
-                    >
-                      View
-                    </button>
-                    {user.is_admin ? (
-                      <button
-                        type="button"
-                        onClick={() => onDemoteAdmin(user.id)}
-                        disabled={isPrimary}
-                        className="px-2 py-1 rounded-lg text-[11px] bg-content-primary/[0.06] text-content-secondary disabled:opacity-40"
-                      >
-                        Demote
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => onPromoteAdmin(user.id)}
-                        className="px-2 py-1 rounded-lg text-[11px] bg-content-primary/[0.05] text-content-primary hover:bg-content-primary/[0.08]"
-                      >
-                        Promote
-                      </button>
-                    )}
-                    {hasFullSuite ? (
-                      <button
-                        type="button"
-                        onClick={() => onGrantRevoke('revoke', user.id)}
-                        disabled={isPrimary}
-                        className="px-2 py-1 rounded-lg text-[11px] bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 disabled:opacity-40"
-                      >
-                        Revoke Suite
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => onGrantRevoke('grant', user.id)}
-                        className="px-2 py-1 rounded-lg text-[11px] bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
-                      >
-                        Grant Suite
-                      </button>
-                    )}
-                    {user.is_banned ? (
-                      <button
-                        type="button"
-                        onClick={() => onAdminAction('unban', user.id)}
-                        className="px-2 py-1 rounded-lg text-[11px] bg-emerald-500/15 text-emerald-300"
-                      >
-                        Unban
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => onAdminAction('ban', user.id)}
-                        disabled={isPrimary}
-                        className="px-2 py-1 rounded-lg text-[11px] bg-rose-500/15 text-rose-300 disabled:opacity-40"
-                      >
-                        Ban
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => onAdminAction('delete', user.id)}
-                      disabled={isPrimary}
-                      className="px-2 py-1 rounded-lg text-[11px] bg-red-500/20 text-red-300 disabled:opacity-40"
-                    >
-                      Delete
-                    </button>
+                  <td className="py-2 text-right">
+                    <div className="inline-flex flex-col items-end gap-1">
+                      <div className="flex flex-wrap justify-end gap-1">
+                        <button
+                          type="button"
+                          onClick={() => onViewUser(user.id)}
+                          className="interactive-press interactive-focus px-2 py-1 rounded-lg text-[11px] bg-surface-elevated text-content-secondary hover:text-content-primary"
+                        >
+                          View
+                        </button>
+                        {user.is_admin ? (
+                          <button
+                            type="button"
+                            onClick={() => onDemoteAdmin(user.id)}
+                            disabled={isPrimary}
+                            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-[11px] bg-content-primary/[0.06] text-content-secondary disabled:opacity-40"
+                          >
+                            Demote
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => onPromoteAdmin(user.id)}
+                            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-[11px] bg-content-primary/[0.05] text-content-primary hover:bg-content-primary/[0.08]"
+                          >
+                            Promote
+                          </button>
+                        )}
+                        {hasFullSuite ? (
+                          <button
+                            type="button"
+                            onClick={() => confirmRevokeSuite(user.id, user.email ?? user.id)}
+                            disabled={isPrimary}
+                            className="danger-button px-2 py-1 rounded-lg text-[11px] bg-amber-500/15 border border-amber-500/35 text-amber-300 hover:bg-amber-500/25 disabled:opacity-40"
+                          >
+                            Revoke Suite
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => onGrantRevoke('grant', user.id)}
+                            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-[11px] bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/25"
+                          >
+                            Grant Suite
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap justify-end gap-1">
+                        {user.is_banned ? (
+                          <button
+                            type="button"
+                            onClick={() => confirmSingleAction('unban', user.id, user.email ?? user.id)}
+                            className="interactive-press interactive-focus px-2 py-1 rounded-lg text-[11px] bg-emerald-500/15 text-emerald-300"
+                          >
+                            Unban
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => confirmSingleAction('ban', user.id, user.email ?? user.id)}
+                            disabled={isPrimary}
+                            className="danger-button px-2 py-1 rounded-lg text-[11px] bg-rose-500/15 border border-rose-500/35 text-rose-300 disabled:opacity-40"
+                          >
+                            Ban
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => confirmSingleAction('delete', user.id, user.email ?? user.id)}
+                          disabled={isPrimary}
+                          className="danger-button px-2 py-1 rounded-lg text-[11px] font-semibold bg-red-500/20 border border-red-500/40 text-red-300 disabled:opacity-40"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               );

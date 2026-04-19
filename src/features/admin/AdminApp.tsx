@@ -6,6 +6,8 @@ import AdminModerationPage from './pages/AdminModerationPage';
 import AdminDataTablesPage from './pages/AdminDataTablesPage';
 import AdminSessionsPage from './pages/AdminSessionsPage';
 import AdminReportsPage from './pages/AdminReportsPage';
+import AdminCompliancePage from './pages/AdminCompliancePage';
+import AdminTelemetryPage from './pages/AdminTelemetryPage';
 import { AdminPermissionGate } from './shared/AdminPermissionGate';
 
 export default function AdminApp() {
@@ -18,6 +20,8 @@ export default function AdminApp() {
         <Route path="moderation" element={<AdminPermissionGate permission="moderation.manage"><AdminModerationPage /></AdminPermissionGate>} />
         <Route path="sessions" element={<AdminPermissionGate permission="users.manage"><AdminSessionsPage /></AdminPermissionGate>} />
         <Route path="reports" element={<AdminPermissionGate permission="dashboard.view"><AdminReportsPage /></AdminPermissionGate>} />
+        <Route path="compliance" element={<AdminPermissionGate permission="compliance.read"><AdminCompliancePage /></AdminPermissionGate>} />
+        <Route path="telemetry" element={<AdminPermissionGate permission="telemetry.read"><AdminTelemetryPage /></AdminPermissionGate>} />
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Route>
     </Routes>

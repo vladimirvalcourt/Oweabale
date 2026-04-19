@@ -12,6 +12,8 @@ const navItems = [
   { to: '/admin/moderation', label: 'Moderation', requiredPermission: 'moderation.manage' },
   { to: '/admin/sessions', label: 'Sessions', requiredPermission: 'users.manage' },
   { to: '/admin/reports', label: 'Reports', requiredPermission: 'dashboard.view' },
+  { to: '/admin/compliance', label: 'Compliance', requiredPermission: 'compliance.read' },
+  { to: '/admin/telemetry', label: 'Telemetry', requiredPermission: 'telemetry.read' },
 ];
 
 export function AdminLayout() {
@@ -33,17 +35,22 @@ export function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-surface-base text-content-secondary">
-      <header className="sticky top-0 z-20 border-b border-surface-border bg-surface-base/95 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-surface-border bg-surface-base/85 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <Shield className="h-4 w-4 text-content-primary" />
-            <p className="text-sm font-semibold text-content-primary">Admin Console</p>
-            <span className="rounded-md border border-surface-border bg-surface-raised px-2 py-0.5 text-[10px] uppercase tracking-wider text-content-tertiary">
+            <span className="rounded-lg border border-surface-border bg-surface-raised/80 p-2 shadow-sm">
+              <Shield className="h-4 w-4 text-content-primary" />
+            </span>
+            <div className="space-y-0.5">
+              <p className="text-sm font-semibold text-content-primary">Admin Console</p>
+              <p className="text-[11px] text-content-tertiary">Operations command center</p>
+            </div>
+            <span className="rounded-md border border-surface-border bg-surface-raised/80 px-2 py-0.5 text-[10px] uppercase tracking-wider text-content-tertiary">
               {envLabel}
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="relative rounded-lg border border-surface-border bg-surface-raised p-2">
+            <div className="relative rounded-lg border border-surface-border bg-surface-raised/80 p-2 shadow-sm transition-colors duration-200 hover:border-content-secondary/40">
               <Bell className="h-4 w-4 text-content-secondary" />
               {unreadCount > 0 ? (
                 <span className="absolute -right-1 -top-1 rounded-full bg-rose-500 px-1.5 text-[10px] text-white">
@@ -53,17 +60,17 @@ export function AdminLayout() {
             </div>
           </div>
         </div>
-        <nav className="mx-auto flex max-w-7xl items-center gap-2 px-4 pb-3 sm:px-6 lg:px-8">
+        <nav className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 px-4 pb-3 sm:px-6 lg:px-8" aria-label="Admin sections">
           {navItems.filter((item) => hasPermission(item.requiredPermission)).map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `rounded-lg px-3 py-1.5 text-xs transition ${
+                `rounded-lg border px-3 py-1.5 text-xs interactive-hover interactive-press interactive-focus ${
                   isActive
-                    ? 'bg-brand-cta text-surface-base'
-                    : 'border border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary'
+                    ? 'border-brand-cta/40 bg-brand-cta text-surface-base shadow-sm'
+                    : 'border-surface-border bg-surface-raised/80 text-content-secondary hover:bg-surface-raised hover:text-content-primary'
                 }`
               }
             >
@@ -73,7 +80,7 @@ export function AdminLayout() {
         </nav>
       </header>
 
-      <main>
+      <main className="mx-auto w-full max-w-7xl px-0 sm:px-2 lg:px-4">
         <Outlet />
       </main>
     </div>
