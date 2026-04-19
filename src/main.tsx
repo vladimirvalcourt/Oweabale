@@ -1,4 +1,5 @@
 import './instrument';
+import { initWebVitalsReporting } from './lib/webVitalsReporting';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MotionConfig } from 'motion/react';
@@ -50,6 +51,8 @@ if (!supabaseUrl || !supabaseKey) {
       : 'Application configuration error.',
   );
 }
+
+initWebVitalsReporting();
 
 const queryClient = new QueryClient({
   defaultOptions: {
