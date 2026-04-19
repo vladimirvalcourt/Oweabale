@@ -244,7 +244,7 @@ export default function MobileCapture() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface-base font-sans">
+    <div className="flex h-[100dvh] min-h-0 flex-col bg-surface-base font-sans">
       {/* Dynamic Header */}
       <div className="flex h-20 shrink-0 items-center justify-between border-b border-surface-border bg-surface-base px-6">
         <div className="flex flex-col gap-0.5">
@@ -259,10 +259,10 @@ export default function MobileCapture() {
         </div>
       </div>
 
-      <main className="flex-1 flex flex-col p-6 sm:p-12 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
-        
-        <div className="w-full max-w-sm mx-auto flex flex-col h-full">
+      <main className="relative min-h-0 flex-1 overflow-y-auto overscroll-y-contain scrollbar-hide px-6 py-6 sm:px-12">
+        <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+
+        <div className="relative mx-auto flex w-full max-w-sm flex-col">
           {!previewUrl ? (
             <div className="flex flex-col h-full">
               {/* Instructions Section */}
@@ -340,7 +340,7 @@ export default function MobileCapture() {
               </div>
             </div>
           ) : (
-            <div className="space-y-10 animate-in slide-in-from-bottom-8 duration-700 h-full flex flex-col py-4">
+            <div className="flex h-full min-h-0 flex-col space-y-6 py-2 animate-in slide-in-from-bottom-8 duration-700">
               {/* Guidance HUD */}
               <div className="text-center">
                  <p className="animate-pulse text-xs font-medium text-content-secondary">
@@ -348,28 +348,29 @@ export default function MobileCapture() {
                  </p>
               </div>
 
-               <div className="relative aspect-[3/4] w-full bg-surface-raised border border-content-primary/[0.12] p-1.5 rounded-lg overflow-hidden shadow-2xl flex-1">
+               <div className="relative flex min-h-[min(52vh,22rem)] w-full flex-1 flex-col overflow-hidden rounded-lg border border-content-primary/[0.12] bg-[#0c0c0e] shadow-2xl">
                  {capturedFileType === 'application/pdf' ? (
-                   <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-surface-base">
+                   <div className="flex w-full flex-1 flex-col items-center justify-center gap-4 bg-surface-base p-6">
                      <div className="w-20 h-20 rounded-lg border border-content-primary/30 bg-content-primary/5 flex items-center justify-center">
                        <FolderOpen className="w-10 h-10 text-content-primary" />
                      </div>
                      <p className="text-xs font-medium text-content-secondary">PDF ready to send</p>
                    </div>
                  ) : (
-                   <img src={previewUrl!} alt="Preview" className="w-full h-full object-cover grayscale brightness-110 contrast-125" />
+                   <div className="flex min-h-0 flex-1 items-center justify-center p-2 sm:p-3">
+                     <img
+                       src={previewUrl!}
+                       alt="Preview"
+                       className="max-h-[min(52vh,26rem)] w-full object-contain object-center contrast-[1.03]"
+                     />
+                   </div>
                  )}
-                 
-                 {/* Visual Viewfinder Overlay */}
-                 <div className="absolute inset-8 border border-content-primary/20 pointer-events-none">
-                    <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-content-primary"></div>
-                    <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-content-primary"></div>
-                    <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-content-primary"></div>
-                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-content-primary"></div>
-                 </div>
+
+                 {/* Light frame — inset so it does not cover document text */}
+                 <div className="pointer-events-none absolute inset-2 rounded-md border border-content-primary/25 sm:inset-3" aria-hidden />
 
                  {status === 'uploading' && (
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-brand-cta shadow-[0_0_20px_rgba(255,255,255,0.2)] animate-scan-y z-20"></div>
+                    <div className="absolute top-0 left-0 z-20 h-[2px] w-full bg-brand-cta shadow-[0_0_20px_rgba(255,255,255,0.2)] animate-scan-y" />
                  )}
                </div>
 
