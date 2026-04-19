@@ -1,0 +1,546 @@
+import { useMemo, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  ArrowLeft,
+  ClipboardCopy,
+  ExternalLink,
+  Loader2,
+  Shield,
+  UserRound,
+} from 'lucide-react';
+import { toast } from 'sonner';
+import { supabase } from '../../../lib/supabase';
+import { useAdminPermissions } from '../shared/useAdminPermissions';
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const SECTION = 'text-[11px] font-semibold uppercase tracking-wide text-content-tertiary mb-2 mt-6';
+
+const fmtDate = (iso: string | null) => {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
+
+const fmtUsd = (cents: number) =>
+  `$${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+type UserDetail = {
+  profile: {
+    id: string;
+    email: string | null;
+    is_admin: boolean;
+    is_banned: boolean;
+    has_completed_onboarding: boolean;
+    created_at: string | null;
+  };
+  entitlements: Array<{
+    id: string;
+    feature_key: string;
+    status: string;
+    source: string;
+    starts_at: string;
+    ends_at: string | null;
+  }>;
+  subscriptions: Array<{
+    id: string;
+    status: string;
+    stripe_subscription_id: string;
+    current_period_start: string | null;
+    current_period_end: string | null;
+    cancel_at_period_end: boolean;
+    created_at: string;
+  }>;
+  payments: Array<{
+    id: string;
+    amount_total: number;
+    currency: string;
+    status: string;
+    product_key: string | null;
+    created_at: string;
+  }>;
+  plaid_items: Array<{
+    institution_name: string | null;
+    last_sync_at: string | null;
+    last_sync_error: string | null;
+    item_login_required: boolean;
+  }>;
+  tickets: Array<{
+    id: string;
+    ticket_number: string;
+    subject: string;
+    status: string;
+    priority: string;
+    created_at: string;
+  }>;
+  compliance?: {
+    user_id: string;
+    kyc_status: string;
+    aml_status: string;
+    pep_sanctions_hit: boolean;
+    risk_score: number;
+    last_checked_at: string | null;
+    updated_at: string | null;
+  } | null;
+  email_connections?: Array<{
+    id: string;
+    provider: string;
+    email_address: string;
+    last_scan_at: string | null;
+    created_at: string;
+  }>;
+};
+
+type TimelineRow = { source: string; at: string; label: string; detail?: unknown };
+
+function StatusBadge({ status }: { status: string }) {
+  const s = status.toLowerCase();
+  const cls =
+    s === 'active'
+      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+      : s === 'trialing'
+        ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
+        : s === 'past_due'
+          ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+          : 'bg-surface-elevated text-content-muted border-surface-border';
+  return (
+    <span className={`inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium ${cls}`}>{status}</span>
+  );
+}
+
+export default function AdminCaseFilePage() {
+  const { userId: userIdParam } = useParams<{ userId?: string }>();
+  const navigate = useNavigate();
+  const qc = useQueryClient();
+  const { hasPermission, isSuperAdmin } = useAdminPermissions();
+  const canReadUsers = hasPermission('users.read');
+  const primaryAdminEmail = (import.meta.env.VITE_ADMIN_EMAIL as string | undefined)?.trim().toLowerCase() ?? '';
+
+  const [lookupDraft, setLookupDraft] = useState('');
+  const [impersonationReason, setImpersonationReason] = useState('');
+
+  const userId = userIdParam?.trim() ?? '';
+  const validUser = UUID_RE.test(userId);
+
+  const detailQuery = useQuery({
+    queryKey: ['admin', 'case-file', 'detail', userId],
+    enabled: validUser && canReadUsers,
+    queryFn: async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not signed in');
+      const { data, error } = await supabase.functions.invoke('admin-actions', {
+        body: { action: 'user_detail', targetUserId: userId },
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (error) throw error;
+      return (data as { user_detail?: UserDetail })?.user_detail ?? null;
+    },
+  });
+
+  const timelineQuery = useQuery({
+    queryKey: ['admin', 'case-file', 'timeline', userId],
+    enabled: validUser && canReadUsers,
+    queryFn: async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not signed in');
+      const { data, error } = await supabase.functions.invoke('admin-actions', {
+        body: { action: 'user_timeline', targetUserId: userId },
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (error) throw error;
+      return ((data as { timeline?: TimelineRow[] })?.timeline ?? []) as TimelineRow[];
+    },
+  });
+
+  const impersonateMutation = useMutation({
+    mutationFn: async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not signed in');
+      const { data, error } = await supabase.functions.invoke('admin-actions', {
+        body: { action: 'impersonate', targetUserId: userId, reason: impersonationReason.trim() },
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (error) throw error;
+      return data as { magic_link_url?: string; secure_handoff?: boolean };
+    },
+    onSuccess: (data) => {
+      const url = data?.magic_link_url;
+      if (typeof url === 'string' && url.length > 0) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+        toast.success('Magic link opened in a new tab. Session is audited and expires in 15 minutes.');
+        void qc.invalidateQueries({ queryKey: ['admin', 'case-file'] });
+      } else {
+        toast.error('Impersonation handoff URL missing.');
+      }
+    },
+    onError: (e: Error) => {
+      toast.error(e?.message ?? 'Impersonation failed.');
+    },
+  });
+
+  const revokeSessionsMutation = useMutation({
+    mutationFn: async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not signed in');
+      const { error } = await supabase.functions.invoke('admin-actions', {
+        body: { action: 'revoke_sessions', targetUserId: userId, revokeScope: 'global' },
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success('Sessions revoked globally for this user.');
+      void qc.invalidateQueries({ queryKey: ['admin', 'case-file', userId] });
+    },
+    onError: (e: Error) => {
+      toast.error(e?.message ?? 'Failed to revoke sessions.');
+    },
+  });
+
+  const detail = detailQuery.data;
+  const isOwnAccount =
+    (detail?.profile.email?.trim().toLowerCase() ?? '') === primaryAdminEmail && primaryAdminEmail.length > 0;
+
+  const timeline = useMemo(() => (timelineQuery.data ?? []).slice(0, 60), [timelineQuery.data]);
+
+  const openLookup = () => {
+    const id = lookupDraft.trim();
+    if (!UUID_RE.test(id)) {
+      toast.error('Enter a valid user UUID.');
+      return;
+    }
+    navigate(`/admin/user/${id}`);
+  };
+
+  if (!canReadUsers) {
+    return (
+      <section className="mx-auto max-w-3xl px-4 py-10 text-center text-sm text-content-tertiary">
+        You do not have permission to view user case files.
+      </section>
+    );
+  }
+
+  if (!userIdParam) {
+    return (
+      <section className="mx-auto max-w-xl space-y-4 px-4 py-8 sm:px-6 lg:px-8">
+        <div className="rounded-2xl border border-surface-border bg-surface-raised p-6">
+          <div className="mb-4 flex items-center gap-2 text-content-primary">
+            <UserRound className="h-5 w-5" />
+            <h1 className="text-lg font-semibold">User case file</h1>
+          </div>
+          <p className="text-xs text-content-tertiary">
+            Paste a user id (UUID) to open billing, Plaid, compliance, email connections, and timeline in one place.
+          </p>
+          <label className="mt-4 block text-[11px] font-medium text-content-secondary">
+            User id
+            <input
+              value={lookupDraft}
+              onChange={(e) => setLookupDraft(e.target.value)}
+              placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+              className="focus-app-field mt-1 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 font-mono text-xs text-content-primary"
+            />
+          </label>
+          <button
+            type="button"
+            onClick={() => openLookup()}
+            className="interactive-press interactive-focus mt-4 w-full rounded-lg bg-brand-cta py-2 text-xs font-semibold text-surface-base"
+          >
+            Open case file
+          </button>
+          <p className="mt-3 text-[11px] text-content-muted">
+            Tip: from <Link className="text-brand-cta underline-offset-2 hover:underline" to="/admin/data">Data → Profiles</Link>, use{' '}
+            <span className="font-medium text-content-secondary">Case file</span> on a row.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
+  if (!validUser) {
+    return (
+      <section className="mx-auto max-w-xl px-4 py-8 sm:px-6 lg:px-8">
+        <p className="text-sm text-rose-300">Invalid user id in URL.</p>
+        <Link to="/admin/user" className="mt-3 inline-block text-xs text-brand-cta hover:underline">
+          ← Back to lookup
+        </Link>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <Link
+            to="/admin/user"
+            className="interactive-focus mb-2 inline-flex items-center gap-1 text-[11px] text-content-tertiary hover:text-content-secondary"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> User lookup
+          </Link>
+          <h1 className="text-lg font-semibold text-content-primary">Operator case file</h1>
+          <p className="mt-1 max-w-2xl text-xs text-content-tertiary">
+            Consolidated view for support and incidents. Links below jump to other admin tools; impersonation opens a
+            one-time magic link (new tab) and is logged with your reason.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            to="/admin"
+            className="interactive-press interactive-focus inline-flex items-center gap-1 rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-[11px] text-content-secondary"
+          >
+            <Shield className="h-3.5 w-3.5" /> Overview & controls
+          </Link>
+          <Link
+            to="/admin/sessions"
+            className="interactive-press interactive-focus rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-[11px] text-content-secondary"
+          >
+            Sessions
+          </Link>
+          <Link
+            to="/admin/compliance"
+            className="interactive-press interactive-focus rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-[11px] text-content-secondary"
+          >
+            Compliance
+          </Link>
+          <Link
+            to="/admin/telemetry"
+            className="interactive-press interactive-focus rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-[11px] text-content-secondary"
+          >
+            Telemetry
+          </Link>
+        </div>
+      </div>
+
+      {detailQuery.isLoading || timelineQuery.isLoading ? (
+        <div className="flex items-center gap-2 rounded-2xl border border-surface-border bg-surface-raised p-8 text-xs text-content-muted">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading case file…
+        </div>
+      ) : null}
+
+      {detailQuery.error ? (
+        <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-xs text-rose-200">
+          {(detailQuery.error as Error)?.message ?? 'Failed to load user.'}
+        </p>
+      ) : null}
+
+      {!detailQuery.isLoading && detail?.profile ? (
+        <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
+          <div className="space-y-1 rounded-2xl border border-surface-border bg-surface-raised p-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-base font-semibold text-content-primary">{detail.profile.email ?? '(no email)'}</span>
+              {detail.profile.is_admin ? (
+                <span className="rounded border border-surface-border bg-surface-base px-1.5 py-0.5 text-[10px] text-content-secondary">
+                  Admin
+                </span>
+              ) : null}
+              {detail.profile.is_banned ? (
+                <span className="rounded border border-rose-500/40 bg-rose-500/15 px-1.5 py-0.5 text-[10px] text-rose-200">
+                  Banned
+                </span>
+              ) : null}
+            </div>
+            <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-content-muted">
+              <span className="max-w-full truncate" title={detail.profile.id}>
+                {detail.profile.id}
+              </span>
+              <button
+                type="button"
+                className="interactive-focus inline-flex items-center gap-1 rounded border border-surface-border px-1.5 py-0.5 text-[10px] text-content-tertiary hover:text-content-secondary"
+                onClick={() => {
+                  void navigator.clipboard.writeText(detail.profile.id);
+                  toast.success('User id copied');
+                }}
+              >
+                <ClipboardCopy className="h-3 w-3" /> Copy
+              </button>
+            </div>
+            <p className="text-xs text-content-tertiary">Member since {fmtDate(detail.profile.created_at)}</p>
+
+            {isSuperAdmin ? (
+              <div className="mt-4 rounded-xl border border-amber-500/35 bg-amber-500/10 p-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-amber-200">Super-admin actions</p>
+                <p className="mt-1 text-[11px] text-amber-100/90">
+                  Impersonation signs you in as this user in a new tab (full app access). Use a dedicated browser profile
+                  for stricter isolation. Every handoff is audited; magic links are single-use.
+                </p>
+                <textarea
+                  value={impersonationReason}
+                  onChange={(e) => setImpersonationReason(e.target.value)}
+                  rows={2}
+                  placeholder="Reason (min. 8 characters, stored in audit log)"
+                  className="focus-app-field mt-2 w-full rounded-lg border border-surface-border bg-surface-base p-2 text-xs text-content-secondary"
+                />
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    disabled={isOwnAccount || impersonateMutation.isPending}
+                    onClick={() => {
+                      if (impersonationReason.trim().length < 8) {
+                        toast.error('Add an impersonation reason (at least 8 characters).');
+                        return;
+                      }
+                      if (!window.confirm('Open a magic link to sign in as this user in a new tab?')) return;
+                      impersonateMutation.mutate();
+                    }}
+                    className="interactive-press inline-flex items-center gap-1 rounded-lg border border-amber-500/50 bg-amber-500/20 px-3 py-1.5 text-[11px] font-semibold text-amber-100 disabled:opacity-40"
+                  >
+                    {impersonateMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
+                    Impersonate (magic link)
+                  </button>
+                  <button
+                    type="button"
+                    disabled={revokeSessionsMutation.isPending}
+                    onClick={() => {
+                      if (!window.confirm('Revoke all Supabase sessions for this user globally?')) return;
+                      revokeSessionsMutation.mutate();
+                    }}
+                    className="danger-button rounded-lg border border-rose-500/50 bg-rose-500/15 px-3 py-1.5 text-[11px] font-semibold text-rose-100 disabled:opacity-40"
+                  >
+                    {revokeSessionsMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                    Revoke sessions
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            <p className={SECTION}>Entitlements</p>
+            {detail.entitlements.length === 0 ? (
+              <p className="text-xs text-content-muted">No entitlements.</p>
+            ) : (
+              <ul className="space-y-2">
+                {detail.entitlements.map((ent) => (
+                  <li key={ent.id} className="rounded-lg border border-surface-border bg-surface-base p-2 text-xs">
+                    <span className="font-medium text-content-primary">{ent.feature_key}</span>{' '}
+                    <StatusBadge status={ent.status} />
+                    <span className="mt-1 block text-content-muted">
+                      {ent.source}
+                      {ent.ends_at ? ` · ends ${fmtDate(ent.ends_at)}` : ''}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <p className={SECTION}>Billing</p>
+            <p className="mb-1 text-[11px] text-content-muted">Recent subscriptions</p>
+            {detail.subscriptions.length === 0 ? (
+              <p className="text-xs text-content-muted">No subscriptions.</p>
+            ) : (
+              <ul className="space-y-1.5 text-xs">
+                {detail.subscriptions.map((s) => (
+                  <li key={s.id} className="rounded border border-surface-border bg-surface-base px-2 py-1.5">
+                    <StatusBadge status={s.status} />
+                    <span className="ml-2 text-content-muted">{s.stripe_subscription_id}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="mb-1 mt-3 text-[11px] text-content-muted">Recent payments</p>
+            {detail.payments.length === 0 ? (
+              <p className="text-xs text-content-muted">No payments.</p>
+            ) : (
+              <ul className="space-y-1 text-xs text-content-secondary">
+                {detail.payments.map((p) => (
+                  <li key={p.id}>
+                    {fmtUsd(p.amount_total)} {p.currency?.toUpperCase()} · {p.status} · {fmtDate(p.created_at)}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <p className={SECTION}>Plaid</p>
+            {detail.plaid_items.length === 0 ? (
+              <p className="text-xs text-content-muted">No Plaid items.</p>
+            ) : (
+              <ul className="space-y-2 text-xs">
+                {detail.plaid_items.map((it, i) => (
+                  <li key={i} className="rounded-lg border border-surface-border bg-surface-base p-2">
+                    <span className="font-medium text-content-primary">{it.institution_name ?? 'Institution'}</span>
+                    {it.item_login_required ? (
+                      <span className="ml-2 text-amber-300">Needs relink</span>
+                    ) : null}
+                    {it.last_sync_error ? (
+                      <span className="mt-1 block text-rose-200/90">{String(it.last_sync_error)}</span>
+                    ) : null}
+                    <span className="mt-0.5 block text-content-muted">Last sync {fmtDate(it.last_sync_at)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <p className={SECTION}>Support tickets</p>
+            {detail.tickets.length === 0 ? (
+              <p className="text-xs text-content-muted">No tickets.</p>
+            ) : (
+              <ul className="space-y-1 text-xs text-content-secondary">
+                {detail.tickets.map((t) => (
+                  <li key={t.id}>
+                    #{t.ticket_number} · {t.subject} · {t.status}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {detail.compliance ? (
+              <>
+                <p className={SECTION}>Compliance snapshot</p>
+                <div className="rounded-lg border border-surface-border bg-surface-base p-3 text-xs text-content-secondary">
+                  <p>KYC: {detail.compliance.kyc_status}</p>
+                  <p>AML: {detail.compliance.aml_status}</p>
+                  <p>Risk score: {detail.compliance.risk_score}</p>
+                  <p>PEP / sanctions hit: {detail.compliance.pep_sanctions_hit ? 'Yes' : 'No'}</p>
+                  <p className="text-content-muted">Updated {fmtDate(detail.compliance.updated_at)}</p>
+                </div>
+              </>
+            ) : null}
+
+            {detail.email_connections && detail.email_connections.length > 0 ? (
+              <>
+                <p className={SECTION}>Email connections</p>
+                <ul className="space-y-1 text-xs text-content-secondary">
+                  {detail.email_connections.map((c) => (
+                    <li key={c.id}>
+                      {c.provider} · {c.email_address} · last scan {fmtDate(c.last_scan_at)}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
+
+            <p className={SECTION}>Timeline</p>
+            {timeline.length === 0 ? (
+              <p className="text-xs text-content-muted">No timeline events.</p>
+            ) : (
+              <ul className="max-h-80 space-y-2 overflow-y-auto text-xs">
+                {timeline.map((row, idx) => (
+                  <li key={idx} className="border-l-2 border-surface-border pl-2">
+                    <span className="text-content-muted">{fmtDate(row.at)}</span>
+                    <span className="ml-2 text-[10px] uppercase text-content-tertiary">{row.source}</span>
+                    <p className="text-content-secondary">{row.label}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <aside className="space-y-3 rounded-2xl border border-surface-border bg-surface-raised p-4 text-xs text-content-secondary">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Runbooks</p>
+            <ul className="list-inside list-disc space-y-1 text-[11px] text-content-muted">
+              <li>Plaid relink: confirm item_login_required, then user reconnects from app.</li>
+              <li>Billing: compare Stripe dashboard with subscriptions above.</li>
+              <li>After impersonation, sign out or close the tab to return to your admin session.</li>
+            </ul>
+          </aside>
+        </div>
+      ) : null}
+    </section>
+  );
+}

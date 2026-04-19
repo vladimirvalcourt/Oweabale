@@ -608,6 +608,8 @@ Deno.serve(async (req: Request) => {
         { data: payments },
         { data: plaidItems },
         { data: tickets },
+        { data: compliance },
+        { data: emailConnections },
       ] = await Promise.all([
         supabaseAdmin
           .from('profiles')
@@ -640,6 +642,17 @@ Deno.serve(async (req: Request) => {
           .eq('user_id', targetUserId)
           .order('created_at', { ascending: false })
           .limit(10),
+        supabaseAdmin
+          .from('user_compliance_status')
+          .select('user_id, kyc_status, aml_status, pep_sanctions_hit, risk_score, last_checked_at, updated_at')
+          .eq('user_id', targetUserId)
+          .maybeSingle(),
+        supabaseAdmin
+          .from('email_connections')
+          .select('id, provider, email_address, last_scan_at, created_at')
+          .eq('user_id', targetUserId)
+          .order('created_at', { ascending: false })
+          .limit(8),
       ])
       return new Response(
         JSON.stringify({
@@ -650,6 +663,8 @@ Deno.serve(async (req: Request) => {
             payments: payments ?? [],
             plaid_items: plaidItems ?? [],
             tickets: tickets ?? [],
+            compliance: compliance ?? null,
+            email_connections: emailConnections ?? [],
           },
         }),
         { headers: jsonHeaders },
@@ -1261,8 +1276,21 @@ Deno.serve(async (req: Request) => {
       if (targetProfile?.is_admin === true || targetRoleKeys.size > 0) {
         throw new Error('Forbidden: cannot impersonate privileged admin account')
       }
-      const { error } = await supabaseAdmin.auth.admin.generateLink({ type: 'magiclink', email: userEmail })
-      if (error) throw error
+      const siteBase = (Deno.env.get('APP_SITE_URL') ?? Deno.env.get('SITE_URL') ?? 'https://www.oweable.com').trim().replace(
+        /\/$/,
+        '',
+      )
+      const redirectTo = `${siteBase}/dashboard`
+      const { data: linkPayload, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+        type: 'magiclink',
+        email: userEmail,
+        options: { redirectTo },
+      })
+      if (linkError) throw linkError
+      const magicLinkUrl = (linkPayload as { properties?: { action_link?: string } })?.properties?.action_link ?? null
+      if (!magicLinkUrl || typeof magicLinkUrl !== 'string') {
+        throw new Error('Failed to create impersonation magic link')
+      }
       const { data: impSession, error: impErr } = await supabaseAdmin
         .from('admin_impersonation_sessions')
         .insert({
@@ -1289,6 +1317,7 @@ Deno.serve(async (req: Request) => {
         JSON.stringify({
           impersonation_session: impSession,
           secure_handoff: true,
+          magic_link_url: magicLinkUrl,
         }),
         { headers: jsonHeaders },
       )

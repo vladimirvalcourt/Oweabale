@@ -158,8 +158,12 @@ export function AdminUserModal({ userId, onClose, invokeAdminActions, primaryAdm
       toast.error(typeof err === 'string' ? err : (err as any)?.message ?? 'Impersonation failed.');
       return;
     }
-    if (data?.secure_handoff) {
-      toast.success('Impersonation session recorded. Secure handoff is enforced server-side.');
+    const url = typeof data?.magic_link_url === 'string' ? data.magic_link_url : '';
+    if (url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+      toast.success('Magic link opened in a new tab. Session is audited; link is single-use.');
+    } else if (data?.secure_handoff) {
+      toast.success('Impersonation session recorded. Open the handoff URL if your client provides one.');
     } else {
       toast.error('Impersonation handoff is not available.');
     }

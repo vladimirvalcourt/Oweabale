@@ -8,6 +8,7 @@ import AdminSessionsPage from './pages/AdminSessionsPage';
 import AdminReportsPage from './pages/AdminReportsPage';
 import AdminCompliancePage from './pages/AdminCompliancePage';
 import AdminTelemetryPage from './pages/AdminTelemetryPage';
+import AdminCaseFilePage from './pages/AdminCaseFilePage';
 import { AdminPermissionGate } from './shared/AdminPermissionGate';
 
 export default function AdminApp() {
@@ -15,6 +16,8 @@ export default function AdminApp() {
     <Routes>
       <Route element={<AdminLayout />}>
         <Route index element={<AdminOverviewPage />} />
+        <Route path="user/:userId" element={<AdminPermissionGate permission="users.read"><AdminCaseFilePage /></AdminPermissionGate>} />
+        <Route path="user" element={<AdminPermissionGate permission="users.read"><AdminCaseFilePage /></AdminPermissionGate>} />
         <Route path="data" element={<AdminPermissionGate permission="users.manage"><AdminDataTablesPage /></AdminPermissionGate>} />
         <Route path="audit-logs" element={<AdminPermissionGate permission="audit.read"><AdminAuditLogsPage /></AdminPermissionGate>} />
         <Route path="moderation" element={<AdminPermissionGate permission="moderation.manage"><AdminModerationPage /></AdminPermissionGate>} />

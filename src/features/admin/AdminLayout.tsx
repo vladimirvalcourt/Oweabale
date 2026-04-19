@@ -7,6 +7,7 @@ import { useAdminPermissions } from './shared/useAdminPermissions';
 
 const navItems = [
   { to: '/admin', label: 'Overview', end: true, requiredPermission: 'dashboard.view' },
+  { to: '/admin/user', label: 'Case file', requiredPermission: 'users.read' },
   { to: '/admin/data', label: 'Data', requiredPermission: 'users.manage' },
   { to: '/admin/audit-logs', label: 'Audit Logs', requiredPermission: 'audit.read' },
   { to: '/admin/moderation', label: 'Moderation', requiredPermission: 'moderation.manage' },

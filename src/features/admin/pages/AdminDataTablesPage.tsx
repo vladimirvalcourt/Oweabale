@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Download } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../../lib/supabase';
@@ -401,6 +402,7 @@ export default function AdminDataTablesPage() {
                       </button>
                     </th>
                   ))}
+                  {profilesView ? <th className="px-3 py-2 font-medium">Case file</th> : null}
                   <th className="px-3 py-2 font-medium">Edit</th>
                 </tr>
               </thead>
@@ -421,6 +423,20 @@ export default function AdminDataTablesPage() {
                         {String(row[column] ?? '—')}
                       </td>
                     ))}
+                    {profilesView ? (
+                      <td className="px-3 py-2">
+                        {typeof row.id === 'string' ? (
+                          <Link
+                            to={`/admin/user/${row.id}`}
+                            className="interactive-focus text-[10px] font-semibold text-brand-cta hover:underline"
+                          >
+                            Open
+                          </Link>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                    ) : null}
                     <td className="px-3 py-2">
                       <button
                         type="button"
