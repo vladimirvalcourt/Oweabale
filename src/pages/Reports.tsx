@@ -230,7 +230,7 @@ export default function Reports() {
         >
           <div className="flex flex-col">
             <SafeResponsiveContainer width="100%" height={220} minWidth={0} minHeight={120}>
-              <BarChart data={monthlyData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+              <BarChart data={monthlyData} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
@@ -287,7 +287,7 @@ export default function Reports() {
         icon={TrendingUp}
       >
         <SafeResponsiveContainer width="100%" height={200} minWidth={0} minHeight={120}>
-          <AreaChart data={netWorthHistory} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+          <AreaChart data={netWorthHistory} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
             <defs>
               <linearGradient id="nwGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#d4d4d4" stopOpacity={0.15} />

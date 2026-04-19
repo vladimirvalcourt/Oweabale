@@ -355,7 +355,7 @@ export default function Analytics() {
           </div>
         ) : (
           <SafeResponsiveContainer width="100%" height={260} minWidth={0} minHeight={120}>
-            <AreaChart data={chartSnapshots} margin={{ top: 5, right: 5, left: 5, bottom: 0 }}>
+            <AreaChart data={chartSnapshots} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
               <defs>
                 <linearGradient id="nwGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%"  stopColor="#d4d4d4" stopOpacity={0.25} />
@@ -390,7 +390,7 @@ export default function Analytics() {
         ) : (
           <>
             <SafeResponsiveContainer width="100%" height={260} minWidth={0} minHeight={120}>
-              <BarChart data={monthlySpend} margin={{ top: 5, right: 5, left: 5, bottom: 0 }}>
+              <BarChart data={monthlySpend} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
                 <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval={1} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={fmt} width={52} />
@@ -485,7 +485,7 @@ export default function Analytics() {
       {/* Savings Rate */}
       <CollapsibleModule title="Monthly Savings Rate" icon={Activity}>
         <SafeResponsiveContainer width="100%" height={200} minWidth={0} minHeight={120}>
-          <LineChart data={cashFlowData} margin={{ top: 5, right: 5, left: 5, bottom: 0 }}>
+          <LineChart data={cashFlowData} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
             <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval={1} />
             <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `${v}%`} width={42} />

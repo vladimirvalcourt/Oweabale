@@ -631,7 +631,7 @@ export default function Obligations() {
                             </p>
                             <div className="h-[120px] w-full min-h-0 overflow-visible relative isolate">
                               <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={120}>
-                                <BarChart data={chartData} margin={{ top: 0, right: 0, left: -30, bottom: 0 }} barSize={8}>
+                                <BarChart data={chartData} margin={{ top: 6, right: 4, left: 4, bottom: 10 }} barSize={8}>
                                   <XAxis dataKey="name" tick={{ fill: '#52525B', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} />
                                   <YAxis tick={{ fill: '#52525B', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}`} />
                                   <Tooltip

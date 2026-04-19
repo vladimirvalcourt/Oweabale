@@ -765,17 +765,24 @@ export default function Dashboard() {
       {/* 30-Day Cash Flow Forecast */}
       {cashFlowForecast.length > 0 && (
         <div className="rounded-lg border border-surface-border bg-surface-elevated p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-content-primary">30-Day Cash Flow Forecast</h3>
+          <div className="flex items-start justify-between gap-3 mb-3">
+            <div className="min-w-0">
+              <h3 className="text-sm font-semibold text-content-primary">30-Day Cash Flow Forecast</h3>
+              <p className="mt-1 text-[11px] leading-snug text-content-secondary">
+                <span className="font-semibold text-content-primary">Today</span>
+                <span className="text-content-tertiary"> — start · </span>
+                {cashFlowForecast[0]?.label}
+              </p>
+            </div>
             {(() => {
               const lowest = cashFlowForecast.reduce((min, d) => d.balance < min.balance ? d : min, cashFlowForecast[0]);
               return lowest.balance < 0 ? (
-                <span className="text-xs text-amber-400 font-medium">⚠ Balance may dip on {lowest.label}</span>
+                <span className="shrink-0 text-xs text-amber-400 font-medium">⚠ Balance may dip on {lowest.label}</span>
               ) : null;
             })()}
           </div>
           <SafeResponsiveContainer width="100%" height={120}>
-            <AreaChart data={cashFlowForecast} margin={{ top: 8, right: 8, left: 8, bottom: 4 }}>
+            <AreaChart data={cashFlowForecast} margin={{ top: 10, right: 8, left: 8, bottom: 6 }}>
               <defs>
                 <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
@@ -791,17 +798,10 @@ export default function Dashboard() {
                 tickFormatter={(v) => String(v)}
               />
               <YAxis
-                tick={{ fontSize: 9, fill: '#6b7280' }}
+                tick={{ fontSize: 10, fill: '#6b7280' }}
                 tickLine={false}
                 axisLine={false}
-                width={40}
-                label={{
-                  value: 'Balance ($)',
-                  angle: -90,
-                  position: 'insideLeft',
-                  offset: 4,
-                  style: { fill: '#6b7280', fontSize: 9, textAnchor: 'middle' },
-                }}
+                width={44}
               />
               <Tooltip
                 {...rechartsTooltipStableProps}
@@ -819,24 +819,30 @@ export default function Dashboard() {
               <ReferenceLine y={0} stroke="#6b7280" strokeDasharray="3 3" />
               <ReferenceLine
                 x={cashFlowForecast[0]?.label}
-                stroke="#9ca3af"
-                strokeDasharray="2 2"
-                label={{ value: 'Today', position: 'top', fill: '#9ca3af', fontSize: 9 }}
+                stroke="var(--content-tertiary)"
+                strokeDasharray="4 3"
+                strokeOpacity={0.85}
               />
               <Area type="monotone" dataKey="balance" name="Projected Balance" stroke="#6366f1" fill="url(#forecastGrad)" strokeWidth={1.5} dot={false} />
             </AreaChart>
           </SafeResponsiveContainer>
-          <div className="mt-2 flex flex-wrap items-center gap-4 text-[11px] text-content-tertiary">
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-content-tertiary">
             <span className="inline-flex items-center gap-2">
               <span className="inline-block h-px w-6 bg-[#6366f1]" aria-hidden />
-              Projected Balance
+              Projected balance
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <span className="inline-block h-3 w-0 border-l border-dashed border-content-tertiary" aria-hidden />
+              Today (chart)
             </span>
           </div>
           <p className="mt-1 text-[11px] text-content-secondary">
             If current patterns continue, your projected balance could reach $
             {cashFlowForecast[cashFlowForecast.length - 1]?.balance.toFixed(0)} by {cashFlowForecast[cashFlowForecast.length - 1]?.label}.
           </p>
-          <p className="mt-1 text-[11px] text-content-tertiary">Dates on the X-axis use short month + day (e.g., Apr 18, Apr 25, May 2).</p>
+          <p className="mt-1 text-[11px] text-content-tertiary">
+            Y-axis: projected balance (USD). X-axis dates are short month + day (e.g., Apr 18, Apr 25, May 2).
+          </p>
         </div>
       )}
 
@@ -1102,7 +1108,7 @@ export default function Dashboard() {
             
             <div className="h-[200px] sm:h-[280px] w-full min-h-[120px]">
               <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={120}>
-                <AreaChart data={cashFlowChartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={cashFlowChartData} margin={{ top: 12, right: 12, left: 8, bottom: 12 }}>
                   <defs>
                     <linearGradient id="colorBalance" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#fafafa" stopOpacity={0.12}/>

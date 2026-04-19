@@ -137,7 +137,7 @@ export default function NetWorth() {
         </p>
         <div className="h-[260px] w-full">
           <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={120}>
-            <AreaChart data={projectionData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <AreaChart data={projectionData} margin={{ top: 12, right: 12, left: 8, bottom: 12 }}>
               <defs>
                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#d4d4d4" stopOpacity={0.2}/>
