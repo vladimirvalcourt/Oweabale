@@ -297,17 +297,17 @@ async function buildUserContextJson(
     supabaseAdmin.from('insurance_policies').select('type,provider,premium,frequency,status,expiration_date,coverage_amount').eq('user_id', uid).eq('status', 'active').limit(CTX_LIMIT),
   ]);
 
-  if (billsR.error) throw billsR.error;
-  if (debtsR.error) throw debtsR.error;
-  if (assetsR.error) throw assetsR.error;
-  if (incomesR.error) throw incomesR.error;
-  if (subsR.error) throw subsR.error;
-  if (citR.error) throw citR.error;
-  if (goalsR.error) throw goalsR.error;
-  if (budgetsR.error) throw budgetsR.error;
-  if (txR.error) throw txR.error;
-  if (profileR.error) throw profileR.error;
-  // investR and insurR are best-effort — tables may not exist yet; don't throw
+  // All table queries are best-effort — a single DB error must not take down the whole function.
+  if (billsR.error) console.warn('[owe-ai] bills query failed:', billsR.error.message);
+  if (debtsR.error) console.warn('[owe-ai] debts query failed:', debtsR.error.message);
+  if (assetsR.error) console.warn('[owe-ai] assets query failed:', assetsR.error.message);
+  if (incomesR.error) console.warn('[owe-ai] incomes query failed:', incomesR.error.message);
+  if (subsR.error) console.warn('[owe-ai] subscriptions query failed:', subsR.error.message);
+  if (citR.error) console.warn('[owe-ai] citations query failed:', citR.error.message);
+  if (goalsR.error) console.warn('[owe-ai] goals query failed:', goalsR.error.message);
+  if (budgetsR.error) console.warn('[owe-ai] budgets query failed:', budgetsR.error.message);
+  if (txR.error) console.warn('[owe-ai] transactions query failed:', txR.error.message);
+  if (profileR.error) console.warn('[owe-ai] profile query failed:', profileR.error.message);
 
   const bills = (billsR.data || []) as Record<string, unknown>[];
   const debts = (debtsR.data || []) as Record<string, unknown>[];
@@ -675,8 +675,8 @@ function oweAiToolsEnabled(): boolean {
   return Deno.env.get('OWE_AI_ENABLE_TOOLS')?.trim().toLowerCase() === 'true';
 }
 
-const HF_CHAT_TIMEOUT_MS = 55_000;
-const HF_CHAT_RETRIES = 2;
+const HF_CHAT_TIMEOUT_MS = 45_000;
+const HF_CHAT_RETRIES = 1;
 
 function messageTextContent(message: { content?: unknown } | undefined): string {
   if (!message) return '';

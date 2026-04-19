@@ -330,13 +330,10 @@ async function streamOweAiSingleAttempt(
           message: 'Owe-AI is temporarily unavailable. Please try again in a few minutes.',
         };
       }
-      const msg =
-        typeof b.message === 'string'
-          ? b.message
-          : typeof b.error === 'string'
-            ? b.error
-            : '';
-      if (/jwt|invalid.*token|session/i.test(msg)) throwOweAiUi('session');
+      const errCode = typeof b.error === 'string' ? b.error : '';
+      const msg = typeof b.message === 'string' ? b.message : errCode;
+      // Only treat INVALID_SESSION (auth expiry) as a session error, not SESSION_REQUIRED (bad UUID).
+      if (errCode === 'INVALID_SESSION' || /jwt|invalid.*token/i.test(msg)) throwOweAiUi('session');
     }
     if (res.status === 403) throwOweAiUi('unavailable');
     if (res.status >= 500 || res.status === 429) throw new OweAiRetriableError();
@@ -494,7 +491,8 @@ async function invokeOweAiSingleAttempt(
             ? b.error.trim()
             : null;
       if (serverMsg) {
-        if (/jwt|invalid.*token|session/i.test(serverMsg)) {
+        const errCode2 = typeof b.error === 'string' ? b.error : '';
+        if (errCode2 === 'INVALID_SESSION' || /jwt|invalid.*token/i.test(serverMsg)) {
           throwOweAiUi('session', error);
         }
         if (/send at least one message|last message must be from the user/i.test(serverMsg)) {
