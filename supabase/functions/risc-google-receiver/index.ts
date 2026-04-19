@@ -29,19 +29,6 @@ function extractIssSub(eventPayload: Record<string, unknown>): string | null {
   return null;
 }
 
-function extractTokenRef(
-  eventPayload: Record<string, unknown>,
-): { alg: string; token: string } | null {
-  const subj = eventPayload.subject as Record<string, unknown> | undefined;
-  if (!subj) return null;
-  if (subj.subject_type !== 'oauth-token') return null;
-  if (subj.token_type !== 'refresh_token') return null;
-  const alg = subj.token_identifier_alg;
-  const token = subj.token;
-  if (typeof alg !== 'string' || typeof token !== 'string') return null;
-  return { alg, token };
-}
-
 async function resolveUserId(
   admin: ReturnType<typeof createClient>,
   googleSub: string,
@@ -69,9 +56,6 @@ async function revokeSessions(
     console.log('[risc-google-receiver] sessions revoked (global)', userId.slice(0, 8), reason);
   }
 }
-
-/** OAuth token-revoked events (no app-side mailbox linkage). */
-async function handleTokenRevoked(): Promise<void> {}
 
 Deno.serve(async (req: Request) => {
   const c = corsHeaders(req.headers.get('origin'), req.headers);
@@ -135,7 +119,6 @@ Deno.serve(async (req: Request) => {
     }
 
     if (eventUri === EVENT_TOKEN_REVOKED) {
-      await handleTokenRevoked();
       continue;
     }
 

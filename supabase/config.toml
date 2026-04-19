@@ -412,16 +412,6 @@ verify_jwt = false
 [functions.send-reengagement-push]
 verify_jwt = false
 
-# Zapier Email Intelligence: setup/disconnect validate JWT in function; webhook validates shared secret.
-[functions.zapier-email-setup]
-verify_jwt = false
-
-[functions.zapier-email-disconnect]
-verify_jwt = false
-
-[functions.email-zapier-webhook]
-verify_jwt = false
-
 # Google Cross-Account Protection (RISC): Google POSTs JWTs to receiver; register uses x-risc-register-secret.
 [functions.risc-google-receiver]
 verify_jwt = false

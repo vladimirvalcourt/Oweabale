@@ -638,53 +638,6 @@ export interface Database {
           created_at?: string
         }
       }
-      email_connections: {
-        Row: {
-          id: string
-          user_id: string
-          provider: string
-          email_address: string
-          encrypted_refresh_token: string | null
-          created_at: string
-          updated_at: string
-          last_scan_at: string | null
-          last_scan_after: string | null
-          google_refresh_token_fp_hash: string | null
-          google_refresh_token_fp_prefix: string | null
-          zapier_ingest_secret_hash: string | null
-          zapier_ingest_enabled: boolean
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          provider?: string
-          email_address: string
-          encrypted_refresh_token?: string | null
-          created_at?: string
-          updated_at?: string
-          last_scan_at?: string | null
-          last_scan_after?: string | null
-          google_refresh_token_fp_hash?: string | null
-          google_refresh_token_fp_prefix?: string | null
-          zapier_ingest_secret_hash?: string | null
-          zapier_ingest_enabled?: boolean
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          provider?: string
-          email_address?: string
-          encrypted_refresh_token?: string | null
-          created_at?: string
-          updated_at?: string
-          last_scan_at?: string | null
-          last_scan_after?: string | null
-          google_refresh_token_fp_hash?: string | null
-          google_refresh_token_fp_prefix?: string | null
-          zapier_ingest_secret_hash?: string | null
-          zapier_ingest_enabled?: boolean
-        }
-      }
       risc_google_events: {
         Row: {
           jti: string
@@ -697,68 +650,6 @@ export interface Database {
         Update: {
           jti?: string
           received_at?: string
-        }
-      }
-      email_scan_findings: {
-        Row: {
-          id: string
-          user_id: string
-          connection_id: string
-          provider_message_id: string
-          subject_snapshot: string
-          sender_domain: string
-          biller_name: string
-          amount_due: number | null
-          due_date: string | null
-          account_last4: string | null
-          extracted_status: string
-          action_required: boolean
-          extracted_category: string
-          confidence_score: number
-          suggested_destination: string
-          urgency: string
-          review_status: string
-          scanned_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          connection_id: string
-          provider_message_id: string
-          subject_snapshot?: string
-          sender_domain?: string
-          biller_name?: string
-          amount_due?: number | null
-          due_date?: string | null
-          account_last4?: string | null
-          extracted_status: string
-          action_required?: boolean
-          extracted_category: string
-          confidence_score: number
-          suggested_destination: string
-          urgency?: string
-          review_status?: string
-          scanned_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          connection_id?: string
-          provider_message_id?: string
-          subject_snapshot?: string
-          sender_domain?: string
-          biller_name?: string
-          amount_due?: number | null
-          due_date?: string | null
-          account_last4?: string | null
-          extracted_status?: string
-          action_required?: boolean
-          extracted_category?: string
-          confidence_score?: number
-          suggested_destination?: string
-          urgency?: string
-          review_status?: string
-          scanned_at?: string
         }
       }
       pending_ingestions: {

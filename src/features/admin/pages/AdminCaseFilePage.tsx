@@ -82,13 +82,6 @@ type UserDetail = {
     last_checked_at: string | null;
     updated_at: string | null;
   } | null;
-  email_connections?: Array<{
-    id: string;
-    provider: string;
-    email_address: string;
-    last_scan_at: string | null;
-    created_at: string;
-  }>;
 };
 
 type TimelineRow = { source: string; at: string; label: string; detail?: unknown };
@@ -237,7 +230,7 @@ export default function AdminCaseFilePage() {
             <h1 className="text-lg font-semibold">User case file</h1>
           </div>
           <p className="text-xs text-content-tertiary">
-            Paste a user id (UUID) to open billing, Plaid, compliance, email connections, and timeline in one place.
+            Paste a user id (UUID) to open billing, Plaid, compliance, and timeline in one place.
           </p>
           <label className="mt-4 block text-[11px] font-medium text-content-secondary">
             User id
@@ -499,19 +492,6 @@ export default function AdminCaseFilePage() {
                   <p>PEP / sanctions hit: {detail.compliance.pep_sanctions_hit ? 'Yes' : 'No'}</p>
                   <p className="text-content-muted">Updated {fmtDate(detail.compliance.updated_at)}</p>
                 </div>
-              </>
-            ) : null}
-
-            {detail.email_connections && detail.email_connections.length > 0 ? (
-              <>
-                <p className={SECTION}>Email connections</p>
-                <ul className="space-y-1 text-xs text-content-secondary">
-                  {detail.email_connections.map((c) => (
-                    <li key={c.id}>
-                      {c.provider} · {c.email_address} · last scan {fmtDate(c.last_scan_at)}
-                    </li>
-                  ))}
-                </ul>
               </>
             ) : null}
 

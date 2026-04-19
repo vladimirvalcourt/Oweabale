@@ -8,19 +8,17 @@ Google’s [Cross-Account Protection](https://developers.google.com/identity/pro
 
 | Piece | Purpose |
 |--------|--------|
-| `supabase/migrations/20260422194500_risc_cross_account_protection.sql` | RPC `find_user_id_by_google_sub`, RPC `risc_revoke_user_sessions`, table `risc_google_events`, Gmail token fingerprints on `email_connections`. |
+| `supabase/migrations/20260422194500_risc_cross_account_protection.sql` | RPC `find_user_id_by_google_sub`, RPC `risc_revoke_user_sessions`, table `risc_google_events`. |
 | `supabase/functions/risc-google-receiver` | HTTPS POST receiver: verify JWT, handle events. |
 | `supabase/functions/risc-google-register` | One-shot / rare: register or verify stream with Google (protected by secret header). |
 | `supabase/functions/_shared/riscGoogleJwt.ts` | Discovery doc, verify inbound JWT, mint SA bearer for RISC API. |
-| `supabase/functions/_shared/riscGoogleFingerprint.ts` | Double SHA-512 + prefix for `token-revoked` matching. |
-| `gmail-oauth-callback` | Stores `google_refresh_token_fp_hash` / `google_refresh_token_fp_prefix` on connect. |
 
 ## GCP checklist (you still do this in Google Cloud)
 
-1. Same project as Google Sign-In / Gmail OAuth: **enable [RISC API](https://console.developers.google.com/apis/library/risc.googleapis.com)** and accept **RISC Terms**.
+1. Same project as Google Sign-In: **enable [RISC API](https://console.developers.google.com/apis/library/risc.googleapis.com)** and accept **RISC Terms**.
 2. **Service account** → grant **`RISC Configuration Admin`** (`roles/riscconfigs.admin`) → create **JSON key** → entire JSON → Supabase secret `RISC_SERVICE_ACCOUNT_JSON`.
 3. **OAuth consent screen → Authorized domains** must include the **host** of your receiver URL (e.g. `supabase.co` so `xxxx.supabase.co` is allowed). If Google rejects `*.supabase.co`, front the receiver on your own domain and set `RISC_RECEIVER_URL`.
-4. Collect every **OAuth Web client ID** that can create Google-linked users or Gmail tokens for your product → `RISC_GOOGLE_OAUTH_CLIENT_IDS` (comma-separated).
+4. Collect every **OAuth Web client ID** that can create Google-linked users for your product → `RISC_GOOGLE_OAUTH_CLIENT_IDS` (comma-separated).
 
 ## Supabase secrets
 
@@ -75,10 +73,10 @@ Check Edge logs for `[risc-google-receiver] verification event`.
 
 ## Event handling (current behavior)
 
-- **`sessions-revoked`**, **`tokens-revoked`**, **`account-purged`**, **`account-credential-change-required`**: resolve Google `sub` → Supabase user, **`auth.admin.signOut(userId, 'global')`** (fallback: `risc_revoke_user_sessions` RPC), **delete** all `email_connections` for that user (Gmail must be re-linked).
+- **`sessions-revoked`**, **`tokens-revoked`**, **`account-purged`**, **`account-credential-change-required`**: resolve Google `sub` → Supabase user, **`auth.admin.signOut(userId, 'global')`** (fallback: `risc_revoke_user_sessions` RPC).
 - **`account-disabled`** (not `bulk-account`): same as above — includes **`reason=hijacking`** and other non-bulk disables (Google does not use a separate “credential-compromised” URI in the standard RISC set; hijack/disable flows use these events).
 - **`account-disabled`** with `reason=bulk-account`: **log only** (no automatic mass sign-out).
-- **`token-revoked`** (refresh token): delete matching `email_connections` row by **hash** or **prefix** fingerprint (no full user sign-out unless paired with account-level events).
+- **`token-revoked`** (refresh token): acknowledged and ignored (no app-side OAuth token rows to clear).
 - **`verification`**: log (Google **Test** / stream verification).
 - **`account-enabled`**: log only (no automatic action).
 
@@ -92,4 +90,3 @@ After adding **`account-purged`** to the subscribed list, **re-run** `risc-googl
 ## References
 
 - [Google RISC documentation](https://developers.google.com/identity/protocols/risc)
-- `docs/GOOGLE_GMAIL_VERIFICATION.md` — Gmail OAuth verification (separate from RISC setup)
