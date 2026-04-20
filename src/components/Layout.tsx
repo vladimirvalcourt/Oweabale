@@ -403,7 +403,6 @@ export default function Layout() {
         icon: typeof Home;
         count?: number;
         hash?: string;
-        nested?: boolean;
       }[];
     }[] => [
       {
@@ -414,7 +413,7 @@ export default function Layout() {
           { name: 'Income', path: '/income', icon: DollarSign },
           { name: 'Freelance / gigs', path: '/freelance', icon: Briefcase },
           { name: 'Regular Bills', path: '/bills', icon: FileText },
-          { name: 'Tickets & Fines', path: '/bills?tab=ambush', icon: AlertTriangle, nested: true },
+          { name: 'Tickets & Fines', path: '/bills?tab=ambush', icon: AlertTriangle },
           { name: 'Debts & loans', path: '/bills?tab=debt', icon: CreditCard },
           { name: 'Due soon', path: '/bills', icon: Clock, hash: 'due-soon', count: dueSoonCount },
           { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },
@@ -591,7 +590,6 @@ export default function Layout() {
                       {group.items.map((item) => {
                         const Icon = item.icon;
                         const isActive = item.isActive;
-                        const nested = 'nested' in item && item.nested;
                         const navCount = (item as { count?: number }).count;
                         const isDueSoonItem = item.name === 'Due soon' && (navCount ?? 0) > 0;
                         return (
@@ -604,26 +602,11 @@ export default function Layout() {
                             <TransitionLink
                               to={item.linkTo}
                               className={cn(
-                                'focus-app group relative flex min-h-10 items-center gap-3 rounded-lg py-2.5 transition-colors duration-200',
-                                // Collapsed: centered icon. Nested: left gutter only (never a full rectangular border — that read as a “square”).
-                                sidebarCollapsed
-                                  ? 'justify-center border border-transparent px-1.5'
-                                  : nested
-                                    ? 'ml-1 rounded-md border-b-0 border-l-2 border-r-0 border-t-0 border-l-surface-border/40 pl-3.5 pr-3'
-                                    : 'border border-transparent px-4',
+                                'focus-app group relative flex min-h-10 items-center gap-3 rounded-lg border border-transparent px-4 py-2.5 transition-colors duration-200',
+                                sidebarCollapsed && 'justify-center border-transparent px-1.5',
                                 isActive
-                                  ? cn(
-                                      'bg-content-primary/[0.07] text-content-primary',
-                                      nested && !sidebarCollapsed
-                                        ? 'border-b-0 border-l-2 border-l-brand-cta/50 border-r-0 border-t-0'
-                                        : 'border border-surface-border/50',
-                                    )
-                                  : cn(
-                                      'text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary',
-                                      nested && !sidebarCollapsed
-                                        ? ''
-                                        : 'border border-transparent',
-                                    ),
+                                  ? 'border border-surface-border/50 bg-content-primary/[0.07] text-content-primary'
+                                  : 'text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary',
                               )}
                               title={sidebarCollapsed ? item.name : undefined}
                               aria-current={isActive ? 'page' : undefined}
@@ -638,7 +621,7 @@ export default function Layout() {
                                 setShowDueSoonPreview(false);
                               }}
                             >
-                              {isActive && !sidebarCollapsed && !nested && (
+                              {isActive && !sidebarCollapsed && (
                                 <span
                                   className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-r-sm bg-content-primary"
                                   aria-hidden
