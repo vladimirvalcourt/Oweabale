@@ -4,13 +4,15 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Terminal, AlertCircle, Loader2, Camera, Eye, EyeOff, AlertTriangle, UploadCloud } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { toast } from 'sonner';
-import { useStore, type IncomeSource } from '../store/useStore';
+import { useStore, type IncomeSource, type TabType } from '../store/useStore';
 import { guessCategory } from '../lib/categorizer';
 import { validateIngestionFile } from '../lib/security';
 import { extractCitationFieldsFromText, looksLikeCitationDocument } from '../lib/citationFromDocument';
 import { yieldForPaint } from '../lib/interaction';
 import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '../lib/quickEntryCategories';
 import { formatLocalISODate, parseQuickEntryDateHint } from '../lib/quickEntryNlp';
+import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
+import { clampQuickAddTabForTier } from '../lib/trackerTier';
 
 interface QuickAddModalProps {
   isOpen: boolean;
@@ -21,6 +23,8 @@ interface QuickAddModalProps {
 type ObligationKind = 'bill-weekly' | 'bill-biweekly' | 'bill-monthly' | 'debt-card' | 'debt-loan';
 
 export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
+  const { hasFullSuite } = useFullSuiteAccess();
+  const trackerOnly = !hasFullSuite;
   const {
     quickAddTab,
     addTransaction,
@@ -224,6 +228,11 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         } catch {}
       }
 
+      if (!hasFullSuite && !isCitationDoc) {
+        setActiveTab('obligation');
+        if (merchantName) setVendor(merchantName);
+      }
+
       if (!fullText.trim()) {
         toast.warning('Could not extract text — fill in the fields manually.');
       } else {
@@ -247,10 +256,24 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
 
   useEffect(() => {
     if (isOpen) {
-      setActiveTab(quickAddTab);
+      setActiveTab(clampQuickAddTabForTier(quickAddTab, hasFullSuite));
       resetFormPreserveTab();
     }
-  }, [isOpen, quickAddTab, resetFormPreserveTab]);
+  }, [isOpen, quickAddTab, resetFormPreserveTab, hasFullSuite]);
+
+  useEffect(() => {
+    if (!trackerOnly) return;
+    if (obligationKind.startsWith('debt-')) {
+      setObligationKind('bill-monthly');
+      setDebtNoPaymentDue(false);
+    }
+  }, [trackerOnly, obligationKind]);
+
+  useEffect(() => {
+    if (trackerOnly && (activeTab === 'transaction' || activeTab === 'income')) {
+      setActiveTab('obligation');
+    }
+  }, [trackerOnly, activeTab]);
 
   useEffect(() => {
     setShowPreview(false);
@@ -298,11 +321,16 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
 
     const lower = val.toLowerCase();
     if (/\b(refund|reimburse|reimbursement|deposit from|money back|cashback)\b/i.test(val)) {
-      setActiveTab('transaction');
-      setTransactionLedgerKind('income');
-      if (/reimburse/i.test(val)) setTxIncomeCategory('Reimbursements');
-      else if (/cashback/i.test(val)) setTxIncomeCategory('Other');
-      else setTxIncomeCategory('Other');
+      if (hasFullSuite) {
+        setActiveTab('transaction');
+        setTransactionLedgerKind('income');
+        if (/reimburse/i.test(val)) setTxIncomeCategory('Reimbursements');
+        else if (/cashback/i.test(val)) setTxIncomeCategory('Other');
+        else setTxIncomeCategory('Other');
+      } else {
+        toast.message('Tracker tier: use Bill or Ticket. Full Suite adds income & expense ledger.');
+        setActiveTab('obligation');
+      }
     }
 
     const parts = val.trim().split(/\s+/);
@@ -344,12 +372,15 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       if (lower.includes('bill') || /\bdue\b/.test(lower)) {
         setActiveTab('obligation');
         if (namePart) setVendor(namePart);
-      } else if (lower.includes('earned') || lower.includes('paid me') || /\bpaycheck\b/.test(lower)) {
+      } else if (hasFullSuite && (lower.includes('earned') || lower.includes('paid me') || /\bpaycheck\b/.test(lower))) {
         setActiveTab('income');
         if (namePart) setDescription(namePart);
-      } else if (!/\b(refund|reimburse|deposit from|money back|cashback)\b/i.test(val)) {
+      } else if (hasFullSuite && !/\b(refund|reimburse|deposit from|money back|cashback)\b/i.test(val)) {
         setActiveTab('transaction');
         if (namePart) setDescription(namePart);
+      } else if (!hasFullSuite && namePart && !/\b(refund|reimburse|deposit from|money back|cashback)\b/i.test(val)) {
+        setActiveTab('obligation');
+        setVendor(namePart);
       }
     }
   };
@@ -357,6 +388,17 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const submitEntry = async (addAnother: boolean) => {
     if (isSubmitting) return;
     if (!validateForm()) return;
+
+    if (trackerOnly) {
+      if (activeTab === 'transaction' || activeTab === 'income') {
+        toast.error('Tracker (free) includes bills and tickets here. Upgrade to Full Suite for ledger and income entries.');
+        return;
+      }
+      if (trackerOnly && activeTab === 'obligation' && obligationKind.startsWith('debt-')) {
+        toast.error('Adding loans and credit cards requires Full Suite.');
+        return;
+      }
+    }
 
     const numAmount = parseFloat(amount);
 
@@ -468,15 +510,15 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     void submitEntry(false);
   };
 
-  const tabOrder = ['transaction', 'obligation', 'income', 'citation'] as const;
+  const tabOrder = (trackerOnly ? (['obligation', 'citation'] as const) : (['transaction', 'obligation', 'income', 'citation'] as const));
   const focusTabAt = (idx: number) => {
     const tab = tabOrder[idx];
     if (!tab) return;
-    setActiveTab(tab);
+    setActiveTab(tab as TabType);
     setErrors({});
   };
   const onTabListKeyDown = (e: React.KeyboardEvent) => {
-    const i = tabOrder.indexOf(activeTab);
+    const i = tabOrder.findIndex((t) => t === activeTab);
     if (i < 0) return;
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
       e.preventDefault();
@@ -646,12 +688,13 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   </div>
 
                   {/* Tabs */}
-                  <div
-                    role="tablist"
-                    aria-label="Record type"
-                    onKeyDown={onTabListKeyDown}
-                    className="flex flex-wrap border-b border-surface-border bg-surface-raised p-1 gap-1"
-                  >
+                    <div
+                      role="tablist"
+                      aria-label="Record type"
+                      onKeyDown={onTabListKeyDown}
+                      className="flex flex-wrap border-b border-surface-border bg-surface-raised p-1 gap-1"
+                    >
+                    {hasFullSuite && (
                     <button
                       type="button"
                       role="tab"
@@ -669,6 +712,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     >
                       Expense
                     </button>
+                    )}
                     <button
                       type="button"
                       role="tab"
@@ -684,8 +728,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         activeTab === 'obligation' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-app`}
                     >
-                      Bill/Debt
+                      {hasFullSuite ? 'Bill/Debt' : 'Bill'}
                     </button>
+                    {hasFullSuite && (
                     <button
                       type="button"
                       role="tab"
@@ -703,6 +748,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     >
                       Income
                     </button>
+                    )}
                     <button
                       type="button"
                       role="tab"
@@ -927,8 +973,12 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               <option value="bill-weekly">Weekly bill</option>
                               <option value="bill-biweekly">Bi-weekly bill</option>
                               <option value="bill-monthly">Monthly bill</option>
-                              <option value="debt-card">Credit card</option>
-                              <option value="debt-loan">Loan</option>
+                              {hasFullSuite && (
+                                <>
+                                  <option value="debt-card">Credit card</option>
+                                  <option value="debt-loan">Loan</option>
+                                </>
+                              )}
                             </select>
                             <p className="text-[10px] font-mono text-content-tertiary mt-1.5 leading-snug">
                               {obligationKind.startsWith('bill-')

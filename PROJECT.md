@@ -6,6 +6,16 @@ Oweable is a personal finance command center built for users who want full visib
 
 **Core Philosophy: No AI Slop.** Every number is the result of a deterministic algorithm. No LLM inference, no chatbots, no vague "insights". Hard math, displayed brutally.
 
+### Tracker (free) vs Full Suite
+
+| | Tracker (free) | Full Suite |
+|---|---|---|
+| **Primary route** | `/bills` (and `/settings`, onboarding, public pages) | Full sidebar: dashboard, ledger, bank sync, taxes, analytics, etc. |
+| **Quick Add** | Recurring **bills** and **tickets/fines** only — no expense/income ledger tabs; no credit card / loan rows | All tabs: expense, income, bill/debt, ticket |
+| **Debts on Bills page** | View balances; **add debt**, **edit debt**, and “add due date” require Full Suite | Full debt tools including Debt Payoff Plan |
+| **Bank (Plaid)** | Not available (UI + Edge Functions) | Link and sync |
+| **Enforcement** | Client: `FullSuiteRouteGuard`, Quick Add, Obligations actions; server: paid checks on Plaid and other privileged APIs | Active entitlement or subscription |
+
 ---
 
 ## Deployment

@@ -360,10 +360,22 @@ export default function Obligations() {
         <div>
           <h1 className="mb-1 text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Bills & debts</h1>
           <p className="text-sm text-content-tertiary">Everything you owe, in one place.</p>
+          {!hasFullSuite && (
+            <p className="mt-2 text-xs text-content-secondary max-w-xl leading-relaxed">
+              <span className="font-medium text-content-primary">Tracker (free):</span> add recurring bills and tickets here. Full Suite unlocks
+              bank sync, expense ledger, income, debt tools, and the rest of the app.
+            </p>
+          )}
         </div>
         <button 
           type="button"
-          onClick={() => openQuickAdd(activeTab === 'ambush' ? 'citation' : 'obligation')}
+          onClick={() => {
+            if (activeTab === 'debt' && !hasFullSuite) {
+              toast.error('Loans and credit cards are a Full Suite feature. Upgrade to add debt.');
+              return;
+            }
+            openQuickAdd(activeTab === 'ambush' ? 'citation' : 'obligation');
+          }}
           className="px-4 py-2.5 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
@@ -806,6 +818,10 @@ export default function Obligations() {
                           <button
                             type="button"
                             onClick={() => {
+                              if (!hasFullSuite) {
+                                toast.error('Editing debt requires Full Suite.');
+                                return;
+                              }
                               const d = debts.find((x) => x.id === ob.id);
                               if (d) setEditDebtRow(d);
                             }}
@@ -850,6 +866,10 @@ export default function Obligations() {
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
+                              if (!hasFullSuite) {
+                                toast.error('Editing debt requires Full Suite.');
+                                return;
+                              }
                               const d = debts.find((x) => x.id === ob.id);
                               if (d) setEditDebtRow(d);
                             }}
