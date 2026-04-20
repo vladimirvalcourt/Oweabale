@@ -66,6 +66,21 @@ export interface Transaction {
   platformTag?: string;
   /** Optional memo (manual entries, Quick Entry). */
   notes?: string;
+  /** Plaid account_id when source is Plaid (for Savings view). */
+  plaidAccountId?: string;
+}
+
+/** Linked bank account metadata from Plaid `/accounts/get` (Savings page). */
+export interface PlaidLinkedAccount {
+  id: string;
+  plaidAccountId: string;
+  name: string;
+  officialName: string | null;
+  accountType: string;
+  accountSubtype: string | null;
+  mask: string | null;
+  subtypeSuggestedSavings: boolean;
+  includeInSavings: boolean;
 }
 
 export interface Asset {
@@ -350,9 +365,12 @@ interface AppState {
   plaidInstitutionName: string | null;
   plaidLastSyncAt: string | null;
   plaidNeedsRelink: boolean;
+  /** Plaid-linked accounts (metadata); populated after bank link + sync. */
+  plaidAccounts: PlaidLinkedAccount[];
   connectBank: () => Promise<void>;
   disconnectBank: () => Promise<void>;
   syncPlaidTransactions: (opts?: { quiet?: boolean }) => Promise<boolean>;
+  updatePlaidAccountIncludeInSavings: (accountRowId: string, include: boolean) => Promise<boolean>;
   addTransaction: (transaction: Omit<Transaction, 'id'>, opts?: { allowBudgetOverride?: boolean }) => Promise<boolean>;
   updateTransaction: (id: string, patch: Partial<Pick<Transaction, 'category' | 'platformTag' | 'name' | 'notes'>>) => Promise<boolean>;
   lastBudgetGuardrail: {
@@ -500,6 +518,7 @@ const initialData = {
   plaidInstitutionName: null,
   plaidLastSyncAt: null,
   plaidNeedsRelink: false,
+  plaidAccounts: [],
   lastBudgetGuardrail: null,
   pendingIngestions: [],
   notifications: [],
@@ -575,6 +594,30 @@ export const useStore = create<AppState>()(
         toast.success('Transactions synced.');
       }
     }
+    return true;
+  },
+  updatePlaidAccountIncludeInSavings: async (accountRowId, include) => {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) {
+      toast.error('Sign in to update savings accounts.');
+      return false;
+    }
+    const now = new Date().toISOString();
+    const { error } = await supabase
+      .from('plaid_accounts')
+      .update({ include_in_savings: include, updated_at: now })
+      .eq('id', accountRowId)
+      .eq('user_id', userId);
+    if (error) {
+      console.error('[updatePlaidAccountIncludeInSavings]', error);
+      toast.error('Could not update account.');
+      return false;
+    }
+    set((s) => ({
+      plaidAccounts: s.plaidAccounts.map((a) =>
+        a.id === accountRowId ? { ...a, includeInSavings: include } : a,
+      ),
+    }));
     return true;
   },
   clearLastBudgetGuardrail: () => set({ lastBudgetGuardrail: null }),
@@ -2497,6 +2540,7 @@ export const useStore = create<AppState>()(
         { data: assets, error: assetsError },
         { data: incomes, error: incomesError },
         { data: subscriptions, error: subscriptionsError },
+        { data: plaidAccountsRows, error: plaidAccountsError },
       ] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', resolvedUserId).maybeSingle(),
         supabase.from('bills').select('*').eq('user_id', resolvedUserId),
@@ -2505,6 +2549,7 @@ export const useStore = create<AppState>()(
         supabase.from('assets').select('*').eq('user_id', resolvedUserId),
         supabase.from('incomes').select('*').eq('user_id', resolvedUserId),
         supabase.from('subscriptions').select('*').eq('user_id', resolvedUserId),
+        supabase.from('plaid_accounts').select('*').eq('user_id', resolvedUserId).order('name', { ascending: true }),
       ]);
 
       // Log any errors
@@ -2518,6 +2563,7 @@ export const useStore = create<AppState>()(
       if (assetsError) console.error('[fetchData] Assets fetch error:', assetsError);
       if (incomesError) console.error('[fetchData] Incomes fetch error:', incomesError);
       if (subscriptionsError) console.error('[fetchData] Subscriptions fetch error:', subscriptionsError);
+      if (plaidAccountsError) console.error('[fetchData] Plaid accounts fetch error:', plaidAccountsError);
 
       if (profileError && profileError.code !== 'PGRST116') {
         console.error('[fetchData] Profile fetch error:', profileError);
@@ -2565,6 +2611,21 @@ export const useStore = create<AppState>()(
             const s = String(n).trim();
             return s || undefined;
           })(),
+          plaidAccountId: (() => {
+            const p = t.plaid_account_id ?? t.plaidAccountId;
+            return typeof p === 'string' && p.length > 0 ? p : undefined;
+          })(),
+        })),
+        plaidAccounts: (plaidAccountsRows || []).map((row: Record<string, unknown>) => ({
+          id: row.id as string,
+          plaidAccountId: row.plaid_account_id as string,
+          name: row.name as string,
+          officialName: (row.official_name ?? null) as string | null,
+          accountType: (row.account_type ?? 'other') as string,
+          accountSubtype: (row.account_subtype ?? null) as string | null,
+          mask: (row.mask ?? null) as string | null,
+          subtypeSuggestedSavings: row.subtype_suggested_savings === true,
+          includeInSavings: row.include_in_savings === true,
         })),
         assets: (assets || []).map((a: Record<string, unknown>) => ({
           id: a.id as string,

@@ -26,6 +26,7 @@ const Ingestion      = lazy(() => import('./pages/Ingestion'));
 const Transactions   = lazy(() => import('./pages/Transactions'));
 const Freelance      = lazy(() => import('./pages/Freelance'));
 const Goals          = lazy(() => import('./pages/Goals'));
+const Savings        = lazy(() => import('./pages/Savings'));
 const Income         = lazy(() => import('./pages/Income'));
 const Investments    = lazy(() => import('./pages/Investments'));
 const Insurance      = lazy(() => import('./pages/Insurance'));
@@ -221,6 +222,16 @@ function AppRoutes() {
               <ErrorBoundary>
                 <FullSuiteRouteGuard featureName="Goals">
                   <Goals />
+                </FullSuiteRouteGuard>
+              </ErrorBoundary>
+            }
+          />
+          <Route
+            path="savings"
+            element={
+              <ErrorBoundary>
+                <FullSuiteRouteGuard featureName="Savings">
+                  <Savings />
                 </FullSuiteRouteGuard>
               </ErrorBoundary>
             }

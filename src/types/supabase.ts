@@ -241,6 +241,53 @@ export interface Database {
           created_at?: string
         }
       }
+      plaid_accounts: {
+        Row: {
+          id: string
+          user_id: string
+          plaid_item_id: string
+          plaid_account_id: string
+          name: string
+          official_name: string | null
+          account_type: string
+          account_subtype: string | null
+          mask: string | null
+          subtype_suggested_savings: boolean
+          include_in_savings: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plaid_item_id: string
+          plaid_account_id: string
+          name: string
+          official_name?: string | null
+          account_type?: string
+          account_subtype?: string | null
+          mask?: string | null
+          subtype_suggested_savings?: boolean
+          include_in_savings?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plaid_item_id?: string
+          plaid_account_id?: string
+          name?: string
+          official_name?: string | null
+          account_type?: string
+          account_subtype?: string | null
+          mask?: string | null
+          subtype_suggested_savings?: boolean
+          include_in_savings?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
       assets: {
         Row: {
           id: string

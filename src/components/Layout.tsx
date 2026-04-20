@@ -22,6 +22,7 @@ import { formatCategoryLabel } from '../lib/categoryDisplay';
 import { BrandWordmark } from './BrandWordmark';
 import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 import { isApplePointerPlatform } from '../lib/platform';
+import { PiggyBank } from 'lucide-react';
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
 const NAV_ROUTE_HASHES: Record<string, string[]> = {
@@ -432,6 +433,7 @@ export default function Layout() {
         label: 'Planning & Growth',
         items: [
           { name: 'Net Worth', path: '/net-worth', icon: Layers },
+          { name: 'Savings', path: '/savings', icon: PiggyBank as unknown as typeof Home },
           { name: 'Investments', path: '/investments', icon: BarChart },
           { name: 'Insurance', path: '/insurance', icon: Shield },
           { name: 'Budgets', path: '/budgets', icon: PieChart },

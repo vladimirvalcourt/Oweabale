@@ -78,6 +78,9 @@ Unified obligations tracker. Three categories:
 ### Net Worth (`/net-worth`)
 Assets minus liabilities with animated counters and a 12-month projection chart. Pie chart breakdown by asset/liability type.
 
+### Savings (`/savings`)
+Observed savings from linked banks (Plaid). Each successful transaction sync also calls Plaid `/accounts/get`; accounts are stored in `plaid_accounts` with a savings-subtype heuristic. Users toggle which accounts appear on this page; activity sums Plaid transactions whose `plaid_account_id` matches included accounts.
+
 ### Transactions (`/transactions`)
 Full ledger with advanced filtering (type, category, date range, amount range) and CSV export.
 

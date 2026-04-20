@@ -42,7 +42,7 @@ The main app shell. Renders the collapsible sidebar, sticky top bar, animated pa
 |---|---|
 | Overview | Dashboard, Income, Freelance / gigs, Regular Bills, Review Inbox |
 | Activity | Subscriptions, Reports, Transactions |
-| Planning | Net Worth, Budgets, Calendar, Goals, Taxes |
+| Planning | Net Worth, Savings, Budgets, Calendar, Goals, Taxes |
 
 **Store dependencies:**  
 `bills`, `debts`, `transactions`, `subscriptions`, `goals`, `user`, `isQuickAddOpen`, `openQuickAdd`, `closeQuickAdd`, `pendingIngestions`

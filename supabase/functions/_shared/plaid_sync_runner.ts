@@ -36,6 +36,90 @@ function inferPlatformTag(name: string): string {
   return '';
 }
 
+interface PlaidAccountApi {
+  account_id: string;
+  name: string;
+  official_name?: string | null;
+  type: string;
+  subtype?: string | null;
+  mask?: string | null;
+}
+
+function isSavingsLikeSubtype(subtype: string | null | undefined): boolean {
+  if (!subtype) return false;
+  const s = subtype.toLowerCase().trim();
+  return (
+    s === 'savings' ||
+    s === 'money market' ||
+    s === 'cd' ||
+    s === 'cash management'
+  );
+}
+
+/** Persist / refresh account metadata for Savings view; preserves include_in_savings on existing rows. */
+async function syncPlaidAccountsForItem(
+  supabase: SupabaseClient,
+  userId: string,
+  itemRowId: string,
+  accessToken: string,
+): Promise<void> {
+  const res = await plaidPost<{ accounts?: PlaidAccountApi[] }>('/accounts/get', {
+    access_token: accessToken,
+  });
+  const accounts = res.accounts ?? [];
+  const now = new Date().toISOString();
+  for (const a of accounts) {
+    const aid = a.account_id;
+    if (!aid) continue;
+    const suggested = isSavingsLikeSubtype(a.subtype ?? null);
+    const name = (a.name || 'Account').slice(0, 200);
+    const official = a.official_name ? String(a.official_name).slice(0, 200) : null;
+    const accType = (a.type || 'other').slice(0, 50);
+    const sub = a.subtype ? String(a.subtype).slice(0, 80) : null;
+    const mask = a.mask ? String(a.mask).slice(0, 8) : null;
+
+    const { data: existing, error: selErr } = await supabase
+      .from('plaid_accounts')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('plaid_account_id', aid)
+      .maybeSingle();
+    if (selErr) throw selErr;
+
+    if (existing) {
+      const { error: upErr } = await supabase
+        .from('plaid_accounts')
+        .update({
+          plaid_item_id: itemRowId,
+          name,
+          official_name: official,
+          account_type: accType,
+          account_subtype: sub,
+          mask,
+          subtype_suggested_savings: suggested,
+          updated_at: now,
+        })
+        .eq('id', existing.id);
+      if (upErr) throw upErr;
+    } else {
+      const { error: insErr } = await supabase.from('plaid_accounts').insert({
+        user_id: userId,
+        plaid_item_id: itemRowId,
+        plaid_account_id: aid,
+        name,
+        official_name: official,
+        account_type: accType,
+        account_subtype: sub,
+        mask,
+        subtype_suggested_savings: suggested,
+        include_in_savings: suggested,
+        updated_at: now,
+      });
+      if (insErr) throw insErr;
+    }
+  }
+}
+
 function mapPlaidRow(tx: PlaidTx, userId: string, rules: RuleRow[]) {
   const nameRaw = (tx.merchant_name || tx.name || 'Transaction').trim();
   const name = nameRaw.slice(0, 500);
@@ -155,6 +239,13 @@ export async function runSyncForPlaidItem(
     }
 
     const now = new Date().toISOString();
+
+    try {
+      await syncPlaidAccountsForItem(supabase, item.user_id, item.id, item.access_token);
+    } catch (accErr) {
+      console.warn('[plaid sync] accounts/get failed (transactions still synced):', accErr);
+    }
+
     await supabase
       .from('plaid_items')
       .update({
