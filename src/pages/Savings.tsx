@@ -11,8 +11,8 @@ import { getCustomIcon } from '../lib/customIcons';
 const DAYS_WINDOW = 90;
 
 export default function Savings() {
-  const BillingIcon = getCustomIcon('billing');
-  const ChartIcon = getCustomIcon('chart');
+  const BillingIcon = getCustomIcon('planning');
+  const ChartIcon = getCustomIcon('payments');
   const {
     transactions,
     plaidAccounts,

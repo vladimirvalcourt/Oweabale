@@ -119,8 +119,8 @@ export default function Obligations() {
   const TicketIcon = getCustomIcon('ticket');
   const PaymentsIcon = getCustomIcon('payments');
   const PlanningIcon = getCustomIcon('planning');
-  const CalendarIcon = getCustomIcon('calendar');
-  const ChartIcon = getCustomIcon('chart');
+  const CalendarIcon = getCustomIcon('planning');
+  const ChartIcon = getCustomIcon('payments');
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { bills, debts, citations, subscriptions, transactions, assets, resolveCitation, openQuickAdd, editBill, editDebt, markBillPaid } = useStore(
