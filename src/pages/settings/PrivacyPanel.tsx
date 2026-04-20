@@ -1,15 +1,9 @@
-import React, { memo, useState } from 'react';
-import { EyeOff, Download, AlertTriangle } from 'lucide-react';
+import React, { memo } from 'react';
+import { Download, AlertTriangle } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { useStore } from '../../store/useStore';
-
-function deferToast(fn: () => void) {
-  requestAnimationFrame(() => {
-    queueMicrotask(fn);
-  });
-}
 
 function escapeCsvCell(v: unknown): string {
   const s = String(v ?? '');
@@ -43,7 +37,6 @@ type PrivacyPanelProps = {
 };
 
 function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPanelProps) {
-  const [privacyMode, setPrivacyMode] = useState(false);
   const exportPayload = useStore(
     useShallow((s) => ({
       profile: s.user,
@@ -191,38 +184,6 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
 
   return (
     <div className="space-y-6">
-      <CollapsibleModule
-        title="Privacy Mode"
-        icon={EyeOff}
-        defaultOpen
-        summaryWhenCollapsed="Privacy Mode — Blur sensitive financial numbers throughout the app"
-      >
-        <p className="text-sm text-content-tertiary mb-6">Control visibility of sensitive information.</p>
-        <div className="flex items-center justify-between border border-surface-border rounded-lg p-4 bg-surface-elevated/50">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-surface-raised border border-surface-border rounded-lg flex items-center justify-center">
-              <EyeOff className="w-5 h-5 text-content-tertiary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-content-primary">Hide Balances</p>
-              <p className="text-xs text-content-tertiary">Blur all monetary values until hovered</p>
-            </div>
-          </div>
-          <div className="flex items-center h-5">
-            <input
-              type="checkbox"
-              checked={privacyMode}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                setPrivacyMode(checked);
-                deferToast(() => toast.success(checked ? 'Privacy mode enabled' : 'Privacy mode disabled'));
-              }}
-              className="h-4 w-4 text-content-secondary focus-app bg-surface-base border-surface-border rounded transition-colors cursor-pointer"
-            />
-          </div>
-        </div>
-      </CollapsibleModule>
-
       <CollapsibleModule title="Data Management" icon={Download} defaultOpen>
         <p className="text-sm text-content-tertiary mb-6">Manage your inputs and export your financial history.</p>
         <div className="space-y-6">

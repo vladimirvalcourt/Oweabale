@@ -11,7 +11,6 @@ import {
   normalizeFinancialAlertPrefs,
 } from '../lib/financialAlertPrefs';
 import { suggestPlatformFromMerchant } from '../lib/platformTag';
-import { DEFAULT_UI_PREFERENCES, normalizeUiPreferences, type UiPreferences } from '../lib/uiPreferences';
 import {
   mergeNotificationPrefsFromSources,
   isNotificationPrefsEmpty,
@@ -327,7 +326,6 @@ interface AppState {
     phone?: string;
     timezone?: string;
     language?: string;
-    uiPreferences: UiPreferences;
     notificationPrefs: NotificationPrefsRecord;
     hasCompletedOnboarding: boolean;
     isAdmin: boolean;
@@ -494,7 +492,6 @@ const initialData = {
     phone: '',
     timezone: 'America/New_York',
     language: 'English (US)',
-    uiPreferences: DEFAULT_UI_PREFERENCES,
     notificationPrefs: mergeNotificationPrefsFromSources({}, loadNotifPrefs()),
     hasCompletedOnboarding: false,
     isAdmin: false,
@@ -1462,14 +1459,13 @@ export const useStore = create<AppState>()(
 
   // ── User / Profile ────────────────────────────────────────────
   updateUser: async (user) => {
-    const prevUiPrefs = user.uiPreferences !== undefined ? get().user.uiPreferences : undefined;
     const prevNotifPrefs = user.notificationPrefs !== undefined ? get().user.notificationPrefs : undefined;
-    if (user.uiPreferences !== undefined || user.notificationPrefs !== undefined) {
+    if (user.notificationPrefs !== undefined) {
+      const nextNotif = user.notificationPrefs;
       set((state) => ({
         user: {
           ...state.user,
-          ...(user.uiPreferences !== undefined ? { uiPreferences: user.uiPreferences } : {}),
-          ...(user.notificationPrefs !== undefined ? { notificationPrefs: user.notificationPrefs } : {}),
+          notificationPrefs: nextNotif,
         },
       }));
     }
@@ -1484,7 +1480,6 @@ export const useStore = create<AppState>()(
     if (user.phone !== undefined)    patch.phone = user.phone;
     if (user.timezone !== undefined) patch.timezone = user.timezone;
     if (user.language !== undefined) patch.language = user.language;
-    if (user.uiPreferences !== undefined) patch.ui_preferences = user.uiPreferences;
     if (user.notificationPrefs !== undefined) patch.notification_prefs = user.notificationPrefs;
     if (user.taxState !== undefined) patch.tax_state = user.taxState;
     if (user.taxRate !== undefined)  patch.tax_rate = user.taxRate;
@@ -1505,12 +1500,11 @@ export const useStore = create<AppState>()(
     if (Object.keys(patch).length > 0) {
       if (!userId) {
         console.error('[updateUser] no authenticated user — cannot persist profile');
-        if (prevUiPrefs !== undefined || prevNotifPrefs !== undefined) {
+        if (prevNotifPrefs !== undefined) {
           set((state) => ({
             user: {
               ...state.user,
-              ...(prevUiPrefs !== undefined ? { uiPreferences: prevUiPrefs } : {}),
-              ...(prevNotifPrefs !== undefined ? { notificationPrefs: prevNotifPrefs } : {}),
+              notificationPrefs: prevNotifPrefs,
             },
           }));
         }
@@ -1524,12 +1518,11 @@ export const useStore = create<AppState>()(
         .upsert({ id: userId, ...patch }, { onConflict: 'id' });
       if (error) {
         console.error('[updateUser] profile upsert failed:', error.message, error.code);
-        if (prevUiPrefs !== undefined || prevNotifPrefs !== undefined) {
+        if (prevNotifPrefs !== undefined) {
           set((state) => ({
             user: {
               ...state.user,
-              ...(prevUiPrefs !== undefined ? { uiPreferences: prevUiPrefs } : {}),
-              ...(prevNotifPrefs !== undefined ? { notificationPrefs: prevNotifPrefs } : {}),
+              notificationPrefs: prevNotifPrefs,
             },
           }));
         }
@@ -1763,7 +1756,6 @@ export const useStore = create<AppState>()(
         plaid_linked_at: null,
         plaid_last_sync_at: null,
         plaid_needs_relink: false,
-        ui_preferences: DEFAULT_UI_PREFERENCES,
         notification_prefs: DEFAULT_NOTIF_PREFS,
       });
 
@@ -1781,7 +1773,6 @@ export const useStore = create<AppState>()(
           hasCompletedOnboarding: false,
           taxState: '',
           taxRate: 0,
-          uiPreferences: DEFAULT_UI_PREFERENCES,
           notificationPrefs: normalizeNotificationPrefsRecord(DEFAULT_NOTIF_PREFS),
         },
         bankConnected: false,
@@ -2628,9 +2619,6 @@ export const useStore = create<AppState>()(
           phone: profile.phone ?? '',
           timezone: profile.timezone ?? 'America/New_York',
           language: profile.language || 'English (US)',
-          uiPreferences: normalizeUiPreferences(
-            (profile as { ui_preferences?: unknown }).ui_preferences,
-          ),
           notificationPrefs: (() => {
             const serverRaw = (profile as { notification_prefs?: unknown }).notification_prefs;
             const merged = mergeNotificationPrefsFromSources(serverRaw, loadNotifPrefs());

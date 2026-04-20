@@ -25,13 +25,6 @@ const DIAL_OPTIONS = [
   { value: '55', label: '+55 (BR)' },
 ] as const;
 
-const LANGUAGE_OPTIONS: { value: string; label: string }[] = [
-  { value: 'English (US)', label: 'English (US)' },
-  { value: 'Spanish', label: 'Spanish (Beta)' },
-  { value: 'French', label: 'French (Beta)' },
-  { value: 'German', label: 'German (Beta)' },
-];
-
 const IANA_ZONES = getIanaTimezoneOptions();
 
 type SaveVisualState = 'idle' | 'saving' | 'saved';
@@ -63,7 +56,6 @@ function ProfilePanelInner() {
     lastName: user.lastName,
     email: user.email,
     timezone: normalizeTimezoneToIana(user.timezone),
-    language: user.language || 'English (US)',
   });
 
   const refreshAuthPhone = useCallback(async () => {
@@ -93,10 +85,9 @@ function ProfilePanelInner() {
       lastName: user.lastName || '',
       email: user.email || '',
       timezone: normalizeTimezoneToIana(user.timezone),
-      language: user.language || 'English (US)',
     });
     setNationalDigits(nationalDigitsFromStored(user.phone));
-  }, [user.id, user.firstName, user.lastName, user.email, user.phone, user.timezone, user.language]);
+  }, [user.id, user.firstName, user.lastName, user.email, user.phone, user.timezone]);
 
   const displayUserId = `OWE_${user.id?.slice(0, 8) ?? '________'}`;
 
@@ -126,7 +117,6 @@ function ProfilePanelInner() {
         email: formData.email,
         phone: phonePayload,
         timezone: formData.timezone,
-        language: formData.language,
       });
       if (ok) {
         setSaveVisual('saved');
@@ -407,7 +397,7 @@ function ProfilePanelInner() {
                 </div>
               </div>
 
-              <div className="sm:col-span-3">
+              <div className="sm:col-span-6">
                 <label htmlFor="timezone" className="mb-2 block text-xs font-medium text-content-secondary">
                   Timezone
                 </label>
@@ -423,27 +413,6 @@ function ProfilePanelInner() {
                     </option>
                   ))}
                 </select>
-              </div>
-
-              <div className="sm:col-span-3">
-                <label htmlFor="language" className="mb-2 block text-xs font-medium text-content-secondary">
-                  Language
-                </label>
-                <select
-                  id="language"
-                  value={formData.language}
-                  disabled
-                  className="focus-app-field block w-full cursor-not-allowed appearance-none rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-tertiary transition-colors"
-                >
-                  {LANGUAGE_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="mt-1.5 text-xs text-content-muted">
-                  The app is English-only today. We keep your selection on your profile for a future translated release.
-                </p>
               </div>
             </div>
 

@@ -23,7 +23,7 @@ const tabs = [
   { id: 'profile' as const, name: 'Profile' },
   { id: 'security' as const, name: 'Security' },
   { id: 'notifications' as const, name: 'Notifications' },
-  { id: 'financial' as const, name: 'Preferences' },
+  { id: 'financial' as const, name: 'Tax' },
   { id: 'rules' as const, name: 'Smart Categories' },
   { id: 'billing' as const, name: 'Billing' },
   { id: 'integrations' as const, name: 'Integrations' },
@@ -160,7 +160,7 @@ export default function Settings() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Settings</h1>
-          <p className="mt-1 text-sm font-medium text-content-secondary">Account, billing, security, and preferences.</p>
+          <p className="mt-1 text-sm font-medium text-content-secondary">Account, billing, security, and tax.</p>
         </div>
       </div>
 
