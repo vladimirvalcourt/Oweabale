@@ -8,6 +8,7 @@ Allow: /pricing
 Allow: /security
 Allow: /privacy
 Allow: /terms
+Allow: /support
 Allow: /llms.txt
 Allow: /llms-full.txt
 Allow: /ai.txt
@@ -28,7 +29,6 @@ Disallow: /education
 Disallow: /categories
 Disallow: /subscriptions
 Disallow: /reports
-Disallow: /support
 Disallow: /settings
 Disallow: /admin
 Disallow: /onboarding
@@ -41,6 +41,7 @@ Allow: /pricing
 Allow: /security
 Allow: /privacy
 Allow: /terms
+Allow: /support
 Allow: /llms.txt
 Allow: /llms-full.txt
 Allow: /ai.txt
@@ -52,6 +53,7 @@ Allow: /pricing
 Allow: /security
 Allow: /privacy
 Allow: /terms
+Allow: /support
 Allow: /llms.txt
 Allow: /llms-full.txt
 Allow: /ai.txt
@@ -136,6 +138,7 @@ Allow: /pricing
 Allow: /security
 Allow: /privacy
 Allow: /terms
+Allow: /support
 Allow: /llms.txt
 Allow: /llms-full.txt
 Allow: /ai.txt
@@ -147,6 +150,7 @@ Allow: /pricing
 Allow: /security
 Allow: /privacy
 Allow: /terms
+Allow: /support
 Allow: /llms-full.txt
 Allow: /ai.txt
 Allow: /llms.txt
@@ -179,8 +183,22 @@ Allow: /pricing
 Allow: /security
 Allow: /privacy
 Allow: /terms
+Allow: /support
 Allow: /llms-full.txt
 Allow: /ai.txt
+
+# ── Apple Intelligence (extended) ───────────────────────────────
+User-agent: Applebot-Extended
+Allow: /
+Allow: /pricing
+Allow: /security
+Allow: /privacy
+Allow: /terms
+Allow: /support
+Allow: /llms.txt
+Allow: /llms-full.txt
+Allow: /ai.txt
+Allow: /.well-known/
 
 # ── DuckDuckGo ─────────────────────────────────────────────────
 User-agent: DuckDuckBot

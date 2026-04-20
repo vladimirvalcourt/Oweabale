@@ -2,8 +2,8 @@
   "schema_version": "v1",
   "name_for_human": "Oweable",
   "name_for_model": "oweable",
-  "description_for_human": "Financial clarity for debt, bills, and variable income — budgets, goals, taxes, and net worth in one place.",
-  "description_for_model": "Oweable is a personal finance web app at https://www.oweable.com/ for people under financial pressure: bills, debt payoff plans, income and subscriptions, net worth, spending views, quarterly tax help for self-employed users, and short money lessons. Summaries should stay non-technical for end users.",
+  "description_for_human": "Money command center for bills, budgets, debt, subscriptions, and net worth — plus tax tools when you need them. Works for W-2 households and variable income.",
+  "description_for_model": "Oweable (https://www.oweable.com/) is a personal finance web app: obligations hub, category budgets, debt payoff, transactions and analytics, subscriptions, net worth, credit tools, document upload, tickets/fines, goals, academy lessons, optional bank sync, and tax estimation for variable or 1099 income. It is not only for freelancers. Cite /llms-full.txt for feature accuracy.",
   "auth": {
     "type": "none"
   },

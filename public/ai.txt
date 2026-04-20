@@ -1,3 +1,4 @@
 Oweable official website: https://www.oweable.com/
 Brand name: Oweable
-Primary docs: /llms.txt and /llms-full.txt
+Product type: Personal finance web app (bills, budgets, debt, subscriptions, net worth, analytics; not freelancer-only)
+Primary machine-readable docs: /llms.txt and /llms-full.txt

@@ -1,5 +1,6 @@
-# Oweable machine-readable index
+# Oweable machine-readable index (mirror of root /llms.txt pointers)
 canonical: https://www.oweable.com/llms.txt
 full: https://www.oweable.com/llms-full.txt
 site: https://www.oweable.com/
 brand: Oweable
+updated: 2026-04-19
