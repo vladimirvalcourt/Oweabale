@@ -46,6 +46,7 @@
     "@fontsource/geist-sans": "^5.2.5",
     "@geist-ui/icons": "^1.0.2",
     "@headlessui/react": "^2.2.9",
+    "@lobehub/ui": "^5.9.1",
     "@sentry/react": "^10.49.0",
     "@supabase/supabase-js": "^2.103.3",
     "@tailwindcss/typography": "^0.5.19",

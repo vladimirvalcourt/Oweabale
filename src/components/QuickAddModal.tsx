@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Terminal, AlertCircle, Loader2, Camera, Eye, EyeOff, AlertTriangle, UploadCloud } from 'lucide-react';
+import { X, AlertCircle, Loader2, Camera, Eye, EyeOff, AlertTriangle } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { toast } from 'sonner';
 import { useStore, type IncomeSource, type TabType } from '../store/useStore';
@@ -13,6 +13,7 @@ import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '../lib/quic
 import { formatLocalISODate, parseQuickEntryDateHint } from '../lib/quickEntryNlp';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 import { clampQuickAddTabForTier } from '../lib/trackerTier';
+import { getCustomIcon } from '../lib/customIcons';
 
 interface QuickAddModalProps {
   isOpen: boolean;
@@ -23,6 +24,8 @@ interface QuickAddModalProps {
 type ObligationKind = 'bill-weekly' | 'bill-biweekly' | 'bill-monthly' | 'debt-card' | 'debt-loan';
 
 export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
+  const NlpIcon = getCustomIcon('nlp');
+  const UploadIcon = getCustomIcon('upload');
   const { hasFullSuite } = useFullSuiteAccess();
   const trackerOnly = !hasFullSuite;
   const {
@@ -640,7 +643,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               </>
                             ) : (
                               <>
-                                <UploadCloud className="w-3.5 h-3.5 shrink-0" aria-hidden />
+                                <UploadIcon className="w-3.5 h-3.5 shrink-0" aria-hidden />
                                 <span>{scannedPreviewUrl ? 'Rescan file' : 'Upload file'}</span>
                               </>
                             )}
@@ -674,12 +677,12 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   {/* Smart Input Bar */}
                   <div className="bg-surface-base p-6 border-b border-surface-border">
                     <div className="flex items-center gap-2 mb-3">
-                      <Terminal className="w-4 h-4 text-content-secondary" />
+                      <NlpIcon className="w-4 h-4 text-content-secondary" />
                       <span className="text-xs font-sans font-medium text-content-secondary">Natural Language Speed Input</span>
                     </div>
                     
                     <textarea
-                      placeholder="e.g. Coffee 5.50 tomorrow · Amazon refund 42.10 · Comcast bill 120 next tuesday · 15th 89 gas"
+                      placeholder={hasFullSuite ? "e.g. Coffee 5.50 tomorrow · Amazon refund 42.10 · Comcast bill 120 next Tuesday · 15th 89 gas" : "e.g. Rent 1200 on the 1st · Internet bill 80 next Tuesday · Parking ticket 65 due Friday"}
                       value={nlpText}
                       onChange={handleNLPInput}
                       className="w-full bg-surface-raised border border-surface-border rounded-lg focus-app-field text-sm font-sans text-content-primary placeholder:text-content-muted p-3 resize-none transition-colors"

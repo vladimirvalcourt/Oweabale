@@ -5,8 +5,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import {
-  Receipt, CreditCard, AlertTriangle, ShieldAlert,
-  FileText, CheckCircle2, Flame,
+  AlertTriangle, CheckCircle2, Flame,
   Calculator, ChevronDown, ChevronUp, Plus, Minus, Pencil, CalendarDays, AlertCircle
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
@@ -29,6 +28,7 @@ import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 import { FullSuiteGateCard } from '../components/FullSuiteGate';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
 import { cn } from '../lib/utils';
+import { getCustomIcon } from '../lib/customIcons';
 
 type ObligationType = 'recurring' | 'debt' | 'ambush';
 type Strategy = 'avalanche' | 'snowball';
@@ -113,6 +113,11 @@ function monthsToDate(months: number): string {
 }
 
 export default function Obligations() {
+  const RecurringIcon = getCustomIcon('recurring');
+  const DebtIcon = getCustomIcon('debt');
+  const TicketIcon = getCustomIcon('ticket');
+  const PaymentsIcon = getCustomIcon('payments');
+  const PlanningIcon = getCustomIcon('planning');
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { bills, debts, citations, subscriptions, transactions, assets, resolveCitation, openQuickAdd, editBill, editDebt, markBillPaid } = useStore(
@@ -178,7 +183,7 @@ export default function Obligations() {
       dueDate: b.dueDate,
       dueLabel: b.dueDate,
       amount: b.amount,
-      icon: Receipt,
+      icon: RecurringIcon,
     }));
     return [
       ...recurringObligations,
@@ -193,7 +198,7 @@ export default function Obligations() {
           dueDate: sortDue,
           dueLabel: pdd ?? 'No due date',
           amount: d.remaining,
-          icon: CreditCard,
+          icon: DebtIcon,
         };
       }),
       ...citations.filter(c => c.status === 'open').map(c => ({
@@ -204,10 +209,10 @@ export default function Obligations() {
         dueDate: new Date(scheduleBaseMs + c.daysLeft * 86400000).toISOString().split('T')[0],
         dueLabel: new Date(scheduleBaseMs + c.daysLeft * 86400000).toISOString().split('T')[0],
         amount: c.amount,
-        icon: ShieldAlert,
+        icon: TicketIcon,
       })),
     ];
-  }, [bills, debts, citations, scheduleBaseMs]);
+  }, [bills, debts, citations, scheduleBaseMs, RecurringIcon, DebtIcon, TicketIcon]);
 
   const horizonBuckets = useMemo(
     () =>
@@ -376,24 +381,30 @@ export default function Obligations() {
             }
             openQuickAdd(activeTab === 'ambush' ? 'citation' : 'obligation');
           }}
-          className="px-4 py-2.5 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile"
+          aria-disabled={activeTab === 'debt' && !hasFullSuite}
+          title={activeTab === 'debt' && !hasFullSuite ? 'Full Suite required to add debt' : undefined}
+          className={`px-4 py-2.5 rounded-lg text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile ${
+            activeTab === 'debt' && !hasFullSuite
+              ? 'bg-surface-elevated border border-surface-border text-content-tertiary'
+              : 'bg-brand-cta hover:bg-brand-cta-hover text-surface-base'
+          }`}
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
-          {activeTab === 'ambush' ? 'Add ticket or fine' : activeTab === 'debt' ? 'Add debt' : 'Add bill'}
+          {activeTab === 'ambush' ? 'Add ticket or fine' : activeTab === 'debt' ? (hasFullSuite ? 'Add debt' : 'Add debt (Full Suite)') : 'Add bill'}
         </button>
       </div>
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-surface-elevated border border-surface-border p-5 rounded-lg">
           <div className="flex items-center gap-2 text-content-tertiary mb-3">
-            <Receipt className="w-3.5 h-3.5" />
+            <RecurringIcon className="w-3.5 h-3.5" />
             <span className="metric-label normal-case text-[11px]">Monthly payments</span>
           </div>
           <p className="text-2xl font-mono text-red-400 font-bold">${totalMonthlyBurn.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
         <div className="bg-surface-elevated border border-surface-border p-5 rounded-lg">
           <div className="flex items-center gap-2 text-content-tertiary mb-3">
-            <CreditCard className="w-3.5 h-3.5" />
+            <DebtIcon className="w-3.5 h-3.5" />
             <span className="metric-label normal-case text-[11px]">Total debt</span>
           </div>
           <p className="text-2xl font-mono text-amber-400 font-bold">${activePrincipal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
@@ -417,12 +428,20 @@ export default function Obligations() {
             Low-balance warning: ${liquidCash.toFixed(0)} cash vs ${weekAheadDueTotal.toFixed(0)} due in the next 7 days.
           </p>
           <div className="mt-2 flex flex-wrap gap-3 text-xs">
-            <TransitionLink to="/dashboard#cash-flow" className="text-content-primary hover:text-content-secondary underline underline-offset-2">
-              Open safe-to-spend
-            </TransitionLink>
-            <TransitionLink to="/calendar#calendar-view" className="text-content-primary hover:text-content-secondary underline underline-offset-2">
-              Open due-date calendar
-            </TransitionLink>
+            {hasFullSuite ? (
+              <>
+                <TransitionLink to="/dashboard#cash-flow" className="text-content-primary hover:text-content-secondary underline underline-offset-2">
+                  Open safe-to-spend
+                </TransitionLink>
+                <TransitionLink to="/calendar#calendar-view" className="text-content-primary hover:text-content-secondary underline underline-offset-2">
+                  Open due-date calendar
+                </TransitionLink>
+              </>
+            ) : (
+              <span className="text-content-secondary">
+                Tracker tip: pay urgent items first and keep 7-day due totals below your available cash.
+              </span>
+            )}
           </div>
         </div>
       )}
@@ -439,7 +458,7 @@ export default function Obligations() {
       )}
 
       {billNegotiationSuggestions.length > 0 && (
-        <CollapsibleModule title="Bill Negotiation Suggestions" icon={Receipt} defaultOpen={false}>
+        <CollapsibleModule title="Bill Negotiation Suggestions" icon={PlanningIcon} defaultOpen={false}>
           <div className="space-y-3">
             {billNegotiationSuggestions.map((suggestion) => (
               <div key={suggestion.id} className="rounded-lg border border-surface-border bg-surface-base p-4">
@@ -681,7 +700,7 @@ export default function Obligations() {
         />
       )}
 
-      <CollapsibleModule title="Debt Learning Lab" icon={Calculator} defaultOpen={false}>
+      <CollapsibleModule title="Debt Learning Lab" icon={PlanningIcon} defaultOpen={false}>
         <div className="space-y-3 text-sm text-content-secondary">
           <p>
             <span className="font-medium text-content-primary">APR:</span> Annual Percentage Rate is the cost of borrowing. Higher APR
@@ -720,7 +739,7 @@ export default function Obligations() {
       </div>
 
       <div id="due-soon" className="scroll-mt-24">
-      <CollapsibleModule title="Scheduled Payments" icon={FileText}>
+      <CollapsibleModule title="Scheduled Payments" icon={PaymentsIcon}>
         <div className="overflow-x-auto -mx-6 -my-6">
           <table className="w-full text-left border-collapse">
             <thead>
@@ -934,7 +953,7 @@ export default function Obligations() {
       </CollapsibleModule>
       </div>
 
-      <CollapsibleModule title="Payment History Log" icon={FileText} defaultOpen={false}>
+      <CollapsibleModule title="Payment History Log" icon={PaymentsIcon} defaultOpen={false}>
         {paymentHistoryRows.length === 0 ? (
           <p className="text-sm text-content-tertiary">No recent payment-like transactions yet.</p>
         ) : (
