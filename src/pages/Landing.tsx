@@ -1,7 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { TransitionLink } from '../components/TransitionLink';
 import Footer from '../components/Footer';
-import { ArrowRight, UploadCloud, Target, BarChart2, TrendingUp, BookOpen, CalendarClock, Quote } from 'lucide-react';
+import {
+  ArrowRight,
+  UploadCloud,
+  Target,
+  BarChart2,
+  TrendingUp,
+  BookOpen,
+  CalendarClock,
+  Quote,
+  Wallet,
+  Repeat,
+  AlertTriangle,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 import { useSEO } from '../hooks/useSEO';
@@ -47,11 +59,11 @@ const FAQ_ITEMS_BASE = [
   },
   {
     q: 'Is Oweable free?',
-    a: 'Yes — Oweable includes a free Tracker tier for core account and bill tracking. Full Suite unlocks advanced tools like the debt payoff planner, subscription alerts, and freelancer tax workflows for $10.99/month.',
+    a: 'Yes — Oweable includes a free Tracker tier for core account and bill tracking. Full Suite unlocks advanced tools like the debt payoff planner, category budgets with guardrails, subscription intelligence, deeper analytics, and tax estimation and reserve planning (especially helpful if you have variable or 1099 income) for $10.99/month.',
   },
   {
     q: 'How is Oweable different from YNAB or Mint?',
-    a: 'YNAB and Mint are built for people with stable, predictable salaries. Oweable is built for real financial situations — multiple debt types, tight budgets, variable income, and financial recovery. It includes debt amortization, credit tracking, bill overdue detection, net worth projection, subscription price-hike alerts, and tax tools for gig workers — features those apps never offered.',
+    a: 'YNAB and Mint focus heavily on envelope-style budgeting for steady paychecks. Oweable is a broader money command center: budgets and spending intelligence, bills and debts in one obligations hub, net worth, subscriptions, credit tools, optional bank sync, and document upload — built for salaried households and for messy real life (variable income, multiple debts, tight cash flow, and recovery). Tax estimation and reserve tools help when your income is not a flat W-2 every two weeks.',
   },
   {
     q: 'Is my financial data secure?',
@@ -85,7 +97,7 @@ const TESTIMONIALS = [
     region: 'Texas',
     tag: 'Bills & reminders',
     initials: 'DR',
-    workType: 'Freelance Designer, Fiverr',
+    workType: 'Marketing coordinator (W-2) + weekend design gigs',
     platform: 'Fiverr',
   },
   {
@@ -96,7 +108,7 @@ const TESTIMONIALS = [
     region: 'Pennsylvania',
     tag: 'Debt tools',
     initials: 'JK',
-    workType: 'Self-employed Handyman, Taskrabbit',
+    workType: 'Electrician (union) + side jobs',
     platform: 'Taskrabbit',
   },
   {
@@ -118,7 +130,7 @@ const TESTIMONIALS = [
     region: 'Washington',
     tag: 'Document scanning',
     initials: 'PM',
-    workType: 'Independent Brand Designer',
+    workType: 'HR generalist, small business',
     platform: 'Dribbble',
   },
   {
@@ -129,7 +141,7 @@ const TESTIMONIALS = [
     region: 'Florida',
     tag: 'One dashboard',
     initials: 'AC',
-    workType: 'Freelance Video Editor',
+    workType: 'IT analyst, hybrid schedule',
     platform: 'Upwork',
   },
   {
@@ -147,10 +159,12 @@ const TESTIMONIALS = [
 
 export default function Landing() {
   useSEO({
-    title: 'Oweable — The Financial OS for Gig Workers, Freelancers & the Self-Employed',
-    description: 'Oweable is the financial operating system for gig workers, freelancers, and the self-employed. Track variable income, estimate quarterly taxes, pay down debt, and stay ahead of every bill in one command center.',
-    ogTitle: 'Oweable — The Financial OS for Gig Workers, Freelancers & the Self-Employed',
-    ogDescription: 'Track variable income, estimate quarterly taxes, pay down debt, and stay ahead of every bill in one precision command center built for 1099 life.',
+    title: 'Oweable — Bills, budgets, debt & net worth in one command center',
+    description:
+      'Oweable brings bills, debts, category budgets, cash flow, subscriptions, net worth, and optional tax tools into one dashboard — for W-2 households, families, and anyone with variable or self-employed income.',
+    ogTitle: 'Oweable — Personal finance tools for bills, debt, and cash flow',
+    ogDescription:
+      'Track obligations, build budgets with guardrails, see spending and net worth, manage subscriptions, and plan payoff — one dashboard for everyday money management, not only freelancers.',
     canonical: 'https://www.oweable.com/',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -217,16 +231,16 @@ export default function Landing() {
             </div>
 
             <p className="text-xs text-content-secondary mb-4">
-              Join <span className="text-content-primary font-medium">3,000+ freelancers and gig workers</span> building financial clarity with Oweable.
+              Join <span className="text-content-primary font-medium">3,000+ households and professionals</span> using Oweable to run their money in one place.
             </p>
             
             <h1 className="text-4xl md:text-6xl xl:text-7xl font-sans font-medium tracking-[-0.03em] text-content-primary mb-8 leading-[1.05]">
-              The Financial OS for<br />
-              Gig Workers, Freelancers &amp; the Self-Employed
+              The money command center for<br />
+              bills, debt, budgets &amp; net worth
             </h1>
             
             <p className="text-lg font-medium text-content-secondary max-w-lg leading-[1.6] mb-10 border-l border-surface-border pl-6">
-              No W-2? No problem. Oweable handles variable income, quarterly tax estimates, debt payoff planning, and bill deadlines in one precision command center.
+              One dashboard for category budgets, bills and debts, subscriptions, cash flow and analytics, credit and net worth — plus document upload and tax tools when you need them. Built for steady paychecks and for variable income alike.
             </p>
             
             <div className="w-full max-w-xl">
@@ -257,8 +271,8 @@ export default function Landing() {
                   <p className="text-sm font-semibold text-content-primary mt-1">$10.99 / month</p>
                   <ul className="mt-3 space-y-1.5 text-xs text-content-secondary">
                     <li>Debt payoff engine (Snowball + Avalanche)</li>
-                    <li>Quarterly tax estimation + reserve planning</li>
-                    <li>Advanced automation and insights</li>
+                    <li>Category budgets, analytics &amp; subscriptions</li>
+                    <li>Tax estimation + reserve planning when you need it</li>
                   </ul>
                 </div>
               </div>
@@ -286,8 +300,11 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8" ref={archRef}>
           <div className={`mb-16 transition-all duration-1000 ease-out ${archVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <h2 className="text-3xl font-sans font-semibold tracking-tight text-content-primary mb-4">
-              Built for clarity
+              Tools that match the dashboard
             </h2>
+            <p className="text-sm text-content-secondary max-w-2xl mb-6 leading-relaxed">
+              Everything below is part of the product today — not a narrow &ldquo;freelancer-only&rdquo; app. Use what fits your life: W-2, household budgeting, side income, or full self-employment.
+            </p>
             <div className="w-full h-px bg-surface-border" />
           </div>
 
@@ -301,9 +318,15 @@ export default function Landing() {
               },
               {
                 icon: CalendarClock,
-                title: "Bill Command Center",
-                benefit: "Track every recurring bill with due dates and auto-overdue detection so nothing slips. Includes synced workflows and deeper automation.",
+                title: "Obligations hub",
+                benefit: "Recurring bills, debt accounts, and tickets or fines in one place — due dates, overdue flags, and calendar-style visibility so nothing hides in a tab you forgot to open.",
                 tier: "Tracker + Full Suite"
+              },
+              {
+                icon: Wallet,
+                title: "Category budgets & guardrails",
+                benefit: "Set spending limits by category with optional rollover and lock modes so you see when a category is on track — or when you need to adjust before the month slips away.",
+                tier: "Full Suite"
               },
               {
                 icon: TrendingUp,
@@ -313,20 +336,32 @@ export default function Landing() {
               },
               {
                 icon: BarChart2,
-                title: "Spending Intelligence",
-                benefit: "Visualize spending by category, income vs. expenses, and cash-flow patterns built from your actual data.",
+                title: "Analytics & reports",
+                benefit: "Spending by category, income vs. expenses, cash-flow views, and report-style summaries built from the transactions and budgets you already maintain.",
                 tier: "Tracker + Full Suite"
               },
               {
+                icon: Repeat,
+                title: "Subscriptions & recurring",
+                benefit: "Track subscription renewals and recurring charges alongside bills so recurring spend does not quietly drift month to month.",
+                tier: "Full Suite"
+              },
+              {
                 icon: UploadCloud,
-                title: "Document Scanning",
-                benefit: "Upload receipts and statements and review extracted biller, amount, and due date before saving to your dashboard.",
+                title: "Document scanning & ingestion",
+                benefit: "Upload receipts and statements, review extracted amounts and dates, and push items into your ledger or inbox without retyping.",
+                tier: "Tracker + Full Suite"
+              },
+              {
+                icon: AlertTriangle,
+                title: "Tickets & fines workflow",
+                benefit: "Log traffic tickets and toll violations with due dates and payment links so fines do not get lost in email while you manage the rest of your money.",
                 tier: "Tracker + Full Suite"
               },
               {
                 icon: BookOpen,
                 title: "Financial Academy",
-                benefit: "Self-paced tracks covering budgeting, debt payoff, credit, and taxes - with saved progress so you pick up where you left off.",
+                benefit: "Self-paced tracks covering budgeting, debt payoff, credit, and taxes — with saved progress so you pick up where you left off.",
                 tier: "Full Suite"
               }
             ].map((feat, i) => (
@@ -361,7 +396,7 @@ export default function Landing() {
               What people use Oweable for
             </h2>
             <p className="text-content-secondary max-w-2xl leading-relaxed text-sm">
-              Real situations we hear about most: bill due dates, debt payoff, irregular paychecks, and getting scattered documents into one workflow.
+              Salaried or self-employed, single or juggling a household — people use Oweable for due dates, debt payoff, subscriptions, budgets, and getting scattered paperwork into one workflow.
             </p>
           </div>
 
@@ -408,13 +443,13 @@ export default function Landing() {
             </div>
             <div className="lg:col-span-8 flex flex-col gap-4 lg:pt-10">
               <p className="text-content-secondary leading-relaxed">
-                Oweable is a financial operating system for anyone dealing with debt, bills, or financial pressure. It consolidates bill tracking, debt payoff planning, income management, credit tools, and net worth monitoring into a single dashboard — replacing spreadsheets and disconnected apps.
+                Oweable is a financial operating system for anyone who wants their money tools in one place: bill and debt tracking, category budgets, transactions and analytics, subscriptions, net worth, investments and insurance snapshots, credit workshop features, and optional bank connection — not a niche freelancer product.
               </p>
               <p className="text-content-secondary leading-relaxed">
-                Unlike consumer finance tools built only for people with predictable salaries, Oweable works for real financial situations — variable income, multiple debt types, tight budgets, and the messy middle ground most people actually live in. It also includes quarterly tax tools for gig workers and 1099 contractors.
+                It fits steady W-2 paychecks and household budgeting, and it also supports variable income, side work, and self-employment with income logging, freelance and tax pages, and quarterly tax estimation when you need them — alongside the same bills-and-debt workflows salaried users rely on.
               </p>
               <p className="text-content-secondary leading-relaxed">
-                Oweable serves single parents juggling bills, people recovering from medical or credit card debt, gig workers, recent grads with student loans, and anyone who needs a clear picture of where they stand financially — and a plan to get ahead.
+                Typical members include single parents, dual-income households, people paying down cards or medical bills, recent grads with loans, gig and contract workers, and salaried professionals who want obligations, budgets, and net worth in one honest view — plus a path to get ahead.
               </p>
             </div>
           </div>

@@ -67,7 +67,8 @@ export default function Pricing() {
 
   useSEO({
     title: 'Pricing — Oweable',
-    description: 'Simple, transparent pricing for freelancers, gig workers, and the self-employed. Start free and upgrade to Full Suite when ready.',
+    description:
+      'Simple pricing for the full money toolkit: bills, budgets, debt, analytics, subscriptions, and optional tax tools. Start free on Tracker; upgrade to Full Suite when you want every module.',
     canonical: 'https://www.oweable.com/pricing',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -306,7 +307,7 @@ export default function Pricing() {
                   </div>
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
-                    <span className="text-content-tertiary text-sm">Tax tools for freelancers</span>
+                    <span className="text-content-tertiary text-sm">Tax estimation &amp; reserves (great for variable or 1099 income)</span>
                   </div>
                 </div>
               </div>
@@ -337,7 +338,7 @@ export default function Pricing() {
               ['Transactions/analytics/reports', 'Not included', 'Included'],
               ['Debt payoff planner', 'Not included', 'Avalanche + snowball planner'],
               ['Advanced planning tools', 'Not included', 'Included'],
-              ['Freelancer tax tools', 'Not included', 'Included'],
+              ['Tax estimation & reserves (variable / 1099)', 'Not included', 'Included'],
             ].map(([feature, freeTier, paidTier]) => (
               <div key={feature} className="grid grid-cols-3 text-sm border-b border-surface-border last:border-b-0">
                 <div className="px-4 py-3 text-content-secondary">{feature}</div>
