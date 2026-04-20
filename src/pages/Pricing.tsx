@@ -3,6 +3,7 @@ import { TransitionLink } from '../components/TransitionLink';
 import Footer from '../components/Footer';
 import { Check, Plus, Minus } from 'lucide-react';
 import { useSEO } from '../hooks/useSEO';
+import { useJsonLd } from '../hooks/useJsonLd';
 import { toast } from 'sonner';
 import { createStripeCheckoutSession, type StripeCheckoutPlanKey } from '../lib/stripe';
 import { BrandWordmark } from '../components/BrandWordmark';
@@ -52,6 +53,146 @@ function FaqItem({ question, answer }: { question: string, answer: string }) {
   );
 }
 
+const PRICING_FAQ_STATIC: { question: string; answer: string }[] = [
+  {
+    question: 'Can I cancel my subscription at any time?',
+    answer:
+      'Yes. We believe in ruthless efficiency, not holding you hostage. Cancel anytime from your dashboard settings with a single click. No questions asked.',
+  },
+  {
+    question: 'Is my financial data secure?',
+    answer:
+      "We use bank-level 256-bit encryption. We don't sell your data, and we don't store your bank credentials. When bank linking is available, we plan to use established connection providers so you never give us your login password directly.",
+  },
+  {
+    question: 'How does the Debt Detonator work?',
+    answer:
+      'It uses a proprietary algorithm to analyze your interest rates, balances, and cash flow to recommend the mathematically optimal payoff strategy (avalanche or snowball) to save you the most money.',
+  },
+  {
+    question: 'Do I need to link my bank accounts?',
+    answer:
+      'No. Free tier uses manual bills only. Plaid syncing and all advanced workflows are part of Full Suite.',
+  },
+];
+
+function getPricingFaqItems(monthlyPrice: number, hasYearlyPricing: boolean) {
+  const items = [...PRICING_FAQ_STATIC];
+  if (hasYearlyPricing) {
+    items.push({
+      question: 'Is there a discount for paying yearly?',
+      answer: `Yes. When you choose annual billing on this page, you pay one yearly charge instead of twelve monthly renewals. The headline rate shows your effective monthly cost; savings are calculated versus twelve months at the standard monthly price ($${monthlyPrice.toFixed(2)}/mo).`,
+    });
+  }
+  return items;
+}
+
+function buildPricingJsonLd(params: {
+  monthlyPrice: number;
+  hasYearlyPricing: boolean;
+  yearlyTotal: number | null;
+  yearlySavingsPct: number;
+}) {
+  const { monthlyPrice, hasYearlyPricing, yearlyTotal, yearlySavingsPct } = params;
+  const pageUrl = 'https://www.oweable.com/pricing';
+  const description =
+    'Simple pricing for the full money toolkit: bills, budgets, debt, analytics, subscriptions, and optional tax tools. Start free on Tracker; upgrade to Full Suite when you want every module.';
+
+  const faqItems = getPricingFaqItems(monthlyPrice, hasYearlyPricing);
+
+  const graph: Record<string, unknown>[] = [
+    {
+      '@type': 'WebPage',
+      '@id': `${pageUrl}#webpage`,
+      url: pageUrl,
+      name: 'Pricing — Oweable',
+      description,
+      isPartOf: {
+        '@type': 'WebSite',
+        name: 'Oweable',
+        url: 'https://www.oweable.com',
+      },
+      about: {
+        '@type': 'SoftwareApplication',
+        name: 'Oweable',
+        applicationCategory: 'FinanceApplication',
+        url: 'https://www.oweable.com',
+      },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.oweable.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Pricing', item: pageUrl },
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${pageUrl}#faq`,
+      url: pageUrl,
+      mainEntity: faqItems.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: item.answer,
+        },
+      })),
+    },
+    {
+      '@type': 'Offer',
+      '@id': `${pageUrl}#offer-tracker`,
+      name: 'Tracker',
+      description: 'Manual bills and settings. Premium modules require Full Suite.',
+      price: '0',
+      priceCurrency: 'USD',
+      url: pageUrl,
+    },
+    {
+      '@type': 'Offer',
+      '@id': `${pageUrl}#offer-full-suite-monthly`,
+      name: 'Full Suite',
+      description:
+        'Full Oweable money toolkit: bank sync when available, debt planner, analytics, subscriptions, and tax tools.',
+      price: monthlyPrice.toFixed(2),
+      priceCurrency: 'USD',
+      priceSpecification: {
+        '@type': 'UnitPriceSpecification',
+        price: monthlyPrice.toFixed(2),
+        priceCurrency: 'USD',
+        unitText: 'MONTH',
+      },
+      url: pageUrl,
+    },
+  ];
+
+  if (hasYearlyPricing && yearlyTotal != null) {
+    graph.push({
+      '@type': 'Offer',
+      '@id': `${pageUrl}#offer-full-suite-yearly`,
+      name: 'Full Suite (annual)',
+      description:
+        yearlySavingsPct > 0
+          ? `Annual billing for Full Suite. Save about ${yearlySavingsPct}% versus twelve monthly renewals at the standard monthly rate.`
+          : 'Annual billing for Full Suite.',
+      price: yearlyTotal.toFixed(2),
+      priceCurrency: 'USD',
+      priceSpecification: {
+        '@type': 'UnitPriceSpecification',
+        price: yearlyTotal.toFixed(2),
+        priceCurrency: 'USD',
+        unitText: 'YEAR',
+      },
+      url: pageUrl,
+    });
+  }
+
+  return {
+    '@context': 'https://schema.org',
+    '@graph': graph,
+  };
+}
+
 export default function Pricing() {
   const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
   const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
@@ -72,6 +213,18 @@ export default function Pricing() {
     canonical: 'https://www.oweable.com/pricing',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
+
+  useJsonLd(
+    'pricing',
+    () =>
+      buildPricingJsonLd({
+        monthlyPrice,
+        hasYearlyPricing,
+        yearlyTotal,
+        yearlySavingsPct,
+      }),
+    [monthlyPrice, hasYearlyPricing, yearlyTotal, yearlySavingsPct]
+  );
 
   const [scrolled, setScrolled] = useState(false);
   const [isStartingCheckout, setIsStartingCheckout] = useState(false);
@@ -360,28 +513,9 @@ export default function Pricing() {
             <h2 className="text-3xl md:text-4xl font-bold mb-12 text-content-primary">Frequently Asked Questions</h2>
             
             <div className="flex flex-col">
-              <FaqItem 
-                question="Can I cancel my subscription at any time?" 
-                answer="Yes. We believe in ruthless efficiency, not holding you hostage. Cancel anytime from your dashboard settings with a single click. No questions asked." 
-              />
-              <FaqItem 
-                question="Is my financial data secure?" 
-                answer="We use bank-level 256-bit encryption. We don't sell your data, and we don't store your bank credentials. When bank linking is available, we plan to use established connection providers so you never give us your login password directly." 
-              />
-              <FaqItem 
-                question="How does the Debt Detonator work?" 
-                answer="It uses a proprietary algorithm to analyze your interest rates, balances, and cash flow to recommend the mathematically optimal payoff strategy (avalanche or snowball) to save you the most money." 
-              />
-              <FaqItem 
-                question="Do I need to link my bank accounts?" 
-                answer="No. Free tier uses manual bills only. Plaid syncing and all advanced workflows are part of Full Suite." 
-              />
-              {hasYearlyPricing ? (
-                <FaqItem
-                  question="Is there a discount for paying yearly?"
-                  answer={`Yes. When you choose annual billing on this page, you pay one yearly charge instead of twelve monthly renewals. The headline rate shows your effective monthly cost; savings are calculated versus twelve months at the standard monthly price ($${monthlyPrice.toFixed(2)}/mo).`}
-                />
-              ) : null}
+              {getPricingFaqItems(monthlyPrice, hasYearlyPricing).map((item) => (
+                <FaqItem key={item.question} question={item.question} answer={item.answer} />
+              ))}
             </div>
           </div>
         </div>

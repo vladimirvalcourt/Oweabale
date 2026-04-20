@@ -3,8 +3,11 @@ import { LifeBuoy, ChevronLeft } from 'lucide-react';
 import { TransitionLink } from '../components/TransitionLink';
 import Footer from '../components/Footer';
 import { useSEO } from '../hooks/useSEO';
+import { useJsonLd } from '../hooks/useJsonLd';
 
 const SUPPORT_EMAIL = 'support@oweable.com';
+
+const SUPPORT_PAGE_URL = 'https://www.oweable.com/support';
 
 const FAQ_ITEMS = [
   {
@@ -25,6 +28,47 @@ const FAQ_ITEMS = [
   },
 ];
 
+function buildSupportJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': ['WebPage', 'ContactPage'],
+        '@id': `${SUPPORT_PAGE_URL}#webpage`,
+        url: SUPPORT_PAGE_URL,
+        name: 'Support — Oweable',
+        description:
+          'Need help with billing, access, security, or account questions? Contact Oweable support and find quick self-serve answers.',
+        isPartOf: {
+          '@type': 'WebSite',
+          name: 'Oweable',
+          url: 'https://www.oweable.com',
+        },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.oweable.com/' },
+          { '@type': 'ListItem', position: 2, name: 'Support', item: SUPPORT_PAGE_URL },
+        ],
+      },
+      {
+        '@type': 'FAQPage',
+        '@id': `${SUPPORT_PAGE_URL}#faq`,
+        url: SUPPORT_PAGE_URL,
+        mainEntity: FAQ_ITEMS.map((item) => ({
+          '@type': 'Question',
+          name: item.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.a,
+          },
+        })),
+      },
+    ],
+  };
+}
+
 export default function Support() {
   const [formData, setFormData] = useState({
     name: '',
@@ -41,6 +85,8 @@ export default function Support() {
     ogDescription: 'Get help with account access, billing, security, and subscription questions.',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
+
+  useJsonLd('support', buildSupportJsonLd, []);
 
   const mailtoHref = useMemo(() => {
     const subject = formData.subject.trim() || 'Oweable support request';
