@@ -59,7 +59,7 @@ const FAQ_ITEMS_BASE = [
   },
   {
     q: 'Is Oweable free?',
-    a: 'Yes — Oweable includes a free Tracker tier for core account and bill tracking. Full Suite unlocks advanced tools like the debt payoff planner, category budgets with guardrails, subscription intelligence, deeper analytics, and tax estimation and reserve planning (especially helpful if you have variable or 1099 income) for $10.99/month.',
+    a: 'Yes — Oweable includes a free Tracker tier focused on recurring bills and tickets/fines. Full Suite unlocks debt tools, income and transaction ledger features, category budgets, deeper analytics, optional bank sync, and tax planning for $10.99/month.',
   },
   {
     q: 'How is Oweable different from YNAB or Mint?',
@@ -262,8 +262,8 @@ export default function Landing() {
                   <p className="text-sm font-semibold text-content-primary mt-1">$0 / month</p>
                   <ul className="mt-3 space-y-1.5 text-xs text-content-secondary">
                     <li>Bill tracking and due-date alerts</li>
-                    <li>Manual income + expense logging</li>
-                    <li>Basic net worth visibility</li>
+                    <li>Recurring obligations + tickets/fines</li>
+                    <li>Settings and core reminders</li>
                   </ul>
                 </div>
                 <div className="rounded-lg border border-surface-border bg-surface-raised p-4">
@@ -271,7 +271,7 @@ export default function Landing() {
                   <p className="text-sm font-semibold text-content-primary mt-1">$10.99 / month</p>
                   <ul className="mt-3 space-y-1.5 text-xs text-content-secondary">
                     <li>Debt payoff engine (Snowball + Avalanche)</li>
-                    <li>Category budgets, analytics &amp; subscriptions</li>
+                    <li>Income + transaction ledger, budgets, analytics</li>
                     <li>Tax estimation + reserve planning when you need it</li>
                   </ul>
                 </div>
@@ -320,7 +320,7 @@ export default function Landing() {
                 icon: CalendarClock,
                 title: "Obligations hub",
                 benefit: "Recurring bills, debt accounts, and tickets or fines in one place — due dates, overdue flags, and calendar-style visibility so nothing hides in a tab you forgot to open.",
-                tier: "Tracker + Full Suite"
+                tier: "Tracker + Full Suite (debt actions: Full Suite)"
               },
               {
                 icon: Wallet,
@@ -332,13 +332,13 @@ export default function Landing() {
                 icon: TrendingUp,
                 title: "Net Worth Engine",
                 benefit: "See your real-time net worth from assets minus liabilities with trend visibility so you can see exactly where you're headed.",
-                tier: "Tracker + Full Suite"
+                tier: "Full Suite"
               },
               {
                 icon: BarChart2,
                 title: "Analytics & reports",
                 benefit: "Spending by category, income vs. expenses, cash-flow views, and report-style summaries built from the transactions and budgets you already maintain.",
-                tier: "Tracker + Full Suite"
+                tier: "Full Suite"
               },
               {
                 icon: Repeat,
@@ -350,7 +350,7 @@ export default function Landing() {
                 icon: UploadCloud,
                 title: "Document scanning & ingestion",
                 benefit: "Upload receipts and statements, review extracted amounts and dates, and push items into your ledger or inbox without retyping.",
-                tier: "Tracker + Full Suite"
+                tier: "Full Suite"
               },
               {
                 icon: AlertTriangle,

@@ -1,24 +1,36 @@
 import type { TabType } from '../store/useStore';
 
 /**
- * Tracker (free) tier — product contract
- *
- * - Routes: primary app surface is `/bills` plus `/settings` (and onboarding/auth/public).
- * - Quick Add: recurring **bills** and **tickets/fines** only — no expense/income ledger rows,
- *   no new debt accounts (loans/credit cards) from Quick Add.
- * - Bills page: can add/edit **recurring bills** and **citations**; **debt** add/edit and payoff
- *   tooling require Full Suite (see Obligations + FullSuiteRouteGuard elsewhere).
- *
- * Enforcement here is client-side UX; Edge Functions still gate Plaid and other paid APIs.
+ * Tracker (free) tier — centralized policy contract.
  */
 
+export const TRACKER_ALLOWED_APP_PATHS = new Set(['/bills', '/settings']);
+
+export function canAccessAppPath(pathname: string, hasFullSuite: boolean): boolean {
+  if (hasFullSuite) return true;
+  return TRACKER_ALLOWED_APP_PATHS.has(pathname);
+}
+
+export function canUseQuickAddTab(tab: TabType, hasFullSuite: boolean): boolean {
+  if (hasFullSuite) return true;
+  return tab === 'obligation' || tab === 'citation';
+}
+
 export function clampQuickAddTabForTier(tab: TabType, hasFullSuite: boolean): TabType {
-  if (hasFullSuite) return tab;
-  if (tab === 'transaction' || tab === 'income') return 'obligation';
-  return tab;
+  if (canUseQuickAddTab(tab, hasFullSuite)) return tab;
+  return 'obligation';
+}
+
+export function canUseDebtActions(hasFullSuite: boolean): boolean {
+  return hasFullSuite;
 }
 
 export function isTrackerObligationDebtBlocked(obligationKind: string, hasFullSuite: boolean): boolean {
-  if (hasFullSuite) return false;
-  return obligationKind.startsWith('debt-');
+  return !hasFullSuite && obligationKind.startsWith('debt-');
 }
+
+/**
+ * Copy contract surfaced in free-tier UI callouts.
+ */
+export const TRACKER_FREE_TIER_SUMMARY =
+  'Tracker (free): recurring bills and tickets/fines on Bills. Full Suite unlocks debt actions, ledger, income, and bank sync.';

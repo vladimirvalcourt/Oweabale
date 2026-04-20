@@ -28,6 +28,13 @@ async function removeIngestionStoragePath(storagePath: string) {
   if (error) console.warn(`[useStore] storage remove (${bucket}):`, error.message);
 }
 
+function isFullSuiteRlsDenied(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const code = (error as { code?: string }).code;
+  const message = String((error as { message?: string }).message || '').toLowerCase();
+  return code === '42501' || message.includes('row-level security');
+}
+
 export interface Bill {
   id: string;
   biller: string;
@@ -751,6 +758,10 @@ export const useStore = create<AppState>()(
       return true;
     } catch (error) {
       console.error('[addTransaction] Sync failed:', error);
+      if (isFullSuiteRlsDenied(error)) {
+        toast.error('Transactions are a Full Suite feature.');
+        return false;
+      }
       toast.error('Failed to save transaction to database.');
       return false;
     }
@@ -863,6 +874,7 @@ export const useStore = create<AppState>()(
       const userId = (await supabase.auth.getUser()).data.user?.id;
       const bill = get().bills.find(b => b.id === id);
       if (!bill) return;
+      let ledgerWriteBlocked = false;
 
       // Compute next due date based on frequency
       const nextDue = new Date(bill.dueDate);
@@ -895,7 +907,7 @@ export const useStore = create<AppState>()(
       };
 
       if (userId) {
-        await supabase.from('transactions').insert({
+        const { error } = await supabase.from('transactions').insert({
           name: newTransaction.name,
           category: newTransaction.category,
           date: newTransaction.date,
@@ -904,14 +916,27 @@ export const useStore = create<AppState>()(
           platform_tag: '',
           user_id: userId,
         });
+        if (error) {
+          if (isFullSuiteRlsDenied(error)) {
+            ledgerWriteBlocked = true;
+          } else {
+            throw error;
+          }
+        }
       }
 
       set((state) => ({
         bills: state.bills.map((b) =>
           b.id === id ? { ...b, status: 'upcoming', dueDate: nextDueStr } : b
         ),
-        transactions: [newTransaction, ...state.transactions].slice(0, 100),
+        transactions: ledgerWriteBlocked
+          ? state.transactions
+          : [newTransaction, ...state.transactions].slice(0, 100),
       }));
+
+      if (ledgerWriteBlocked) {
+        toast.info('Bill marked paid. Ledger history is a Full Suite feature.');
+      }
     } catch (err) {
       console.error('Error marking bill paid:', err);
       toast.error('Failed to update bill record.');
@@ -948,6 +973,10 @@ export const useStore = create<AppState>()(
       return true;
     } catch (error) {
       console.error('[addDebt] Sync failed:', error);
+      if (isFullSuiteRlsDenied(error)) {
+        toast.error('Debt accounts are a Full Suite feature.');
+        return false;
+      }
       toast.error('Failed to sync debt record.');
       return false;
     }
@@ -967,7 +996,14 @@ export const useStore = create<AppState>()(
       if (updatedDebt.termMonths !== undefined) snakeCased.term_months = updatedDebt.termMonths;
       if (updatedDebt.paymentDueDate !== undefined) snakeCased.payment_due_date = updatedDebt.paymentDueDate;
       const { error } = await supabase.from('debts').update(snakeCased).eq('id', id).eq('user_id', userId);
-      if (error) { toast.error('Failed to update debt'); return; }
+      if (error) {
+        if (isFullSuiteRlsDenied(error)) {
+          toast.error('Debt editing is a Full Suite feature.');
+          return;
+        }
+        toast.error('Failed to update debt');
+        return;
+      }
     }
     set((state) => ({
       debts: state.debts.map((d) => d.id === id ? { ...d, ...updatedDebt } : d)
@@ -977,7 +1013,14 @@ export const useStore = create<AppState>()(
     const userId = (await supabase.auth.getUser()).data.user?.id;
     if (userId) {
       const { error } = await supabase.from('debts').delete().eq('id', id).eq('user_id', userId);
-      if (error) { toast.error('Failed to delete debt'); return; }
+      if (error) {
+        if (isFullSuiteRlsDenied(error)) {
+          toast.error('Debt deletion is a Full Suite feature.');
+          return;
+        }
+        toast.error('Failed to delete debt');
+        return;
+      }
     }
     set((state) => ({ debts: state.debts.filter((d) => d.id !== id) }));
   },
@@ -989,7 +1032,14 @@ export const useStore = create<AppState>()(
     const newPaid = debt.paid + amount;
     if (userId) {
       const { error } = await supabase.from('debts').update({ remaining: newRemaining, paid: newPaid }).eq('id', id).eq('user_id', userId);
-      if (error) { toast.error('Failed to sync debt payment'); return; }
+      if (error) {
+        if (isFullSuiteRlsDenied(error)) {
+          toast.error('Debt payments are a Full Suite feature.');
+          return;
+        }
+        toast.error('Failed to sync debt payment');
+        return;
+      }
     }
     const newTx: Transaction = {
       id: crypto.randomUUID(),
@@ -1000,7 +1050,15 @@ export const useStore = create<AppState>()(
       type: 'expense',
     };
     if (userId) {
-      await supabase.from('transactions').insert({ name: newTx.name, category: newTx.category, date: newTx.date, amount: newTx.amount, type: newTx.type, platform_tag: '', user_id: userId });
+      const { error } = await supabase.from('transactions').insert({ name: newTx.name, category: newTx.category, date: newTx.date, amount: newTx.amount, type: newTx.type, platform_tag: '', user_id: userId });
+      if (error) {
+        if (isFullSuiteRlsDenied(error)) {
+          toast.error('Debt payments are a Full Suite feature.');
+          return;
+        }
+        toast.error('Failed to record payment transaction.');
+        return;
+      }
     }
     set((state) => ({
       debts: state.debts.map((d) => d.id === id ? { ...d, remaining: newRemaining, paid: newPaid } : d),
@@ -1255,6 +1313,10 @@ export const useStore = create<AppState>()(
       return true;
     } catch (error) {
       console.error('[addIncome] Sync failed:', error);
+      if (isFullSuiteRlsDenied(error)) {
+        toast.error('Income tracking is a Full Suite feature.');
+        return false;
+      }
       toast.error('Failed to sync income source.');
       return false;
     }
@@ -1272,7 +1334,14 @@ export const useStore = create<AppState>()(
       if (updatedIncome.status !== undefined)       patch.status = updatedIncome.status;
       if (updatedIncome.isTaxWithheld !== undefined) patch.is_tax_withheld = updatedIncome.isTaxWithheld;
       const { error } = await supabase.from('incomes').update(patch).eq('id', id).eq('user_id', userId);
-      if (error) { toast.error('Failed to update income'); return false; }
+      if (error) {
+        if (isFullSuiteRlsDenied(error)) {
+          toast.error('Income editing is a Full Suite feature.');
+          return false;
+        }
+        toast.error('Failed to update income');
+        return false;
+      }
       set((state) => ({ incomes: state.incomes.map((i) => i.id === id ? { ...i, ...updatedIncome } : i) }));
       return true;
     } catch (err) {
@@ -1286,7 +1355,14 @@ export const useStore = create<AppState>()(
       const userId = (await supabase.auth.getUser()).data.user?.id;
       if (!userId) { toast.error('You must be signed in to delete income.'); return false; }
       const { error } = await supabase.from('incomes').delete().eq('id', id).eq('user_id', userId);
-      if (error) { toast.error('Failed to delete income'); return false; }
+      if (error) {
+        if (isFullSuiteRlsDenied(error)) {
+          toast.error('Income deletion is a Full Suite feature.');
+          return false;
+        }
+        toast.error('Failed to delete income');
+        return false;
+      }
       set((state) => ({ incomes: state.incomes.filter((i) => i.id !== id) }));
       return true;
     } catch (err) {
@@ -1311,7 +1387,14 @@ export const useStore = create<AppState>()(
         type: 'income',
       };
       const { error } = await supabase.from('transactions').insert({ name: newTx.name, category: newTx.category, date: newTx.date, amount: newTx.amount, type: newTx.type, platform_tag: '', user_id: userId });
-      if (error) { toast.error('Failed to record deposit'); return false; }
+      if (error) {
+        if (isFullSuiteRlsDenied(error)) {
+          toast.error('Income deposits are a Full Suite feature.');
+          return false;
+        }
+        toast.error('Failed to record deposit');
+        return false;
+      }
       set((state) => ({ transactions: [newTx, ...state.transactions].slice(0, 50) }));
       return true;
     } catch (err) {

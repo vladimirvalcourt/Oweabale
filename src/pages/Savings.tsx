@@ -5,10 +5,14 @@ import { PiggyBank, RefreshCw, ArrowDownRight, ArrowUpRight, Landmark } from 'lu
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { TransitionLink } from '../components/TransitionLink';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
+import { toast } from 'sonner';
+import { getCustomIcon } from '../lib/customIcons';
 
 const DAYS_WINDOW = 90;
 
 export default function Savings() {
+  const BillingIcon = getCustomIcon('billing');
+  const ChartIcon = getCustomIcon('chart');
   const {
     transactions,
     plaidAccounts,
@@ -27,6 +31,7 @@ export default function Savings() {
     })),
   );
   const [syncing, setSyncing] = useState(false);
+  const [savingAccountId, setSavingAccountId] = useState<string | null>(null);
 
   const trackedPlaidIds = useMemo(
     () => new Set(plaidAccounts.filter((a) => a.includeInSavings).map((a) => a.plaidAccountId)),
@@ -70,6 +75,16 @@ export default function Savings() {
       await syncPlaidTransactions();
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const onToggleSavingsAccount = async (accountRowId: string, include: boolean) => {
+    setSavingAccountId(accountRowId);
+    try {
+      const ok = await updatePlaidAccountIncludeInSavings(accountRowId, include);
+      if (ok) toast.success(include ? 'Account added to Savings tracking' : 'Account removed from Savings tracking');
+    } finally {
+      setSavingAccountId(null);
     }
   };
 
@@ -130,7 +145,7 @@ export default function Savings() {
       )}
 
       {bankConnected && plaidAccounts.length > 0 && (
-        <CollapsibleModule title="Linked accounts" icon={Landmark} defaultOpen>
+        <CollapsibleModule title="Linked accounts" icon={BillingIcon} defaultOpen>
           <ul className="divide-y divide-surface-border">
             {plaidAccounts.map((acc) => (
               <li key={acc.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-4">
@@ -145,13 +160,14 @@ export default function Savings() {
                     )}
                   </p>
                 </div>
-                <label className="inline-flex items-center gap-2 cursor-pointer shrink-0">
-                  <span className="text-xs text-content-secondary">Track on Savings page</span>
+                <label className={`inline-flex items-center gap-2 shrink-0 ${savingAccountId === acc.id ? 'cursor-wait' : 'cursor-pointer'}`}>
+                  <span className="text-xs text-content-secondary">{savingAccountId === acc.id ? 'Saving...' : 'Track on Savings page'}</span>
                   <input
                     type="checkbox"
-                    className="rounded border-surface-border text-brand-cta focus:ring-brand-cta"
+                    className="rounded border-surface-border text-brand-cta focus:ring-brand-cta disabled:opacity-60"
                     checked={acc.includeInSavings}
-                    onChange={(e) => void updatePlaidAccountIncludeInSavings(acc.id, e.target.checked)}
+                    disabled={savingAccountId === acc.id}
+                    onChange={(e) => void onToggleSavingsAccount(acc.id, e.target.checked)}
                   />
                 </label>
               </li>
@@ -183,7 +199,7 @@ export default function Savings() {
             </div>
           </div>
 
-          <CollapsibleModule title="Recent activity (tracked accounts)" icon={PiggyBank} defaultOpen>
+          <CollapsibleModule title="Recent activity (tracked accounts)" icon={ChartIcon} defaultOpen>
             {recentSavingsTx.length === 0 ? (
               <p className="px-4 py-10 text-center text-sm text-content-tertiary">
                 No Plaid transactions on these accounts in the last {DAYS_WINDOW} days. Try syncing or see all activity in{' '}

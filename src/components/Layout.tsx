@@ -22,6 +22,7 @@ import { formatCategoryLabel } from '../lib/categoryDisplay';
 import { BrandWordmark } from './BrandWordmark';
 import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 import { isApplePointerPlatform } from '../lib/platform';
+import { canAccessAppPath } from '../lib/trackerTier';
 import { PiggyBank } from 'lucide-react';
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
@@ -450,11 +451,10 @@ export default function Layout() {
 
   const visibleNavGroups = useMemo(() => {
     if (checkingFullSuite || hasFullSuite) return navGroups;
-    const freePaths = new Set(['/bills']);
     return navGroups
       .map((group) => ({
         ...group,
-        items: group.items.filter((item) => freePaths.has(item.path.split('?')[0])),
+        items: group.items.filter((item) => canAccessAppPath(item.path.split('?')[0], false)),
       }))
       .filter((group) => group.items.length > 0);
   }, [checkingFullSuite, hasFullSuite, navGroups]);

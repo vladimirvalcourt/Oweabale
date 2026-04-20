@@ -12,7 +12,7 @@ import { yieldForPaint } from '../lib/interaction';
 import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '../lib/quickEntryCategories';
 import { formatLocalISODate, parseQuickEntryDateHint } from '../lib/quickEntryNlp';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
-import { clampQuickAddTabForTier } from '../lib/trackerTier';
+import { clampQuickAddTabForTier, canUseQuickAddTab, isTrackerObligationDebtBlocked } from '../lib/trackerTier';
 import { getCustomIcon } from '../lib/customIcons';
 
 interface QuickAddModalProps {
@@ -393,11 +393,11 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     if (!validateForm()) return;
 
     if (trackerOnly) {
-      if (activeTab === 'transaction' || activeTab === 'income') {
+      if (!canUseQuickAddTab(activeTab, hasFullSuite)) {
         toast.error('Tracker (free) includes bills and tickets here. Upgrade to Full Suite for ledger and income entries.');
         return;
       }
-      if (trackerOnly && activeTab === 'obligation' && obligationKind.startsWith('debt-')) {
+      if (trackerOnly && activeTab === 'obligation' && isTrackerObligationDebtBlocked(obligationKind, hasFullSuite)) {
         toast.error('Adding loans and credit cards requires Full Suite.');
         return;
       }

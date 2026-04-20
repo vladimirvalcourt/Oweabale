@@ -72,7 +72,7 @@ const PRICING_FAQ_STATIC: { question: string; answer: string }[] = [
   {
     question: 'Do I need to link my bank accounts?',
     answer:
-      'No. Free tier uses manual bills only. Plaid syncing and all advanced workflows are part of Full Suite.',
+      'No. Tracker works without bank linking for recurring bills and tickets/fines. Plaid syncing and broader planning workflows are part of Full Suite.',
   },
 ];
 
@@ -96,7 +96,7 @@ function buildPricingJsonLd(params: {
   const { monthlyPrice, hasYearlyPricing, yearlyTotal, yearlySavingsPct } = params;
   const pageUrl = 'https://www.oweable.com/pricing';
   const description =
-    'Simple pricing for the full money toolkit: bills, budgets, debt, analytics, subscriptions, and optional tax tools. Start free on Tracker; upgrade to Full Suite when you want every module.';
+    'Simple pricing with a useful free Tracker and a Full Suite upgrade. Tracker covers recurring bills and tickets/fines; Full Suite unlocks debt, income, ledger, analytics, and optional tax planning.';
 
   const faqItems = getPricingFaqItems(monthlyPrice, hasYearlyPricing);
 
@@ -143,7 +143,7 @@ function buildPricingJsonLd(params: {
       '@type': 'Offer',
       '@id': `${pageUrl}#offer-tracker`,
       name: 'Tracker',
-      description: 'Manual bills and settings. Premium modules require Full Suite.',
+      description: 'Recurring bills and tickets/fines on Bills, plus settings. Premium modules require Full Suite.',
       price: '0',
       priceCurrency: 'USD',
       url: pageUrl,
@@ -153,7 +153,7 @@ function buildPricingJsonLd(params: {
       '@id': `${pageUrl}#offer-full-suite-monthly`,
       name: 'Full Suite',
       description:
-        'Full Oweable money toolkit: bank sync when available, debt planner, analytics, subscriptions, and tax tools.',
+        'Full Oweable money toolkit: debt planner, income and transaction ledger, budgets/analytics, subscriptions, bank sync when available, and tax tools.',
       price: monthlyPrice.toFixed(2),
       priceCurrency: 'USD',
       priceSpecification: {
@@ -209,7 +209,7 @@ export default function Pricing() {
   useSEO({
     title: 'Pricing — Oweable',
     description:
-      'Simple pricing for the full money toolkit: bills, budgets, debt, analytics, subscriptions, and optional tax tools. Start free on Tracker; upgrade to Full Suite when you want every module.',
+      'Simple pricing with a useful free Tracker and a Full Suite upgrade. Tracker covers recurring bills and tickets/fines; Full Suite unlocks debt, income, ledger, analytics, and optional tax planning.',
     canonical: 'https://www.oweable.com/pricing',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -307,8 +307,8 @@ export default function Pricing() {
             Priced for maximum leverage.
           </h1>
           
-          <p className="mx-auto max-w-2xl text-base font-medium leading-relaxed text-content-secondary md:text-lg">
-            Stop paying for apps that just track your debt. Invest in the arsenal that eliminates it.
+            <p className="mx-auto max-w-2xl text-base font-medium leading-relaxed text-content-secondary md:text-lg">
+            Start with Tracker for recurring bills and tickets/fines. Upgrade to Full Suite when you want debt planning, ledger, analytics, and tax workflows in one place.
           </p>
         </div>
       </section>
@@ -324,7 +324,7 @@ export default function Pricing() {
             {/* Card 1: Tracker (Free) */}
             <div className={`bg-surface-raised border border-surface-border rounded-lg p-10 flex flex-col transition-all duration-700 ease-out delay-[100ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
               <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Tracker</h3>
-              <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Manual bills + settings access. Premium modules require Full Suite.</p>
+              <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Recurring bills and tickets/fines on Bills, plus settings access.</p>
               
               <div className="mb-10 p-6 bg-surface-base border border-surface-border rounded-lg">
                 <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">$0</span>
@@ -341,15 +341,15 @@ export default function Pricing() {
               <div className="flex flex-col gap-5 mt-auto">
                 <div className="flex items-start gap-3">
                   <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
-                  <span className="text-content-tertiary text-sm">Bills workflow access</span>
+                  <span className="text-content-tertiary text-sm">Recurring bills workflow</span>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
+                  <span className="text-content-tertiary text-sm">Tickets/fines tracking in Bills</span>
                 </div>
                 <div className="flex items-start gap-3">
                   <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
                   <span className="text-content-tertiary text-sm">Settings and account controls</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
-                  <span className="text-content-tertiary text-sm">No Plaid, no premium modules</span>
                 </div>
               </div>
             </div>
@@ -448,7 +448,7 @@ export default function Pricing() {
                 <div className="flex flex-col gap-5 mt-auto">
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
-                    <span className="text-content-tertiary text-sm">Unlimited account sync</span>
+                    <span className="text-content-tertiary text-sm">Bank sync when available</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
@@ -456,7 +456,7 @@ export default function Pricing() {
                   </div>
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
-                    <span className="text-content-tertiary text-sm">Subscription price-change alerts</span>
+                    <span className="text-content-tertiary text-sm">Income + transaction ledger, budgets, analytics</span>
                   </div>
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
@@ -471,7 +471,7 @@ export default function Pricing() {
           <div className="mt-8 rounded-lg border border-surface-border bg-surface-raised p-5">
             <h4 className="text-sm font-semibold text-content-primary">Free-tier trust promise</h4>
             <p className="mt-2 text-sm text-content-secondary">
-              Tracker remains useful without upgrading: you can keep managing core workflows, export your data, and cancel paid plans in-app any time.
+              Tracker remains useful without upgrading: recurring bills and tickets/fines stay available, and you can cancel paid plans in-app any time.
             </p>
             <p className="mt-1 text-xs text-content-tertiary">
               No forced phone calls, no hidden cancellation path, and no lock-in for your account controls.
@@ -487,7 +487,9 @@ export default function Pricing() {
 
             {[
               ['App access', 'Bills + Settings only', 'All modules unlocked'],
+              ['Bills page', 'Recurring bills + tickets/fines', 'Recurring + debt actions'],
               ['Bank connection (Plaid)', 'Not included', 'Included'],
+              ['Income tracking', 'Not included', 'Included'],
               ['Transactions/analytics/reports', 'Not included', 'Included'],
               ['Debt payoff planner', 'Not included', 'Avalanche + snowball planner'],
               ['Advanced planning tools', 'Not included', 'Included'],

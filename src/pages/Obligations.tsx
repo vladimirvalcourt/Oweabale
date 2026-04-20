@@ -28,6 +28,7 @@ import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 import { FullSuiteGateCard } from '../components/FullSuiteGate';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
 import { cn } from '../lib/utils';
+import { canUseDebtActions, TRACKER_FREE_TIER_SUMMARY } from '../lib/trackerTier';
 import { getCustomIcon } from '../lib/customIcons';
 
 type ObligationType = 'recurring' | 'debt' | 'ambush';
@@ -118,6 +119,8 @@ export default function Obligations() {
   const TicketIcon = getCustomIcon('ticket');
   const PaymentsIcon = getCustomIcon('payments');
   const PlanningIcon = getCustomIcon('planning');
+  const CalendarIcon = getCustomIcon('calendar');
+  const ChartIcon = getCustomIcon('chart');
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { bills, debts, citations, subscriptions, transactions, assets, resolveCitation, openQuickAdd, editBill, editDebt, markBillPaid } = useStore(
@@ -161,6 +164,7 @@ export default function Obligations() {
   const [editBillRow, setEditBillRow] = useState<Bill | null>(null);
   const [editDebtRow, setEditDebtRow] = useState<Debt | null>(null);
   const { hasFullSuite } = useFullSuiteAccess();
+  const canUseDebt = canUseDebtActions(hasFullSuite);
 
   useEffect(() => {
     if (location.hash === '#due-soon') {
@@ -367,24 +371,23 @@ export default function Obligations() {
           <p className="text-sm text-content-tertiary">Everything you owe, in one place.</p>
           {!hasFullSuite && (
             <p className="mt-2 text-xs text-content-secondary max-w-xl leading-relaxed">
-              <span className="font-medium text-content-primary">Tracker (free):</span> add recurring bills and tickets here. Full Suite unlocks
-              bank sync, expense ledger, income, debt tools, and the rest of the app.
+              {TRACKER_FREE_TIER_SUMMARY}
             </p>
           )}
         </div>
         <button 
           type="button"
           onClick={() => {
-            if (activeTab === 'debt' && !hasFullSuite) {
+            if (activeTab === 'debt' && !canUseDebt) {
               toast.error('Loans and credit cards are a Full Suite feature. Upgrade to add debt.');
               return;
             }
             openQuickAdd(activeTab === 'ambush' ? 'citation' : 'obligation');
           }}
-          aria-disabled={activeTab === 'debt' && !hasFullSuite}
-          title={activeTab === 'debt' && !hasFullSuite ? 'Full Suite required to add debt' : undefined}
+          aria-disabled={activeTab === 'debt' && !canUseDebt}
+          title={activeTab === 'debt' && !canUseDebt ? 'Full Suite required to add debt' : undefined}
           className={`px-4 py-2.5 rounded-lg text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile ${
-            activeTab === 'debt' && !hasFullSuite
+            activeTab === 'debt' && !canUseDebt
               ? 'bg-surface-elevated border border-surface-border text-content-tertiary'
               : 'bg-brand-cta hover:bg-brand-cta-hover text-surface-base'
           }`}
@@ -486,7 +489,7 @@ export default function Obligations() {
 
       <CollapsibleModule
         title="Upcoming cash out (30 / 60 / 90 days)"
-        icon={CalendarDays}
+        icon={CalendarIcon}
         defaultOpen={false}
         extraHeader={
           <TransitionLink
@@ -530,7 +533,7 @@ export default function Obligations() {
       {debts.length > 0 && hasFullSuite && (
         <CollapsibleModule 
           title="Debt Payoff Plan" 
-          icon={Flame}
+          icon={ChartIcon}
           extraHeader={
             <span className="text-xs font-sans text-content-tertiary bg-surface-base border border-surface-border px-2 py-0.5 rounded-lg">
               Payoff {payoffResult.months > 0 ? monthsToDate(payoffResult.months) : '—'}
@@ -837,7 +840,7 @@ export default function Obligations() {
                           <button
                             type="button"
                             onClick={() => {
-                              if (!hasFullSuite) {
+                              if (!canUseDebt) {
                                 toast.error('Editing debt requires Full Suite.');
                                 return;
                               }
@@ -885,7 +888,7 @@ export default function Obligations() {
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
-                              if (!hasFullSuite) {
+                              if (!canUseDebt) {
                                 toast.error('Editing debt requires Full Suite.');
                                 return;
                               }
