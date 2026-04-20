@@ -11,6 +11,14 @@ import {
   normalizeFinancialAlertPrefs,
 } from '../lib/financialAlertPrefs';
 import { suggestPlatformFromMerchant } from '../lib/platformTag';
+import { DEFAULT_UI_PREFERENCES, normalizeUiPreferences, type UiPreferences } from '../lib/uiPreferences';
+import {
+  mergeNotificationPrefsFromSources,
+  isNotificationPrefsEmpty,
+  normalizeNotificationPrefsRecord,
+  type NotificationPrefsRecord,
+} from '../lib/notificationPreferences';
+import { DEFAULT_NOTIF_PREFS, NOTIF_PREFS_STORAGE_KEY, loadNotifPrefs } from '../pages/settings/constants';
 export type { CategorizationRule, CategorizationExclusion };
 export type { FinancialAlertPrefs };
 
@@ -319,6 +327,8 @@ interface AppState {
     phone?: string;
     timezone?: string;
     language?: string;
+    uiPreferences: UiPreferences;
+    notificationPrefs: NotificationPrefsRecord;
     hasCompletedOnboarding: boolean;
     isAdmin: boolean;
   };
@@ -484,6 +494,8 @@ const initialData = {
     phone: '',
     timezone: 'America/New_York',
     language: 'English (US)',
+    uiPreferences: DEFAULT_UI_PREFERENCES,
+    notificationPrefs: mergeNotificationPrefsFromSources({}, loadNotifPrefs()),
     hasCompletedOnboarding: false,
     isAdmin: false,
   },
@@ -1450,6 +1462,18 @@ export const useStore = create<AppState>()(
 
   // ── User / Profile ────────────────────────────────────────────
   updateUser: async (user) => {
+    const prevUiPrefs = user.uiPreferences !== undefined ? get().user.uiPreferences : undefined;
+    const prevNotifPrefs = user.notificationPrefs !== undefined ? get().user.notificationPrefs : undefined;
+    if (user.uiPreferences !== undefined || user.notificationPrefs !== undefined) {
+      set((state) => ({
+        user: {
+          ...state.user,
+          ...(user.uiPreferences !== undefined ? { uiPreferences: user.uiPreferences } : {}),
+          ...(user.notificationPrefs !== undefined ? { notificationPrefs: user.notificationPrefs } : {}),
+        },
+      }));
+    }
+
     const userId = (await supabase.auth.getUser()).data.user?.id;
     const patch: Record<string, unknown> = {};
     if (user.firstName !== undefined) patch.first_name = user.firstName;
@@ -1460,6 +1484,8 @@ export const useStore = create<AppState>()(
     if (user.phone !== undefined)    patch.phone = user.phone;
     if (user.timezone !== undefined) patch.timezone = user.timezone;
     if (user.language !== undefined) patch.language = user.language;
+    if (user.uiPreferences !== undefined) patch.ui_preferences = user.uiPreferences;
+    if (user.notificationPrefs !== undefined) patch.notification_prefs = user.notificationPrefs;
     if (user.taxState !== undefined) patch.tax_state = user.taxState;
     if (user.taxRate !== undefined)  patch.tax_rate = user.taxRate;
     if (user.taxReservePercent !== undefined) patch.tax_reserve_percent = user.taxReservePercent;
@@ -1479,6 +1505,15 @@ export const useStore = create<AppState>()(
     if (Object.keys(patch).length > 0) {
       if (!userId) {
         console.error('[updateUser] no authenticated user — cannot persist profile');
+        if (prevUiPrefs !== undefined || prevNotifPrefs !== undefined) {
+          set((state) => ({
+            user: {
+              ...state.user,
+              ...(prevUiPrefs !== undefined ? { uiPreferences: prevUiPrefs } : {}),
+              ...(prevNotifPrefs !== undefined ? { notificationPrefs: prevNotifPrefs } : {}),
+            },
+          }));
+        }
         toast.error('Could not save profile. Please try again.');
         return false;
       }
@@ -1489,11 +1524,27 @@ export const useStore = create<AppState>()(
         .upsert({ id: userId, ...patch }, { onConflict: 'id' });
       if (error) {
         console.error('[updateUser] profile upsert failed:', error.message, error.code);
+        if (prevUiPrefs !== undefined || prevNotifPrefs !== undefined) {
+          set((state) => ({
+            user: {
+              ...state.user,
+              ...(prevUiPrefs !== undefined ? { uiPreferences: prevUiPrefs } : {}),
+              ...(prevNotifPrefs !== undefined ? { notificationPrefs: prevNotifPrefs } : {}),
+            },
+          }));
+        }
         toast.error('Could not save profile. Please try again.');
         return false;
       }
     }
     set((state) => ({ user: { ...state.user, ...user } }));
+    if (user.notificationPrefs !== undefined && typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(NOTIF_PREFS_STORAGE_KEY, JSON.stringify(get().user.notificationPrefs));
+      } catch {
+        /* ignore quota / private mode */
+      }
+    }
     return true;
   },
   addFreelanceEntry: async (entry) => {
@@ -1712,7 +1763,15 @@ export const useStore = create<AppState>()(
         plaid_linked_at: null,
         plaid_last_sync_at: null,
         plaid_needs_relink: false,
+        ui_preferences: DEFAULT_UI_PREFERENCES,
+        notification_prefs: DEFAULT_NOTIF_PREFS,
       });
+
+      try {
+        localStorage.setItem(NOTIF_PREFS_STORAGE_KEY, JSON.stringify(normalizeNotificationPrefsRecord(DEFAULT_NOTIF_PREFS)));
+      } catch {
+        /* ignore */
+      }
 
       // 3. RESET LOCAL STATE
       set({
@@ -1721,7 +1780,9 @@ export const useStore = create<AppState>()(
           ...get().user,
           hasCompletedOnboarding: false,
           taxState: '',
-          taxRate: 0
+          taxRate: 0,
+          uiPreferences: DEFAULT_UI_PREFERENCES,
+          notificationPrefs: normalizeNotificationPrefsRecord(DEFAULT_NOTIF_PREFS),
         },
         bankConnected: false,
         plaidInstitutionName: null,
@@ -2567,6 +2628,27 @@ export const useStore = create<AppState>()(
           phone: profile.phone ?? '',
           timezone: profile.timezone ?? 'America/New_York',
           language: profile.language || 'English (US)',
+          uiPreferences: normalizeUiPreferences(
+            (profile as { ui_preferences?: unknown }).ui_preferences,
+          ),
+          notificationPrefs: (() => {
+            const serverRaw = (profile as { notification_prefs?: unknown }).notification_prefs;
+            const merged = mergeNotificationPrefsFromSources(serverRaw, loadNotifPrefs());
+            if (typeof window !== 'undefined') {
+              try {
+                localStorage.setItem(NOTIF_PREFS_STORAGE_KEY, JSON.stringify(merged));
+              } catch {
+                /* ignore */
+              }
+            }
+            if (isNotificationPrefsEmpty(serverRaw)) {
+              void supabase.from('profiles').upsert(
+                { id: resolvedUserId, notification_prefs: merged },
+                { onConflict: 'id' },
+              );
+            }
+            return merged;
+          })(),
           hasCompletedOnboarding: profile.has_completed_onboarding === true,
           taxState: profile.tax_state ?? '',
           taxRate: profile.tax_rate ?? 0,

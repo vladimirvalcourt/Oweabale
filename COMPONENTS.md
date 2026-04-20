@@ -40,7 +40,7 @@ The main app shell. Renders the collapsible sidebar, sticky top bar, animated pa
 
 | Group | Items |
 |---|---|
-| Overview | Dashboard, Income, Freelance Vault, Regular Bills, Review Inbox |
+| Overview | Dashboard, Income, Freelance / gigs, Regular Bills, Review Inbox |
 | Activity | Subscriptions, Reports, Transactions |
 | Planning | Net Worth, Budgets, Calendar, Goals, Taxes |
 

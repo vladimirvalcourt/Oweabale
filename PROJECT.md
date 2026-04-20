@@ -54,12 +54,12 @@ The main command center. Shows:
 ### Income (`/income`)
 Tracks recurring income sources (W-2 and freelance). Each entry tagged with `isTaxWithheld` — salaried income marked as withheld, gig income marked as gross (tax reserve applied automatically in Taxes page).
 
-### Freelance Vault (`/freelance`)
-Dedicated gig worker income tracker. Features:
+### Freelance / gigs (`/freelance`)
+Dedicated gig and freelance income tracker. Features:
 - PDF/image statement scanning via pdfjs-dist + Tesseract
 - Automatic extraction of platform (Uber, Lyft, DoorDash), gross amount, mileage deductions, platform fees
 - Per-entry tax liability calculation (SE tax 15.3% + state rate + 12% federal estimate)
-- "Vault" toggle to mark tax money as physically set aside
+- Tax reserve toggle to mark tax money as physically set aside
 
 ### Taxes (`/taxes`)
 Freelance tax planning dashboard. Features:

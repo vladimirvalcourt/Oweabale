@@ -43,6 +43,8 @@ export interface Database {
           tax_reserve_percent: number
           steady_salary_target: number
           alert_preferences: Json
+          ui_preferences: Json
+          notification_prefs: Json
           created_at: string
           updated_at: string
         }
@@ -71,6 +73,8 @@ export interface Database {
           tax_reserve_percent?: number
           steady_salary_target?: number
           alert_preferences?: Json
+          ui_preferences?: Json
+          notification_prefs?: Json
           created_at?: string
           updated_at?: string
         }
@@ -99,6 +103,8 @@ export interface Database {
           tax_reserve_percent?: number
           steady_salary_target?: number
           alert_preferences?: Json
+          ui_preferences?: Json
+          notification_prefs?: Json
           created_at?: string
           updated_at?: string
         }

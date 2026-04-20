@@ -412,7 +412,7 @@ export default function Layout() {
           { name: 'Dashboard', path: '/dashboard', icon: Home },
           { name: 'Cash flow', path: '/dashboard', icon: RefreshCw, hash: 'cash-flow' },
           { name: 'Income', path: '/income', icon: DollarSign },
-          { name: 'Freelance Vault', path: '/freelance', icon: Briefcase },
+          { name: 'Freelance / gigs', path: '/freelance', icon: Briefcase },
           { name: 'Regular Bills', path: '/bills', icon: FileText },
           { name: 'Tickets & Fines', path: '/bills?tab=ambush', icon: AlertTriangle, nested: true },
           { name: 'Debts & loans', path: '/bills?tab=debt', icon: CreditCard },

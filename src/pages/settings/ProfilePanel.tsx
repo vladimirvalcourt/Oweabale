@@ -56,6 +56,7 @@ function ProfilePanelInner() {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [cropApplying, setCropApplying] = useState(false);
+  const [signInProviderLabel, setSignInProviderLabel] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     firstName: user.firstName,
@@ -73,6 +74,18 @@ function ProfilePanelInner() {
   useEffect(() => {
     void refreshAuthPhone();
   }, [refreshAuthPhone, user.id]);
+
+  useEffect(() => {
+    void supabase.auth.getUser().then(({ data: { user: u } }) => {
+      const nonEmail = u?.identities?.find((i) => i.provider !== 'email');
+      const first = u?.identities?.[0]?.provider;
+      const p = nonEmail?.provider ?? first;
+      if (p === 'google') setSignInProviderLabel('Google');
+      else if (p === 'email') setSignInProviderLabel('Email & password');
+      else if (p) setSignInProviderLabel(p.charAt(0).toUpperCase() + p.slice(1));
+      else setSignInProviderLabel(null);
+    });
+  }, [user.id]);
 
   useEffect(() => {
     setFormData({
@@ -252,7 +265,7 @@ function ProfilePanelInner() {
         icon={User}
         extraHeader={
           <span className="text-xs font-medium text-content-tertiary">
-            Google sign-in
+            {signInProviderLabel ? `${signInProviderLabel} sign-in` : 'Sign-in'}
             {authPhoneConfirmed ? (
               <span className="ml-2 text-emerald-500">· Phone verified</span>
             ) : (
@@ -337,7 +350,7 @@ function ProfilePanelInner() {
               <div className="sm:col-span-4">
                 <label htmlFor="email" className="mb-2 block text-xs font-medium text-content-secondary">
                   Email address
-                  <span className="ml-2 font-normal text-content-tertiary">(managed by Google)</span>
+                  <span className="ml-2 font-normal text-content-tertiary">(from your auth provider)</span>
                 </label>
                 <input
                   type="email"
@@ -419,8 +432,8 @@ function ProfilePanelInner() {
                 <select
                   id="language"
                   value={formData.language}
-                  onChange={handleChange}
-                  className="focus-app-field block w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
+                  disabled
+                  className="focus-app-field block w-full cursor-not-allowed appearance-none rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-tertiary transition-colors"
                 >
                   {LANGUAGE_OPTIONS.map((o) => (
                     <option key={o.value} value={o.value}>
@@ -428,6 +441,9 @@ function ProfilePanelInner() {
                     </option>
                   ))}
                 </select>
+                <p className="mt-1.5 text-xs text-content-muted">
+                  The app is English-only today. We keep your selection on your profile for a future translated release.
+                </p>
               </div>
             </div>
 

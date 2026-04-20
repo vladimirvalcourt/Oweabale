@@ -230,7 +230,7 @@ export default function Freelance() {
 
   return (
     <div className="space-y-6 w-full">
-      {/* Hero: The Vault Status */}
+      {/* Hero: weekly income & tax reserve */}
       <div className="bg-surface-raised border border-surface-border p-8 md:p-12 relative overflow-hidden group shadow-none">
         <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-surface-border" />
         <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-surface-border" />
@@ -242,6 +242,9 @@ export default function Freelance() {
               <p className="text-xs font-sans text-content-tertiary">
                 Weekly income tracker
                 {hasTaxState ? ` · ${taxState}` : ''}
+              </p>
+              <p className="text-xs text-content-tertiary mt-2 max-w-md leading-relaxed">
+                Upload gig pay PDFs, log payments, and see how much to set aside for taxes.
               </p>
             </div>
             
@@ -380,7 +383,7 @@ export default function Freelance() {
                         >
                           Set your state
                         </TransitionLink>{' '}
-                        so Freelance Vault can estimate state withholding.
+                        so Freelance / gigs can estimate state withholding.
                       </p>
                     ) : (
                       <p className="text-xs text-content-tertiary leading-relaxed">

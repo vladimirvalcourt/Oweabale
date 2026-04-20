@@ -149,7 +149,7 @@ function AppRoutes() {
             path="freelance"
             element={
               <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Freelance Vault">
+                <FullSuiteRouteGuard featureName="Freelance / gigs">
                   <Freelance />
                 </FullSuiteRouteGuard>
               </ErrorBoundary>

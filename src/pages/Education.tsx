@@ -41,7 +41,7 @@ const MODULES = [
     icon: Calculator,
     lessons: [
       { id: '3-1', title: 'Quarterly Estimated Taxes Overview', type: 'article', readTime: '20 MIN', content: "If you expect to owe more than $1,000 in taxes at the end of the year from freelance or 1099 work, the IRS requires you to pay estimated taxes quarterly. Missing these payments can result in penalties.\n\nOweable calculates this for you automatically in the Taxes module." },
-      { id: '3-2', title: 'Write-Offs You Are Probably Missing', type: 'article', readTime: '15 MIN', content: "Did you know a portion of your home internet, cell phone bill, and even rent can be written off if you have a dedicated home office?\n\nIf you use your personal vehicle for gig work, you can deduct standard mileage. Always track these in Oweable's Freelance Vault to reduce your taxable liability." },
+      { id: '3-2', title: 'Write-Offs You Are Probably Missing', type: 'article', readTime: '15 MIN', content: "Did you know a portion of your home internet, cell phone bill, and even rent can be written off if you have a dedicated home office?\n\nIf you use your personal vehicle for gig work, you can deduct standard mileage. Always track these in Oweable's Freelance / gigs area to reduce your taxable liability." },
       { id: '3-3', title: 'Separating Business & Personal Accounts', type: 'article', readTime: '10 MIN', content: "The number one mistake freelancers make is co-mingling funds. Always open a completely separate checking account for your 1099 income. When a client pays you, it goes to the business account. Then, you transfer a 'salary' to your personal account. This ensures an audit trail that the IRS loves." },
     ]
   },

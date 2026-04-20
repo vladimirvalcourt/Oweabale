@@ -1,4 +1,4 @@
-import React, { memo, startTransition, useCallback, useEffect, useState } from 'react';
+import React, { memo, startTransition, useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Dialog } from '@headlessui/react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
@@ -102,12 +102,6 @@ export default function Settings() {
       ? (tabFromUrl as SettingsTab)
       : 'profile';
 
-  useEffect(() => {
-    if (!tabFromUrl) {
-      setSearchParams({ tab: 'profile' }, { replace: true });
-    }
-  }, [tabFromUrl, setSearchParams]);
-
   const selectTab = useCallback((tabId: SettingsTab) => {
     startTransition(() => {
       if (tabId === 'profile') {
@@ -200,7 +194,7 @@ export default function Settings() {
       </div>
 
       <p className="max-w-5xl mx-auto text-center text-[11px] font-mono text-content-muted">
-        Settings apply to this browser session and your Oweable profile on the server.
+        Most preferences sync to your Oweable profile. App Lock, web push, and some session data stay on this device.
       </p>
 
       <Dialog open={isResetDialogOpen} onClose={() => setIsResetDialogOpen(false)} className="relative z-50">

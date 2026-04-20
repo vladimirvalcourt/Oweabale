@@ -114,7 +114,7 @@ function FinancialPanelInner() {
 
       <CollapsibleModule title="Tax residence (freelance)" icon={MapPin} defaultOpen={false}>
         <p id="tax-state-preference" className="mb-4 text-sm text-content-secondary">
-          Used for Freelance Vault state tax estimates. You can also adjust this from the Taxes page.
+          Used for Freelance / gigs state tax estimates. You can also adjust this from the Taxes page.
         </p>
         <div className="max-w-md space-y-4">
           <div>
