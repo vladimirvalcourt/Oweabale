@@ -3,34 +3,63 @@
  * Expense/bill values are lowercase slugs stored on transactions & bills.
  */
 
-export const EXPENSE_BILL_CATEGORY_OPTIONS: { value: string; label: string }[] = [
-  { value: 'housing', label: 'Housing & rent' },
-  { value: 'utilities', label: 'Utilities & telecom' },
-  { value: 'insurance', label: 'Insurance (auto, home, etc.)' },
-  { value: 'life_disability_insurance', label: 'Life & disability insurance' },
-  { value: 'subscriptions', label: 'Subscriptions & streaming' },
-  { value: 'auto', label: 'Auto, loan & car expenses' },
-  { value: 'transport', label: 'Gas, transit, parking & tolls' },
-  { value: 'food', label: 'Food & dining' },
-  { value: 'shopping', label: 'Shopping & retail' },
-  { value: 'health', label: 'Health & medical' },
-  { value: 'childcare', label: 'Childcare, babysitting & after-school' },
-  { value: 'daycare', label: 'Daycare & preschool' },
-  { value: 'child_support', label: 'Child support (paid out)' },
-  { value: 'alimony', label: 'Alimony (paid out)' },
-  { value: 'education', label: 'Education & student loans' },
-  { value: 'pets', label: 'Pets & vet' },
-  { value: 'personal', label: 'Personal care, gym & wellness' },
-  { value: 'travel', label: 'Travel & vacation' },
-  { value: 'entertainment', label: 'Entertainment & hobbies' },
-  { value: 'gifts_charity', label: 'Gifts & charitable giving' },
-  { value: 'taxes', label: 'Taxes & licensing' },
-  { value: 'legal', label: 'Legal & professional fees' },
-  { value: 'business', label: 'Business & software' },
-  { value: 'debt', label: 'Debt payments & credit' },
-  { value: 'cash_misc', label: 'Cash, ATM & miscellaneous' },
-  { value: 'other', label: 'Other' },
+export const EXPENSE_CATEGORY_OPTGROUPS: { label: string; options: { value: string; label: string }[] }[] = [
+  {
+    label: 'Home & essentials',
+    options: [
+      { value: 'housing', label: 'Housing & rent' },
+      { value: 'utilities', label: 'Utilities & telecom' },
+      { value: 'insurance', label: 'Insurance (auto, home, etc.)' },
+      { value: 'life_disability_insurance', label: 'Life & disability insurance' },
+      { value: 'subscriptions', label: 'Subscriptions & streaming' },
+      { value: 'taxes', label: 'Taxes & licensing' },
+    ],
+  },
+  {
+    label: 'Getting around',
+    options: [
+      { value: 'auto', label: 'Auto, loan & car expenses' },
+      { value: 'transport', label: 'Gas, transit, parking & tolls' },
+    ],
+  },
+  {
+    label: 'Daily life',
+    options: [
+      { value: 'food', label: 'Food & dining' },
+      { value: 'shopping', label: 'Shopping & retail' },
+      { value: 'health', label: 'Health & medical' },
+      { value: 'personal', label: 'Personal care, gym & wellness' },
+      { value: 'pets', label: 'Pets & vet' },
+      { value: 'entertainment', label: 'Entertainment & hobbies' },
+      { value: 'travel', label: 'Travel & vacation' },
+      { value: 'gifts_charity', label: 'Gifts & charitable giving' },
+    ],
+  },
+  {
+    label: 'Family & dependents',
+    options: [
+      { value: 'childcare', label: 'Childcare, babysitting & after-school' },
+      { value: 'daycare', label: 'Daycare & preschool' },
+      { value: 'child_support', label: 'Child support (paid out)' },
+      { value: 'alimony', label: 'Alimony (paid out)' },
+      { value: 'education', label: 'Education & student loans' },
+    ],
+  },
+  {
+    label: 'Money & work',
+    options: [
+      { value: 'business', label: 'Business & software' },
+      { value: 'legal', label: 'Legal & professional fees' },
+      { value: 'debt', label: 'Debt payments & credit' },
+      { value: 'cash_misc', label: 'Cash, ATM & miscellaneous' },
+      { value: 'other', label: 'Other' },
+    ],
+  },
 ];
+
+/** Flat list for Review Inbox `<option>` maps and label lookup */
+export const EXPENSE_BILL_CATEGORY_OPTIONS: { value: string; label: string }[] =
+  EXPENSE_CATEGORY_OPTGROUPS.flatMap((g) => g.options);
 
 /** Labels for analytics / UI (slug → display) */
 export const EXPENSE_CATEGORY_LABELS: Record<string, string> = Object.fromEntries(

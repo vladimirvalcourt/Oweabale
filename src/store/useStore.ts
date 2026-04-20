@@ -57,6 +57,8 @@ export interface Transaction {
   type: 'income' | 'expense';
   /** Gig platform or custom label (optional). */
   platformTag?: string;
+  /** Optional memo (manual entries, Quick Entry). */
+  notes?: string;
 }
 
 export interface Asset {
@@ -344,7 +346,7 @@ interface AppState {
   disconnectBank: () => Promise<void>;
   syncPlaidTransactions: (opts?: { quiet?: boolean }) => Promise<boolean>;
   addTransaction: (transaction: Omit<Transaction, 'id'>, opts?: { allowBudgetOverride?: boolean }) => Promise<boolean>;
-  updateTransaction: (id: string, patch: Partial<Pick<Transaction, 'category' | 'platformTag' | 'name'>>) => Promise<boolean>;
+  updateTransaction: (id: string, patch: Partial<Pick<Transaction, 'category' | 'platformTag' | 'name' | 'notes'>>) => Promise<boolean>;
   lastBudgetGuardrail: {
     type: 'soft' | 'hard';
     category: string;
@@ -661,6 +663,7 @@ export const useStore = create<AppState>()(
           amount: transaction.amount,
           type: transaction.type,
           platform_tag: platformTag,
+          notes: transaction.notes?.trim() || null,
           user_id: userId 
         })
         .select('id')
@@ -671,7 +674,12 @@ export const useStore = create<AppState>()(
 
       set((state) => ({
         transactions: [
-          { ...transaction, id: newId, platformTag: platformTag ? platformTag : undefined },
+          {
+            ...transaction,
+            id: newId,
+            platformTag: platformTag ? platformTag : undefined,
+            notes: transaction.notes?.trim() || undefined,
+          },
           ...state.transactions,
         ].slice(0, 100)
       }));
@@ -706,6 +714,7 @@ export const useStore = create<AppState>()(
       if (patch.name !== undefined) db.name = patch.name;
       if (patch.category !== undefined) db.category = patch.category;
       if (patch.platformTag !== undefined) db.platform_tag = patch.platformTag.trim();
+      if (patch.notes !== undefined) db.notes = patch.notes.trim() || null;
       if (Object.keys(db).length === 0) return true;
       const { error } = await supabase.from('transactions').update(db).eq('id', id).eq('user_id', userId);
       if (error) {
@@ -2496,6 +2505,12 @@ export const useStore = create<AppState>()(
           platformTag: (() => {
             const pt = t.platform_tag ?? t.platformTag;
             const s = typeof pt === 'string' ? pt.trim() : '';
+            return s || undefined;
+          })(),
+          notes: (() => {
+            const n = t.notes;
+            if (n == null) return undefined;
+            const s = String(n).trim();
             return s || undefined;
           })(),
         })),

@@ -9,7 +9,8 @@ import { guessCategory } from '../lib/categorizer';
 import { validateIngestionFile } from '../lib/security';
 import { extractCitationFieldsFromText, looksLikeCitationDocument } from '../lib/citationFromDocument';
 import { yieldForPaint } from '../lib/interaction';
-import { EXPENSE_BILL_CATEGORY_OPTIONS, INCOME_CATEGORY_OPTIONS } from '../lib/quickEntryCategories';
+import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '../lib/quickEntryCategories';
+import { formatLocalISODate, parseQuickEntryDateHint } from '../lib/quickEntryNlp';
 
 interface QuickAddModalProps {
   isOpen: boolean;
@@ -37,7 +38,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('food');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(() => formatLocalISODate());
   const [obligationKind, setObligationKind] = useState<ObligationKind>('bill-monthly');
   /** Closed card / no statement cycle — omit payment due date on debt. */
   const [debtNoPaymentDue, setDebtNoPaymentDue] = useState(false);
@@ -45,6 +46,11 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [vendor, setVendor] = useState('');
   const [incomeCategory, setIncomeCategory] = useState('Salary');
   const [incomeFrequency, setIncomeFrequency] = useState<IncomeSource['frequency']>('Monthly');
+  /** Transaction tab: expense vs income/refund (stored as income row). */
+  const [transactionLedgerKind, setTransactionLedgerKind] = useState<'expense' | 'income'>('expense');
+  const [txIncomeCategory, setTxIncomeCategory] = useState('Reimbursements');
+  const [incomeTaxWithheld, setIncomeTaxWithheld] = useState(false);
+  const [memoNotes, setMemoNotes] = useState('');
   // Citation-specific states
   const [citationType, setCitationType] = useState('Toll Violation');
   const [jurisdiction, setJurisdiction] = useState('');
@@ -67,6 +73,44 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [showPreview, setShowPreview] = useState(false);
   const scanFileInputRef = useRef<HTMLInputElement>(null);
   const scanCameraInputRef = useRef<HTMLInputElement>(null);
+
+  const resetFormPreserveTab = React.useCallback(() => {
+    setAmount('');
+    setDescription('');
+    setVendor('');
+    setCategory('food');
+    setDate(formatLocalISODate());
+    setTransactionLedgerKind('expense');
+    setTxIncomeCategory('Reimbursements');
+    setMemoNotes('');
+    setIncomeTaxWithheld(false);
+    setObligationKind('bill-monthly');
+    setDueDate('');
+    setIncomeCategory('Salary');
+    setIncomeFrequency('Monthly');
+    setNlpText('');
+    setIsScanning(false);
+    setErrors({});
+    if (scanFileInputRef.current) scanFileInputRef.current.value = '';
+    if (scanCameraInputRef.current) scanCameraInputRef.current.value = '';
+    setScannedPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    setShowPreview(false);
+    setCitationType('Toll Violation');
+    setJurisdiction('');
+    setCitationNumber('');
+    setPenaltyFee('');
+    setApr('19.99');
+    setMinPayment('');
+    setDebtNoPaymentDue(false);
+    setDaysLeft('30');
+    setCitationDueDate('');
+    setPaymentUrl('');
+    setAllowBudgetOverride(false);
+    clearLastBudgetGuardrail();
+  }, [clearLastBudgetGuardrail]);
 
   // Noise patterns that should be skipped when finding a merchant name
   const RECEIPT_NOISE = /^(receipt|invoice|thank you|thanks|welcome|store|branch|tel:|phone:|www\.|http|address:|date:|time:|cashier|order #|order:|transaction|subtotal|total|tax|amount|change|cash|card|approved|auth|ref:|refund|void|copy|customer|#\d+|\d{3}[-.\s]\d{3}[-.\s]\d{4}|\d{1,5}\s+\w+\s+(st|ave|blvd|rd|dr|lane|ln|way|ct|pl|suite))/i;
@@ -149,12 +193,12 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         if (activeTab === 'transaction') setDescription(merchantName);
         else if (activeTab === 'obligation') setVendor(merchantName);
         const guessed = guessCategory(merchantName);
-        if (guessed) setCategory(guessed);
+        if (guessed && !(activeTab === 'transaction' && transactionLedgerKind === 'income')) setCategory(guessed);
       }
 
       if (!merchantName) {
         const guessed = guessCategory(fullText.substring(0, 500));
-        if (guessed) setCategory(guessed);
+        if (guessed && !(activeTab === 'transaction' && transactionLedgerKind === 'income')) setCategory(guessed);
       }
 
       if (isCitationDoc) {
@@ -204,36 +248,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   useEffect(() => {
     if (isOpen) {
       setActiveTab(quickAddTab);
-      setAmount('');
-      setDescription('');
-      setVendor('');
-      setCategory('food');
-      setDate(new Date().toISOString().split('T')[0]);
-      setObligationKind('bill-monthly');
-      setDueDate('');
-      setIncomeCategory('Salary');
-      setIncomeFrequency('Monthly');
-      setNlpText('');
-      setIsScanning(false);
-      setErrors({});
-      if (scanFileInputRef.current) scanFileInputRef.current.value = '';
-      if (scanCameraInputRef.current) scanCameraInputRef.current.value = '';
-      setScannedPreviewUrl(prev => { if (prev) URL.revokeObjectURL(prev); return null; });
-      setShowPreview(false);
-      setCitationType('Toll Violation');
-      setJurisdiction('');
-      setCitationNumber('');
-      setPenaltyFee('');
-      setApr('19.99');
-      setMinPayment('');
-      setDebtNoPaymentDue(false);
-      setDaysLeft('30');
-      setCitationDueDate('');
-      setPaymentUrl('');
-      setAllowBudgetOverride(false);
-      clearLastBudgetGuardrail();
+      resetFormPreserveTab();
     }
-  }, [isOpen, quickAddTab, clearLastBudgetGuardrail]);
+  }, [isOpen, quickAddTab, resetFormPreserveTab]);
 
   useEffect(() => {
     setShowPreview(false);
@@ -243,11 +260,11 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     if (activeTab === 'obligation' && vendor.length > 2) {
       const guessed = guessCategory(vendor);
       if (guessed) setCategory(guessed);
-    } else if (activeTab === 'transaction' && description.length > 2) {
+    } else if (activeTab === 'transaction' && transactionLedgerKind === 'expense' && description.length > 2) {
       const guessed = guessCategory(description);
       if (guessed) setCategory(guessed);
     }
-  }, [vendor, description, activeTab]);
+  }, [vendor, description, activeTab, transactionLedgerKind]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -275,64 +292,92 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const handleNLPInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
     setNlpText(val);
-    
-    // Simple NLP parsing
-    const parts = val.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      const lastPart = parts[parts.length - 1].toLowerCase();
-      
-      // Date parsing check
-      if (lastPart === 'today') setDate(new Date().toISOString().split('T')[0]);
-      if (lastPart === 'yesterday') {
-        const d = new Date();
-        d.setDate(d.getDate() - 1);
-        setDate(d.toISOString().split('T')[0]);
-      }
-      if (lastPart === 'tomorrow') {
-        const d = new Date();
-        d.setDate(d.getDate() + 1);
-        setDate(d.toISOString().split('T')[0]);
-      }
 
-      // Find amount (e.g. 50 or $50)
-      const amountPart = parts.find(p => p.match(/^\$?\d+(\.\d{2})?$/));
-      if (amountPart) {
-        setAmount(amountPart.replace('$', ''));
-        const namePart = parts.filter(p => p !== amountPart && !['today', 'yesterday', 'tomorrow'].includes(p.toLowerCase())).join(' ');
-        
-        if (val.toLowerCase().includes('bill') || val.toLowerCase().includes('due')) {
-          setActiveTab('obligation');
-          setVendor(namePart);
-        } else if (val.toLowerCase().includes('earned') || val.toLowerCase().includes('paid me')) {
-          setActiveTab('income');
-        } else {
-          setActiveTab('transaction');
-          setDescription(namePart);
-        }
+    const hinted = parseQuickEntryDateHint(val);
+    if (hinted) setDate(hinted);
+
+    const lower = val.toLowerCase();
+    if (/\b(refund|reimburse|reimbursement|deposit from|money back|cashback)\b/i.test(val)) {
+      setActiveTab('transaction');
+      setTransactionLedgerKind('income');
+      if (/reimburse/i.test(val)) setTxIncomeCategory('Reimbursements');
+      else if (/cashback/i.test(val)) setTxIncomeCategory('Other');
+      else setTxIncomeCategory('Other');
+    }
+
+    const parts = val.trim().split(/\s+/);
+    if (parts.length < 1) return;
+
+    const amountPart = parts.find((p) => /^\$?\d+(\.\d{1,2})?$/.test(p.replace(/,/g, '')));
+    if (amountPart) {
+      const normalized = amountPart.replace(/[$,]/g, '');
+      setAmount(normalized);
+
+      const stripTokens = new Set(
+        [
+          'today',
+          'yesterday',
+          'tomorrow',
+          'next',
+          'week',
+          'month',
+          'the',
+          'of',
+          'end',
+          'start',
+          'bill',
+          'due',
+          'paid',
+          'me',
+          'earned',
+          'income',
+          'refund',
+          'reimbursement',
+        ].flatMap((w) => [w, `${w}.`]),
+      );
+      const namePart = parts
+        .filter((p) => p !== amountPart && !stripTokens.has(p.toLowerCase()))
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      if (lower.includes('bill') || /\bdue\b/.test(lower)) {
+        setActiveTab('obligation');
+        if (namePart) setVendor(namePart);
+      } else if (lower.includes('earned') || lower.includes('paid me') || /\bpaycheck\b/.test(lower)) {
+        setActiveTab('income');
+        if (namePart) setDescription(namePart);
+      } else if (!/\b(refund|reimburse|deposit from|money back|cashback)\b/i.test(val)) {
+        setActiveTab('transaction');
+        if (namePart) setDescription(namePart);
       }
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitEntry = async (addAnother: boolean) => {
     if (isSubmitting) return;
     if (!validateForm()) return;
-    
+
     const numAmount = parseFloat(amount);
 
     setIsSubmitting(true);
     await yieldForPaint();
     try {
       if (activeTab === 'transaction') {
-        const ok = await addTransaction({
-          name: description,
-          amount: numAmount,
-          category: category,
-          date: date,
-          type: 'expense'
-        }, { allowBudgetOverride });
+        const isIncome = transactionLedgerKind === 'income';
+        const ok = await addTransaction(
+          {
+            name: description,
+            amount: numAmount,
+            category: isIncome ? txIncomeCategory : category,
+            date: date,
+            type: isIncome ? 'income' : 'expense',
+            notes: memoNotes.trim() || undefined,
+          },
+          { allowBudgetOverride: isIncome ? false : allowBudgetOverride },
+        );
         if (!ok) return;
-        toast.success(`Transaction saved`);
+        toast.success(isIncome ? 'Income saved to ledger' : 'Transaction saved');
       } else if (activeTab === 'obligation') {
         if (obligationKind.startsWith('bill-')) {
           const freq =
@@ -373,7 +418,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
           category: incomeCategory,
           nextDate: date,
           status: 'active',
-          isTaxWithheld: false
+          isTaxWithheld: incomeTaxWithheld,
         });
         if (!ok) return;
         toast.success(`Income recorded`);
@@ -398,7 +443,15 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
         });
         if (!ok) return;
         toast.success(`Citation recorded`);
+        if (addAnother) {
+          resetFormPreserveTab();
+          return;
+        }
         onClose();
+        return;
+      }
+      if (addAnother) {
+        resetFormPreserveTab();
         return;
       }
       onClose();
@@ -407,6 +460,36 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       console.error(error);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    void submitEntry(false);
+  };
+
+  const tabOrder = ['transaction', 'obligation', 'income', 'citation'] as const;
+  const focusTabAt = (idx: number) => {
+    const tab = tabOrder[idx];
+    if (!tab) return;
+    setActiveTab(tab);
+    setErrors({});
+  };
+  const onTabListKeyDown = (e: React.KeyboardEvent) => {
+    const i = tabOrder.indexOf(activeTab);
+    if (i < 0) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      focusTabAt((i + 1) % tabOrder.length);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      focusTabAt((i - 1 + tabOrder.length) % tabOrder.length);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      focusTabAt(0);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      focusTabAt(tabOrder.length - 1);
     }
   };
 
@@ -461,6 +544,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         </p>
                         <p className="text-[8px] font-mono text-content-muted uppercase tracking-widest mt-0.5">
                           JPG · PNG · WEBP · PDF
+                        </p>
+                        <p className="text-[10px] font-sans text-content-muted mt-2 leading-snug max-w-md">
+                          Review amount, entry type, and category before saving — OCR can misread symbols or merchants.
                         </p>
                       </div>
                       <div className="flex flex-wrap items-center gap-2 sm:justify-end min-w-0 w-full sm:w-auto">
@@ -551,7 +637,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     </div>
                     
                     <textarea
-                      placeholder="e.g. 'Coffee 5.50 today' or 'Comcast bill 120 next tuesday'"
+                      placeholder="e.g. Coffee 5.50 tomorrow · Amazon refund 42.10 · Comcast bill 120 next tuesday · 15th 89 gas"
                       value={nlpText}
                       onChange={handleNLPInput}
                       className="w-full bg-surface-raised border border-surface-border rounded-lg focus-app-field text-sm font-sans text-content-primary placeholder:text-content-muted p-3 resize-none transition-colors"
@@ -560,44 +646,91 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   </div>
 
                   {/* Tabs */}
-                  <div className="flex border-b border-surface-border bg-surface-raised p-1 gap-1">
+                  <div
+                    role="tablist"
+                    aria-label="Record type"
+                    onKeyDown={onTabListKeyDown}
+                    className="flex flex-wrap border-b border-surface-border bg-surface-raised p-1 gap-1"
+                  >
                     <button
-                      onClick={() => { setActiveTab('transaction'); setErrors({}); }}
-                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg ${
+                      type="button"
+                      role="tab"
+                      id="qa-tab-transaction"
+                      aria-selected={activeTab === 'transaction'}
+                      aria-controls="quick-add-form"
+                      tabIndex={activeTab === 'transaction' ? 0 : -1}
+                      onClick={() => {
+                        setActiveTab('transaction');
+                        setErrors({});
+                      }}
+                      className={`min-w-[5.5rem] flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg ${
                         activeTab === 'transaction' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-app`}
                     >
                       Expense
                     </button>
                     <button
-                      onClick={() => { setActiveTab('obligation'); setErrors({}); }}
-                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg ${
+                      type="button"
+                      role="tab"
+                      id="qa-tab-obligation"
+                      aria-selected={activeTab === 'obligation'}
+                      aria-controls="quick-add-form"
+                      tabIndex={activeTab === 'obligation' ? 0 : -1}
+                      onClick={() => {
+                        setActiveTab('obligation');
+                        setErrors({});
+                      }}
+                      className={`min-w-[5.5rem] flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg ${
                         activeTab === 'obligation' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-app`}
                     >
                       Bill/Debt
                     </button>
                     <button
-                      onClick={() => { setActiveTab('income'); setErrors({}); }}
-                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg ${
+                      type="button"
+                      role="tab"
+                      id="qa-tab-income"
+                      aria-selected={activeTab === 'income'}
+                      aria-controls="quick-add-form"
+                      tabIndex={activeTab === 'income' ? 0 : -1}
+                      onClick={() => {
+                        setActiveTab('income');
+                        setErrors({});
+                      }}
+                      className={`min-w-[5.5rem] flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg ${
                         activeTab === 'income' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-app`}
                     >
                       Income
                     </button>
                     <button
-                      onClick={() => { setActiveTab('citation'); setErrors({}); }}
-                      className={`flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg flex items-center justify-center gap-1.5 ${
+                      type="button"
+                      role="tab"
+                      id="qa-tab-citation"
+                      aria-selected={activeTab === 'citation'}
+                      aria-controls="quick-add-form"
+                      tabIndex={activeTab === 'citation' ? 0 : -1}
+                      onClick={() => {
+                        setActiveTab('citation');
+                        setErrors({});
+                      }}
+                      className={`min-w-[5.5rem] flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg flex items-center justify-center gap-1.5 ${
                         activeTab === 'citation' ? 'bg-content-primary/[0.08] text-content-primary border border-surface-border' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-app`}
                     >
-                      <AlertTriangle className="w-3 h-3" />
+                      <AlertTriangle className="w-3 h-3 shrink-0" aria-hidden />
                       Ticket
                     </button>
                   </div>
 
                   {/* Form Body */}
-                  <form id="quick-add-form" onSubmit={handleSubmit} className="p-6 space-y-5">
+                  <form
+                    id="quick-add-form"
+                    onSubmit={handleFormSubmit}
+                    role="tabpanel"
+                    aria-labelledby={`qa-tab-${activeTab}`}
+                    className="p-6 space-y-5"
+                  >
                     
                     {/* AMOUNT FIELD (ALWAYS PRESENT) */}
                     <div>
@@ -620,10 +753,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       )}
                     </div>
 
-                    {/* EXPENSE FIELDS */}
+                    {/* TRANSACTION (expense or income/refund) */}
                     {activeTab === 'transaction' && (
                       <>
-                        {lastBudgetGuardrail && (
+                        {lastBudgetGuardrail && transactionLedgerKind === 'expense' && (
                           <div
                             className={`rounded-lg border px-3 py-2 text-xs ${
                               lastBudgetGuardrail.type === 'hard'
@@ -674,19 +807,79 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           )}
                         </div>
 
+                        <div className="rounded-lg border border-surface-border bg-surface-base p-3">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                            <span className="text-xs font-medium text-content-tertiary">Ledger</span>
+                            <div
+                              className="flex rounded-lg border border-surface-border p-0.5 bg-surface-raised gap-0.5"
+                              role="group"
+                              aria-label="Expense or income"
+                            >
+                              <button
+                                type="button"
+                                onClick={() => setTransactionLedgerKind('expense')}
+                                className={`flex-1 rounded-md px-3 py-1.5 text-xs font-sans font-medium transition-colors ${
+                                  transactionLedgerKind === 'expense'
+                                    ? 'bg-brand-cta text-surface-base'
+                                    : 'text-content-tertiary hover:text-content-primary'
+                                } focus-app`}
+                              >
+                                Expense
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setTransactionLedgerKind('income')}
+                                className={`flex-1 rounded-md px-3 py-1.5 text-xs font-sans font-medium transition-colors ${
+                                  transactionLedgerKind === 'income'
+                                    ? 'bg-brand-cta text-surface-base'
+                                    : 'text-content-tertiary hover:text-content-primary'
+                                } focus-app`}
+                              >
+                                Income / refund
+                              </button>
+                            </div>
+                          </div>
+                          <p className="text-[10px] text-content-muted mt-2 leading-snug">
+                            Refunds and deposits save as income; choose the category that matches the source.
+                          </p>
+                        </div>
+
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label htmlFor="category" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Category</label>
-                            <select 
-                              id="category"
-                              value={category}
-                              onChange={(e) => setCategory(e.target.value)}
-                              className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer"
-                            >
-                              {EXPENSE_BILL_CATEGORY_OPTIONS.map((o) => (
-                                <option key={o.value} value={o.value}>{o.label}</option>
-                              ))}
-                            </select>
+                            <label htmlFor="transaction-category" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
+                              {transactionLedgerKind === 'expense' ? 'Expense category' : 'Income category'}
+                            </label>
+                            {transactionLedgerKind === 'expense' ? (
+                              <select
+                                id="transaction-category"
+                                value={category}
+                                onChange={(e) => setCategory(e.target.value)}
+                                className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer"
+                              >
+                                {EXPENSE_CATEGORY_OPTGROUPS.map((g) => (
+                                  <optgroup key={g.label} label={g.label}>
+                                    {g.options.map((o) => (
+                                      <option key={o.value} value={o.value}>
+                                        {o.label}
+                                      </option>
+                                    ))}
+                                  </optgroup>
+                                ))}
+                              </select>
+                            ) : (
+                              <select
+                                id="transaction-category"
+                                value={txIncomeCategory}
+                                onChange={(e) => setTxIncomeCategory(e.target.value)}
+                                className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer"
+                              >
+                                {INCOME_CATEGORY_OPTIONS.map((o) => (
+                                  <option key={o.value} value={o.value}>
+                                    {o.label}
+                                  </option>
+                                ))}
+                              </select>
+                            )}
                           </div>
                           <div>
                             <label htmlFor="date" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Date</label>
@@ -698,6 +891,20 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               className="input-date-dark w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans"
                             />
                           </div>
+                        </div>
+
+                        <div>
+                          <label htmlFor="memoNotes" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
+                            Notes <span className="text-content-muted font-normal">(optional)</span>
+                          </label>
+                          <textarea
+                            id="memoNotes"
+                            value={memoNotes}
+                            onChange={(e) => setMemoNotes(e.target.value)}
+                            placeholder="Split with roommate, business trip, etc."
+                            rows={2}
+                            className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field text-sm font-sans text-content-primary placeholder:text-content-muted p-3 resize-none transition-colors"
+                          />
                         </div>
                       </>
                     )}
@@ -791,8 +998,14 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               onChange={(e) => setCategory(e.target.value)}
                               className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary cursor-pointer"
                             >
-                              {EXPENSE_BILL_CATEGORY_OPTIONS.map((o) => (
-                                <option key={o.value} value={o.value}>{o.label}</option>
+                              {EXPENSE_CATEGORY_OPTGROUPS.map((g) => (
+                                <optgroup key={g.label} label={g.label}>
+                                  {g.options.map((o) => (
+                                    <option key={o.value} value={o.value}>
+                                      {o.label}
+                                    </option>
+                                  ))}
+                                </optgroup>
                               ))}
                             </select>
                           </div>
@@ -980,6 +1193,15 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           />
                           {errors.date && <p className="text-xs text-red-400 mt-1.5">{errors.date}</p>}
                         </div>
+                        <label className="flex items-start gap-2.5 text-xs text-content-secondary cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={incomeTaxWithheld}
+                            onChange={(e) => setIncomeTaxWithheld(e.target.checked)}
+                            className="mt-0.5 rounded border-surface-border bg-surface-base focus-app"
+                          />
+                          <span>Taxes withheld (typical W-2 paycheck). Leave off for gross 1099 or contract pay.</span>
+                        </label>
                       </>
                     )}
 
@@ -987,7 +1209,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                 </div>
 
                 {/* Footer Controls */}
-                <div className="px-6 py-4 border-t border-surface-border bg-surface-raised shrink-0 flex justify-end gap-3">
+                <div className="px-6 py-4 border-t border-surface-border bg-surface-raised shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
                   <button
                     type="button"
                     onClick={onClose}
@@ -997,16 +1219,24 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     Cancel
                   </button>
                   <button
-                    type="submit"
-                    form="quick-add-form"
+                    type="button"
+                    onClick={() => void submitEntry(true)}
                     disabled={isSubmitting}
-                    className={`px-5 py-2 rounded-lg text-sm font-sans font-medium transition-colors focus-app ${
+                    className="px-4 py-2 rounded-lg text-sm font-sans font-medium border border-surface-border text-content-secondary hover:text-content-primary hover:bg-surface-elevated transition-colors focus-app disabled:opacity-50"
+                  >
+                    {isSubmitting ? 'Saving…' : 'Save & add another'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void submitEntry(false)}
+                    disabled={isSubmitting}
+                    className={`px-5 py-2 rounded-lg text-sm font-sans font-medium transition-colors focus-app disabled:opacity-50 ${
                       activeTab === 'citation'
                         ? 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover border border-surface-border'
                         : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover'
                     }`}
                   >
-                    {isSubmitting ? 'Saving…' : 'Save Entry'}
+                    {isSubmitting ? 'Saving…' : 'Save entry'}
                   </button>
                 </div>
               </Dialog.Panel>

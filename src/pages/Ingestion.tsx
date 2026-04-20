@@ -25,7 +25,7 @@ import { buildScanExtraction } from '../lib/ingestionExtraction';
 import { extractDocumentText } from '../lib/ingestionScan';
 import type { PendingIngestion } from '../store/useStore';
 import { yieldForPaint } from '../lib/interaction';
-import { EXPENSE_BILL_CATEGORY_OPTIONS, INCOME_CATEGORY_OPTIONS } from '../lib/quickEntryCategories';
+import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '../lib/quickEntryCategories';
 
 // Upload rate limiter — max 5 files per 60 seconds
 const uploadTimestamps: number[] = [];
@@ -764,8 +764,12 @@ export default function Ingestion() {
                                     }
                                     className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field transition-colors"
                                   >
-                                    {EXPENSE_BILL_CATEGORY_OPTIONS.map((o) => (
-                                      <option key={o.value} value={o.value}>{o.label}</option>
+                                    {EXPENSE_CATEGORY_OPTGROUPS.map((g) => (
+                                      <optgroup key={g.label} label={g.label}>
+                                        {g.options.map((o) => (
+                                          <option key={o.value} value={o.value}>{o.label}</option>
+                                        ))}
+                                      </optgroup>
                                     ))}
                                   </select>
                                 </div>
@@ -873,8 +877,12 @@ export default function Ingestion() {
                                     onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, category: e.target.value } })}
                                     className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xs font-mono text-content-tertiary focus-app-field transition-colors uppercase tracking-widest"
                                   >
-                                    {EXPENSE_BILL_CATEGORY_OPTIONS.map((o) => (
-                                      <option key={o.value} value={o.value}>{o.label}</option>
+                                    {EXPENSE_CATEGORY_OPTGROUPS.map((g) => (
+                                      <optgroup key={g.label} label={g.label}>
+                                        {g.options.map((o) => (
+                                          <option key={o.value} value={o.value}>{o.label}</option>
+                                        ))}
+                                      </optgroup>
                                     ))}
                                   </select>
                                 </div>

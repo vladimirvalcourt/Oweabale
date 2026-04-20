@@ -204,6 +204,7 @@ export interface Database {
           plaid_transaction_id: string | null
           plaid_account_id: string | null
           platform_tag: string
+          notes: string | null
           created_at: string
         }
         Insert: {
@@ -218,6 +219,7 @@ export interface Database {
           plaid_transaction_id?: string | null
           plaid_account_id?: string | null
           platform_tag?: string
+          notes?: string | null
           created_at?: string
         }
         Update: {
@@ -232,6 +234,7 @@ export interface Database {
           plaid_transaction_id?: string | null
           plaid_account_id?: string | null
           platform_tag?: string
+          notes?: string | null
           created_at?: string
         }
       }
