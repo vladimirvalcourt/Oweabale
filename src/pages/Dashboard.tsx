@@ -649,11 +649,19 @@ export default function Dashboard() {
             <p className="mt-2 text-sm text-content-secondary max-w-2xl">
               Add your income source and next payday to see how much you can safely spend each day.
             </p>
+            {/* 3-step mini-progress indicator */}
+            <div className="mt-4 flex items-center gap-2 text-xs text-content-tertiary">
+              <span className="rounded-full bg-brand-cta px-2.5 py-0.5 text-surface-base font-medium">Connect bank</span>
+              <span className="text-content-muted">→</span>
+              <span className="rounded-full border border-surface-border px-2.5 py-0.5">Add bills</span>
+              <span className="text-content-muted">→</span>
+              <span className="rounded-full border border-surface-border px-2.5 py-0.5">Set a budget</span>
+            </div>
             <TransitionLink
               to="/income"
               className="mt-4 inline-flex min-h-10 items-center justify-center rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
             >
-              Add Income →
+              Connect your bank to begin.
             </TransitionLink>
           </div>
         ) : (

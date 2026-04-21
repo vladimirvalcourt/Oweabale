@@ -338,7 +338,7 @@ function BillingPanelInner() {
                 type="button"
                 onClick={() => setImmediateCancelOpen(true)}
                 disabled={isWorking}
-                className="shrink-0 rounded-lg border border-rose-500/40 bg-rose-500/15 px-4 py-2.5 text-sm font-medium text-rose-100 transition-colors hover:bg-rose-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+                className="shrink-0 rounded-lg border border-rose-500/40 bg-transparent px-4 py-2.5 text-sm font-medium text-rose-400 transition-colors hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancel immediately
               </button>

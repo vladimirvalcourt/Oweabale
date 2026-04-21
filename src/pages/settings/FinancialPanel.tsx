@@ -6,6 +6,12 @@ import { useStore } from '../../store/useStore';
 import { STATE_TAX_MAP } from '../Taxes';
 import { getCustomIcon } from '../../lib/customIcons';
 
+// When the stored taxRate is 0 (never been explicitly saved), fall back to the map
+// rate for the user's actual state. This keeps FinancialPanel in sync with Taxes.tsx.
+function resolveDisplayRate(state: string, rate: number): string {
+  return rate > 0 ? String(rate) : String(STATE_TAX_MAP[state]?.rate ?? 0);
+}
+
 function FinancialPanelInner() {
   const TaxesIcon = getCustomIcon('taxes');
   const taxState = useStore((s) => s.user.taxState ?? '');
@@ -13,13 +19,13 @@ function FinancialPanelInner() {
   const setTaxSettings = useStore((s) => s.setTaxSettings);
 
   const [localTaxState, setLocalTaxState] = useState(taxState || '');
-  const [localTaxRate, setLocalTaxRate] = useState(String(taxRate || STATE_TAX_MAP.NY.rate));
+  const [localTaxRate, setLocalTaxRate] = useState(() => resolveDisplayRate(taxState || 'NY', taxRate));
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalTaxState(taxState || '');
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLocalTaxRate(String(taxRate ?? STATE_TAX_MAP.NY.rate));
+    setLocalTaxRate(resolveDisplayRate(taxState || 'NY', taxRate));
   }, [taxState, taxRate]);
 
   return (
