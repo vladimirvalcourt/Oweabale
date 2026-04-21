@@ -15,7 +15,11 @@ const navItems = [
   { to: '/admin/reports', label: 'Reports', requiredPermission: 'dashboard.view' },
   { to: '/admin/compliance', label: 'Compliance', requiredPermission: 'compliance.read' },
   { to: '/admin/telemetry', label: 'Telemetry', requiredPermission: 'telemetry.read' },
+  // ADD 7 + 6
+  { to: '/admin/email-blast', label: 'Email Blast', requiredPermission: 'moderation.manage' },
+  { to: '/admin/coupons', label: 'Coupons', requiredPermission: 'dashboard.view' },
 ];
+
 
 export function AdminLayout() {
   const envLabel = useMemo(() => (import.meta.env.PROD ? 'Production' : 'Staging'), []);

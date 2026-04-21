@@ -272,6 +272,12 @@ export default function Ingestion() {
     if (ok && selectedId === id) setSelectedId(null);
   };
 
+  const handleCommitAsTransaction = async (id: string) => {
+    await yieldForPaint();
+    const ok = await useStore.getState().commitIngestionAsTransaction(id);
+    if (ok && selectedId === id) setSelectedId(null);
+  };
+
   const handleBulkCommit = async () => {
     const readyItems = pendingIngestions.filter(pi => pi.status === 'ready');
     let n = 0;
@@ -940,6 +946,14 @@ export default function Ingestion() {
                             >
                               Delete
                             </button>
+                            {item.type === 'transaction' && (
+                              <button 
+                                onClick={() => handleCommit(item.id)}
+                                className="px-10 py-3 bg-emerald-600 text-white hover:bg-emerald-500 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-colors shadow-none"
+                              >
+                                Add as Transaction ✓
+                              </button>
+                            )}
                             <button 
                               onClick={() => handleCommit(item.id)}
                               className="px-10 py-3 bg-brand-cta text-surface-base hover:bg-brand-cta-hover rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-colors shadow-none"

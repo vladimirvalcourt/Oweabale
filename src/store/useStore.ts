@@ -18,6 +18,7 @@ import {
   type NotificationPrefsRecord,
 } from '../lib/notificationPreferences';
 import { DEFAULT_NOTIF_PREFS, NOTIF_PREFS_STORAGE_KEY, loadNotifPrefs } from '../pages/settings/constants';
+import type { Household, HouseholdMember, UserRole } from '../types/household';
 export type { CategorizationRule, CategorizationExclusion };
 export type { FinancialAlertPrefs };
 
@@ -362,6 +363,10 @@ interface AppState {
   };
   investmentAccounts: InvestmentAccount[];
   insurancePolicies: InsurancePolicy[];
+  // Household state
+  currentHousehold: Household | null;
+  householdMembers: HouseholdMember[];
+  userRole: UserRole | null;
   addInvestmentAccount: (account: Omit<InvestmentAccount, 'id' | 'lastUpdated'>) => Promise<boolean>;
   editInvestmentAccount: (id: string, updates: Partial<InvestmentAccount>) => Promise<boolean>;
   deleteInvestmentAccount: (id: string) => Promise<boolean>;
@@ -485,6 +490,11 @@ interface AppState {
   quickAddTab: TabType;
   openQuickAdd: (tab?: TabType) => void;
   closeQuickAdd: () => void;
+  // Household Management
+  inviteHouseholdMember: (email: string, role: 'partner' | 'viewer') => Promise<boolean>;
+  removeHouseholdMember: (memberId: string) => Promise<boolean>;
+  updateMemberRole: (memberId: string, role: 'partner' | 'viewer') => Promise<boolean>;
+  acceptHouseholdInvite: (householdId: string) => Promise<boolean>;
 }
 
 export type TabType = 'transaction' | 'obligation' | 'income' | 'citation';
@@ -546,6 +556,10 @@ const initialData = {
   },
   investmentAccounts: [],
   insurancePolicies: [],
+  // Household state
+  currentHousehold: null,
+  householdMembers: [],
+  userRole: null,
 };
 
 export const useStore = create<AppState>()(
@@ -2626,6 +2640,8 @@ export const useStore = create<AppState>()(
         { data: incomes, error: incomesError },
         { data: subscriptions, error: subscriptionsError },
         { data: plaidAccountsRows, error: plaidAccountsError },
+        { data: households, error: householdsError },
+        { data: householdMembersRows, error: householdMembersError },
       ] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', resolvedUserId).maybeSingle(),
         supabase.from('bills').select('*').eq('user_id', resolvedUserId),
@@ -2635,6 +2651,9 @@ export const useStore = create<AppState>()(
         supabase.from('incomes').select('*').eq('user_id', resolvedUserId),
         supabase.from('subscriptions').select('*').eq('user_id', resolvedUserId),
         supabase.from('plaid_accounts').select('*').eq('user_id', resolvedUserId).order('name', { ascending: true }),
+        // Household data
+        supabase.from('households').select('*').maybeSingle(),
+        supabase.from('household_members').select('*, profiles!inner(email, first_name, avatar_url)').eq('status', 'accepted'),
       ]);
 
       // Log any errors
@@ -2797,6 +2816,25 @@ export const useStore = create<AppState>()(
           ),
           isAdmin: profile.is_admin === true,
         } : { ...get().user, id: resolvedUserId },
+        // Household state
+        currentHousehold: households || null,
+        householdMembers: (householdMembersRows || []).map((m: Record<string, unknown>) => ({
+          id: m.id as string,
+          household_id: m.household_id as string,
+          user_id: (m.user_id ?? null) as string | null,
+          role: m.role as 'owner' | 'partner' | 'viewer',
+          invited_email: (m.invited_email ?? null) as string | null,
+          status: m.status as 'pending' | 'accepted',
+          joined_at: (m.joined_at ?? null) as string | null,
+          email: ((m.profiles as any)?.email ?? null) as string | null,
+          first_name: ((m.profiles as any)?.first_name ?? null) as string | null,
+          avatar_url: ((m.profiles as any)?.avatar_url ?? null) as string | null,
+        })),
+        userRole: (() => {
+          if (!households || !householdMembersRows) return null;
+          const member = householdMembersRows.find((m: any) => m.user_id === resolvedUserId);
+          return member?.role ?? null;
+        })(),
       });
 
       // Release first paint as soon as the phase-1 shell is ready. Phase-2 datasets
@@ -3074,6 +3112,148 @@ export const useStore = create<AppState>()(
   quickAddTab: 'transaction',
   openQuickAdd: (tab = 'transaction') => set({ isQuickAddOpen: true, quickAddTab: tab }),
   closeQuickAdd: () => set({ isQuickAddOpen: false }),
+  
+  // Household Management
+  inviteHouseholdMember: async (email: string, role: 'partner' | 'viewer') => {
+    const household = get().currentHousehold;
+    if (!household) {
+      toast.error('No active household');
+      return false;
+    }
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('You must be signed in');
+        return false;
+      }
+      
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/household-invite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          householdId: household.id,
+          email,
+          role,
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        if (result.alreadyExists) {
+          toast.warning('This person has already been invited');
+        } else {
+          toast.error(result.error || 'Failed to send invite');
+        }
+        return false;
+      }
+      
+      toast.success(`Invite sent to ${email}`);
+      // Refresh members list
+      await get().fetchData(undefined, { background: true });
+      return true;
+    } catch (error) {
+      console.error('[inviteHouseholdMember]', error);
+      toast.error('Failed to send invite');
+      return false;
+    }
+  },
+  
+  removeHouseholdMember: async (memberId: string) => {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) return false;
+      
+      const { error } = await supabase
+        .from('household_members')
+        .delete()
+        .eq('id', memberId)
+        .eq('household_id', get().currentHousehold?.id ?? '');
+      
+      if (error) {
+        toast.error('Failed to remove member');
+        return false;
+      }
+      
+      set((state) => ({
+        householdMembers: state.householdMembers.filter(m => m.id !== memberId),
+      }));
+      
+      toast.success('Member removed');
+      return true;
+    } catch (error) {
+      console.error('[removeHouseholdMember]', error);
+      toast.error('Failed to remove member');
+      return false;
+    }
+  },
+  
+  updateMemberRole: async (memberId: string, role: 'partner' | 'viewer') => {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) return false;
+      
+      const { error } = await supabase
+        .from('household_members')
+        .update({ role })
+        .eq('id', memberId)
+        .eq('household_id', get().currentHousehold?.id ?? '');
+      
+      if (error) {
+        toast.error('Failed to update role');
+        return false;
+      }
+      
+      set((state) => ({
+        householdMembers: state.householdMembers.map(m =>
+          m.id === memberId ? { ...m, role } : m
+        ),
+      }));
+      
+      toast.success('Role updated');
+      return true;
+    } catch (error) {
+      console.error('[updateMemberRole]', error);
+      toast.error('Failed to update role');
+      return false;
+    }
+  },
+  
+  acceptHouseholdInvite: async (householdId: string) => {
+    try {
+      const userId = (await supabase.auth.getUser()).data.user?.id;
+      if (!userId) return false;
+      
+      // Update the member record to accepted
+      const { error } = await supabase
+        .from('household_members')
+        .update({
+          status: 'accepted',
+          user_id: userId,
+          joined_at: new Date().toISOString(),
+        })
+        .eq('household_id', householdId)
+        .eq('user_id', userId);
+      
+      if (error) {
+        toast.error('Failed to accept invite');
+        return false;
+      }
+      
+      toast.success('Welcome to the household!');
+      // Refresh all data
+      await get().fetchData(undefined, { background: false });
+      return true;
+    } catch (error) {
+      console.error('[acceptHouseholdInvite]', error);
+      toast.error('Failed to accept invite');
+      return false;
+    }
+  },
     }),
     {
       name: 'oweable-store-persistence',

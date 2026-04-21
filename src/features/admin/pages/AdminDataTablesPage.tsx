@@ -64,6 +64,55 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     editableColumns: ['title', 'content', 'type'],
     defaultOrder: 'created_at',
   },
+  // ADD 10: New financial data tables
+  {
+    key: 'Bills',
+    table: 'bills',
+    primaryKey: 'id',
+    columns: ['id', 'user_id', 'name', 'amount', 'due_date', 'status', 'type'],
+    editableColumns: ['status', 'amount'],
+    defaultOrder: 'due_date',
+  },
+  {
+    key: 'Transactions',
+    table: 'transactions',
+    primaryKey: 'id',
+    columns: ['id', 'user_id', 'merchant_name', 'amount', 'date', 'category', 'source'],
+    editableColumns: ['category'],
+    defaultOrder: 'date',
+  },
+  {
+    key: 'Subscriptions',
+    table: 'subscriptions',
+    primaryKey: 'id',
+    columns: ['id', 'user_id', 'name', 'amount', 'billing_cycle', 'status'],
+    editableColumns: ['status', 'billing_cycle'],
+    defaultOrder: 'created_at',
+  },
+  {
+    key: 'Plaid Items',
+    table: 'plaid_items',
+    primaryKey: 'id',
+    columns: ['id', 'user_id', 'institution_name', 'item_login_required', 'last_sync_at', 'last_sync_error'],
+    editableColumns: [],
+    defaultOrder: 'last_sync_at',
+  },
+  {
+    key: 'Budgets',
+    table: 'budgets',
+    primaryKey: 'id',
+    columns: ['id', 'user_id', 'category', 'limit', 'period', 'created_at'],
+    editableColumns: ['limit', 'period'],
+    defaultOrder: 'created_at',
+  },
+  {
+    key: 'Goals',
+    table: 'goals',
+    primaryKey: 'id',
+    columns: ['id', 'user_id', 'name', 'target_amount', 'current_amount', 'deadline', 'status'],
+    editableColumns: ['status', 'target_amount'],
+    defaultOrder: 'deadline',
+  },
 ];
 
 function toCsv(rows: Record<string, unknown>[], columns: string[]): string {
@@ -134,6 +183,8 @@ export default function AdminDataTablesPage() {
   const selectedOnPageCount = allPageRowIds.filter((id) => selectedIds.includes(id)).length;
   const allVisibleSelected = allPageRowIds.length > 0 && selectedOnPageCount === allPageRowIds.length;
   const profilesView = config.table === 'profiles';
+  // ADD 10: show case file link for any table with user_id column
+  const hasUserIdColumn = config.columns.includes('user_id');
 
   const handleExportCsv = () => {
     if (rows.length === 0) return;
@@ -411,7 +462,7 @@ export default function AdminDataTablesPage() {
                       </button>
                     </th>
                   ))}
-                  {profilesView ? <th className="px-3 py-2 font-medium">Case file</th> : null}
+                  {hasUserIdColumn ? <th className="px-3 py-2 font-medium">Case file</th> : null}
                   <th className="px-3 py-2 font-medium">Edit</th>
                 </tr>
               </thead>
@@ -432,14 +483,14 @@ export default function AdminDataTablesPage() {
                         {String(row[column] ?? '—')}
                       </td>
                     ))}
-                    {profilesView ? (
+                    {hasUserIdColumn ? (
                       <td className="px-3 py-2">
-                        {typeof row.id === 'string' ? (
+                        {typeof (profilesView ? row.id : row.user_id) === 'string' ? (
                           <Link
-                            to={`/admin/user/${row.id}`}
+                            to={`/admin/user/${profilesView ? row.id : row.user_id}`}
                             className="interactive-focus text-[10px] font-semibold text-brand-cta hover:underline"
                           >
-                            Open
+                            Case file
                           </Link>
                         ) : (
                           '—'

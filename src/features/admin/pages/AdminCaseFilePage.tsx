@@ -1,17 +1,19 @@
-import { useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ArrowLeft,
   ClipboardCopy,
   ExternalLink,
   Loader2,
+  Search,
   Shield,
   UserRound,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '../../../lib/supabase';
 import { useAdminPermissions } from '../shared/useAdminPermissions';
+import { useMemo } from 'react';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -109,7 +111,13 @@ export default function AdminCaseFilePage() {
   const canReadUsers = hasPermission('users.read');
   const primaryAdminEmail = (import.meta.env.VITE_ADMIN_EMAIL as string | undefined)?.trim().toLowerCase() ?? '';
 
+  // UUID lookup
   const [lookupDraft, setLookupDraft] = useState('');
+  // ADD 4: Email lookup
+  const [emailDraft, setEmailDraft] = useState('');
+  const [emailSearchLoading, setEmailSearchLoading] = useState(false);
+  const [emailSearchError, setEmailSearchError] = useState<string | null>(null);
+
   const [impersonationReason, setImpersonationReason] = useState('');
 
   const userId = userIdParam?.trim() ?? '';
@@ -213,6 +221,35 @@ export default function AdminCaseFilePage() {
     navigate(`/admin/user/${id}`);
   };
 
+  // ADD 4: Email search handler
+  const handleEmailSearch = async () => {
+    const email = emailDraft.trim().toLowerCase();
+    if (!email) {
+      toast.error('Enter an email address.');
+      return;
+    }
+    setEmailSearchLoading(true);
+    setEmailSearchError(null);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id')
+        .ilike('email', email)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data?.id) {
+        setEmailSearchError('No user found with that email');
+        return;
+      }
+      setLookupDraft(data.id);
+      navigate(`/admin/user/${data.id}`);
+    } catch (err) {
+      setEmailSearchError((err as Error).message ?? 'Search failed');
+    } finally {
+      setEmailSearchLoading(false);
+    }
+  };
+
   if (!canReadUsers) {
     return (
       <section className="mx-auto max-w-3xl px-4 py-10 text-center text-sm text-content-tertiary">
@@ -230,13 +267,16 @@ export default function AdminCaseFilePage() {
             <h1 className="text-lg font-semibold">User case file</h1>
           </div>
           <p className="text-xs text-content-tertiary">
-            Paste a user id (UUID) to open billing, Plaid, compliance, and timeline in one place.
+            Paste a user id (UUID) or search by email to open billing, Plaid, compliance, and timeline in one place.
           </p>
+
+          {/* UUID search */}
           <label className="mt-4 block text-[11px] font-medium text-content-secondary">
-            User id
+            User UUID
             <input
               value={lookupDraft}
               onChange={(e) => setLookupDraft(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && openLookup()}
               placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
               className="focus-app-field mt-1 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 font-mono text-xs text-content-primary"
             />
@@ -244,10 +284,37 @@ export default function AdminCaseFilePage() {
           <button
             type="button"
             onClick={() => openLookup()}
-            className="interactive-press interactive-focus mt-4 w-full rounded-lg bg-brand-cta py-2 text-xs font-semibold text-surface-base"
+            className="interactive-press interactive-focus mt-3 w-full rounded-lg bg-brand-cta py-2 text-xs font-semibold text-surface-base"
           >
             Open case file
           </button>
+
+          {/* ADD 4: Email search */}
+          <div className="mt-5 border-t border-surface-border pt-4">
+            <p className="mb-2 text-[11px] font-medium text-content-tertiary uppercase tracking-wide">Or search by email</p>
+            <div className="flex gap-2">
+              <input
+                value={emailDraft}
+                onChange={(e) => { setEmailDraft(e.target.value); setEmailSearchError(null); }}
+                onKeyDown={(e) => e.key === 'Enter' && void handleEmailSearch()}
+                placeholder="user@example.com"
+                type="email"
+                className="focus-app-field flex-1 rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-xs text-content-primary"
+              />
+              <button
+                type="button"
+                disabled={emailSearchLoading}
+                onClick={() => void handleEmailSearch()}
+                className="interactive-press interactive-focus inline-flex items-center gap-1 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs text-content-secondary disabled:opacity-50"
+              >
+                {emailSearchLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Search className="h-3 w-3" />}
+              </button>
+            </div>
+            {emailSearchError ? (
+              <p className="mt-1 text-xs text-rose-300">{emailSearchError}</p>
+            ) : null}
+          </div>
+
           <p className="mt-3 text-[11px] text-content-muted">
             Tip: from <Link className="text-brand-cta underline-offset-2 hover:underline" to="/admin/data">Data → Profiles</Link>, use{' '}
             <span className="font-medium text-content-secondary">Case file</span> on a row.

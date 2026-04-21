@@ -16,10 +16,12 @@ import { IntegrationsPanel } from './settings/IntegrationsPanel';
 import { PrivacyPanel } from './settings/PrivacyPanel';
 import { SupportPanel } from './settings/SupportPanel';
 import { FeedbackPanel } from './settings/FeedbackPanel';
+import { HouseholdPanel } from './settings/HouseholdPanel';
 import { yieldForPaint } from '../lib/interaction';
 
 const tabs = [
   { id: 'profile' as const, name: 'Profile' },
+  { id: 'household' as const, name: 'Household' },
   { id: 'security' as const, name: 'Security' },
   { id: 'notifications' as const, name: 'Notifications' },
   { id: 'financial' as const, name: 'Tax' },

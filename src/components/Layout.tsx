@@ -16,6 +16,7 @@ import { useShallow } from 'zustand/react/shallow';
 import QuickAddModal from './QuickAddModal';
 import { PrivacyScreenWhenHidden } from './PrivacyScreenWhenHidden';
 import { TactileIcon, MorphingMenuIcon } from './ui/TactileIcon';
+import { HouseholdAvatarStack } from './HouseholdAvatarStack';
 import type { Notification } from '../store/useStore';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
@@ -23,6 +24,7 @@ import { BrandWordmark } from './BrandWordmark';
 import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 import { isApplePointerPlatform } from '../lib/platform';
 import { canAccessAppPath } from '../lib/trackerTier';
+import type { HouseholdMember } from '../types/household';
 
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
@@ -99,6 +101,7 @@ export default function Layout() {
     markNotificationsRead,
     clearNotifications,
     citations,
+    householdMembers,
   } = useStore(
     useShallow((s) => ({
       bills: s.bills,
@@ -118,6 +121,7 @@ export default function Layout() {
       markNotificationsRead: s.markNotificationsRead,
       clearNotifications: s.clearNotifications,
       citations: s.citations,
+      householdMembers: s.householdMembers,
     }))
   );
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -913,6 +917,9 @@ export default function Layout() {
                 </div>
               )}
             </div>
+
+            {/* Household Members Avatar Stack */}
+            <HouseholdAvatarStack members={householdMembers} />
 
             {/* Profile Dropdown */}
             <HeadlessMenu as="div" className="relative">

@@ -137,7 +137,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-content-primary/15 flex flex-col">
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-black/55 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40 border-surface-border' : 'bg-transparent border-transparent'}`}>
+      <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 animate-in fade-in slide-in-from-top-4 duration-700 ease-out fill-mode-both delay-100 ${scrolled ? 'bg-black/55 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40 border-surface-border' : 'bg-transparent border-transparent'}`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
           <TransitionLink to="/" className="text-content-primary">
             <BrandWordmark textClassName="brand-header-text" />
@@ -175,28 +175,28 @@ export default function Landing() {
         <div ref={heroRef} className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-32 items-center">
           
           <div className="lg:col-span-7 flex flex-col items-start pr-0 lg:pr-12">
-            <div className="inline-flex items-center gap-2 border border-surface-border bg-surface-raised px-3 py-1.5 mb-8 text-xs font-sans font-medium text-content-secondary rounded-lg">
+            <div className="inline-flex items-center gap-2 border border-surface-border bg-surface-raised px-3 py-1.5 mb-8 text-xs font-sans font-medium text-content-secondary rounded-lg animate-in fade-in slide-in-from-bottom-6 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] fill-mode-both">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
               Bank-grade Security
             </div>
 
-            <p className="text-xs text-content-secondary mb-4">
+            <p className="text-xs text-content-secondary mb-4 animate-in fade-in slide-in-from-bottom-6 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[100ms] fill-mode-both">
               Join <span className="text-content-primary font-medium">3,000+ households and professionals</span> using Oweable to run their money in one place.
             </p>
             
-            <h1 className="text-4xl md:text-6xl xl:text-7xl font-sans font-medium tracking-[-0.03em] text-content-primary mb-8 leading-[1.05]">
+            <h1 className="text-4xl md:text-6xl xl:text-7xl font-sans font-medium tracking-[-0.03em] text-content-primary mb-8 leading-[1.05] animate-in fade-in slide-in-from-bottom-8 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[200ms] fill-mode-both">
               Stop Drowning in Bills and Debt —<br />
               Finally See a Way Out.
             </h1>
             
-            <p className="text-lg font-medium text-content-secondary max-w-lg leading-[1.6] mb-10 border-l border-surface-border pl-6">
+            <p className="text-lg font-medium text-content-secondary max-w-lg leading-[1.6] mb-10 border-l border-surface-border pl-6 animate-in fade-in slide-in-from-bottom-6 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[300ms] fill-mode-both">
               Oweable gives you a single dashboard to track everything you owe, every bill you have, and a clear path to pay it all off — even if you're self-employed.
             </p>
             
-            <div className="w-full max-w-xl">
+            <div className="w-full max-w-xl animate-in fade-in slide-in-from-bottom-6 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[400ms] fill-mode-both">
               <TransitionLink
                 to={user?.id ? "/dashboard" : "/onboarding"}
-                className="group inline-flex items-center gap-4 bg-brand-cta text-surface-base hover:bg-brand-cta-hover px-8 py-4 text-sm font-sans font-medium shadow-none rounded-lg transition-colors"
+                className="group inline-flex items-center gap-4 bg-brand-cta text-surface-base hover:bg-brand-cta-hover px-8 py-4 text-sm font-sans font-medium shadow-none rounded-lg transition-[transform,box-shadow,background-color] duration-300 hover:scale-[1.02] active:scale-[0.98] hover:shadow-[0_4px_24px_rgba(255,255,255,0.15)]"
               >
                 {user?.id ? "Open dashboard" : "Start Free — No Credit Card Required"}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -232,8 +232,8 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="lg:col-span-5 relative">
-            <div className="bg-surface-raised border border-surface-border rounded-lg p-1 shadow-none">
+          <div className="lg:col-span-5 relative animate-in fade-in zoom-in-[0.98] duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[300ms] fill-mode-both">
+            <div className="bg-surface-raised border border-surface-border rounded-lg p-1 shadow-none transition-colors duration-500 hover:border-surface-border-subtle">
               <HeroPreviewMedia />
             </div>
             
@@ -299,7 +299,7 @@ export default function Landing() {
           <div className="space-y-16">
             
             {/* Group 1: Debt Payoff */}
-            <div>
+            <div className={`transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[100ms] ${archVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <div className="mb-6 flex items-center gap-4">
                  <div className="h-10 w-10 shrink-0 bg-brand-primary/10 text-brand-primary flex items-center justify-center rounded-lg border border-brand-primary/20">
                    <Target className="w-5 h-5" />
@@ -327,7 +327,7 @@ export default function Landing() {
             </div>
 
             {/* Group 2: Bill Control */}
-            <div>
+            <div className={`transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[200ms] ${archVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <div className="mb-6 flex items-center gap-4">
                  <div className="h-10 w-10 shrink-0 bg-blue-500/10 text-blue-400 flex items-center justify-center rounded-lg border border-blue-500/20">
                    <CalendarClock className="w-5 h-5" />
@@ -360,7 +360,7 @@ export default function Landing() {
             </div>
 
             {/* Group 3: Income & Tax */}
-            <div>
+            <div className={`transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[300ms] ${archVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <div className="mb-6 flex items-center gap-4">
                  <div className="h-10 w-10 shrink-0 bg-emerald-500/10 text-emerald-400 flex items-center justify-center rounded-lg border border-emerald-500/20">
                    <TrendingUp className="w-5 h-5" />
@@ -392,7 +392,7 @@ export default function Landing() {
           <div className="mt-16 text-center">
              <TransitionLink
                 to={user?.id ? "/dashboard" : "/onboarding"}
-                className="group inline-flex items-center gap-4 bg-surface-raised border border-surface-border text-content-primary hover:bg-content-primary/[0.04] px-8 py-4 text-sm font-sans font-medium shadow-none rounded-lg transition-colors"
+                className="group inline-flex items-center gap-4 bg-surface-raised border border-surface-border text-content-primary hover:bg-content-primary/[0.04] px-8 py-4 text-sm font-sans font-medium shadow-none rounded-lg transition-[transform,box-shadow,background-color] duration-300 hover:scale-[1.02] active:scale-[0.98] hover:shadow-[0_4px_24px_rgba(255,255,255,0.05)]"
               >
                 {user?.id ? "Open dashboard" : "Start Free — No Credit Card Required"}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -573,8 +573,9 @@ export default function Landing() {
       </section>
 
       {/* Bottom CTA Block */}
-      <section className="py-32 border-t border-surface-border bg-surface-base text-center">
-        <div className="max-w-3xl mx-auto px-6">
+      <section className="py-32 border-t border-surface-border bg-surface-base text-center overflow-hidden relative">
+        <div className="max-w-3xl mx-auto px-6 relative z-10">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[500px] bg-brand-cta/5 blur-[120px] rounded-full -z-10 animate-pulse-highlight"></div>
           <h2 className="text-4xl font-semibold tracking-tight text-content-primary mb-6">
             Ready to get out of the red?
           </h2>
@@ -584,7 +585,7 @@ export default function Landing() {
           <div className="flex flex-col items-center justify-center gap-3">
             <TransitionLink
               to={user?.id ? "/dashboard" : "/onboarding"}
-              className="group inline-flex items-center gap-4 bg-brand-cta text-surface-base hover:bg-brand-cta-hover px-10 py-5 text-sm font-sans font-medium shadow-none rounded-lg transition-colors"
+              className="group inline-flex items-center gap-4 bg-brand-cta text-surface-base hover:bg-brand-cta-hover px-10 py-5 text-sm font-sans font-medium shadow-none rounded-lg transition-[transform,box-shadow,background-color] duration-300 hover:scale-[1.02] active:scale-[0.98] hover:shadow-[0_4px_24px_rgba(255,255,255,0.15)]"
             >
               {user?.id ? "Open dashboard" : "Start Free — No Credit Card Required"}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

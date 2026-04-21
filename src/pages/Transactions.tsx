@@ -483,8 +483,30 @@ export default function Transactions() {
                                 className="rounded-lg border border-surface-border bg-surface-base px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-widest text-content-primary focus-app-field"
                                 onChange={async (e) => {
                                   const newCat = e.target.value;
+                                  const oldCat = transaction.category;
                                   setEditingCategory(null);
                                   await updateTransaction(transaction.id, { category: newCat });
+                                  
+                                  // Smart suggestion: offer to create a rule
+                                  if (newCat !== oldCat && transaction.name && transaction.name.trim().length > 0) {
+                                    const merchantName = transaction.name.trim();
+                                    toast(`Always categorize "${merchantName}" as ${formatCategoryLabel(newCat)}?`, {
+                                      action: {
+                                        label: 'Create Rule',
+                                        onClick: async () => {
+                                          const { addCategorizationRule } = useStore.getState();
+                                          await addCategorizationRule({
+                                            match_type: 'contains',
+                                            match_value: merchantName,
+                                            category: newCat,
+                                            priority: 0,
+                                          });
+                                          toast.success('Rule created!');
+                                        },
+                                      },
+                                      duration: 6000,
+                                    });
+                                  }
                                 }}
                                 onBlur={() => setEditingCategory(null)}
                                 onKeyDown={(e) => { if (e.key === 'Escape') setEditingCategory(null); }}
