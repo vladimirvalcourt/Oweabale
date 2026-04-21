@@ -13,11 +13,14 @@ import AuthGuard from './components/AuthGuard';
 import AdminGuard from './components/AdminGuard';
 import MaintenanceGuard from './components/MaintenanceGuard';
 import { FullSuiteRouteGuard } from './components/FullSuiteGate';
-import { AppLoader } from './components/PageSkeleton';
+import { DashboardSkeleton, ListSkeleton, AppLoader } from './components/PageSkeleton';
 import SessionWarningModal from './components/SessionWarningModal';
 import { useStore } from './store/useStore';
 import { useAuth } from './hooks/useAuth';
-import Dashboard from './pages/Dashboard';
+
+// Fix 1: Dashboard is now lazy — this keeps recharts + motion/react OUT of the initial
+// bundle. The 70 KB page was previously blocking first paint for ALL authenticated users.
+const Dashboard      = lazy(() => import('./pages/Dashboard'));
 
 const AuthPage       = lazy(() => import('./pages/AuthPage'));
 const Obligations    = lazy(() => import('./pages/Obligations'));
@@ -96,6 +99,7 @@ function AppRoutes() {
   }
 
   return (
+    // Outer Suspense: catches any lazy page not individually wrapped (404, legal pages, etc.)
     <Suspense fallback={<AppLoader />}>
     <Routes>
       {/* ── Public routes ── */}
@@ -130,7 +134,10 @@ function AppRoutes() {
             element={
               <ErrorBoundary>
                 <FullSuiteRouteGuard featureName="Dashboard">
-                  <Dashboard />
+                  {/* Fix 1: Content-matched skeleton — shows real grid shape while 70 KB chunk loads */}
+                  <Suspense fallback={<DashboardSkeleton />}>
+                    <Dashboard />
+                  </Suspense>
                 </FullSuiteRouteGuard>
               </ErrorBoundary>
             }
@@ -171,7 +178,10 @@ function AppRoutes() {
             element={
               <ErrorBoundary>
                 <FullSuiteRouteGuard featureName="Transaction history">
-                  <Transactions />
+                  {/* Fix 1: list skeleton matches the transactions table layout */}
+                  <Suspense fallback={<ListSkeleton rows={8} />}>
+                    <Transactions />
+                  </Suspense>
                 </FullSuiteRouteGuard>
               </ErrorBoundary>
             }
@@ -271,7 +281,9 @@ function AppRoutes() {
             element={
               <ErrorBoundary>
                 <FullSuiteRouteGuard featureName="Reports">
-                  <Reports />
+                  <Suspense fallback={<DashboardSkeleton />}>
+                    <Reports />
+                  </Suspense>
                 </FullSuiteRouteGuard>
               </ErrorBoundary>
             }
@@ -281,7 +293,10 @@ function AppRoutes() {
             element={
               <ErrorBoundary>
                 <FullSuiteRouteGuard featureName="Analytics">
-                  <Analytics />
+                  {/* Fix 1: analytics skeleton with chart-shape blocks */}
+                  <Suspense fallback={<DashboardSkeleton />}>
+                    <Analytics />
+                  </Suspense>
                 </FullSuiteRouteGuard>
               </ErrorBoundary>
             }
@@ -336,7 +351,16 @@ function AppRoutes() {
               </ErrorBoundary>
             }
           />
-          <Route path="settings" element={<ErrorBoundary><Settings /></ErrorBoundary>} />
+          <Route
+            path="settings"
+            element={
+              <ErrorBoundary>
+                <Suspense fallback={<ListSkeleton rows={6} />}>
+                  <Settings />
+                </Suspense>
+              </ErrorBoundary>
+            }
+          />
         </Route>
         </Route>
       </Route>

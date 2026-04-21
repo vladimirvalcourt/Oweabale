@@ -11,6 +11,7 @@ import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 import { TransitionLink } from '../components/TransitionLink';
+import { getCustomIcon } from '../lib/customIcons';
 
 function AnimatedValue({ value, prefix = "", suffix = "", decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
   const prefersReducedMotion = usePrefersReducedMotion();
@@ -40,6 +41,9 @@ function AnimatedValue({ value, prefix = "", suffix = "", decimals = 0 }: { valu
 }
 
 export default function NetWorth() {
+  const ChartIcon = getCustomIcon('chart');
+  const BillingIcon = getCustomIcon('billing');
+  const DebtIcon = getCustomIcon('debt');
   const { assets, debts, incomes, bills, subscriptions, deleteAsset } = useStore();
 
   const totalAssets = useMemo(() => assets.reduce((sum, asset) => sum + asset.value, 0), [assets]);
@@ -110,7 +114,7 @@ export default function NetWorth() {
       </div>
 
       {/* Forward Projection — 12 months */}
-      <CollapsibleModule title="Net Worth Projection — 12 Months Forward" icon={TrendingUp}>
+      <CollapsibleModule title="Net Worth Projection — 12 Months Forward" icon={ChartIcon}>
         <div className="flex items-center gap-3 mb-4">
           <span className="text-xs font-sans text-content-tertiary">Extra per month</span>
           <button
@@ -163,7 +167,7 @@ export default function NetWorth() {
           {/* Asset Allocation Donut */}
           <CollapsibleModule 
             title="Asset Allocation" 
-            icon={PieChart}
+            icon={ChartIcon}
           >
             <div className="flex flex-col items-center gap-4">
               <SafeResponsiveContainer width="100%" height={140} minWidth={0} minHeight={120}>
@@ -200,7 +204,7 @@ export default function NetWorth() {
         {/* Assets List */}
         <CollapsibleModule 
           title="Assets" 
-          icon={Building2} 
+          icon={BillingIcon} 
           extraHeader={<span className="text-xs font-mono text-emerald-400 font-bold">${totalAssets.toLocaleString()}</span>}
         >
           <div className="divide-y divide-surface-border -mx-6 -my-6">
@@ -228,7 +232,7 @@ export default function NetWorth() {
         {/* Liabilities List */}
         <CollapsibleModule 
           title="Liabilities" 
-          icon={CreditCard} 
+          icon={DebtIcon} 
           extraHeader={<span className="text-xs font-mono text-red-400 font-bold">${totalLiabilities.toLocaleString()}</span>}
         >
           <div className="divide-y divide-surface-border -mx-6 -my-6">

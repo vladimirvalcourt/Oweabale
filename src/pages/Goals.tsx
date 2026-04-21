@@ -5,9 +5,11 @@ import { Target, Plus, TrendingUp, TrendingDown, CheckCircle2, X } from 'lucide-
 import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { yieldForPaint } from '../lib/interaction';
+import { getCustomIcon } from '../lib/customIcons';
 
 const ACCOUNTABILITY_CHECKIN_KEY = 'oweable_accountability_checkins_v1';
 export default function Goals() {
+  const GoalsIcon = getCustomIcon('goals');
   const { goals, addGoal, addGoalProgress, deleteGoal } = useStore();
   const [isAddingGoal, setIsAddingGoal] = useState(false);
   const [progressInput, setProgressInput] = useState<{ id: string; value: string } | null>(null);
@@ -135,7 +137,7 @@ export default function Goals() {
 
   return (
     <div className="space-y-6">
-      <CollapsibleModule title="Accountability Check-in" icon={Target} defaultOpen={false}>
+      <CollapsibleModule title="Accountability Check-in" icon={GoalsIcon} defaultOpen={false}>
         <div className="space-y-3">
           <p className="text-sm text-content-secondary">
             Weekly commitment log to stay consistent. Current streak: <span className="font-medium text-content-primary">{checkInStreakWeeks} week(s)</span>.
@@ -304,7 +306,7 @@ export default function Goals() {
       ) : (
         <CollapsibleModule 
           title="Your Goals"
-          icon={Target}
+          icon={GoalsIcon}
           extraHeader={<span className="text-xs font-sans text-content-tertiary">{goals.length} active</span>}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 -mx-6 -my-6 p-6">

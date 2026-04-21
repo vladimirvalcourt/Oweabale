@@ -13,14 +13,8 @@ export default function Footer() {
               <BrandWordmark textClassName="brand-header-text" />
             </TransitionLink>
             <p className="text-sm text-content-tertiary max-w-sm leading-relaxed mb-8">
-              The Financial OS for Gig Workers, Freelancers &amp; the Self-Employed.
+              The Financial OS for Debt, Bills & Cash Flow.
             </p>
-            <TransitionLink
-              to="/onboarding"
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-cta px-6 py-3 text-sm font-sans font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
-            >
-              Get Started Free
-            </TransitionLink>
           </div>
 
           {/* Platform */}

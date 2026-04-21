@@ -20,6 +20,22 @@ export const customIcons = {
   ticket: RailSymbolIcon as IconComponent,
   payments: SkillsIcon as IconComponent,
   planning: McpIcon as IconComponent,
+  transactions: SkillsIcon as IconComponent,
+  filters: McpIcon as IconComponent,
+  budget: ProviderIcon as IconComponent,
+  income: ThinkIcon as IconComponent,
+  subscriptions: RailSymbolIcon as IconComponent,
+  overview: McpIcon as IconComponent,
+  chart: ThinkIcon as IconComponent,
+  security: TreeUpDownRightIcon as IconComponent,
+  support: SkillsIcon as IconComponent,
+  billing: ProviderIcon as IconComponent,
+  calendar: RailSymbolIcon as IconComponent,
+  education: ThinkIcon as IconComponent,
+  goals: ThinkIcon as IconComponent,
+  taxes: ProviderIcon as IconComponent,
+  categories: SkillsIcon as IconComponent,
+  rules: McpIcon as IconComponent,
 };
 
 export type CustomIconName = keyof typeof customIcons;

@@ -13,6 +13,7 @@ import { CollapsibleModule } from '../components/CollapsibleModule';
 import { TransitionLink } from '../components/TransitionLink';
 import { IRS_MILEAGE_RATE } from '../lib/finance';
 import { yieldForPaint } from '../lib/interaction';
+import { getCustomIcon } from '../lib/customIcons';
 
 /** Simplified average federal income rate used for freelance tax estimates. */
 const FED_INCOME_ESTIMATE_RATE = 0.12;
@@ -20,6 +21,8 @@ const FED_INCOME_ESTIMATE_RATE = 0.12;
 const SE_TAX_RATE = 0.153;
 
 export default function Freelance() {
+  const IncomeIcon = getCustomIcon('income');
+  const PlanningIcon = getCustomIcon('planning');
   const {
     freelanceEntries,
     addFreelanceEntry,
@@ -293,7 +296,7 @@ export default function Freelance() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <CollapsibleModule title="Income Tracker" icon={Briefcase}>
+          <CollapsibleModule title="Income Tracker" icon={IncomeIcon}>
             <div className="p-0">
                <div className="divide-y divide-surface-border">
                   {entriesWithMath.length === 0 ? (
@@ -445,7 +448,7 @@ export default function Freelance() {
         </div>
       </div>
 
-      <CollapsibleModule title="Client invoices (accounts receivable)" icon={FileText} defaultOpen={false}>
+      <CollapsibleModule title="Client invoices (accounts receivable)" icon={PlanningIcon} defaultOpen={false}>
         <p className="text-sm text-content-tertiary mb-6 max-w-2xl">
           Track what you&apos;re owed. Mark an invoice <span className="text-content-secondary">Sent</span> when it goes out —
           we can nudge you before the due date if invoice alerts are on in Notifications.

@@ -8,6 +8,7 @@ import { cn } from '../../lib/utils';
 import { supabase } from '../../lib/supabase';
 import { loadNotifPrefs } from './constants';
 import { sendWebPushMessage } from '../../lib/webPush';
+import { getCustomIcon } from '../../lib/customIcons';
 import {
   cancelStripeSubscription,
   createStripeCheckoutSession,
@@ -30,6 +31,7 @@ function isSubscriptionLive(row: { status: string } | undefined) {
 }
 
 function BillingPanelInner() {
+  const BillingIcon = getCustomIcon('billing');
   const TRIAL_REMINDER_SENT_KEY = 'oweable_trial_charge_reminder_last_sent_v1';
   const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
   const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
@@ -45,6 +47,8 @@ function BillingPanelInner() {
   const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'trialing' | 'canceled' | 'incomplete' | null>(null);
   const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
   const [immediateCancelOpen, setImmediateCancelOpen] = useState(false);
+  // E-05: replaces window.confirm() for "cancel at period end" flow
+  const [periodCancelOpen, setPeriodCancelOpen] = useState(false);
 
   const loadBillingState = useCallback(async (opts?: { stripeSyncFirst?: boolean }): Promise<boolean> => {
     setIsLoading(true);
@@ -217,12 +221,14 @@ function BillingPanelInner() {
     window.location.href = result.url;
   };
 
-  const onCancelAtPeriodEnd = async () => {
+  // E-05: Opens the period-cancel confirmation dialog instead of window.confirm.
+  const onCancelAtPeriodEnd = () => {
     if (isWorking) return;
-    const confirmed = window.confirm(
-      'Cancel at the end of your current billing period? You keep Full Suite access until then.',
-    );
-    if (!confirmed) return;
+    setPeriodCancelOpen(true);
+  };
+
+  const onCancelAtPeriodEndConfirmed = async () => {
+    setPeriodCancelOpen(false);
     setIsWorking(true);
     await yieldForPaint();
     const result = await cancelStripeSubscription({ immediate: false });
@@ -266,7 +272,7 @@ function BillingPanelInner() {
     <div className="space-y-6">
       <CollapsibleModule
         title="Subscription Plan"
-        icon={Building2}
+        icon={BillingIcon}
         defaultOpen
         extraHeader={
           <span className="inline-flex items-center rounded-lg border border-surface-border bg-surface-raised px-2.5 py-1 text-xs font-medium text-content-secondary">
@@ -315,7 +321,7 @@ function BillingPanelInner() {
               </p>
               <button
                 type="button"
-                onClick={() => void onCancelAtPeriodEnd()}
+                onClick={() => onCancelAtPeriodEnd()}
                 disabled={isWorking}
                 className="shrink-0 rounded-lg border border-surface-border bg-surface-raised px-4 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-60"
               >
@@ -362,7 +368,7 @@ function BillingPanelInner() {
         )}
       </CollapsibleModule>
 
-      <CollapsibleModule title="Billing History" icon={Download} defaultOpen={false}>
+      <CollapsibleModule title="Billing History" icon={BillingIcon} defaultOpen={false}>
         <p className="text-sm text-content-tertiary mb-6">View and download your previous invoices.</p>
         {paymentHistory.length === 0 ? (
           <div className="border border-surface-border border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center bg-surface-base">
@@ -389,7 +395,7 @@ function BillingPanelInner() {
         )}
       </CollapsibleModule>
 
-      <CollapsibleModule title="Payment Methods" icon={CreditCardIcon} defaultOpen={false}>
+      <CollapsibleModule title="Payment Methods" icon={BillingIcon} defaultOpen={false}>
         <p className="text-sm text-content-tertiary mb-6">Manage payment methods used for your subscriptions.</p>
         <div className="border border-surface-border border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center mb-4 bg-surface-base">
           <CreditCardIcon className="w-8 h-8 text-content-muted mb-3" />
@@ -442,7 +448,40 @@ function BillingPanelInner() {
         </div>
       </Dialog>
 
-      <CollapsibleModule title="Billing Transparency Center" icon={Building2} defaultOpen={false}>
+      {/* E-05: Period-end cancel confirmation dialog */}
+      <Dialog open={periodCancelOpen} onClose={() => setPeriodCancelOpen(false)} className="relative z-50">
+        <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="mx-auto max-w-md rounded-lg border border-surface-border bg-surface-raised p-6 shadow-xl">
+            <Dialog.Title className="text-lg font-semibold text-content-primary">Cancel at end of billing period?</Dialog.Title>
+            <Dialog.Description className="mt-2 text-sm text-content-tertiary">
+              You keep Full Suite access until{' '}
+              {currentPeriodEnd
+                ? new Date(currentPeriodEnd).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
+                : 'your period end date'}. After that, your account reverts to the free Tracker tier. Your data is retained.
+            </Dialog.Description>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setPeriodCancelOpen(false)}
+                className="rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base hover:bg-brand-cta-hover"
+              >
+                Keep my plan
+              </button>
+              <button
+                type="button"
+                onClick={() => void onCancelAtPeriodEndConfirmed()}
+                disabled={isWorking}
+                className="rounded-lg border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary hover:bg-surface-elevated disabled:opacity-60"
+              >
+                {isWorking ? 'Working…' : 'Yes, cancel at period end'}
+              </button>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
+
+      <CollapsibleModule title="Billing Transparency Center" icon={BillingIcon} defaultOpen={false}>
         <div className="space-y-3 text-sm text-content-secondary">
           <p>
             Cancel from this app: use <strong className="font-medium text-content-primary">Cancel at period end</strong> to keep

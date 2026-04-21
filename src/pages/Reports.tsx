@@ -14,6 +14,7 @@ import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 import { buildSpendingRecap } from '../lib/finance';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
+import { getCustomIcon } from '../lib/customIcons';
 
 type DateRange = '30d' | '90d' | '1y';
 
@@ -38,6 +39,10 @@ function exportCSV(data: { date: string; name: string; category: string; amount:
 
 
 export default function Reports() {
+  const OverviewIcon = getCustomIcon('overview');
+  const ChartIcon = getCustomIcon('chart');
+  const DebtIcon = getCustomIcon('debt');
+  const CalendarIcon = getCustomIcon('calendar');
   const { transactions, debts, assets } = useStore();
   const [dateRange, setDateRange] = useState<DateRange>('30d');
   const monthlyRecap = useMemo(() => buildSpendingRecap(transactions, 'monthly'), [transactions]);
@@ -177,7 +182,7 @@ export default function Reports() {
       </div>
 
       {/* Summary Cards */}
-      <CollapsibleModule title="Financial Summary" icon={TrendingUp}>
+      <CollapsibleModule title="Financial Summary" icon={OverviewIcon}>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 -mx-6 -my-6 p-6">
           {[
             { label: 'Total Income', value: `$${filteredTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'text-emerald-400' },
@@ -193,7 +198,7 @@ export default function Reports() {
         </div>
       </CollapsibleModule>
 
-      <CollapsibleModule title="Spending Recaps" icon={Calendar}>
+      <CollapsibleModule title="Spending Recaps" icon={CalendarIcon}>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 -mx-6 -my-6 p-6">
           {[
             { label: 'Monthly recap', recap: monthlyRecap, compareTo: 'last month' },
@@ -226,7 +231,7 @@ export default function Reports() {
         {/* Income vs Expenses */}
         <CollapsibleModule 
           title="Monthly Cash Flow"
-          icon={BarChart3}
+          icon={ChartIcon}
         >
           <div className="flex flex-col">
             <SafeResponsiveContainer width="100%" height={220} minWidth={0} minHeight={120}>
@@ -249,7 +254,7 @@ export default function Reports() {
         {/* Spending by Category */}
         <CollapsibleModule 
           title="Spending by Category"
-          icon={PieChart}
+          icon={ChartIcon}
         >
           {categoryData.length === 0 ? (
             <div className="h-[220px] flex items-center justify-center text-content-tertiary text-sm">No expense data in this range</div>
@@ -284,7 +289,7 @@ export default function Reports() {
       {/* Net Worth Trend */}
       <CollapsibleModule 
         title="Net Worth Over Time"
-        icon={TrendingUp}
+        icon={ChartIcon}
       >
         <SafeResponsiveContainer width="100%" height={200} minWidth={0} minHeight={120}>
           <AreaChart data={netWorthHistory} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
@@ -306,7 +311,7 @@ export default function Reports() {
       {/* Debt Payoff Progress */}
       <CollapsibleModule 
         title="Debt Payoff Progress"
-        icon={CreditCard}
+        icon={DebtIcon}
         extraHeader={<span className="text-sm font-sans font-semibold text-content-primary">{debtProgress.length} accounts</span>}
       >
         <div className="space-y-5">

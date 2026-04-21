@@ -4,6 +4,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { useStore } from '../../store/useStore';
+import { getCustomIcon } from '../../lib/customIcons';
 
 function escapeCsvCell(v: unknown): string {
   const s = String(v ?? '');
@@ -37,6 +38,8 @@ type PrivacyPanelProps = {
 };
 
 function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPanelProps) {
+  const BillingIcon = getCustomIcon('billing');
+  const SecurityIcon = getCustomIcon('security');
   const exportPayload = useStore(
     useShallow((s) => ({
       profile: s.user,
@@ -184,7 +187,7 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
 
   return (
     <div className="space-y-6">
-      <CollapsibleModule title="Data Management" icon={Download} defaultOpen>
+      <CollapsibleModule title="Data Management" icon={BillingIcon} defaultOpen>
         <p className="text-sm text-content-tertiary mb-6">Manage your inputs and export your financial history.</p>
         <div className="space-y-6">
           <div className="border border-surface-border rounded-lg p-4 bg-surface-elevated/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -228,7 +231,7 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
         </div>
       </CollapsibleModule>
 
-      <CollapsibleModule title="Danger Zone" icon={AlertTriangle} defaultOpen={false} className="border-[#7F1D1D]/50 bg-red-500/5">
+      <CollapsibleModule title="Danger Zone" icon={SecurityIcon} defaultOpen={false} className="border-[#7F1D1D]/50 bg-red-500/5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h4 className="text-sm font-medium text-content-primary">Delete Account</h4>

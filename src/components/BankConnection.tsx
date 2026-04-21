@@ -92,6 +92,7 @@ function BankConnectionPlaid() {
     plaidInstitutionName,
     plaidLastSyncAt,
     plaidNeedsRelink,
+    plaidAccounts,
     platformSettings,
   } = useStore();
   const [isSyncing, setIsSyncing] = useState(false);
@@ -411,6 +412,32 @@ function BankConnectionPlaid() {
                 ? `Last transaction sync: ${lastSyncLabel}`
                 : 'No sync yet — use Sync now or wait for automatic updates.'}
             </div>
+            {/* E-08: Per-account last-synced timestamps */}
+            {plaidAccounts.length > 0 && (
+              <div className="mt-3 space-y-1.5">
+                <p className="text-[11px] font-medium text-content-tertiary">Linked accounts</p>
+                <ul className="space-y-1">
+                  {plaidAccounts.map((acct) => (
+                    <li
+                      key={acct.id}
+                      className="flex flex-wrap items-center justify-between gap-2 rounded border border-surface-border bg-surface-raised px-2.5 py-1.5 text-xs"
+                    >
+                      <span className="font-medium text-content-primary">
+                        {acct.name}
+                        {acct.mask ? ` ···${acct.mask}` : ''}
+                      </span>
+                      <span className="text-content-muted capitalize">
+                        {acct.lastSyncAt
+                          ? `Synced ${new Date(acct.lastSyncAt).toLocaleString()}`
+                          : lastSyncLabel
+                          ? `Synced ${lastSyncLabel}`
+                          : 'Not yet synced'}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <div className="mt-2">
               <button
                 type="button"

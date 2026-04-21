@@ -3,7 +3,9 @@ import { useStore } from '../store/useStore';
 import { Tags, Plus, Edit2, Trash2, Tag } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { toast } from 'sonner';
+import { getCustomIcon } from '../lib/customIcons';
 export default function Categories() {
+  const CategoriesIcon = getCustomIcon('categories');
   const { categories, addCategory, editCategory, deleteCategory } = useStore();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -176,7 +178,7 @@ export default function Categories() {
       ) : (
         <CollapsibleModule 
           title="Manage Categories" 
-          icon={Tags}
+          icon={CategoriesIcon}
           extraHeader={<span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{categories.length} Categories Saved</span>}
         >
           <div className="bg-surface-raised rounded-lg border border-surface-border overflow-hidden -mx-6 -my-6">

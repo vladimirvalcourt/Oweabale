@@ -7,6 +7,7 @@ import { CollapsibleModule } from '../components/CollapsibleModule';
 import { AppPageShell } from '../components/AppPageShell';
 import { Dialog } from '@headlessui/react';
 import { yieldForPaint } from '../lib/interaction';
+import { getCustomIcon } from '../lib/customIcons';
 
 const TYPE_LABELS: Record<InsurancePolicy['type'], string> = {
   health: 'Health', life: 'Life', auto: 'Auto', renters: 'Renters',
@@ -36,6 +37,7 @@ const EMPTY_FORM = {
 };
 
 export default function Insurance() {
+  const SecurityIcon = getCustomIcon('security');
   const { insurancePolicies, addInsurancePolicy, editInsurancePolicy, deleteInsurancePolicy } = useStore();
   const [insuranceNowMs] = useState(() => Date.now());
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -140,7 +142,7 @@ export default function Insurance() {
         </div>
 
         {/* Coverage Audit */}
-        <CollapsibleModule title="Coverage Audit" icon={Shield} defaultOpen>
+        <CollapsibleModule title="Coverage Audit" icon={SecurityIcon} defaultOpen>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {CORE_COVERAGE.map(({ key, label, desc }) => {
               const covered = key === 'renters/homeowners'
@@ -206,7 +208,7 @@ export default function Insurance() {
             </button>
           </div>
         ) : (
-          <CollapsibleModule title="Your Policies" icon={Shield} defaultOpen>
+          <CollapsibleModule title="Your Policies" icon={SecurityIcon} defaultOpen>
             <div className="space-y-3 -mx-6 -my-6 p-6">
               {insurancePolicies.map(policy => (
                 <div

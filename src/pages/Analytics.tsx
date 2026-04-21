@@ -15,6 +15,7 @@ import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
 import { TransitionLink } from '../components/TransitionLink';
+import { getCustomIcon } from '../lib/customIcons';
 
 type Period = '1M' | '3M' | '6M' | '1Y' | 'ALL';
 
@@ -58,6 +59,8 @@ function periodCutoff(p: Period): Date | null {
 }
 
 export default function Analytics() {
+  const ChartIcon = getCustomIcon('chart');
+  const GoalsIcon = getCustomIcon('goals');
   const { transactions } = useStore();
   const [period, setPeriod] = useState<Period>('6M');
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
@@ -65,17 +68,24 @@ export default function Analytics() {
 
   // ── Load snapshots from DB ─────────────────────────────────────
   useEffect(() => {
-    async function load() {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { setLoading(false); return; }
+    // Fix 2: Fire getUser() and the snapshots query in parallel.
+    // Previously these were sequential (waterfall): getUser → then query.
+    // Supabase caches the session so getUser() resolves instantly from memory;
+    // starting the DB query immediately after removes the double round-trip.
+    let cancelled = false;
+    setLoading(true);
 
-      const { data } = await supabase
+    const querySnapshots = (userId: string) =>
+      supabase
         .from('net_worth_snapshots')
         .select('date, net_worth, assets, debts')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('date', { ascending: true });
 
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user || cancelled) { setLoading(false); return; }
+      const { data } = await querySnapshots(user.id);
+      if (cancelled) return;
       setSnapshots(
         (data || []).map((r: any) => ({
           date:      r.date as string,
@@ -85,9 +95,11 @@ export default function Analytics() {
         }))
       );
       setLoading(false);
-    }
-    load();
+    });
+
+    return () => { cancelled = true; };
   }, []);
+
 
   // ── Filter snapshots by selected period ───────────────────────
   const filteredSnapshots = useMemo(() => {
@@ -341,7 +353,7 @@ export default function Analytics() {
       </div>
 
       {/* Net Worth Timeline */}
-      <CollapsibleModule title="Net Worth Timeline" icon={TrendingUp}>
+      <CollapsibleModule title="Net Worth Timeline" icon={ChartIcon}>
         {loading ? (
           <div className="h-64 flex items-center justify-center">
             <p className="text-sm text-content-tertiary animate-pulse">Loading history…</p>
@@ -382,7 +394,7 @@ export default function Analytics() {
       </CollapsibleModule>
 
       {/* Monthly Spending by Category */}
-      <CollapsibleModule title="Spending by Category" icon={PieChart}>
+      <CollapsibleModule title="Spending by Category" icon={ChartIcon}>
         {monthlySpend.every(m => topCategories.every(c => m[c] === 0)) ? (
           <div className="h-64 flex items-center justify-center">
             <p className="text-sm text-content-tertiary">No expense transactions yet.</p>
@@ -412,7 +424,7 @@ export default function Analytics() {
         )}
       </CollapsibleModule>
 
-      <CollapsibleModule title="Spending benchmarks" icon={Target} defaultOpen={false}>
+      <CollapsibleModule title="Spending benchmarks" icon={GoalsIcon} defaultOpen={false}>
         {!spendingBenchmark.hasData ? (
           <p className="text-sm text-content-tertiary py-6 text-center">
             Need expense history in two consecutive months to compare spending month over month.
@@ -483,7 +495,7 @@ export default function Analytics() {
       </CollapsibleModule>
 
       {/* Savings Rate */}
-      <CollapsibleModule title="Monthly Savings Rate" icon={Activity}>
+      <CollapsibleModule title="Monthly Savings Rate" icon={ChartIcon}>
         <SafeResponsiveContainer width="100%" height={200} minWidth={0} minHeight={120}>
           <LineChart data={cashFlowData} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />

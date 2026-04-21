@@ -5,6 +5,7 @@ import { Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
 import { supabase } from '../lib/supabase';
 import { yieldForPaint } from '../lib/interaction';
+import { getCustomIcon } from '../lib/customIcons';
 
 interface Ticket {
   id: string;
@@ -24,6 +25,7 @@ interface Broadcast {
 }
 
 export default function HelpDesk() {
+  const SupportIcon = getCustomIcon('support');
   const [activeTab, setActiveTab] = useState<'tickets' | 'broadcast'>('tickets');
   const [isNewTicketOpen, setIsNewTicketOpen] = useState(false);
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -174,7 +176,7 @@ export default function HelpDesk() {
         <div className="grid grid-cols-1 gap-6">
           <CollapsibleModule
             title="Your Support Tickets"
-            icon={LifeBuoy}
+            icon={SupportIcon}
             extraHeader={
               <button
                 onClick={() => setIsNewTicketOpen(true)}

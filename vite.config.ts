@@ -122,6 +122,34 @@ export default defineConfig(({ mode }) => {
     build: {
       sourcemap: isProd ? 'hidden' : false,
       rollupOptions: {
+        output: {
+          /**
+           * Manual chunk strategy — keeps heavy libs in ONE stable, long-cached chunk
+           * instead of Rollup duplicating them across every lazy page that imports them.
+           *
+           * Chunk budget targets (gzip):
+           *   charts  — recharts + d3 deps         ≈ 60 KB  (loaded only on chart pages)
+           *   motion  — motion/react (Framer)       ≈ 30 KB  (Dashboard only)
+           *   ui      — headlessui                  ≈  8 KB  (Settings, Billing dialogs)
+           *   react   — react + react-dom           ≈ 45 KB  (always needed, cache-busts rarely)
+           *   vendor  — everything else              varies
+           */
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return undefined;
+            // Charts — recharts ships its own d3 subset; keep all in one chunk
+            if (id.includes('recharts') || id.includes('/d3-') || id.includes('victory-vendor')) return 'charts';
+            // Motion — motion/react is large and only needed by Dashboard
+            if (id.includes('motion/react') || id.includes('motion/dist') || id.includes('framer-motion')) return 'motion';
+            // Headless UI — dialogs, menus, used across settings/billing pages
+            if (id.includes('@headlessui')) return 'ui';
+            // React core — stable, cache-busts only on React version bumps
+            if (id.includes('react-dom') || id.includes('/react/') || id.match(/node_modules\/react$/)) return 'react';
+            // Supabase JS client — large auth+realtime bundle
+            if (id.includes('@supabase')) return 'supabase';
+            // Everything else
+            return 'vendor';
+          },
+        },
         plugins: analyze
           ? [
               visualizer({
@@ -134,6 +162,7 @@ export default defineConfig(({ mode }) => {
           : [],
       },
     },
+
     server: {
       historyApiFallback: true,
       hmr: process.env.DISABLE_HMR !== 'true',

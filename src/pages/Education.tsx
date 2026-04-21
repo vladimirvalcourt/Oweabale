@@ -7,6 +7,7 @@ import { CollapsibleModule } from '../components/CollapsibleModule';
 import { supabase } from '../lib/supabase';
 import { FullSuiteGateCard } from '../components/FullSuiteGate';
 import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
+import { getCustomIcon } from '../lib/customIcons';
 
 const MODULES = [
   {
@@ -126,6 +127,7 @@ const MODULES = [
 ];
 
 export default function Education() {
+  const EducationIcon = getCustomIcon('education');
   const { isLoading: isAccessLoading, hasFullSuite } = useFullSuiteAccess();
   const [selectedModule, setSelectedModule] = useState(MODULES[0].id);
   const [viewerOpen, setViewerOpen] = useState(false);
@@ -301,7 +303,7 @@ export default function Education() {
             return (
               <CollapsibleModule
                 title={activeModule.title}
-                icon={GraduationCap}
+                icon={EducationIcon}
                 extraHeader={<span className="text-xs font-sans font-medium text-content-tertiary px-2 py-0.5 border border-surface-border rounded-lg">{activeModule.category}</span>}
               >
                 <div className="p-6">

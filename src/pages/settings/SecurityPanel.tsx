@@ -1,15 +1,23 @@
 import React, { memo, useEffect, useState } from 'react';
-import { Lock, Shield, CheckCircle2, Loader2, ShieldCheck } from 'lucide-react';
+import { Lock, Shield, CheckCircle2, Loader2, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import { useStore } from '../../store/useStore';
+import { getCustomIcon } from '../../lib/customIcons';
+
+// E-03: Set to true when authenticator enrollment UI is ready to ship.
+const FEATURE_2FA_ENROLLMENT = false;
 
 function SecurityPanelInner() {
+  const SecurityIcon = getCustomIcon('security');
   const userEmail = useStore((s) => s.user.email);
   const [mfaEnabled, setMfaEnabled] = useState<boolean | null>(null);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [hasEmailPassword, setHasEmailPassword] = useState<boolean | null>(null);
+
+  // E-02: true = SSO-only user (Google, GitHub, etc.), no email/password identity.
+  const isSsoOnly = hasEmailPassword === false;
 
   const securityScoreMax = 2;
   const securityScore = (mfaEnabled ? 1 : 0) + (hasEmailPassword ? 1 : 0);
@@ -36,7 +44,7 @@ function SecurityPanelInner() {
     if (mfaEnabled && hasEmailPassword) return 'Strong — 2FA and an Oweable password are both enabled.';
     if (mfaEnabled && !hasEmailPassword) return '2FA is on. Password changes apply only if you use email & password sign-in.';
     if (!mfaEnabled && hasEmailPassword) return 'Use a strong unique password; add authenticator 2FA when it is available in Oweable.';
-    return 'You sign in with a social or SSO provider — use that provider’s security settings for passwords and 2FA.';
+    return "You sign in with a social or SSO provider \u2014 use that provider's security settings for passwords and 2FA.";
   })();
 
   return (
@@ -46,17 +54,42 @@ function SecurityPanelInner() {
         <span>Secure connection — your session is encrypted in transit (HTTPS).</span>
       </div>
 
-      <div className="rounded-lg border border-surface-border bg-surface-elevated/50 px-4 py-3">
-        <p className="text-sm font-medium text-content-primary">
-          Security score: {securityScore}/{securityScoreMax}
-        </p>
-        <p className="mt-1 text-xs text-content-tertiary">{scoreHint}</p>
-        <p className="mt-2 text-xs text-content-muted">
-          Score reflects Oweable TOTP 2FA (when enabled) and email/password sign-in only.
-        </p>
-      </div>
+      {/* E-02: Show trust badge for SSO users instead of a misleading 0/2 score */}
+      {isSsoOnly ? (
+        <div className="flex items-start gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
+          <ShieldCheck className="w-5 h-5 shrink-0 text-emerald-500 mt-0.5" aria-hidden />
+          <div>
+            <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+              Secured via Google
+            </p>
+            <p className="mt-1 text-xs text-content-secondary leading-relaxed">
+              Your account is secured through your Google sign-in. Manage your password and
+              two-factor authentication directly in your{' '}
+              <a
+                href="https://myaccount.google.com/security"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 hover:no-underline"
+              >
+                Google account security settings
+              </a>
+              .
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-lg border border-surface-border bg-surface-elevated/50 px-4 py-3">
+          <p className="text-sm font-medium text-content-primary">
+            Security score: {hasEmailPassword === null || mfaEnabled === null ? '…' : `${securityScore}/${securityScoreMax}`}
+          </p>
+          <p className="mt-1 text-xs text-content-tertiary">{scoreHint}</p>
+          <p className="mt-2 text-xs text-content-muted">
+            Score reflects Oweable TOTP 2FA (when enabled) and email/password sign-in only.
+          </p>
+        </div>
+      )}
 
-      <CollapsibleModule title="Password" icon={Lock} defaultOpen>
+      <CollapsibleModule title="Password" icon={SecurityIcon} defaultOpen>
         {hasEmailPassword === null ? (
           <p className="text-sm text-content-tertiary">Checking how you sign in…</p>
         ) : hasEmailPassword ? (
@@ -153,45 +186,73 @@ function SecurityPanelInner() {
           </>
         ) : (
           <p className="text-sm text-content-tertiary max-w-md">
-            You&apos;re signed in with a social or SSO provider, not an Oweable-only password. Manage passwords and two-factor
-            authentication in that provider&apos;s security settings.
+            You&apos;re signed in with a social or SSO provider, not an Oweable-only password. Manage passwords and
+            two-factor authentication in that provider&apos;s security settings.
           </p>
         )}
       </CollapsibleModule>
 
       <CollapsibleModule
         title="Two-Factor Authentication"
-        icon={Shield}
+        icon={SecurityIcon}
         defaultOpen
         summaryWhenCollapsed={
           mfaEnabled === null ? 'Checking…' : mfaEnabled ? 'Enabled' : 'Not enabled'
         }
       >
-        <div className="flex items-start gap-3 border border-surface-border rounded-lg p-4 bg-surface-elevated/50">
-          <div
-            className={`w-10 h-10 shrink-0 border rounded-full flex items-center justify-center ${
-              mfaEnabled ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-surface-border bg-surface-raised'
-            }`}
-          >
-            {mfaEnabled === null ? (
-              <Loader2 className="w-5 h-5 text-content-tertiary animate-spin" />
-            ) : mfaEnabled ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-            ) : (
-              <Shield className="w-5 h-5 text-content-tertiary" />
-            )}
+        {/* E-03: Gate enrollment UI behind feature flag. If flag is off and 2FA is not
+            already active, show a coming-soon locked card. If 2FA is already enrolled
+            (e.g. added via another pathway), always show verified status. */}
+        {mfaEnabled || FEATURE_2FA_ENROLLMENT ? (
+          <div className="flex items-start gap-3 border border-surface-border rounded-lg p-4 bg-surface-elevated/50">
+            <div
+              className={`w-10 h-10 shrink-0 border rounded-full flex items-center justify-center ${
+                mfaEnabled ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-surface-border bg-surface-raised'
+              }`}
+            >
+              {mfaEnabled === null ? (
+                <Loader2 className="w-5 h-5 text-content-tertiary animate-spin" />
+              ) : mfaEnabled ? (
+                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+              ) : (
+                <Shield className="w-5 h-5 text-content-tertiary" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-content-primary">
+                {mfaEnabled === null
+                  ? 'Checking status…'
+                  : mfaEnabled
+                  ? 'Authenticator 2FA is enabled'
+                  : 'Authenticator 2FA is not enabled'}
+              </p>
+              <p className="mt-1 text-sm text-content-tertiary">
+                {mfaEnabled
+                  ? 'Your account uses a verified authenticator factor.'
+                  : 'Enroll an authenticator app to add a second layer of sign-in security.'}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-content-primary">
-              {mfaEnabled === null ? 'Checking status…' : mfaEnabled ? 'Authenticator 2FA is enabled' : 'Authenticator 2FA is not enabled'}
-            </p>
-            <p className="mt-1 text-sm text-content-tertiary">
-              {mfaEnabled
-                ? 'Your account uses a verified authenticator factor.'
-                : 'Oweable does not offer enrolling new authenticator factors yet. Use your sign-in provider’s 2FA when you use Google or SSO.'}
-            </p>
+        ) : (
+          // E-03: Coming-soon locked state when flag is off and 2FA not yet enrolled
+          <div className="flex items-start gap-3 border border-surface-border rounded-lg p-4 bg-surface-elevated/50 opacity-70">
+            <div className="w-10 h-10 shrink-0 border border-surface-border bg-surface-raised rounded-full flex items-center justify-center">
+              <Lock className="w-5 h-5 text-content-muted" aria-hidden />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-content-primary flex items-center gap-2">
+                Authenticator 2FA
+                <span className="rounded-full border border-surface-border bg-surface-raised px-2 py-0.5 text-[10px] font-medium text-content-tertiary tracking-wide">
+                  Coming soon
+                </span>
+              </p>
+              <p className="mt-1 text-xs text-content-tertiary max-w-md">
+                TOTP authenticator enrollment is on our roadmap. In the meantime, keep your{' '}
+                {isSsoOnly ? 'Google account' : 'Oweable password'} strong and unique.
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </CollapsibleModule>
     </div>
   );

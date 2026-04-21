@@ -7,8 +7,10 @@ import { toast } from 'sonner';
 import type { SupportTicket } from './types';
 import { useStore } from '../../store/useStore';
 import { yieldForPaint } from '../../lib/interaction';
+import { getCustomIcon } from '../../lib/customIcons';
 
 function SupportPanelInner() {
+  const SupportIcon = getCustomIcon('support');
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [ticketsLoading, setTicketsLoading] = useState(false);
   const [isSubmittingTicket, setIsSubmittingTicket] = useState(false);
@@ -131,7 +133,7 @@ function SupportPanelInner() {
 
   return (
     <div className="space-y-6">
-      <CollapsibleModule title="Service Status" icon={LifeBuoy} defaultOpen={false}>
+      <CollapsibleModule title="Service Status" icon={SupportIcon} defaultOpen={false}>
         <div className="space-y-3">
           <div className="rounded-lg border border-surface-border bg-surface-base p-3 text-sm">
             <p className="font-medium text-content-primary">App connectivity: {isOnline ? 'Online' : 'Offline'}</p>
@@ -162,7 +164,7 @@ function SupportPanelInner() {
         </div>
       </CollapsibleModule>
 
-      <CollapsibleModule title="Submit a Support Request" icon={LifeBuoy}>
+      <CollapsibleModule title="Submit a Support Request" icon={SupportIcon}>
         <div className="-mx-6 -my-6 p-6 bg-surface-base">
           <form onSubmit={handleSubmitTicket} className="space-y-4">
             <div>
@@ -244,7 +246,7 @@ function SupportPanelInner() {
 
       <CollapsibleModule
         title="My Tickets"
-        icon={MessageSquare}
+        icon={SupportIcon}
         extraHeader={
           <span className="text-xs font-medium text-content-tertiary">
             {tickets.length} ticket{tickets.length !== 1 ? 's' : ''}

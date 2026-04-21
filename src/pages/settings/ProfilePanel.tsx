@@ -12,29 +12,104 @@ import { getCroppedAvatarBlob } from '../../lib/cropAvatar';
 import { getIanaTimezoneOptions, normalizeTimezoneToIana } from '../../lib/timezones';
 import { formatUsNational, nationalDigitsFromStored, toE164 } from '../../lib/phoneInput';
 import { cn } from '../../lib/utils';
+import { getCustomIcon } from '../../lib/customIcons';
 
-const DIAL_OPTIONS = [
-  { value: '1', label: '+1 (US/CA)' },
-  { value: '44', label: '+44 (UK)' },
-  { value: '33', label: '+33 (FR)' },
-  { value: '49', label: '+49 (DE)' },
-  { value: '81', label: '+81 (JP)' },
-  { value: '61', label: '+61 (AU)' },
-  { value: '91', label: '+91 (IN)' },
-  { value: '52', label: '+52 (MX)' },
-  { value: '55', label: '+55 (BR)' },
+// E-07: Comprehensive ITU calling code dataset (60+ countries).
+// Sorted by usage frequency (US first) then alphabetically.
+const FULL_DIAL_OPTIONS = [
+  { value: '1',   label: '+1 · US / Canada' },
+  { value: '44',  label: '+44 · United Kingdom' },
+  { value: '33',  label: '+33 · France' },
+  { value: '49',  label: '+49 · Germany' },
+  { value: '61',  label: '+61 · Australia' },
+  { value: '91',  label: '+91 · India' },
+  { value: '52',  label: '+52 · Mexico' },
+  { value: '55',  label: '+55 · Brazil' },
+  { value: '81',  label: '+81 · Japan' },
+  { value: '86',  label: '+86 · China' },
+  { value: '82',  label: '+82 · South Korea' },
+  { value: '34',  label: '+34 · Spain' },
+  { value: '39',  label: '+39 · Italy' },
+  { value: '31',  label: '+31 · Netherlands' },
+  { value: '46',  label: '+46 · Sweden' },
+  { value: '47',  label: '+47 · Norway' },
+  { value: '45',  label: '+45 · Denmark' },
+  { value: '358', label: '+358 · Finland' },
+  { value: '41',  label: '+41 · Switzerland' },
+  { value: '43',  label: '+43 · Austria' },
+  { value: '32',  label: '+32 · Belgium' },
+  { value: '351', label: '+351 · Portugal' },
+  { value: '30',  label: '+30 · Greece' },
+  { value: '48',  label: '+48 · Poland' },
+  { value: '420', label: '+420 · Czech Republic' },
+  { value: '36',  label: '+36 · Hungary' },
+  { value: '40',  label: '+40 · Romania' },
+  { value: '7',   label: '+7 · Russia' },
+  { value: '380', label: '+380 · Ukraine' },
+  { value: '90',  label: '+90 · Turkey' },
+  { value: '972', label: '+972 · Israel' },
+  { value: '971', label: '+971 · UAE' },
+  { value: '966', label: '+966 · Saudi Arabia' },
+  { value: '20',  label: '+20 · Egypt' },
+  { value: '234', label: '+234 · Nigeria' },
+  { value: '27',  label: '+27 · South Africa' },
+  { value: '254', label: '+254 · Kenya' },
+  { value: '233', label: '+233 · Ghana' },
+  { value: '60',  label: '+60 · Malaysia' },
+  { value: '65',  label: '+65 · Singapore' },
+  { value: '62',  label: '+62 · Indonesia' },
+  { value: '63',  label: '+63 · Philippines' },
+  { value: '84',  label: '+84 · Vietnam' },
+  { value: '66',  label: '+66 · Thailand' },
+  { value: '880', label: '+880 · Bangladesh' },
+  { value: '92',  label: '+92 · Pakistan' },
+  { value: '94',  label: '+94 · Sri Lanka' },
+  { value: '98',  label: '+98 · Iran' },
+  { value: '964', label: '+964 · Iraq' },
+  { value: '962', label: '+962 · Jordan' },
+  { value: '961', label: '+961 · Lebanon' },
+  { value: '54',  label: '+54 · Argentina' },
+  { value: '56',  label: '+56 · Chile' },
+  { value: '57',  label: '+57 · Colombia' },
+  { value: '51',  label: '+51 · Peru' },
+  { value: '58',  label: '+58 · Venezuela' },
+  { value: '593', label: '+593 · Ecuador' },
+  { value: '53',  label: '+53 · Cuba' },
+  { value: '1876', label: '+1876 · Jamaica' },
+  { value: '64',  label: '+64 · New Zealand' },
+  { value: '679', label: '+679 · Fiji' },
+  { value: '353', label: '+353 · Ireland' },
+  { value: '354', label: '+354 · Iceland' },
+  { value: '370', label: '+370 · Lithuania' },
+  { value: '371', label: '+371 · Latvia' },
+  { value: '372', label: '+372 · Estonia' },
 ] as const;
+
+
 
 const IANA_ZONES = getIanaTimezoneOptions();
 
 type SaveVisualState = 'idle' | 'saving' | 'saved';
 
 function ProfilePanelInner() {
+  const OverviewIcon = getCustomIcon('overview');
   const user = useStore((s) => s.user);
   const updateUser = useStore((s) => s.updateUser);
 
   const [saveVisual, setSaveVisual] = useState<SaveVisualState>('idle');
-  const [dialCode, setDialCode] = useState('1');
+  const [dialCode, setDialCode] = useState(() => {
+    // Infer dialCode from stored phone on mount
+    const stored = user.phone ?? '';
+    if (!stored) return '1';
+    const match = FULL_DIAL_OPTIONS.find((o) => stored.startsWith(`+${o.value}`));
+    return match?.value ?? '1';
+  });
+  // E-07: search field text; initialized to the matching label so the field is pre-filled
+  const [dialSearch, setDialSearch] = useState<string>(() => {
+    const stored = user.phone ?? '';
+    const match = FULL_DIAL_OPTIONS.find((o) => stored.startsWith(`+${o.value}`));
+    return match ? match.label : FULL_DIAL_OPTIONS[0].label;
+  });
   const [nationalDigits, setNationalDigits] = useState(() => nationalDigitsFromStored(user.phone));
   const [authPhoneConfirmed, setAuthPhoneConfirmed] = useState(false);
   const [otpOpen, setOtpOpen] = useState(false);
@@ -252,7 +327,7 @@ function ProfilePanelInner() {
     <>
       <CollapsibleModule
         title="Personal Information"
-        icon={User}
+        icon={OverviewIcon}
         extraHeader={
           <span className="text-xs font-medium text-content-tertiary">
             {signInProviderLabel ? `${signInProviderLabel} sign-in` : 'Sign-in'}
@@ -354,18 +429,36 @@ function ProfilePanelInner() {
               <div className="sm:col-span-4">
                 <span className="mb-2 block text-xs font-medium text-content-secondary">Phone number</span>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
-                  <select
-                    value={dialCode}
-                    onChange={(e) => setDialCode(e.target.value)}
-                    className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary sm:w-40"
-                    aria-label="Country code"
-                  >
-                    {DIAL_OPTIONS.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
+                  {/* E-07: Combobox-style country code selector with search */}
+                  <div className="relative w-full sm:w-44 shrink-0">
+                    <input
+                      type="text"
+                      list="dial-code-list"
+                      id="dial-code-search"
+                      value={dialSearch}
+                      placeholder="+1 or country…"
+                      aria-label="Country code search"
+                      autoComplete="off"
+                      className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary"
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        setDialSearch(raw);
+                        // Match by label or numeric dial code
+                        const match = FULL_DIAL_OPTIONS.find(
+                          (o) =>
+                            o.label.toLowerCase() === raw.toLowerCase() ||
+                            `+${o.value}` === raw.trim() ||
+                            o.value === raw.replace(/^\+/, '').trim(),
+                        );
+                        if (match) setDialCode(match.value);
+                      }}
+                    />
+                    <datalist id="dial-code-list">
+                      {FULL_DIAL_OPTIONS.map((o) => (
+                        <option key={o.value} value={o.label} />
+                      ))}
+                    </datalist>
+                  </div>
                   <input
                     type="tel"
                     inputMode="numeric"

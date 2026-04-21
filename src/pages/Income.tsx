@@ -10,8 +10,11 @@ import { toast } from 'sonner';
 import { guessCategory } from '../lib/categorizer';
 import { yieldForPaint } from '../lib/interaction';
 import { cn } from '../lib/utils';
+import { getCustomIcon } from '../lib/customIcons';
 
 export default function Income() {
+  const IncomeIcon = getCustomIcon('income');
+  const PlanningIcon = getCustomIcon('planning');
   const { incomes, addIncome, editIncome, deleteIncome, recordIncomeDeposit, user, updateUser } = useStore();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -186,7 +189,7 @@ export default function Income() {
       {incomes.length === 0 ? (
         <div className="bg-surface-raised rounded-lg border border-surface-border py-20 px-6 flex flex-col items-center justify-center text-center">
           <div className="w-12 h-12 border border-surface-border bg-surface-elevated rounded-lg flex items-center justify-center mb-4">
-            <Vault className="w-5 h-5 text-content-tertiary" />
+            <IncomeIcon className="w-5 h-5 text-content-tertiary" />
           </div>
           <h2 className="text-lg font-sans font-semibold text-content-primary mb-2">No income yet</h2>
           <p className="text-sm text-content-tertiary max-w-md">Add salary or freelance sources to forecast cash flow and tax set-aside.</p>
@@ -207,7 +210,7 @@ export default function Income() {
           {/* Overview Stats */}
           <CollapsibleModule 
             title="Income Overview" 
-            icon={TrendingUp}
+            icon={IncomeIcon}
             extraHeader={
               <span className="text-sm font-mono tabular-nums font-semibold text-content-primary data-numeric">
                 ${totalMonthlyIncome.toLocaleString()} /mo
@@ -217,7 +220,7 @@ export default function Income() {
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 -mx-6 -my-6 p-6">
               <div className="bg-surface-elevated rounded-lg border border-surface-border p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="w-3.5 h-3.5 text-content-tertiary" />
+                  <IncomeIcon className="w-3.5 h-3.5 text-content-tertiary" />
                   <p className="metric-label normal-case text-content-tertiary">Expected monthly</p>
                 </div>
                 <p className="mt-2 text-2xl font-bold font-mono tabular-nums text-content-primary data-numeric">
@@ -226,7 +229,7 @@ export default function Income() {
               </div>
               <div className="bg-surface-elevated rounded-lg border border-surface-border p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <Vault className="w-3.5 h-3.5 text-content-tertiary" />
+                  <PlanningIcon className="w-3.5 h-3.5 text-content-tertiary" />
                   <p className="metric-label normal-case text-content-tertiary">Active sources</p>
                 </div>
                 <p className="mt-2 text-2xl font-bold font-mono tabular-nums text-content-primary data-numeric">
@@ -236,7 +239,7 @@ export default function Income() {
             </div>
           </CollapsibleModule>
 
-          <CollapsibleModule title="Steady salary & tax reserve" icon={PiggyBank} defaultOpen>
+          <CollapsibleModule title="Steady salary & tax reserve" icon={PlanningIcon} defaultOpen>
             <div className="px-6 py-5 space-y-5 -mx-6 -my-6">
               {selfEmployedMonthly <= 0 ? (
                 <p className="text-sm text-content-tertiary leading-relaxed">
@@ -335,7 +338,7 @@ export default function Income() {
           </CollapsibleModule>
 
           {/* Income Sources List */}
-          <CollapsibleModule title="Your Income Sources" icon={Vault}>
+          <CollapsibleModule title="Your Income Sources" icon={IncomeIcon}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 -mx-6 -my-6 p-6">
               {incomes.map((income) => (
                 <div 

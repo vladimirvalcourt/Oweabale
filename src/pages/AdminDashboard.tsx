@@ -26,6 +26,7 @@ import { AdminUserDataPanel } from './admin/components/AdminUserDataPanel';
 import { AdminIngestionQueuesPanel } from './admin/components/AdminIngestionQueuesPanel';
 import { useAdminPermissions } from '../features/admin/shared/useAdminPermissions';
 import { getAdminActionErrorMessage } from '../lib/adminActionsInvoke';
+import { getCustomIcon } from '../lib/customIcons';
 import type {
   AdminAuditEntry,
   AdminBroadcastRow,
@@ -50,6 +51,10 @@ const STRIPE_DASHBOARD_URL = (import.meta.env.VITE_STRIPE_DASHBOARD_URL ?? '').t
 const PROFILE_PAGE_SIZE = 200;
 
 export default function AdminDashboard() {
+  const OverviewIcon = getCustomIcon('overview');
+  const ChartIcon = getCustomIcon('chart');
+  const SupportIcon = getCustomIcon('support');
+  const BillingIcon = getCustomIcon('billing');
   const { isSuperAdmin, hasPermission } = useAdminPermissions();
   const canBillingManage = isSuperAdmin || hasPermission('billing.manage');
   const canManagePlatform = isSuperAdmin || hasPermission('settings.platform');
@@ -712,7 +717,7 @@ export default function AdminDashboard() {
         </div>
 
         <section className="glass-card rounded-2xl p-4">
-          <CollapsibleModule title="At a glance" icon={LayoutDashboard} defaultOpen>
+          <CollapsibleModule title="At a glance" icon={OverviewIcon} defaultOpen>
             <AdminMetricsBar metrics={metricData} />
           </CollapsibleModule>
         </section>
@@ -720,7 +725,7 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
           <section className="space-y-6 xl:col-span-8">
             <div className="glass-card rounded-2xl p-4">
-              <CollapsibleModule title="Exports & analytics" icon={LineChart} defaultOpen>
+              <CollapsibleModule title="Exports & analytics" icon={ChartIcon} defaultOpen>
                 <div className="space-y-6">
                   <AdminExportBar profiles={profiles} billingStats={billingStats} />
                   <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -734,7 +739,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="glass-card rounded-2xl p-4">
-              <CollapsibleModule title="Users & roles" icon={Users} defaultOpen>
+              <CollapsibleModule title="Users & roles" icon={SupportIcon} defaultOpen>
                 <AdminUsersPanel
                   users={filteredProfiles}
                   search={userSearch}
@@ -758,7 +763,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="glass-card rounded-2xl p-4">
-              <CollapsibleModule title="Plaid connections" icon={Landmark} defaultOpen={false}>
+              <CollapsibleModule title="Plaid connections" icon={BillingIcon} defaultOpen={false}>
                 <AdminPlaidDrilldown items={plaidItems} />
               </CollapsibleModule>
             </div>

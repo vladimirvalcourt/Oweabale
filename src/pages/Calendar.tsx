@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { useStore } from '../store/useStore';
+import { getCustomIcon } from '../lib/customIcons';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -29,6 +30,8 @@ interface PopoverState {
 } 
 
 export default function Calendar() {
+  const CalendarIcon = getCustomIcon('calendar');
+  const OverviewIcon = getCustomIcon('overview');
   const location = useLocation();
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
@@ -212,7 +215,7 @@ export default function Calendar() {
       </div>      {/* Month Navigation & Grid */}
       <CollapsibleModule 
         title="Financial Calendar"
-        icon={CalendarDays}
+        icon={CalendarIcon}
         extraHeader={<span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{Array.from(eventsByDay.values()).flat().length} Events Detected</span>}
       >
         <div className="bg-surface-raised border border-surface-border rounded-lg overflow-hidden -mx-6 -my-6">
@@ -367,7 +370,7 @@ export default function Calendar() {
       )}
 
       {/* Upcoming Events List */}
-      <CollapsibleModule title="Upcoming Events" icon={ChevronRight}>
+      <CollapsibleModule title="Upcoming Events" icon={OverviewIcon}>
         <div className="space-y-2 -mx-6 -my-6 p-6">
           {Array.from(eventsByDay.entries())
             .filter(([day]) => day >= today.getDate() || month !== today.getMonth() || year !== today.getFullYear())

@@ -7,10 +7,13 @@ import React from 'react';
 export default function HeroDashboardMock() {
   return (
     <div className="bg-black border border-surface-border rounded-[6px] p-5 sm:p-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between pb-3 border-b border-surface-border">
+      <div className="flex items-center justify-between pb-3 border-b border-surface-border relative">
+        <div className="absolute -top-8 -right-2 bg-brand-cta text-surface-base px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg transform rotate-[-2deg]">
+          Preview coming soon
+        </div>
         <div>
           <p className="text-[10px] uppercase tracking-[0.18em] text-content-tertiary">Oweable Command Center</p>
-          <p className="text-sm text-content-primary font-medium mt-1">Freelancer Finance Overview</p>
+          <p className="text-sm text-content-primary font-medium mt-1">Financial Overview</p>
         </div>
         <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[10px] font-medium text-emerald-300">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden />

@@ -5,6 +5,7 @@ import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, Hash,
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
+import { getCustomIcon } from '../lib/customIcons';
 
 const BUTTON_BASE_CLASS =
   'inline-flex min-h-10 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-app disabled:opacity-50 disabled:cursor-not-allowed';
@@ -12,6 +13,8 @@ const BUTTON_SECONDARY_CLASS = `${BUTTON_BASE_CLASS} border border-surface-borde
 const BUTTON_PRIMARY_CLASS = `${BUTTON_BASE_CLASS} bg-brand-cta text-surface-base hover:bg-brand-cta-hover`;
 
 export default function Transactions() {
+  const TransactionsIcon = getCustomIcon('transactions');
+  const FiltersIcon = getCustomIcon('filters');
   const {
     transactions,
     subscriptions,
@@ -158,7 +161,7 @@ export default function Transactions() {
 
       <CollapsibleModule 
         title="Filter Transactions"
-        icon={Filter}
+        icon={FiltersIcon}
         extraHeader={<span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{filteredTransactions.length} Records Detected</span>}
       >
         <div className="-mx-6 -my-6 p-6 space-y-4">
@@ -306,7 +309,7 @@ export default function Transactions() {
         {filteredTransactions.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12 text-center">
             <div className="w-16 h-16 border border-surface-border rounded-full flex items-center justify-center mb-4">
-              <Activity className="w-8 h-8 text-content-tertiary" />
+              <TransactionsIcon className="w-8 h-8 text-content-tertiary" />
             </div>
             <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-1">No transactions found</h3>
             <p className="text-sm text-content-tertiary max-w-sm">
@@ -350,7 +353,7 @@ export default function Transactions() {
           </div>
         ) : (
         <>
-        <CollapsibleModule title="Your Transactions" icon={Activity}>
+        <CollapsibleModule title="Your Transactions" icon={TransactionsIcon}>
           <div className="overflow-x-auto -mx-6 -my-6">
             <table className="min-w-full divide-y divide-surface-highlight">
               <thead className="bg-surface-base">

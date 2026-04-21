@@ -19,6 +19,7 @@ import { CollapsibleModule } from '../components/CollapsibleModule';
 import { TransitionLink } from '../components/TransitionLink';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
+import { getCustomIcon } from '../lib/customIcons';
 
 function defaultIrsRateForPurpose(purpose: MileageLogEntry['purpose']): number {
   switch (purpose) {
@@ -62,6 +63,9 @@ export const STATE_TAX_MAP: Record<string, { name: string; rate: number }> = {
 };
 
 export default function Taxes() {
+  const TaxesIcon = getCustomIcon('taxes');
+  const CalendarIcon = getCustomIcon('calendar');
+  const PlanningIcon = getCustomIcon('planning');
   const {
     incomes,
     deductions,
@@ -94,7 +98,10 @@ export default function Taxes() {
   });
 
   const taxState = user.taxState || 'NY';
-  const stateRate = user.taxRate ?? 6.25;
+  // E-01: derive fallback from the selected state's map rate — keeps Taxes.tsx
+  // and FinancialPanel in sync. Both read user.taxRate; when unset, fall back to
+  // the rate for the currently selected state rather than a hardcoded 6.25.
+  const stateRate = user.taxRate ?? (STATE_TAX_MAP[taxState]?.rate ?? 0);
 
   // Quarterly deadlines HUD
   const today = new Date();
@@ -352,7 +359,7 @@ export default function Taxes() {
             </div>
           </div>
 
-          <CollapsibleModule title="Add trip" icon={Plus} defaultOpen>
+          <CollapsibleModule title="Add trip" icon={PlanningIcon} defaultOpen>
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <p className="text-xs text-content-tertiary mb-1">Date</p>
@@ -479,7 +486,7 @@ export default function Taxes() {
             </div>
           </CollapsibleModule>
 
-          <CollapsibleModule title="Logged trips" icon={Map} defaultOpen>
+          <CollapsibleModule title="Logged trips" icon={TaxesIcon} defaultOpen>
             <div className="divide-y divide-surface-border max-h-[min(480px,50vh)] overflow-y-auto">
               {mileageLog.length === 0 ? (
                 <p className="p-6 text-sm text-content-tertiary">No trips yet — add one above.</p>
@@ -538,7 +545,7 @@ export default function Taxes() {
         </div>
       </div>
 
-      <CollapsibleModule title="Tax reduction playbook" icon={ListChecks} defaultOpen>
+      <CollapsibleModule title="Tax reduction playbook" icon={PlanningIcon} defaultOpen>
         <div className="px-6 py-5 space-y-4">
           <p className="text-sm text-content-secondary leading-relaxed">
             High-impact moves freelancers use to lower taxable income and stay compliant. Not tax advice—use this as a checklist with your CPA.
@@ -615,7 +622,7 @@ export default function Taxes() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <CollapsibleModule title="Yearly Tax Estimates" icon={Calculator}>
+          <CollapsibleModule title="Yearly Tax Estimates" icon={TaxesIcon}>
             <div className="flex flex-col items-center justify-center py-10">
               <p className="metric-label normal-case text-content-tertiary mb-2">Estimated total liability</p>
               <h2 className="text-6xl font-bold font-mono text-content-primary tabular-nums tracking-tighter data-numeric">
@@ -649,7 +656,7 @@ export default function Taxes() {
             </div>
           </CollapsibleModule>
 
-          <CollapsibleModule title="Tax Write-offs Tracker" icon={Plus}>
+          <CollapsibleModule title="Tax Write-offs Tracker" icon={PlanningIcon}>
             <div className="p-0">
                <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-elevated/50">
                   <p className="text-sm font-sans font-medium text-content-secondary">Write-offs from your ledger</p>
@@ -695,7 +702,7 @@ export default function Taxes() {
         </div>
 
         <div className="space-y-6">
-          <CollapsibleModule title="Quarterly Tax Deadlines" icon={Clock}>
+          <CollapsibleModule title="Quarterly Tax Deadlines" icon={CalendarIcon}>
             <div className="space-y-4">
               {quarterlyDates.map(q => (
                 <div key={q.label} className={`p-4 rounded-lg border ${q.overdue ? 'bg-surface-raised border-surface-border opacity-50' : q.daysLeft < 15 ? 'bg-rose-500/5 border-rose-500/30 shadow-[inset_0_0_15px_rgba(244,63,94,0.05)]' : 'bg-surface-elevated border-surface-border'}`}>

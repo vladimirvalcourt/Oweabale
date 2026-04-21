@@ -13,6 +13,7 @@ import { Dialog, Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { toast } from 'sonner';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
+import { getCustomIcon } from '../lib/customIcons';
 
 const BUDGET_PERIODS: Budget['period'][] = ['Weekly', 'Bi-weekly', 'Monthly', 'Quarterly', 'Yearly'];
 const SAVINGS_TARGET_STORAGE_KEY = 'oweable_budget_monthly_savings_target';
@@ -25,6 +26,8 @@ function loadMonthlySavingsTarget(): number {
 }
 
 export default function Budgets() {
+  const BudgetIcon = getCustomIcon('budget');
+  const PlanningIcon = getCustomIcon('planning');
   const { budgets, transactions, addBudget, editBudget, deleteBudget, categories, subscriptions } = useStore();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -267,7 +270,7 @@ export default function Budgets() {
       {budgets.length === 0 ? (
         <div className="bg-surface-raised border border-surface-border rounded-lg p-12 text-center">
           <div className="w-16 h-16 bg-surface-elevated rounded-lg flex items-center justify-center mx-auto mb-4 border border-surface-border">
-            <PieChart className="w-8 h-8 text-content-muted" />
+            <BudgetIcon className="w-8 h-8 text-content-muted" />
           </div>
           <h3 className="text-lg font-semibold text-content-primary mb-2">No budgets yet</h3>
           <p className="text-sm text-content-tertiary mb-8 max-w-sm mx-auto">Add a limit per category so you can see spending against it each month.</p>
@@ -282,7 +285,7 @@ export default function Budgets() {
         </div>
       ) : (
         <>
-          <CollapsibleModule title="Savings Target" icon={CheckCircle2}>
+          <CollapsibleModule title="Savings Target" icon={PlanningIcon}>
             <div className="space-y-4">
               <div className="rounded-lg border border-surface-border bg-surface-elevated p-4">
                 <label className="block text-xs font-medium text-content-tertiary mb-2">Monthly savings target</label>
@@ -333,7 +336,7 @@ export default function Budgets() {
           </CollapsibleModule>
 
           {personalizedSavingsSuggestions.length > 0 && (
-            <CollapsibleModule title="Personalized Savings Suggestions" icon={AlertTriangle} defaultOpen={false}>
+            <CollapsibleModule title="Personalized Savings Suggestions" icon={PlanningIcon} defaultOpen={false}>
               <div className="space-y-3">
                 {personalizedSavingsSuggestions.map((suggestion) => (
                   <div key={suggestion.id} className="rounded-lg border border-surface-border bg-surface-elevated p-4">
@@ -365,7 +368,7 @@ export default function Budgets() {
           )}
           <CollapsibleModule 
             title="Budget Limits" 
-            icon={PieChart}
+            icon={BudgetIcon}
             extraHeader={<span className="text-xs font-sans text-content-tertiary">{budgets.length} active</span>}
           >
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 -mx-6 -my-6 p-6">

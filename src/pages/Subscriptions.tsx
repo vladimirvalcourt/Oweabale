@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 import { yieldForPaint } from '../lib/interaction';
+import { getCustomIcon } from '../lib/customIcons';
 type SubFrequency = 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Yearly';
 
 const SUB_FREQUENCIES: SubFrequency[] = ['Weekly', 'Bi-weekly', 'Monthly', 'Yearly'];
@@ -34,6 +35,8 @@ function nextBillingFromCandidate(c: SubscriptionCandidate): string {
 }
 
 export default function Subscriptions() {
+  const SubscriptionsIcon = getCustomIcon('subscriptions');
+  const PlanningIcon = getCustomIcon('planning');
   const { subscriptions, transactions, addSubscription, editSubscription, deleteSubscription } = useStore();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -378,7 +381,7 @@ export default function Subscriptions() {
       {/* Overview Stats */}
       <CollapsibleModule
         title="Subscription overview"
-        icon={TrendingUp}
+        icon={PlanningIcon}
         extraHeader={
           <span className="text-sm font-mono tabular-nums font-semibold text-content-primary data-numeric">
             ${monthlyCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}/mo
@@ -499,7 +502,7 @@ export default function Subscriptions() {
       {subscriptions.length === 0 && !isAdding ? (
         <div className="bg-surface-raised rounded-lg border border-surface-border border-dashed p-12 text-center">
           <div className="w-16 h-16 border border-surface-border rounded-lg flex items-center justify-center mx-auto mb-4">
-            <Repeat className="w-8 h-8 text-content-tertiary" />
+            <SubscriptionsIcon className="w-8 h-8 text-content-tertiary" />
           </div>
           <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No subscriptions yet</h3>
           <p className="text-sm text-content-tertiary max-w-sm mx-auto mb-8">
@@ -515,7 +518,7 @@ export default function Subscriptions() {
           </button>
         </div>
       ) : (
-        <CollapsibleModule title="Your subscriptions" icon={Repeat}>
+        <CollapsibleModule title="Your subscriptions" icon={SubscriptionsIcon}>
           <ul className="divide-y divide-surface-highlight -mx-6 -my-6">
             {subscriptions.map((sub) => (
               <li
@@ -527,7 +530,7 @@ export default function Subscriptions() {
                   return (
                     <>
                 <div className="flex items-center gap-4">
-                  <BrandLogo size="lg" name={sub.name} fallbackIcon={<Repeat className="w-5 h-5 text-content-muted" />} />
+                  <BrandLogo size="lg" name={sub.name} fallbackIcon={<SubscriptionsIcon className="w-5 h-5 text-content-muted" />} />
                   <div>
                     <h4 className="text-sm font-sans font-semibold text-content-primary flex items-center gap-2">
                       {sub.name}

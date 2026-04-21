@@ -5,8 +5,10 @@ import { supabase } from '../../lib/supabase';
 import { toast } from 'sonner';
 import type { UserFeedback } from './types';
 import { yieldForPaint } from '../../lib/interaction';
+import { getCustomIcon } from '../../lib/customIcons';
 
 function FeedbackPanelInner() {
+  const SupportIcon = getCustomIcon('support');
   const [feedbacks, setFeedbacks] = useState<UserFeedback[]>([]);
   const [feedbacksLoading, setFeedbacksLoading] = useState(false);
   const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
@@ -81,7 +83,7 @@ function FeedbackPanelInner() {
 
   return (
     <div className="space-y-6">
-      <CollapsibleModule title="Share Your Feedback" icon={ThumbsUp}>
+      <CollapsibleModule title="Share Your Feedback" icon={SupportIcon}>
         <div className="-mx-6 -my-6 p-6 bg-surface-base">
           <form onSubmit={handleSubmitFeedback} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -156,7 +158,7 @@ function FeedbackPanelInner() {
 
       <CollapsibleModule
         title="My Feedback History"
-        icon={MessageSquare}
+        icon={SupportIcon}
         extraHeader={
           <span className="text-xs font-medium text-content-tertiary">
             {feedbacks.length} submission{feedbacks.length !== 1 ? 's' : ''}

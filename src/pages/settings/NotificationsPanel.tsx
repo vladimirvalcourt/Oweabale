@@ -7,6 +7,7 @@ import { useStore } from '../../store/useStore';
 import { NOTIF_PREFS_STORAGE_KEY, type NotifPrefKey, loadNotifPrefs } from './constants';
 import { useFullSuiteAccess } from '../../hooks/useFullSuiteAccess';
 import { FullSuiteGateCard } from '../../components/FullSuiteGate';
+import { getCustomIcon } from '../../lib/customIcons';
 import {
   getVapidPublicKey,
   hasActivePushSubscription,
@@ -23,6 +24,9 @@ function deferToast(fn: () => void) {
 }
 
 function NotificationsPanelInner() {
+  const SupportIcon = getCustomIcon('support');
+  const RulesIcon = getCustomIcon('rules');
+  const OverviewIcon = getCustomIcon('overview');
   const [notifPrefs, setNotifPrefs] = useState(loadNotifPrefs);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { financialAlertPrefs, updateUser } = useStore(
@@ -82,7 +86,7 @@ function NotificationsPanelInner() {
 
   return (
     <div className="space-y-6">
-      <CollapsibleModule title="Email Notifications" icon={Mail} defaultOpen>
+      <CollapsibleModule title="Email Notifications" icon={SupportIcon} defaultOpen>
         <p className="mb-6 text-sm font-medium text-content-secondary">Choose what updates you want to receive via email.</p>
         <div className="space-y-6">
           {[
@@ -118,7 +122,7 @@ function NotificationsPanelInner() {
         </div>
       </CollapsibleModule>
 
-      <CollapsibleModule title="Push Notifications" icon={BellRing} defaultOpen={false}>
+      <CollapsibleModule title="Push Notifications" icon={SupportIcon} defaultOpen={false}>
         <p className="mb-6 text-sm font-medium text-content-secondary">
           Browser push for this device. When you enable due-date and payment alerts below, we&apos;ll use this subscription to deliver
           them once server scheduling is wired.
@@ -236,7 +240,7 @@ function NotificationsPanelInner() {
         </div>
       </CollapsibleModule>
 
-      <CollapsibleModule title="Financial Alerts" icon={Zap} defaultOpen={false}>
+      <CollapsibleModule title="Financial Alerts" icon={OverviewIcon} defaultOpen={false}>
         <p className="text-sm text-content-tertiary mb-6">
           Push rules stored on your profile for the Oweable alert runner. Requires browser push to be enabled above.
         </p>
@@ -325,7 +329,7 @@ function NotificationsPanelInner() {
         </div>
       </CollapsibleModule>
 
-      <CollapsibleModule title="Smart Alerts (Full Suite)" icon={BrainCircuit} defaultOpen={false}>
+      <CollapsibleModule title="Smart Alerts (Full Suite)" icon={RulesIcon} defaultOpen={false}>
         <p className="mb-6 text-sm font-medium text-content-secondary">Optional premium alerts for subscriptions and debt progress.</p>
         {hasFullSuite || isAdmin ? (
           <div className="space-y-6">

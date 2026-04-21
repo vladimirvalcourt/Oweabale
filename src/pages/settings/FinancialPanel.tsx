@@ -4,8 +4,10 @@ import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { useStore } from '../../store/useStore';
 import { STATE_TAX_MAP } from '../Taxes';
+import { getCustomIcon } from '../../lib/customIcons';
 
 function FinancialPanelInner() {
+  const TaxesIcon = getCustomIcon('taxes');
   const taxState = useStore((s) => s.user.taxState ?? '');
   const taxRate = useStore((s) => s.user.taxRate ?? 0);
   const setTaxSettings = useStore((s) => s.setTaxSettings);
@@ -22,7 +24,7 @@ function FinancialPanelInner() {
 
   return (
     <div className="space-y-6">
-      <CollapsibleModule title="Tax residence (freelance)" icon={MapPin} defaultOpen>
+      <CollapsibleModule title="Tax residence (freelance)" icon={TaxesIcon} defaultOpen>
         <p id="tax-state-preference" className="mb-4 text-sm text-content-secondary">
           Used for Freelance / gigs state tax estimates. You can also adjust this from the Taxes page.
         </p>

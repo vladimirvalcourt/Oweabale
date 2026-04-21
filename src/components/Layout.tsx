@@ -31,9 +31,20 @@ const NAV_ROUTE_HASHES: Record<string, string[]> = {
   '/bills': ['due-soon'],
 };
 
+/**
+ * Fix 4: One-shot hover prefetch — fires the lazy import() on first mouseenter so
+ * the route chunk is downloaded and parsed BEFORE the click. Uses a Set<string> ref
+ * per component instance (shared across re-renders). Safe to call multiple times;
+ * the Set deduplication ensures each chunk is only fetched once per session.
+ */
+function usePrefetchedSet() {
+  return useRef<Set<string>>(new Set());
+}
+
 export default function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const prefetchedPaths = usePrefetchedSet(); // Fix 4
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -405,44 +416,46 @@ export default function Layout() {
         icon: typeof Home;
         count?: number;
         hash?: string;
+        /** Fix 4: lazy import factory for hover-prefetch; undefined = no chunked page */
+        lazyImport?: () => Promise<unknown>;
       }[];
     }[] => [
       {
         label: 'Overview',
         items: [
-          { name: 'Dashboard', path: '/dashboard', icon: Home },
-          { name: 'Cash flow', path: '/dashboard', icon: RefreshCw, hash: 'cash-flow' },
-          { name: 'Income', path: '/income', icon: DollarSign },
-          { name: 'Freelance / gigs', path: '/freelance', icon: Briefcase },
-          { name: 'Regular Bills', path: '/bills', icon: FileText },
-          { name: 'Tickets & Fines', path: '/bills?tab=ambush', icon: AlertTriangle },
-          { name: 'Debts & loans', path: '/bills?tab=debt', icon: CreditCard },
-          { name: 'Due soon', path: '/bills', icon: Clock, hash: 'due-soon', count: dueSoonCount },
-          { name: 'Subscriptions', path: '/subscriptions', icon: Repeat },
-          { name: 'Document Inbox', path: '/ingestion', icon: Inbox, count: pendingIngestions.length },
+          { name: 'Dashboard',        path: '/dashboard',         icon: Home,       lazyImport: () => import('../pages/Dashboard') },
+          { name: 'Cash flow',        path: '/dashboard',         icon: RefreshCw,  hash: 'cash-flow' },
+          { name: 'Income',           path: '/income',            icon: DollarSign, lazyImport: () => import('../pages/Income') },
+          { name: 'Freelance / gigs', path: '/freelance',         icon: Briefcase,  lazyImport: () => import('../pages/Freelance') },
+          { name: 'Regular Bills',    path: '/bills',             icon: FileText,   lazyImport: () => import('../pages/Obligations') },
+          { name: 'Tickets & Fines',  path: '/bills?tab=ambush',  icon: AlertTriangle },
+          { name: 'Debts & loans',    path: '/bills?tab=debt',    icon: CreditCard },
+          { name: 'Due soon',         path: '/bills',             icon: Clock,      hash: 'due-soon', count: dueSoonCount },
+          { name: 'Subscriptions',    path: '/subscriptions',     icon: Repeat,     lazyImport: () => import('../pages/Subscriptions') },
+          { name: 'Document Inbox',   path: '/ingestion',         icon: Inbox,      count: pendingIngestions.length, lazyImport: () => import('../pages/Ingestion') },
         ],
       },
       {
         label: 'Activity',
         items: [
-          { name: 'Trends', path: '/analytics', icon: Activity },
-          { name: 'Reports', path: '/reports', icon: BarChart2 },
-          { name: 'Transactions', path: '/transactions', icon: Activity },
+          { name: 'Trends',        path: '/analytics',     icon: Activity,  lazyImport: () => import('../pages/Analytics') },
+          { name: 'Reports',       path: '/reports',       icon: BarChart2, lazyImport: () => import('../pages/Reports') },
+          { name: 'Transactions',  path: '/transactions',  icon: Activity,  lazyImport: () => import('../pages/Transactions') },
         ],
       },
       {
         label: 'Planning & Growth',
         items: [
-          { name: 'Net Worth', path: '/net-worth', icon: Layers },
-          { name: 'Savings', path: '/savings', icon: PiggyBank as unknown as typeof Home },
-          { name: 'Investments', path: '/investments', icon: BarChart },
-          { name: 'Insurance', path: '/insurance', icon: Shield },
-          { name: 'Budgets', path: '/budgets', icon: PieChart },
-          { name: 'Academy', path: '/education', icon: BookOpen },
-          { name: 'Calendar', path: '/calendar', icon: CalendarIcon },
-          { name: 'Goals', path: '/goals', icon: Target },
-          { name: 'Credit Workshop', path: '/credit', icon: Shield },
-          { name: 'Taxes', path: '/taxes', icon: Percent },
+          { name: 'Net Worth',        path: '/net-worth',    icon: Layers,                                        lazyImport: () => import('../pages/NetWorth') },
+          { name: 'Savings',          path: '/savings',      icon: PiggyBank as unknown as typeof Home,           lazyImport: () => import('../pages/Savings') },
+          { name: 'Investments',      path: '/investments',  icon: BarChart,                                      lazyImport: () => import('../pages/Investments') },
+          { name: 'Insurance',        path: '/insurance',    icon: Shield,                                        lazyImport: () => import('../pages/Insurance') },
+          { name: 'Budgets',          path: '/budgets',      icon: PieChart,                                      lazyImport: () => import('../pages/Budgets') },
+          { name: 'Academy',          path: '/education',    icon: BookOpen,                                      lazyImport: () => import('../pages/Education') },
+          { name: 'Calendar',         path: '/calendar',     icon: CalendarIcon,                                  lazyImport: () => import('../pages/Calendar') },
+          { name: 'Goals',            path: '/goals',        icon: Target,                                        lazyImport: () => import('../pages/Goals') },
+          { name: 'Credit Workshop',  path: '/credit',       icon: Shield,                                        lazyImport: () => import('../pages/CreditCenter') },
+          { name: 'Taxes',            path: '/taxes',        icon: Percent,                                       lazyImport: () => import('../pages/Taxes') },
         ],
       },
     ],
@@ -598,7 +611,15 @@ export default function Layout() {
                           <div
                             key={item.name}
                             className="relative mx-1"
-                            onMouseEnter={() => { if (isDueSoonItem) setShowDueSoonPreview(true); }}
+                            onMouseEnter={() => {
+                              if (isDueSoonItem) setShowDueSoonPreview(true);
+                              // Fix 4: Hover-prefetch — load the route chunk before the click
+                              const lazyItem = item as typeof item & { lazyImport?: () => Promise<unknown> };
+                              if (lazyItem.lazyImport && !prefetchedPaths.current.has(item.path)) {
+                                prefetchedPaths.current.add(item.path);
+                                lazyItem.lazyImport().catch(() => {/* silent — prefetch is best-effort */});
+                              }
+                            }}
                             onMouseLeave={() => { if (isDueSoonItem) setShowDueSoonPreview(false); }}
                           >
                             <TransitionLink

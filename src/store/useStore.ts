@@ -88,6 +88,8 @@ export interface PlaidLinkedAccount {
   mask: string | null;
   subtypeSuggestedSavings: boolean;
   includeInSavings: boolean;
+  /** E-08: ISO timestamp of last sync for this account row (from updated_at). */
+  lastSyncAt: string | null;
 }
 
 export interface Asset {
@@ -2709,6 +2711,8 @@ export const useStore = create<AppState>()(
           mask: (row.mask ?? null) as string | null,
           subtypeSuggestedSavings: row.subtype_suggested_savings === true,
           includeInSavings: row.include_in_savings === true,
+          // E-08: per-account last sync timestamp sourced from updated_at
+          lastSyncAt: (row.updated_at ?? null) as string | null,
         })),
         assets: (assets || []).map((a: Record<string, unknown>) => ({
           id: a.id as string,
