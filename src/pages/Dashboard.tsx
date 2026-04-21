@@ -303,8 +303,8 @@ export default function Dashboard() {
     const nextReminderAt = Date.now() + 3 * 24 * 60 * 60 * 1000;
     try {
       localStorage.setItem(LOW_TAX_RESERVE_SNOOZE_UNTIL_KEY, String(nextReminderAt));
-    } catch {
-      /* ignore quota / private mode */
+    } catch (err) {
+      console.warn('[Dashboard] Failed to persist tax reserve snooze:', err);
     }
     setLowTaxReserveSnoozeUntil(nextReminderAt);
   }, []);
@@ -314,8 +314,8 @@ export default function Dashboard() {
     const nextReminderAt = Date.now() + 24 * 60 * 60 * 1000;
     try {
       localStorage.setItem(LOW_TAX_RESERVE_SNOOZE_UNTIL_KEY, String(nextReminderAt));
-    } catch {
-      /* ignore */
+    } catch (err) {
+      console.warn('[Dashboard] Failed to persist tax reserve acknowledgment:', err);
     }
     setLowTaxReserveSnoozeUntil(nextReminderAt);
   }, []);
@@ -325,8 +325,8 @@ export default function Dashboard() {
       const next = !prev;
       try {
         localStorage.setItem(DASHBOARD_CALM_MODE_KEY, next ? '1' : '0');
-      } catch {
-        // ignore storage failures
+      } catch (err) {
+        console.warn('[Dashboard] Failed to persist calm mode setting:', err);
       }
       return next;
     });

@@ -27,7 +27,7 @@ function SecurityPanelInner() {
         const verified = (data?.totp ?? []).filter((f: { status?: string }) => f.status === 'verified');
         setMfaEnabled(verified.length > 0);
       })
-      .catch(() => setMfaEnabled(false));
+      .catch((err) => { console.warn('[SecurityPanel] MFA factor listing failed:', err); setMfaEnabled(false); });
   }, []);
 
   useEffect(() => {

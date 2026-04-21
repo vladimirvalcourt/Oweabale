@@ -31,13 +31,14 @@ export function ProWelcomeModal() {
       if (!localStorage.getItem(STORAGE_KEY)) {
         setIsOpen(true);
       }
-    } catch {
+    } catch (err) {
       // localStorage unavailable (private browsing etc.) — silently skip
+      console.warn('[ProWelcomeModal] localStorage unavailable:', err);
     }
   }, []);
 
   const dismiss = () => {
-    try { localStorage.setItem(STORAGE_KEY, '1'); } catch { /* silent */ }
+    try { localStorage.setItem(STORAGE_KEY, '1'); } catch (err) { console.warn('[ProWelcomeModal] Could not persist dismissal:', err); }
     setIsOpen(false);
   };
 

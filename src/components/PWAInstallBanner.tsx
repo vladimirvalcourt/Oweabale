@@ -25,12 +25,12 @@ export function PWAInstallBanner({ isLoggedIn }: { isLoggedIn: boolean }) {
     // Guards wrapped in try/catch: localStorage throws in iOS private browsing
     try {
       if (localStorage.getItem(STORAGE_KEYS.PWA_INSTALL_DISMISSED) === 'true') return;
-    } catch { return; }
+    } catch (err) { console.warn('[PWAInstallBanner] localStorage unavailable:', err); return; }
 
     try {
       if (window.matchMedia('(display-mode: standalone)').matches) return;
       if ((window.navigator as { standalone?: boolean }).standalone === true) return;
-    } catch { /* matchMedia unavailable — proceed to listen for prompt */ }
+    } catch (err) { console.warn('[PWAInstallBanner] matchMedia unavailable:', err); /* proceed to listen for prompt */ }
 
     const handler = (e: Event) => {
       e.preventDefault();
@@ -63,7 +63,7 @@ export function PWAInstallBanner({ isLoggedIn }: { isLoggedIn: boolean }) {
   };
 
   const handleDismiss = () => {
-    try { localStorage.setItem(STORAGE_KEYS.PWA_INSTALL_DISMISSED, 'true'); } catch { /* ignore */ }
+    try { localStorage.setItem(STORAGE_KEYS.PWA_INSTALL_DISMISSED, 'true'); } catch (err) { console.warn('[PWAInstallBanner] Could not persist dismissal:', err); }
     setVisible(false);
   };
 

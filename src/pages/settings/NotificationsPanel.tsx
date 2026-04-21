@@ -67,8 +67,8 @@ function NotificationsPanelInner() {
       saveTimerRef.current = null;
       try {
         localStorage.setItem(NOTIF_PREFS_STORAGE_KEY, JSON.stringify(next));
-      } catch {
-        /* ignore quota / private mode */
+      } catch (err) {
+        console.warn('[NotificationsPanel] Could not persist notification prefs:', err);
       }
     }, 400);
   }, []);

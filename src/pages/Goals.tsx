@@ -27,7 +27,8 @@ export default function Goals() {
       if (!raw) return [];
       const parsed = JSON.parse(raw) as Array<{ at: string; note: string }>;
       return Array.isArray(parsed) ? parsed : [];
-    } catch {
+    } catch (err) {
+      console.warn('[Goals] Failed to read accountability check-ins from localStorage:', err);
       return [];
     }
   });
@@ -36,8 +37,8 @@ export default function Goals() {
     setCheckIns(next);
     try {
       localStorage.setItem(ACCOUNTABILITY_CHECKIN_KEY, JSON.stringify(next.slice(0, 20)));
-    } catch {
-      // ignore storage failures
+    } catch (err) {
+      console.warn('[Goals] Failed to save accountability check-ins to localStorage:', err);
     }
   };
 
