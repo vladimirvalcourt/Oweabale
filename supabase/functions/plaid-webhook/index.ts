@@ -1,3 +1,4 @@
+import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { decodeProtectedHeader, importJWK, jwtVerify } from 'https://esm.sh/jose@5.9.6';
 import { plaidPost } from '../_shared/plaid_client.ts';

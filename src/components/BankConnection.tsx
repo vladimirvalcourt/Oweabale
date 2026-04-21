@@ -190,8 +190,14 @@ function BankConnectionPlaid() {
       const checkout = await createStripeCheckoutSession('pro_monthly');
       if ('error' in checkout) {
         toast.error(checkout.error || 'Unable to start checkout');
+        setIsUpgrading(false);
+        return;
       }
-    } finally {
+      // Redirect to Stripe Checkout
+      window.location.href = checkout.checkoutUrl;
+    } catch (err) {
+      console.error('[BankConnection] Upgrade error:', err);
+      toast.error('Unable to start checkout. Please try again.');
       setIsUpgrading(false);
     }
   };

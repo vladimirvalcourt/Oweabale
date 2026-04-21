@@ -2,6 +2,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 import { plaidPost } from '../_shared/plaid_client.ts';
 import { hasPaidFullSuiteAccess } from '../_shared/plaidAccess.ts';
+import { enforceRateLimit, rateLimiters, createRateLimitHeaders, getClientIp } from '../_shared/rateLimiter.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
@@ -16,6 +17,12 @@ Deno.serve(async (req: Request) => {
       status: 405,
       headers: { ...ch, 'Content-Type': 'application/json' },
     });
+  }
+
+  // Enforce rate limiting (30 requests per minute per IP)
+  const rateLimitCheck = await enforceRateLimit(req, rateLimiters.api);
+  if (!rateLimitCheck.allowed) {
+    return rateLimitCheck.response!;
   }
 
   try {

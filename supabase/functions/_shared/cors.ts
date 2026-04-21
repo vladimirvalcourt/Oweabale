@@ -1,8 +1,13 @@
 /** CORS for browser-invoked Edge Functions (Plaid, `admin-actions`, etc.). */
 
-const DEFAULT_ORIGINS = [
+// Production origins only - development origins added dynamically based on environment
+const PRODUCTION_ORIGINS = [
   'https://oweable.com',
   'https://www.oweable.com',
+];
+
+// Development origins - only included in non-production environments
+const DEVELOPMENT_ORIGINS = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   'http://localhost:5173',
@@ -30,23 +35,37 @@ const DEFAULT_ORIGINS = [
   'https://127.0.0.1:4174',
 ];
 
+function isProductionEnvironment(): boolean {
+  const env = Deno.env.get('DENO_ENV')?.toLowerCase();
+  const supabaseEnv = Deno.env.get('SUPABASE_ENV')?.toLowerCase();
+  return env === 'production' || supabaseEnv === 'production';
+}
+
+function getDefaultOrigins(): string[] {
+  if (isProductionEnvironment()) {
+    return PRODUCTION_ORIGINS;
+  }
+  return [...PRODUCTION_ORIGINS, ...DEVELOPMENT_ORIGINS];
+}
+
 function parseAllowedOrigins(): string[] {
   const raw = Deno.env.get('PLAID_ALLOWED_ORIGINS');
-  if (!raw?.trim()) return DEFAULT_ORIGINS;
-  return [...DEFAULT_ORIGINS, ...raw.split(',').map((s) => s.trim()).filter(Boolean)];
+  const baseOrigins = getDefaultOrigins();
+  if (!raw?.trim()) return baseOrigins;
+  return [...baseOrigins, ...raw.split(',').map((s: string) => s.trim()).filter(Boolean)];
 }
 
 /** Extra exact origins (e.g. preview URLs) — comma-separated, merged with PLAID_ALLOWED_ORIGINS. */
 function parseEdgeCorsExtraOrigins(): string[] {
   const raw = Deno.env.get('EDGE_CORS_EXTRA_ORIGINS')?.trim();
   if (!raw) return [];
-  return raw.split(',').map((s) => s.trim()).filter(Boolean);
+  return raw.split(',').map((s: string) => s.trim()).filter(Boolean);
 }
 
 function parseVercelProjectAllowlist(): string[] {
   const raw = Deno.env.get('VERCEL_PREVIEW_ALLOWLIST');
   if (!raw?.trim()) return [];
-  return raw.split(',').map((s) => s.trim()).filter(Boolean);
+  return raw.split(',').map((s: string) => s.trim()).filter(Boolean);
 }
 
 function isLocalDevOrigin(url: URL): boolean {
@@ -95,13 +114,15 @@ function resolveAllowedOrigin(origin: string | null): string {
 
   try {
     const url = new URL(trimmed);
-    if (isLocalDevOrigin(url)) return trimmed;
+    // Only allow localhost in non-production environments
+    if (!isProductionEnvironment() && isLocalDevOrigin(url)) return trimmed;
     if (url.protocol === 'https:' && isOweableHostedOrigin(url.hostname)) return trimmed;
     if (url.protocol === 'https:' && isTrustedVercelPreview(url.hostname)) return trimmed;
   } catch {
     /* ignore */
   }
 
+  // In production, reject any origin not explicitly allowed
   return list[0] ?? 'https://www.oweable.com';
 }
 

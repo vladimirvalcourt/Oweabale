@@ -46,6 +46,7 @@ const Reports        = lazy(() => import('./pages/Reports'));
 const Landing        = lazy(() => import('./pages/Landing'));
 const Onboarding     = lazy(() => import('./pages/Onboarding'));
 const Pricing        = lazy(() => import('./pages/Pricing'));
+const FAQ            = lazy(() => import('./pages/FAQ'));
 const Privacy        = lazy(() => import('./pages/Privacy'));
 const Terms          = lazy(() => import('./pages/Terms'));
 const Security       = lazy(() => import('./pages/Security'));
@@ -117,6 +118,7 @@ function AppRoutes() {
       {/* ── Public routes ── */}
       <Route path="/" element={<Landing />} />
       <Route path="/pricing" element={<Pricing />} />
+      <Route path="/faq" element={<FAQ />} />
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/security" element={<Security />} />

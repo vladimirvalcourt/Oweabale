@@ -6,8 +6,6 @@ import { toast } from 'sonner';
 import { useStore } from '../../store/useStore';
 import { getCustomIcon } from '../../lib/customIcons';
 
-// E-03: Set to true when authenticator enrollment UI is ready to ship.
-const FEATURE_2FA_ENROLLMENT = false;
 
 function SecurityPanelInner() {
   const SecurityIcon = getCustomIcon('security');
@@ -200,56 +198,24 @@ function SecurityPanelInner() {
           mfaEnabled === null ? 'Checking…' : mfaEnabled ? 'Enabled' : 'Not enabled'
         }
       >
-        {/* E-03: Gate enrollment UI behind feature flag. If flag is off and 2FA is not
-            already active, show a coming-soon locked card. If 2FA is already enrolled
-            (e.g. added via another pathway), always show verified status. */}
-        {mfaEnabled || FEATURE_2FA_ENROLLMENT ? (
+        {mfaEnabled ? (
           <div className="flex items-start gap-3 border border-surface-border rounded-lg p-4 bg-surface-elevated/50">
-            <div
-              className={`w-10 h-10 shrink-0 border rounded-full flex items-center justify-center ${
-                mfaEnabled ? 'border-emerald-500/30 bg-emerald-500/10' : 'border-surface-border bg-surface-raised'
-              }`}
-            >
-              {mfaEnabled === null ? (
-                <Loader2 className="w-5 h-5 text-content-tertiary animate-spin" />
-              ) : mfaEnabled ? (
-                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-              ) : (
-                <Shield className="w-5 h-5 text-content-tertiary" />
-              )}
+            <div className="w-10 h-10 shrink-0 border rounded-full flex items-center justify-center border-emerald-500/30 bg-emerald-500/10">
+              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-content-primary">
-                {mfaEnabled === null
-                  ? 'Checking status…'
-                  : mfaEnabled
-                  ? 'Authenticator 2FA is enabled'
-                  : 'Authenticator 2FA is not enabled'}
-              </p>
-              <p className="mt-1 text-sm text-content-tertiary">
-                {mfaEnabled
-                  ? 'Your account uses a verified authenticator factor.'
-                  : 'Enroll an authenticator app to add a second layer of sign-in security.'}
-              </p>
+              <p className="text-sm font-medium text-content-primary">Authenticator 2FA is enabled</p>
+              <p className="mt-1 text-sm text-content-tertiary">Your account uses a verified authenticator factor.</p>
             </div>
           </div>
         ) : (
-          // E-03: Coming-soon locked state when flag is off and 2FA not yet enrolled
-          <div className="flex items-start gap-3 border border-surface-border rounded-lg p-4 bg-surface-elevated/50 opacity-70">
+          <div className="flex items-start gap-3 border border-surface-border rounded-lg p-4 bg-surface-elevated/50">
             <div className="w-10 h-10 shrink-0 border border-surface-border bg-surface-raised rounded-full flex items-center justify-center">
-              <Lock className="w-5 h-5 text-content-muted" aria-hidden />
+              <Shield className="w-5 h-5 text-content-tertiary" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-content-primary flex items-center gap-2">
-                Authenticator 2FA
-                <span className="rounded-full border border-surface-border bg-surface-raised px-2 py-0.5 text-[10px] font-medium text-content-tertiary tracking-wide">
-                  Coming soon
-                </span>
-              </p>
-              <p className="mt-1 text-xs text-content-tertiary max-w-md">
-                TOTP authenticator enrollment is on our roadmap. In the meantime, keep your{' '}
-                {isSsoOnly ? 'Google account' : 'Oweable password'} strong and unique.
-              </p>
+              <p className="text-sm font-medium text-content-primary">Authenticator 2FA is not enabled</p>
+              <p className="mt-1 text-sm text-content-tertiary">Enroll an authenticator app to add a second layer of sign-in security.</p>
             </div>
           </div>
         )}
