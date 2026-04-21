@@ -22,7 +22,10 @@
       "Bash(git add:*)",
       "Bash(git commit -m ':*)",
       "Bash(git push:*)",
-      "mcp__Desktop_Commander__read_file"
+      "mcp__Desktop_Commander__read_file",
+      "Bash(gh auth *)",
+      "Bash(git remote *)",
+      "Bash(git commit -m 'refactor: Landing page — remove floating OCR icon + update CLI allowlist *)"
     ]
   }
 }

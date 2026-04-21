@@ -348,10 +348,7 @@ export default function Landing() {
                   <h4 className="text-sm font-medium text-content-primary mb-2">Recurring Management</h4>
                   <p className="text-xs text-content-secondary leading-relaxed">Alerts for upcoming rent, utilities, and subscriptions. Never miss a due date again.</p>
                 </div>
-                <div className="border border-surface-border rounded-lg p-6 bg-surface-raised border-indigo-500/20 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-3 opacity-10">
-                    <UploadCloud className="w-16 h-16" />
-                  </div>
+                <div className="border border-surface-border rounded-lg p-6 bg-surface-raised border-indigo-500/20">
                   <h4 className="text-sm font-medium text-content-primary mb-2">Instant OCR Capture</h4>
                   <p className="text-xs text-content-secondary leading-relaxed">Scan a QR code to upload paper bills or receipts straight from your phone's browser. It extracts the dates and amounts automatically.</p>
                 </div>
