@@ -98,20 +98,21 @@ export default defineConfig(({ mode }) => {
             }),
           ]
         : []),
-      // awesome-vite: vite-plugin-checker — TS + ESLint overlay in dev; TS-only on production build (faster CI)
-      checker({
-        typescript: true,
-        ...(isProd
-          ? {}
-          : {
+      // awesome-vite: vite-plugin-checker — TS + ESLint overlay in dev; DISABLED on production build for speed
+      // TypeScript type-checking is handled by CI/CD pipeline separately
+      ...(isProd
+        ? []
+        : [
+            checker({
+              typescript: true,
               eslint: {
                 lintCommand: 'eslint "src/**/*.{ts,tsx}"',
                 useFlatConfig: true,
               },
+              overlay: { initialIsOpen: false },
+              enableBuild: false, // Disable during build for faster dev HMR
             }),
-        overlay: { initialIsOpen: false },
-        enableBuild: true,
-      }),
+          ]),
       // awesome-vite: vite-plugin-remove-console — quieter production bundles (keep warn/error)
       ...(isProd ? [removeConsole({ includes: ['log', 'info', 'debug'] })] : []),
       // PWA — service worker + manifest plumbing
@@ -206,6 +207,10 @@ export default defineConfig(({ mode }) => {
             if (id.includes('react-dom') || id.includes('/react/') || id.match(/node_modules\/react$/)) return 'react';
             // Supabase JS client — large auth+realtime bundle
             if (id.includes('@supabase')) return 'supabase';
+            // Split large vendor libraries into separate chunks
+            if (id.includes('date-fns') || id.includes('dayjs')) return 'vendor-date';
+            if (id.includes('lodash') || id.includes('ramda')) return 'vendor-utils';
+            if (id.includes('zod') || id.includes('yup')) return 'vendor-validation';
             // Everything else
             return 'vendor';
           },

@@ -147,9 +147,9 @@ function AppRoutes() {
           path="free/dashboard"
           element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><FreeDashboard /></Suspense></ErrorBoundary>}
         />
-        <Route path="free/bills"         element={<ErrorBoundary><Obligations /></ErrorBoundary>} />
-        <Route path="free/subscriptions" element={<ErrorBoundary><Subscriptions /></ErrorBoundary>} />
-        <Route path="free/calendar"      element={<ErrorBoundary><Calendar /></ErrorBoundary>} />
+        <Route path="free/bills"         element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Obligations /></Suspense></ErrorBoundary>} />
+        <Route path="free/subscriptions" element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Subscriptions /></Suspense></ErrorBoundary>} />
+        <Route path="free/calendar"      element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Calendar /></Suspense></ErrorBoundary>} />
         <Route
           path="free/settings"
           element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Settings /></Suspense></ErrorBoundary>}
@@ -166,24 +166,24 @@ function AppRoutes() {
           path="pro/dashboard"
           element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><Dashboard /></Suspense></ErrorBoundary>}
         />
-        <Route path="pro/bills"          element={<ErrorBoundary><Obligations /></ErrorBoundary>} />
-        <Route path="pro/income"         element={<ErrorBoundary><Income /></ErrorBoundary>} />
-        <Route path="pro/freelance"      element={<ErrorBoundary><Freelance /></ErrorBoundary>} />
-        <Route path="pro/ingestion"      element={<ErrorBoundary><Ingestion /></ErrorBoundary>} />
+        <Route path="pro/bills"          element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Obligations /></Suspense></ErrorBoundary>} />
+        <Route path="pro/income"         element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Income /></Suspense></ErrorBoundary>} />
+        <Route path="pro/freelance"      element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Freelance /></Suspense></ErrorBoundary>} />
+        <Route path="pro/ingestion"      element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Ingestion /></Suspense></ErrorBoundary>} />
         <Route path="pro/transactions"   element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={8} />}><Transactions /></Suspense></ErrorBoundary>} />
-        <Route path="pro/budgets"        element={<ErrorBoundary><Budgets /></ErrorBoundary>} />
-        <Route path="pro/net-worth"      element={<ErrorBoundary><NetWorth /></ErrorBoundary>} />
-        <Route path="pro/calendar"       element={<ErrorBoundary><Calendar /></ErrorBoundary>} />
-        <Route path="pro/taxes"          element={<ErrorBoundary><Taxes /></ErrorBoundary>} />
-        <Route path="pro/goals"          element={<ErrorBoundary><Goals /></ErrorBoundary>} />
-        <Route path="pro/savings"        element={<ErrorBoundary><Savings /></ErrorBoundary>} />
-        <Route path="pro/education"      element={<ErrorBoundary><Education /></ErrorBoundary>} />
-        <Route path="pro/categories"     element={<ErrorBoundary><Categories /></ErrorBoundary>} />
-        <Route path="pro/subscriptions"  element={<ErrorBoundary><Subscriptions /></ErrorBoundary>} />
+        <Route path="pro/budgets"        element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><Budgets /></Suspense></ErrorBoundary>} />
+        <Route path="pro/net-worth"      element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><NetWorth /></Suspense></ErrorBoundary>} />
+        <Route path="pro/calendar"       element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Calendar /></Suspense></ErrorBoundary>} />
+        <Route path="pro/taxes"          element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Taxes /></Suspense></ErrorBoundary>} />
+        <Route path="pro/goals"          element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Goals /></Suspense></ErrorBoundary>} />
+        <Route path="pro/savings"        element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Savings /></Suspense></ErrorBoundary>} />
+        <Route path="pro/education"      element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Education /></Suspense></ErrorBoundary>} />
+        <Route path="pro/categories"     element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Categories /></Suspense></ErrorBoundary>} />
+        <Route path="pro/subscriptions"  element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Subscriptions /></Suspense></ErrorBoundary>} />
         <Route path="pro/reports"        element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><Reports /></Suspense></ErrorBoundary>} />
         <Route path="pro/analytics"      element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><Analytics /></Suspense></ErrorBoundary>} />
-        <Route path="pro/investments"    element={<ErrorBoundary><Investments /></ErrorBoundary>} />
-        <Route path="pro/insurance"      element={<ErrorBoundary><Insurance /></ErrorBoundary>} />
+        <Route path="pro/investments"    element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Investments /></Suspense></ErrorBoundary>} />
+        <Route path="pro/insurance"      element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Insurance /></Suspense></ErrorBoundary>} />
         <Route path="pro/credit"         element={<ErrorBoundary><CreditCenter /></ErrorBoundary>} />
         <Route path="pro/app/support"    element={<ErrorBoundary><HelpDesk /></ErrorBoundary>} />
         <Route path="pro/changelog"      element={<ErrorBoundary><Changelog /></ErrorBoundary>} />
