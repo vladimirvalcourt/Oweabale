@@ -1,5 +1,10 @@
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowRight, Users, GitBranch, CheckCircle, BarChart3 } from 'lucide-react';
+import { 
+  ArrowRight, Users, GitBranch, CheckCircle, BarChart3, 
+  Database, ShieldAlert, Gavel, Activity, FileText, 
+  Scale, Radio, Mail, Ticket, Search
+} from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 
 type FunnelStep = {
@@ -18,6 +23,69 @@ type OnboardingMetrics = {
   set_first_goal: number;
   completed_onboarding: number;
 };
+
+const adminModules = [
+  {
+    title: 'Case File',
+    description: 'Look up and manage individual user profiles, billing, and settings.',
+    icon: Search,
+    href: '/admin/user',
+  },
+  {
+    title: 'Data Tables',
+    description: 'Raw access to core database tables and entity management.',
+    icon: Database,
+    href: '/admin/data',
+  },
+  {
+    title: 'Audit Logs',
+    description: 'System-wide security and action logs for accountability.',
+    icon: ShieldAlert,
+    href: '/admin/audit-logs',
+  },
+  {
+    title: 'Moderation',
+    description: 'Manage bans, warnings, and user-generated content.',
+    icon: Gavel,
+    href: '/admin/moderation',
+  },
+  {
+    title: 'Sessions',
+    description: 'Monitor active user sessions and security events.',
+    icon: Activity,
+    href: '/admin/sessions',
+  },
+  {
+    title: 'Reports',
+    description: 'Financial, operational, and system performance reports.',
+    icon: FileText,
+    href: '/admin/reports',
+  },
+  {
+    title: 'Compliance',
+    description: 'KYC/AML status, document verification, and legal holds.',
+    icon: Scale,
+    href: '/admin/compliance',
+  },
+  {
+    title: 'Telemetry',
+    description: 'Real-time system performance, errors, and API metrics.',
+    icon: Radio,
+    href: '/admin/telemetry',
+  },
+  {
+    title: 'Email Blast',
+    description: 'Send targeted marketing and operational broadcasts.',
+    icon: Mail,
+    href: '/admin/email-blast',
+  },
+  {
+    title: 'Coupons',
+    description: 'Manage Stripe discount codes and promotional campaigns.',
+    icon: Ticket,
+    href: '/admin/coupons',
+  },
+];
 
 export default function AdminOverviewPage() {
   const { data, isLoading, error } = useQuery({
@@ -76,14 +144,46 @@ export default function AdminOverviewPage() {
     : null;
 
   return (
-    <section className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
-      {/* Onboarding Funnel — ADD 12 */}
-      <div className="glass-card rounded-2xl p-5">
+    <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
+      
+      {/* Navigation Cards */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <h2 className="text-lg font-semibold text-content-primary">Admin Modules</h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {adminModules.map((module) => (
+            <Link
+              key={module.href}
+              to={module.href}
+              className="group flex flex-col justify-between rounded-2xl border border-surface-border bg-surface-raised p-5 transition-all duration-200 hover:-translate-y-1 hover:border-brand-cta/30 hover:shadow-md"
+            >
+              <div>
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-surface-elevated text-content-secondary group-hover:bg-brand-cta/10 group-hover:text-brand-cta transition-colors">
+                  <module.icon className="h-5 w-5" />
+                </div>
+                <h3 className="text-sm font-semibold text-content-primary group-hover:text-brand-cta transition-colors">
+                  {module.title}
+                </h3>
+                <p className="mt-2 text-xs text-content-tertiary leading-relaxed">
+                  {module.description}
+                </p>
+              </div>
+              <div className="mt-4 flex items-center text-[11px] font-medium text-content-muted group-hover:text-brand-cta transition-colors">
+                Open module <ArrowRight className="ml-1 h-3 w-3" />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Onboarding Funnel */}
+      <div className="glass-card rounded-2xl p-5 mt-8">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
               <GitBranch className="h-4 w-4 text-brand-cta" />
-              <h1 className="text-base font-semibold text-content-primary">Onboarding Funnel</h1>
+              <h2 className="text-base font-semibold text-content-primary">Analytics: Onboarding Funnel</h2>
             </div>
             <p className="mt-1 text-xs text-content-tertiary">
               Cumulative progression of all {data?.total_signups?.toLocaleString() ?? '—'} users through activation steps.
@@ -167,7 +267,7 @@ export default function AdminOverviewPage() {
 
       {/* Quick stats */}
       {data && !isLoading ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 mt-4">
           {steps.map((step) => (
             <div key={step.label} className="rounded-xl border border-surface-border bg-surface-raised px-3 py-2">
               <p className="text-[10px] truncate uppercase tracking-wide text-content-tertiary">{step.label}</p>
@@ -180,7 +280,7 @@ export default function AdminOverviewPage() {
 
       {/* Empty state message */}
       {!isLoading && !error && (!data || data.total_signups === 0) ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-surface-border bg-surface-raised py-16 text-center">
+        <div className="flex flex-col items-center gap-3 rounded-2xl border border-surface-border bg-surface-raised py-16 text-center mt-4">
           <Users className="h-10 w-10 text-content-muted" />
           <p className="text-sm text-content-secondary">No users yet — funnel will populate as signups come in.</p>
         </div>
