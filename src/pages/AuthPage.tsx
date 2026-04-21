@@ -6,6 +6,7 @@ import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
 import { runAfterPaint } from '../lib/interaction';
 import { BrandWordmark } from '../components/BrandWordmark';
+import { CheckCircle2 } from 'lucide-react';
 
 type AuthPageProps = {
   mode?: 'signin' | 'signup';
@@ -112,16 +113,14 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
             <div className="rounded-[10px] border border-surface-border bg-surface-elevated px-8 py-10 sm:px-10 sm:py-12">
               <div className="mb-8 inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-base px-3 py-1.5 text-xs font-medium text-content-secondary">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
-                {isSignupMode ? 'Start free' : 'Secure sign-in'}
+                Free · No credit card required
               </div>
 
               <h1 className="text-3xl font-medium tracking-[-0.03em] text-content-primary sm:text-4xl">
-                {isSignupMode ? 'Create your free account' : 'Welcome back'}
+                Welcome to Oweable
               </h1>
               <p className="mt-3 max-w-md text-base font-medium leading-relaxed text-content-secondary">
-                {isSignupMode
-                  ? 'Start your financial OS — no credit card required'
-                  : 'Sign in to manage debt, bills, and your full financial picture in one place.'}
+                Sign in or create your account — it&apos;s the same button. One click gets you started.
               </p>
 
               <button
@@ -152,29 +151,24 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
                         d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                       />
                     </svg>
-                    {isSignupMode ? 'Sign Up Free' : 'Sign In'}
+                    Continue with Google
                   </>
                 )}
               </button>
 
-              {isSignupMode ? (
-                <p className="mt-4 text-center text-xs text-content-tertiary">
-                  Already have an account?{' '}
-                  <TransitionLink to="/auth" className="underline underline-offset-2 hover:text-content-primary">
-                    Sign in →
-                  </TransitionLink>
+              <div className="mt-4 flex items-center justify-center gap-2">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-content-secondary" aria-hidden />
+                <p className="text-xs text-content-secondary">
+                  New here? Signing in creates your account automatically.
                 </p>
-              ) : (
-                <p className="mt-4 text-center text-xs text-content-tertiary">
-                  New to Oweable?{' '}
-                  <TransitionLink to="/onboarding" className="underline underline-offset-2 hover:text-content-primary">
-                    Sign up free →
-                  </TransitionLink>
-                </p>
-              )}
+              </div>
+
+              <p className="mt-2 text-center text-xs text-content-secondary">
+                We never post to Google or store your password.
+              </p>
 
               <p className="mt-8 text-center text-xs leading-relaxed text-content-tertiary">
-                Authentication is handled by Google Identity. Oweable does not receive your Google password.
+                Protected by Google Identity. Your password stays secure.
               </p>
 
               <p className="mt-8 text-center text-xs leading-relaxed text-content-muted">
