@@ -272,6 +272,11 @@ export default function Ingestion() {
     if (ok && selectedId === id) setSelectedId(null);
   };
 
+  const handleBulkCommit = async () => {
+    const readyItems = pendingIngestions.filter(pi => pi.status === 'ready');
+    let n = 0;
+    await yieldForPaint();
+    for (const item of readyItems) {
       if (await useStore.getState().commitIngestion(item.id)) n++;
     }
     if (n > 0) toast.success(`Saved ${n} item${n === 1 ? '' : 's'} to history`);
@@ -935,14 +940,6 @@ export default function Ingestion() {
                             >
                               Delete
                             </button>
-                            {item.type === 'transaction' && (
-                              <button 
-                                onClick={() => handleCommit(item.id)}
-                                className="px-10 py-3 bg-emerald-600 text-white hover:bg-emerald-500 rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-colors shadow-none"
-                              >
-                                Add as Transaction ✓
-                              </button>
-                            )}
                             <button 
                               onClick={() => handleCommit(item.id)}
                               className="px-10 py-3 bg-brand-cta text-surface-base hover:bg-brand-cta-hover rounded-lg text-[10px] font-mono font-bold uppercase tracking-widest transition-colors shadow-none"
