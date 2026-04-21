@@ -272,6 +272,11 @@ export default function Ingestion() {
     if (ok && selectedId === id) setSelectedId(null);
   };
 
+  const handleBulkCommit = async () => {
+    const readyItems = pendingIngestions.filter(pi => pi.status === 'ready');
+    let n = 0;
+    await yieldForPaint();
+    for (const item of readyItems) {
       if (await useStore.getState().commitIngestion(item.id)) n++;
     }
     if (n > 0) toast.success(`Saved ${n} item${n === 1 ? '' : 's'} to history`);

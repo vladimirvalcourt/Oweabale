@@ -85,7 +85,13 @@ export function HouseholdPanel() {
       return;
     }
 
-    await updateMemberRole(memberId, newRole);
+    // Only allow changing to partner or viewer (not owner)
+    if (newRole === 'owner') {
+      toast.error('Cannot change role to owner');
+      return;
+    }
+
+    await updateMemberRole(memberId, newRole as 'partner' | 'viewer');
   };
 
   const getRoleBadgeColor = (role: UserRole) => {

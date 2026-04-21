@@ -6,7 +6,6 @@ import { CollapsibleModule } from '../components/CollapsibleModule';
 import { BrandLogo } from '../components/BrandLogo';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
 import { getCustomIcon } from '../lib/customIcons';
-import { toast } from 'sonner';
 
 const BUTTON_BASE_CLASS =
   'inline-flex min-h-10 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-app disabled:opacity-50 disabled:cursor-not-allowed';

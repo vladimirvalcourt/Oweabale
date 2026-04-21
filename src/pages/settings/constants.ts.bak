@@ -1,7 +1,6 @@
 export type SettingsTab =
   | 'profile'
   | 'household'
-  | 'household'
   | 'notifications'
   | 'security'
   | 'billing'
