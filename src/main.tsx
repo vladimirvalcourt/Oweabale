@@ -1,4 +1,5 @@
 import './instrument';
+import { registerSW } from 'virtual:pwa-register';
 import { initWebVitalsReporting } from './lib/webVitalsReporting';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -53,6 +54,11 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 initWebVitalsReporting();
+
+// Register the Service Worker for PWA (with immediate update check)
+if ('serviceWorker' in navigator) {
+  registerSW({ immediate: true });
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -117,7 +117,7 @@ export default defineConfig(({ mode }) => {
       // PWA — service worker + manifest plumbing
       VitePWA({
         registerType: 'autoUpdate',
-        injectRegister: 'auto',
+        injectRegister: false,
         // We ship our own /public/manifest.json
         manifest: false,
         includeAssets: [
@@ -135,8 +135,8 @@ export default defineConfig(({ mode }) => {
         workbox: {
           // Pre-cache the full app shell
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,webp,jpg}'],
-          // Offline fallback for navigation requests
-          navigateFallback: '/offline.html',
+          // React SPA routing: ALWAYS fallback to index.html for navigation.
+          navigateFallback: '/index.html',
           // Don't use offline fallback for admin routes — they have no offline value
           navigateFallbackDenylist: [/^\/admin/],
           runtimeCaching: [
