@@ -117,7 +117,8 @@ function AppRoutes() {
   // Protected routes naturally wait for auth via AuthGuard.
 
   return (
-    // Outer Suspense: catches any lazy page not individually wrapped (404, legal pages, etc.)
+    <>
+    {/* Outer Suspense: catches any lazy page not individually wrapped (404, legal pages, etc.) */}
     <Suspense fallback={<AppLoader />}>
     <Routes>
       {/* ── Public routes ── */}
@@ -244,6 +245,7 @@ function AppRoutes() {
       onExtend={extendSession}
       onLogout={() => { useStore.getState().signOut(); }}
     />
+    </>
   );
 }
 

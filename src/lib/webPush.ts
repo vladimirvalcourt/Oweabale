@@ -114,12 +114,14 @@ export async function sendWebPushMessage(
   return { ok: true };
 }
 
-/** Convert VITE VAPID base64url key to Uint8Array for PushManager. */
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
+/** Convert VAPID base64url key to a typed Uint8Array for PushManager.subscribe(). */
+function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
   const raw = atob(base64);
-  const out = new Uint8Array(raw.length);
+  // Allocate an ArrayBuffer directly (not SharedArrayBuffer) so TS's strict generic matches.
+  const buf = new ArrayBuffer(raw.length);
+  const out = new Uint8Array(buf);
   for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
   return out;
 }
