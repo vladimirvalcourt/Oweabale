@@ -15,10 +15,13 @@ export function usePWAUpdateNotification() {
     updateServiceWorker,
   } = useRegisterSW({
     onRegistered(r) {
-      // Optional: set an interval to check for updates every hour
-      if (r) {
-        setInterval(() => r.update(), 60 * 60 * 1000);
-      }
+      if (!r) return;
+      // Poll for updates every hour. Store ID so it can be cleared by the browser
+      // when the page unloads (GC will handle it; unlike a leaked naked setInterval).
+      const id = setInterval(() => void r.update(), 60 * 60 * 1000);
+      // Attach to the registration object so we aren't holding a closure leak
+      (r as ServiceWorkerRegistration & { _updateIntervalId?: ReturnType<typeof setInterval> })
+        ._updateIntervalId = id;
     },
     onRegisterError(error) {
       console.warn('[PWA] Service worker registration error:', error);

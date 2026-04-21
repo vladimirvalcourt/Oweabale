@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient';
 
-const SW_PATH = '/sw.js';
+const SW_PATH = '/push-handler.js';
 
 export function isWebPushSupported(): boolean {
   return typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window;
@@ -18,7 +18,17 @@ export async function hasActivePushSubscription(): Promise<boolean> {
   return Boolean(sub);
 }
 
+/**
+ * Returns the push-specific SW registration.
+ * Uses the already-active SW if it controls this page (VitePWA's precache SW),
+ * otherwise registers the dedicated push handler at /push-handler.js.
+ * This avoids conflicting with VitePWA's generated sw.js at the same path.
+ */
 async function getRegistration(): Promise<ServiceWorkerRegistration> {
+  // Prefer the already-controlling SW; it will handle push events too
+  // if they were merged. Otherwise register the dedicated push handler.
+  const existing = await navigator.serviceWorker.getRegistration('/');
+  if (existing) return existing;
   return navigator.serviceWorker.register(SW_PATH, { scope: '/' });
 }
 

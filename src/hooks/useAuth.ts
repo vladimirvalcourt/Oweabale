@@ -52,6 +52,8 @@ export function useAuth(): AuthState {
         // First paint already used `getSession()`; this avoids double-firing INITIAL_SESSION
         // before the async read completes.
         if (event === 'INITIAL_SESSION') {
+          // Ensure authLoading is unblocked even when getSession() is slow or has already run.
+          setAuthLoading(false);
           return;
         }
 
@@ -138,7 +140,9 @@ export function useAuth(): AuthState {
     ] as const;
     events.forEach((e) => window.addEventListener(e, resetIdleTimer));
 
-    const interval = setInterval(checkTimeout, 1000);
+    // 10s granularity is more than sufficient: warning threshold is 2 minutes.
+    // 1s was firing 3,600 times/hour per tab — unnecessary CPU cost.
+    const interval = setInterval(checkTimeout, 10_000);
 
     return () => {
       clearInterval(interval);

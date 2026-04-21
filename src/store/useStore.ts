@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
+import { clearUserStorageKeys } from '../lib/storageKeys';
 import { type CategorizationRule, type CategorizationExclusion, applyCategorizationRules, merchantKey } from '../lib/categorizationRules';
 import { disconnectPlaid, syncPlaidTransactions as invokePlaidSync } from '../lib/plaid';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
@@ -1862,6 +1863,7 @@ export const useStore = create<AppState>()(
   },
 
   signOut: async () => {
+    clearUserStorageKeys();
     await supabase.auth.signOut();
     set({ ...initialData });
   },

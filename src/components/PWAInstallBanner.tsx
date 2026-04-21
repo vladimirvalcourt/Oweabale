@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Download, MonitorSmartphone, X } from 'lucide-react';
 import { toast } from 'sonner';
-
-const DISMISSED_KEY = 'pwa_install_dismissed';
+import { STORAGE_KEYS } from '../lib/storageKeys';
 
 // The BeforeInstallPromptEvent is not in standard TS lib
 interface BeforeInstallPromptEvent extends Event {
@@ -23,10 +22,15 @@ export function PWAInstallBanner({ isLoggedIn }: { isLoggedIn: boolean }) {
   }, []);
 
   useEffect(() => {
-    // Don't show if user already dismissed or is already in standalone mode
-    if (localStorage.getItem(DISMISSED_KEY) === 'true') return;
-    if (window.matchMedia('(display-mode: standalone)').matches) return;
-    if ((window.navigator as { standalone?: boolean }).standalone === true) return;
+    // Guards wrapped in try/catch: localStorage throws in iOS private browsing
+    try {
+      if (localStorage.getItem(STORAGE_KEYS.PWA_INSTALL_DISMISSED) === 'true') return;
+    } catch { return; }
+
+    try {
+      if (window.matchMedia('(display-mode: standalone)').matches) return;
+      if ((window.navigator as { standalone?: boolean }).standalone === true) return;
+    } catch { /* matchMedia unavailable — proceed to listen for prompt */ }
 
     const handler = (e: Event) => {
       e.preventDefault();
@@ -59,7 +63,7 @@ export function PWAInstallBanner({ isLoggedIn }: { isLoggedIn: boolean }) {
   };
 
   const handleDismiss = () => {
-    localStorage.setItem(DISMISSED_KEY, 'true');
+    try { localStorage.setItem(STORAGE_KEYS.PWA_INSTALL_DISMISSED, 'true'); } catch { /* ignore */ }
     setVisible(false);
   };
 

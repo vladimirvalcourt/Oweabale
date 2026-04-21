@@ -128,6 +128,9 @@ export default defineConfig(({ mode }) => {
           'apple-touch-icon.png',
           'apple-touch-icon-pwa.png',
           'icons/*.png',
+          // push-handler.js handles Web Push events separately from VitePWA's generated sw.js
+          // This eliminates the dual SW registration conflict.
+          'push-handler.js',
         ],
         workbox: {
           // Pre-cache the full app shell

@@ -57,18 +57,18 @@ const Support        = lazy(() => import('./pages/Support'));
 const AdminApp        = lazy(() => import('./features/admin/AdminApp'));
 const Education      = lazy(() => import('./pages/Education'));
 const HelpDesk       = lazy(() => import('./pages/HelpDesk'));
-const Changelog      = lazy(() => import('./pages/Changelog'));
-const Analytics      = lazy(() => import('./pages/Analytics'));
-const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
 import AuthCallback from './pages/AuthCallback';
 import PlaidCallback from './pages/PlaidCallback';
-const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
-const NotFound         = lazy(() => import('./pages/NotFound'));
-const FreeDashboard    = lazy(() => import('./pages/FreeDashboard'));
-
 import { useDataSync } from './hooks/useDataSync';
 import { ThemedToaster } from './components/ThemedToaster';
 import { UnsupportedBrowserBanner } from './components/UnsupportedBrowserBanner';
+
+const Changelog      = lazy(() => import('./pages/Changelog'));
+const Analytics      = lazy(() => import('./pages/Analytics'));
+const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
+const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
+const NotFound       = lazy(() => import('./pages/NotFound'));
+const FreeDashboard  = lazy(() => import('./pages/FreeDashboard'));
 
 /** After sign-in, route users to the correct namespace based on their plan. */
 function SignInRoute({ authUser }: { authUser: User | null }) {
@@ -112,9 +112,6 @@ function AppRoutes() {
   useDataSync({ authUserId: authUser?.id ?? null, authLoading });
   usePWAUpdateNotification();
   usePWAStandaloneMode();
-
-  // Show install banner only on /pro/* routes (logged-in app shell)
-  const isProRoute = location.pathname.startsWith('/pro');
 
   // Public routes render instantly (e.g., Landing page, SEO pages).
   // Protected routes naturally wait for auth via AuthGuard.
@@ -239,13 +236,14 @@ function AppRoutes() {
 
       <Route path="*" element={<NotFound />} />
     </Routes>
-    <SessionWarningModal 
+    </Suspense>
+    {/* SessionWarningModal is outside Suspense so it's never hidden by a route-level fallback */}
+    <SessionWarningModal
       isOpen={showWarning}
       timeLeftSeconds={timeLeft}
       onExtend={extendSession}
       onLogout={() => { useStore.getState().signOut(); }}
     />
-    </Suspense>
   );
 }
 

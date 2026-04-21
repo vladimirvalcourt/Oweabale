@@ -148,9 +148,12 @@ export default function AdminEmailBlastPage() {
               </button>
             </div>
             {preview ? (
-              <div
-                className="min-h-32 rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-xs text-content-secondary"
-                dangerouslySetInnerHTML={{ __html: body }}
+              <iframe
+                srcDoc={body}
+                sandbox=""
+                title="Email preview"
+                className="min-h-32 w-full rounded-lg border border-surface-border bg-surface-base"
+                style={{ colorScheme: 'light' }}
               />
             ) : (
               <textarea
