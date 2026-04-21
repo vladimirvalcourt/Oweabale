@@ -6,7 +6,7 @@ import {
   Settings, Repeat, BarChart3, Plus, X, ChevronDown, Inbox,
   Banknote, PieChart, Scale, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, ShieldCheck, Clock, Landmark, AlertCircle,
   TrendingUp,
-  Command, LineChart, Umbrella, PiggyBank
+  Command, LineChart, Umbrella, PiggyBank, Home, Activity, AlertTriangle
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
@@ -23,7 +23,7 @@ import { BrandWordmark } from './BrandWordmark';
 import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 import { isApplePointerPlatform } from '../lib/platform';
 import { canAccessAppPath } from '../lib/trackerTier';
-import { PiggyBank } from 'lucide-react';
+
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
 const NAV_ROUTE_HASHES: Record<string, string[]> = {
