@@ -110,7 +110,7 @@ export default function AdminOverviewPage() {
 
       return {
         total_signups: totalSignups,
-        completed_profile: totalSignups, // All signups have a profile
+        completed_profile: completedOnboarding, // Users who completed the onboarding flow
         linked_bank: withBank,
         added_first_bill: withBill,
         set_first_budget: withBudget,

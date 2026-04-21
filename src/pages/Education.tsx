@@ -137,15 +137,23 @@ export default function Education() {
 
   useEffect(() => {
     async function loadProgress() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data } = await supabase
-        .from('profiles')
-        .select('completed_lessons')
-        .eq('id', user.id)
-        .single();
-      if (data?.completed_lessons) {
-        setCompletedLessons(data.completed_lessons as string[]);
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        if (userError) {
+          console.warn('[Education] Failed to get current user:', userError.message);
+          return;
+        }
+        if (!user) return;
+        const { data } = await supabase
+          .from('profiles')
+          .select('completed_lessons')
+          .eq('id', user.id)
+          .single();
+        if (data?.completed_lessons) {
+          setCompletedLessons(data.completed_lessons as string[]);
+        }
+      } catch (err) {
+        console.warn('[Education] Failed to load lesson progress:', err);
       }
     }
     loadProgress();

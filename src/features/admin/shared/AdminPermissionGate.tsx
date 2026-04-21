@@ -19,7 +19,7 @@ export function AdminPermissionGate({
     return () => window.clearTimeout(id);
   }, [isLoading]);
 
-  // Still loading — but if we have timed out, fall back to profile-level check
+  // Still loading (and not yet timed out) — show spinner
   if (isLoading && !timedOut) {
     return (
       <p className="mx-auto max-w-7xl px-4 py-6 text-xs text-content-muted">
@@ -28,10 +28,12 @@ export function AdminPermissionGate({
     );
   }
 
-  // Timed out: if is_admin=true in profiles, grant access; otherwise show error
-  if (timedOut && !hasPermission(permission)) {
+  // Timed out while still loading: fall back to profile-level admin flag.
+  // Only grant pass-through when RBAC is still unresolved (isLoading),
+  // NOT when it has already resolved with a denial.
+  if (timedOut && isLoading && !hasPermission(permission)) {
     if (isAdminProfile) {
-      // Admin profile gets pass-through on timeout
+      // RBAC never resolved — grant pass-through to admin profiles only
       return <>{children}</>;
     }
     return (

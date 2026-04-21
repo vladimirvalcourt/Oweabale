@@ -98,6 +98,8 @@ export default function Dashboard() {
   const [calmMode, setCalmMode] = useState<boolean>(() => parseCalmModeEnabled());
   /** Stable anchor for citation due dates (matches Obligations / safe-to-spend math). */
   const [scheduleBaseMs] = useState(() => Date.now());
+  /** Controls how many projected months show in the Cash Flow Trajectory chart. */
+  const [trajectoryWindow, setTrajectoryWindow] = useState<'30' | '90'>('30');
 
   useEffect(() => {
     if (location.hash === '#cash-flow') {
@@ -116,12 +118,13 @@ export default function Dashboard() {
 
   /** Recharts can emit invalid SVG lines if all values are NaN or data is empty. */
   const cashFlowChartData = useMemo(() => {
-    const rows = (projectedData || []).filter(
-      (d) => d && typeof d.name === 'string' && Number.isFinite(d.balance)
-    );
+    const monthLimit = trajectoryWindow === '30' ? 1 : 3;
+    const rows = (projectedData || [])
+      .filter((d) => d && typeof d.name === 'string' && Number.isFinite(d.balance))
+      .slice(0, monthLimit + 1);
     if (rows.length === 0) return [{ name: '—', balance: 0 }];
     return rows;
-  }, [projectedData]);
+  }, [projectedData, trajectoryWindow]);
 
   // --- Financial Calcs ---
   const totalAssets = useMemo(() => (assets || []).reduce((acc, asset) => acc + (asset?.value || 0), 0), [assets]);
@@ -1110,9 +1113,13 @@ export default function Dashboard() {
                 <h3 className="text-sm font-sans font-semibold text-content-primary tracking-tight">Cash Flow Trajectory</h3>
                 <p className="text-xs font-sans text-content-secondary mt-1">Projected balances across all accounts</p>
               </div>
-              <select className="h-10 rounded-lg border border-surface-border bg-surface-base px-3 text-sm font-medium text-content-secondary focus-app-field cursor-pointer">
-                <option>Next 30 Days</option>
-                <option>Next 90 Days</option>
+              <select
+                value={trajectoryWindow}
+                onChange={(e) => setTrajectoryWindow(e.target.value as '30' | '90')}
+                className="h-10 rounded-lg border border-surface-border bg-surface-base px-3 text-sm font-medium text-content-secondary focus-app-field cursor-pointer"
+              >
+                <option value="30">Next 30 Days</option>
+                <option value="90">Next 90 Days</option>
               </select>
             </div>
             

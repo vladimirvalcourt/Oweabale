@@ -71,7 +71,7 @@ server.tool(
         .single();
 
       if (error) {
-        console.error("Supabase error while loading account summary");
+        console.error('Supabase error while loading account summary:', error);
         throw error;
       }
 
@@ -93,7 +93,7 @@ server.tool(
 const transport = new StdioServerTransport();
 
 async function runServer() {
-  console.error("🚀 Oweable MCP Server Status: [ ONLINE ]");
+  console.info("Oweable MCP Server Status: [ ONLINE ]");
   await server.connect(transport);
 }
 

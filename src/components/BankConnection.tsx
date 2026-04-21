@@ -24,7 +24,8 @@ function loadTimeline(): ConnectionTimelineEvent[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw) as ConnectionTimelineEvent[];
     return Array.isArray(parsed) ? parsed : [];
-  } catch {
+  } catch (err) {
+    console.warn('[BankConnection] Failed to parse connection timeline from localStorage:', err);
     return [];
   }
 }
@@ -33,8 +34,8 @@ function saveTimeline(events: ConnectionTimelineEvent[]) {
   if (typeof window === 'undefined') return;
   try {
     localStorage.setItem(CONNECTION_TIMELINE_STORAGE_KEY, JSON.stringify(events.slice(0, 20)));
-  } catch {
-    // ignore storage failures
+  } catch (err) {
+    console.warn('[BankConnection] Failed to save connection timeline to localStorage:', err);
   }
 }
 

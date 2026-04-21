@@ -32,7 +32,7 @@ function parseDeviceType(ua: string | null): 'Mobile' | 'Desktop' | 'Unknown' {
 
 function parseBrowser(ua: string | null): string {
   if (!ua) return 'Unknown';
-  if (/edg\//i.test(ua)) return 'Edge';
+  if (/edg\//i.test(ua)) return 'Edge'; // edg/ matches "Edg/xx.x" in Edge UA strings
   if (/chrome/i.test(ua) && !/chromium/i.test(ua)) return 'Chrome';
   if (/firefox/i.test(ua)) return 'Firefox';
   if (/safari/i.test(ua) && !/chrome/i.test(ua)) return 'Safari';
