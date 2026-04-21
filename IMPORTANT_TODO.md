@@ -12,8 +12,3 @@ This file tracks major architectural requirements that have been deferred for la
 - **Edge Functions**: Deploy a secure Supabase Edge Function to securely interface with the Plaid API to spin up `link_token` instances.
 - **Client Integration**: Add Plaid Link flow into the `/settings` or `/onboarding` page to allow users to securely authenticate their bank accounts without storing credentials.
 - **Webhook Processing**: Create listeners that automatically ingest, tokenize, and categorize recurring bills directly from checking account data dumps.
-
-## 3. Support Ticket System (Medium Priority)
-- Build a user support form in the application.
-- Link submitted tickets to the centralized Admin Dashboard's `Global Broadcast` / `User Registry` modules. 
-- Track open vs. closed tickets.
