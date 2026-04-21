@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ToggleRight } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '../../../../lib/supabase';
+import { supabase } from '../../../lib/supabase';
 
 // ADD 9: 3-state flag values
 export type FlagState = 'enabled' | 'beta' | 'disabled';

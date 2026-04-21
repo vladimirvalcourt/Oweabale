@@ -28,10 +28,27 @@ ALTER TABLE budgets ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES househ
 ALTER TABLE transactions ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES households(id);
 ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES households(id);
 ALTER TABLE goals ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES households(id);
-ALTER TABLE savings ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES households(id);
-ALTER TABLE debts ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES households(id);
-ALTER TABLE assets ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES households(id);
-ALTER TABLE incomes ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES households(id);
+-- Conditionally alter optional tables that may not exist
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'savings') THEN
+    ALTER TABLE savings ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES households(id);
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'debts') THEN
+    ALTER TABLE debts ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES households(id);
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'assets') THEN
+    ALTER TABLE assets ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES households(id);
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'incomes') THEN
+    ALTER TABLE incomes ADD COLUMN IF NOT EXISTS household_id UUID REFERENCES households(id);
+  END IF;
+END $$;
 
 -- Add created_by tracking for attribution
 ALTER TABLE bills ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES auth.users(id);
@@ -78,7 +95,7 @@ CREATE POLICY "household_owner_manage_members" ON household_members
 CREATE POLICY "household_partner_invite" ON household_members
   FOR INSERT WITH CHECK (
     household_id IN (
-      SELECT id FROM households h
+      SELECT h.id FROM households h
       JOIN household_members hm ON h.id = hm.household_id
       WHERE hm.user_id = auth.uid() 
         AND hm.status = 'accepted' 
@@ -127,37 +144,50 @@ CREATE POLICY "household_goals_access" ON goals
     )
   );
 
-CREATE POLICY "household_savings_access" ON savings
-  FOR ALL USING (
-    household_id IN (
-      SELECT household_id FROM household_members
-      WHERE user_id = auth.uid() AND status = 'accepted'
-    )
-  );
-
-CREATE POLICY "household_debts_access" ON debts
-  FOR ALL USING (
-    household_id IN (
-      SELECT household_id FROM household_members
-      WHERE user_id = auth.uid() AND status = 'accepted'
-    )
-  );
-
-CREATE POLICY "household_assets_access" ON assets
-  FOR ALL USING (
-    household_id IN (
-      SELECT household_id FROM household_members
-      WHERE user_id = auth.uid() AND status = 'accepted'
-    )
-  );
-
-CREATE POLICY "household_incomes_access" ON incomes
-  FOR ALL USING (
-    household_id IN (
-      SELECT household_id FROM household_members
-      WHERE user_id = auth.uid() AND status = 'accepted'
-    )
-  );
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'savings') THEN
+    CREATE POLICY "household_savings_access" ON savings
+      FOR ALL USING (
+        household_id IN (
+          SELECT household_id FROM household_members
+          WHERE user_id = auth.uid() AND status = 'accepted'
+        )
+      );
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'debts') THEN
+    CREATE POLICY "household_debts_access" ON debts
+      FOR ALL USING (
+        household_id IN (
+          SELECT household_id FROM household_members
+          WHERE user_id = auth.uid() AND status = 'accepted'
+        )
+      );
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'assets') THEN
+    CREATE POLICY "household_assets_access" ON assets
+      FOR ALL USING (
+        household_id IN (
+          SELECT household_id FROM household_members
+          WHERE user_id = auth.uid() AND status = 'accepted'
+        )
+      );
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'incomes') THEN
+    CREATE POLICY "household_incomes_access" ON incomes
+      FOR ALL USING (
+        household_id IN (
+          SELECT household_id FROM household_members
+          WHERE user_id = auth.uid() AND status = 'accepted'
+        )
+      );
+  END IF;
+END $$;
 
 -- Auto-create household on signup (trigger)
 CREATE OR REPLACE FUNCTION public.handle_new_user_household()
