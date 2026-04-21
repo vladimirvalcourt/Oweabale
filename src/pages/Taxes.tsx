@@ -14,6 +14,7 @@ import {
   ListChecks,
   BookOpen,
   Landmark,
+  Info,
 } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { TransitionLink } from '../components/TransitionLink';
@@ -540,12 +541,21 @@ export default function Taxes() {
         <div>
           <p className="text-sm font-sans font-semibold text-amber-400 mb-1">Freelancer tip: the savings rule</p>
           <p className="text-sm text-content-secondary leading-relaxed font-sans">
-            As a freelancer in <strong>{STATE_TAX_MAP[taxState].name}</strong>, you pay both sides of Social Security & Medicare. This is an extra <strong>15.3%</strong> cost that regular employees don't see. Oweable has factored this into your current <strong>${(stateRate + 15.3 + (incomeStats.total > 0 ? fedTax/incomeStats.total*100 : 0)).toFixed(1)}%</strong> estimated savings rate.
+            As a freelancer in <strong>{STATE_TAX_MAP[taxState].name}</strong>, you pay both sides of Social Security & Medicare. This is an extra{' '}
+            <strong>15.3%</strong> cost{' '}
+            {/* COPY-03: self-employment tax label + tooltip */}
+            (<span className="relative inline-flex cursor-default items-center group">
+              <span className="underline underline-offset-2 decoration-dotted text-content-secondary">self-employment tax</span>
+              <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-72 -translate-x-1/2 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-[11px] font-normal leading-snug text-content-secondary opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+                As a freelancer, you pay both the employee AND employer share of Social Security and Medicare.
+              </span>
+            </span>){' '}
+            that regular employees don&apos;t see. Oweable has factored this into your current <strong>${(stateRate + 15.3 + (incomeStats.total > 0 ? fedTax/incomeStats.total*100 : 0)).toFixed(1)}%</strong> estimated savings rate.
           </p>
         </div>
       </div>
 
-      <CollapsibleModule title="Tax reduction playbook" icon={PlanningIcon} defaultOpen>
+      <CollapsibleModule title="Tax Reduction Playbook" icon={PlanningIcon} defaultOpen>
         <div className="px-6 py-5 space-y-4">
           <p className="text-sm text-content-secondary leading-relaxed">
             High-impact moves freelancers use to lower taxable income and stay compliant. Not tax advice—use this as a checklist with your CPA.
@@ -711,7 +721,16 @@ export default function Taxes() {
                     {q.overdue ? <span className="bg-surface-elevated text-content-tertiary text-xs px-2 py-0.5 rounded-lg">Completed</span> : <span className="text-emerald-400 text-xs font-sans font-medium">{q.daysLeft}d left</span>}
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <p className="text-xs text-content-tertiary">Due {q.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
+                    <span className="flex items-center gap-1.5 text-xs text-content-tertiary">
+                      Due {q.date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {/* COPY-02: penalty tooltip on each quarterly deadline */}
+                      <span className="relative inline-flex cursor-default items-center group">
+                        <Info className="h-3 w-3 text-content-muted" aria-hidden />
+                        <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-64 -translate-x-1/2 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-[11px] font-normal leading-snug text-content-secondary opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+                          Missing this deadline may result in an IRS underpayment penalty. Consult your CPA for your specific situation.
+                        </span>
+                      </span>
+                    </span>
                     {!q.overdue && (
                       <a href={q.portal} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-content-secondary hover:text-content-primary text-xs font-sans font-semibold transition-colors">
                         IRS Direct Pay <ExternalLink className="w-3 h-3 shrink-0" aria-hidden />

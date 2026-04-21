@@ -39,6 +39,8 @@ export default function Transactions() {
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterPlatform, setFilterPlatform] = useState<string>('all');
   const [editingPlatform, setEditingPlatform] = useState<{ id: string; value: string } | null>(null);
+  // PAGE-08: inline category editing
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<{start: string, end: string}>({start: '', end: ''});
   const [amountRange, setAmountRange] = useState<{min: string, max: string}>({min: '', max: ''});
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -473,12 +475,34 @@ export default function Transactions() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex flex-col gap-1">
-                            <span
-                              title={exclusionReason ?? undefined}
-                              className="inline-flex items-center px-2 py-0.5 rounded-lg text-[9px] font-mono font-bold uppercase tracking-widest bg-surface-base border border-surface-border text-content-tertiary group-hover:text-content-secondary transition-colors"
-                            >
-                              {formatCategoryLabel(transaction.category)}
-                            </span>
+                            {/* PAGE-08: inline category editing — click tag to open dropdown */}
+                            {editingCategory === transaction.id ? (
+                              <select
+                                autoFocus
+                                value={transaction.category}
+                                className="rounded-lg border border-surface-border bg-surface-base px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-widest text-content-primary focus-app-field"
+                                onChange={async (e) => {
+                                  const newCat = e.target.value;
+                                  setEditingCategory(null);
+                                  await updateTransaction(transaction.id, { category: newCat });
+                                }}
+                                onBlur={() => setEditingCategory(null)}
+                                onKeyDown={(e) => { if (e.key === 'Escape') setEditingCategory(null); }}
+                              >
+                                {uniqueCategories.map((cat) => (
+                                  <option key={cat} value={cat}>{formatCategoryLabel(cat)}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <button
+                                type="button"
+                                title={exclusionReason ?? 'Click to change category'}
+                                onClick={() => setEditingCategory(transaction.id)}
+                                className="inline-flex items-center px-2 py-0.5 rounded-lg text-[9px] font-mono font-bold uppercase tracking-widest bg-surface-base border border-surface-border text-content-tertiary group-hover:text-content-secondary hover:border-content-muted transition-colors cursor-pointer"
+                              >
+                                {formatCategoryLabel(transaction.category)}
+                              </button>
+                            )}
                             {exclusionReason && (
                               <span
                                 title={exclusionReason}

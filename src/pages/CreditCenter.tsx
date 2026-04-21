@@ -210,7 +210,7 @@ ${user.firstName} ${user.lastName}
                   <>
                     <p className="text-2xl font-sans font-bold text-content-primary mb-4 italic leading-tight">
                       Reduce <span className="text-content-primary">{boostTip.cardName}</span> balance <br className="hidden md:block"/>
-                      to <span className="text-content-primary">10% utilization</span> 
+                      to <span className="text-content-primary">10% utilization</span>
                     </p>
                     <p className="text-sm text-content-tertiary mb-6 max-w-lg leading-relaxed">
                       Your current utilization on this account is suppressing your score. Pay <span className="text-content-primary font-mono">${boostTip.amountToPay.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span> to trigger a recalculation.
@@ -223,6 +223,68 @@ ${user.firstName} ${user.lastName}
                 ) : (
                   <p className="text-content-tertiary text-sm">Add active credit lines to see high-velocity boost tips.</p>
                 )}
+
+                {/* PAGE-07: Score-bracket tips — shown below the boost tip */}
+                {creditScore > 0 && (() => {
+                  const bracket =
+                    creditScore >= 740 ? 'excellent' :
+                    creditScore >= 670 ? 'good' :
+                    creditScore >= 580 ? 'fair' : 'building';
+                  const tipsByBracket: Record<string, { label: string; tips: string[] }> = {
+                    building: {
+                      label: '300–579 · Building',
+                      tips: [
+                        'Become an authorized user on a trusted family member\'s card to inherit their history.',
+                        'Open a secured credit card — even a $200 limit builds positive payment history.',
+                        'Pay every bill on time, every time. Payment history is 35% of your score.',
+                        'Keep balances below 30% of your available credit.',
+                      ],
+                    },
+                    fair: {
+                      label: '580–669 · Fair',
+                      tips: [
+                        'Request a credit limit increase without a hard inquiry to lower your utilization ratio.',
+                        'Dispute any errors on your credit report — even one mistake can cost 20+ points.',
+                        'Avoid opening multiple new accounts in the same year.',
+                        'Set up autopay to eliminate missed payments permanently.',
+                      ],
+                    },
+                    good: {
+                      label: '670–739 · Good',
+                      tips: [
+                        'Keep utilization below 10% (not 30%) to push into excellent territory.',
+                        'Let your oldest accounts stay open — account age matters more as your score improves.',
+                        'Diversify credit types: a small installment loan alongside cards can boost your mix.',
+                        'Space new credit applications at least 6 months apart.',
+                      ],
+                    },
+                    excellent: {
+                      label: '740+ · Excellent',
+                      tips: [
+                        'Maintain utilization under 5% across all cards to protect your score.',
+                        'Monitor for hard inquiries — you qualify for the best rates so protect that status.',
+                        'Consider premium rewards cards; approval is likely and rewards compound at your level.',
+                        'Annual credit report review catches identity theft before it impacts your score.',
+                      ],
+                    },
+                  };
+                  const { label, tips } = tipsByBracket[bracket];
+                  return (
+                    <div className="mt-8 border-t border-surface-border pt-6">
+                      <p className="text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-3">
+                        Tips for your score range · {label}
+                      </p>
+                      <ul className="space-y-2">
+                        {tips.map((tip, i) => (
+                          <li key={i} className="flex items-start gap-2 text-xs text-content-secondary leading-relaxed">
+                            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-content-muted/50" aria-hidden />
+                            {tip}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })()}
               </div>
             </section>
           </div>

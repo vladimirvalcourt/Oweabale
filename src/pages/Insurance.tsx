@@ -36,6 +36,8 @@ const EMPTY_FORM = {
   notes: '',
 };
 
+const INSURANCE_BANNER_KEY = 'oweable_insurance_banner_dismissed';
+
 export default function Insurance() {
   const SecurityIcon = getCustomIcon('security');
   const { insurancePolicies, addInsurancePolicy, editInsurancePolicy, deleteInsurancePolicy } = useStore();
@@ -43,6 +45,14 @@ export default function Insurance() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  // PAGE-06: first-visit explainer banner
+  const [bannerDismissed, setBannerDismissed] = useState(
+    () => localStorage.getItem(INSURANCE_BANNER_KEY) === 'true',
+  );
+  const dismissBanner = () => {
+    setBannerDismissed(true);
+    try { localStorage.setItem(INSURANCE_BANNER_KEY, 'true'); } catch { /* ignore */ }
+  };
 
   const activePolicies = useMemo(() =>
     insurancePolicies.filter(p => p.status === 'active'),
@@ -140,6 +150,26 @@ export default function Insurance() {
             Add Policy
           </button>
         </div>
+
+        {/* PAGE-06: First-visit explainer banner — dismissable */}
+        {!bannerDismissed && (
+          <div className="flex items-start gap-3 rounded-lg border border-surface-border bg-surface-raised p-4">
+            <Shield className="h-5 w-5 shrink-0 text-content-secondary mt-0.5" aria-hidden />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-content-primary">Why track insurance here?</p>
+              <p className="mt-1 text-xs leading-relaxed text-content-secondary">
+                Your premiums are a fixed monthly cost — seeing them alongside bills gives you a complete picture of your true monthly obligations.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={dismissBanner}
+              className="shrink-0 rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-elevated"
+            >
+              Got it
+            </button>
+          </div>
+        )}
 
         {/* Coverage Audit */}
         <CollapsibleModule title="Coverage Audit" icon={SecurityIcon} defaultOpen>
