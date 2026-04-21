@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+/// <reference types="vite-plugin-pwa/client" />
 
 // Allow ?url imports (e.g. pdfjs worker)
 declare module '*?url' {

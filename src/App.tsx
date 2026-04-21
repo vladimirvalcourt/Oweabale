@@ -20,6 +20,9 @@ import SessionWarningModal from './components/SessionWarningModal';
 import { useStore } from './store/useStore';
 import { useAuth } from './hooks/useAuth';
 import { usePlanRedirect } from './hooks/usePlanRedirect';
+import { usePWAUpdateNotification } from './hooks/usePWAUpdateNotification';
+import { usePWAStandaloneMode } from './hooks/usePWAStandaloneMode';
+import { PWAInstallBanner } from './components/PWAInstallBanner';
 
 // Fix 1: Dashboard is now lazy — this keeps recharts + motion/react OUT of the initial
 // bundle. The 70 KB page was previously blocking first paint for ALL authenticated users.
@@ -107,6 +110,11 @@ function AppRoutes() {
   const location = useLocation();
 
   useDataSync({ authUserId: authUser?.id ?? null, authLoading });
+  usePWAUpdateNotification();
+  usePWAStandaloneMode();
+
+  // Show install banner only on /pro/* routes (logged-in app shell)
+  const isProRoute = location.pathname.startsWith('/pro');
 
   // Public routes render instantly (e.g., Landing page, SEO pages).
   // Protected routes naturally wait for auth via AuthGuard.
@@ -244,12 +252,25 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <AppShell />
+    </BrowserRouter>
+  );
+}
+
+/** Inner component so we have access to routing context for isProRoute */
+function AppShell() {
+  const { user: authUser } = useAuth();
+  const location = useLocation();
+  const isProRoute = location.pathname.startsWith('/pro');
+  return (
+    <>
       <UnsupportedBrowserBanner />
       <ThemedToaster />
       <ErrorBoundary>
         <AppRoutes />
       </ErrorBoundary>
-    </BrowserRouter>
+      <PWAInstallBanner isLoggedIn={isProRoute && !!authUser?.id} />
+    </>
   );
 }
 

@@ -6,6 +6,7 @@ import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import removeConsole from 'vite-plugin-remove-console';
+import { VitePWA } from 'vite-plugin-pwa';
 
 /** Same resolution as Sentry bundler `release.name` — keep browser SDK + uploaded artifacts aligned. */
 function resolveSentryReleaseName(): string | undefined {
@@ -113,6 +114,62 @@ export default defineConfig(({ mode }) => {
       }),
       // awesome-vite: vite-plugin-remove-console — quieter production bundles (keep warn/error)
       ...(isProd ? [removeConsole({ includes: ['log', 'info', 'debug'] })] : []),
+      // PWA — service worker + manifest plumbing
+      VitePWA({
+        registerType: 'autoUpdate',
+        injectRegister: 'auto',
+        // We ship our own /public/manifest.json
+        manifest: false,
+        includeAssets: [
+          'favicon.ico',
+          'favicon.svg',
+          'favicon-16x16.png',
+          'favicon-32x32.png',
+          'apple-touch-icon.png',
+          'apple-touch-icon-pwa.png',
+          'icons/*.png',
+        ],
+        workbox: {
+          // Pre-cache the full app shell
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,webp,jpg}'],
+          // Offline fallback for navigation requests
+          navigateFallback: '/offline.html',
+          // Don't use offline fallback for admin routes — they have no offline value
+          navigateFallbackDenylist: [/^\/admin/],
+          runtimeCaching: [
+            {
+              // Supabase REST API — NetworkFirst so UI always tries live data
+              urlPattern: /^https:\/\/.*\.supabase\.co\/(rest|auth|storage)\//i,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'supabase-api-cache',
+                expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 },
+                networkTimeoutSeconds: 10,
+              },
+            },
+            {
+              // Static images — CacheFirst for 30 days
+              urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'static-images',
+                expiration: { maxEntries: 60, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              },
+            },
+            {
+              // Google Fonts — StaleWhileRevalidate
+              urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
+              handler: 'StaleWhileRevalidate',
+              options: { cacheName: 'google-fonts', expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } },
+            },
+          ],
+        },
+        devOptions: {
+          // Enable SW in dev so we can test the install prompt during development
+          enabled: true,
+          type: 'module',
+        },
+      }),
     ],
     resolve: {
       alias: {

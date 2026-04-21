@@ -38,6 +38,7 @@
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:status": "supabase status",
+    "generate:icons": "tsx scripts/generate-icons.ts",
     "functions:deploy": "supabase functions deploy",
     "functions:deploy:admin-actions": "supabase functions deploy admin-actions"
   },
@@ -92,13 +93,16 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.4.0",
     "rollup-plugin-visualizer": "^7.0.1",
+    "sharp": "^0.34.5",
     "supabase": "^2.92.1",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "vite": "^8.0.8",
     "vite-plugin-checker": "^0.12.0",
+    "vite-plugin-pwa": "^1.2.0",
     "vite-plugin-remove-console": "^2.2.0",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "workbox-window": "^7.4.0"
   }
 }

@@ -550,4 +550,20 @@ ul.recharts-tooltip-item-list {
   list-style: none;
 }
 
+/* ─── PWA Standalone Mode ──────────────────────────────────────────────────
+   When Oweable is launched from the home screen / dock as an installed PWA,
+   the browser chrome is gone. We compensate with safe-area-inset padding.
+   The `pwa-mode` class is added to <body> by usePWAStandaloneMode hook.
+──────────────────────────────────────────────────────────────────────────── */
+body.pwa-mode {
+  /* iOS status bar clearance (notch, Dynamic Island) */
+  padding-top: env(safe-area-inset-top);
+  /* Bottom home indicator on iPhone X+ */
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
+/* Sidebar and top bars inside pwa-mode inherit the top inset so content
+   doesn't clip behind the status bar */
+body.pwa-mode [data-pwa-top-bar] {
+  padding-top: calc(0.75rem + env(safe-area-inset-top));
+}
