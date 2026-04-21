@@ -238,6 +238,19 @@ export default function Subscriptions() {
         </button>
       </div>
 
+      {/* PAGE-03: Monthly total summary — shown when there are active subscriptions */}
+      {activeSubscriptions.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-4 py-3 text-sm text-content-secondary">
+          <span className="font-medium text-content-primary">
+            Total monthly cost: ${monthlyCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+          <span className="text-content-muted">·</span>
+          <span>{activeSubscriptions.length} active subscription{activeSubscriptions.length !== 1 ? 's' : ''}</span>
+          <span className="text-content-muted">·</span>
+          <span>Annual equivalent: ${(monthlyCost * 12).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}/yr</span>
+        </div>
+      )}
+
       {activeSubscriptions.length === 0 && subscriptionCandidates.length > 0 && (
         <div className="rounded-lg border border-brand-cta/25 bg-brand-cta/10 p-4">
           <p className="text-sm font-medium text-content-primary">

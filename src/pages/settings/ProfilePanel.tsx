@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
-import { User, Loader2, Camera, Copy, Check } from 'lucide-react';
+import { User, Loader2, Camera, Copy, Check, Info } from 'lucide-react';
 import Cropper, { type Area } from 'react-easy-crop';
 import { Dialog } from '@headlessui/react';
 import { useStore } from '../../store/useStore';
@@ -195,6 +195,7 @@ function ProfilePanelInner() {
       });
       if (ok) {
         setSaveVisual('saved');
+        toast.success('Profile updated');
         window.setTimeout(() => setSaveVisual('idle'), 2200);
       } else {
         setSaveVisual('idle');
@@ -323,6 +324,23 @@ function ProfilePanelInner() {
   const saveButtonLabel =
     saveVisual === 'saving' ? 'Saving...' : saveVisual === 'saved' ? 'Saved' : 'Save Changes';
 
+  // SET-03: track unsaved changes to show sticky action bar
+  const isDirty =
+    formData.firstName !== (user.firstName || '') ||
+    formData.lastName !== (user.lastName || '') ||
+    formData.timezone !== normalizeTimezoneToIana(user.timezone) ||
+    nationalDigits !== nationalDigitsFromStored(user.phone);
+
+  const handleDiscard = useCallback(() => {
+    setFormData({
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      email: user.email || '',
+      timezone: normalizeTimezoneToIana(user.timezone),
+    });
+    setNationalDigits(nationalDigitsFromStored(user.phone));
+  }, [user]);
+
   return (
     <>
       <CollapsibleModule
@@ -369,6 +387,8 @@ function ProfilePanelInner() {
               </div>
               <div className="space-y-2 min-w-0">
                 <p className="text-xs text-content-tertiary">JPG or PNG, max 2 MB. Crop after you choose a photo.</p>
+                {/* SET-01: Support ID with label and helper text */}
+                <p className="text-[11px] font-medium text-content-tertiary">Your Support ID</p>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-mono text-sm text-content-secondary">{displayUserId}</span>
                   <button
@@ -380,6 +400,7 @@ function ProfilePanelInner() {
                     <Copy className="h-3.5 w-3.5" />
                   </button>
                 </div>
+                <p className="text-[11px] text-content-muted">Share this with our team if you need help.</p>
               </div>
             </div>
 
@@ -413,9 +434,15 @@ function ProfilePanelInner() {
               </div>
 
               <div className="sm:col-span-4">
-                <label htmlFor="email" className="mb-2 block text-xs font-medium text-content-secondary">
+                <label htmlFor="email" className="mb-2 flex items-center gap-1 text-xs font-medium text-content-secondary">
                   Email address
-                  <span className="ml-2 font-normal text-content-tertiary">(from your auth provider)</span>
+                  {/* SET-02: tooltip explaining read-only email */}
+                  <span className="relative ml-0.5 inline-flex cursor-default items-center group">
+                    <Info className="h-3 w-3 text-content-muted" aria-hidden />
+                    <span className="pointer-events-none absolute left-full top-1/2 z-20 ml-2 w-56 -translate-y-1/2 rounded-lg border border-surface-border bg-surface-raised px-2.5 py-1.5 text-[11px] font-normal leading-snug text-content-secondary opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+                      This email comes from your Google sign-in. To change it, update your Google account.
+                    </span>
+                  </span>
                 </label>
                 <input
                   type="email"
@@ -509,22 +536,33 @@ function ProfilePanelInner() {
               </div>
             </div>
 
-            <div className="flex justify-end pt-8">
-              <button
-                type="submit"
-                disabled={saveVisual === 'saving'}
-                className={cn(
-                  'flex min-h-10 items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-medium shadow-none transition-colors disabled:cursor-not-allowed disabled:opacity-60',
-                  saveVisual === 'saved'
-                    ? 'bg-emerald-600 text-white hover:bg-emerald-500'
-                    : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover',
-                )}
-              >
-                {saveVisual === 'saving' && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-                {saveVisual === 'saved' && <Check className="h-3.5 w-3.5" />}
-                {saveButtonLabel}
-              </button>
-            </div>
+            {/* SET-03: sticky action bar — appears only when fields have changed */}
+            {isDirty && (
+              <div className="sticky bottom-0 z-10 -mx-8 mt-8 flex items-center justify-end gap-3 border-t border-surface-border bg-surface-elevated/95 px-8 py-4 backdrop-blur-sm sm:-mx-10 sm:px-10">
+                <button
+                  type="button"
+                  onClick={handleDiscard}
+                  disabled={saveVisual === 'saving'}
+                  className="rounded-lg border border-surface-border px-5 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-raised disabled:opacity-50"
+                >
+                  Discard
+                </button>
+                <button
+                  type="submit"
+                  disabled={saveVisual === 'saving'}
+                  className={cn(
+                    'flex min-h-10 items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-medium shadow-none transition-colors disabled:cursor-not-allowed disabled:opacity-60',
+                    saveVisual === 'saved'
+                      ? 'bg-emerald-600 text-white hover:bg-emerald-500'
+                      : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover',
+                  )}
+                >
+                  {saveVisual === 'saving' && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                  {saveVisual === 'saved' && <Check className="h-3.5 w-3.5" />}
+                  {saveButtonLabel}
+                </button>
+              </div>
+            )}
           </form>
         </div>
       </CollapsibleModule>

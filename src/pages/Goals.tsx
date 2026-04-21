@@ -288,20 +288,40 @@ export default function Goals() {
       )}
 
       {goals.length === 0 && !isAddingGoal ? (
-        <div className="bg-surface-raised rounded-lg border border-surface-border border-dashed p-12 text-center">
-          <div className="w-16 h-16 border border-surface-border rounded-lg flex items-center justify-center mx-auto mb-4 bg-surface-elevated">
-            <Target className="w-8 h-8 text-content-muted" />
+        <div className="space-y-4">
+          {/* PAGE-05: Ghost example goal card — sets expectations before first goal is created */}
+          <div className="relative rounded-lg border border-surface-border border-dashed bg-surface-raised/50 p-5 opacity-60 select-none pointer-events-none">
+            <div className="absolute -top-2.5 left-4 rounded-full border border-surface-border bg-surface-elevated px-2.5 py-0.5 text-[10px] font-medium text-content-muted tracking-wide">
+              Example
+            </div>
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <p className="text-sm font-semibold text-content-primary">Emergency Fund</p>
+                <p className="text-xs text-content-tertiary mt-0.5">savings · Due Dec 31, 2025</p>
+              </div>
+              <span className="text-xs font-mono text-content-secondary">$3,200 / $6,000</span>
+            </div>
+            <div className="w-full rounded-full bg-surface-elevated h-2 overflow-hidden">
+              <div className="h-2 rounded-full bg-content-muted/40" style={{ width: '53%' }} />
+            </div>
+            <p className="mt-2 text-right text-[11px] text-content-muted">53% complete</p>
           </div>
-          <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No goals yet</h3>
-          <p className="text-sm text-content-tertiary max-w-sm mx-auto mb-8">Set a target amount and date—progress updates as you add money.</p>
-          <button
-            type="button"
-            onClick={() => setIsAddingGoal(true)}
-            className="px-8 py-3 rounded-lg bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-surface-base text-sm font-sans font-semibold transition-colors flex items-center gap-2 mx-auto shadow-sm"
-          >
-            <Plus className="w-4 h-4 shrink-0" aria-hidden />
-            Create your first goal
-          </button>
+
+          <div className="bg-surface-raised rounded-lg border border-surface-border border-dashed p-12 text-center">
+            <div className="w-16 h-16 border border-surface-border rounded-lg flex items-center justify-center mx-auto mb-4 bg-surface-elevated">
+              <Target className="w-8 h-8 text-content-muted" />
+            </div>
+            <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No goals yet</h3>
+            <p className="text-sm text-content-tertiary max-w-sm mx-auto mb-8">Set a target amount and date—progress updates as you add money.</p>
+            <button
+              type="button"
+              onClick={() => setIsAddingGoal(true)}
+              className="px-8 py-3 rounded-lg bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-surface-base text-sm font-sans font-semibold transition-colors flex items-center gap-2 mx-auto shadow-sm"
+            >
+              <Plus className="w-4 h-4 shrink-0" aria-hidden />
+              Create your first goal
+            </button>
+          </div>
         </div>
       ) : (
         <CollapsibleModule 

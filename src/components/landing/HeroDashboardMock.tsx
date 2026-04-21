@@ -8,9 +8,6 @@ export default function HeroDashboardMock() {
   return (
     <div className="bg-black border border-surface-border rounded-[6px] p-5 sm:p-6 flex flex-col gap-4">
       <div className="flex items-center justify-between pb-3 border-b border-surface-border relative">
-        <div className="absolute -top-8 -right-2 bg-brand-cta text-surface-base px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-lg transform rotate-[-2deg]">
-          Preview coming soon
-        </div>
         <div>
           <p className="text-[10px] uppercase tracking-[0.18em] text-content-tertiary">Oweable Command Center</p>
           <p className="text-sm text-content-primary font-medium mt-1">Financial Overview</p>

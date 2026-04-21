@@ -942,11 +942,30 @@ export default function Obligations() {
               })}
               {filteredObligations.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center">
-                    <div className="flex flex-col items-center justify-center text-content-tertiary">
-                      <CheckCircle2 className="w-8 h-8 mb-3 text-emerald-500/50" />
-                      <p className="text-sm font-mono">No obligations in this category.</p>
-                    </div>
+                  <td colSpan={5} className="px-6 py-14 text-center">
+                    {activeTab === 'ambush' ? (
+                      /* PAGE-04: Tickets & Fines empty state with context */
+                      <div className="flex flex-col items-center justify-center gap-3">
+                        <TicketIcon className="w-10 h-10 text-content-muted" />
+                        <p className="text-base font-semibold text-content-primary">Track unexpected charges</p>
+                        <p className="max-w-xs text-sm text-content-tertiary leading-relaxed">
+                          Log parking tickets, court fines, late fees, or any one-time charge. We&apos;ll add them to your bill calendar.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => openQuickAdd('citation')}
+                          className="mt-2 inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2.5 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
+                        >
+                          <Plus className="w-4 h-4 shrink-0" aria-hidden />
+                          Add a fine or ticket
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-content-tertiary">
+                        <CheckCircle2 className="w-8 h-8 mb-3 text-emerald-500/50" />
+                        <p className="text-sm font-mono">No obligations in this category.</p>
+                      </div>
+                    )}
                   </td>
                 </tr>
               )}
