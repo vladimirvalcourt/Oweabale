@@ -29,7 +29,7 @@ function hasDuplicateWord(label: string): boolean {
 }
 
 function RulesPanelInner() {
-  const RulesIcon = getCustomIcon('rules');
+  const RulesIcon = getCustomIcon('smart');
   const categories = useStore((s) => s.categories);
   const transactions = useStore((s) => s.transactions);
   const categorizationRules = useStore((s) => s.categorizationRules);

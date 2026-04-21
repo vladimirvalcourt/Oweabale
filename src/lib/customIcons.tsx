@@ -35,7 +35,6 @@ export const customIcons = {
   goals: ThinkIcon as IconComponent,
   taxes: ProviderIcon as IconComponent,
   categories: SkillsIcon as IconComponent,
-  rules: McpIcon as IconComponent,
 };
 
 export type CustomIconName = keyof typeof customIcons;

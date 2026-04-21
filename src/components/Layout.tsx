@@ -2,12 +2,12 @@ import React, { useState, useRef, useEffect, useCallback, useMemo, startTransiti
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { TransitionLink } from './TransitionLink';
 import { 
-  Bell, Search, Home, FileText, Target, Activity,
-  Settings, Repeat, BarChart2, BarChart, Plus, X, ChevronDown, Inbox,
-  DollarSign, PieChart, Layers, Calendar as CalendarIcon, Percent, Briefcase, BookOpen, Shield, Clock, CreditCard, AlertTriangle,
-  RefreshCw,
-  Command,
-} from '@geist-ui/icons';
+  Bell, Search, LayoutDashboard, Receipt, Target, ArrowRightLeft,
+  Settings, Repeat, BarChart3, Plus, X, ChevronDown, Inbox,
+  Banknote, PieChart, Scale, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, ShieldCheck, Clock, Landmark, AlertCircle,
+  TrendingUp,
+  Command, LineChart, Umbrella, PiggyBank
+} from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
@@ -139,8 +139,8 @@ export default function Layout() {
     return u.email?.split('@')[0] ?? 'Account';
   }, [user]);
 
-  const planBadgeLabel = checkingFullSuite ? 'Checking plan…' : hasFullSuite ? 'Full Suite' : 'Tracker';
-  const isSettingsRoute = location.pathname.startsWith('/settings');
+  const planBadgeLabel = 'Full Suite';
+  const isSettingsRoute = location.pathname.startsWith('/pro/settings');
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -423,54 +423,47 @@ export default function Layout() {
       {
         label: 'Overview',
         items: [
-          { name: 'Dashboard',        path: '/dashboard',         icon: Home,       lazyImport: () => import('../pages/Dashboard') },
-          { name: 'Cash flow',        path: '/dashboard',         icon: RefreshCw,  hash: 'cash-flow' },
-          { name: 'Income',           path: '/income',            icon: DollarSign, lazyImport: () => import('../pages/Income') },
-          { name: 'Freelance / gigs', path: '/freelance',         icon: Briefcase,  lazyImport: () => import('../pages/Freelance') },
-          { name: 'Regular Bills',    path: '/bills',             icon: FileText,   lazyImport: () => import('../pages/Obligations') },
-          { name: 'Tickets & Fines',  path: '/bills?tab=ambush',  icon: AlertTriangle },
-          { name: 'Debts & loans',    path: '/bills?tab=debt',    icon: CreditCard },
-          { name: 'Due soon',         path: '/bills',             icon: Clock,      hash: 'due-soon', count: dueSoonCount },
-          { name: 'Subscriptions',    path: '/subscriptions',     icon: Repeat,     lazyImport: () => import('../pages/Subscriptions') },
-          { name: 'Document Inbox',   path: '/ingestion',         icon: Inbox,      count: pendingIngestions.length, lazyImport: () => import('../pages/Ingestion') },
+          { name: 'Dashboard',        path: '/pro/dashboard',         icon: LayoutDashboard,       lazyImport: () => import('../pages/Dashboard') },
+          { name: 'Cash flow',        path: '/pro/dashboard',         icon: ArrowRightLeft,  hash: 'cash-flow' },
+          { name: 'Income',           path: '/pro/income',            icon: Banknote, lazyImport: () => import('../pages/Income') },
+          { name: 'Freelance / gigs', path: '/pro/freelance',         icon: Briefcase,  lazyImport: () => import('../pages/Freelance') },
+          { name: 'Regular Bills',    path: '/pro/bills',             icon: Receipt,   lazyImport: () => import('../pages/Obligations') },
+          { name: 'Tickets & Fines',  path: '/pro/bills?tab=ambush',  icon: AlertCircle },
+          { name: 'Debts & loans',    path: '/pro/bills?tab=debt',    icon: Landmark },
+          { name: 'Due soon',         path: '/pro/bills',             icon: Clock,      hash: 'due-soon', count: dueSoonCount },
+          { name: 'Subscriptions',    path: '/pro/subscriptions',     icon: Repeat,     lazyImport: () => import('../pages/Subscriptions') },
+          { name: 'Document Inbox',   path: '/pro/ingestion',         icon: Inbox,      count: pendingIngestions.length, lazyImport: () => import('../pages/Ingestion') },
         ],
       },
       {
         label: 'Activity',
         items: [
-          { name: 'Trends',        path: '/analytics',     icon: Activity,  lazyImport: () => import('../pages/Analytics') },
-          { name: 'Reports',       path: '/reports',       icon: BarChart2, lazyImport: () => import('../pages/Reports') },
-          { name: 'Transactions',  path: '/transactions',  icon: Activity,  lazyImport: () => import('../pages/Transactions') },
+          { name: 'Trends',        path: '/pro/analytics',     icon: TrendingUp,  lazyImport: () => import('../pages/Analytics') },
+          { name: 'Reports',       path: '/pro/reports',       icon: BarChart3, lazyImport: () => import('../pages/Reports') },
+          { name: 'Transactions',  path: '/pro/transactions',  icon: ArrowRightLeft,  lazyImport: () => import('../pages/Transactions') },
         ],
       },
       {
         label: 'Planning & Growth',
         items: [
-          { name: 'Net Worth',        path: '/net-worth',    icon: Layers,                                        lazyImport: () => import('../pages/NetWorth') },
-          { name: 'Savings',          path: '/savings',      icon: PiggyBank as unknown as typeof Home,           lazyImport: () => import('../pages/Savings') },
-          { name: 'Investments',      path: '/investments',  icon: BarChart,                                      lazyImport: () => import('../pages/Investments') },
-          { name: 'Insurance',        path: '/insurance',    icon: Shield,                                        lazyImport: () => import('../pages/Insurance') },
-          { name: 'Budgets',          path: '/budgets',      icon: PieChart,                                      lazyImport: () => import('../pages/Budgets') },
-          { name: 'Academy',          path: '/education',    icon: BookOpen,                                      lazyImport: () => import('../pages/Education') },
-          { name: 'Calendar',         path: '/calendar',     icon: CalendarIcon,                                  lazyImport: () => import('../pages/Calendar') },
-          { name: 'Goals',            path: '/goals',        icon: Target,                                        lazyImport: () => import('../pages/Goals') },
-          { name: 'Credit Workshop',  path: '/credit',       icon: Shield,                                        lazyImport: () => import('../pages/CreditCenter') },
-          { name: 'Taxes',            path: '/taxes',        icon: Percent,                                       lazyImport: () => import('../pages/Taxes') },
+          { name: 'Net Worth',        path: '/pro/net-worth',    icon: Scale,                                        lazyImport: () => import('../pages/NetWorth') },
+          { name: 'Savings',          path: '/pro/savings',      icon: PiggyBank as unknown as typeof LayoutDashboard,           lazyImport: () => import('../pages/Savings') },
+          { name: 'Investments',      path: '/pro/investments',  icon: LineChart,                                      lazyImport: () => import('../pages/Investments') },
+          { name: 'Insurance',        path: '/pro/insurance',    icon: Umbrella,                                        lazyImport: () => import('../pages/Insurance') },
+          { name: 'Budgets',          path: '/pro/budgets',      icon: PieChart,                                      lazyImport: () => import('../pages/Budgets') },
+          { name: 'Academy',          path: '/pro/education',    icon: GraduationCap,                                      lazyImport: () => import('../pages/Education') },
+          { name: 'Calendar',         path: '/pro/calendar',     icon: CalendarIcon,                                  lazyImport: () => import('../pages/Calendar') },
+          { name: 'Goals',            path: '/pro/goals',        icon: Target,                                        lazyImport: () => import('../pages/Goals') },
+          { name: 'Credit Workshop',  path: '/pro/credit',       icon: ShieldCheck,                                        lazyImport: () => import('../pages/CreditCenter') },
+          { name: 'Taxes',            path: '/pro/taxes',        icon: Calculator,                                       lazyImport: () => import('../pages/Taxes') },
         ],
       },
     ],
     [dueSoonCount, pendingIngestions.length]
   );
 
-  const visibleNavGroups = useMemo(() => {
-    if (checkingFullSuite || hasFullSuite) return navGroups;
-    return navGroups
-      .map((group) => ({
-        ...group,
-        items: group.items.filter((item) => canAccessAppPath(item.path.split('?')[0], false)),
-      }))
-      .filter((group) => group.items.length > 0);
-  }, [checkingFullSuite, hasFullSuite, navGroups]);
+  // Layout is only rendered inside ProPlanGuard — always show all nav groups.
+  const visibleNavGroups = navGroups;
 
   /* Defer location so active-nav recalculation does not block the click→paint frame (INP).
      Tradeoff: active highlight can lag one frame after navigation — intentional. */
@@ -528,13 +521,13 @@ export default function Layout() {
         <div className="shrink-0 flex h-[4.5rem] items-center justify-between gap-2 border-b border-surface-border/90 px-3 sm:px-4">
           <div className="flex min-w-0 flex-1 items-center overflow-hidden">
             {!sidebarCollapsed ? (
-              <TransitionLink to="/dashboard" className="min-w-0 shrink focus-app rounded-lg">
+              <TransitionLink to="/pro/dashboard" className="min-w-0 shrink focus-app rounded-lg">
                 <BrandWordmark textClassName="brand-header-text" />
               </TransitionLink>
             ) : (
               <div className="flex w-full justify-center">
                 <TransitionLink
-                  to="/dashboard"
+                  to="/pro/dashboard"
                   aria-label="Oweable home"
                   className="flex shrink-0 rounded-lg p-1 focus-app"
                 >
@@ -559,20 +552,7 @@ export default function Layout() {
           </button>
         </div>
 
-        {!checkingFullSuite && !hasFullSuite && !sidebarCollapsed && (
-          <div className="mx-3 mt-2 rounded-lg border border-amber-500/25 bg-amber-500/[0.07] px-3 py-2.5">
-            <p className="chrome-micro-label text-amber-200/90">Free plan</p>
-            <p className="mt-1 font-sans text-xs leading-snug text-content-tertiary">
-              Bills and core tools are included. Upgrade to unlock dashboard, income, reports, and the full suite.
-            </p>
-            <TransitionLink
-              to="/pricing"
-              className="mt-2 inline-flex font-sans text-xs font-medium text-content-primary hover:text-content-secondary"
-            >
-              View plans →
-            </TransitionLink>
-          </div>
-        )}
+          {/* Sidebar free-plan upgrade banner removed — Layout only renders for Pro users */}
 
         <nav className={cn('min-h-0 flex-1 overflow-y-auto scrollbar-hide', sidebarCollapsed ? 'space-y-3 px-1.5 py-4' : 'space-y-4 px-3 py-6')} aria-label="App sections">
           {processedSidebarNav.map((group, groupIndex) => {
@@ -721,7 +701,7 @@ export default function Layout() {
           )}
           <div className={cn('flex flex-col gap-2 p-3 sm:p-4', sidebarCollapsed ? 'pt-3' : '')}>
             <TransitionLink
-              to="/settings"
+              to="/pro/settings"
               onClick={closeSidebarMobile}
               title={sidebarCollapsed ? 'Settings' : undefined}
               aria-current={isSettingsRoute ? 'page' : undefined}
@@ -1003,7 +983,7 @@ export default function Layout() {
                     <HeadlessMenu.Item>
                       {({ active }) => (
                         <TransitionLink
-                          to="/settings"
+                          to="/pro/settings"
                           className={cn(
                             'flex items-center gap-3 px-3 py-2 text-sm transition-colors',
                             active ? 'bg-content-primary/5 text-content-primary' : 'text-content-tertiary',

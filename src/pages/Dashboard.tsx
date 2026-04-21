@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { TransitionLink } from '../components/TransitionLink';
 import { 
-  ArrowRight, Activity, ShieldCheck, Flame, Inbox, ShieldAlert,
+  ArrowRight, TrendingUp, ShieldCheck, Flame, Inbox, ShieldAlert,
   X, Copy, ExternalLink, Wallet
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine, ReferenceArea } from 'recharts';
@@ -17,6 +17,7 @@ import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
 import { AppPageShell } from '../components/AppPageShell';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
 import { formatCategoryLabel } from '../lib/categoryDisplay';
+import { ProWelcomeModal } from '../components/ProWelcomeModal';
 
 import type { Citation } from '../store/useStore';
 
@@ -476,6 +477,7 @@ export default function Dashboard() {
 
   return (
     <AppPageShell>
+      <ProWelcomeModal />
       <div className="space-y-8 w-full pb-8">
       
       {/* 1. Dashboard Header */}
@@ -1030,7 +1032,7 @@ export default function Dashboard() {
                           : 'border-surface-border bg-surface-base text-content-tertiary'
                       }`}
                     >
-                      <Activity className="w-5 h-5" />
+                      <TrendingUp className="w-5 h-5" />
                     </div>
                     <span className="inline-flex items-center gap-2 text-[10px] font-sans uppercase tracking-wide text-content-secondary">
                       <span

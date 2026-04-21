@@ -7,16 +7,19 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import type { User } from '@supabase/supabase-js';
 import { lazy, Suspense } from 'react';
 import Layout from './components/Layout';
+import FreeLayout from './components/FreeLayout';
 import DeviceGuard from './components/DeviceGuard';
 import ErrorBoundary from './components/ErrorBoundary';
 import AuthGuard from './components/AuthGuard';
 import AdminGuard from './components/AdminGuard';
 import MaintenanceGuard from './components/MaintenanceGuard';
-import { FullSuiteRouteGuard } from './components/FullSuiteGate';
+import { FreePlanGuard } from './components/FreePlanGuard';
+import { ProPlanGuard } from './components/ProPlanGuard';
 import { DashboardSkeleton, ListSkeleton, AppLoader } from './components/PageSkeleton';
 import SessionWarningModal from './components/SessionWarningModal';
 import { useStore } from './store/useStore';
 import { useAuth } from './hooks/useAuth';
+import { usePlanRedirect } from './hooks/usePlanRedirect';
 
 // Fix 1: Dashboard is now lazy — this keeps recharts + motion/react OUT of the initial
 // bundle. The 70 KB page was previously blocking first paint for ALL authenticated users.
@@ -57,20 +60,43 @@ import AuthCallback from './pages/AuthCallback';
 import PlaidCallback from './pages/PlaidCallback';
 const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
 const NotFound         = lazy(() => import('./pages/NotFound'));
+const FreeDashboard    = lazy(() => import('./pages/FreeDashboard'));
 
 import { useDataSync } from './hooks/useDataSync';
 import { ThemedToaster } from './components/ThemedToaster';
 import { UnsupportedBrowserBanner } from './components/UnsupportedBrowserBanner';
 
+/** After sign-in, route users to the correct namespace based on their plan. */
 function SignInRoute({ authUser }: { authUser: User | null }) {
   const location = useLocation();
-  if (!authUser) {
-    return <AuthPage mode="signin" />;
-  }
+  const { plan } = usePlanRedirect();
+
+  if (!authUser) return <AuthPage mode="signin" />;
+
+  // Honor explicit ?redirect= param first (e.g. deep-linked protected page)
   const raw = new URLSearchParams(location.search).get('redirect');
-  const to =
-    raw && raw.startsWith('/') && !raw.startsWith('//') && !raw.includes(':') ? raw : '/dashboard';
-  return <Navigate to={to} replace />;
+  if (raw && raw.startsWith('/') && !raw.startsWith('//') && !raw.includes(':')) {
+    return <Navigate to={raw} replace />;
+  }
+
+  // Wait for plan check before redirecting so we don't flash the wrong dashboard
+  if (plan === 'loading') return <AppLoader />;
+
+  return <Navigate to={plan === 'pro' ? '/pro/dashboard' : '/free/dashboard'} replace />;
+}
+
+/**
+ * PlanAwareRedirect
+ * Replaces the old flat /dashboard, /bills etc. routes.
+ * Preserves ?search and #hash so deep links keep working.
+ */
+function PlanAwareRedirect({ free, pro }: { free: string; pro: string }) {
+  const { plan } = usePlanRedirect();
+  const location = useLocation();
+  const suffix = location.search + location.hash;
+  if (plan === 'loading') return <AppLoader />;
+  const base = plan === 'pro' ? pro : free;
+  return <Navigate to={`${base}${suffix}`} replace />;
 }
 
 function AppRoutes() {
@@ -117,6 +143,62 @@ function AppRoutes() {
       <Route path="/plaid/callback" element={<PlaidCallback />} />
       <Route path="/capture" element={<MobileCapture />} />
 
+      {/* ────────────────────────────────────────────────────────────────
+           FREE NAMESPACE  /free/*
+           Guarded by FreePlanGuard (pro users → /pro/dashboard).
+           Pages are the same components used by legacy routes — no duplication.
+      ──────────────────────────────────────────────────────────────── */}
+      <Route element={<FreePlanGuard><FreeLayout /></FreePlanGuard>}>
+        <Route
+          path="free/dashboard"
+          element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><FreeDashboard /></Suspense></ErrorBoundary>}
+        />
+        <Route path="free/bills"         element={<ErrorBoundary><Obligations /></ErrorBoundary>} />
+        <Route path="free/subscriptions" element={<ErrorBoundary><Subscriptions /></ErrorBoundary>} />
+        <Route path="free/calendar"      element={<ErrorBoundary><Calendar /></ErrorBoundary>} />
+        <Route
+          path="free/settings"
+          element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Settings /></Suspense></ErrorBoundary>}
+        />
+      </Route>
+
+      {/* ────────────────────────────────────────────────────────────────
+           PRO NAMESPACE  /pro/*
+           Guarded by ProPlanGuard (free users → /free/dashboard).
+           Re-uses every existing page component — no file duplication.
+      ──────────────────────────────────────────────────────────────── */}
+      <Route element={<ProPlanGuard><DeviceGuard><Layout /></DeviceGuard></ProPlanGuard>}>
+        <Route
+          path="pro/dashboard"
+          element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><Dashboard /></Suspense></ErrorBoundary>}
+        />
+        <Route path="pro/bills"          element={<ErrorBoundary><Obligations /></ErrorBoundary>} />
+        <Route path="pro/income"         element={<ErrorBoundary><Income /></ErrorBoundary>} />
+        <Route path="pro/freelance"      element={<ErrorBoundary><Freelance /></ErrorBoundary>} />
+        <Route path="pro/ingestion"      element={<ErrorBoundary><Ingestion /></ErrorBoundary>} />
+        <Route path="pro/transactions"   element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={8} />}><Transactions /></Suspense></ErrorBoundary>} />
+        <Route path="pro/budgets"        element={<ErrorBoundary><Budgets /></ErrorBoundary>} />
+        <Route path="pro/net-worth"      element={<ErrorBoundary><NetWorth /></ErrorBoundary>} />
+        <Route path="pro/calendar"       element={<ErrorBoundary><Calendar /></ErrorBoundary>} />
+        <Route path="pro/taxes"          element={<ErrorBoundary><Taxes /></ErrorBoundary>} />
+        <Route path="pro/goals"          element={<ErrorBoundary><Goals /></ErrorBoundary>} />
+        <Route path="pro/savings"        element={<ErrorBoundary><Savings /></ErrorBoundary>} />
+        <Route path="pro/education"      element={<ErrorBoundary><Education /></ErrorBoundary>} />
+        <Route path="pro/categories"     element={<ErrorBoundary><Categories /></ErrorBoundary>} />
+        <Route path="pro/subscriptions"  element={<ErrorBoundary><Subscriptions /></ErrorBoundary>} />
+        <Route path="pro/reports"        element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><Reports /></Suspense></ErrorBoundary>} />
+        <Route path="pro/analytics"      element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><Analytics /></Suspense></ErrorBoundary>} />
+        <Route path="pro/investments"    element={<ErrorBoundary><Investments /></ErrorBoundary>} />
+        <Route path="pro/insurance"      element={<ErrorBoundary><Insurance /></ErrorBoundary>} />
+        <Route path="pro/credit"         element={<ErrorBoundary><CreditCenter /></ErrorBoundary>} />
+        <Route path="pro/app/support"    element={<ErrorBoundary><HelpDesk /></ErrorBoundary>} />
+        <Route path="pro/changelog"      element={<ErrorBoundary><Changelog /></ErrorBoundary>} />
+        <Route
+          path="pro/settings"
+          element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Settings /></Suspense></ErrorBoundary>}
+        />
+      </Route>
+
       {/* ── Protected routes — require authentication ── */}
       <Route element={<AuthGuard />}>
         <Route element={<MaintenanceGuard />}>
@@ -128,240 +210,34 @@ function AppRoutes() {
         {/* Onboarding doesn't need Layout sidebar/topbar */}
         <Route path="/onboarding/setup" element={<Onboarding />} />
 
-        <Route element={<DeviceGuard><Layout /></DeviceGuard>}>
-          <Route
-            path="dashboard"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Dashboard">
-                  {/* Fix 1: Content-matched skeleton — shows real grid shape while 70 KB chunk loads */}
-                  <Suspense fallback={<DashboardSkeleton />}>
-                    <Dashboard />
-                  </Suspense>
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route path="bills" element={<ErrorBoundary><Obligations /></ErrorBoundary>} />
-          <Route
-            path="income"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Income tracking">
-                  <Income />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="freelance"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Freelance / gigs">
-                  <Freelance />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="ingestion"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Document ingestion">
-                  <Ingestion />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="transactions"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Transaction history">
-                  {/* Fix 1: list skeleton matches the transactions table layout */}
-                  <Suspense fallback={<ListSkeleton rows={8} />}>
-                    <Transactions />
-                  </Suspense>
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="budgets"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Budgeting">
-                  <Budgets />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="net-worth"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Net worth">
-                  <NetWorth />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="calendar"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Calendar planning">
-                  <Calendar />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="taxes"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Tax tools">
-                  <Taxes />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="goals"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Goals">
-                  <Goals />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="savings"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Savings">
-                  <Savings />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="education"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Financial Academy">
-                  <Education />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="categories"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Categories">
-                  <Categories />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="subscriptions"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Subscriptions">
-                  <Subscriptions />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="reports"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Reports">
-                  <Suspense fallback={<DashboardSkeleton />}>
-                    <Reports />
-                  </Suspense>
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="analytics"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Analytics">
-                  {/* Fix 1: analytics skeleton with chart-shape blocks */}
-                  <Suspense fallback={<DashboardSkeleton />}>
-                    <Analytics />
-                  </Suspense>
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="investments"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Investments">
-                  <Investments />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="insurance"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Insurance">
-                  <Insurance />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="credit"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Credit Workshop">
-                  <CreditCenter />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="app/support"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Support tools">
-                  <HelpDesk />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="changelog"
-            element={
-              <ErrorBoundary>
-                <FullSuiteRouteGuard featureName="Changelog">
-                  <Changelog />
-                </FullSuiteRouteGuard>
-              </ErrorBoundary>
-            }
-          />
-          <Route
-            path="settings"
-            element={
-              <ErrorBoundary>
-                <Suspense fallback={<ListSkeleton rows={6} />}>
-                  <Settings />
-                </Suspense>
-              </ErrorBoundary>
-            }
-          />
-        </Route>
+        {/* ── Legacy redirect routes (kept for ~2 weeks; remove after Sprint 3) ─────────────────
+             Any old bookmark/hardcoded link (e.g. /dashboard) bounces to the correct namespace.
+             PlanAwareRedirect preserves ?search and #hash automatically.
+        ── */}
+        <Route path="dashboard"    element={<PlanAwareRedirect free="/free/dashboard"   pro="/pro/dashboard" />} />
+        <Route path="bills"        element={<PlanAwareRedirect free="/free/bills"        pro="/pro/bills" />} />
+        <Route path="income"       element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/income" />} />
+        <Route path="freelance"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/freelance" />} />
+        <Route path="ingestion"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/ingestion" />} />
+        <Route path="transactions" element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/transactions" />} />
+        <Route path="budgets"      element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/budgets" />} />
+        <Route path="net-worth"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/net-worth" />} />
+        <Route path="calendar"     element={<PlanAwareRedirect free="/free/calendar"     pro="/pro/calendar" />} />
+        <Route path="taxes"        element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/taxes" />} />
+        <Route path="goals"        element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/goals" />} />
+        <Route path="savings"      element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/savings" />} />
+        <Route path="education"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/education" />} />
+        <Route path="categories"   element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/categories" />} />
+        <Route path="subscriptions" element={<PlanAwareRedirect free="/free/subscriptions" pro="/pro/subscriptions" />} />
+        <Route path="reports"      element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/reports" />} />
+        <Route path="analytics"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/analytics" />} />
+        <Route path="investments"  element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/investments" />} />
+        <Route path="insurance"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/insurance" />} />
+        <Route path="credit"       element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/credit" />} />
+        <Route path="settings"     element={<PlanAwareRedirect free="/free/settings"     pro="/pro/settings" />} />
+        <Route path="app/support"  element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/app/support" />} />
+        <Route path="changelog"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/changelog" />} />
+
         </Route>
       </Route>
 

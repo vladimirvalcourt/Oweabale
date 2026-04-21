@@ -6,7 +6,6 @@ export type SettingsTab =
   | 'financial'
   | 'privacy'
   | 'integrations'
-  | 'rules'
   | 'support'
   | 'feedback';
 
@@ -73,7 +72,6 @@ export const SETTINGS_TAB_IDS: SettingsTab[] = [
   'financial',
   'privacy',
   'integrations',
-  'rules',
   'support',
   'feedback',
 ];

@@ -14,7 +14,6 @@ import { BillingPanel } from './settings/BillingPanel';
 import { FinancialPanel } from './settings/FinancialPanel';
 import { IntegrationsPanel } from './settings/IntegrationsPanel';
 import { PrivacyPanel } from './settings/PrivacyPanel';
-import { RulesPanel } from './settings/RulesPanel';
 import { SupportPanel } from './settings/SupportPanel';
 import { FeedbackPanel } from './settings/FeedbackPanel';
 import { yieldForPaint } from '../lib/interaction';
@@ -24,7 +23,6 @@ const tabs = [
   { id: 'security' as const, name: 'Security' },
   { id: 'notifications' as const, name: 'Notifications' },
   { id: 'financial' as const, name: 'Tax' },
-  { id: 'rules' as const, name: 'Smart Categories' },
   { id: 'billing' as const, name: 'Billing' },
   { id: 'integrations' as const, name: 'Integrations' },
   { id: 'privacy' as const, name: 'Data & Privacy' },
@@ -187,7 +185,6 @@ export default function Settings() {
               }}
             />
           )}
-          {activeTab === 'rules' && <RulesPanel />}
           {activeTab === 'support' && <SupportPanel />}
           {activeTab === 'feedback' && <FeedbackPanel />}
         </div>
