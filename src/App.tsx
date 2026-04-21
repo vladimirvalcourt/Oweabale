@@ -70,7 +70,9 @@ import { UnsupportedBrowserBanner } from './components/UnsupportedBrowserBanner'
 function SignInRoute({ authUser }: { authUser: User | null }) {
   const location = useLocation();
   const { plan } = usePlanRedirect();
+  const { authLoading } = useAuth();
 
+  if (authLoading) return <AppLoader />;
   if (!authUser) return <AuthPage mode="signin" />;
 
   // Honor explicit ?redirect= param first (e.g. deep-linked protected page)
@@ -101,28 +103,12 @@ function PlanAwareRedirect({ free, pro }: { free: string; pro: string }) {
 
 function AppRoutes() {
   const { user: authUser, showWarning, timeLeft, extendSession, authLoading } = useAuth();
-  const user = useStore((s) => s.user);
-  const isLoading = useStore((s) => s.isLoading);
   const location = useLocation();
 
   useDataSync({ authUserId: authUser?.id ?? null, authLoading });
 
-  // Only block the entire app on authentication resolution.
-  if (authLoading) return <AppLoader />;
-
-  // Wait for the first Supabase sync after sign-in so we do not use stale persisted
-  // `hasCompletedOnboarding` from Zustand before `fetchData` finishes.
-  if (authUser && isLoading) return <AppLoader />;
-
-  if (
-    authUser &&
-    user.id === authUser.id &&
-    !user.hasCompletedOnboarding &&
-    !isLoading &&
-    location.pathname !== '/onboarding/setup'
-  ) {
-    return <Navigate to="/onboarding/setup" replace />;
-  }
+  // Public routes render instantly (e.g., Landing page, SEO pages).
+  // Protected routes naturally wait for auth via AuthGuard.
 
   return (
     // Outer Suspense: catches any lazy page not individually wrapped (404, legal pages, etc.)

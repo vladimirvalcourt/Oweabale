@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { AppLoader } from './PageSkeleton';
+import { useStore } from '../store/useStore';
 
 /**
  * AuthGuard — wraps all protected dashboard routes.
@@ -8,13 +9,22 @@ import { AppLoader } from './PageSkeleton';
  * Shows a loader while the session is being resolved.
  */
 export default function AuthGuard() {
-  const { user, authLoading } = useAuth();
+  const { user: authUser, authLoading } = useAuth();
   const location = useLocation();
+  const user = useStore((s) => s.user);
+  const isLoading = useStore((s) => s.isLoading);
 
   if (authLoading) return <AppLoader />;
-  if (!user) {
+  if (!authUser) {
     const redirectPath = `${location.pathname}${location.search}${location.hash}`;
     return <Navigate to={`/auth?redirect=${encodeURIComponent(redirectPath)}`} replace />;
+  }
+
+  // Wait for the first Supabase sync so we don't act on stale persisted state.
+  if (isLoading) return <AppLoader />;
+
+  if (user.id === authUser.id && !user.hasCompletedOnboarding && location.pathname !== '/onboarding/setup') {
+    return <Navigate to="/onboarding/setup" replace />;
   }
 
   return <Outlet />;
