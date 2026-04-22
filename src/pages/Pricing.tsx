@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { TransitionLink } from '../components/TransitionLink';
-import Footer from '../components/Footer';
-import { Check, Plus, Minus } from 'lucide-react';
-import { useSEO } from '../hooks/useSEO';
-import { useJsonLd } from '../hooks/useJsonLd';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowRight, Check, Minus, Plus, Shield, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
-import { createStripeCheckoutSession, type StripeCheckoutPlanKey } from '../lib/stripe';
 import { BrandWordmark } from '../components/BrandWordmark';
+import Footer from '../components/Footer';
+import { TransitionLink } from '../components/TransitionLink';
+import { useJsonLd } from '../hooks/useJsonLd';
+import { useSEO } from '../hooks/useSEO';
+import { createStripeCheckoutSession, type StripeCheckoutPlanKey } from '../lib/stripe';
 
 function useInView(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
@@ -22,76 +22,80 @@ function useInView(threshold = 0.15) {
       },
       { threshold }
     );
-    if (ref.current) {
-      observer.observe(ref.current);
-    }
+    if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
   }, [threshold]);
 
   return [ref, isVisible] as const;
 }
 
-function FaqItem({ question, answer }: { question: string, answer: string }) {
+function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <div className="border-b border-surface-border py-6">
-      <button 
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full text-left focus-app group"
+    <div className="rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] px-6 py-5">
+      <button
+        type="button"
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="flex w-full items-center justify-between gap-4 text-left"
       >
-        <span className="text-lg font-medium text-content-primary group-hover:text-content-primary transition-colors">{question}</span>
+        <span className="text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">{question}</span>
         {isOpen ? (
-          <Minus className="w-5 h-5 text-content-tertiary group-hover:text-content-primary transition-colors" />
+          <Minus className="h-5 w-5 shrink-0 text-[#5f6b62]" />
         ) : (
-          <Plus className="w-5 h-5 text-content-tertiary group-hover:text-content-primary transition-colors" />
+          <Plus className="h-5 w-5 shrink-0 text-[#5f6b62]" />
         )}
       </button>
-      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-40 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
-        <p className="text-content-tertiary leading-relaxed">{answer}</p>
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-out ${
+          isOpen ? 'mt-4 max-h-48 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+      >
+        <p className="max-w-3xl text-base leading-7 text-[#5b685e]">{answer}</p>
       </div>
     </div>
   );
 }
 
-const PRICING_FAQ_STATIC: { question: string; answer: string }[] = [
+const PRICING_FAQ_STATIC = [
   {
     question: 'Do I need a credit card to try Oweable?',
     answer:
-      'No. Sign up with just your email or Google account. You get 14 days of Full Suite free, then drop to the free Tracker tier automatically. No surprise charges.',
+      'No. You can create an account and start with a 14-day Full Suite trial without adding a card first.',
   },
   {
-    question: 'Can I get another trial after it expires?',
+    question: 'What happens when the trial ends?',
     answer:
-      'The 14-day trial is available once per account. After it ends, you can stay on the free Tracker tier or upgrade to Full Suite anytime.',
+      'You drop to the free Tracker tier automatically unless you upgrade. No surprise charges, no forced phone calls, no weird cancellation path.',
   },
   {
-    question: 'Can I cancel my subscription at any time?',
+    question: 'Can I cancel anytime?',
     answer:
-      'Yes. We believe in ruthless efficiency, not holding you hostage. Cancel anytime from your dashboard settings with a single click. No questions asked.',
+      'Yes. If you upgrade, you can manage or cancel your subscription from your account settings.',
+  },
+  {
+    question: 'Is this only for freelancers?',
+    answer:
+      'No. Oweable works for households, salaried workers, side gigs, freelancers, and mixed-income setups. Variable-income tax tools are there when you need them.',
+  },
+  {
+    question: 'Do I need to connect my bank account?',
+    answer:
+      'No. You can start manually. Account connection is optional and meant to reduce data entry, not block access to the product.',
   },
   {
     question: 'Is my financial data secure?',
     answer:
-      "We use bank-level AES-256 encryption at rest and TLS 1.2+ in transit. We don't sell your data, and we don't store your bank credentials. When bank linking is available, we plan to use established connection providers so you never give us your login password directly.",
+      "Oweable uses bank-level encryption in transit and at rest. Your data is not sold, and connected accounts are designed to stay read-only where applicable.",
   },
-  {
-    question: 'How does the Debt Payoff Engine work?',
-    answer:
-      'It uses a proprietary algorithm to analyze your interest rates, balances, and cash flow to recommend the mathematically optimal payoff strategy (avalanche or snowball) to save you the most money.',
-  },
-  {
-    question: 'Do I need to link my bank accounts?',
-    answer:
-      'No. Tracker works without bank linking for recurring bills and tickets/fines. Plaid syncing and broader planning workflows are part of Full Suite.',
-  },
-];
+] as const;
 
 function getPricingFaqItems(monthlyPrice: number, hasYearlyPricing: boolean) {
   const items = [...PRICING_FAQ_STATIC];
   if (hasYearlyPricing) {
     items.push({
-      question: 'Is there a discount for paying yearly?',
-      answer: `Yes — the annual plan is $${(monthlyPrice * 12 * 0.70).toFixed(2)}/year ($${(monthlyPrice * 0.70).toFixed(2)}/mo), saving you 30% compared to monthly billing. That's 2 months free.`,
+      question: 'Is there a yearly discount?',
+      answer: `Yes. The annual plan lowers your effective monthly cost compared with paying $${monthlyPrice.toFixed(2)} every month.`,
     });
   }
   return items;
@@ -105,9 +109,6 @@ function buildPricingJsonLd(params: {
 }) {
   const { monthlyPrice, hasYearlyPricing, yearlyTotal, yearlySavingsPct } = params;
   const pageUrl = 'https://www.oweable.com/pricing';
-  const description =
-    'Simple pricing with a useful free Tracker and a Full Suite upgrade. Tracker covers recurring bills and tickets/fines; Full Suite unlocks debt, income, ledger, analytics, and optional tax planning.';
-
   const faqItems = getPricingFaqItems(monthlyPrice, hasYearlyPricing);
 
   const graph: Record<string, unknown>[] = [
@@ -116,25 +117,8 @@ function buildPricingJsonLd(params: {
       '@id': `${pageUrl}#webpage`,
       url: pageUrl,
       name: 'Pricing — Oweable',
-      description,
-      isPartOf: {
-        '@type': 'WebSite',
-        name: 'Oweable',
-        url: 'https://www.oweable.com',
-      },
-      about: {
-        '@type': 'SoftwareApplication',
-        name: 'Oweable',
-        applicationCategory: 'FinanceApplication',
-        url: 'https://www.oweable.com',
-      },
-    },
-    {
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.oweable.com/' },
-        { '@type': 'ListItem', position: 2, name: 'Pricing', item: pageUrl },
-      ],
+      description:
+        'Choose between the free Tracker tier and the Full Suite plan for debt payoff, budgets, analytics, cash-flow planning, and optional tax tools.',
     },
     {
       '@type': 'FAQPage',
@@ -153,17 +137,15 @@ function buildPricingJsonLd(params: {
       '@type': 'Offer',
       '@id': `${pageUrl}#offer-tracker`,
       name: 'Tracker',
-      description: 'Recurring bills and tickets/fines on Bills, plus settings. Premium modules require Full Suite.',
       price: '0',
       priceCurrency: 'USD',
+      description: 'Free plan for bills, due dates, recurring obligations, and account basics.',
       url: pageUrl,
     },
     {
       '@type': 'Offer',
       '@id': `${pageUrl}#offer-full-suite-monthly`,
       name: 'Full Suite',
-      description:
-        'Full Oweable money toolkit: debt planner, income and transaction ledger, budgets/analytics, subscriptions, bank sync when available, and tax tools.',
       price: monthlyPrice.toFixed(2),
       priceCurrency: 'USD',
       priceSpecification: {
@@ -172,6 +154,8 @@ function buildPricingJsonLd(params: {
         priceCurrency: 'USD',
         unitText: 'MONTH',
       },
+      description:
+        'Paid plan with debt payoff tools, budgets, analytics, transaction views, cash-flow planning, and tax estimates when needed.',
       url: pageUrl,
     },
   ];
@@ -181,10 +165,6 @@ function buildPricingJsonLd(params: {
       '@type': 'Offer',
       '@id': `${pageUrl}#offer-full-suite-yearly`,
       name: 'Full Suite (annual)',
-      description:
-        yearlySavingsPct > 0
-          ? `Annual billing for Full Suite. Save about ${yearlySavingsPct}% versus twelve monthly renewals at the standard monthly rate.`
-          : 'Annual billing for Full Suite.',
       price: yearlyTotal.toFixed(2),
       priceCurrency: 'USD',
       priceSpecification: {
@@ -193,22 +173,33 @@ function buildPricingJsonLd(params: {
         priceCurrency: 'USD',
         unitText: 'YEAR',
       },
+      description:
+        yearlySavingsPct > 0
+          ? `Annual Full Suite plan with about ${yearlySavingsPct}% savings versus twelve monthly renewals.`
+          : 'Annual Full Suite plan.',
       url: pageUrl,
     });
   }
 
-  return {
-    '@context': 'https://schema.org',
-    '@graph': graph,
-  };
+  return { '@context': 'https://schema.org', '@graph': graph };
 }
+
+const comparisonRows = [
+  ['Bills and due dates', 'Included', 'Included'],
+  ['Recurring obligations and subscriptions', 'Included', 'Included'],
+  ['Core reminders and account settings', 'Included', 'Included'],
+  ['Debt payoff planner', 'Not included', 'Included'],
+  ['Budgets and analytics', 'Not included', 'Included'],
+  ['Income and transaction views', 'Not included', 'Included'],
+  ['Optional bank sync', 'Not included', 'Included'],
+  ['Tax estimates for variable income', 'Not included', 'Included'],
+] as const;
 
 export default function Pricing() {
   const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
   const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
   const configuredYearly = Number(import.meta.env.VITE_PRICING_YEARLY_DISPLAY);
-  const yearlyTotal =
-    Number.isFinite(configuredYearly) && configuredYearly > 0 ? configuredYearly : null;
+  const yearlyTotal = Number.isFinite(configuredYearly) && configuredYearly > 0 ? configuredYearly : null;
   const hasYearlyPricing = yearlyTotal !== null;
   const yearlyEffectiveMonthly = hasYearlyPricing ? yearlyTotal / 12 : null;
   const yearlySavingsPct =
@@ -219,7 +210,7 @@ export default function Pricing() {
   useSEO({
     title: 'Pricing — Oweable',
     description:
-      'Simple pricing with a useful free Tracker and a Full Suite upgrade. Tracker covers recurring bills and tickets/fines; Full Suite unlocks debt, income, ledger, analytics, and optional tax planning.',
+      'Choose between the free Tracker tier and the Full Suite plan for debt payoff, budgets, analytics, cash-flow planning, and optional tax tools.',
     canonical: 'https://www.oweable.com/pricing',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -239,17 +230,14 @@ export default function Pricing() {
   const [scrolled, setScrolled] = useState(false);
   const [isStartingCheckout, setIsStartingCheckout] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
-  
-  const [headerRef, headerVisible] = useInView();
-  const [cardsRef, cardsVisible] = useInView();
-  const [faqRef, faqVisible] = useInView();
+  const [headerRef, headerVisible] = useInView(0.08);
+  const [plansRef, plansVisible] = useInView(0.1);
+  const [faqRef, faqVisible] = useInView(0.1);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
   const startCheckout = async (planKey: StripeCheckoutPlanKey) => {
@@ -267,137 +255,127 @@ export default function Pricing() {
   const checkoutPlanKey: StripeCheckoutPlanKey =
     hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly';
 
-  const onFullSuiteCheckout = () => startCheckout(checkoutPlanKey);
-
-  const fullSuiteColumnLabel = (() => {
-    if (hasYearlyPricing && billingPeriod === 'yearly') {
-      return `Full Suite ($${yearlyTotal.toFixed(0)}/yr)`;
-    }
-    return `Full Suite ($${monthlyPrice.toFixed(2)}/mo)`;
-  })();
-
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-content-primary/15 overflow-x-hidden">
-      {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 border-b py-4 transition-colors duration-300 ${scrolled ? 'bg-black/55 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40 border-surface-border' : 'bg-transparent border-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 flex items-center justify-between">
-          <TransitionLink to="/" className="text-content-primary transition-colors duration-200">
-            <BrandWordmark textClassName="brand-header-text" />
+    <div className="min-h-screen bg-[#f6efe4] text-[#1f2b24] selection:bg-[#1f2b24]/15">
+      <nav
+        className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
+          scrolled
+            ? 'border-[#d7cebf] bg-[#f6efe4]/92 backdrop-blur-xl'
+            : 'border-transparent bg-transparent'
+        }`}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+          <TransitionLink to="/" className="text-[#1f2b24]">
+            <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[-0.02em] text-[#1f2b24]" />
           </TransitionLink>
-          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-content-tertiary">
-            <TransitionLink to="/#features" className="hover:text-content-secondary transition-colors duration-200 text-content-primary">Features</TransitionLink>
-            <TransitionLink to="/pricing" className="text-content-primary transition-colors duration-200">Pricing</TransitionLink>
-            <TransitionLink to="/auth" className="hover:text-content-secondary transition-colors duration-200 text-content-primary">Sign In</TransitionLink>
+          <div className="hidden items-center gap-8 text-sm text-[#5e695f] md:flex">
+            <TransitionLink to="/#why" className="transition-colors hover:text-[#1f2b24]">
+              Why it works
+            </TransitionLink>
+            <TransitionLink to="/pricing" className="text-[#1f2b24]">
+              Pricing
+            </TransitionLink>
+            <TransitionLink to="/auth" className="transition-colors hover:text-[#1f2b24]">
+              Sign in
+            </TransitionLink>
           </div>
-          <TransitionLink 
-            to="/onboarding" 
-            className="px-5 py-2.5 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors duration-200"
+          <TransitionLink
+            to="/onboarding"
+            className="inline-flex items-center gap-2 rounded-full bg-[#1f2b24] px-5 py-2.5 text-sm font-medium text-[#f7f2ea] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2d3a32]"
           >
-            Join free
+            Start free
           </TransitionLink>
         </div>
       </nav>
 
-      {/* Header Section */}
-      <section className="relative pt-40 pb-20 overflow-hidden">
-        {/* Subtle Background Glow */}
-        <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-500/10 via-surface-base/0 to-transparent pointer-events-none"></div>
-
-        <div 
-          ref={headerRef}
-          className={`relative z-10 max-w-4xl mx-auto px-6 lg:px-8 w-full flex flex-col items-center text-center transition-all duration-1000 ease-out ${headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}
-        >
-          <div className="flex items-center gap-4 mb-8">
-            <div className="h-[1px] w-8 bg-[#F59E0B]"></div>
-            <span className="text-[#F59E0B] text-xs font-sans font-medium">Simple pricing</span>
-            <div className="h-[1px] w-8 bg-[#F59E0B]"></div>
-          </div>
-          
-          <h1 className="mb-8 text-4xl font-medium tracking-tight text-content-primary md:text-6xl md:leading-[1.1]">
-            Priced for maximum leverage.
-          </h1>
-          
-            <p className="mx-auto max-w-2xl text-base font-medium leading-relaxed text-content-secondary md:text-lg">
-            Start free — get 14 days of Full Suite on us, no credit card required. After that, stay on Tracker or upgrade to keep everything.
-          </p>
-        </div>
-      </section>
-
-      {/* Pricing Cards Section */}
-      <section className="relative pb-32">
-        <div 
-          ref={cardsRef}
-          className="max-w-5xl mx-auto px-6 lg:px-8 relative z-10"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            
-            {/* Card 1: Tracker (Free) */}
-            <div className={`bg-surface-raised border border-surface-border rounded-lg p-10 flex flex-col transition-all duration-700 ease-out delay-[100ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-              <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Tracker</h3>
-              <p className="text-content-tertiary text-sm mb-8 h-10 leading-relaxed">Recurring bills and tickets/fines on Bills, plus settings access.</p>
-              
-              <div className="mb-10 p-6 bg-surface-base border border-surface-border rounded-lg">
-                <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">$0</span>
-                <span className="text-content-muted text-sm ml-3">forever free</span>
-              </div>
-              
-              <TransitionLink 
-                to="/onboarding" 
-                className="w-full py-4 px-6 bg-transparent border border-surface-border hover:border-content-muted hover:bg-content-primary/5 text-content-primary rounded-lg text-sm font-sans font-semibold text-center transition-all duration-200 mb-4"
-              >
-                Start free — includes 14-day Full Suite trial
-              </TransitionLink>
-              <p className="text-xs text-content-tertiary text-center mb-10">
-                No credit card required. Full access for 14 days, then Tracker tier.
-              </p>
-              
-              <div className="flex flex-col gap-5 mt-auto">
-                <div className="flex items-start gap-3">
-                  <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
-                  <span className="text-content-tertiary text-sm">Recurring bills workflow</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
-                  <span className="text-content-tertiary text-sm">Tickets/fines tracking in Bills</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Check className="w-3.5 h-3.5 text-content-tertiary shrink-0 mt-0.5" />
-                  <span className="text-content-tertiary text-sm">Settings and account controls</span>
-                </div>
-              </div>
+      <main>
+        <section className="relative overflow-hidden pt-32 sm:pt-36">
+          <div className="absolute inset-x-0 top-0 h-[32rem] bg-[radial-gradient(circle_at_top_left,_rgba(180,137,64,0.16),_transparent_42%),radial-gradient(circle_at_top_right,_rgba(62,111,86,0.14),_transparent_36%)]" />
+          <div
+            ref={headerRef}
+            className={`mx-auto max-w-5xl px-6 pb-20 text-center transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
+              headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            }`}
+          >
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Pricing that stays honest</p>
+            <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-[#1f2b24] sm:text-6xl lg:text-7xl">
+              Start simple. Upgrade for full control.
+            </h1>
+            <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-[#556157] sm:text-xl">
+              The free tier gives you real value right away. Full Suite adds the planning, payoff, and cash-flow tools
+              that turn visibility into progress.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-[#5f6b62]">
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#fff9f0] px-3 py-1.5">
+                <Check className="h-4 w-4 text-[#35684f]" />
+                14-day Full Suite trial
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#fff9f0] px-3 py-1.5">
+                <Check className="h-4 w-4 text-[#35684f]" />
+                No credit card required
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#fff9f0] px-3 py-1.5">
+                <Check className="h-4 w-4 text-[#35684f]" />
+                Cancel anytime
+              </span>
             </div>
+          </div>
+        </section>
 
-            {/* Card 2: Full Suite */}
-            <div className={`relative transition-all duration-700 ease-out delay-[200ms] ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-              {/* Indigo Glow Behind Card */}
-              <div className="absolute -inset-1 z-0 rounded-2xl bg-content-primary/[0.05] blur-3xl"></div>
-              
-              <div className="bg-surface-raised border border-surface-border rounded-lg p-10 flex flex-col relative z-10 h-full shadow-none">
-                <div className="absolute top-0 right-10 transform -translate-y-1/2">
-                  <span className="bg-emerald-600 text-white text-xs font-sans font-semibold px-3 py-1 rounded-lg">Most popular</span>
+        <section className="border-y border-[#ddd3c5] bg-[#f9f4ec] py-24">
+          <div
+            ref={plansRef}
+            className={`mx-auto max-w-7xl px-6 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
+              plansVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            }`}
+          >
+            <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]">
+              <div className="rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-8">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#efe6d9] text-[#7b6548]">
+                  <Wallet className="h-5 w-5" />
                 </div>
-                
-                <h3 className="text-lg font-sans font-semibold text-content-primary mb-2">Full suite</h3>
-                <p className="text-content-tertiary text-sm mb-6 min-h-[2.5rem] leading-relaxed">
-                  {hasYearlyPricing && billingPeriod === 'yearly'
-                    ? 'Same features as monthly — billed once per year at a lower effective rate.'
-                    : 'Everything in the app with one simple monthly plan.'}
+                <p className="mt-6 text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Tracker</p>
+                <div className="mt-4 flex items-end gap-2">
+                  <span className="text-5xl font-semibold tracking-[-0.05em] text-[#1f2b24]">$0</span>
+                  <span className="pb-1 text-sm text-[#627066]">forever free</span>
+                </div>
+                <p className="mt-4 max-w-md text-base leading-7 text-[#5b685e]">
+                  Built for immediate clarity around bills, due dates, recurring obligations, and reminders.
                 </p>
+                <ul className="mt-6 space-y-3 text-sm text-[#4f5c53]">
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#35684f]" /> Bills and due-date visibility</li>
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#35684f]" /> Recurring obligations, subscriptions, tickets, and fines</li>
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#35684f]" /> Core reminders and account settings</li>
+                </ul>
+                <TransitionLink
+                  to="/onboarding"
+                  className="mt-8 inline-flex w-full items-center justify-center rounded-full border border-[#d3cabd] px-6 py-3.5 text-sm font-medium text-[#314137] transition-colors hover:border-[#bcae94] hover:bg-[#fff9f0]"
+                >
+                  Start free
+                </TransitionLink>
+              </div>
+
+              <div className="rounded-[2rem] border border-[#1f2b24] bg-[#1f2b24] p-8 text-[#f7f2ea] shadow-[0_28px_80px_rgba(31,43,36,0.22)]">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2d3a32] text-[#cfd8d1]">
+                    <Shield className="h-5 w-5" />
+                  </div>
+                  <span className="rounded-full bg-[#e7efe7] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#35684f]">
+                    Most complete
+                  </span>
+                </div>
+                <p className="mt-6 text-xs font-medium uppercase tracking-[0.18em] text-[#cbbca4]">Full Suite</p>
 
                 {hasYearlyPricing ? (
-                  <div
-                    className="mb-6 flex rounded-lg border border-surface-border p-1 bg-surface-base"
-                    role="group"
-                    aria-label="Billing period"
-                  >
+                  <div className="mt-5 inline-flex rounded-full border border-[#4d5a52] bg-[#2a3730] p-1">
                     <button
                       type="button"
                       onClick={() => setBillingPeriod('monthly')}
                       aria-pressed={billingPeriod === 'monthly'}
-                      className={`flex-1 rounded-md py-2.5 text-sm font-sans font-semibold transition-colors ${
+                      className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                         billingPeriod === 'monthly'
-                          ? 'bg-surface-raised text-content-primary shadow-sm'
-                          : 'text-content-tertiary hover:text-content-secondary'
+                          ? 'bg-[#f7f2ea] text-[#1f2b24]'
+                          : 'text-[#d0d8d2]'
                       }`}
                     >
                       Monthly
@@ -406,141 +384,149 @@ export default function Pricing() {
                       type="button"
                       onClick={() => setBillingPeriod('yearly')}
                       aria-pressed={billingPeriod === 'yearly'}
-                      className={`relative flex-1 rounded-md py-2.5 text-sm font-sans font-semibold transition-colors ${
+                      className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                         billingPeriod === 'yearly'
-                          ? 'bg-surface-raised text-content-primary shadow-sm'
-                          : 'text-content-tertiary hover:text-content-secondary'
+                          ? 'bg-[#f7f2ea] text-[#1f2b24]'
+                          : 'text-[#d0d8d2]'
                       }`}
                     >
-                      Yearly
-                      {yearlySavingsPct > 0 ? (
-                        <span className="ml-1.5 text-xs font-semibold text-emerald-600">−{yearlySavingsPct}%</span>
-                      ) : null}
+                      Yearly{yearlySavingsPct > 0 ? ` · Save ${yearlySavingsPct}%` : ''}
                     </button>
                   </div>
                 ) : null}
-                
-                <div className="mb-10 p-6 bg-surface-base border border-surface-border rounded-lg relative min-h-[100px] flex flex-col justify-center shadow-none">
+
+                <div className="mt-6">
                   {hasYearlyPricing && billingPeriod === 'yearly' && yearlyEffectiveMonthly !== null ? (
-                    <div className="transition-all duration-300 ease-in-out">
-                      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                        <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">
-                          ${yearlyEffectiveMonthly.toFixed(2)}
-                        </span>
-                        <span className="text-content-muted text-sm">/ month</span>
+                    <>
+                      <div className="flex items-end gap-2">
+                        <span className="text-5xl font-semibold tracking-[-0.05em]">${yearlyEffectiveMonthly.toFixed(2)}</span>
+                        <span className="pb-1 text-sm text-[#c7d0c8]">per month</span>
                       </div>
-                      <p className="mt-2 text-sm text-content-tertiary">
-                        Billed ${yearlyTotal.toFixed(2)} per year
-                        {yearlySavingsPct > 0 ? (
-                          <span className="text-emerald-600 font-medium"> · Save {yearlySavingsPct}%</span>
-                        ) : null}
+                      <p className="mt-2 text-sm text-[#c7d0c8]">
+                        Billed ${yearlyTotal?.toFixed(2)} yearly
                       </p>
-                    </div>
+                    </>
                   ) : (
-                    <div className="transition-all duration-300 ease-in-out flex flex-wrap items-baseline gap-x-3">
-                      <span className="text-4xl font-mono font-bold tabular-nums text-content-primary data-numeric">
-                        ${monthlyPrice.toFixed(2)}
-                      </span>
-                      <span className="text-content-muted text-sm">per month</span>
+                    <div className="flex items-end gap-2">
+                      <span className="text-5xl font-semibold tracking-[-0.05em]">${monthlyPrice.toFixed(2)}</span>
+                      <span className="pb-1 text-sm text-[#c7d0c8]">per month</span>
                     </div>
                   )}
                 </div>
-                
+
+                <p className="mt-4 max-w-md text-base leading-7 text-[#d8dfd9]">
+                  For people who want the full financial operating system: payoff strategy, budgets, analytics,
+                  cash-flow clarity, and tax planning when income gets uneven.
+                </p>
+                <ul className="mt-6 space-y-3 text-sm text-[#edf0ec]">
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#88c59e]" /> Debt payoff engine with Snowball and Avalanche</li>
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#88c59e]" /> Budgets, analytics, income ledger, and transaction views</li>
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#88c59e]" /> Optional bank sync and broader planning workflows</li>
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#88c59e]" /> Tax estimates and reserve planning for variable income</li>
+                </ul>
                 <button
                   type="button"
-                  onClick={onFullSuiteCheckout}
+                  onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                   disabled={isStartingCheckout}
-                  className="w-full py-4 px-6 rounded-lg bg-brand-cta hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed text-surface-base text-sm font-sans font-semibold text-center transition-all duration-200 mb-3 shadow-sm"
+                  className="mt-8 inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#f7f2ea] px-6 py-3.5 text-sm font-medium text-[#1f2b24] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#efe6d9] disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {isStartingCheckout
-                    ? 'Starting checkout...'
-                    : hasYearlyPricing && billingPeriod === 'yearly'
-                      ? 'Start yearly plan'
-                      : 'Start monthly plan'}
+                  {isStartingCheckout ? 'Starting checkout...' : 'Unlock Full Suite'}
+                  <ArrowRight className="h-4 w-4" />
                 </button>
-                <p className="text-xs text-content-tertiary text-center mb-10">
-                  Start with 14-day free trial, no credit card needed.
+                <p className="mt-4 text-sm text-[#c7d0c8]">
+                  Starts with a 14-day free trial. No credit card required to create your account.
                 </p>
-                <div className="flex flex-col gap-5 mt-auto">
-                  <div className="flex items-start gap-3">
-                    <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
-                    <span className="text-content-tertiary text-sm">Bank sync when available</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
-                    <span className="text-content-tertiary text-sm">Debt payoff planner (avalanche & snowball)</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
-                    <span className="text-content-tertiary text-sm">Income + transaction ledger, budgets, analytics</span>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />
-                    <span className="text-content-tertiary text-sm">Tax estimation &amp; reserves (great for variable or 1099 income)</span>
-                  </div>
+              </div>
+            </div>
+
+            <div className="mt-8 rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-6">
+              <p className="text-sm font-semibold text-[#1f2b24]">Free-tier trust promise</p>
+              <p className="mt-2 max-w-3xl text-sm leading-7 text-[#5b685e]">
+                The free plan is meant to stay genuinely useful. You do not have to upgrade to keep your basic system for bills, due dates, and recurring obligations working.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-[#f6efe4] py-24">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr]">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Compare plans</p>
+                <h2 className="mt-4 max-w-lg text-4xl font-semibold tracking-[-0.04em] text-[#1f2b24]">
+                  Choose based on how much control you want, not how much jargon you can tolerate.
+                </h2>
+              </div>
+              <div className="overflow-hidden rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3]">
+                <div className="grid grid-cols-3 border-b border-[#e7ddcf] bg-[#f9f3e9] text-sm font-semibold text-[#1f2b24]">
+                  <div className="px-4 py-4">Feature</div>
+                  <div className="border-l border-[#e7ddcf] px-4 py-4">Tracker</div>
+                  <div className="border-l border-[#e7ddcf] px-4 py-4">Full Suite</div>
                 </div>
+                {comparisonRows.map(([feature, tracker, suite]) => (
+                  <div key={feature} className="grid grid-cols-3 border-b border-[#eee3d5] text-sm last:border-b-0">
+                    <div className="px-4 py-4 text-[#4d5a51]">{feature}</div>
+                    <div className="border-l border-[#eee3d5] px-4 py-4 text-[#5f6b62]">{tracker}</div>
+                    <div className="border-l border-[#eee3d5] px-4 py-4 text-[#5f6b62]">{suite}</div>
+                  </div>
+                ))}
               </div>
             </div>
-
           </div>
+        </section>
 
-          <div className="mt-8 rounded-lg border border-surface-border bg-surface-raised p-5">
-            <h4 className="text-sm font-semibold text-content-primary">Free-tier trust promise</h4>
-            <p className="mt-2 text-sm text-content-secondary">
-              Tracker remains useful without upgrading: recurring bills and tickets/fines stay available, and you can cancel paid plans in-app any time.
-            </p>
-            <p className="mt-1 text-xs text-content-tertiary">
-              No forced phone calls, no hidden cancellation path, and no lock-in for your account controls.
-            </p>
-          </div>
-
-          <div className="mt-16 border border-surface-border rounded-lg bg-surface-raised overflow-hidden">
-            <div className="grid grid-cols-3 border-b border-surface-border text-xs font-mono uppercase tracking-widest">
-              <div className="px-4 py-3 text-content-muted">Feature</div>
-              <div className="px-4 py-3 text-content-muted border-l border-surface-border">Tracker (Free)</div>
-              <div className="px-4 py-3 text-content-muted border-l border-surface-border">{fullSuiteColumnLabel}</div>
+        <section id="faq" className="border-y border-[#ddd3c5] bg-[#f9f4ec] py-24">
+          <div
+            ref={faqRef}
+            className={`mx-auto max-w-5xl px-6 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
+              faqVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+            }`}
+          >
+            <div className="max-w-2xl">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">FAQ</p>
+              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-[#1f2b24]">
+                The answers people usually want before they commit.
+              </h2>
             </div>
-
-            {[
-              ['App access', 'Bills + Settings only', 'All modules unlocked'],
-              ['Bills page', 'Recurring bills + tickets/fines', 'Recurring + debt actions'],
-              ['Bank connection (Plaid)', 'Not included', 'Included'],
-              ['Income tracking', 'Not included', 'Included'],
-              ['Transactions/analytics/reports', 'Not included', 'Included'],
-              ['Debt payoff planner', 'Not included', 'Avalanche + snowball planner'],
-              ['Advanced planning tools', 'Not included', 'Included'],
-              ['Tax estimation & reserves (variable / 1099)', 'Not included', 'Included'],
-            ].map(([feature, freeTier, paidTier]) => (
-              <div key={feature} className="grid grid-cols-3 text-sm border-b border-surface-border last:border-b-0">
-                <div className="px-4 py-3 text-content-secondary">{feature}</div>
-                <div className="px-4 py-3 text-content-tertiary border-l border-surface-border">{freeTier}</div>
-                <div className="px-4 py-3 text-content-tertiary border-l border-surface-border">{paidTier}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section className="relative pb-32 bg-surface-base">
-        <div 
-          ref={faqRef}
-          className="max-w-3xl mx-auto px-6 lg:px-8"
-        >
-          <div className={`transition-all duration-1000 ease-out ${faqVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-            <h2 className="text-3xl md:text-4xl font-bold mb-12 text-content-primary">Frequently Asked Questions</h2>
-            
-            <div className="flex flex-col">
+            <div className="mt-10 space-y-4">
               {getPricingFaqItems(monthlyPrice, hasYearlyPricing).map((item) => (
                 <FaqItem key={item.question} question={item.question} answer={item.answer} />
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <section className="overflow-hidden bg-[#1f2b24] py-24 text-[#f7f2ea]">
+          <div className="mx-auto max-w-5xl px-6 text-center lg:px-8">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#cbbca4]">Ready when you are</p>
+            <h2 className="mt-5 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
+              Start with visibility. Upgrade when you want leverage.
+            </h2>
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-[#d8dfd9]">
+              Oweable should feel useful before you pay and powerful when you do.
+            </p>
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <TransitionLink
+                to="/onboarding"
+                className="inline-flex items-center gap-3 rounded-full bg-[#f7f2ea] px-7 py-3.5 text-sm font-medium text-[#1f2b24] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#efe6d9]"
+              >
+                Create free account
+                <ArrowRight className="h-4 w-4" />
+              </TransitionLink>
+              <button
+                type="button"
+                onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
+                disabled={isStartingCheckout}
+                className="inline-flex items-center gap-3 rounded-full border border-[#536157] px-7 py-3.5 text-sm font-medium text-[#f7f2ea] transition-colors hover:bg-[#2d3a32] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                Upgrade to Full Suite
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
 
       <Footer />
     </div>
   );
 }
-

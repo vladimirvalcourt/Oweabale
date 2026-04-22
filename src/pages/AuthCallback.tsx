@@ -51,6 +51,29 @@ export default function AuthCallback() {
     void (async () => {
       const session = await waitForSession(20_000);
       if (session) {
+        // Send welcome email for new users on their first sign-in
+        try {
+          const user = session.user;
+          const firstName = 
+            user.user_metadata?.given_name || 
+            user.user_metadata?.first_name ||
+            user.email?.split('@')[0] || 
+            'there';
+          
+          // Invoke welcome email Edge Function (fire-and-forget, don't block navigation)
+          supabase.functions.invoke('trial-welcome-email', {
+            body: {
+              email: user.email,
+              firstName: firstName,
+            },
+          }).catch((error) => {
+            // Log error but don't show to user - email is non-critical
+            console.error('Failed to send welcome email:', error);
+          });
+        } catch (error) {
+          console.error('Error preparing welcome email:', error);
+        }
+        
         go(finalRedirect);
         return;
       }

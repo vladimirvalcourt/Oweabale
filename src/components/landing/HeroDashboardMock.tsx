@@ -1,81 +1,110 @@
 import React from 'react';
 
 /**
- * Static hero visual — shown when prefers-reduced-motion is on
- * or while the ambient preview video is unavailable.
+ * Editorial-style landing mock that emphasizes due dates, clarity, and payoff momentum
+ * instead of reading like a dense admin dashboard.
  */
 export default function HeroDashboardMock() {
   return (
-    <div className="bg-black border border-surface-border rounded-[6px] p-5 sm:p-6 flex flex-col gap-4">
-      <div className="flex items-center justify-between pb-3 border-b border-surface-border relative">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.18em] text-content-tertiary">Oweable Command Center</p>
-          <p className="text-sm text-content-primary font-medium mt-1">Financial Overview</p>
-        </div>
-        <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[10px] font-medium text-emerald-300">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden />
-          Live
-        </span>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-md border border-surface-border bg-surface-raised p-3">
-          <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Income Vault</p>
-          <p className="text-lg font-semibold text-content-primary mt-1">$6,840</p>
-          <p className="text-[11px] text-emerald-400 mt-1">+14% vs last month</p>
-        </div>
-        <div className="rounded-md border border-surface-border bg-surface-raised p-3">
-          <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Tax Shield</p>
-          <p className="text-lg font-semibold text-content-primary mt-1">$1,539</p>
-          <p className="text-[11px] text-content-secondary mt-1">Q2 due: Jun 15</p>
-        </div>
-      </div>
-
-      <div className="rounded-md border border-surface-border bg-surface-raised p-3">
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Debt Tracker</p>
-          <p className="text-[10px] text-content-secondary">Avalanche Plan</p>
-        </div>
-        <div className="mt-3 h-2 rounded-full bg-content-primary/10 overflow-hidden">
-          <div className="h-full w-[61%] rounded-full bg-emerald-500" />
-        </div>
-        <div className="mt-2 flex items-center justify-between text-[11px] text-content-secondary">
-          <span>39% remaining</span>
-          <span>Debt-free: Feb 2027</span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-5 gap-3">
-        <div className="col-span-3 rounded-md border border-surface-border bg-surface-raised p-3">
-          <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Net Worth Timeline</p>
-          <div className="mt-3 h-16 flex items-end gap-1.5">
-            {[22, 28, 34, 33, 42, 48, 56, 61].map((h, index) => (
-              <div
-                key={index}
-                className="flex-1 rounded-sm bg-content-primary/20"
-                style={{ height: `${h}%` }}
-                aria-hidden
-              />
-            ))}
+    <div className="rounded-[1.5rem] border border-[#e0d6c8] bg-[#fffdf8] p-4 text-[#1f2b24] sm:p-5">
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between rounded-[1.25rem] border border-[#e7ddcf] bg-[#f7f1e6] px-4 py-3">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.18em] text-[#8a7356]">This week at a glance</p>
+            <p className="mt-1 text-sm font-semibold text-[#1f2b24]">You have a clear plan for the next 7 days</p>
           </div>
-          <p className="text-[11px] text-emerald-400 mt-2">+18.4% over last 8 months</p>
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#e4efe5] px-3 py-1 text-[11px] font-medium text-[#35684f]">
+            <span className="h-2 w-2 rounded-full bg-[#35684f]" aria-hidden />
+            Updated
+          </span>
         </div>
-        <div className="col-span-2 rounded-md border border-surface-border bg-surface-raised p-3">
-          <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Bills This Week</p>
-          <ul className="mt-2 space-y-2 text-[11px] text-content-secondary">
-            <li className="flex items-center justify-between">
-              <span>Car Insurance</span>
-              <span>$148</span>
-            </li>
-            <li className="flex items-center justify-between">
-              <span>Phone</span>
-              <span>$92</span>
-            </li>
-            <li className="flex items-center justify-between text-rose-300">
-              <span>Quarterly Tax</span>
-              <span>$1,120</span>
-            </li>
-          </ul>
+
+        <div className="grid gap-3 md:grid-cols-[1.08fr_0.92fr]">
+          <div className="rounded-[1.4rem] border border-[#e7ddcf] bg-[#fcf7ef] p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.18em] text-[#8a7356]">Due next</p>
+                <p className="mt-1 text-xl font-semibold tracking-[-0.03em] text-[#1f2b24]">$842.00</p>
+              </div>
+              <div className="rounded-full bg-[#f1e7d9] px-3 py-1 text-[11px] font-medium text-[#7b6548]">3 obligations</div>
+            </div>
+
+            <div className="mt-4 space-y-3">
+              {[
+                ['Rent', 'Tomorrow', '$1,200', 'bg-[#f4ecdf] text-[#7c6647]'],
+                ['Car insurance', 'Friday', '$148', 'bg-[#eef4ef] text-[#35684f]'],
+                ['Phone', 'Monday', '$92', 'bg-[#f4ecdf] text-[#7c6647]'],
+              ].map(([name, when, value, tone]) => (
+                <div key={name} className="flex items-center justify-between rounded-2xl border border-[#e7ddcf] bg-white px-4 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-[#1f2b24]">{name}</p>
+                    <p className="mt-1 text-xs text-[#6a766d]">{when}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${tone}`}>
+                      scheduled
+                    </span>
+                    <span className="text-sm font-semibold text-[#1f2b24]">{value}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <div className="rounded-[1.4rem] border border-[#e7ddcf] bg-[#fcf7ef] p-4">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-[#8a7356]">Payoff momentum</p>
+              <p className="mt-2 text-lg font-semibold text-[#1f2b24]">Debt-free target: Feb 2027</p>
+              <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-[#e7ddcf]">
+                <div className="h-full w-[64%] rounded-full bg-[#35684f]" />
+              </div>
+              <div className="mt-3 flex items-center justify-between text-xs text-[#667268]">
+                <span>64% plan confidence</span>
+                <span>$183 extra this month</span>
+              </div>
+            </div>
+
+            <div className="rounded-[1.4rem] border border-[#e7ddcf] bg-[#fcf7ef] p-4">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-[#8a7356]">Safe to move</p>
+              <p className="mt-2 text-3xl font-semibold tracking-[-0.04em] text-[#1f2b24]">$1,184</p>
+              <p className="mt-2 text-sm leading-6 text-[#617067]">
+                After upcoming bills, minimum debt payments, and your tax reserve.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-[0.88fr_1.12fr]">
+          <div className="rounded-[1.4rem] border border-[#e7ddcf] bg-[#fcf7ef] p-4">
+            <p className="text-[10px] uppercase tracking-[0.18em] text-[#8a7356]">Reserve health</p>
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="rounded-2xl bg-white p-3">
+                <p className="text-xs text-[#6b776e]">Tax reserve</p>
+                <p className="mt-2 text-lg font-semibold text-[#1f2b24]">$1,539</p>
+              </div>
+              <div className="rounded-2xl bg-white p-3">
+                <p className="text-xs text-[#6b776e]">Emergency buffer</p>
+                <p className="mt-2 text-lg font-semibold text-[#1f2b24]">$3,200</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[1.4rem] border border-[#e7ddcf] bg-[#fcf7ef] p-4">
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-[#8a7356]">Net worth trend</p>
+              <p className="text-xs font-medium text-[#35684f]">+18.4% in 8 months</p>
+            </div>
+            <div className="mt-5 flex h-24 items-end gap-2">
+              {[22, 28, 35, 39, 46, 54, 60, 70].map((height, index) => (
+                <div
+                  key={index}
+                  className="flex-1 rounded-t-[0.85rem] bg-[linear-gradient(180deg,_rgba(53,104,79,0.22),_rgba(53,104,79,0.75))]"
+                  style={{ height: `${height}%` }}
+                  aria-hidden
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

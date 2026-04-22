@@ -1,58 +1,86 @@
-import { TransitionLink } from './TransitionLink';
 import { BrandWordmark } from './BrandWordmark';
+import { TransitionLink } from './TransitionLink';
+
+const platformLinks = [
+  { label: 'Features', href: '/#why' },
+  { label: 'How it works', href: '/#flow' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'FAQ', href: '/faq' },
+];
+
+const companyLinks = [
+  { label: 'Support', href: '/support' },
+  { label: 'Security', href: '/security' },
+  { label: 'Sign in', href: '/dashboard' },
+];
+
+const legalLinks = [
+  { label: 'Privacy', href: '/privacy' },
+  { label: 'Terms', href: '/terms' },
+];
 
 export default function Footer() {
   return (
-    <footer className="border-t border-surface-border bg-surface-base pt-20 pb-10">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-
-          {/* Brand */}
-          <div className="col-span-1 md:col-span-2">
-            <TransitionLink to="/" className="mb-5 text-content-primary">
+    <footer className="border-t border-surface-border bg-surface-base text-content-primary">
+      <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-[1.2fr_0.8fr_0.7fr_0.7fr]">
+          <div>
+            <TransitionLink to="/" className="inline-flex text-content-primary">
               <BrandWordmark textClassName="brand-header-text" />
             </TransitionLink>
-            <p className="text-sm text-content-tertiary max-w-sm leading-relaxed mb-8">
-              Know what you owe. Own your finances.
+            <p className="mt-5 max-w-sm text-sm leading-7 text-content-secondary">
+              Oweable helps you see what is due, what is behind, and what to pay off next so your money stops running on guesswork.
             </p>
+            <div className="mt-6 inline-flex rounded-full border border-surface-border bg-surface-raised px-4 py-2 text-xs text-content-secondary">
+              Browser-based finance command center for households, debt payoff, and variable income.
+            </div>
           </div>
 
-          {/* Platform */}
           <div>
-            <h4 className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-primary mb-6">Platform</h4>
-            <ul className="flex flex-col gap-3 text-xs font-mono text-content-tertiary uppercase tracking-widest">
-              <li><a href="/#features" className="hover:text-content-primary transition-colors">Features</a></li>
-              <li><TransitionLink to="/pricing" className="hover:text-content-primary transition-colors">Pricing</TransitionLink></li>
-              <li><TransitionLink to="/dashboard" className="hover:text-content-primary transition-colors">Sign In</TransitionLink></li>
-              <li><TransitionLink to="/support" className="hover:text-content-primary transition-colors">Support</TransitionLink></li>
+            <h4 className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Platform</h4>
+            <ul className="mt-5 space-y-3 text-sm text-content-secondary">
+              {platformLinks.map((link) => (
+                <li key={link.label}>
+                  <a href={link.href} className="transition-colors hover:text-content-primary">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Legal */}
           <div>
-            <h4 className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-primary mb-6">Legal</h4>
-            <ul className="flex flex-col gap-3 text-xs font-mono text-content-tertiary uppercase tracking-widest">
-              <li><TransitionLink to="/privacy" className="hover:text-content-primary transition-colors">Privacy</TransitionLink></li>
-              <li><TransitionLink to="/terms" className="hover:text-content-primary transition-colors">Terms</TransitionLink></li>
-              <li><TransitionLink to="/security" className="hover:text-content-primary transition-colors">Security</TransitionLink></li>
+            <h4 className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Company</h4>
+            <ul className="mt-5 space-y-3 text-sm text-content-secondary">
+              {companyLinks.map((link) => (
+                <li key={link.label}>
+                  <TransitionLink to={link.href} className="transition-colors hover:text-content-primary">
+                    {link.label}
+                  </TransitionLink>
+                </li>
+              ))}
             </ul>
           </div>
 
+          <div>
+            <h4 className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Legal</h4>
+            <ul className="mt-5 space-y-3 text-sm text-content-secondary">
+              {legalLinks.map((link) => (
+                <li key={link.label}>
+                  <TransitionLink to={link.href} className="transition-colors hover:text-content-primary">
+                    {link.label}
+                  </TransitionLink>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="pt-8 border-t border-surface-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-6 text-[10px] font-mono text-content-muted uppercase tracking-widest">
-            <span>OWEABLE INC. NYC</span>
-            <span className="mx-1 h-3 w-px bg-surface-border shrink-0 inline-block align-middle" aria-hidden />
-            <span>© {new Date().getFullYear()} All Rights Reserved</span>
-          </div>
-          <TransitionLink
-            to="/support"
-            className="text-[10px] font-mono uppercase tracking-widest text-content-muted hover:text-content-primary transition-colors"
-          >
-            Contact support
-          </TransitionLink>
+        <div className="mt-12 flex flex-col gap-4 border-t border-surface-border pt-6 text-sm text-content-muted md:flex-row md:items-center md:justify-between">
+          <p>Oweable Inc. NYC. © {new Date().getFullYear()} All rights reserved.</p>
+          <p className="max-w-xl text-content-secondary">
+            Oweable is a financial organization tool, not legal or tax advice.
+          </p>
         </div>
       </div>
     </footer>
