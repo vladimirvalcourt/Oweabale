@@ -192,7 +192,7 @@ export default function Landing() {
             </h1>
             
             <p className="text-lg font-medium text-content-secondary max-w-lg leading-[1.6] mb-10 border-l border-surface-border pl-6 animate-in fade-in slide-in-from-bottom-6 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[300ms] fill-mode-both">
-              Oweable tracks your bills, debts, subscriptions, and budgets in one place — with overdue alerts, debt payoff plans, and tax estimates for gig and self-employed income. Sign up free. No app download needed.
+              Oweable tracks your bills, debts, subscriptions, and budgets in one place — with overdue alerts, debt payoff plans, and tax estimates for gig and self-employed income. Start free with a 14-day Full Suite trial, no credit card required.
             </p>
             
             <div className="w-full max-w-xl animate-in fade-in slide-in-from-bottom-6 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[400ms] fill-mode-both">
@@ -219,6 +219,7 @@ export default function Landing() {
                     <li>Recurring obligations + tickets/fines</li>
                     <li>Settings and core reminders</li>
                   </ul>
+                  <p className="mt-3 text-[10px] text-content-tertiary italic">Includes 14-day Full Suite trial — no card needed</p>
                 </div>
                 <div className="rounded-lg border border-surface-border bg-surface-raised p-4">
                   <p className="text-[10px] uppercase tracking-[0.15em] text-content-tertiary">Full Suite</p>
@@ -228,6 +229,7 @@ export default function Landing() {
                     <li>Income + transaction ledger, budgets, analytics</li>
                     <li>Tax estimation + reserve planning when you need it</li>
                   </ul>
+                  <p className="mt-3 text-[10px] text-content-tertiary italic">Start with 14-day free trial, then $10.99/mo or $92.32/yr (save 30%)</p>
                 </div>
               </div>
               <TransitionLink to="/pricing" className="mt-3 inline-flex text-xs text-content-secondary hover:text-content-primary transition-colors">

@@ -63,6 +63,28 @@ Deno.serve(async (req: Request) => {
       } else {
         console.log(`Downgraded user ${user.id} (${user.email}) to tracker`);
         results.push({ userId: user.id, success: true });
+        
+        // Send Day 14 expiry email
+        try {
+          const resendApiKey = Deno.env.get('RESEND_API_KEY');
+          if (resendApiKey) {
+            await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                Authorization: `Bearer ${resendApiKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                from: Deno.env.get('ADMIN_ALERTS_FROM_EMAIL') ?? 'alerts@oweable.com',
+                to: [user.email],
+                subject: 'Your Full Suite trial has ended',
+                html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;"><h1>Your trial has ended${user.first_name ? `, ${escapeHtml(user.first_name)}` : ''}</h1><p>Your 14-day Full Suite trial has ended. You've been moved to our free Tracker tier.</p><p><a href="https://www.oweable.com/pricing" style="display: inline-block; background-color: #f59e0b; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px;">Upgrade to Full Suite — $10.99/mo</a></p></div>`,
+              }),
+            });
+          }
+        } catch (emailError) {
+          console.error(`Failed to send expiry email to ${user.email}:`, emailError);
+        }
 
         // TODO: Send Day 14 expiry email here (Section 5 - Email 3)
         // await sendTrialExpiredEmail(user.email, user.first_name);
@@ -93,3 +115,12 @@ Deno.serve(async (req: Request) => {
     );
   }
 });
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
