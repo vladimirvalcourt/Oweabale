@@ -302,11 +302,7 @@ export default function Landing() {
               <div className="relative rounded-[2rem] border border-white/10 bg-surface-raised/40 backdrop-blur-md p-3 shadow-2xl">
                 <HeroPreviewMedia />
               </div>
-              <div className="absolute -bottom-3 left-2 right-2 sm:-bottom-6 sm:left-auto sm:right-auto sm:-left-6 rounded-2xl border border-white/10 bg-surface-raised/80 backdrop-blur-md px-5 py-4 shadow-xl">
-                <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-content-tertiary">Live insight</p>
-                <p className="mt-1 text-sm font-semibold text-content-primary">3 bills due, 1 overdue, payoff plan active</p>
-              </div>
-            </div>
+
           </div>
         </section>
 
