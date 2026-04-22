@@ -364,19 +364,19 @@ export default function Landing() {
               </p>
             </div>
 
-            <div className="mt-14 grid gap-6 lg:grid-cols-3">
+            <div className="mt-14 grid gap-8 lg:grid-cols-3">
               {painPoints.map((item) => {
                 const Icon = item.icon;
                 return (
                   <article
                     key={item.title}
-                    className="group relative rounded-md border border-surface-border bg-surface-raised p-7 transition-all hover:border-surface-border-subtle hover:shadow-sm"
+                    className="group relative flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border-subtle hover:shadow-sm"
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-md bg-surface-elevated text-content-primary">
+                    <div className="flex h-12 w-12 items-start justify-start rounded-xl bg-surface-elevated text-content-primary">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="mt-6 text-xl font-semibold tracking-[-0.03em] text-content-primary">{item.title}</h3>
-                    <p className="mt-4 text-sm leading-7 text-content-secondary">{item.copy}</p>
+                    <h3 className="mt-6 text-xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">{item.title}</h3>
+                    <p className="mt-4 text-sm leading-relaxed text-content-secondary">{item.copy}</p>
                   </article>
                 );
               })}
@@ -421,22 +421,22 @@ export default function Landing() {
                 </div>
               </div>
 
-              <div className="space-y-5">
+              <div className="space-y-6">
                 {workflowSteps.map((step) => {
                   const Icon = step.icon;
                   return (
                     <article
                       key={step.title}
-                      className="group relative rounded-md border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border-subtle hover:shadow-sm"
+                      className="group relative flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border-subtle hover:shadow-sm"
                     >
-                      <div className="flex items-start gap-5">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-surface-elevated text-content-primary">
+                      <div className="flex items-start gap-6">
+                        <div className="flex h-12 w-12 shrink-0 items-start justify-start rounded-xl bg-surface-elevated text-content-primary">
                           <Icon className="h-5 w-5" />
                         </div>
                         <div>
                           <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">{step.eyebrow}</p>
-                          <h3 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-content-primary">{step.title}</h3>
-                          <p className="mt-3 text-sm leading-7 text-content-secondary">{step.copy}</p>
+                          <h3 className="mt-2 text-xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">{step.title}</h3>
+                          <p className="mt-3 text-sm leading-relaxed text-content-secondary">{step.copy}</p>
                         </div>
                       </div>
                     </article>
@@ -467,15 +467,15 @@ export default function Landing() {
                   return (
                     <article
                       key={column.title}
-                      className="group relative rounded-2xl border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border-subtle hover:shadow-sm"
+                      className="group relative flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border-subtle hover:shadow-sm"
                     >
-                      <div className="flex h-12 w-12 items-center justify-start rounded-xl bg-surface-elevated text-content-primary">
+                      <div className="flex h-12 w-12 items-start justify-start rounded-xl bg-surface-elevated text-content-primary">
                         <Icon className="h-5 w-5" />
                       </div>
-                      <h3 className="mt-5 text-lg font-semibold tracking-[-0.03em] text-content-primary">{column.title}</h3>
-                      <ul className="mt-5 space-y-3 text-sm leading-6 text-content-secondary">
+                      <h3 className="mt-6 text-lg font-semibold tracking-[-0.03em] leading-tight text-content-primary">{column.title}</h3>
+                      <ul className="mt-6 space-y-3 text-sm leading-relaxed text-content-secondary">
                         {column.items.map((item) => (
-                          <li key={item} className="flex gap-3">
+                          <li key={item} className="flex items-start gap-3">
                             <Check className="mt-1 h-4 w-4 shrink-0 text-brand-profit" />
                             <span>{item}</span>
                           </li>
@@ -503,21 +503,21 @@ export default function Landing() {
                   Built for real financial lives, not idealized money routines.
                 </h2>
               </div>
-              <div className="grid gap-5">
+              <div className="grid gap-6">
                 {audienceCards.map((item, index) => (
                   <article
                     key={item.title}
-                    className="group grid gap-5 rounded-md border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border-subtle hover:shadow-sm md:grid-cols-[auto_1fr] md:items-start"
+                    className="group grid gap-6 rounded-2xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border-subtle hover:shadow-sm md:grid-cols-[auto_1fr] md:items-start"
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-md bg-brand-cta text-surface-base">
+                    <div className="flex h-12 w-12 items-start justify-start rounded-xl bg-brand-cta text-surface-base">
                       {index === 0 && <Users className="h-5 w-5" />}
                       {index === 1 && <Shield className="h-5 w-5" />}
                       {index === 2 && <TrendingUp className="h-5 w-5" />}
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold tracking-[-0.03em] text-content-primary">{item.title}</h3>
-                      <p className="mt-3 text-sm leading-7 text-content-secondary">{item.copy}</p>
-                      <p className="mt-4 text-sm font-medium text-brand-profit">{item.accent}</p>
+                      <h3 className="text-lg font-semibold tracking-[-0.03em] leading-tight text-content-primary">{item.title}</h3>
+                      <p className="mt-4 text-sm leading-relaxed text-content-secondary">{item.copy}</p>
+                      <p className="mt-5 text-sm font-medium text-brand-profit">{item.accent}</p>
                     </div>
                   </article>
                 ))}
@@ -539,13 +539,13 @@ export default function Landing() {
                   stop feeling like emergencies.
                 </p>
               </div>
-              <div className="grid gap-5 md:grid-cols-3">
+              <div className="grid gap-6 md:grid-cols-3">
                 {testimonials.map((item) => (
                   <article
                     key={item.name}
-                    className="group flex h-full flex-col justify-between rounded-md border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border-subtle hover:shadow-sm"
+                    className="group flex h-full flex-col items-start justify-between rounded-2xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border-subtle hover:shadow-sm"
                   >
-                    <p className="text-sm leading-7 text-content-primary">"{item.quote}"</p>
+                    <p className="text-sm leading-relaxed text-content-primary">"{item.quote}"</p>
                     <div className="mt-8 border-t border-surface-border pt-5">
                       <p className="text-sm font-semibold text-content-primary">{item.name}</p>
                       <p className="mt-1 text-sm text-content-secondary">{item.label}</p>
@@ -566,36 +566,36 @@ export default function Landing() {
               </h2>
             </div>
 
-            <div className="mt-12 grid gap-6 lg:grid-cols-2">
-              <article className="group rounded-md border border-surface-border bg-surface-raised p-7 transition-all hover:border-surface-border-subtle hover:shadow-sm">
+            <div className="mt-12 grid gap-8 lg:grid-cols-2">
+              <article className="group flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border-subtle hover:shadow-sm">
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Free Tracker</p>
-                <div className="mt-4 flex items-end gap-2">
-                  <span className="text-5xl font-semibold tracking-[-0.05em] text-content-primary">$0</span>
+                <div className="mt-5 flex items-end gap-2">
+                  <span className="text-5xl font-semibold tracking-[-0.05em] leading-tight text-content-primary">$0</span>
                   <span className="pb-1 text-sm text-content-secondary">per month</span>
                 </div>
-                <p className="mt-4 max-w-md text-base leading-7 text-content-secondary">
+                <p className="mt-5 max-w-md text-base leading-relaxed text-content-secondary">
                   Start here if you want immediate visibility into bills, due dates, recurring obligations, and core reminders.
                 </p>
-                <ul className="mt-6 space-y-3 text-sm text-content-secondary">
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Bill tracking and due-date visibility</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Recurring obligations and tickets or fines</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Core reminders and settings</li>
+                <ul className="mt-6 space-y-3 text-sm leading-relaxed text-content-secondary">
+                  <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Bill tracking and due-date visibility</li>
+                  <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Recurring obligations and tickets or fines</li>
+                  <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Core reminders and settings</li>
                 </ul>
               </article>
 
-              <article className="group rounded-md border border-brand-cta bg-brand-cta p-7 text-surface-base shadow-lg">
+              <article className="group flex flex-col items-start rounded-2xl border border-brand-cta bg-brand-cta p-8 text-surface-base shadow-lg">
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-surface-base/80">Full Suite</p>
-                <div className="mt-4 flex items-end gap-2">
-                  <span className="text-5xl font-semibold tracking-[-0.05em]">$10.99</span>
+                <div className="mt-5 flex items-end gap-2">
+                  <span className="text-5xl font-semibold tracking-[-0.05em] leading-tight">$10.99</span>
                   <span className="pb-1 text-sm text-surface-base/80">per month</span>
                 </div>
-                <p className="mt-4 max-w-md text-base leading-7 text-surface-base/90">
+                <p className="mt-5 max-w-md text-base leading-relaxed text-surface-base/90">
                   Get the complete operating system: debt payoff, budgets, analytics, deeper cash-flow tools, and tax planning when your income needs it.
                 </p>
-                <ul className="mt-6 space-y-3 text-sm text-surface-base/90">
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0" /> Debt payoff engine with Snowball and Avalanche</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0" /> Budgets, analytics, income ledger, and transaction tools</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0" /> Tax estimates and reserve planning for variable income</li>
+                <ul className="mt-6 space-y-3 text-sm leading-relaxed text-surface-base/90">
+                  <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0" /> Debt payoff engine with Snowball and Avalanche</li>
+                  <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0" /> Budgets, analytics, income ledger, and transaction tools</li>
+                  <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0" /> Tax estimates and reserve planning for variable income</li>
                 </ul>
                 <p className="mt-6 text-sm text-surface-base/80">Every account starts with a 14-day Full Suite trial. No credit card required.</p>
               </article>
@@ -621,14 +621,14 @@ export default function Landing() {
                 A few quick answers before you start.
               </h2>
             </div>
-            <div className="mt-12 grid gap-5 md:grid-cols-2">
+            <div className="mt-12 grid gap-6 md:grid-cols-2">
               {faqItems.map((item) => (
                 <article
                   key={item.q}
-                  className="rounded-md border border-surface-border bg-surface-raised p-7"
+                  className="rounded-2xl border border-surface-border bg-surface-raised p-8"
                 >
-                  <h3 className="text-lg font-semibold tracking-[-0.02em] text-content-primary">{item.q}</h3>
-                  <p className="mt-4 text-base leading-7 text-content-secondary">{item.a}</p>
+                  <h3 className="text-lg font-semibold tracking-[-0.02em] leading-tight text-content-primary">{item.q}</h3>
+                  <p className="mt-4 text-base leading-relaxed text-content-secondary">{item.a}</p>
                 </article>
               ))}
             </div>
