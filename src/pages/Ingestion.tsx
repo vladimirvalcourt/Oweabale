@@ -177,36 +177,45 @@ export default function Ingestion() {
 
     // 2. Trigger OCR for new mobile syncs
     const pendingMobile = pendingIngestions.find(pi => pi.source === 'mobile' && pi.status === 'uploading');
-    if (pendingMobile && pendingMobile.storageUrl) {
-       const signedUrl = sanitizeUrl(pendingMobile.storageUrl);
-       if (!signedUrl) return;
-       // Derive the MIME type from the storage path extension so PDFs are handled correctly
-       const extMatch = pendingMobile.storagePath?.split('.').pop()?.toLowerCase() ?? 'jpg';
-       const mimeMap: Record<string, string> = {
-         pdf: 'application/pdf',
-         jpg: 'image/jpeg',
-         jpeg: 'image/jpeg',
-         png: 'image/png',
-         webp: 'image/webp',
-         gif: 'image/gif',
-       };
-       const mimeType = mimeMap[extMatch] ?? 'image/jpeg';
-       fetch(signedUrl)
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error(`Signed URL fetch failed: ${res.status}`);
-          }
-          return res.blob();
-        })
-         .then(blob => {
+    if (pendingMobile && pendingMobile.storagePath) {
+       // Generate signed URL on-demand (don't rely on stored URL)
+       supabase.storage
+         .from('scans')
+         .createSignedUrl(pendingMobile.storagePath, 3600) // 1 hour expiry
+         .then(({ data, error }) => {
+           if (error || !data?.signedUrl) {
+             throw new Error(error?.message || 'Failed to generate signed URL');
+           }
+           return data.signedUrl;
+         })
+         .then((signedUrl) => {
+           // Derive the MIME type from the storage path extension so PDFs are handled correctly
+           const extMatch = pendingMobile.storagePath!.split('.').pop()?.toLowerCase() ?? 'jpg';
+           const mimeMap: Record<string, string> = {
+             pdf: 'application/pdf',
+             jpg: 'image/jpeg',
+             jpeg: 'image/jpeg',
+             png: 'image/png',
+             webp: 'image/webp',
+             gif: 'image/gif',
+           };
+           const mimeType = mimeMap[extMatch] ?? 'image/jpeg';
+           return fetch(signedUrl).then((res) => {
+             if (!res.ok) {
+               throw new Error(`Signed URL fetch failed: ${res.status}`);
+             }
+             return res.blob().then(blob => ({ blob, extMatch, mimeType }));
+           });
+         })
+         .then(({ blob, extMatch, mimeType }) => {
            const file = new File([blob], `mobile_scan.${extMatch}`, { type: mimeType });
            triggerManualScan(pendingMobile.id, file);
-        })
-        .catch((err) => {
-          console.warn('[Ingestion] Mobile scan fetch failed:', err);
-          updatePendingIngestion(pendingMobile.id, { status: 'error' });
-          toast.error('Failed to download mobile scan. Please retry from phone.');
-        });
+         })
+         .catch((err) => {
+           console.warn('[Ingestion] Mobile scan fetch failed:', err);
+           updatePendingIngestion(pendingMobile.id, { status: 'error' });
+           toast.error('Failed to download mobile scan. Please retry from phone.');
+         });
     }
   }, [pendingIngestions]);
 
