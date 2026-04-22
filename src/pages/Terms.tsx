@@ -67,17 +67,17 @@ export default function Terms() {
               <p className="mt-4 text-sm text-content-muted">Last updated April 2026</p>
             </div>
 
-            <div className="mt-12 space-y-5">
+            <div className="mt-12 space-y-6">
               {sections.map((section, index) => (
-                <section key={section.title} className="public-hover-lift rounded-md border border-surface-border bg-surface-raised p-6 sm:p-7 shadow-sm">
+                <section key={section.title} className="public-hover-lift rounded-2xl border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
                   <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Section {index + 1}</p>
-                  <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-content-primary">{section.title}</h2>
-                  <p className="mt-4 max-w-4xl text-base leading-8 text-content-secondary">{section.copy}</p>
+                  <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">{section.title}</h2>
+                  <p className="mt-4 max-w-4xl text-base leading-relaxed text-content-secondary">{section.copy}</p>
                 </section>
               ))}
             </div>
 
-            <div className="public-fade-up public-delay-1 mt-10 rounded-md border border-surface-border bg-surface-highlight p-6 sm:p-7">
+            <div className="public-fade-up public-delay-1 mt-10 rounded-2xl border border-surface-border bg-surface-highlight p-8 sm:p-10">
               <p className="text-base leading-8 text-content-secondary">
                 For billing and plan details, visit{' '}
                 <TransitionLink to="/pricing" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">

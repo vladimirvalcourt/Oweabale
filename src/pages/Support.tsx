@@ -134,21 +134,21 @@ export default function Support() {
               <p className="mt-6 max-w-xl text-lg leading-8 text-content-secondary">
                 Reach out for billing, access, account, product, or technical issues. We usually reply within one business day.
               </p>
-              <div className="mt-8 grid gap-4">
-                <div className="public-hover-lift rounded-md border border-surface-border bg-surface-raised p-5">
+              <div className="mt-8 grid gap-6">
+                <div className="public-hover-lift flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8">
                   <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-tertiary">Best for</p>
-                  <p className="mt-2 text-sm leading-7 text-content-secondary">Account access problems, billing questions, bugs, and anything blocking your workflow.</p>
+                  <p className="mt-3 text-sm leading-relaxed text-content-secondary">Account access problems, billing questions, bugs, and anything blocking your workflow.</p>
                 </div>
-                <div className="public-hover-lift rounded-md border border-surface-border bg-surface-raised p-5">
+                <div className="public-hover-lift flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8">
                   <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-tertiary">Direct email</p>
-                  <a href={`mailto:${SUPPORT_EMAIL}`} className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-content-primary hover:text-brand-profit">
+                  <a href={`mailto:${SUPPORT_EMAIL}`} className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-content-primary hover:text-brand-profit">
                     <Mail className="h-4 w-4" />
                     {SUPPORT_EMAIL}
                   </a>
                 </div>
-                <div className="public-hover-lift rounded-md border border-surface-border bg-surface-raised p-5">
+                <div className="public-hover-lift flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8">
                   <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-tertiary">Sensitive requests</p>
-                  <p className="mt-2 text-sm leading-7 text-content-secondary">
+                  <p className="mt-3 text-sm leading-relaxed text-content-secondary">
                     For privacy or security-specific concerns, include that in your subject line so we can route it quickly.
                   </p>
                 </div>
@@ -156,9 +156,9 @@ export default function Support() {
             </div>
 
             <div className="public-fade-up public-delay-1 grid gap-6">
-              <section className="rounded-md border border-surface-border bg-surface-raised p-6 sm:p-7 shadow-sm">
-                <h2 className="text-2xl font-semibold tracking-[-0.03em] text-content-primary">Send a message</h2>
-                <p className="mt-3 text-base leading-7 text-content-secondary">
+              <section className="rounded-2xl border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
+                <h2 className="text-2xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">Send a message</h2>
+                <p className="mt-4 text-base leading-relaxed text-content-secondary">
                   Give us the basics and a little context. The clearer the message, the faster we can help.
                 </p>
 
@@ -239,13 +239,13 @@ export default function Support() {
                 )}
               </section>
 
-              <section className="rounded-md border border-surface-border bg-surface-raised p-6 sm:p-7">
-                <h2 className="text-2xl font-semibold tracking-[-0.03em] text-content-primary">Quick answers</h2>
-                <div className="mt-6 grid gap-4">
+              <section className="rounded-2xl border border-surface-border bg-surface-raised p-8 sm:p-10">
+                <h2 className="text-2xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">Quick answers</h2>
+                <div className="mt-6 grid gap-5">
                   {QUICK_HELP.map((item) => (
-                    <div key={item.q} className="rounded-md bg-surface-highlight p-5">
-                      <h3 className="text-base font-semibold text-content-primary">{item.q}</h3>
-                      <p className="mt-2 text-sm leading-7 text-content-secondary">{item.a}</p>
+                    <div key={item.q} className="rounded-xl bg-surface-highlight p-6">
+                      <h3 className="text-base font-semibold leading-tight text-content-primary">{item.q}</h3>
+                      <p className="mt-3 text-sm leading-relaxed text-content-secondary">{item.a}</p>
                     </div>
                   ))}
                 </div>

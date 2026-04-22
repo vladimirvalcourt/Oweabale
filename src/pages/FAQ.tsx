@@ -53,22 +53,22 @@ function FaqCard({ question, answer }: { question: string; answer: string }) {
   const panelId = `faq-panel-${question.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 
   return (
-    <article className="rounded-md border border-surface-border bg-surface-raised px-6 py-5 shadow-sm">
+    <article className="rounded-2xl border border-surface-border bg-surface-raised px-8 py-6 shadow-sm">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
         aria-controls={panelId}
-        className="flex w-full items-center justify-between gap-4 text-left"
+        className="flex w-full items-start justify-between gap-4 text-left"
       >
-        <h3 className="text-lg font-semibold tracking-[-0.02em] text-content-primary">{question}</h3>
+        <h3 className="text-lg font-semibold tracking-[-0.02em] leading-tight text-content-primary">{question}</h3>
         {open ? <Minus className="h-5 w-5 shrink-0 text-content-secondary" /> : <Plus className="h-5 w-5 shrink-0 text-content-secondary" />}
       </button>
       <div
         id={panelId}
         className={`overflow-hidden transition-all duration-300 ease-out ${open ? 'mt-4 max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
       >
-        <p className="text-base leading-7 text-content-secondary">{answer}</p>
+        <p className="text-base leading-relaxed text-content-secondary">{answer}</p>
       </div>
     </article>
   );
@@ -156,7 +156,7 @@ export default function FAQ() {
               ))}
             </div>
 
-            <div className="public-fade-up public-delay-2 mt-14 rounded-md border border-surface-border bg-surface-raised p-7 sm:p-8 text-center shadow-sm">
+            <div className="public-fade-up public-delay-2 mt-14 rounded-2xl border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
               <h2 className="text-3xl font-semibold tracking-[-0.04em] text-content-primary">
                 Want the full picture instead of another patchwork system?
               </h2>

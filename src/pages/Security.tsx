@@ -70,22 +70,22 @@ export default function Security() {
               </p>
             </div>
 
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <div className="mt-12 grid gap-8 md:grid-cols-3">
               {securityCards.map((card) => {
                 const Icon = card.icon;
                 return (
-                  <article key={card.title} className="public-hover-lift rounded-md border border-surface-border bg-surface-raised p-6 sm:p-7 shadow-sm">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-md bg-surface-highlight text-brand-profit">
+                  <article key={card.title} className="public-hover-lift flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8 shadow-sm">
+                    <div className="flex h-12 w-12 items-start justify-start rounded-xl bg-surface-highlight text-brand-profit">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h2 className="mt-5 text-xl font-semibold tracking-[-0.03em] text-content-primary">{card.title}</h2>
-                    <p className="mt-3 text-base leading-7 text-content-secondary">{card.body}</p>
+                    <h2 className="mt-6 text-xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">{card.title}</h2>
+                    <p className="mt-4 text-base leading-relaxed text-content-secondary">{card.body}</p>
                   </article>
                 );
               })}
             </div>
 
-            <div className="public-fade-up public-delay-1 mt-12 rounded-md border border-surface-border bg-surface-raised p-7 sm:p-8">
+            <div className="public-fade-up public-delay-1 mt-12 rounded-2xl border border-surface-border bg-surface-raised p-8 sm:p-10">
               <div className="space-y-10">
                 {sections.map((section) => (
                   <section key={section.title}>

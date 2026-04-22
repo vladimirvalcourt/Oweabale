@@ -34,13 +34,13 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="rounded-md border border-surface-border bg-surface-raised px-6 py-5">
+    <div className="rounded-2xl border border-surface-border bg-surface-raised px-8 py-6">
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between gap-4 text-left"
+        className="flex w-full items-start justify-between gap-4 text-left"
       >
-        <span className="text-lg font-semibold tracking-[-0.02em] text-content-primary">{question}</span>
+        <span className="text-lg font-semibold tracking-[-0.02em] leading-tight text-content-primary">{question}</span>
         {isOpen ? (
           <Minus className="h-5 w-5 shrink-0 text-content-secondary" />
         ) : (
@@ -443,9 +443,9 @@ export default function Pricing() {
               </div>
             </div>
 
-            <div className="mt-8 rounded-md border border-surface-border bg-surface-raised p-6">
-              <p className="text-sm font-semibold text-content-primary">Free-tier trust promise</p>
-              <p className="mt-2 max-w-3xl text-sm leading-7 text-content-secondary">
+            <div className="mt-8 rounded-2xl border border-surface-border bg-surface-raised p-8">
+              <p className="text-sm font-semibold leading-tight text-content-primary">Free-tier trust promise</p>
+              <p className="mt-3 max-w-3xl text-sm leading-relaxed text-content-secondary">
                 The free plan is meant to stay genuinely useful. You do not have to upgrade to keep your basic system for bills, due dates, and recurring obligations working.
               </p>
             </div>
@@ -461,7 +461,7 @@ export default function Pricing() {
                   Choose based on how much control you want, not how much jargon you can tolerate.
                 </h2>
               </div>
-              <div className="overflow-x-auto rounded-md border border-surface-border bg-surface-raised">
+              <div className="overflow-x-auto rounded-2xl border border-surface-border bg-surface-raised">
                 <div className="grid grid-cols-3 border-b border-surface-border bg-surface-highlight text-sm font-semibold text-content-primary">
                   <div className="min-w-[180px] px-4 py-4">Feature</div>
                   <div className="min-w-[140px] border-l border-surface-border px-4 py-4">Tracker</div>
