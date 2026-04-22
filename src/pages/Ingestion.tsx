@@ -905,7 +905,7 @@ export default function Ingestion() {
                                   type="number"
                                   value={item.extractedData.amount ?? ''} 
                                   onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, amount: parseFloat(e.target.value) } })}
-                                  className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xl font-mono text-[#4ade80] focus-app focus:border-[#4ade80] transition-colors font-bold"
+                                  className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xl font-mono text-brand-profit focus-app focus:border-brand-profit transition-colors font-bold"
                                 />
                               </div>
                               <div>

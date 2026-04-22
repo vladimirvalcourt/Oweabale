@@ -451,7 +451,7 @@ export default function Budgets() {
                                 <button
                                   onClick={() => handleDelete(budget.id)}
                                   className={`${
-                                    active ? 'bg-surface-elevated text-[#EF4444]' : 'text-[#7F1D1D]'
+                                    active ? 'bg-surface-elevated text-brand-expense' : 'text-red-900'
                                   } group flex w-full items-center px-4 py-2 text-sm`}
                                 >
                                   <Trash2 className="mr-3 h-4 w-4 text-current" />

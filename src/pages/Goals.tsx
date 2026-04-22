@@ -415,7 +415,7 @@ export default function Goals() {
                       </button>
                       <button
                         onClick={async () => { const ok = await deleteGoal(goal.id); if (ok) toast.success('Goal deleted'); }}
-                        className="text-sm font-medium text-[#EF4444] hover:text-[#DC2626] transition-colors"
+                        className="text-sm font-medium text-brand-expense hover:text-red-700 transition-colors"
                       >
                         Delete
                       </button>

@@ -3,6 +3,7 @@ import { ArrowRight, Check, Minus, Plus, Shield, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 import { BrandWordmark } from '../components/BrandWordmark';
 import Footer from '../components/Footer';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { TransitionLink } from '../components/TransitionLink';
 import { useJsonLd } from '../hooks/useJsonLd';
 import { useSEO } from '../hooks/useSEO';
@@ -33,17 +34,17 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] px-6 py-5">
+    <div className="rounded-md border border-surface-border bg-surface-raised px-6 py-5">
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
         className="flex w-full items-center justify-between gap-4 text-left"
       >
-        <span className="text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">{question}</span>
+        <span className="text-lg font-semibold tracking-[-0.02em] text-content-primary">{question}</span>
         {isOpen ? (
-          <Minus className="h-5 w-5 shrink-0 text-[#5f6b62]" />
+          <Minus className="h-5 w-5 shrink-0 text-content-secondary" />
         ) : (
-          <Plus className="h-5 w-5 shrink-0 text-[#5f6b62]" />
+          <Plus className="h-5 w-5 shrink-0 text-content-secondary" />
         )}
       </button>
       <div
@@ -51,7 +52,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
           isOpen ? 'mt-4 max-h-48 opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <p className="max-w-3xl text-base leading-7 text-[#5b685e]">{answer}</p>
+        <p className="max-w-3xl text-base leading-7 text-content-secondary">{answer}</p>
       </div>
     </div>
   );
@@ -256,73 +257,76 @@ export default function Pricing() {
     hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly';
 
   return (
-    <div className="min-h-screen bg-[#f6efe4] text-[#1f2b24] selection:bg-[#1f2b24]/15">
+    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
       <nav
         className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
           scrolled
-            ? 'border-[#d7cebf] bg-[#f6efe4]/92 backdrop-blur-xl'
+            ? 'border-surface-border bg-surface-base/92 backdrop-blur-xl'
             : 'border-transparent bg-transparent'
         }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-          <TransitionLink to="/" className="text-[#1f2b24]">
-            <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[-0.02em] text-[#1f2b24]" />
+          <TransitionLink to="/" className="text-content-primary">
+            <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[-0.02em] text-content-primary" />
           </TransitionLink>
-          <div className="hidden items-center gap-8 text-sm text-[#5e695f] md:flex">
-            <TransitionLink to="/#why" className="transition-colors hover:text-[#1f2b24]">
+          <div className="hidden items-center gap-8 text-sm text-content-secondary md:flex">
+            <TransitionLink to="/#why" className="transition-colors hover:text-content-primary">
               Why it works
             </TransitionLink>
-            <TransitionLink to="/pricing" className="text-[#1f2b24]">
+            <TransitionLink to="/pricing" className="text-content-primary">
               Pricing
             </TransitionLink>
-            <TransitionLink to="/auth" className="transition-colors hover:text-[#1f2b24]">
+            <TransitionLink to="/auth" className="transition-colors hover:text-content-primary">
               Sign in
             </TransitionLink>
           </div>
-          <TransitionLink
-            to="/onboarding"
-            className="inline-flex items-center gap-2 rounded-full bg-[#1f2b24] px-5 py-2.5 text-sm font-medium text-[#f7f2ea] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2d3a32]"
-          >
-            Start free
-          </TransitionLink>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <TransitionLink
+              to="/onboarding"
+              className="inline-flex items-center gap-2 rounded-full bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
+            >
+              Start free
+            </TransitionLink>
+          </div>
         </div>
       </nav>
 
       <main>
         <section className="relative overflow-hidden pt-32 sm:pt-36">
-          <div className="absolute inset-x-0 top-0 h-[32rem] bg-[radial-gradient(circle_at_top_left,_rgba(180,137,64,0.16),_transparent_42%),radial-gradient(circle_at_top_right,_rgba(62,111,86,0.14),_transparent_36%)]" />
+          <div className="absolute inset-x-0 top-0 h-[32rem] bg-gradient-to-b from-surface-highlight to-transparent" />
           <div
             ref={headerRef}
             className={`public-fade-up mx-auto max-w-5xl px-6 pb-16 sm:pb-20 text-center transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
               headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
             }`}
           >
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Pricing that stays honest</p>
-            <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-[#1f2b24] sm:text-6xl lg:text-7xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Pricing that stays honest</p>
+            <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-content-primary sm:text-6xl lg:text-7xl">
               Start simple. Upgrade for full control.
             </h1>
-            <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-[#556157] sm:text-xl">
+            <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-content-secondary sm:text-xl">
               The free tier gives you real value right away. Full Suite adds the planning, payoff, and cash-flow tools
               that turn visibility into follow-through.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-[#5f6b62]">
-              <span className="inline-flex items-center gap-2 rounded-full bg-[#fff9f0] px-3 py-1.5">
-                <Check className="h-4 w-4 text-[#35684f]" />
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-content-secondary">
+              <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
+                <Check className="h-4 w-4 text-brand-profit" />
                 14-day Full Suite trial
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-[#fff9f0] px-3 py-1.5">
-                <Check className="h-4 w-4 text-[#35684f]" />
+              <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
+                <Check className="h-4 w-4 text-brand-profit" />
                 No credit card required
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-[#fff9f0] px-3 py-1.5">
-                <Check className="h-4 w-4 text-[#35684f]" />
+              <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
+                <Check className="h-4 w-4 text-brand-profit" />
                 Cancel anytime
               </span>
             </div>
           </div>
         </section>
 
-        <section className="border-y border-[#ddd3c5] bg-[#f9f4ec] py-24">
+        <section className="border-y border-surface-border bg-surface-raised py-24">
           <div
             ref={plansRef}
             className={`mx-auto max-w-7xl px-6 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
@@ -330,52 +334,52 @@ export default function Pricing() {
             }`}
           >
             <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]">
-              <div className="public-hover-lift rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-7 sm:p-8">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#efe6d9] text-[#7b6548]">
+              <div className="public-hover-lift rounded-md border border-surface-border bg-surface-base p-7 sm:p-8">
+                <div className="flex h-12 w-12 items-center justify-center rounded-md bg-surface-elevated text-content-primary">
                   <Wallet className="h-5 w-5" />
                 </div>
-                <p className="mt-6 text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Tracker</p>
+                <p className="mt-6 text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Tracker</p>
                 <div className="mt-4 flex items-end gap-2">
-                  <span className="text-5xl font-semibold tracking-[-0.05em] text-[#1f2b24]">$0</span>
-                  <span className="pb-1 text-sm text-[#627066]">forever free</span>
+                  <span className="text-5xl font-semibold tracking-[-0.05em] text-content-primary">$0</span>
+                  <span className="pb-1 text-sm text-content-secondary">forever free</span>
                 </div>
-                <p className="mt-4 max-w-md text-base leading-7 text-[#5b685e]">
+                <p className="mt-4 max-w-md text-base leading-7 text-content-secondary">
                   Built for immediate clarity around bills, due dates, recurring obligations, and reminders you will actually see.
                 </p>
-                <ul className="mt-6 space-y-3 text-sm text-[#4f5c53]">
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#35684f]" /> Bills and due-date visibility</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#35684f]" /> Recurring obligations, subscriptions, tickets, and fines</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#35684f]" /> Core reminders and account settings</li>
+                <ul className="mt-6 space-y-3 text-sm text-content-secondary">
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Bills and due-date visibility</li>
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Recurring obligations, subscriptions, tickets, and fines</li>
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Core reminders and account settings</li>
                 </ul>
                 <TransitionLink
                   to="/onboarding"
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-full border border-[#d3cabd] px-6 py-3.5 text-sm font-medium text-[#314137] transition-colors hover:border-[#bcae94] hover:bg-[#fff9f0]"
+                  className="mt-8 inline-flex w-full items-center justify-center rounded-full border border-surface-border px-6 py-3.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
                 >
                   Start free
                 </TransitionLink>
               </div>
 
-              <div className="public-hover-lift rounded-[2rem] border border-[#1f2b24] bg-[#1f2b24] p-7 sm:p-8 text-[#f7f2ea] shadow-[0_28px_80px_rgba(31,43,36,0.22)]">
+              <div className="public-hover-lift rounded-md border border-brand-cta bg-brand-cta p-7 sm:p-8 text-surface-base shadow-lg">
                 <div className="flex items-center justify-between gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2d3a32] text-[#cfd8d1]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-md bg-surface-base/20 text-surface-base">
                     <Shield className="h-5 w-5" />
                   </div>
-                  <span className="rounded-full bg-[#e7efe7] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#35684f]">
+                  <span className="rounded-full bg-surface-base/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-surface-base">
                     Most complete
                   </span>
                 </div>
-                <p className="mt-6 text-xs font-medium uppercase tracking-[0.18em] text-[#cbbca4]">Full Suite</p>
+                <p className="mt-6 text-xs font-medium uppercase tracking-[0.18em] text-surface-base/80">Full Suite</p>
 
                 {hasYearlyPricing ? (
-                  <div className="mt-5 inline-flex rounded-full border border-[#4d5a52] bg-[#2a3730] p-1">
+                  <div className="mt-5 inline-flex rounded-full border border-surface-base/30 bg-surface-base/10 p-1">
                     <button
                       type="button"
                       onClick={() => setBillingPeriod('monthly')}
                       aria-pressed={billingPeriod === 'monthly'}
                       className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                         billingPeriod === 'monthly'
-                          ? 'bg-[#f7f2ea] text-[#1f2b24]'
-                          : 'text-[#d0d8d2]'
+                          ? 'bg-surface-base text-surface-base'
+                          : 'text-surface-base/70'
                       }`}
                     >
                       Monthly
@@ -386,8 +390,8 @@ export default function Pricing() {
                       aria-pressed={billingPeriod === 'yearly'}
                       className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                         billingPeriod === 'yearly'
-                          ? 'bg-[#f7f2ea] text-[#1f2b24]'
-                          : 'text-[#d0d8d2]'
+                          ? 'bg-surface-base text-surface-base'
+                          : 'text-surface-base/70'
                       }`}
                     >
                       Yearly{yearlySavingsPct > 0 ? ` · Save ${yearlySavingsPct}%` : ''}
@@ -400,74 +404,74 @@ export default function Pricing() {
                     <>
                       <div className="flex items-end gap-2">
                         <span className="text-5xl font-semibold tracking-[-0.05em]">${yearlyEffectiveMonthly.toFixed(2)}</span>
-                        <span className="pb-1 text-sm text-[#c7d0c8]">per month</span>
+                        <span className="pb-1 text-sm text-surface-base/80">per month</span>
                       </div>
-                      <p className="mt-2 text-sm text-[#c7d0c8]">
+                      <p className="mt-2 text-sm text-surface-base/80">
                         Billed ${yearlyTotal?.toFixed(2)} yearly
                       </p>
                     </>
                   ) : (
                     <div className="flex items-end gap-2">
                       <span className="text-5xl font-semibold tracking-[-0.05em]">${monthlyPrice.toFixed(2)}</span>
-                      <span className="pb-1 text-sm text-[#c7d0c8]">per month</span>
+                      <span className="pb-1 text-sm text-surface-base/80">per month</span>
                     </div>
                   )}
                 </div>
 
-                <p className="mt-4 max-w-md text-base leading-7 text-[#d8dfd9]">
+                <p className="mt-4 max-w-md text-base leading-7 text-surface-base/90">
                   For people who want the full financial operating system: payoff strategy, budgets, analytics,
                   cash-flow clarity, and tax planning when income gets uneven.
                 </p>
-                <ul className="mt-6 space-y-3 text-sm text-[#edf0ec]">
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#88c59e]" /> Debt payoff engine with Snowball and Avalanche</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#88c59e]" /> Budgets, analytics, income ledger, and transaction views</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#88c59e]" /> Optional bank sync and broader planning workflows</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#88c59e]" /> Tax estimates and reserve planning for variable income</li>
+                <ul className="mt-6 space-y-3 text-sm text-surface-base/90">
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-surface-base" /> Debt payoff engine with Snowball and Avalanche</li>
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-surface-base" /> Budgets, analytics, income ledger, and transaction views</li>
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-surface-base" /> Optional bank sync and broader planning workflows</li>
+                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-surface-base" /> Tax estimates and reserve planning for variable income</li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                   disabled={isStartingCheckout}
-                  className="mt-8 inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#f7f2ea] px-6 py-3.5 text-sm font-medium text-[#1f2b24] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#efe6d9] disabled:cursor-not-allowed disabled:opacity-70"
+                  className="mt-8 inline-flex w-full items-center justify-center gap-3 rounded-full bg-surface-base px-6 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface-base/90 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {isStartingCheckout ? 'Starting checkout...' : 'Unlock Full Suite'}
                   <ArrowRight className="h-4 w-4" />
                 </button>
-                <p className="mt-4 text-sm text-[#c7d0c8]">
+                <p className="mt-4 text-sm text-surface-base/80">
                   Starts with a 14-day free trial. No credit card required to create your account.
                 </p>
               </div>
             </div>
 
-            <div className="mt-8 rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-6">
-              <p className="text-sm font-semibold text-[#1f2b24]">Free-tier trust promise</p>
-              <p className="mt-2 max-w-3xl text-sm leading-7 text-[#5b685e]">
+            <div className="mt-8 rounded-md border border-surface-border bg-surface-raised p-6">
+              <p className="text-sm font-semibold text-content-primary">Free-tier trust promise</p>
+              <p className="mt-2 max-w-3xl text-sm leading-7 text-content-secondary">
                 The free plan is meant to stay genuinely useful. You do not have to upgrade to keep your basic system for bills, due dates, and recurring obligations working.
               </p>
             </div>
           </div>
         </section>
 
-        <section className="bg-[#f6efe4] py-24">
+        <section className="bg-surface-base py-24">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr]">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Compare plans</p>
-                <h2 className="mt-4 max-w-lg text-4xl font-semibold tracking-[-0.04em] text-[#1f2b24]">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Compare plans</p>
+                <h2 className="mt-4 max-w-lg text-4xl font-semibold tracking-[-0.04em] text-content-primary">
                   Choose based on how much control you want, not how much jargon you can tolerate.
                 </h2>
               </div>
-              <div className="overflow-x-auto rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3]">
-                <div className="grid grid-cols-3 border-b border-[#e7ddcf] bg-[#f9f3e9] text-sm font-semibold text-[#1f2b24]">
+              <div className="overflow-x-auto rounded-md border border-surface-border bg-surface-raised">
+                <div className="grid grid-cols-3 border-b border-surface-border bg-surface-highlight text-sm font-semibold text-content-primary">
                   <div className="min-w-[180px] px-4 py-4">Feature</div>
-                  <div className="min-w-[140px] border-l border-[#e7ddcf] px-4 py-4">Tracker</div>
-                  <div className="min-w-[160px] border-l border-[#e7ddcf] px-4 py-4">Full Suite</div>
+                  <div className="min-w-[140px] border-l border-surface-border px-4 py-4">Tracker</div>
+                  <div className="min-w-[160px] border-l border-surface-border px-4 py-4">Full Suite</div>
                 </div>
                 {comparisonRows.map(([feature, tracker, suite]) => (
-                  <div key={feature} className="grid grid-cols-3 border-b border-[#eee3d5] text-sm last:border-b-0">
-                    <div className="min-w-[180px] px-4 py-4 text-[#4d5a51]">{feature}</div>
-                    <div className="min-w-[140px] border-l border-[#eee3d5] px-4 py-4 text-[#5f6b62]">{tracker}</div>
-                    <div className="min-w-[160px] border-l border-[#eee3d5] px-4 py-4 text-[#5f6b62]">{suite}</div>
+                  <div key={feature} className="grid grid-cols-3 border-b border-surface-border text-sm last:border-b-0">
+                    <div className="min-w-[180px] px-4 py-4 text-content-secondary">{feature}</div>
+                    <div className="min-w-[140px] border-l border-surface-border px-4 py-4 text-content-secondary">{tracker}</div>
+                    <div className="min-w-[160px] border-l border-surface-border px-4 py-4 text-content-secondary">{suite}</div>
                   </div>
                 ))}
               </div>
@@ -475,7 +479,7 @@ export default function Pricing() {
           </div>
         </section>
 
-        <section id="faq" className="border-y border-[#ddd3c5] bg-[#f9f4ec] py-24">
+        <section id="faq" className="border-y border-surface-border bg-surface-raised py-24">
           <div
             ref={faqRef}
             className={`mx-auto max-w-5xl px-6 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
@@ -483,8 +487,8 @@ export default function Pricing() {
             }`}
           >
             <div className="max-w-2xl">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">FAQ</p>
-              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-[#1f2b24]">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">FAQ</p>
+              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-content-primary">
                 The answers people usually want before they commit.
               </h2>
             </div>
@@ -496,19 +500,19 @@ export default function Pricing() {
           </div>
         </section>
 
-        <section className="overflow-hidden bg-[#1f2b24] py-24 text-[#f7f2ea]">
+        <section className="overflow-hidden bg-surface-offset py-24 text-content-primary">
           <div className="mx-auto max-w-5xl px-6 text-center lg:px-8">
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#cbbca4]">Ready when you are</p>
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Ready when you are</p>
             <h2 className="mt-5 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
               Start with visibility. Upgrade when you want leverage.
             </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-[#d8dfd9]">
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-content-secondary">
               Oweable should feel useful before you pay and powerful when you do.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <TransitionLink
                 to="/onboarding"
-                className="inline-flex items-center gap-3 rounded-full bg-[#f7f2ea] px-7 py-3.5 text-sm font-medium text-[#1f2b24] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#efe6d9]"
+                className="inline-flex items-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
               >
                 Create free account
                 <ArrowRight className="h-4 w-4" />
@@ -517,7 +521,7 @@ export default function Pricing() {
                 type="button"
                 onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                 disabled={isStartingCheckout}
-                className="inline-flex items-center gap-3 rounded-full border border-[#536157] px-7 py-3.5 text-sm font-medium text-[#f7f2ea] transition-colors hover:bg-[#2d3a32] disabled:cursor-not-allowed disabled:opacity-70"
+                className="inline-flex items-center gap-3 rounded-full border border-surface-border px-7 py-3.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight disabled:cursor-not-allowed disabled:opacity-70"
               >
                 Upgrade to Full Suite
               </button>

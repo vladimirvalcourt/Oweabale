@@ -348,7 +348,7 @@ export default function MobileCapture() {
                  </p>
               </div>
 
-               <div className="relative flex min-h-[min(52vh,22rem)] w-full flex-1 flex-col overflow-hidden rounded-lg border border-content-primary/[0.12] bg-[#0c0c0e] shadow-2xl">
+               <div className="relative flex min-h-[min(52vh,22rem)] w-full flex-1 flex-col overflow-hidden rounded-lg border border-content-primary/[0.12] bg-surface-base shadow-2xl">
                  {capturedFileType === 'application/pdf' ? (
                    <div className="flex w-full flex-1 flex-col items-center justify-center gap-4 bg-surface-base p-6">
                      <div className="w-20 h-20 rounded-lg border border-content-primary/30 bg-content-primary/5 flex items-center justify-center">

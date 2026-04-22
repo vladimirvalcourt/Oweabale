@@ -611,7 +611,7 @@ export default function Subscriptions() {
                     </button>
                     <button
                       onClick={() => handleDelete(sub.id)}
-                      className="p-2 text-content-tertiary hover:text-[#EF4444] rounded-md hover:bg-surface-elevated transition-colors"
+                      className="p-2 text-content-tertiary hover:text-brand-expense rounded-md hover:bg-surface-elevated transition-colors"
                       title="Delete"
                     >
                       <Trash2 className="w-4 h-4" />
