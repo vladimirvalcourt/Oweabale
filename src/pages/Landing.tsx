@@ -405,7 +405,12 @@ export default function Landing() {
             <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0 overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?q=80&w=150&auto=format&fit=crop" alt="Salaried Worker" className="h-full w-full object-cover" />
+                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full p-1.5 text-white">
+                    <circle cx="32" cy="22" r="11" fill="currentColor" />
+                    <path d="M22 22h20M24 20v4M40 20v4" stroke="black" strokeWidth="2.5" />
+                    <path d="M14 56C14 44 22 38 32 38C42 38 50 44 50 56" fill="currentColor" />
+                    <path d="M26 38L32 46L38 38" fill="black" />
+                  </svg>
                 </div>
                 <div>
                   <h3 className="text-lg font-medium text-content-primary tracking-tight">Salaried & W-2 Workers</h3>
@@ -419,7 +424,12 @@ export default function Landing() {
             <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0 overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop" alt="Gig Worker" className="h-full w-full object-cover" />
+                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full p-1.5 text-white">
+                    <circle cx="32" cy="24" r="11" fill="currentColor" />
+                    <path d="M18 20 Q 32 8 46 20" fill="currentColor" />
+                    <path d="M46 20 L 54 22" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                    <path d="M16 56C16 46 22 40 32 40C42 40 48 46 48 56" fill="currentColor" />
+                  </svg>
                 </div>
                 <div>
                   <h3 className="text-lg font-medium text-content-primary tracking-tight">Gig Workers & Freelancers</h3>
@@ -433,7 +443,12 @@ export default function Landing() {
             <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0 overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="Family" className="h-full w-full object-cover" />
+                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full p-1.5 text-white">
+                    <circle cx="26" cy="26" r="9" fill="currentColor" />
+                    <path d="M12 56C12 46 18 40 26 40C32 40 36.5 43 38.5 48" fill="currentColor" />
+                    <circle cx="44" cy="34" r="6.5" fill="currentColor" />
+                    <path d="M34 56C34 50 38 46 44 46C50 46 54 50 54 56" fill="currentColor" />
+                  </svg>
                 </div>
                 <div>
                   <h3 className="text-lg font-medium text-content-primary tracking-tight">Families & Households</h3>
