@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, startTransition } from 'react';
 import { useLocation } from 'react-router-dom';
 import { TransitionLink } from '../components/TransitionLink';
 import { 
@@ -1258,8 +1258,11 @@ export default function Dashboard() {
                         <button
                           type="button"
                           onClick={() => {
-                            setSelectedCitation(citation);
-                            setIsCitationModalOpen(true);
+                            // Fix: Defer non-critical state updates with startTransition for better INP
+                            startTransition(() => {
+                              setSelectedCitation(citation);
+                              setIsCitationModalOpen(true);
+                            });
                           }}
                           className={`inline-flex min-h-10 w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-app ${
                             citation.daysLeft < 0
@@ -1326,7 +1329,16 @@ export default function Dashboard() {
                         className="bg-surface-base border border-surface-border rounded-l px-3 py-2 text-sm font-mono text-content-secondary w-full focus-app-field" 
                       />
                       <button 
-                        onClick={() => { navigator.clipboard.writeText(selectedCitation.citationNumber).then(() => toast.success('Copied to clipboard')).catch(() => toast.error('Failed to copy')); }} 
+                        onClick={async () => { 
+                          // Fix: Yield to main thread before clipboard operation to avoid blocking paint
+                          const sched = (window as any).scheduler;
+                          if (sched && typeof sched.yield === 'function') {
+                            await sched.yield();
+                          }
+                          navigator.clipboard.writeText(selectedCitation.citationNumber)
+                            .then(() => toast.success('Copied to clipboard'))
+                            .catch(() => toast.error('Failed to copy')); 
+                        }} 
                         className="inline-flex min-h-10 items-center justify-center bg-surface-border hover:bg-surface-elevated text-content-secondary px-3 border border-l-0 border-surface-border rounded-r transition-colors focus-app z-10"
                         title="Copy"
                       >

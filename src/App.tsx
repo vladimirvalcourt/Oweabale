@@ -23,6 +23,7 @@ import { usePlanRedirect } from './hooks/usePlanRedirect';
 import { usePWAUpdateNotification } from './hooks/usePWAUpdateNotification';
 import { usePWAStandaloneMode } from './hooks/usePWAStandaloneMode';
 import { PWAInstallBanner } from './components/PWAInstallBanner';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Fix 1: Dashboard is now lazy — this keeps recharts + motion/react OUT of the initial
 // bundle. The 70 KB page was previously blocking first paint for ALL authenticated users.
@@ -253,6 +254,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AppShell />
+      <SpeedInsights />
     </BrowserRouter>
   );
 }

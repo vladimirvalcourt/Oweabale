@@ -134,27 +134,39 @@ export default function Transactions() {
           </p>
         </div>
         <button
-          onClick={() => {
+          onClick={async () => {
             const rowsSource = filteredTransactions;
-            requestAnimationFrame(() => {
-              const headers = ['Date', 'Name', 'Category', 'Platform', 'Type', 'Amount'];
-              const rows = rowsSource.map((t) => [
+            // Fix: Chunk large CSV exports to avoid blocking main thread (INP)
+            const CHUNK_SIZE = 500;
+            const headers = ['Date', 'Name', 'Category', 'Platform', 'Type', 'Amount'];
+            const csvRows: string[] = [headers.join(',')];
+            
+            for (let i = 0; i < rowsSource.length; i += CHUNK_SIZE) {
+              const chunk = rowsSource.slice(i, i + CHUNK_SIZE);
+              const chunkRows = chunk.map((t) => [
                 t.date,
                 `"${t.name}"`,
                 formatCategoryLabel(t.category),
                 (t.platformTag || '').trim(),
                 t.type,
                 t.amount.toFixed(2),
-              ]);
-              const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
-              const blob = new Blob([csv], { type: 'text/csv' });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = 'oweable-transactions.csv';
-              a.click();
-              URL.revokeObjectURL(url);
-            });
+              ].join(','));
+              csvRows.push(...chunkRows);
+              
+              // Yield between chunks to let browser paint
+              if (i + CHUNK_SIZE < rowsSource.length) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+              }
+            }
+            
+            const csv = csvRows.join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'oweable-transactions.csv';
+            a.click();
+            URL.revokeObjectURL(url);
           }}
           className={`${BUTTON_SECONDARY_CLASS} gap-2`}
         >

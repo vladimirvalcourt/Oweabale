@@ -7,6 +7,15 @@ declare module '*?url' {
   export default src;
 }
 
+// Scheduler API for INP optimization (scheduler.yield)
+interface Scheduler {
+  yield(): Promise<void>;
+}
+
+interface Window {
+  scheduler?: Scheduler;
+}
+
 interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL: string;
   readonly VITE_SUPABASE_ANON_KEY: string;
