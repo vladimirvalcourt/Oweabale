@@ -255,7 +255,7 @@ export default function Landing() {
           <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-content-secondary">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-emerald-500" />
-              <span>Bank-level encryption</span>
+              <span>Enterprise-level encryption</span>
             </div>
             <div className="hidden sm:block w-px h-4 bg-surface-border"></div>
             <div className="flex items-center gap-2">
@@ -402,8 +402,8 @@ export default function Landing() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
               <div className="flex items-center gap-4 mb-6">
-                <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0">
-                  💼
+                <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0 overflow-hidden">
+                  <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="Salaried Worker" className="h-full w-full object-cover" />
                 </div>
                 <div>
                   <h3 className="text-lg font-medium text-content-primary tracking-tight">Salaried & W-2 Workers</h3>
@@ -416,8 +416,8 @@ export default function Landing() {
 
             <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
               <div className="flex items-center gap-4 mb-6">
-                <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0">
-                  🚗
+                <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0 overflow-hidden">
+                  <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=150&auto=format&fit=crop" alt="Gig Worker" className="h-full w-full object-cover" />
                 </div>
                 <div>
                   <h3 className="text-lg font-medium text-content-primary tracking-tight">Gig Workers & Freelancers</h3>
@@ -430,8 +430,8 @@ export default function Landing() {
 
             <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
               <div className="flex items-center gap-4 mb-6">
-                <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0">
-                  👨‍👩‍👧
+                <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0 overflow-hidden">
+                  <img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=150&auto=format&fit=crop" alt="Family" className="h-full w-full object-cover" />
                 </div>
                 <div>
                   <h3 className="text-lg font-medium text-content-primary tracking-tight">Families & Households</h3>
@@ -497,21 +497,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Trust & Security Section */}
-      <section className="py-24 border-t border-surface-border bg-surface-raised mb-12">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center flex flex-col items-center">
-            <div className="h-16 w-16 bg-surface-base border border-surface-border rounded-full flex items-center justify-center mb-6 text-brand-primary">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-            </div>
-            <h2 className="text-2xl font-semibold tracking-tight text-content-primary mb-4">Bank-Grade Security & Privacy</h2>
-            <p className="text-content-secondary leading-relaxed max-w-2xl mb-8">
-              We understand you are trusting us with your financial truth. Oweable uses AES-256 encryption at rest and TLS 1.2+ in transit to protect your data. If you choose to connect a bank, we use secure read-only connections via Plaid. We never see your bank credentials, and we never sell your personal data.
-            </p>
-            <TransitionLink to="/security" className="text-sm font-medium text-brand-primary hover:text-brand-primary-hover transition-colors inline-flex items-center gap-2">
-              Read our full security policy <ArrowRight className="w-4 h-4" />
-            </TransitionLink>
-        </div>
-      </section>
+
 
       {/* FAQ Section — indexed by search engines and AI crawlers */}
       <section id="faq" className="py-24 border-t border-surface-border bg-surface-base">

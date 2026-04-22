@@ -165,11 +165,11 @@ export default function Dashboard() {
   }, [cashFlow.fixedExpenses, cashFlow.subscriptions, monthlyIncome]);
   const spendingBenchmark = useMemo(() => {
     if (spendingShareOfIncome === null) return null;
-    if (spendingShareOfIncome <= 30) return { label: 'Well under budget', emoji: '🟢', tone: 'text-brand-profit' };
-    if (spendingShareOfIncome <= 50) return { label: 'On track', emoji: '🟡', tone: 'text-amber-300' };
-    if (spendingShareOfIncome <= 75) return { label: 'Approaching limit', emoji: '🟠', tone: 'text-amber-400' };
-    if (spendingShareOfIncome <= 100) return { label: 'At limit', emoji: '🔴', tone: 'text-rose-400' };
-    return { label: 'Over budget', emoji: '🔴', tone: 'text-rose-400' };
+    if (spendingShareOfIncome <= 30) return { label: 'Well under budget', dotClass: 'bg-brand-profit', tone: 'text-brand-profit' };
+    if (spendingShareOfIncome <= 50) return { label: 'On track', dotClass: 'bg-amber-300', tone: 'text-amber-300' };
+    if (spendingShareOfIncome <= 75) return { label: 'Approaching limit', dotClass: 'bg-amber-400', tone: 'text-amber-400' };
+    if (spendingShareOfIncome <= 100) return { label: 'At limit', dotClass: 'bg-rose-400', tone: 'text-rose-400' };
+    return { label: 'Over budget', dotClass: 'bg-rose-400', tone: 'text-rose-400' };
   }, [spendingShareOfIncome]);
 
   const weeklySpendingRecap = useMemo(() => {
@@ -753,8 +753,9 @@ export default function Dashboard() {
           </p>
           <p className="mt-1 text-xs text-content-secondary">Fixed bills, debt minimums, and subscriptions as share of income.</p>
           {spendingBenchmark && (
-            <p className={`mt-1 text-xs font-medium ${spendingBenchmark.tone}`}>
-              {spendingBenchmark.label} {spendingBenchmark.emoji}
+            <p className={`mt-1 text-xs font-medium flex items-center gap-1.5 ${spendingBenchmark.tone}`}>
+              <span className={`inline-block w-2 h-2 rounded-full ${spendingBenchmark.dotClass}`} aria-hidden="true" />
+              {spendingBenchmark.label}
             </p>
           )}
           <p className="mt-1 text-[11px] text-content-tertiary">
