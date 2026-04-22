@@ -302,7 +302,7 @@ export default function Landing() {
               <div className="relative rounded-[2rem] border border-white/10 bg-surface-raised/40 backdrop-blur-md p-3 shadow-2xl">
                 <HeroPreviewMedia />
               </div>
-
+            </div>
           </div>
         </section>
 
