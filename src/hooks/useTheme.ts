@@ -30,9 +30,8 @@ export function useTheme() {
     
     if (theme === 'light') {
       root.classList.add('theme-light');
-      root.classList.remove('theme-dark');
     } else {
-      root.classList.add('theme-dark');
+      // Dark mode is default - remove light class
       root.classList.remove('theme-light');
     }
 

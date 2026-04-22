@@ -28,6 +28,7 @@ import type { HouseholdMember } from '../types/household';
 import TrialBanner from './TrialBanner';
 import TrialExpiryModal from './TrialExpiryModal';
 import { ThemeToggle } from './ThemeToggle';
+import { useTheme } from '../hooks/useTheme';
 
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
@@ -53,6 +54,9 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showTrialExpiryModal, setShowTrialExpiryModal] = useState(true);
+  
+  // Initialize theme system
+  const { theme } = useTheme();
 
   const closeSidebarMobile = useCallback(() => {
     startTransition(() => setSidebarOpen(false));
@@ -248,18 +252,9 @@ export default function Layout() {
   }, [navigate, openQuickAdd]);
 
   useEffect(() => {
-    if (user?.theme === 'Light') {
-      document.documentElement.classList.add('theme-light');
-      document.documentElement.removeAttribute('data-theme');
-    } else {
-      document.documentElement.classList.remove('theme-light');
-      if (user?.theme && user.theme !== 'Dark') {
-        document.documentElement.setAttribute('data-theme', user.theme.toLowerCase());
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-      }
-    }
-  }, [user?.theme]);
+    // Theme is now managed by useTheme hook - no need to sync with user?.theme
+    // The useTheme hook handles localStorage and system preference automatically
+  }, []);
 
   const deferredSearchQuery = useDeferredValue(searchQuery.trim());
 
