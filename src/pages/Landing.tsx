@@ -266,14 +266,13 @@ export default function Landing() {
                 Next-Gen Financial Operating System
               </div>
               
-              <h1 className="mt-8 text-6xl font-bold tracking-[-0.05em] text-content-primary sm:text-7xl lg:text-[7rem] lg:leading-[0.9]">
+              <h1 className="mt-8 text-6xl font-bold tracking-tight text-content-primary sm:text-7xl lg:text-[7rem] lg:leading-[1.0]">
                 Clarity for<br />
                 <span className="bg-gradient-to-r from-white via-white/60 to-white/20 bg-clip-text text-transparent">Complex Money.</span>
               </h1>
               
-              <p className="mt-10 max-w-xl text-lg leading-relaxed text-content-secondary lg:text-xl font-light">
-                Oweable turns your fragmented bills, debt, and uneven income into a single, dependable rhythm. 
-                Stop guessing and start knowing what your money needs next.
+              <p className="mt-10 max-w-2xl text-lg leading-relaxed text-content-secondary lg:text-xl">
+                Oweable turns your fragmented bills, debt, and uneven income into a single, dependable rhythm. Stop guessing and start knowing what your money needs next.
               </p>
 
               <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -320,9 +319,9 @@ export default function Landing() {
         <section id="why" className="py-32 relative overflow-hidden">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="flex flex-col items-center text-center mb-24">
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-profit mb-4">The Logic</p>
-              <h2 className="text-4xl font-bold tracking-tight text-content-primary sm:text-5xl lg:text-6xl">
-                The problem isn't spending.<br />
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">The Logic</p>
+              <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl lg:text-6xl lg:tracking-tighter">
+                The problem isn't spending.<br className="hidden lg:block" />
                 <span className="text-content-secondary">It's financial fog.</span>
               </h2>
             </div>
@@ -361,13 +360,12 @@ export default function Landing() {
           >
             <div className="grid gap-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-profit mb-6">The System</p>
-                <h2 className="text-4xl font-bold tracking-tight text-content-primary sm:text-5xl">
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-8">The System</p>
+                <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl lg:tracking-tighter">
                   One command center for what your money needs next.
                 </h2>
-                <p className="mt-8 text-lg leading-relaxed text-content-secondary font-light">
-                  Oweable isn't just a tracker. It's a financial operating system that reduces decision friction by 
-                  pulling everything into one rhythm.
+                <p className="mt-8 max-w-2xl text-lg leading-relaxed text-content-secondary">
+                  Oweable isn't just a tracker. It's a financial operating system that reduces decision friction by pulling everything into one rhythm.
                 </p>
                 
                 <div className="mt-12 space-y-4">
@@ -421,9 +419,9 @@ export default function Landing() {
         <section className="py-32 relative border-t border-white/5">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="flex flex-col items-start mb-20">
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-profit mb-4">Capabilities</p>
-              <h2 className="text-4xl font-bold tracking-tight text-content-primary sm:text-5xl">
-                Precision engineering for<br />
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Capabilities</p>
+              <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl lg:tracking-tighter">
+                Precision engineering for<br className="hidden lg:block" />
                 <span className="text-content-secondary">your money workflow.</span>
               </h2>
             </div>
@@ -462,13 +460,12 @@ export default function Landing() {
           >
             <div className="grid gap-16 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-profit mb-4">Audience</p>
-                <h2 className="text-4xl font-bold tracking-tight text-content-primary sm:text-5xl">
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Audience</p>
+                <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl lg:tracking-tighter">
                   Built for the messy reality of money.
                 </h2>
-                <p className="mt-8 text-lg leading-relaxed text-content-secondary font-light">
-                  We don't expect you to have a perfect budget. We expect you to have a life. 
-                  Oweable is built for households, freelancers, and anyone with "too many moving pieces."
+                <p className="mt-8 max-w-2xl text-lg leading-relaxed text-content-secondary">
+                  We don't expect you to have a perfect budget. We expect you to have a life. Oweable is built for households, freelancers, and anyone with "too many moving pieces."
                 </p>
               </div>
               <div className="grid gap-4">
@@ -528,21 +525,21 @@ export default function Landing() {
         <section id="pricing" className="py-32 relative border-t border-white/5">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="flex flex-col items-center text-center mb-20">
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-profit mb-4">Pricing</p>
-              <h2 className="text-4xl font-bold tracking-tight text-content-primary sm:text-5xl">
-                Start with essentials.<br />
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Pricing</p>
+              <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl lg:tracking-tighter">
+                Start with essentials.<br className="hidden lg:block" />
                 <span className="text-content-secondary">Upgrade when you're ready.</span>
               </h2>
             </div>
 
             <div className="mt-12 grid gap-8 lg:grid-cols-2 max-w-5xl mx-auto">
               <article className="glass-card group p-10 flex flex-col transition-all hover:bg-white/[0.02]">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-content-tertiary mb-6">Free Tracker</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary mb-6">Free Tracker</p>
                 <div className="flex items-end gap-2 mb-8">
                   <span className="text-6xl font-bold tracking-tight text-content-primary">$0</span>
                   <span className="pb-1 text-sm text-content-secondary font-medium">/ month</span>
                 </div>
-                <p className="text-sm leading-relaxed text-content-secondary mb-10 font-light">
+                <p className="text-sm leading-relaxed text-content-secondary mb-10">
                   Immediate visibility into bills, due dates, and core reminders.
                 </p>
                 <ul className="space-y-4 mb-10 flex-grow">
@@ -560,12 +557,12 @@ export default function Landing() {
 
               <article className="relative p-10 flex flex-col rounded-2xl border border-brand-profit/30 bg-brand-profit/5 overflow-hidden group">
                 <div className="absolute top-0 right-0 p-3 bg-brand-profit text-black text-[9px] font-black uppercase tracking-widest rounded-bl-xl">Best Value</div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-profit mb-6">Full Suite</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Full Suite</p>
                 <div className="flex items-end gap-2 mb-8">
                   <span className="text-6xl font-bold tracking-tight text-white">$10.99</span>
                   <span className="pb-1 text-sm text-brand-profit/70 font-medium">/ month</span>
                 </div>
-                <p className="text-sm leading-relaxed text-white/80 mb-10 font-light">
+                <p className="text-sm leading-relaxed text-white/80 mb-10">
                   The complete operating system: debt, budgets, taxes, and deep cash-flow.
                 </p>
                 <ul className="space-y-4 mb-10 flex-grow">
@@ -588,8 +585,8 @@ export default function Landing() {
         <section id="faq" className="py-32 relative border-t border-white/5">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="flex flex-col items-center text-center mb-20">
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-profit mb-4">FAQ</p>
-              <h2 className="text-4xl font-bold tracking-tight text-content-primary sm:text-5xl">
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">FAQ</p>
+              <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
                 Common inquiries.
               </h2>
             </div>
@@ -599,8 +596,8 @@ export default function Landing() {
                   key={item.q}
                   className="glass-card p-8 transition-all hover:bg-white/[0.03]"
                 >
-                  <h3 className="text-sm font-bold text-content-primary mb-4 tracking-tight uppercase tracking-wider">{item.q}</h3>
-                  <p className="text-sm leading-relaxed text-content-secondary font-light">{item.a}</p>
+                  <h3 className="text-sm font-semibold text-content-primary mb-4 tracking-tight">{item.q}</h3>
+                  <p className="text-sm leading-relaxed text-content-secondary">{item.a}</p>
                 </article>
               ))}
             </div>
@@ -613,9 +610,9 @@ export default function Landing() {
           </div>
 
           <div className="mx-auto max-w-4xl px-6 lg:px-8 text-center relative z-10">
-            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-profit mb-8">Ready to Initialize</p>
-            <h2 className="text-5xl font-bold tracking-tighter text-content-primary sm:text-7xl lg:text-8xl mb-12">
-              Money stress is just<br />
+            <p className="text-xs font-black uppercase tracking-widest text-brand-profit mb-8">Ready to Initialize</p>
+            <h2 className="text-5xl font-bold tracking-tight text-content-primary sm:text-7xl lg:text-8xl mb-12">
+              Money stress is just<br className="hidden lg:block" />
               <span className="text-content-secondary/40">missing visibility.</span>
             </h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
