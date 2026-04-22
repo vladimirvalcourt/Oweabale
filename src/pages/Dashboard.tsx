@@ -166,10 +166,10 @@ export default function Dashboard() {
   const spendingBenchmark = useMemo(() => {
     if (spendingShareOfIncome === null) return null;
     if (spendingShareOfIncome <= 30) return { label: 'Well under budget', dotClass: 'bg-brand-profit', tone: 'text-brand-profit' };
-    if (spendingShareOfIncome <= 50) return { label: 'On track', dotClass: 'bg-amber-300', tone: 'text-amber-300' };
-    if (spendingShareOfIncome <= 75) return { label: 'Approaching limit', dotClass: 'bg-amber-400', tone: 'text-amber-400' };
-    if (spendingShareOfIncome <= 100) return { label: 'At limit', dotClass: 'bg-rose-400', tone: 'text-rose-400' };
-    return { label: 'Over budget', dotClass: 'bg-rose-400', tone: 'text-rose-400' };
+    if (spendingShareOfIncome <= 50) return { label: 'On track', dotClass: 'bg-amber-500', tone: 'text-amber-500' };
+    if (spendingShareOfIncome <= 75) return { label: 'Approaching limit', dotClass: 'bg-amber-600', tone: 'text-amber-600' };
+    if (spendingShareOfIncome <= 100) return { label: 'At limit', dotClass: 'bg-red-500', tone: 'text-red-500' };
+    return { label: 'Over budget', dotClass: 'bg-red-600', tone: 'text-red-600' };
   }, [spendingShareOfIncome]);
 
   const weeklySpendingRecap = useMemo(() => {
@@ -548,7 +548,7 @@ export default function Dashboard() {
                 >
                   <div className="flex items-center gap-5">
                     <div className="relative w-10 h-10 bg-content-primary/[0.06] rounded-full flex items-center justify-center shrink-0 border border-surface-border">
-                      <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-red-500 ring-2 ring-[#0a0a0a]" aria-hidden />
+                      <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-red-500 ring-2 ring-surface-base" aria-hidden />
                       <ShieldAlert className="w-5 h-5 text-content-primary" />
                     </div>
                     <div>
@@ -601,7 +601,7 @@ export default function Dashboard() {
                 >
                   <div className="flex items-center gap-5 min-w-0">
                     <div className="relative w-10 h-10 bg-content-primary/[0.06] rounded-full flex items-center justify-center shrink-0 border border-surface-border">
-                      <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-amber-500 ring-2 ring-[#0a0a0a]" aria-hidden />
+                      <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-amber-500 ring-2 ring-surface-base" aria-hidden />
                       <ShieldAlert className="w-5 h-5 text-content-primary" aria-hidden />
                     </div>
                     <div className="min-w-0">
@@ -721,12 +721,12 @@ export default function Dashboard() {
 
       {/* Spending Anomaly Callout */}
       {!calmMode && spendingAnomalies.length > 0 && (
-        <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-3">
-          <p className="text-xs font-semibold text-amber-400 mb-1.5">Spending Anomalies Detected</p>
+        <div className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3">
+          <p className="text-xs font-semibold text-red-400 mb-1.5">Spending Anomalies Detected</p>
           <div className="flex flex-wrap gap-x-5 gap-y-1">
             {spendingAnomalies.slice(0, 3).map(a => (
               <span key={a.category} className="text-xs text-content-secondary">
-                <span className="font-medium text-amber-300">{formatCategoryLabel(a.category)}</span>
+                <span className="font-medium text-red-300">{formatCategoryLabel(a.category)}</span>
                 {' '}is {a.overagePercent.toFixed(0)}% above your usual ${a.threeMonthAvg.toFixed(0)}/mo
               </span>
             ))}
@@ -791,7 +791,7 @@ export default function Dashboard() {
             {(() => {
               const lowest = cashFlowForecast.reduce((min, d) => d.balance < min.balance ? d : min, cashFlowForecast[0]);
               return lowest.balance < 0 ? (
-                <span className="shrink-0 text-xs text-amber-400 font-medium">⚠ Balance may dip on {lowest.label}</span>
+                <span className="shrink-0 text-xs text-red-400 font-medium">⚠ Balance may dip on {lowest.label}</span>
               ) : null;
             })()}
           </div>
@@ -799,20 +799,20 @@ export default function Dashboard() {
             <AreaChart data={cashFlowForecast} margin={{ top: 10, right: 8, left: 8, bottom: 6 }}>
               <defs>
                 <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                  <stop offset="5%" stopColor="var(--color-brand-violet)" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="var(--color-brand-violet)" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis
                 dataKey="label"
-                tick={{ fontSize: 9, fill: '#6b7280' }}
+                tick={{ fontSize: 9, fill: 'var(--color-content-secondary)' }}
                 tickLine={false}
                 axisLine={false}
                 interval={6}
                 tickFormatter={(v) => String(v)}
               />
               <YAxis
-                tick={{ fontSize: 10, fill: '#6b7280' }}
+                tick={{ fontSize: 10, fill: 'var(--color-content-secondary)' }}
                 tickLine={false}
                 axisLine={false}
                 width={44}
@@ -830,14 +830,14 @@ export default function Dashboard() {
                   fillOpacity={0.2}
                 />
               )}
-              <ReferenceLine y={0} stroke="#6b7280" strokeDasharray="3 3" />
+              <ReferenceLine y={0} stroke="var(--color-content-secondary)" strokeDasharray="3 3" />
               <ReferenceLine
                 x={cashFlowForecast[0]?.label}
                 stroke="var(--content-tertiary)"
                 strokeDasharray="4 3"
                 strokeOpacity={0.85}
               />
-              <Area type="monotone" dataKey="balance" name="Projected Balance" stroke="#6366f1" fill="url(#forecastGrad)" strokeWidth={1.5} dot={false} />
+              <Area type="monotone" dataKey="balance" name="Projected Balance" stroke="var(--color-brand-violet)" fill="url(#forecastGrad)" strokeWidth={1.5} dot={false} />
             </AreaChart>
           </SafeResponsiveContainer>
           <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-content-tertiary">
@@ -902,7 +902,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-surface-raised p-4 sm:p-6 border border-surface-border rounded-lg shadow-none text-left">
               <p className="metric-label mb-3">Net Worth</p>
-              <p className={`text-2xl sm:text-4xl font-mono font-bold tabular-nums data-numeric ${netWorth < 0 ? 'text-rose-400' : 'text-content-primary'}`}>
+              <p className={`text-2xl sm:text-4xl font-mono font-bold tabular-nums data-numeric ${netWorth < 0 ? 'text-red-400' : 'text-content-primary'}`}>
                 $<AnimatedValue value={netWorth} />
               </p>
               {netWorth < 0 && (
@@ -938,8 +938,8 @@ export default function Dashboard() {
                 </>
               ) : (
                 <>
-                  <p className="metric-label mb-3 text-rose-400">Tax Shortfall</p>
-                  <p className="text-2xl sm:text-4xl font-mono text-rose-400 font-bold tabular-nums data-numeric">
+                  <p className="metric-label mb-3 text-red-400">Tax Shortfall</p>
+                  <p className="text-2xl sm:text-4xl font-mono text-red-400 font-bold tabular-nums data-numeric">
                     $<AnimatedValue value={Math.abs(taxReservePosition)} />
                   </p>
                   <p className="mt-2 text-xs text-content-secondary">
@@ -952,7 +952,7 @@ export default function Dashboard() {
               <p className="metric-label mb-3">Monthly Surplus</p>
               <p
                 className={`text-2xl sm:text-4xl font-mono font-bold tabular-nums data-numeric ${
-                  cashFlow.surplus >= 0 ? 'text-brand-profit' : 'text-rose-400'
+                  cashFlow.surplus >= 0 ? 'text-brand-profit' : 'text-red-400'
                 }`}
               >
                 {cashFlow.surplus >= 0 ? '+' : '−'}$
