@@ -403,7 +403,7 @@ export default function Landing() {
             <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0 overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=150&auto=format&fit=crop" alt="Salaried Worker" className="h-full w-full object-cover" />
+                  <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Salaried Worker" className="h-full w-full object-cover" />
                 </div>
                 <div>
                   <h3 className="text-lg font-medium text-content-primary tracking-tight">Salaried & W-2 Workers</h3>
@@ -417,7 +417,7 @@ export default function Landing() {
             <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0 overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=150&auto=format&fit=crop" alt="Gig Worker" className="h-full w-full object-cover" />
+                  <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Gig Worker" className="h-full w-full object-cover" />
                 </div>
                 <div>
                   <h3 className="text-lg font-medium text-content-primary tracking-tight">Gig Workers & Freelancers</h3>
@@ -431,7 +431,7 @@ export default function Landing() {
             <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0 overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=150&auto=format&fit=crop" alt="Family" className="h-full w-full object-cover" />
+                  <img src="https://randomuser.me/api/portraits/men/46.jpg" alt="Family" className="h-full w-full object-cover" />
                 </div>
                 <div>
                   <h3 className="text-lg font-medium text-content-primary tracking-tight">Families & Households</h3>
