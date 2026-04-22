@@ -55,6 +55,16 @@ function FaqItem({ question, answer }: { question: string, answer: string }) {
 
 const PRICING_FAQ_STATIC: { question: string; answer: string }[] = [
   {
+    question: 'Do I need a credit card to try Oweable?',
+    answer:
+      'No. Sign up with just your email or Google account. You get 14 days of Full Suite free, then drop to the free Tracker tier automatically. No surprise charges.',
+  },
+  {
+    question: 'Can I get another trial after it expires?',
+    answer:
+      'The 14-day trial is available once per account. After it ends, you can stay on the free Tracker tier or upgrade to Full Suite anytime.',
+  },
+  {
     question: 'Can I cancel my subscription at any time?',
     answer:
       'Yes. We believe in ruthless efficiency, not holding you hostage. Cancel anytime from your dashboard settings with a single click. No questions asked.',
@@ -62,7 +72,7 @@ const PRICING_FAQ_STATIC: { question: string; answer: string }[] = [
   {
     question: 'Is my financial data secure?',
     answer:
-      "We use bank-level 256-bit encryption. We don't sell your data, and we don't store your bank credentials. When bank linking is available, we plan to use established connection providers so you never give us your login password directly.",
+      "We use bank-level AES-256 encryption at rest and TLS 1.2+ in transit. We don't sell your data, and we don't store your bank credentials. When bank linking is available, we plan to use established connection providers so you never give us your login password directly.",
   },
   {
     question: 'How does the Debt Payoff Engine work?',
@@ -81,7 +91,7 @@ function getPricingFaqItems(monthlyPrice: number, hasYearlyPricing: boolean) {
   if (hasYearlyPricing) {
     items.push({
       question: 'Is there a discount for paying yearly?',
-      answer: `Yes. When you choose annual billing on this page, you pay one yearly charge instead of twelve monthly renewals. The headline rate shows your effective monthly cost; savings are calculated versus twelve months at the standard monthly price ($${monthlyPrice.toFixed(2)}/mo).`,
+      answer: `Yes — the annual plan is $${(monthlyPrice * 12 * 0.70).toFixed(2)}/year ($${(monthlyPrice * 0.70).toFixed(2)}/mo), saving you 30% compared to monthly billing. That's 2 months free.`,
     });
   }
   return items;
@@ -308,7 +318,7 @@ export default function Pricing() {
           </h1>
           
             <p className="mx-auto max-w-2xl text-base font-medium leading-relaxed text-content-secondary md:text-lg">
-            Start with Tracker for recurring bills and tickets/fines. Upgrade to Full Suite when you want debt planning, ledger, analytics, and tax workflows in one place.
+            Start free — get 14 days of Full Suite on us, no credit card required. After that, stay on Tracker or upgrade to keep everything.
           </p>
         </div>
       </section>
@@ -333,10 +343,13 @@ export default function Pricing() {
               
               <TransitionLink 
                 to="/onboarding" 
-                className="w-full py-4 px-6 bg-transparent border border-surface-border hover:border-content-muted hover:bg-content-primary/5 text-content-primary rounded-lg text-sm font-sans font-semibold text-center transition-all duration-200 mb-10"
+                className="w-full py-4 px-6 bg-transparent border border-surface-border hover:border-content-muted hover:bg-content-primary/5 text-content-primary rounded-lg text-sm font-sans font-semibold text-center transition-all duration-200 mb-4"
               >
-                Use free tracker
+                Start free — includes 14-day Full Suite trial
               </TransitionLink>
+              <p className="text-xs text-content-tertiary text-center mb-10">
+                No credit card required. Full access for 14 days, then Tracker tier.
+              </p>
               
               <div className="flex flex-col gap-5 mt-auto">
                 <div className="flex items-start gap-3">
@@ -445,6 +458,9 @@ export default function Pricing() {
                       ? 'Start yearly plan'
                       : 'Start monthly plan'}
                 </button>
+                <p className="text-xs text-content-tertiary text-center mb-10">
+                  Start with 14-day free trial, no credit card needed.
+                </p>
                 <div className="flex flex-col gap-5 mt-auto">
                   <div className="flex items-start gap-3">
                     <Check className="w-3.5 h-3.5 text-content-primary shrink-0 mt-0.5" />

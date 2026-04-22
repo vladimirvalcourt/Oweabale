@@ -38,7 +38,7 @@ export function useFullSuiteAccess() {
     }
 
     const [profileRes, entitlementRes, subscriptionRes] = await Promise.all([
-      supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle(),
+      supabase.from('profiles').select('is_admin, plan, trial_ends_at, trial_expired').eq('id', user.id).maybeSingle(),
       supabase
         .from('entitlements')
         .select('status, ends_at')
@@ -59,11 +59,19 @@ export function useFullSuiteAccess() {
     const isAdmin = profileRes.data?.is_admin === true;
     const hasEntitlement = isEntitlementActive(entitlementRes.data);
     const hasLiveSubscription = isSubscriptionLive(subscriptionRes.data);
+    
+    // Check if user is on active trial
+    const profile = profileRes.data;
+    const isOnTrial = 
+      profile?.plan === 'trial' && 
+      !profile?.trial_expired && 
+      profile?.trial_ends_at && 
+      new Date(profile.trial_ends_at).getTime() > Date.now();
 
     setState({
       isLoading: false,
       isAdmin,
-      hasFullSuite: isAdmin || hasEntitlement || hasLiveSubscription,
+      hasFullSuite: isAdmin || hasEntitlement || hasLiveSubscription || isOnTrial,
     });
   }, []);
 
