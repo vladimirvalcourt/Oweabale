@@ -25,6 +25,8 @@ import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 import { isApplePointerPlatform } from '../lib/platform';
 import { canAccessAppPath } from '../lib/trackerTier';
 import type { HouseholdMember } from '../types/household';
+import TrialBanner from './TrialBanner';
+import TrialExpiryModal from './TrialExpiryModal';
 
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
@@ -49,6 +51,7 @@ export default function Layout() {
   const prefetchedPaths = usePrefetchedSet(); // Fix 4
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showTrialExpiryModal, setShowTrialExpiryModal] = useState(true);
 
   const closeSidebarMobile = useCallback(() => {
     startTransition(() => setSidebarOpen(false));
@@ -503,6 +506,8 @@ export default function Layout() {
   return (
     <div className="min-h-[100dvh] bg-surface-base font-sans text-content-primary flex">
       <PrivacyScreenWhenHidden />
+      <TrialBanner />
+      <TrialExpiryModal onDismiss={() => setShowTrialExpiryModal(false)} />
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
