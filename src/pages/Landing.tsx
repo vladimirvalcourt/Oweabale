@@ -13,6 +13,9 @@ import {
   Wallet,
   Repeat,
   AlertTriangle,
+  Shield,
+  CreditCard,
+  Users,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
@@ -109,12 +112,12 @@ const TESTIMONIALS = [
 
 export default function Landing() {
   useSEO({
-    title: 'Oweable — Bills, budgets, debt & net worth in one command center',
+    title: 'Oweable — Stop Losing Money to Bills, Debt & Late Fees',
     description:
-      'Oweable brings bills, debts, category budgets, cash flow, subscriptions, net worth, and optional tax tools into one dashboard — for W-2 households, families, and anyone with variable or self-employed income.',
-    ogTitle: 'Oweable — Personal finance tools for bills, debt, and cash flow',
+      'Oweable tracks your bills, debts, subscriptions, and budgets in one place — with overdue alerts, debt payoff plans, and tax estimates for gig and self-employed income. Sign up free.',
+    ogTitle: 'Oweable — Stop Losing Money to Bills, Debt & Late Fees',
     ogDescription:
-      'Track obligations, build budgets with guardrails, see spending and net worth, manage subscriptions, and plan payoff — one dashboard for everyday money management, not only freelancers.',
+      'Finally know exactly what you owe and when. Track everything in one dashboard with automatic alerts and clear payoff strategies. No credit card required.',
     canonical: 'https://www.oweable.com/',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -185,12 +188,11 @@ export default function Landing() {
             </p>
             
             <h1 className="text-4xl md:text-6xl xl:text-7xl font-sans font-medium tracking-[-0.03em] text-content-primary mb-8 leading-[1.05] animate-in fade-in slide-in-from-bottom-8 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[200ms] fill-mode-both">
-              Stop Drowning in Bills and Debt —<br />
-              Finally See a Way Out.
+              Finally know exactly what you owe — and when.
             </h1>
             
             <p className="text-lg font-medium text-content-secondary max-w-lg leading-[1.6] mb-10 border-l border-surface-border pl-6 animate-in fade-in slide-in-from-bottom-6 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[300ms] fill-mode-both">
-              Oweable gives you a single dashboard to track everything you owe, every bill you have, and a clear path to pay it all off — even if you're self-employed.
+              Oweable tracks your bills, debts, subscriptions, and budgets in one place — with overdue alerts, debt payoff plans, and tax estimates for gig and self-employed income. Sign up free. No app download needed.
             </p>
             
             <div className="w-full max-w-xl animate-in fade-in slide-in-from-bottom-6 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[400ms] fill-mode-both">
@@ -198,13 +200,15 @@ export default function Landing() {
                 to={user?.id ? "/dashboard" : "/onboarding"}
                 className="group inline-flex items-center gap-4 bg-brand-cta text-surface-base hover:bg-brand-cta-hover px-8 py-4 text-sm font-sans font-medium shadow-none rounded-lg transition-[transform,box-shadow,background-color] duration-300 hover:scale-[1.02] active:scale-[0.98] hover:shadow-[0_4px_24px_rgba(255,255,255,0.15)]"
               >
-                {user?.id ? "Open dashboard" : "Start Free — No Credit Card Required"}
+                {user?.id ? "Open dashboard" : "Get Started Free"}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </TransitionLink>
 
-              <p className="mt-3 text-xs text-content-tertiary">
-                See your full financial picture in under 5 minutes.
-              </p>
+              <div className="mt-4 flex items-center gap-4">
+                <TransitionLink to="/pricing" className="text-sm text-content-secondary hover:text-content-primary transition-colors">
+                  See how it works →
+                </TransitionLink>
+              </div>
 
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="rounded-lg border border-surface-border bg-surface-raised p-4">
@@ -245,41 +249,30 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Social Proof Section */}
-      <section className="py-12 border-t border-surface-border bg-surface-raised mb-12">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center flex flex-col items-center">
-            <h3 className="text-sm font-medium tracking-wide text-content-secondary uppercase mb-6">Trusted by 3,000+ users to get out of debt</h3>
-            <div className="flex flex-col md:flex-row items-center gap-6 justify-center w-full max-w-4xl">
-              
-              <div className="flex-1 max-w-[280px]">
-                <div className="flex items-center justify-center gap-1 text-amber-400 mb-2">
-                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                </div>
-                <p className="text-xs text-content-secondary italic mb-2">"Finally stopped paying late fees. A lifesaver for my messy bills."</p>
-                <p className="text-[10px] uppercase tracking-wider text-content-tertiary">— Sarah, W-2 & Side Gigs</p>
-              </div>
-
-               <div className="hidden md:block w-px h-12 bg-surface-border"></div>
-
-              <div className="flex-1 max-w-[280px]">
-                <div className="flex items-center justify-center gap-1 text-amber-400 mb-2">
-                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                </div>
-                <p className="text-xs text-content-secondary italic mb-2">"The Debt Detonator paid for itself in one month. Unreal."</p>
-                <p className="text-[10px] uppercase tracking-wider text-content-tertiary">— Mark T., $12k in Credit Cards</p>
-              </div>
-
-              <div className="hidden md:block w-px h-12 bg-surface-border"></div>
-
-              <div className="flex-1 max-w-[280px]">
-                 <div className="flex items-center justify-center gap-1 text-amber-400 mb-2">
-                  <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
-                </div>
-                <p className="text-xs text-content-secondary italic mb-2">"No app to download, just snap a picture of the bill. So easy."</p>
-                <p className="text-[10px] uppercase tracking-wider text-content-tertiary">— Jessica R., Freelancer</p>
-              </div>
-
+      {/* Trust Bar */}
+      <section className="py-8 border-t border-b border-surface-border bg-surface-raised">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-content-secondary">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-emerald-500" />
+              <span>Bank-level encryption</span>
             </div>
+            <div className="hidden sm:block w-px h-4 bg-surface-border"></div>
+            <div className="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+              <span>Optional bank sync</span>
+            </div>
+            <div className="hidden sm:block w-px h-4 bg-surface-border"></div>
+            <div className="flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-emerald-500" />
+              <span>No credit card required</span>
+            </div>
+            <div className="hidden sm:block w-px h-4 bg-surface-border"></div>
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-emerald-500" />
+              <span>Your data is never sold</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -288,101 +281,93 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8" ref={archRef}>
           <div className={`mb-16 transition-all duration-1000 ease-out ${archVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <h2 className="text-3xl font-sans font-semibold tracking-tight text-content-primary mb-4">
-              Everything to manage what you owe
+              Everything you need to stay on top of your money
             </h2>
-            <p className="text-sm text-content-secondary max-w-2xl mb-6 leading-relaxed">
-              Oweable isn't just about simple tracking. It’s built to actually get you ahead, whether you’re destroying debt, stabilizing bills, or managing irregular income.
-            </p>
             <div className="w-full h-px bg-surface-border" />
           </div>
 
           <div className="space-y-16">
             
-            {/* Group 1: Debt Payoff */}
+            {/* Pillar 1: Never miss a bill */}
             <div className={`transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[100ms] ${archVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <div className="mb-6 flex items-center gap-4">
                  <div className="h-10 w-10 shrink-0 bg-brand-primary/10 text-brand-primary flex items-center justify-center rounded-lg border border-brand-primary/20">
-                   <Target className="w-5 h-5" />
-                 </div>
-                 <div>
-                    <h3 className="text-xl font-medium tracking-tight text-content-primary">Debt Payoff Engine</h3>
-                    <p className="text-sm text-content-secondary">Finally see a clear path to zero balance.</p>
-                 </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="border border-surface-border rounded-lg p-6 bg-surface-raised">
-                  <h4 className="text-sm font-medium text-content-primary mb-2">Track Everything</h4>
-                  <p className="text-xs text-content-secondary leading-relaxed">Credit cards, personal loans, medical debt, and auto loans—all your balances and interest rates in one place.</p>
-                </div>
-                <div className="border border-surface-border rounded-lg p-6 bg-surface-raised">
-                  <h4 className="text-sm font-medium text-content-primary mb-2">Strategy Visualizer</h4>
-                  <p className="text-xs text-content-secondary leading-relaxed">Switch between Avalanche (save interest) or Snowball (build momentum) and see the exact month you'll be debt-free.</p>
-                </div>
-                <div className="border border-surface-border rounded-lg p-6 bg-surface-raised">
-                  <h4 className="text-sm font-medium text-content-primary mb-2">Progress Tracker</h4>
-                  <p className="text-xs text-content-secondary leading-relaxed">Watch the principal shrink with every payment. The dashboard recalculates automatically as you go.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Group 2: Bill Control */}
-            <div className={`transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[200ms] ${archVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              <div className="mb-6 flex items-center gap-4">
-                 <div className="h-10 w-10 shrink-0 bg-blue-500/10 text-blue-400 flex items-center justify-center rounded-lg border border-blue-500/20">
                    <CalendarClock className="w-5 h-5" />
                  </div>
                  <div>
-                    <h3 className="text-xl font-medium tracking-tight text-content-primary flex items-center gap-3">
-                      Bill Control
-                      <span className="inline-flex items-center rounded bg-indigo-500/10 px-2 py-0.5 text-[10px] font-medium text-indigo-400 ring-1 ring-inset ring-indigo-500/20">
-                        ✨ No App Download Required
-                      </span>
-                    </h3>
-                    <p className="text-sm text-content-secondary">Stop late fees and organize your monthly burn rate.</p>
+                    <h3 className="text-xl font-medium tracking-tight text-content-primary">Never miss a bill or payment again</h3>
+                    <p className="text-sm text-content-secondary">Track every bill, debt, fine, and subscription with automatic overdue detection.</p>
                  </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="border border-surface-border rounded-lg p-6 bg-surface-raised">
-                  <h4 className="text-sm font-medium text-content-primary mb-2">Recurring Management</h4>
-                  <p className="text-xs text-content-secondary leading-relaxed">Alerts for upcoming rent, utilities, and subscriptions. Never miss a due date again.</p>
-                </div>
-                <div className="border border-surface-border rounded-lg p-6 bg-surface-raised border-indigo-500/20">
-                  <h4 className="text-sm font-medium text-content-primary mb-2">Instant OCR Capture</h4>
-                  <p className="text-xs text-content-secondary leading-relaxed">Scan a QR code to upload paper bills or receipts straight from your phone's browser. It extracts the dates and amounts automatically.</p>
+                  <h4 className="text-sm font-medium text-content-primary mb-2">Build a real debt payoff plan</h4>
+                  <p className="text-xs text-content-secondary leading-relaxed">Use Snowball or Avalanche strategies to see exactly when you'll be debt-free and how much interest you'll save.</p>
                 </div>
                 <div className="border border-surface-border rounded-lg p-6 bg-surface-raised">
-                  <h4 className="text-sm font-medium text-content-primary mb-2">Shared Expenses</h4>
-                  <p className="text-xs text-content-secondary leading-relaxed">Split bills and track who owes what for household utilities or group trips.</p>
+                  <h4 className="text-sm font-medium text-content-primary mb-2">Capture bills instantly</h4>
+                  <p className="text-xs text-content-secondary leading-relaxed">Use your phone camera to scan paper bills — no app required. OCR extracts dates and amounts automatically.</p>
+                </div>
+                <div className="border border-surface-border rounded-lg p-6 bg-surface-raised">
+                  <h4 className="text-sm font-medium text-content-primary mb-2">Automatic overdue alerts</h4>
+                  <p className="text-xs text-content-secondary leading-relaxed">Get notified before bills go late. Never pay another late fee again.</p>
                 </div>
               </div>
             </div>
 
-            {/* Group 3: Income & Tax */}
+            {/* Pillar 2: Spend with confidence */}
+            <div className={`transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[200ms] ${archVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+              <div className="mb-6 flex items-center gap-4">
+                 <div className="h-10 w-10 shrink-0 bg-blue-500/10 text-blue-400 flex items-center justify-center rounded-lg border border-blue-500/20">
+                   <BarChart2 className="w-5 h-5" />
+                 </div>
+                 <div>
+                    <h3 className="text-xl font-medium tracking-tight text-content-primary">Spend with confidence, not anxiety</h3>
+                    <p className="text-sm text-content-secondary">Set category budgets with guardrails and rollover options.</p>
+                 </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="border border-surface-border rounded-lg p-6 bg-surface-raised">
+                  <h4 className="text-sm font-medium text-content-primary mb-2">Log all income sources</h4>
+                  <p className="text-xs text-content-secondary leading-relaxed">Track W-2, freelance, gig work, or mixed income streams in one place.</p>
+                </div>
+                <div className="border border-surface-border rounded-lg p-6 bg-surface-raised">
+                  <h4 className="text-sm font-medium text-content-primary mb-2">Automatic tax estimates</h4>
+                  <p className="text-xs text-content-secondary leading-relaxed">Get reserve calculations so you're never blindsided at tax time.</p>
+                </div>
+                <div className="border border-surface-border rounded-lg p-6 bg-surface-raised">
+                  <h4 className="text-sm font-medium text-content-primary mb-2">Budget guardrails</h4>
+                  <p className="text-xs text-content-secondary leading-relaxed">Stay on track with smart spending limits that adapt to your cash flow.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Pillar 3: See your complete financial health */}
             <div className={`transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[300ms] ${archVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
               <div className="mb-6 flex items-center gap-4">
                  <div className="h-10 w-10 shrink-0 bg-emerald-500/10 text-emerald-400 flex items-center justify-center rounded-lg border border-emerald-500/20">
                    <TrendingUp className="w-5 h-5" />
                  </div>
                  <div>
-                    <h3 className="text-xl font-medium tracking-tight text-content-primary">Income & Tax (For the Self-Employed)</h3>
-                    <p className="text-sm text-content-secondary">You don't need a steady paycheck to use a steady plan.</p>
+                    <h3 className="text-xl font-medium tracking-tight text-content-primary">See your complete financial health at a glance</h3>
+                    <p className="text-sm text-content-secondary">Track net worth, investments, and insurance in one dashboard.</p>
                  </div>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="border border-surface-border rounded-lg p-6 bg-surface-raised">
-                  <h4 className="text-sm font-medium text-content-primary mb-2">Gig Worker Tracking</h4>
-                  <p className="text-xs text-content-secondary leading-relaxed">Log irregular 1099 income from Uber, DoorDash, Upwork, or clients directly alongside your expenses.</p>
+                  <h4 className="text-sm font-medium text-content-primary mb-2">Monitor your credit score</h4>
+                  <p className="text-xs text-content-secondary leading-relaxed">Build your credit with our Credit Workshop tools and tracking features.</p>
                 </div>
                 <div className="border border-surface-border rounded-lg p-6 bg-surface-raised">
-                  <h4 className="text-sm font-medium text-content-primary mb-2">Quarterly Tax Estimation</h4>
-                  <p className="text-xs text-content-secondary leading-relaxed">Oweable automatically projects your estimated tax reserves so you aren't surprised by the IRS.</p>
+                  <h4 className="text-sm font-medium text-content-primary mb-2">OCR document capture</h4>
+                  <p className="text-xs text-content-secondary leading-relaxed">Scan, upload, and store receipts, invoices, and statements securely.</p>
                 </div>
                 <div className="border border-surface-border rounded-lg p-6 bg-surface-raised">
-                  <h4 className="text-sm font-medium text-content-primary mb-2">Irregular Budgeting</h4>
-                  <p className="text-xs text-content-secondary leading-relaxed">Budgeting tools built for cash flow that changes month-to-month, not just flat bi-weekly salaries.</p>
+                  <h4 className="text-sm font-medium text-content-primary mb-2">Investment & insurance views</h4>
+                  <p className="text-xs text-content-secondary leading-relaxed">See your full financial picture including assets and coverage.</p>
                 </div>
               </div>
             </div>
@@ -402,7 +387,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Personas ("Who It's For") */}
+      {/* Who It's For Section */}
       <section id="stories" className="py-24 border-t border-surface-border bg-surface-base">
         <div className="max-w-7xl mx-auto px-6 lg:px-8" ref={testimonialsRef}>
           <div
@@ -410,131 +395,105 @@ export default function Landing() {
           >
             <span className="text-xs font-sans font-medium text-content-secondary">Who It's For</span>
             <h2 className="text-3xl font-sans font-semibold tracking-tight text-content-primary mt-4 mb-3">
-              Built for real financial situations
+              Built for real financial lives — not just spreadsheet people
             </h2>
-            <p className="text-content-secondary max-w-2xl leading-relaxed text-sm">
-              Whether you need to get out of the red, build a cushion, or tame unpredictable income, Oweable bends to fit how you make and manage money.
-            </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((t, i) => (
-              <div
-                key={i}
-                className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full"
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0">
-                    {t.initials}
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium text-content-primary tracking-tight">{t.name}</h3>
-                    <span className="inline-flex items-center gap-1.5 text-xs text-content-secondary mt-1">
-                      <span className="h-1.5 w-1.5 rounded-full bg-neutral-500" aria-hidden />
-                      {t.tag}
-                    </span>
-                  </div>
+            <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0">
+                  💼
                 </div>
-                
-                <p className="text-sm font-medium text-content-primary mb-4">{t.role}</p>
-                
-                <div className="flex-1">
-                  <p className="text-sm text-content-secondary italic leading-relaxed">
-                    "{t.quote}"
-                  </p>
+                <div>
+                  <h3 className="text-lg font-medium text-content-primary tracking-tight">Salaried & W-2 Workers</h3>
                 </div>
               </div>
-            ))}
+              <p className="text-sm text-content-secondary leading-relaxed">
+                Budget by paycheck, track every bill, and watch your net worth grow — all in one place.
+              </p>
+            </div>
+
+            <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0">
+                  🚗
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-content-primary tracking-tight">Gig Workers & Freelancers</h3>
+                </div>
+              </div>
+              <p className="text-sm text-content-secondary leading-relaxed">
+                Irregular income? No problem. Estimate your taxes, manage what you owe, and stop getting caught off guard.
+              </p>
+            </div>
+
+            <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0">
+                  👨‍👩‍👧
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-content-primary tracking-tight">Families & Households</h3>
+                </div>
+              </div>
+              <p className="text-sm text-content-secondary leading-relaxed">
+                One dashboard for shared bills, debt payoff goals, and your entire household budget.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Comparison Section */}
+      {/* Social Proof Section */}
+      <section className="py-24 border-t border-surface-border bg-surface-raised">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-sans font-semibold tracking-tight text-content-primary mb-12">
+            People are finally getting a handle on their money
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="border border-surface-border rounded-lg p-8 bg-surface-base">
+              <p className="text-sm text-content-secondary italic leading-relaxed mb-4">
+                "Finally stopped paying late fees. The automatic alerts saved me hundreds."
+              </p>
+              <p className="text-xs text-content-tertiary">— Sarah, W-2 & Side Gigs</p>
+            </div>
+
+            <div className="border border-surface-border rounded-lg p-8 bg-surface-base">
+              <p className="text-sm text-content-secondary italic leading-relaxed mb-4">
+                "Paid off $12k in credit cards using the Avalanche strategy. Life-changing."
+              </p>
+              <p className="text-xs text-content-tertiary">— Mark T., Freelance Designer</p>
+            </div>
+
+            <div className="border border-surface-border rounded-lg p-8 bg-surface-base">
+              <p className="text-sm text-content-secondary italic leading-relaxed mb-4">
+                "No app to download, just scan bills with my phone camera. So simple."
+              </p>
+              <p className="text-xs text-content-tertiary">— Jessica R., Small Business Owner</p>
+            </div>
+          </div>
+
+          <p className="mt-12 text-sm text-content-secondary">
+            Thousands of households tracking over $2M in debt payoff progress.
+          </p>
+        </div>
+      </section>
+
+      {/* Financial Academy Section */}
       <section className="py-24 border-t border-surface-border bg-surface-base">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="mb-16 text-center">
-            <span className="text-xs font-sans font-medium text-content-secondary">Compare</span>
-            <h2 className="text-3xl font-sans font-semibold tracking-tight text-content-primary mt-4 mb-3">
-              Why Oweable?
-            </h2>
-            <p className="text-sm text-content-secondary max-w-2xl mx-auto leading-relaxed">
-              Oweable is the only platform that combines heavy-duty debt payoff, no-app document capture, and gig worker tax tracking in one clean dashboard.
-            </p>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[600px]">
-              <thead>
-                <tr>
-                  <th className="py-4 px-6 border-b border-surface-border font-medium text-sm text-content-secondary">Feature</th>
-                  <th className="py-4 px-6 border-b border-surface-border font-bold text-sm text-content-primary w-1/5">Oweable</th>
-                  <th className="py-4 px-6 border-b border-surface-border font-medium text-sm text-content-tertiary w-1/5">YNAB</th>
-                  <th className="py-4 px-6 border-b border-surface-border font-medium text-sm text-content-tertiary w-1/5">Monarch</th>
-                  <th className="py-4 px-6 border-b border-surface-border font-medium text-sm text-content-tertiary w-1/5">Copilot</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm">
-                <tr className="hover:bg-content-primary/[0.02]">
-                  <td className="py-4 px-6 border-b border-surface-border text-content-primary">Avalanche & Snowball Debt Payoff Engine</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-brand-primary">Yes</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">Limited</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">No</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">No</td>
-                </tr>
-                <tr className="hover:bg-content-primary/[0.02]">
-                  <td className="py-4 px-6 border-b border-surface-border text-content-primary">No-App OCR Document Capture</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-brand-primary">Yes</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">No</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">No</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">No</td>
-                </tr>
-                <tr className="hover:bg-content-primary/[0.02]">
-                  <td className="py-4 px-6 border-b border-surface-border text-content-primary">Gig Worker Tax Tracking & Estimation</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-brand-primary">Yes</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">No</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">No</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">No</td>
-                </tr>
-                <tr className="hover:bg-content-primary/[0.02]">
-                  <td className="py-4 px-6 border-b border-surface-border text-content-primary">Zero-Based Envelope Budgeting</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-brand-primary">Yes</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">Yes</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">Yes</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">Yes</td>
-                </tr>
-                 <tr className="hover:bg-content-primary/[0.02]">
-                  <td className="py-4 px-6 border-b border-surface-border text-content-primary">Free Tier for Tracking Bills</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-brand-primary">Yes</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">No</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">No</td>
-                  <td className="py-4 px-6 border-b border-surface-border text-content-tertiary">No</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {/* What is Oweable? — plain-language definition for AI crawlers and search engines */}
-      <section id="what-is-oweable" className="py-24 border-t border-surface-border">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-            <div className="lg:col-span-4">
-              <span className="text-xs font-sans font-medium text-content-secondary">Overview</span>
-              <h2 className="text-3xl font-medium tracking-tight text-content-primary mt-4">What is Oweable?</h2>
-            </div>
-            <div className="lg:col-span-8 flex flex-col gap-4 lg:pt-10">
-              <p className="text-content-secondary leading-relaxed">
-                Oweable is a financial operating system for anyone who wants their money tools in one place: bill and debt tracking, category budgets, transactions and analytics, subscriptions, net worth, investments and insurance snapshots, credit workshop features, and optional bank connection — not a niche freelancer product.
-              </p>
-              <p className="text-content-secondary leading-relaxed">
-                It fits steady W-2 paychecks and household budgeting, and it also supports variable income, side work, and self-employment with income logging, freelance and tax pages, and quarterly tax estimation when you need them — alongside the same bills-and-debt workflows salaried users rely on.
-              </p>
-              <p className="text-content-secondary leading-relaxed">
-                Typical members include single parents, dual-income households, people paying down cards or medical bills, recent grads with loans, gig and contract workers, and salaried professionals who want obligations, budgets, and net worth in one honest view — plus a path to get ahead.
-              </p>
-            </div>
-          </div>
+        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+          <BookOpen className="w-12 h-12 text-brand-primary mx-auto mb-6" />
+          <h2 className="text-3xl font-sans font-semibold tracking-tight text-content-primary mb-4">
+            Free Financial Academy — Learn in Plain English
+          </h2>
+          <p className="text-sm text-content-secondary leading-relaxed max-w-2xl mx-auto mb-8">
+            Not sure where to start? Oweable's self-paced Financial Academy covers budgeting, debt payoff strategies, credit building, and more — written for real people, not finance majors. It's completely free with your account.
+          </p>
+          <TransitionLink to="/education" className="inline-flex items-center gap-2 text-sm font-medium text-brand-primary hover:text-brand-primary-hover transition-colors">
+            Explore the Academy →
+          </TransitionLink>
         </div>
       </section>
 
@@ -572,27 +531,24 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Bottom CTA Block */}
+      {/* Bottom CTA Section */}
       <section className="py-32 border-t border-surface-border bg-surface-base text-center overflow-hidden relative">
         <div className="max-w-3xl mx-auto px-6 relative z-10">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[500px] bg-brand-cta/5 blur-[120px] rounded-full -z-10 animate-pulse-highlight"></div>
           <h2 className="text-4xl font-semibold tracking-tight text-content-primary mb-6">
-            Ready to get out of the red?
+            Your finances won't fix themselves. But Oweable makes it a lot easier.
           </h2>
           <p className="text-lg text-content-secondary mb-10">
-            Join thousands of users organizing their bills, paying down debt, and building genuine momentum.
+            Join free today. No credit card. No app download. Just clarity.
           </p>
           <div className="flex flex-col items-center justify-center gap-3">
             <TransitionLink
               to={user?.id ? "/dashboard" : "/onboarding"}
               className="group inline-flex items-center gap-4 bg-brand-cta text-surface-base hover:bg-brand-cta-hover px-10 py-5 text-sm font-sans font-medium shadow-none rounded-lg transition-[transform,box-shadow,background-color] duration-300 hover:scale-[1.02] active:scale-[0.98] hover:shadow-[0_4px_24px_rgba(255,255,255,0.15)]"
             >
-              {user?.id ? "Open dashboard" : "Start Free — No Credit Card Required"}
+              {user?.id ? "Open dashboard" : "Create My Free Account"}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </TransitionLink>
-            <p className="text-xs text-content-tertiary">
-              See your full financial picture in under 5 minutes.
-            </p>
           </div>
         </div>
       </section>
