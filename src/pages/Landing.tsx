@@ -54,7 +54,7 @@ const FAQ_ITEMS_BASE = [
   },
   {
     q: 'Is my financial data safe?',
-    a: 'Absolutely. We use 256-bit SSL encryption to protect your information in transit, and any connected bank data is strictly read-only through our secure partners. Your data is yours—we never sell it to third parties or use it to target you with ads.',
+    a: 'Absolutely. We use AES-256 encryption at rest and TLS 1.2+ in transit to protect your information. Any connected bank data is strictly read-only through our secure partners. Your data is yours—we never sell it to third parties or use it to target you with ads.',
   },
   {
     q: 'Does it work if I have irregular income?',
@@ -159,14 +159,14 @@ export default function Landing() {
                 }}
                 className="hidden sm:block px-6 py-2 bg-transparent border border-surface-border text-content-secondary hover:text-content-primary hover:bg-content-primary/[0.04] text-sm font-sans font-medium transition-colors rounded-lg"
               >
-                Sign out
+                Sign Out
               </button>
             )}
             <TransitionLink 
               to={user?.id ? "/dashboard" : "/onboarding"} 
               className="px-6 py-2 rounded-lg bg-brand-cta text-surface-base hover:bg-brand-cta-hover text-sm font-sans font-medium shadow-none transition-colors"
             >
-              {user?.id ? "Open dashboard" : "Sign in"}
+              {user?.id ? "Open dashboard" : "Start Free"}
             </TransitionLink>
           </div>
         </div>
@@ -180,7 +180,7 @@ export default function Landing() {
           <div className="lg:col-span-7 flex flex-col items-start pr-0 lg:pr-12">
             <div className="inline-flex items-center gap-2 border border-surface-border bg-surface-raised px-3 py-1.5 mb-8 text-xs font-sans font-medium text-content-secondary rounded-lg animate-in fade-in slide-in-from-bottom-6 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] fill-mode-both">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
-              Bank-grade Security
+              AES-256 + TLS 1.2+ Encryption
             </div>
 
             <p className="text-xs text-content-secondary mb-4 animate-in fade-in slide-in-from-bottom-6 duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] delay-[100ms] fill-mode-both">
@@ -505,7 +505,7 @@ export default function Landing() {
             </div>
             <h2 className="text-2xl font-semibold tracking-tight text-content-primary mb-4">Bank-Grade Security & Privacy</h2>
             <p className="text-content-secondary leading-relaxed max-w-2xl mb-8">
-              We understand you are trusting us with your financial truth. Oweable uses 256-bit SSL encryption to protect your data. If you choose to connect a bank, we use secure read-only connections via Plaid. We never see your bank credentials, and we never sell your personal data.
+              We understand you are trusting us with your financial truth. Oweable uses AES-256 encryption at rest and TLS 1.2+ in transit to protect your data. If you choose to connect a bank, we use secure read-only connections via Plaid. We never see your bank credentials, and we never sell your personal data.
             </p>
             <TransitionLink to="/security" className="text-sm font-medium text-brand-primary hover:text-brand-primary-hover transition-colors inline-flex items-center gap-2">
               Read our full security policy <ArrowRight className="w-4 h-4" />

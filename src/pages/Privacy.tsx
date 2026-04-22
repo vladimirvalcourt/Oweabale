@@ -1,7 +1,8 @@
 import React from 'react';
-import { Eye, ChevronLeft } from 'lucide-react';
+import { Eye } from 'lucide-react';
 import { TransitionLink } from '../components/TransitionLink';
 import Footer from '../components/Footer';
+import Header from '../components/Header';
 import { useSEO } from '../hooks/useSEO';
 
 export default function Privacy() {
@@ -14,13 +15,11 @@ export default function Privacy() {
 
   return (
     <>
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-content-primary/15">
+    <Header />
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans pt-24 p-8 md:p-24 selection:bg-content-primary/15">
       <div className="max-w-3xl mx-auto">
-        <TransitionLink to="/" className="inline-flex items-center gap-2 text-sm text-content-tertiary hover:text-content-primary transition-colors mb-12 font-sans">
-          <ChevronLeft className="w-4 h-4 shrink-0" aria-hidden /> Back to home
-        </TransitionLink>
         
-        <header className="mb-16 border-l-4 border-surface-border pl-8">
+        <header className="mb-16 border-l-4 border-surface-border pl-8 mt-8">
           <div className="flex items-center gap-3 text-content-secondary mb-4">
             <Eye className="w-6 h-6 shrink-0" aria-hidden />
             <span className="text-xs font-sans font-medium">Legal</span>
@@ -89,7 +88,7 @@ export default function Privacy() {
               California residents may request access to categories and specific pieces of personal information collected, request deletion of eligible data, and request correction of inaccurate information, subject to legal exceptions.
             </p>
             <p className="mt-4">
-              Oweable does not sell personal information. To submit a CCPA request, contact us through the support page.
+              Oweable does not sell personal information. To submit a CCPA request, email <a href="mailto:privacy@oweable.com" className="underline underline-offset-2 hover:text-content-primary">privacy@oweable.com</a> or contact us through the support page.
             </p>
           </section>
 

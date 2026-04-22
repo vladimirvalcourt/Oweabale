@@ -309,7 +309,7 @@ export default function Obligations() {
   const urgentCitations = citations.filter(c => c.status === 'open' && c.daysLeft <= 7);
   const urgentTotal = urgentCitations.reduce((sum, c) => sum + c.amount, 0);
 
-  // Debt Detonator calculation
+  // Debt Payoff Engine calculation
   const payoffResult = useMemo(() => calcPayoff(
     debts.map(d => ({ remaining: d.remaining, apr: d.apr, minPayment: d.minPayment, name: d.name })),
     extraPayment,
@@ -529,7 +529,7 @@ export default function Obligations() {
         </div>
       </CollapsibleModule>
 
-      {/* Debt Detonator Panel */}
+      {/* Debt Payoff Engine Panel */}
       {debts.length > 0 && hasFullSuite && (
         <CollapsibleModule 
           title="Debt Payoff Plan" 

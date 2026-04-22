@@ -65,7 +65,7 @@ const PRICING_FAQ_STATIC: { question: string; answer: string }[] = [
       "We use bank-level 256-bit encryption. We don't sell your data, and we don't store your bank credentials. When bank linking is available, we plan to use established connection providers so you never give us your login password directly.",
   },
   {
-    question: 'How does the Debt Detonator work?',
+    question: 'How does the Debt Payoff Engine work?',
     answer:
       'It uses a proprietary algorithm to analyze your interest rates, balances, and cash flow to recommend the mathematically optimal payoff strategy (avalanche or snowball) to save you the most money.',
   },

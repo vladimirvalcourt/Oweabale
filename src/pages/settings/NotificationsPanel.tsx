@@ -336,8 +336,8 @@ function NotificationsPanelInner() {
             {[
               { id: 'sniper-increase' as const, label: 'Subscription Sniper: price hikes', desc: 'Alert me instantly if a subscription price increases.' },
               { id: 'sniper-renewal' as const, label: 'Subscription Sniper: auto-renewals', desc: 'Alert me 7 days before an annual subscription renews.' },
-              { id: 'detonator-milestone' as const, label: 'Debt Detonator: milestones', desc: 'Celebrate when I pay off 25%, 50%, 75%, and 100% of a debt.' },
-              { id: 'detonator-rate' as const, label: 'Debt Detonator: rate changes', desc: 'Alert me if a variable interest rate changes.' },
+              { id: 'detonator-milestone' as const, label: 'Debt Payoff Engine: milestones', desc: 'Celebrate when I pay off 25%, 50%, 75%, and 100% of a debt.' },
+              { id: 'detonator-rate' as const, label: 'Debt Payoff Engine: rate changes', desc: 'Alert me if a variable interest rate changes.' },
             ].map((item) => (
               <div key={item.id} className="flex items-start justify-between border-b border-surface-border pb-4 last:border-0 last:pb-0">
                 <div className="pr-4">
@@ -364,7 +364,7 @@ function NotificationsPanelInner() {
           <FullSuiteGateCard
             compact
             title="Smart Alerts are on Full Suite"
-            description="Upgrade to enable Subscription Sniper and Debt Detonator alert automations."
+            description="Upgrade to enable Subscription Sniper and Debt Payoff Engine alert automations."
           />
         )}
       </CollapsibleModule>

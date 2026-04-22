@@ -1,9 +1,12 @@
-import React, { useMemo, useState } from 'react';
-import { LifeBuoy, ChevronLeft } from 'lucide-react';
+import React, { useState } from 'react';
+import { LifeBuoy } from 'lucide-react';
 import { TransitionLink } from '../components/TransitionLink';
 import Footer from '../components/Footer';
+import Header from '../components/Header';
 import { useSEO } from '../hooks/useSEO';
 import { useJsonLd } from '../hooks/useJsonLd';
+import { submitSupportContact } from '../lib/supportContact';
+import { toast } from 'sonner';
 
 const SUPPORT_EMAIL = 'support@oweable.com';
 
@@ -16,7 +19,7 @@ const FAQ_ITEMS = [
   },
   {
     q: 'I cannot access my account. What should I do?',
-    a: 'Use Google sign-in with the same email you originally used. If you still cannot access your account, contact support and include the email tied to your account.',
+    a: 'Sign in with the same method you used to create your account (Google or email/password). If you still cannot access your account, contact support and include the email tied to your account.',
   },
   {
     q: 'How secure is my financial data?',
@@ -76,6 +79,8 @@ export default function Support() {
     subject: '',
     message: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   useSEO({
     title: 'Support — Oweable',
@@ -88,26 +93,51 @@ export default function Support() {
 
   useJsonLd('support', buildSupportJsonLd, []);
 
-  const mailtoHref = useMemo(() => {
-    const subject = formData.subject.trim() || 'Oweable support request';
-    const body = [
-      `Name: ${formData.name.trim() || 'Not provided'}`,
-      `Email: ${formData.email.trim() || 'Not provided'}`,
-      '',
-      formData.message.trim() || 'Please describe your issue here.',
-    ].join('\n');
-    return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  }, [formData]);
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      toast.error('Please enter your name');
+      return false;
+    }
+    if (!formData.email.trim()) {
+      toast.error('Please enter your email');
+      return false;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Please enter a valid email address');
+      return false;
+    }
+    if (!formData.message.trim()) {
+      toast.error('Please enter a message');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+    const result = await submitSupportContact(formData);
+    setIsSubmitting(false);
+
+    if ('error' in result) {
+      toast.error(result.error);
+    } else {
+      setSubmitted(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      toast.success('We got your message — we\'ll reply within 1 business day.');
+    }
+  };
 
   return (
     <>
-      <div className="min-h-screen bg-surface-base text-content-primary font-sans p-8 md:p-24 selection:bg-content-primary/15">
+      <Header />
+      <div className="min-h-screen bg-surface-base text-content-primary font-sans pt-24 p-8 md:p-24 selection:bg-content-primary/15">
         <div className="max-w-4xl mx-auto">
-          <TransitionLink to="/" className="inline-flex items-center gap-2 text-sm text-content-tertiary hover:text-content-primary transition-colors mb-12">
-            <ChevronLeft className="w-4 h-4 shrink-0" aria-hidden /> Back to home
-          </TransitionLink>
 
-          <header className="mb-12 border-l-4 border-surface-border pl-8">
+          <header className="mb-12 border-l-4 border-surface-border pl-8 mt-8">
             <div className="flex items-center gap-3 text-content-secondary mb-4">
               <LifeBuoy className="w-6 h-6 shrink-0" aria-hidden />
               <span className="text-xs font-medium">Support</span>
@@ -120,53 +150,76 @@ export default function Support() {
 
           <section className="rounded-lg border border-surface-border bg-surface-raised p-6 md:p-8 mb-10">
             <h2 className="text-lg font-semibold text-content-primary mb-5">Contact support</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <label className="text-sm text-content-secondary">
-                Name
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                  className="mt-2 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-content-primary focus-app-field"
-                  placeholder="Your name"
-                />
-              </label>
-              <label className="text-sm text-content-secondary">
-                Email
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                  className="mt-2 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-content-primary focus-app-field"
-                  placeholder="you@example.com"
-                />
-              </label>
-            </div>
-            <label className="text-sm text-content-secondary block mb-4">
-              Subject
-              <input
-                type="text"
-                value={formData.subject}
-                onChange={(e) => setFormData((prev) => ({ ...prev, subject: e.target.value }))}
-                className="mt-2 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-content-primary focus-app-field"
-                placeholder="Billing, login issue, bug report..."
-              />
-            </label>
-            <label className="text-sm text-content-secondary block mb-5">
-              Message
-              <textarea
-                value={formData.message}
-                onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
-                className="mt-2 w-full min-h-[140px] rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-content-primary focus-app-field"
-                placeholder="Tell us what happened and how we can help."
-              />
-            </label>
-            <a
-              href={mailtoHref}
-              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-cta px-6 py-3 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
-            >
-              Email support
-            </a>
+            
+            {submitted ? (
+              <div className="text-center py-8">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-600"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                </div>
+                <h3 className="text-lg font-semibold text-content-primary mb-2">Message sent!</h3>
+                <p className="text-sm text-content-secondary mb-6">We got your message — we'll reply within 1 business day.</p>
+                <button
+                  onClick={() => setSubmitted(false)}
+                  className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-cta px-6 py-3 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
+                >
+                  Send another message
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <label className="text-sm text-content-secondary">
+                    Name *
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                      className="mt-2 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-content-primary focus-app-field"
+                      placeholder="Your name"
+                      required
+                    />
+                  </label>
+                  <label className="text-sm text-content-secondary">
+                    Email *
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                      className="mt-2 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-content-primary focus-app-field"
+                      placeholder="you@example.com"
+                      required
+                    />
+                  </label>
+                </div>
+                <label className="text-sm text-content-secondary block mb-4">
+                  Subject
+                  <input
+                    type="text"
+                    value={formData.subject}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, subject: e.target.value }))}
+                    className="mt-2 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-content-primary focus-app-field"
+                    placeholder="Billing, login issue, bug report..."
+                  />
+                </label>
+                <label className="text-sm text-content-secondary block mb-5">
+                  Message *
+                  <textarea
+                    value={formData.message}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
+                    className="mt-2 w-full min-h-[140px] rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-content-primary focus-app-field"
+                    placeholder="Tell us what happened and how we can help."
+                    required
+                  />
+                </label>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex min-h-11 items-center justify-center rounded-lg bg-brand-cta px-6 py-3 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? 'Sending...' : 'Send message'}
+                </button>
+              </form>
+            )}
             <p className="mt-3 text-xs text-content-tertiary">
               Prefer direct email? Write to <a className="underline hover:text-content-primary" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
             </p>

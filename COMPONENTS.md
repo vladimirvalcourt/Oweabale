@@ -337,7 +337,7 @@ import { Card, CardHeader, CardContent } from '../components/ui/Card';
 | `Dashboard.tsx` | `/dashboard` | Main financial command center with all widgets |
 | `Income.tsx` | `/income` | Income sources, deposits, cash flow |
 | `Freelance.tsx` | `/freelance` | Freelance income, deductions, PDF parsing |
-| `Obligations.tsx` | `/bills` | Bills, debts, citations (Debt Detonator, Spending Pulse) |
+| `Obligations.tsx` | `/bills` | Bills, debts, citations (Debt Payoff Engine, Spending Pulse) |
 | `Ingestion.tsx` | `/ingestion` | Review Inbox — scanned documents and pending entries |
 | `Transactions.tsx` | `/transactions` | Transaction ledger with filtering |
 | `NetWorth.tsx` | `/net-worth` | Assets, liabilities, net worth projection charts |
