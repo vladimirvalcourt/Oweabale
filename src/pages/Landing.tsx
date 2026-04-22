@@ -405,11 +405,12 @@ export default function Landing() {
             <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0 overflow-hidden">
-                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full p-1.5 text-white">
-                    <circle cx="32" cy="22" r="11" fill="currentColor" />
-                    <path d="M22 22h20M24 20v4M40 20v4" stroke="black" strokeWidth="2.5" />
-                    <path d="M14 56C14 44 22 38 32 38C42 38 50 44 50 56" fill="currentColor" />
-                    <path d="M26 38L32 46L38 38" fill="black" />
+                  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full p-1 text-white">
+                    <circle cx="24" cy="17" r="9" fill="currentColor" />
+                    <path d="M14 36C14 31 18 27 24 27C30 27 34 31 34 36" stroke="currentColor" strokeWidth="2" fill="none" />
+                    <rect x="18" y="13" width="12" height="7" rx="1.5" fill="white" stroke="currentColor" strokeWidth="0.5" />
+                    <path d="M20 16L22 18.5L20 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M26 16L28 18.5L26 21" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
                 <div>
@@ -424,11 +425,12 @@ export default function Landing() {
             <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0 overflow-hidden">
-                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full p-1.5 text-white">
-                    <circle cx="32" cy="24" r="11" fill="currentColor" />
-                    <path d="M18 20 Q 32 8 46 20" fill="currentColor" />
-                    <path d="M46 20 L 54 22" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-                    <path d="M16 56C16 46 22 40 32 40C42 40 48 46 48 56" fill="currentColor" />
+                  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full p-1 text-white">
+                    <circle cx="24" cy="18" r="9" fill="currentColor" />
+                    <path d="M14 36C14 31 18 27 24 27C30 27 34 31 34 36" stroke="currentColor" strokeWidth="2" fill="none" />
+                    <path d="M18 14C18 14 20 10 24 10C28 10 30 14 30 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    <circle cx="24" cy="13" r="2" fill="white" />
+                    <path d="M30 12L34 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
                   </svg>
                 </div>
                 <div>
@@ -443,11 +445,11 @@ export default function Landing() {
             <div className="border border-surface-border rounded-lg p-8 bg-surface-raised hover:bg-content-primary/[0.02] transition-colors flex flex-col h-full">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-12 w-12 rounded-full border border-surface-border bg-black text-content-primary flex items-center justify-center font-semibold shrink-0 overflow-hidden">
-                  <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full p-1.5 text-white">
-                    <circle cx="26" cy="26" r="9" fill="currentColor" />
-                    <path d="M12 56C12 46 18 40 26 40C32 40 36.5 43 38.5 48" fill="currentColor" />
-                    <circle cx="44" cy="34" r="6.5" fill="currentColor" />
-                    <path d="M34 56C34 50 38 46 44 46C50 46 54 50 54 56" fill="currentColor" />
+                  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-full w-full p-1 text-white">
+                    <circle cx="20" cy="19" r="7" fill="currentColor" />
+                    <path d="M12 34C12 30 15 27 20 27C24 27 27 29 28.5 32" stroke="currentColor" strokeWidth="2" fill="none" />
+                    <circle cx="32" cy="23" r="5.5" fill="currentColor" />
+                    <path d="M26 34C26 31 28 28 32 28C36 28 38 31 38 34" stroke="currentColor" strokeWidth="2" fill="none" />
                   </svg>
                 </div>
                 <div>
