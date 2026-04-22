@@ -2,7 +2,7 @@
 @plugin "tailwindcss-animate";
 
 @theme {
-  /* Vercel-dashboard–inspired dark surfaces: near-black, thin neutral borders, minimal chrome */
+  /* Default theme: Dark mode (Vercel-dashboard–inspired) */
   --color-surface-base: #000000;
   --color-surface-raised: #0a0a0a;
   --color-surface-elevated: #111111;
@@ -17,7 +17,7 @@
   --color-content-tertiary: #737373;
   --color-content-muted: #666666;
 
-  /* Neutral “accent” — replaces saturated indigo for chrome/links; components may still use Tailwind palette where needed */
+  /* Brand colors - neutral accent system */
   --color-brand-indigo: #fafafa;
   --color-brand-violet: #a3a3a3;
   --color-brand-cta: #ffffff;
@@ -491,34 +491,47 @@ body {
   animation-play-state: paused;
 }
 
-/* Light theme — toggled via `theme-light` on <html> (see Layout) */
+/* Light theme — Vercel-inspired clean aesthetic with new brand colors */
 :root.theme-light {
-  --color-surface-base: #f1f2f4;
-  --color-surface-raised: #ffffff;
-  --color-surface-elevated: #e8eaee;
-  --color-surface-highlight: rgba(0, 0, 0, 0.04);
-  --color-surface-border: #d1d5db;
-  --color-surface-border-subtle: #e5e7eb;
+  /* Clean white surfaces with subtle gray elevation */
+  --color-surface-base: #ffffff;
+  --color-surface-raised: #fafafa;
+  --color-surface-elevated: #f5f5f5;
+  --color-surface-highlight: rgba(0, 0, 0, 0.03);
+  --color-surface-border: #e5e5e5;
+  --color-surface-border-subtle: #f0f0f0;
+  --color-surface-offset: #f8f8f8;
 
-  --color-content-primary: #111827;
-  --color-content-secondary: #4b5563;
-  /* ≥4.5:1 on #f1f2f4 / #fff for normal text (WCAG AA) */
-  --color-content-tertiary: #5b636e;
-  --color-content-muted: #525a63;
+  /* High-contrast text for readability */
+  --color-content-primary: #000000;
+  --color-content-secondary: #666666;
+  --color-content-tertiary: #888888;
+  --color-content-muted: #999999;
 
-  --shadow-tactile: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 2px rgba(0, 0, 0, 0.06);
+  /* Brand colors adapted for light backgrounds */
+  --color-brand-indigo: #000000;
+  --color-brand-violet: #404040;
+  --color-brand-cta: #000000;
+  --color-brand-cta-hover: #1a1a1a;
+  --color-brand-profit: #16a34a;
+  --color-brand-expense: #dc2626;
+  --color-brand-tax: #525252;
+  --color-error-highlight: #e11d48;
+
+  /* Shadows optimized for light backgrounds */
+  --shadow-tactile: inset 0 1px 0 rgba(255, 255, 255, 1), 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-tactile-hover: inset 0 1px 0 rgba(255, 255, 255, 1), 0 2px 6px rgba(0, 0, 0, 0.08);
-  --shadow-glow-indigo: 0 0 12px rgba(37, 99, 235, 0.2);
-  --color-brand-cta: #4338ca;
-  --color-brand-cta-hover: #4f46e5;
-  /* Brighter blues fail AA on white; use darker hues for inline text/icons */
-  --color-brand-indigo: #2563eb;
-  --color-brand-violet: #4f46e5;
-  --color-brand-tax: #2563eb;
+  --shadow-glow-indigo: 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
+/* Ensure proper text rendering in light mode */
 :root.theme-light .brand-header-text {
   text-shadow: none;
+}
+
+:root.theme-light .section-label,
+:root.theme-light .metric-label {
+  color: var(--color-content-tertiary);
 }
 
 /*

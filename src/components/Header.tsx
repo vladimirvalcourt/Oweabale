@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 import { BrandWordmark } from './BrandWordmark';
 import { TransitionLink } from './TransitionLink';
+import { ThemeToggle } from './ThemeToggle';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -41,6 +42,9 @@ export default function Header() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Theme Toggle */}
+          <ThemeToggle />
+          
           {user?.id && (
             <button
               onClick={() => {

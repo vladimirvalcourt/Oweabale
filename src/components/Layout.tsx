@@ -27,6 +27,7 @@ import { canAccessAppPath } from '../lib/trackerTier';
 import type { HouseholdMember } from '../types/household';
 import TrialBanner from './TrialBanner';
 import TrialExpiryModal from './TrialExpiryModal';
+import { ThemeToggle } from './ThemeToggle';
 
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
@@ -551,14 +552,18 @@ export default function Layout() {
               </div>
             )}
           </div>
-          <button 
-            type="button"
-            aria-label="Close navigation menu"
-            className="shrink-0 p-2 text-content-tertiary transition-colors hover:text-content-secondary focus-app rounded-lg lg:hidden"
-            onClick={closeSidebarMobile}
-          >
-            <MorphingMenuIcon isOpen={sidebarOpen} className="text-content-primary" />
-          </button>
+          <div className="flex items-center gap-1">
+            {/* Theme Toggle (Mobile) */}
+            <ThemeToggle className="lg:hidden" />
+            <button 
+              type="button"
+              aria-label="Close navigation menu"
+              className="shrink-0 p-2 text-content-tertiary transition-colors hover:text-content-secondary focus-app rounded-lg lg:hidden"
+              onClick={closeSidebarMobile}
+            >
+              <MorphingMenuIcon isOpen={sidebarOpen} className="text-content-primary" />
+            </button>
+          </div>
         </div>
 
           {/* Sidebar free-plan upgrade banner removed — Layout only renders for Pro users */}
@@ -869,6 +874,9 @@ export default function Layout() {
             >
               <Plus className="w-3.5 h-3.5" aria-hidden />
             </button>
+
+            {/* Theme Toggle */}
+            <ThemeToggle className="hidden sm:inline-flex" />
 
             {/* Notifications */}
             <div className="relative" ref={notifRef}>
