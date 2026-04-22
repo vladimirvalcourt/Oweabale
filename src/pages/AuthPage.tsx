@@ -72,16 +72,16 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
         </div>
 
         {/* Auth Container */}
-        <div className="flex flex-1 flex-col justify-center px-8 sm:px-12 md:px-16 lg:px-20 max-w-xl mx-auto w-full pb-20">
+        <div className="flex flex-1 flex-col justify-start px-6 sm:px-8 md:px-12 lg:px-16 max-w-xl w-full pt-12 pb-20">
           <div className="mb-8 inline-flex w-fit items-center gap-2 rounded-full border border-surface-border bg-surface-raised px-3 py-1.5 text-xs font-medium text-content-secondary">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
             Free · No credit card required
           </div>
 
-          <h1 className="text-3xl font-medium tracking-tight text-content-primary sm:text-4xl">
+          <h1 className="text-left text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
             Welcome to Oweable
           </h1>
-          <p className="mt-4 text-base leading-relaxed text-content-secondary max-w-sm">
+          <p className="mt-4 text-left text-base leading-relaxed text-content-secondary max-w-sm">
             Sign in or create your account — it's the same button. One click gets you started.
           </p>
 
@@ -89,7 +89,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
             type="button"
             onClick={() => void handleGoogleSignIn()}
             disabled={googleLoading}
-            className="mt-10 flex min-h-12 w-full items-center justify-center gap-3 rounded-lg bg-brand-cta px-4 py-3 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-50 focus-app"
+            className="mt-10 flex min-h-12 w-full items-start justify-start gap-3 rounded-lg bg-brand-cta px-4 py-3 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-50 focus-app"
           >
             {googleLoading ? (
               <span className="text-content-secondary">Redirecting…</span>

@@ -636,15 +636,15 @@ export default function Landing() {
         </section>
 
         <section className="overflow-hidden border-t border-surface-border bg-surface-base py-24">
-          <div className="mx-auto max-w-5xl px-6 text-center lg:px-8">
+          <div className="mx-auto max-w-5xl px-6 lg:px-8">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Final nudge</p>
-            <h2 className="mt-5 text-4xl font-semibold tracking-[-0.05em] text-content-primary sm:text-5xl">
+            <h2 className="mt-5 text-left text-4xl font-semibold tracking-[-0.05em] text-content-primary sm:text-5xl">
               The money stress usually is not mystery. It is missing visibility.
             </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-content-secondary">
+            <p className="mt-6 max-w-2xl text-left text-lg leading-8 text-content-secondary">
               Start free, get the whole picture, and make your next decision with more certainty than guesswork.
             </p>
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row">
               <TransitionLink
                 to={primaryHref}
                 className="inline-flex items-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
