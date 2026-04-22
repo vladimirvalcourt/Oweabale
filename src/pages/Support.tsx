@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowRight, LifeBuoy, Mail, ShieldCheck } from 'lucide-react';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
+import { BrandWordmark } from '../components/BrandWordmark';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { TransitionLink } from '../components/TransitionLink';
 import { useJsonLd } from '../hooks/useJsonLd';
 import { useSEO } from '../hooks/useSEO';
 import { submitSupportContact } from '../lib/supportContact';
 import { toast } from 'sonner';
+import { useStore } from '../store/useStore';
 
 const SUPPORT_EMAIL = 'support@oweable.com';
 const SUPPORT_PAGE_URL = 'https://www.oweable.com/support';
@@ -59,6 +61,8 @@ function buildSupportJsonLd() {
 }
 
 export default function Support() {
+  const [scrolled, setScrolled] = useState(false);
+  const user = useStore((state) => state.user);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -76,6 +80,12 @@ export default function Support() {
     ogDescription: 'Get help with account access, billing, subscriptions, and product questions.',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useJsonLd('support', buildSupportJsonLd, []);
 
@@ -118,9 +128,39 @@ export default function Support() {
   };
 
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-surface-base px-6 pb-20 pt-28 text-content-primary selection:bg-content-primary/15 lg:px-8">
+    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
+      <nav
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
+          scrolled
+            ? 'border-b border-white/5 bg-surface-base/60 backdrop-blur-xl'
+            : 'bg-transparent'
+        }`}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+          <TransitionLink to="/" className="group flex items-center gap-2">
+            <div className="h-6 w-6 rounded-sm bg-white flex items-center justify-center transition-transform group-hover:rotate-12">
+              <div className="h-3 w-3 bg-black rounded-full" />
+            </div>
+            <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />
+          </TransitionLink>
+          <div className="hidden items-center gap-10 text-[11px] font-medium uppercase tracking-[0.15em] text-content-tertiary md:flex">
+            <a href="/pricing" className="transition-colors hover:text-content-primary">Plans</a>
+            <a href="/faq" className="transition-colors hover:text-content-primary">FAQ</a>
+            <a href="/security" className="transition-colors hover:text-content-primary">Security</a>
+          </div>
+          <div className="flex items-center gap-6">
+            <ThemeToggle />
+            <TransitionLink
+              to={user?.id ? '/dashboard' : '/onboarding'}
+              className="group relative inline-flex items-center justify-center rounded-full bg-content-primary px-6 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-surface-base transition-all duration-300 hover:scale-105"
+            >
+              <span className="relative z-10">{user?.id ? 'Dashboard' : 'Get Started'}</span>
+            </TransitionLink>
+          </div>
+        </div>
+      </nav>
+
+      <main>
         <div className="mx-auto max-w-7xl">
           <section className="grid gap-10 py-10 sm:py-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-12">
             <div className="public-fade-up">
@@ -273,8 +313,8 @@ export default function Support() {
             </div>
           </section>
         </div>
-      </div>
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }

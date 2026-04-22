@@ -6,6 +6,7 @@ import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
 import { runAfterPaint } from '../lib/interaction';
 import { BrandWordmark } from '../components/BrandWordmark';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { CheckCircle2 } from 'lucide-react';
 
 type AuthPageProps = {
@@ -65,10 +66,14 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
       <div className="flex w-full flex-col lg:w-[45%] xl:w-[40%] relative z-10 border-r border-surface-border bg-surface-base">
         
         {/* Nav Header */}
-        <div className="flex items-center justify-between px-8 py-8 md:px-12">
-          <TransitionLink to="/" className="text-content-primary">
-            <BrandWordmark textClassName="brand-header-text" />
+        <div className="flex items-center justify-between px-8 py-6 md:px-12">
+          <TransitionLink to="/" className="group flex items-center gap-2">
+            <div className="h-6 w-6 rounded-sm bg-white flex items-center justify-center transition-transform group-hover:rotate-12">
+              <div className="h-3 w-3 bg-black rounded-full" />
+            </div>
+            <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />
           </TransitionLink>
+          <ThemeToggle />
         </div>
 
         {/* Auth Container */}
