@@ -5,7 +5,6 @@ import path from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
-import removeConsole from 'vite-plugin-remove-console';
 import { VitePWA } from 'vite-plugin-pwa';
 
 /** Same resolution as Sentry bundler `release.name` — keep browser SDK + uploaded artifacts aligned. */
@@ -113,8 +112,6 @@ export default defineConfig(({ mode }) => {
               enableBuild: false, // Disable during build for faster dev HMR
             }),
           ]),
-      // awesome-vite: vite-plugin-remove-console — quieter production bundles (keep warn/error)
-      ...(isProd ? [removeConsole({ includes: ['log', 'info', 'debug'] })] : []),
       // PWA — service worker + manifest plumbing
       VitePWA({
         registerType: 'autoUpdate',
@@ -181,6 +178,8 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
+      chunkSizeWarningLimit: 500,
+      minify: 'esbuild',
       sourcemap: isProd ? 'hidden' : false,
       rollupOptions: {
         output: {
@@ -207,6 +206,22 @@ export default defineConfig(({ mode }) => {
             if (id.includes('react-dom') || id.includes('/react/') || id.match(/node_modules\/react$/)) return 'react';
             // Supabase JS client — large auth+realtime bundle
             if (id.includes('@supabase')) return 'supabase';
+            // Route/navigation dependencies
+            if (id.includes('react-router') || id.includes('@remix-run/router') || id.includes('history')) return 'router';
+            // Observability and errors
+            if (id.includes('@sentry')) return 'sentry';
+            // PDF stack
+            if (id.includes('pdfjs-dist')) return 'pdfjs';
+            // Data/query layer
+            if (id.includes('@tanstack')) return 'query';
+            // Editor/markdown sanitization
+            if (id.includes('react-markdown') || id.includes('rehype-sanitize')) return 'markdown';
+            // Notifications and utility UI libs
+            if (id.includes('sonner') || id.includes('lucide-react') || id.includes('@geist-ui/icons')) return 'ui-kit';
+            // OCR / scanning helpers
+            if (id.includes('tesseract.js') || id.includes('qrcode') || id.includes('react-easy-crop')) return 'capture';
+            // Finance integrations
+            if (id.includes('react-plaid-link') || id.includes('@stripe')) return 'payments';
             // Split large vendor libraries into separate chunks
             if (id.includes('date-fns') || id.includes('dayjs')) return 'vendor-date';
             if (id.includes('lodash') || id.includes('ramda')) return 'vendor-utils';

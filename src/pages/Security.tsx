@@ -60,7 +60,7 @@ export default function Security() {
       <div className="min-h-screen bg-[#f6efe4] px-6 pb-20 pt-28 text-[#1f2b24] selection:bg-[#1f2b24]/15 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <section className="py-12">
-            <div className="max-w-3xl">
+            <div className="public-fade-up max-w-3xl">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Security</p>
               <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-[#1f2b24] sm:text-6xl">
                 Security, explained without theater.
@@ -74,7 +74,7 @@ export default function Security() {
               {securityCards.map((card) => {
                 const Icon = card.icon;
                 return (
-                  <article key={card.title} className="rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-7 shadow-[0_12px_30px_rgba(49,65,55,0.04)]">
+                  <article key={card.title} className="public-hover-lift rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-6 sm:p-7 shadow-[0_12px_30px_rgba(49,65,55,0.04)]">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef4ef] text-[#35684f]">
                       <Icon className="h-5 w-5" />
                     </div>
@@ -85,7 +85,7 @@ export default function Security() {
               })}
             </div>
 
-            <div className="mt-12 rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-8">
+            <div className="public-fade-up public-delay-1 mt-12 rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-7 sm:p-8">
               <div className="space-y-10">
                 {sections.map((section) => (
                   <section key={section.title}>

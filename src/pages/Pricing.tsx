@@ -293,7 +293,7 @@ export default function Pricing() {
           <div className="absolute inset-x-0 top-0 h-[32rem] bg-[radial-gradient(circle_at_top_left,_rgba(180,137,64,0.16),_transparent_42%),radial-gradient(circle_at_top_right,_rgba(62,111,86,0.14),_transparent_36%)]" />
           <div
             ref={headerRef}
-            className={`mx-auto max-w-5xl px-6 pb-20 text-center transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
+            className={`public-fade-up mx-auto max-w-5xl px-6 pb-16 sm:pb-20 text-center transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
               headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
             }`}
           >
@@ -303,7 +303,7 @@ export default function Pricing() {
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-[#556157] sm:text-xl">
               The free tier gives you real value right away. Full Suite adds the planning, payoff, and cash-flow tools
-              that turn visibility into progress.
+              that turn visibility into follow-through.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-[#5f6b62]">
               <span className="inline-flex items-center gap-2 rounded-full bg-[#fff9f0] px-3 py-1.5">
@@ -330,7 +330,7 @@ export default function Pricing() {
             }`}
           >
             <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]">
-              <div className="rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-8">
+              <div className="public-hover-lift rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-7 sm:p-8">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#efe6d9] text-[#7b6548]">
                   <Wallet className="h-5 w-5" />
                 </div>
@@ -340,7 +340,7 @@ export default function Pricing() {
                   <span className="pb-1 text-sm text-[#627066]">forever free</span>
                 </div>
                 <p className="mt-4 max-w-md text-base leading-7 text-[#5b685e]">
-                  Built for immediate clarity around bills, due dates, recurring obligations, and reminders.
+                  Built for immediate clarity around bills, due dates, recurring obligations, and reminders you will actually see.
                 </p>
                 <ul className="mt-6 space-y-3 text-sm text-[#4f5c53]">
                   <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-[#35684f]" /> Bills and due-date visibility</li>
@@ -355,7 +355,7 @@ export default function Pricing() {
                 </TransitionLink>
               </div>
 
-              <div className="rounded-[2rem] border border-[#1f2b24] bg-[#1f2b24] p-8 text-[#f7f2ea] shadow-[0_28px_80px_rgba(31,43,36,0.22)]">
+              <div className="public-hover-lift rounded-[2rem] border border-[#1f2b24] bg-[#1f2b24] p-7 sm:p-8 text-[#f7f2ea] shadow-[0_28px_80px_rgba(31,43,36,0.22)]">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2d3a32] text-[#cfd8d1]">
                     <Shield className="h-5 w-5" />
@@ -457,17 +457,17 @@ export default function Pricing() {
                   Choose based on how much control you want, not how much jargon you can tolerate.
                 </h2>
               </div>
-              <div className="overflow-hidden rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3]">
+              <div className="overflow-x-auto rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3]">
                 <div className="grid grid-cols-3 border-b border-[#e7ddcf] bg-[#f9f3e9] text-sm font-semibold text-[#1f2b24]">
-                  <div className="px-4 py-4">Feature</div>
-                  <div className="border-l border-[#e7ddcf] px-4 py-4">Tracker</div>
-                  <div className="border-l border-[#e7ddcf] px-4 py-4">Full Suite</div>
+                  <div className="min-w-[180px] px-4 py-4">Feature</div>
+                  <div className="min-w-[140px] border-l border-[#e7ddcf] px-4 py-4">Tracker</div>
+                  <div className="min-w-[160px] border-l border-[#e7ddcf] px-4 py-4">Full Suite</div>
                 </div>
                 {comparisonRows.map(([feature, tracker, suite]) => (
                   <div key={feature} className="grid grid-cols-3 border-b border-[#eee3d5] text-sm last:border-b-0">
-                    <div className="px-4 py-4 text-[#4d5a51]">{feature}</div>
-                    <div className="border-l border-[#eee3d5] px-4 py-4 text-[#5f6b62]">{tracker}</div>
-                    <div className="border-l border-[#eee3d5] px-4 py-4 text-[#5f6b62]">{suite}</div>
+                    <div className="min-w-[180px] px-4 py-4 text-[#4d5a51]">{feature}</div>
+                    <div className="min-w-[140px] border-l border-[#eee3d5] px-4 py-4 text-[#5f6b62]">{tracker}</div>
+                    <div className="min-w-[160px] border-l border-[#eee3d5] px-4 py-4 text-[#5f6b62]">{suite}</div>
                   </div>
                 ))}
               </div>

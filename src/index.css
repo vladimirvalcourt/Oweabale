@@ -225,6 +225,24 @@
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
   }
+  @keyframes public-fade-up {
+    0% {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes public-fade-in {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
   .skeleton-shimmer {
     background: linear-gradient(
       110deg,
@@ -246,6 +264,43 @@
   .animate-pulse-highlight {
     animation: pulse-highlight 2s ease-in-out infinite;
     will-change: background-color;
+  }
+  .public-fade-up {
+    animation: public-fade-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+    will-change: transform, opacity;
+  }
+  .public-fade-in {
+    animation: public-fade-in 0.7s ease-out both;
+    will-change: opacity;
+  }
+  .public-delay-1 {
+    animation-delay: 120ms;
+  }
+  .public-delay-2 {
+    animation-delay: 220ms;
+  }
+  .public-delay-3 {
+    animation-delay: 320ms;
+  }
+  .public-hover-lift {
+    @apply transition-transform duration-300 ease-out hover:-translate-y-1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .public-fade-up,
+    .public-fade-in {
+      animation: none;
+    }
+
+    .public-delay-1,
+    .public-delay-2,
+    .public-delay-3 {
+      animation-delay: 0ms;
+    }
+
+    .public-hover-lift {
+      transition: none;
+      transform: none;
+    }
   }
 
   /** Native date/datetime inputs: avoid black text/icon on dark surfaces (WebKit + Firefox). */

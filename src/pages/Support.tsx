@@ -122,8 +122,8 @@ export default function Support() {
       <Header />
       <div className="min-h-screen bg-[#f6efe4] px-6 pb-20 pt-28 text-[#1f2b24] selection:bg-[#1f2b24]/15 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <section className="grid gap-12 py-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-            <div>
+          <section className="grid gap-10 py-10 sm:py-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-12">
+            <div className="public-fade-up">
               <div className="inline-flex items-center gap-2 rounded-full border border-[#d7cebf] bg-[#fff9f0] px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-[#5f6b62]">
                 <LifeBuoy className="h-3.5 w-3.5 text-[#35684f]" />
                 Support
@@ -135,18 +135,18 @@ export default function Support() {
                 Reach out for billing, access, account, product, or technical issues. We usually reply within one business day.
               </p>
               <div className="mt-8 grid gap-4">
-                <div className="rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] p-5">
+                <div className="public-hover-lift rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] p-5">
                   <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#7a6a54]">Best for</p>
                   <p className="mt-2 text-sm leading-7 text-[#5b685e]">Account access problems, billing questions, bugs, and anything blocking your workflow.</p>
                 </div>
-                <div className="rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] p-5">
+                <div className="public-hover-lift rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] p-5">
                   <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#7a6a54]">Direct email</p>
                   <a href={`mailto:${SUPPORT_EMAIL}`} className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-[#1f2b24] hover:text-[#35684f]">
                     <Mail className="h-4 w-4" />
                     {SUPPORT_EMAIL}
                   </a>
                 </div>
-                <div className="rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] p-5">
+                <div className="public-hover-lift rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] p-5">
                   <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#7a6a54]">Sensitive requests</p>
                   <p className="mt-2 text-sm leading-7 text-[#5b685e]">
                     For privacy or security-specific concerns, include that in your subject line so we can route it quickly.
@@ -155,8 +155,8 @@ export default function Support() {
               </div>
             </div>
 
-            <div className="grid gap-6">
-              <section className="rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-7 shadow-[0_16px_40px_rgba(49,65,55,0.05)]">
+            <div className="public-fade-up public-delay-1 grid gap-6">
+              <section className="rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-6 sm:p-7 shadow-[0_16px_40px_rgba(49,65,55,0.05)]">
                 <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#1f2b24]">Send a message</h2>
                 <p className="mt-3 text-base leading-7 text-[#5b685e]">
                   Give us the basics and a little context. The clearer the message, the faster we can help.
@@ -239,7 +239,7 @@ export default function Support() {
                 )}
               </section>
 
-              <section className="rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-7">
+              <section className="rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-6 sm:p-7">
                 <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#1f2b24]">Quick answers</h2>
                 <div className="mt-6 grid gap-4">
                   {QUICK_HELP.map((item) => (

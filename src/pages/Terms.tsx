@@ -56,7 +56,7 @@ export default function Terms() {
       <div className="min-h-screen bg-[#f6efe4] px-6 pb-20 pt-28 text-[#1f2b24] selection:bg-[#1f2b24]/15 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <section className="py-12">
-            <div className="max-w-3xl">
+            <div className="public-fade-up max-w-3xl">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Terms</p>
               <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-[#1f2b24] sm:text-6xl">
                 Terms that are meant to be read by humans.
@@ -69,7 +69,7 @@ export default function Terms() {
 
             <div className="mt-12 space-y-5">
               {sections.map((section, index) => (
-                <section key={section.title} className="rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-7 shadow-[0_12px_30px_rgba(49,65,55,0.04)]">
+                <section key={section.title} className="public-hover-lift rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-6 sm:p-7 shadow-[0_12px_30px_rgba(49,65,55,0.04)]">
                   <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Section {index + 1}</p>
                   <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#1f2b24]">{section.title}</h2>
                   <p className="mt-4 max-w-4xl text-base leading-8 text-[#5b685e]">{section.copy}</p>
@@ -77,7 +77,7 @@ export default function Terms() {
               ))}
             </div>
 
-            <div className="mt-10 rounded-[1.75rem] border border-[#d7cebf] bg-[#f1e7d9] p-7">
+            <div className="public-fade-up public-delay-1 mt-10 rounded-[1.75rem] border border-[#d7cebf] bg-[#f1e7d9] p-6 sm:p-7">
               <p className="text-base leading-8 text-[#435047]">
                 For billing and plan details, visit{' '}
                 <TransitionLink to="/pricing" className="font-semibold text-[#1f2b24] underline underline-offset-4 hover:text-[#35684f]">

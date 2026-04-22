@@ -264,10 +264,10 @@ export default function Landing() {
       <main id="main-content">
         <section className="relative overflow-hidden pt-28 sm:pt-32 lg:pt-36">
           <div className="absolute inset-x-0 top-0 h-[38rem] bg-[radial-gradient(circle_at_top_left,_rgba(180,137,64,0.18),_transparent_42%),radial-gradient(circle_at_top_right,_rgba(62,111,86,0.16),_transparent_36%)]" />
-          <div className="mx-auto grid max-w-7xl gap-14 px-6 pb-20 lg:grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)] lg:items-center lg:px-8">
+          <div className="mx-auto grid max-w-7xl gap-12 px-6 pb-16 sm:pb-20 lg:grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)] lg:items-center lg:gap-14 lg:px-8">
             <div
               ref={heroRef}
-              className={`relative transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+              className={`relative public-fade-up transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                 heroVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
               }`}
             >
@@ -276,16 +276,16 @@ export default function Landing() {
                 Clarity for bills, debt, and cash flow
               </div>
               <p className="max-w-xl text-sm font-medium text-[#5f6b62]">
-                Oweable is for people whose finances are real life messy, not spreadsheet neat.
+                Oweable is for people whose finances are real-life messy, not spreadsheet neat.
               </p>
               <h1 className="mt-5 max-w-4xl text-5xl font-semibold tracking-[-0.06em] text-[#1f2b24] sm:text-6xl lg:text-7xl">
                 Stop guessing what you owe.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-[#556157] sm:text-xl">
                 Track bills, debt, subscriptions, budgets, and uneven income in one place. Oweable shows what is due,
-                what is behind, and what to pay off next, so your money stops running on memory.
+                what is behind, and what to pay off next, so your money stops running on memory and guesswork.
               </p>
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                 <TransitionLink
                   to={primaryHref}
                   className="inline-flex items-center justify-center gap-3 rounded-full bg-[#1f2b24] px-7 py-3.5 text-sm font-medium text-[#f7f2ea] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2c3931]"
@@ -317,7 +317,7 @@ export default function Landing() {
             </div>
 
             <div
-              className={`relative transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-150 ${
+              className={`relative public-fade-up public-delay-1 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-150 ${
                 heroVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
               }`}
             >
@@ -325,9 +325,9 @@ export default function Landing() {
               <div className="relative rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3]/95 p-3 shadow-[0_28px_80px_rgba(49,65,55,0.12)]">
                 <HeroPreviewMedia />
               </div>
-              <div className="absolute -bottom-4 -left-4 rounded-3xl border border-[#d7cebf] bg-[#fff9f0] px-4 py-3 shadow-[0_16px_40px_rgba(49,65,55,0.08)]">
+              <div className="absolute -bottom-3 left-2 right-2 sm:-bottom-4 sm:left-auto sm:right-auto sm:-left-4 rounded-3xl border border-[#d7cebf] bg-[#fff9f0] px-4 py-3 shadow-[0_16px_40px_rgba(49,65,55,0.08)]">
                 <p className="text-[11px] uppercase tracking-[0.18em] text-[#7a6a54]">This week</p>
-                <p className="mt-1 text-sm font-semibold text-[#1f2b24]">3 bills due, 1 overdue, payoff on track</p>
+                <p className="mt-1 text-sm font-semibold text-[#1f2b24]">3 bills due, 1 overdue, payoff plan still on track</p>
               </div>
             </div>
           </div>
@@ -366,7 +366,7 @@ export default function Landing() {
                 return (
                   <article
                     key={item.title}
-                    className="rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-8 shadow-[0_20px_50px_rgba(49,65,55,0.06)]"
+                  className="public-hover-lift rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-7 sm:p-8 shadow-[0_20px_50px_rgba(49,65,55,0.06)]"
                   >
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#e8efe8] text-[#35684f]">
                       <Icon className="h-5 w-5" />
@@ -423,7 +423,7 @@ export default function Landing() {
                   return (
                     <article
                       key={step.title}
-                      className="rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-7 shadow-[0_20px_50px_rgba(49,65,55,0.05)]"
+                      className="public-hover-lift rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-6 sm:p-7 shadow-[0_20px_50px_rgba(49,65,55,0.05)]"
                     >
                       <div className="flex items-start gap-5">
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#e7efe7] text-[#35684f]">
@@ -463,7 +463,7 @@ export default function Landing() {
                   return (
                     <article
                       key={column.title}
-                      className="rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-7"
+                      className="public-hover-lift rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-6 sm:p-7"
                     >
                       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f1e7d9] text-[#35684f]">
                         <Icon className="h-5 w-5" />
@@ -503,7 +503,7 @@ export default function Landing() {
                 {audienceCards.map((item, index) => (
                   <article
                     key={item.title}
-                    className="grid gap-5 rounded-[1.75rem] border border-[#d0c4b1] bg-[#fff8ef] p-7 md:grid-cols-[auto_1fr] md:items-start"
+                    className="public-hover-lift grid gap-5 rounded-[1.75rem] border border-[#d0c4b1] bg-[#fff8ef] p-6 sm:p-7 md:grid-cols-[auto_1fr] md:items-start"
                   >
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#1f2b24] text-[#f7f2ea]">
                       {index === 0 && <Users className="h-5 w-5" />}
@@ -539,7 +539,7 @@ export default function Landing() {
                 {testimonials.map((item) => (
                   <article
                     key={item.name}
-                    className="flex h-full flex-col justify-between rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-7"
+                    className="public-hover-lift flex h-full flex-col justify-between rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-6 sm:p-7"
                   >
                     <p className="text-base leading-7 text-[#39463d]">“{item.quote}”</p>
                     <div className="mt-8 border-t border-[#e7ddcf] pt-5">
@@ -563,7 +563,7 @@ export default function Landing() {
             </div>
 
             <div className="mt-12 grid gap-6 lg:grid-cols-2">
-              <article className="rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-8">
+              <article className="public-hover-lift rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-7 sm:p-8">
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Free Tracker</p>
                 <div className="mt-4 flex items-end gap-2">
                   <span className="text-5xl font-semibold tracking-[-0.05em] text-[#1f2b24]">$0</span>
@@ -579,7 +579,7 @@ export default function Landing() {
                 </ul>
               </article>
 
-              <article className="rounded-[2rem] border border-[#1f2b24] bg-[#1f2b24] p-8 text-[#f7f2ea] shadow-[0_28px_80px_rgba(31,43,36,0.22)]">
+              <article className="public-hover-lift rounded-[2rem] border border-[#1f2b24] bg-[#1f2b24] p-7 sm:p-8 text-[#f7f2ea] shadow-[0_28px_80px_rgba(31,43,36,0.22)]">
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#cbbca4]">Full Suite</p>
                 <div className="mt-4 flex items-end gap-2">
                   <span className="text-5xl font-semibold tracking-[-0.05em]">$10.99</span>

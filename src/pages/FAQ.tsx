@@ -49,18 +49,24 @@ const FAQ_DATA = [
 
 function FaqCard({ question, answer }: { question: string; answer: string }) {
   const [open, setOpen] = useState(false);
+  const panelId = `faq-panel-${question.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 
   return (
     <article className="rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] px-6 py-5 shadow-[0_12px_30px_rgba(49,65,55,0.04)]">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
+        aria-expanded={open}
+        aria-controls={panelId}
         className="flex w-full items-center justify-between gap-4 text-left"
       >
         <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">{question}</h3>
         {open ? <Minus className="h-5 w-5 shrink-0 text-[#5f6b62]" /> : <Plus className="h-5 w-5 shrink-0 text-[#5f6b62]" />}
       </button>
-      <div className={`overflow-hidden transition-all duration-300 ease-out ${open ? 'mt-4 max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}>
+      <div
+        id={panelId}
+        className={`overflow-hidden transition-all duration-300 ease-out ${open ? 'mt-4 max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
+      >
         <p className="text-base leading-7 text-[#5b685e]">{answer}</p>
       </div>
     </article>
@@ -132,10 +138,10 @@ export default function FAQ() {
           <section className="mx-auto max-w-5xl px-6 lg:px-8">
             <div className="text-center">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">FAQ</p>
-              <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-[#1f2b24] sm:text-6xl">
+              <h1 className="public-fade-up mt-5 text-5xl font-semibold tracking-[-0.06em] text-[#1f2b24] sm:text-6xl">
                 The questions people ask before they trust their money to something new.
               </h1>
-              <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-[#556157]">
+              <p className="public-fade-up public-delay-1 mx-auto mt-6 max-w-3xl text-lg leading-8 text-[#556157]">
                 Short answers, plain English, and no fake mystery. If you still need help after this, the support page is one click away.
               </p>
             </div>
@@ -146,7 +152,7 @@ export default function FAQ() {
               ))}
             </div>
 
-            <div className="mt-14 rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-8 text-center shadow-[0_16px_40px_rgba(49,65,55,0.05)]">
+            <div className="public-fade-up public-delay-2 mt-14 rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-7 sm:p-8 text-center shadow-[0_16px_40px_rgba(49,65,55,0.05)]">
               <h2 className="text-3xl font-semibold tracking-[-0.04em] text-[#1f2b24]">
                 Want the full picture instead of another patchwork system?
               </h2>
