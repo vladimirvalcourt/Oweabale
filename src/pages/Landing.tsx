@@ -216,122 +216,95 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
       <nav
-        className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
           scrolled
-            ? 'border-surface-border bg-surface-base/92 backdrop-blur-xl'
-            : 'border-transparent bg-transparent'
+            ? 'border-b border-white/5 bg-surface-base/60 backdrop-blur-xl'
+            : 'bg-transparent'
         }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-          <TransitionLink to="/" className="text-content-primary">
-            <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[-0.02em] text-content-primary" />
+          <TransitionLink to="/" className="group flex items-center gap-2">
+            <div className="h-6 w-6 rounded-sm bg-white flex items-center justify-center transition-transform group-hover:rotate-12">
+              <div className="h-3 w-3 bg-black rounded-full" />
+            </div>
+            <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />
           </TransitionLink>
-          <div className="hidden items-center gap-8 text-sm text-content-secondary md:flex">
-            <a href="#why" className="transition-colors hover:text-content-primary">
-              Why it works
-            </a>
-            <a href="#flow" className="transition-colors hover:text-content-primary">
-              How it works
-            </a>
-            <a href="#pricing" className="transition-colors hover:text-content-primary">
-              Pricing
-            </a>
-            <a href="#faq" className="transition-colors hover:text-content-primary">
-              FAQ
-            </a>
+          <div className="hidden items-center gap-10 text-[11px] font-medium uppercase tracking-[0.15em] text-content-tertiary md:flex">
+            <a href="#why" className="transition-colors hover:text-content-primary">Why</a>
+            <a href="#flow" className="transition-colors hover:text-content-primary">System</a>
+            <a href="#pricing" className="transition-colors hover:text-content-primary">Plans</a>
+            <a href="#faq" className="transition-colors hover:text-content-primary">FAQ</a>
           </div>
-          <div className="flex items-center gap-3">
-            {/* Theme Toggle */}
+          <div className="flex items-center gap-6">
             <ThemeToggle />
-            
-            {user?.id && (
-              <button
-                onClick={() => {
-                  useStore.getState().signOut();
-                  toast.success('Session terminated');
-                }}
-                className="hidden rounded-full border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:border-surface-border-subtle hover:text-content-primary sm:block"
-              >
-                Sign out
-              </button>
-            )}
             <TransitionLink
               to={primaryHref}
-              className="inline-flex items-center gap-2 rounded-full bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
+              className="group relative inline-flex items-center justify-center rounded-full bg-content-primary px-6 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-surface-base transition-all duration-300 hover:scale-105"
             >
-              {user?.id ? 'Open dashboard' : 'Start free'}
+              <span className="relative z-10">{user?.id ? 'Dashboard' : 'Get Started'}</span>
             </TransitionLink>
           </div>
         </div>
       </nav>
 
       <main id="main-content">
-        <section className="relative overflow-hidden pt-28 sm:pt-32 lg:pt-36">
-          <div className="absolute inset-x-0 top-0 h-[38rem] bg-gradient-to-b from-surface-highlight to-transparent" />
-          <div className="mx-auto grid max-w-7xl gap-12 px-6 pb-16 sm:pb-20 lg:grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)] lg:items-center lg:gap-14 lg:px-8">
+        <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
+          {/* Advanced Atmospheric Layers (Static) */}
+          <div className="absolute inset-0 z-0">
+            <div className="absolute top-[-10%] left-[-5%] h-[70%] w-[70%] rounded-full bg-brand-profit/10 blur-[150px]" />
+            <div className="absolute bottom-[-10%] right-[-5%] h-[60%] w-[60%] rounded-full bg-white/5 blur-[120px]" />
+            <div className="absolute top-[30%] left-[40%] h-[40%] w-[40%] rounded-full bg-brand-profit/5 blur-[100px]" />
+          </div>
+
+          <div className="mx-auto grid max-w-7xl gap-16 px-6 py-20 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:px-8 relative z-10">
             <div
               ref={heroRef}
-              className={`relative public-fade-up transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                heroVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-              }`}
+              className="opacity-100 translate-y-0"
             >
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-surface-border bg-surface-raised/80 px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-content-secondary">
-                <Shield className="h-3.5 w-3.5 text-brand-profit" />
-                Clarity for bills, debt, and cash flow
+              <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-content-secondary backdrop-blur-md">
+                <div className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
+                Next-Gen Financial Operating System
               </div>
-              <p className="max-w-xl text-sm font-medium text-content-secondary">
-                Oweable is for people whose finances are real-life messy, not spreadsheet neat.
-              </p>
-              <h1 className="mt-5 max-w-4xl text-5xl font-semibold tracking-[-0.06em] text-content-primary sm:text-6xl lg:text-7xl">
-                Stop guessing what you owe.
+              
+              <h1 className="mt-8 text-6xl font-bold tracking-[-0.05em] text-content-primary sm:text-7xl lg:text-[7rem] lg:leading-[0.9]">
+                Clarity for<br />
+                <span className="bg-gradient-to-r from-white via-white/60 to-white/20 bg-clip-text text-transparent">Complex Money.</span>
               </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-8 text-content-secondary sm:text-xl">
-                Track bills, debt, subscriptions, budgets, and uneven income in one place. Oweable shows what is due,
-                what is behind, and what to pay off next, so your money stops running on memory and guesswork.
+              
+              <p className="mt-10 max-w-xl text-lg leading-relaxed text-content-secondary lg:text-xl font-light">
+                Oweable turns your fragmented bills, debt, and uneven income into a single, dependable rhythm. 
+                Stop guessing and start knowing what your money needs next.
               </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+
+              <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <TransitionLink
                   to={primaryHref}
-                  className="inline-flex items-center justify-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
+                  className="group relative inline-flex items-center justify-center gap-3 rounded-full bg-white px-10 py-4 text-xs font-bold uppercase tracking-[0.15em] text-black transition-all duration-300 hover:scale-[1.02]"
                 >
-                  {user?.id ? 'Open dashboard' : 'Create free account'}
-                  <ArrowRight className="h-4 w-4" />
+                  {user?.id ? 'Enter Dashboard' : 'Initialize Account'}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </TransitionLink>
                 <a
                   href="#flow"
-                  className="inline-flex items-center justify-center rounded-full border border-surface-border px-7 py-3.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-raised"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-10 py-4 text-xs font-bold uppercase tracking-[0.15em] text-content-primary transition-all hover:bg-white/10"
                 >
-                  See how it works
+                  System Overview
                 </a>
-              </div>
-              <div className="mt-8 flex flex-wrap items-center gap-3 text-sm text-content-secondary">
-                <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                  <Check className="h-4 w-4 text-brand-profit" />
-                  No credit card required
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                  <Check className="h-4 w-4 text-brand-profit" />
-                  Works in your browser
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                  <Check className="h-4 w-4 text-brand-profit" />
-                  Built for steady and variable income
-                </span>
               </div>
             </div>
 
             <div
-              className={`relative public-fade-up public-delay-1 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-150 ${
+              className={`relative transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-150 ${
                 heroVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
               }`}
             >
-              <div className="absolute inset-6 rounded-[2rem] bg-gradient-to-b from-surface-highlight to-transparent blur-3xl" />
-              <div className="relative rounded-[2rem] border border-surface-border bg-surface-raised/95 p-3 shadow-lg">
+              <div className="absolute inset-6 rounded-[2rem] bg-brand-profit/10 blur-3xl" />
+              <div className="relative rounded-[2rem] border border-white/10 bg-surface-raised/40 backdrop-blur-md p-3 shadow-2xl">
                 <HeroPreviewMedia />
               </div>
-              <div className="absolute -bottom-3 left-2 right-2 sm:-bottom-4 sm:left-auto sm:right-auto sm:-left-4 rounded-3xl border border-surface-border bg-surface-raised px-4 py-3 shadow-lg">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-content-tertiary">This week</p>
-                <p className="mt-1 text-sm font-semibold text-content-primary">3 bills due, 1 overdue, payoff plan still on track</p>
+              <div className="absolute -bottom-3 left-2 right-2 sm:-bottom-6 sm:left-auto sm:right-auto sm:-left-6 rounded-2xl border border-white/10 bg-surface-raised/80 backdrop-blur-md px-5 py-4 shadow-xl">
+                <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-content-tertiary">Live insight</p>
+                <p className="mt-1 text-sm font-semibold text-content-primary">3 bills due, 1 overdue, payoff plan active</p>
               </div>
             </div>
           </div>
@@ -348,35 +321,29 @@ export default function Landing() {
           </div>
         </section>
 
-        <section id="why" className="bg-surface-base py-24">
+        <section id="why" className="py-32 relative overflow-hidden">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Why this landing page matters</p>
-                <h2 className="mt-4 max-w-xl text-4xl font-semibold tracking-[-0.04em] text-content-primary">
-                  The real problem is not spending. It is financial fog.
-                </h2>
-              </div>
-              <p className="max-w-2xl text-lg leading-8 text-content-secondary">
-                People do not lose money only because they spend too much. They lose money because due dates, balances,
-                subscriptions, taxes, and payoff decisions stay fragmented. Oweable should feel like relief the moment the
-                page loads.
-              </p>
+            <div className="flex flex-col items-center text-center mb-24">
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-profit mb-4">The Logic</p>
+              <h2 className="text-4xl font-bold tracking-tight text-content-primary sm:text-5xl lg:text-6xl">
+                The problem isn't spending.<br />
+                <span className="text-content-secondary">It's financial fog.</span>
+              </h2>
             </div>
 
-            <div className="mt-14 grid gap-8 lg:grid-cols-3">
+            <div className="grid gap-6 lg:grid-cols-3">
               {painPoints.map((item) => {
                 const Icon = item.icon;
                 return (
                   <article
                     key={item.title}
-                    className="group relative flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border-subtle hover:shadow-sm"
+                    className="glass-card group relative p-10 transition-all hover:bg-white/[0.03]"
                   >
-                    <div className="flex h-12 w-12 items-start justify-start rounded-xl bg-surface-elevated text-content-primary">
+                    <div className="h-10 w-10 rounded-lg bg-white/5 flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="mt-6 text-xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">{item.title}</h3>
-                    <p className="mt-4 text-sm leading-relaxed text-content-secondary">{item.copy}</p>
+                    <h3 className="text-xl font-bold text-content-primary mb-4">{item.title}</h3>
+                    <p className="text-sm leading-relaxed text-content-secondary line-clamp-4">{item.copy}</p>
                   </article>
                 );
               })}
@@ -386,57 +353,65 @@ export default function Landing() {
 
         <section
           id="flow"
-          className="border-y border-surface-border bg-surface-raised py-24"
+          className="relative py-32 overflow-hidden border-t border-white/5"
         >
+          <div className="absolute inset-0 z-0">
+             <div className="absolute top-[20%] right-[-10%] h-[50%] w-[50%] rounded-full bg-brand-profit/5 blur-[120px]" />
+          </div>
+
           <div
             ref={storyRef}
-            className={`mx-auto max-w-7xl px-6 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
-              storyVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-            }`}
+            className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10 opacity-100 translate-y-0"
           >
-            <div className="grid gap-14 lg:grid-cols-[0.94fr_1.06fr] lg:items-start">
+            <div className="grid gap-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">How it works</p>
-                <h2 className="mt-4 max-w-xl text-4xl font-semibold tracking-[-0.04em] text-content-primary">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-profit mb-6">The System</p>
+                <h2 className="text-4xl font-bold tracking-tight text-content-primary sm:text-5xl">
                   One command center for what your money needs next.
                 </h2>
-                <p className="mt-6 max-w-xl text-lg leading-8 text-content-secondary">
-                  Oweable is strongest when it helps you make the next smart move quickly. That is the experience the
-                  landing page should sell, not a wall of disconnected features.
+                <p className="mt-8 text-lg leading-relaxed text-content-secondary font-light">
+                  Oweable isn't just a tracker. It's a financial operating system that reduces decision friction by 
+                  pulling everything into one rhythm.
                 </p>
-                <div className="mt-8 rounded-md border border-surface-border bg-surface-raised p-6">
-                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Also included</p>
-                  <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                    <div className="rounded-md bg-surface-elevated p-4">
-                      <UploadCloud className="h-5 w-5 text-content-primary" />
-                      <p className="mt-3 text-sm font-semibold text-content-primary">Document and bill capture</p>
-                      <p className="mt-2 text-sm leading-6 text-content-secondary">Snap paper statements and bring them into the same system.</p>
+                
+                <div className="mt-12 space-y-4">
+                  <div className="glass-card p-6 flex items-start gap-5 group hover:bg-white/[0.03] transition-colors">
+                    <div className="h-10 w-10 rounded-lg bg-white/5 flex items-center justify-center text-white shrink-0">
+                      <UploadCloud className="h-5 w-5" />
                     </div>
-                    <div className="rounded-md bg-surface-elevated p-4">
-                      <BookOpen className="h-5 w-5 text-content-primary" />
-                      <p className="mt-3 text-sm font-semibold text-content-primary">Financial Academy</p>
-                      <p className="mt-2 text-sm leading-6 text-content-secondary">Plain-English lessons for the moments when you want more context, not more jargon.</p>
+                    <div>
+                      <p className="text-sm font-bold text-content-primary mb-1">Bill Capture</p>
+                      <p className="text-xs text-content-secondary leading-relaxed">Snap statements and bring them into the system automatically.</p>
+                    </div>
+                  </div>
+                  <div className="glass-card p-6 flex items-start gap-5 group hover:bg-white/[0.03] transition-colors">
+                    <div className="h-10 w-10 rounded-lg bg-white/5 flex items-center justify-center text-white shrink-0">
+                      <BookOpen className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-content-primary mb-1">Financial Academy</p>
+                      <p className="text-xs text-content-secondary leading-relaxed">Plain-English lessons for the moments when you want more context.</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {workflowSteps.map((step) => {
                   const Icon = step.icon;
                   return (
                     <article
                       key={step.title}
-                      className="group relative flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border-subtle hover:shadow-sm"
+                      className="glass-card group p-8 transition-all hover:bg-white/[0.03]"
                     >
                       <div className="flex items-start gap-6">
-                        <div className="flex h-12 w-12 shrink-0 items-start justify-start rounded-xl bg-surface-elevated text-content-primary">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/5 text-content-primary group-hover:bg-brand-profit/20 group-hover:text-brand-profit transition-all">
                           <Icon className="h-5 w-5" />
                         </div>
                         <div>
-                          <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">{step.eyebrow}</p>
-                          <h3 className="mt-2 text-xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">{step.title}</h3>
-                          <p className="mt-3 text-sm leading-relaxed text-content-secondary">{step.copy}</p>
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-profit/70 mb-2">{step.eyebrow}</p>
+                          <h3 className="text-xl font-bold text-content-primary mb-3">{step.title}</h3>
+                          <p className="text-sm leading-relaxed text-content-secondary">{step.copy}</p>
                         </div>
                       </div>
                     </article>
@@ -447,77 +422,74 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="bg-surface-base py-24">
+        <section className="py-32 relative border-t border-white/5">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="grid gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">What Oweable actually gives you</p>
-                <h2 className="mt-4 max-w-lg text-4xl font-semibold tracking-[-0.04em] text-content-primary">
-                  Not another budgeting app. A calmer operating system for your money.
-                </h2>
-                <p className="mt-6 max-w-lg text-lg leading-8 text-content-secondary">
-                  The redesign should make every section reinforce a single idea: Oweable reduces decision friction by
-                  pulling obligations, payoff strategy, and cash flow into one dependable rhythm.
-                </p>
-              </div>
+            <div className="flex flex-col items-start mb-20">
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-profit mb-4">Capabilities</p>
+              <h2 className="text-4xl font-bold tracking-tight text-content-primary sm:text-5xl">
+                Precision engineering for<br />
+                <span className="text-content-secondary">your money workflow.</span>
+              </h2>
+            </div>
 
-              <div className="grid gap-8 md:grid-cols-3">
-                {capabilityColumns.map((column) => {
-                  const Icon = column.icon;
-                  return (
-                    <article
-                      key={column.title}
-                      className="group relative flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border-subtle hover:shadow-sm"
-                    >
-                      <div className="flex h-12 w-12 items-start justify-start rounded-xl bg-surface-elevated text-content-primary">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <h3 className="mt-6 text-lg font-semibold tracking-[-0.03em] leading-tight text-content-primary">{column.title}</h3>
-                      <ul className="mt-6 space-y-3 text-sm leading-relaxed text-content-secondary">
-                        {column.items.map((item) => (
-                          <li key={item} className="flex items-start gap-3">
-                            <Check className="mt-1 h-4 w-4 shrink-0 text-brand-profit" />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </article>
-                  );
-                })}
-              </div>
+            <div className="grid gap-6 md:grid-cols-3">
+              {capabilityColumns.map((column) => {
+                const Icon = column.icon;
+                return (
+                  <article
+                    key={column.title}
+                    className="glass-card group p-10 transition-all hover:bg-white/[0.03]"
+                  >
+                    <div className="h-10 w-10 rounded-lg bg-white/5 flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-lg font-bold text-content-primary mb-6 tracking-tight">{column.title}</h3>
+                    <ul className="space-y-4">
+                      {column.items.map((item) => (
+                        <li key={item} className="flex items-start gap-3 group/item">
+                          <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-brand-profit opacity-50 group-hover/item:opacity-100 transition-opacity" />
+                          <span className="text-sm text-content-secondary group-hover/item:text-content-primary transition-colors leading-relaxed font-light">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        <section className="border-y border-surface-border bg-surface-raised py-24">
+        <section className="py-32 relative overflow-hidden border-t border-white/5">
           <div
             ref={audienceRef}
-            className={`mx-auto max-w-7xl px-6 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
-              audienceVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-            }`}
+            className="mx-auto max-w-7xl px-6 lg:px-8 opacity-100 translate-y-0"
           >
-            <div className="grid gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
+            <div className="grid gap-16 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Who it is for</p>
-                <h2 className="mt-4 max-w-xl text-4xl font-semibold tracking-[-0.04em] text-content-primary">
-                  Built for real financial lives, not idealized money routines.
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-profit mb-4">Audience</p>
+                <h2 className="text-4xl font-bold tracking-tight text-content-primary sm:text-5xl">
+                  Built for the messy reality of money.
                 </h2>
+                <p className="mt-8 text-lg leading-relaxed text-content-secondary font-light">
+                  We don't expect you to have a perfect budget. We expect you to have a life. 
+                  Oweable is built for households, freelancers, and anyone with "too many moving pieces."
+                </p>
               </div>
-              <div className="grid gap-6">
+              <div className="grid gap-4">
                 {audienceCards.map((item, index) => (
                   <article
                     key={item.title}
-                    className="group grid gap-6 rounded-2xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border-subtle hover:shadow-sm md:grid-cols-[auto_1fr] md:items-start"
+                    className="glass-card group p-8 flex flex-col md:flex-row md:items-center gap-8 transition-all hover:bg-white/[0.03]"
                   >
-                    <div className="flex h-12 w-12 items-start justify-start rounded-xl bg-brand-cta text-surface-base">
+                    <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
                       {index === 0 && <Users className="h-5 w-5" />}
                       {index === 1 && <Shield className="h-5 w-5" />}
                       {index === 2 && <TrendingUp className="h-5 w-5" />}
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold tracking-[-0.03em] leading-tight text-content-primary">{item.title}</h3>
-                      <p className="mt-4 text-sm leading-relaxed text-content-secondary">{item.copy}</p>
-                      <p className="mt-5 text-sm font-medium text-brand-profit">{item.accent}</p>
+                      <h3 className="text-lg font-bold text-content-primary mb-2">{item.title}</h3>
+                      <p className="text-sm text-content-secondary leading-relaxed font-light mb-4">{item.copy}</p>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-brand-profit">{item.accent}</p>
                     </div>
                   </article>
                 ))}
@@ -557,106 +529,112 @@ export default function Landing() {
           </div>
         </section>
 
-        <section id="pricing" className="border-y border-surface-border bg-surface-raised py-24">
+        <section id="pricing" className="py-32 relative border-t border-white/5">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="max-w-3xl">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Pricing</p>
-              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-content-primary">
-                Start with the essentials. Upgrade when you want the full system.
+            <div className="flex flex-col items-center text-center mb-20">
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-profit mb-4">Pricing</p>
+              <h2 className="text-4xl font-bold tracking-tight text-content-primary sm:text-5xl">
+                Start with essentials.<br />
+                <span className="text-content-secondary">Upgrade when you're ready.</span>
               </h2>
             </div>
 
-            <div className="mt-12 grid gap-8 lg:grid-cols-2">
-              <article className="group flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border-subtle hover:shadow-sm">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Free Tracker</p>
-                <div className="mt-5 flex items-end gap-2">
-                  <span className="text-5xl font-semibold tracking-[-0.05em] leading-tight text-content-primary">$0</span>
-                  <span className="pb-1 text-sm text-content-secondary">per month</span>
+            <div className="mt-12 grid gap-8 lg:grid-cols-2 max-w-5xl mx-auto">
+              <article className="glass-card group p-10 flex flex-col transition-all hover:bg-white/[0.02]">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-content-tertiary mb-6">Free Tracker</p>
+                <div className="flex items-end gap-2 mb-8">
+                  <span className="text-6xl font-bold tracking-tight text-content-primary">$0</span>
+                  <span className="pb-1 text-sm text-content-secondary font-medium">/ month</span>
                 </div>
-                <p className="mt-5 max-w-md text-base leading-relaxed text-content-secondary">
-                  Start here if you want immediate visibility into bills, due dates, recurring obligations, and core reminders.
+                <p className="text-sm leading-relaxed text-content-secondary mb-10 font-light">
+                  Immediate visibility into bills, due dates, and core reminders.
                 </p>
-                <ul className="mt-6 space-y-3 text-sm leading-relaxed text-content-secondary">
-                  <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Bill tracking and due-date visibility</li>
-                  <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Recurring obligations and tickets or fines</li>
-                  <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Core reminders and settings</li>
+                <ul className="space-y-4 mb-10 flex-grow">
+                  {['Bill tracking', 'Due-date visibility', 'Recurring obligations', 'Core reminders'].map(f => (
+                    <li key={f} className="flex items-center gap-3 text-sm text-content-secondary font-medium">
+                      <div className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
+                      {f}
+                    </li>
+                  ))}
                 </ul>
+                <button className="w-full py-4 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold uppercase tracking-[0.2em] text-white hover:bg-white/10 transition-colors">
+                  Start Track
+                </button>
               </article>
 
-              <article className="group flex flex-col items-start rounded-2xl border border-brand-cta bg-brand-cta p-8 text-surface-base shadow-lg">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-surface-base/80">Full Suite</p>
-                <div className="mt-5 flex items-end gap-2">
-                  <span className="text-5xl font-semibold tracking-[-0.05em] leading-tight">$10.99</span>
-                  <span className="pb-1 text-sm text-surface-base/80">per month</span>
+              <article className="relative p-10 flex flex-col rounded-2xl border border-brand-profit/30 bg-brand-profit/5 overflow-hidden group">
+                <div className="absolute top-0 right-0 p-3 bg-brand-profit text-black text-[9px] font-black uppercase tracking-widest rounded-bl-xl">Best Value</div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-profit mb-6">Full Suite</p>
+                <div className="flex items-end gap-2 mb-8">
+                  <span className="text-6xl font-bold tracking-tight text-white">$10.99</span>
+                  <span className="pb-1 text-sm text-brand-profit/70 font-medium">/ month</span>
                 </div>
-                <p className="mt-5 max-w-md text-base leading-relaxed text-surface-base/90">
-                  Get the complete operating system: debt payoff, budgets, analytics, deeper cash-flow tools, and tax planning when your income needs it.
+                <p className="text-sm leading-relaxed text-white/80 mb-10 font-light">
+                  The complete operating system: debt, budgets, taxes, and deep cash-flow.
                 </p>
-                <ul className="mt-6 space-y-3 text-sm leading-relaxed text-surface-base/90">
-                  <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0" /> Debt payoff engine with Snowball and Avalanche</li>
-                  <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0" /> Budgets, analytics, income ledger, and transaction tools</li>
-                  <li className="flex items-start gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0" /> Tax estimates and reserve planning for variable income</li>
+                <ul className="space-y-4 mb-10 flex-grow">
+                  {['Debt payoff engine', 'Advanced analytics', 'Tax planning', 'Variable income tools'].map(f => (
+                    <li key={f} className="flex items-center gap-3 text-sm text-white font-medium">
+                      <Check className="h-4 w-4 text-brand-profit" />
+                      {f}
+                    </li>
+                  ))}
                 </ul>
-                <p className="mt-6 text-sm text-surface-base/80">Every account starts with a 14-day Full Suite trial. No credit card required.</p>
+                <button className="w-full py-4 rounded-full bg-white text-[10px] font-bold uppercase tracking-[0.2em] text-black hover:scale-[1.02] transition-transform">
+                  Deploy Suite
+                </button>
+                <p className="mt-6 text-[10px] text-center text-white/50 uppercase tracking-widest">14-day trial included</p>
               </article>
-            </div>
-
-            <div className="mt-8">
-              <TransitionLink
-                to={primaryHref}
-                className="inline-flex items-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
-              >
-                {user?.id ? 'Open dashboard' : 'Start free'}
-                <ArrowRight className="h-4 w-4" />
-              </TransitionLink>
             </div>
           </div>
         </section>
 
-        <section id="faq" className="bg-surface-base py-24">
+        <section id="faq" className="py-32 relative border-t border-white/5">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="max-w-2xl">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">FAQ</p>
-              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-content-primary">
-                A few quick answers before you start.
+            <div className="flex flex-col items-center text-center mb-20">
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-brand-profit mb-4">FAQ</p>
+              <h2 className="text-4xl font-bold tracking-tight text-content-primary sm:text-5xl">
+                Common inquiries.
               </h2>
             </div>
-            <div className="mt-12 grid gap-6 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-2 max-w-5xl mx-auto">
               {faqItems.map((item) => (
                 <article
                   key={item.q}
-                  className="rounded-2xl border border-surface-border bg-surface-raised p-8"
+                  className="glass-card p-8 transition-all hover:bg-white/[0.03]"
                 >
-                  <h3 className="text-lg font-semibold tracking-[-0.02em] leading-tight text-content-primary">{item.q}</h3>
-                  <p className="mt-4 text-base leading-relaxed text-content-secondary">{item.a}</p>
+                  <h3 className="text-sm font-bold text-content-primary mb-4 tracking-tight uppercase tracking-wider">{item.q}</h3>
+                  <p className="text-sm leading-relaxed text-content-secondary font-light">{item.a}</p>
                 </article>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="overflow-hidden border-t border-surface-border bg-surface-base py-24">
-          <div className="mx-auto max-w-5xl px-6 lg:px-8">
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Final nudge</p>
-            <h2 className="mt-5 text-left text-4xl font-semibold tracking-[-0.05em] text-content-primary sm:text-5xl">
-              The money stress usually is not mystery. It is missing visibility.
+        <section className="py-40 relative border-t border-white/5 overflow-hidden">
+          <div className="absolute inset-0 z-0">
+             <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 h-full w-full bg-brand-profit/5 blur-[180px]" />
+          </div>
+
+          <div className="mx-auto max-w-4xl px-6 lg:px-8 text-center relative z-10">
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-profit mb-8">Ready to Initialize</p>
+            <h2 className="text-5xl font-bold tracking-tighter text-content-primary sm:text-7xl lg:text-8xl mb-12">
+              Money stress is just<br />
+              <span className="text-content-secondary/40">missing visibility.</span>
             </h2>
-            <p className="mt-6 max-w-2xl text-left text-lg leading-8 text-content-secondary">
-              Start free, get the whole picture, and make your next decision with more certainty than guesswork.
-            </p>
-            <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <TransitionLink
                 to={primaryHref}
-                className="inline-flex items-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
+                className="group relative inline-flex items-center justify-center gap-3 rounded-full bg-white px-12 py-5 text-xs font-bold uppercase tracking-[0.2em] text-black transition-all duration-300 hover:scale-105"
               >
-                {user?.id ? 'Open dashboard' : 'Create my free account'}
-                <ArrowRight className="h-4 w-4" />
+                {user?.id ? 'Open Command Center' : 'Initialize Account'}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </TransitionLink>
               <TransitionLink
                 to="/pricing"
-                className="inline-flex items-center gap-2 rounded-full border border-surface-border px-7 py-3.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-raised"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-12 py-5 text-xs font-bold uppercase tracking-[0.2em] text-content-primary transition-all hover:bg-white/10"
               >
-                Compare plans
+                Compare Systems
               </TransitionLink>
             </div>
           </div>
