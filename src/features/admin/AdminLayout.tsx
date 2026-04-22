@@ -4,6 +4,9 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../lib/supabase';
 import { useAdminPermissions } from './shared/useAdminPermissions';
+import { ThemeToggle } from '../../components/ThemeToggle';
+import { BrandWordmark } from '../../components/BrandWordmark';
+import { TransitionLink } from '../../components/TransitionLink';
 
 const navItems = [
   { to: '/admin', label: 'Overview', end: true, requiredPermission: 'dashboard.view' },
@@ -43,18 +46,18 @@ export function AdminLayout() {
       <header className="sticky top-0 z-20 border-b border-surface-border bg-surface-base/85 shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl min-h-[3.25rem] items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex min-h-[3rem] items-center gap-3">
-            <span className="rounded-lg border border-surface-border bg-surface-raised/80 p-2 shadow-sm">
-              <Shield className="h-4 w-4 text-content-primary" />
-            </span>
-            <div className="min-h-[2.5rem] space-y-0.5 leading-tight">
-              <p className="text-sm font-semibold leading-snug text-content-primary">Admin Console</p>
-              <p className="text-[11px] leading-snug text-content-tertiary">Operations command center</p>
-            </div>
+            <TransitionLink to="/pro/dashboard" className="group flex items-center gap-2">
+              <div className="h-6 w-6 rounded-sm bg-white flex items-center justify-center transition-transform group-hover:rotate-12">
+                <div className="h-3 w-3 bg-black rounded-full" />
+              </div>
+              <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />
+            </TransitionLink>
             <span className="shrink-0 rounded-md border border-surface-border bg-surface-raised/80 px-2 py-0.5 text-[10px] uppercase tracking-wider text-content-tertiary">
               {envLabel}
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <div
               className="relative rounded-lg border border-surface-border bg-surface-raised/80 p-2 shadow-sm transition-colors duration-200 hover:border-content-secondary/40"
               role="status"
