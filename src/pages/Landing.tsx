@@ -461,15 +461,15 @@ export default function Landing() {
                 </p>
               </div>
 
-              <div className="grid gap-6 md:grid-cols-3">
+              <div className="grid gap-8 md:grid-cols-3">
                 {capabilityColumns.map((column) => {
                   const Icon = column.icon;
                   return (
                     <article
                       key={column.title}
-                      className="group relative rounded-md border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border-subtle hover:shadow-sm"
+                      className="group relative rounded-2xl border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border-subtle hover:shadow-sm"
                     >
-                      <div className="flex h-12 w-12 items-center justify-center rounded-md bg-surface-elevated text-content-primary">
+                      <div className="flex h-12 w-12 items-center justify-start rounded-xl bg-surface-elevated text-content-primary">
                         <Icon className="h-5 w-5" />
                       </div>
                       <h3 className="mt-5 text-lg font-semibold tracking-[-0.03em] text-content-primary">{column.title}</h3>
