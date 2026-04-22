@@ -1,83 +1,104 @@
 import React from 'react';
-import { ShieldCheck, Database, Key } from 'lucide-react';
-import { TransitionLink } from '../components/TransitionLink';
+import { Database, Key, ShieldCheck } from 'lucide-react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { useSEO } from '../hooks/useSEO';
 
+const securityCards = [
+  {
+    title: 'Encryption in transit and at rest',
+    body: 'Sensitive data is protected with strong transport and storage encryption so core financial information is not moving around in plain text.',
+    icon: Database,
+  },
+  {
+    title: 'Controlled access',
+    body: 'Access to internal systems is restricted and support workflows are meant to avoid casual browsing of private financial information.',
+    icon: Key,
+  },
+  {
+    title: 'Security operations mindset',
+    body: 'Oweable is designed around secure defaults, active monitoring, and fast handling of serious issues when they appear.',
+    icon: ShieldCheck,
+  },
+] as const;
+
+const sections = [
+  {
+    title: 'How Oweable approaches security',
+    copy:
+      'The product is built for sensitive financial workflows, so security cannot be an afterthought. The current posture focuses on strong encryption, constrained access, and practical response processes.',
+  },
+  {
+    title: 'Infrastructure and hosting',
+    copy:
+      'Core infrastructure is hosted with managed cloud services and monitored for abnormal activity. Operational controls are intended to reduce unauthorized access and improve visibility into platform health.',
+  },
+  {
+    title: 'Vulnerability reporting',
+    copy:
+      'If you discover a security issue, email security@oweable.com with as much detail as you can safely share. Reports are reviewed and prioritized based on severity and user impact.',
+  },
+  {
+    title: 'Data residency and compliance posture',
+    copy:
+      'Core product data is handled with U.S.-based infrastructure unless a different arrangement is explicitly required. Privacy and compliance requests are processed through the support and privacy channels.',
+  },
+] as const;
+
 export default function Security() {
   useSEO({
     title: 'Security — Oweable',
-    description: 'How Oweable protects your financial data: encryption, strict access controls, secure sign-in, and regular security testing.',
+    description:
+      'How Oweable protects financial data with encryption, controlled access, infrastructure safeguards, and vulnerability reporting.',
     canonical: 'https://www.oweable.com/security',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
 
   return (
     <>
-    <Header />
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans pt-24 p-8 md:p-24 selection:bg-content-primary/15">
-      <div className="max-w-3xl mx-auto">
-        
-        <header className="mb-16 border-l-4 border-surface-border pl-8 mt-8">
-          <div className="flex items-center gap-3 text-content-secondary mb-4">
-            <ShieldCheck className="w-6 h-6 shrink-0" aria-hidden />
-            <span className="text-xs font-sans font-medium">Security</span>
-          </div>
-          <h1 className="text-4xl md:text-6xl font-medium tracking-tight mb-4">Security</h1>
-          <p className="text-sm text-content-tertiary">How we protect your data and your account</p>
-        </header>
-
-        <div className="space-y-12 text-content-secondary leading-relaxed">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <div className="p-6 bg-surface-raised border border-surface-border flex flex-col gap-4 rounded-lg">
-              <Database className="w-8 h-8 text-content-secondary shrink-0" aria-hidden />
-              <h3 className="text-base font-sans font-semibold text-content-primary">Strong encryption in transit and at rest</h3>
-              <p className="text-sm">
-                Sensitive identifiers are encrypted before they reach our primary storage, using industry-standard algorithms and key management practices.
+      <Header />
+      <div className="min-h-screen bg-[#f6efe4] px-6 pb-20 pt-28 text-[#1f2b24] selection:bg-[#1f2b24]/15 lg:px-8">
+        <div className="mx-auto max-w-6xl">
+          <section className="py-12">
+            <div className="max-w-3xl">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Security</p>
+              <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-[#1f2b24] sm:text-6xl">
+                Security, explained without theater.
+              </h1>
+              <p className="mt-6 text-lg leading-8 text-[#556157]">
+                Oweable handles sensitive financial workflows, so security has to be built into the product, the infrastructure, and the support process.
               </p>
             </div>
-            <div className="p-6 bg-surface-raised border border-surface-border flex flex-col gap-4 rounded-lg">
-              <Key className="w-8 h-8 text-content-secondary shrink-0" aria-hidden />
-              <h3 className="text-base font-sans font-semibold text-content-primary">Validated cryptography</h3>
-              <p className="text-sm">
-                Cryptographic operations use FIPS-validated modules where applicable for key management and secure operations.
-              </p>
+
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
+              {securityCards.map((card) => {
+                const Icon = card.icon;
+                return (
+                  <article key={card.title} className="rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-7 shadow-[0_12px_30px_rgba(49,65,55,0.04)]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eef4ef] text-[#35684f]">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h2 className="mt-5 text-xl font-semibold tracking-[-0.03em] text-[#1f2b24]">{card.title}</h2>
+                    <p className="mt-3 text-base leading-7 text-[#5b685e]">{card.body}</p>
+                  </article>
+                );
+              })}
             </div>
-          </div>
 
-          <section>
-            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">1. SOC 2 framework</h2>
-            <p>
-              We are building toward SOC 2 Type II certification and use SOC 2 security controls as our internal operating standard today. This includes strict access controls, security training for engineering staff, and recurring security testing.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">2. Infrastructure and hosting</h2>
-            <p>
-              Our infrastructure is hosted on isolated virtual private clouds (VPCs) across multiple availability zones. We maintain 24/7/365 monitoring for unusual activity or unauthorized access attempts using AI-driven threat detection.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">3. Vulnerability disclosure</h2>
-            <p>
-              We operate a coordinated vulnerability disclosure (CVD) program. Security researchers can report discovered issues to our team at <a href="mailto:security@oweable.com" className="underline underline-offset-2 hover:text-content-primary">security@oweable.com</a> for prioritized remediation. We take all reports seriously and aim to resolve critical issues within 24 hours.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-sans font-semibold text-content-primary mb-4 border-b border-surface-border pb-2">4. Data residency</h2>
-            <p>
-              All core data vaults are residency-locked in the United States unless otherwise specified by enterprise agreements. We strictly adhere to GDPR and CCPA requirements for data transfer and subject access requests.
-            </p>
+            <div className="mt-12 rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-8">
+              <div className="space-y-10">
+                {sections.map((section) => (
+                  <section key={section.title}>
+                    <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#1f2b24]">{section.title}</h2>
+                    <p className="mt-4 max-w-4xl text-base leading-8 text-[#5b685e]">{section.copy}</p>
+                  </section>
+                ))}
+              </div>
+            </div>
           </section>
         </div>
-
       </div>
-    </div>
-    <Footer />
+      <Footer />
     </>
   );
 }
