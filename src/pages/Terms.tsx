@@ -53,42 +53,42 @@ export default function Terms() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#f6efe4] px-6 pb-20 pt-28 text-[#1f2b24] selection:bg-[#1f2b24]/15 lg:px-8">
+      <div className="min-h-screen bg-surface-base px-6 pb-20 pt-28 text-content-primary selection:bg-content-primary/15 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <section className="py-12">
             <div className="public-fade-up max-w-3xl">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Terms</p>
-              <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-[#1f2b24] sm:text-6xl">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Terms</p>
+              <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-content-primary sm:text-6xl">
                 Terms that are meant to be read by humans.
               </h1>
-              <p className="mt-6 text-lg leading-8 text-[#556157]">
+              <p className="mt-6 text-lg leading-8 text-content-secondary">
                 This is the plain-language overview of the rules that govern use of Oweable. It is about expectations, billing, fair use, and legal boundaries.
               </p>
-              <p className="mt-4 text-sm text-[#6b776e]">Last updated April 2026</p>
+              <p className="mt-4 text-sm text-content-muted">Last updated April 2026</p>
             </div>
 
             <div className="mt-12 space-y-5">
               {sections.map((section, index) => (
-                <section key={section.title} className="public-hover-lift rounded-[1.75rem] border border-[#d7cebf] bg-[#fffaf3] p-6 sm:p-7 shadow-[0_12px_30px_rgba(49,65,55,0.04)]">
-                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">Section {index + 1}</p>
-                  <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-[#1f2b24]">{section.title}</h2>
-                  <p className="mt-4 max-w-4xl text-base leading-8 text-[#5b685e]">{section.copy}</p>
+                <section key={section.title} className="public-hover-lift rounded-md border border-surface-border bg-surface-raised p-6 sm:p-7 shadow-sm">
+                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Section {index + 1}</p>
+                  <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-content-primary">{section.title}</h2>
+                  <p className="mt-4 max-w-4xl text-base leading-8 text-content-secondary">{section.copy}</p>
                 </section>
               ))}
             </div>
 
-            <div className="public-fade-up public-delay-1 mt-10 rounded-[1.75rem] border border-[#d7cebf] bg-[#f1e7d9] p-6 sm:p-7">
-              <p className="text-base leading-8 text-[#435047]">
+            <div className="public-fade-up public-delay-1 mt-10 rounded-md border border-surface-border bg-surface-highlight p-6 sm:p-7">
+              <p className="text-base leading-8 text-content-secondary">
                 For billing and plan details, visit{' '}
-                <TransitionLink to="/pricing" className="font-semibold text-[#1f2b24] underline underline-offset-4 hover:text-[#35684f]">
+                <TransitionLink to="/pricing" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
                   Pricing
                 </TransitionLink>
                 . For data handling, use{' '}
-                <TransitionLink to="/privacy" className="font-semibold text-[#1f2b24] underline underline-offset-4 hover:text-[#35684f]">
+                <TransitionLink to="/privacy" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
                   Privacy
                 </TransitionLink>
                 . If something is unclear, contact{' '}
-                <TransitionLink to="/support" className="font-semibold text-[#1f2b24] underline underline-offset-4 hover:text-[#35684f]">
+                <TransitionLink to="/support" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
                   Support
                 </TransitionLink>
                 .

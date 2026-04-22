@@ -439,7 +439,7 @@ function BillingPanelInner() {
                 type="button"
                 onClick={() => void onCancelImmediatelyConfirmed()}
                 disabled={isWorking}
-                className="rounded-lg bg-[#EF4444] px-4 py-2 text-sm font-medium text-white hover:bg-[#DC2626] disabled:opacity-60"
+                className="rounded-lg bg-brand-expense px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60"
               >
                 {isWorking ? 'Working…' : 'End access today'}
               </button>

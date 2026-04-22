@@ -18,25 +18,25 @@ export default function Header() {
   return (
     <nav
       className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
-        scrolled ? 'border-[#d7cebf] bg-[#f6efe4]/92 backdrop-blur-xl' : 'border-transparent bg-transparent'
+        scrolled ? 'border-surface-border bg-surface-base/92 backdrop-blur-xl' : 'border-transparent bg-transparent'
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-        <TransitionLink to="/" className="text-[#1f2b24]">
-          <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[-0.02em] text-[#1f2b24]" />
+        <TransitionLink to="/" className="text-content-primary">
+          <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[-0.02em] text-content-primary" />
         </TransitionLink>
 
-        <div className="hidden items-center gap-8 text-sm text-[#5e695f] md:flex">
-          <TransitionLink to="/#why" className="transition-colors hover:text-[#1f2b24]">
+        <div className="hidden items-center gap-8 text-sm text-content-secondary md:flex">
+          <TransitionLink to="/#why" className="transition-colors hover:text-content-primary">
             Why it works
           </TransitionLink>
-          <TransitionLink to="/pricing" className="transition-colors hover:text-[#1f2b24]">
+          <TransitionLink to="/pricing" className="transition-colors hover:text-content-primary">
             Pricing
           </TransitionLink>
-          <TransitionLink to="/faq" className="transition-colors hover:text-[#1f2b24]">
+          <TransitionLink to="/faq" className="transition-colors hover:text-content-primary">
             FAQ
           </TransitionLink>
-          <TransitionLink to="/support" className="transition-colors hover:text-[#1f2b24]">
+          <TransitionLink to="/support" className="transition-colors hover:text-content-primary">
             Support
           </TransitionLink>
         </div>
@@ -51,14 +51,14 @@ export default function Header() {
                 useStore.getState().signOut();
                 toast.success('Session terminated');
               }}
-              className="hidden rounded-full border border-[#cfc5b2] px-4 py-2 text-sm font-medium text-[#4f5c53] transition-colors hover:border-[#bcae94] hover:text-[#1f2b24] sm:block"
+              className="hidden rounded-full border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:border-surface-border-subtle hover:text-content-primary sm:block"
             >
               Sign out
             </button>
           )}
           <TransitionLink
             to={user?.id ? '/dashboard' : '/onboarding'}
-            className="inline-flex items-center gap-2 rounded-full bg-[#1f2b24] px-5 py-2.5 text-sm font-medium text-[#f7f2ea] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2d3a32]"
+            className="inline-flex items-center gap-2 rounded-full bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
           >
             {user?.id ? 'Open dashboard' : 'Start free'}
           </TransitionLink>

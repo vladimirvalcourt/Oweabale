@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, Check, Minus, Plus } from 'lucide-react';
 import { BrandWordmark } from '../components/BrandWordmark';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
 
@@ -52,7 +53,7 @@ function FaqCard({ question, answer }: { question: string; answer: string }) {
   const panelId = `faq-panel-${question.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 
   return (
-    <article className="rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] px-6 py-5 shadow-[0_12px_30px_rgba(49,65,55,0.04)]">
+    <article className="rounded-md border border-surface-border bg-surface-raised px-6 py-5 shadow-sm">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
@@ -60,14 +61,14 @@ function FaqCard({ question, answer }: { question: string; answer: string }) {
         aria-controls={panelId}
         className="flex w-full items-center justify-between gap-4 text-left"
       >
-        <h3 className="text-lg font-semibold tracking-[-0.02em] text-[#1f2b24]">{question}</h3>
-        {open ? <Minus className="h-5 w-5 shrink-0 text-[#5f6b62]" /> : <Plus className="h-5 w-5 shrink-0 text-[#5f6b62]" />}
+        <h3 className="text-lg font-semibold tracking-[-0.02em] text-content-primary">{question}</h3>
+        {open ? <Minus className="h-5 w-5 shrink-0 text-content-secondary" /> : <Plus className="h-5 w-5 shrink-0 text-content-secondary" />}
       </button>
       <div
         id={panelId}
         className={`overflow-hidden transition-all duration-300 ease-out ${open ? 'mt-4 max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
       >
-        <p className="text-base leading-7 text-[#5b685e]">{answer}</p>
+        <p className="text-base leading-7 text-content-secondary">{answer}</p>
       </div>
     </article>
   );
@@ -107,41 +108,44 @@ export default function FAQ() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <div className="min-h-screen bg-[#f6efe4] text-[#1f2b24] selection:bg-[#1f2b24]/15">
+      <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
         <nav
           className={`fixed inset-x-0 top-0 z-50 border-b transition-all duration-300 ${
-            scrolled ? 'border-[#d7cebf] bg-[#f6efe4]/92 backdrop-blur-xl' : 'border-transparent bg-transparent'
+            scrolled ? 'border-surface-border bg-surface-base/92 backdrop-blur-xl' : 'border-transparent bg-transparent'
           }`}
         >
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-            <TransitionLink to="/" className="text-[#1f2b24]">
-              <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[-0.02em] text-[#1f2b24]" />
+            <TransitionLink to="/" className="text-content-primary">
+              <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[-0.02em] text-content-primary" />
             </TransitionLink>
-            <div className="hidden items-center gap-8 text-sm text-[#5e695f] md:flex">
-              <TransitionLink to="/pricing" className="transition-colors hover:text-[#1f2b24]">
+            <div className="hidden items-center gap-8 text-sm text-content-secondary md:flex">
+              <TransitionLink to="/pricing" className="transition-colors hover:text-content-primary">
                 Pricing
               </TransitionLink>
-              <TransitionLink to="/support" className="transition-colors hover:text-[#1f2b24]">
+              <TransitionLink to="/support" className="transition-colors hover:text-content-primary">
                 Support
               </TransitionLink>
             </div>
-            <TransitionLink
-              to="/onboarding"
-              className="inline-flex items-center gap-2 rounded-full bg-[#1f2b24] px-5 py-2.5 text-sm font-medium text-[#f7f2ea] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2d3a32]"
-            >
-              Start free
-            </TransitionLink>
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              <TransitionLink
+                to="/onboarding"
+                className="inline-flex items-center gap-2 rounded-full bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
+              >
+                Start free
+              </TransitionLink>
+            </div>
           </div>
         </nav>
 
         <main className="pt-32 pb-24">
           <section className="mx-auto max-w-5xl px-6 lg:px-8">
             <div className="text-center">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-[#7a6a54]">FAQ</p>
-              <h1 className="public-fade-up mt-5 text-5xl font-semibold tracking-[-0.06em] text-[#1f2b24] sm:text-6xl">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">FAQ</p>
+              <h1 className="public-fade-up mt-5 text-5xl font-semibold tracking-[-0.06em] text-content-primary sm:text-6xl">
                 The questions people ask before they trust their money to something new.
               </h1>
-              <p className="public-fade-up public-delay-1 mx-auto mt-6 max-w-3xl text-lg leading-8 text-[#556157]">
+              <p className="public-fade-up public-delay-1 mx-auto mt-6 max-w-3xl text-lg leading-8 text-content-secondary">
                 Short answers, plain English, and no fake mystery. If you still need help after this, the support page is one click away.
               </p>
             </div>
@@ -152,35 +156,35 @@ export default function FAQ() {
               ))}
             </div>
 
-            <div className="public-fade-up public-delay-2 mt-14 rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-7 sm:p-8 text-center shadow-[0_16px_40px_rgba(49,65,55,0.05)]">
-              <h2 className="text-3xl font-semibold tracking-[-0.04em] text-[#1f2b24]">
+            <div className="public-fade-up public-delay-2 mt-14 rounded-md border border-surface-border bg-surface-raised p-7 sm:p-8 text-center shadow-sm">
+              <h2 className="text-3xl font-semibold tracking-[-0.04em] text-content-primary">
                 Want the full picture instead of another patchwork system?
               </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-[#5b685e]">
+              <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-content-secondary">
                 Oweable is built to reduce money fog, not add more interfaces to babysit.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <TransitionLink
                   to="/onboarding"
-                  className="inline-flex items-center gap-3 rounded-full bg-[#1f2b24] px-7 py-3.5 text-sm font-medium text-[#f7f2ea] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2d3a32]"
+                  className="inline-flex items-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
                 >
                   Create free account
                   <ArrowRight className="h-4 w-4" />
                 </TransitionLink>
                 <TransitionLink
                   to="/pricing"
-                  className="inline-flex items-center gap-3 rounded-full border border-[#d3cabd] px-7 py-3.5 text-sm font-medium text-[#314137] transition-colors hover:border-[#bcae94] hover:bg-[#fff9f0]"
+                  className="inline-flex items-center gap-3 rounded-full border border-surface-border px-7 py-3.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
                 >
                   Compare plans
                 </TransitionLink>
               </div>
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm text-[#5f6b62]">
-                <span className="inline-flex items-center gap-2 rounded-full bg-[#f6efe4] px-3 py-1.5">
-                  <Check className="h-4 w-4 text-[#35684f]" />
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm text-content-secondary">
+                <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
+                  <Check className="h-4 w-4 text-brand-profit" />
                   No credit card required
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full bg-[#f6efe4] px-3 py-1.5">
-                  <Check className="h-4 w-4 text-[#35684f]" />
+                <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
+                  <Check className="h-4 w-4 text-brand-profit" />
                   Browser-based on desktop and mobile
                 </span>
               </div>

@@ -662,7 +662,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           transition={{ duration: 0.15 }}
                           className="border-t border-surface-border"
                         >
-                          <div className="relative flex min-h-[7rem] max-h-[min(14rem,42svh)] w-full items-center justify-center border-surface-border bg-[#0c0c0e] px-2 py-3">
+                          <div className="relative flex min-h-[7rem] max-h-[min(14rem,42svh)] w-full items-center justify-center border-surface-border bg-surface-base px-2 py-3">
                             <img
                               src={scannedPreviewUrl}
                               alt="Scanned document"

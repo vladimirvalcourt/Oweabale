@@ -231,7 +231,7 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
         </div>
       </CollapsibleModule>
 
-      <CollapsibleModule title="Danger Zone" icon={SecurityIcon} defaultOpen={false} className="border-[#7F1D1D]/50 bg-red-500/5">
+      <CollapsibleModule title="Danger Zone" icon={SecurityIcon} defaultOpen={false} className="border-red-900/50 bg-red-500/5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h4 className="text-sm font-medium text-content-primary">Delete Account</h4>

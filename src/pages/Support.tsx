@@ -120,35 +120,35 @@ export default function Support() {
   return (
     <>
       <Header />
-      <div className="min-h-screen bg-[#f6efe4] px-6 pb-20 pt-28 text-[#1f2b24] selection:bg-[#1f2b24]/15 lg:px-8">
+      <div className="min-h-screen bg-surface-base px-6 pb-20 pt-28 text-content-primary selection:bg-content-primary/15 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <section className="grid gap-10 py-10 sm:py-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-12">
             <div className="public-fade-up">
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#d7cebf] bg-[#fff9f0] px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-[#5f6b62]">
-                <LifeBuoy className="h-3.5 w-3.5 text-[#35684f]" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-surface-border bg-surface-raised px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-content-secondary">
+                <LifeBuoy className="h-3.5 w-3.5 text-brand-profit" />
                 Support
               </div>
-              <h1 className="mt-6 text-5xl font-semibold tracking-[-0.06em] text-[#1f2b24] sm:text-6xl">
+              <h1 className="mt-6 text-5xl font-semibold tracking-[-0.06em] text-content-primary sm:text-6xl">
                 Help that feels like a real person will read it.
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-[#556157]">
+              <p className="mt-6 max-w-xl text-lg leading-8 text-content-secondary">
                 Reach out for billing, access, account, product, or technical issues. We usually reply within one business day.
               </p>
               <div className="mt-8 grid gap-4">
-                <div className="public-hover-lift rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] p-5">
-                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#7a6a54]">Best for</p>
-                  <p className="mt-2 text-sm leading-7 text-[#5b685e]">Account access problems, billing questions, bugs, and anything blocking your workflow.</p>
+                <div className="public-hover-lift rounded-md border border-surface-border bg-surface-raised p-5">
+                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-tertiary">Best for</p>
+                  <p className="mt-2 text-sm leading-7 text-content-secondary">Account access problems, billing questions, bugs, and anything blocking your workflow.</p>
                 </div>
-                <div className="public-hover-lift rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] p-5">
-                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#7a6a54]">Direct email</p>
-                  <a href={`mailto:${SUPPORT_EMAIL}`} className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-[#1f2b24] hover:text-[#35684f]">
+                <div className="public-hover-lift rounded-md border border-surface-border bg-surface-raised p-5">
+                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-tertiary">Direct email</p>
+                  <a href={`mailto:${SUPPORT_EMAIL}`} className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-content-primary hover:text-brand-profit">
                     <Mail className="h-4 w-4" />
                     {SUPPORT_EMAIL}
                   </a>
                 </div>
-                <div className="public-hover-lift rounded-[1.5rem] border border-[#d7cebf] bg-[#fffaf3] p-5">
-                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#7a6a54]">Sensitive requests</p>
-                  <p className="mt-2 text-sm leading-7 text-[#5b685e]">
+                <div className="public-hover-lift rounded-md border border-surface-border bg-surface-raised p-5">
+                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-tertiary">Sensitive requests</p>
+                  <p className="mt-2 text-sm leading-7 text-content-secondary">
                     For privacy or security-specific concerns, include that in your subject line so we can route it quickly.
                   </p>
                 </div>
@@ -156,24 +156,24 @@ export default function Support() {
             </div>
 
             <div className="public-fade-up public-delay-1 grid gap-6">
-              <section className="rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-6 sm:p-7 shadow-[0_16px_40px_rgba(49,65,55,0.05)]">
-                <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#1f2b24]">Send a message</h2>
-                <p className="mt-3 text-base leading-7 text-[#5b685e]">
+              <section className="rounded-md border border-surface-border bg-surface-raised p-6 sm:p-7 shadow-sm">
+                <h2 className="text-2xl font-semibold tracking-[-0.03em] text-content-primary">Send a message</h2>
+                <p className="mt-3 text-base leading-7 text-content-secondary">
                   Give us the basics and a little context. The clearer the message, the faster we can help.
                 </p>
 
                 {submitted ? (
-                  <div className="mt-8 rounded-[1.5rem] bg-[#eef4ef] p-8 text-center">
-                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white text-[#35684f] shadow-sm">
+                  <div className="mt-8 rounded-md bg-surface-highlight p-8 text-center">
+                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-surface-base text-brand-profit shadow-sm">
                       <ShieldCheck className="h-8 w-8" />
                     </div>
-                    <h3 className="mt-5 text-2xl font-semibold tracking-[-0.03em] text-[#1f2b24]">Message sent</h3>
-                    <p className="mt-3 text-base leading-7 text-[#5b685e]">
+                    <h3 className="mt-5 text-2xl font-semibold tracking-[-0.03em] text-content-primary">Message sent</h3>
+                    <p className="mt-3 text-base leading-7 text-content-secondary">
                       We got your note and will usually reply within one business day.
                     </p>
                     <button
                       onClick={() => setSubmitted(false)}
-                      className="mt-6 inline-flex items-center justify-center rounded-full bg-[#1f2b24] px-6 py-3 text-sm font-medium text-[#f7f2ea] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2d3a32]"
+                      className="mt-6 inline-flex items-center justify-center rounded-full bg-brand-cta px-6 py-3 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
                     >
                       Send another message
                     </button>
@@ -181,47 +181,47 @@ export default function Support() {
                 ) : (
                   <form onSubmit={handleSubmit} className="mt-8">
                     <div className="grid gap-4 md:grid-cols-2">
-                      <label className="text-sm font-medium text-[#445148]">
+                      <label className="text-sm font-medium text-content-secondary">
                         Name
                         <input
                           type="text"
                           value={formData.name}
                           onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                          className="mt-2 w-full rounded-2xl border border-[#d7cebf] bg-[#fdf8f1] px-4 py-3 text-[#1f2b24] outline-none transition-colors focus:border-[#bcae94]"
+                          className="mt-2 w-full rounded-md border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
                           placeholder="Your name"
                           required
                         />
                       </label>
-                      <label className="text-sm font-medium text-[#445148]">
+                      <label className="text-sm font-medium text-content-secondary">
                         Email
                         <input
                           type="email"
                           value={formData.email}
                           onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                          className="mt-2 w-full rounded-2xl border border-[#d7cebf] bg-[#fdf8f1] px-4 py-3 text-[#1f2b24] outline-none transition-colors focus:border-[#bcae94]"
+                          className="mt-2 w-full rounded-md border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
                           placeholder="you@example.com"
                           required
                         />
                       </label>
                     </div>
 
-                    <label className="mt-4 block text-sm font-medium text-[#445148]">
+                    <label className="mt-4 block text-sm font-medium text-content-secondary">
                       Subject
                       <input
                         type="text"
                         value={formData.subject}
                         onChange={(e) => setFormData((prev) => ({ ...prev, subject: e.target.value }))}
-                        className="mt-2 w-full rounded-2xl border border-[#d7cebf] bg-[#fdf8f1] px-4 py-3 text-[#1f2b24] outline-none transition-colors focus:border-[#bcae94]"
+                        className="mt-2 w-full rounded-md border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
                         placeholder="Billing, login issue, bug report..."
                       />
                     </label>
 
-                    <label className="mt-4 block text-sm font-medium text-[#445148]">
+                    <label className="mt-4 block text-sm font-medium text-content-secondary">
                       Message
                       <textarea
                         value={formData.message}
                         onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
-                        className="mt-2 min-h-[160px] w-full rounded-2xl border border-[#d7cebf] bg-[#fdf8f1] px-4 py-3 text-[#1f2b24] outline-none transition-colors focus:border-[#bcae94]"
+                        className="mt-2 min-h-[160px] w-full rounded-md border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
                         placeholder="Tell us what happened, what you expected, and anything that would help us reproduce or understand the issue."
                         required
                       />
@@ -230,7 +230,7 @@ export default function Support() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="mt-6 inline-flex items-center gap-3 rounded-full bg-[#1f2b24] px-7 py-3.5 text-sm font-medium text-[#f7f2ea] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2d3a32] disabled:cursor-not-allowed disabled:opacity-70"
+                      className="mt-6 inline-flex items-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       {isSubmitting ? 'Sending...' : 'Send message'}
                       <ArrowRight className="h-4 w-4" />
@@ -239,32 +239,32 @@ export default function Support() {
                 )}
               </section>
 
-              <section className="rounded-[2rem] border border-[#d7cebf] bg-[#fffaf3] p-6 sm:p-7">
-                <h2 className="text-2xl font-semibold tracking-[-0.03em] text-[#1f2b24]">Quick answers</h2>
+              <section className="rounded-md border border-surface-border bg-surface-raised p-6 sm:p-7">
+                <h2 className="text-2xl font-semibold tracking-[-0.03em] text-content-primary">Quick answers</h2>
                 <div className="mt-6 grid gap-4">
                   {QUICK_HELP.map((item) => (
-                    <div key={item.q} className="rounded-[1.25rem] bg-[#f8f2e9] p-5">
-                      <h3 className="text-base font-semibold text-[#1f2b24]">{item.q}</h3>
-                      <p className="mt-2 text-sm leading-7 text-[#5b685e]">{item.a}</p>
+                    <div key={item.q} className="rounded-md bg-surface-highlight p-5">
+                      <h3 className="text-base font-semibold text-content-primary">{item.q}</h3>
+                      <p className="mt-2 text-sm leading-7 text-content-secondary">{item.a}</p>
                     </div>
                   ))}
                 </div>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <TransitionLink
                     to="/pricing"
-                    className="inline-flex items-center gap-2 rounded-full border border-[#d3cabd] px-5 py-2.5 text-sm font-medium text-[#314137] transition-colors hover:border-[#bcae94] hover:bg-[#fff9f0]"
+                    className="inline-flex items-center gap-2 rounded-full border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
                   >
                     Pricing
                   </TransitionLink>
                   <TransitionLink
                     to="/security"
-                    className="inline-flex items-center gap-2 rounded-full border border-[#d3cabd] px-5 py-2.5 text-sm font-medium text-[#314137] transition-colors hover:border-[#bcae94] hover:bg-[#fff9f0]"
+                    className="inline-flex items-center gap-2 rounded-full border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
                   >
                     Security
                   </TransitionLink>
                   <TransitionLink
                     to="/privacy"
-                    className="inline-flex items-center gap-2 rounded-full border border-[#d3cabd] px-5 py-2.5 text-sm font-medium text-[#314137] transition-colors hover:border-[#bcae94] hover:bg-[#fff9f0]"
+                    className="inline-flex items-center gap-2 rounded-full border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
                   >
                     Privacy
                   </TransitionLink>
