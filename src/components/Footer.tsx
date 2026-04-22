@@ -13,7 +13,7 @@ export default function Footer() {
               <BrandWordmark textClassName="brand-header-text" />
             </TransitionLink>
             <p className="text-sm text-content-tertiary max-w-sm leading-relaxed mb-8">
-              The Financial OS for Debt, Bills & Cash Flow.
+              Know what you owe. Own your finances.
             </p>
           </div>
 
