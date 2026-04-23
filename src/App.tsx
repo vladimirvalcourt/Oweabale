@@ -49,7 +49,7 @@ const Subscriptions  = lazy(() => import('./pages/Subscriptions'));
 const Reports        = lazy(() => import('./pages/Reports'));
 const Landing        = lazy(() => import('./pages/Landing'));
 const Onboarding     = lazy(() => import('./pages/Onboarding'));
-const Pricing        = lazy(() => import('./pages/Pricing'));
+import Pricing       from './pages/Pricing';
 const FAQ            = lazy(() => import('./pages/FAQ'));
 const Privacy        = lazy(() => import('./pages/Privacy'));
 const Terms          = lazy(() => import('./pages/Terms'));
