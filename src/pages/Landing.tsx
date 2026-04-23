@@ -545,7 +545,7 @@ export default function Landing() {
                 </p>
               </div>
               <motion.div
-                className="grid gap-4"
+                className="grid gap-6 lg:grid-cols-3"
                 variants={staggerContainer}
                 initial="hidden"
                 whileInView="visible"
