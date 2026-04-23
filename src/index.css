@@ -52,6 +52,11 @@
   --radius-icon: 8px;          /* Icon containers, badges */
   --radius-badge: 9999px;      /* Pill badges, status indicators */
   --radius-input: 8px;         /* Form inputs, search fields */
+  
+  /* Button Height System - Engineered Precision */
+  --button-height-sm: 40px;    /* Compact buttons (icon-only, tags) */
+  --button-height-md: 48px;    /* Standard buttons (primary actions) */
+  --button-height-lg: 56px;    /* Prominent buttons (hero CTAs) */
 }
 
 @layer utilities {
@@ -62,6 +67,11 @@
   .radius-icon { border-radius: var(--radius-icon); }
   .radius-badge { border-radius: var(--radius-badge); }
   .radius-input { border-radius: var(--radius-input); }
+  
+  /* Button Height Utility Classes */
+  .btn-sm { height: var(--button-height-sm); min-height: var(--button-height-sm); }
+  .btn-md { height: var(--button-height-md); min-height: var(--button-height-md); }
+  .btn-lg { height: var(--button-height-lg); min-height: var(--button-height-lg); }
   
   .sr-only {
     position: absolute;

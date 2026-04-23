@@ -351,7 +351,7 @@ export default function Pricing() {
                 </ul>
                 <TransitionLink
                   to="/onboarding"
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-[10px] border border-surface-border px-6 py-3.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
+                  className="mt-8 inline-flex w-full items-center justify-center rounded-[10px] border border-surface-border px-6 h-[48px] text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
                 >
                   Start free
                 </TransitionLink>

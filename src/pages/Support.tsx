@@ -213,7 +213,7 @@ export default function Support() {
                     </p>
                     <button
                       onClick={() => setSubmitted(false)}
-                      className="mt-6 inline-flex items-center justify-center rounded-[10px] bg-brand-cta px-6 py-3 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
+                      className="mt-6 inline-flex items-center justify-center rounded-[10px] bg-brand-cta px-6 h-[48px] text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover min-w-[160px]"
                     >
                       Send another message
                     </button>

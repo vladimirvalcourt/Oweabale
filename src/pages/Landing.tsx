@@ -273,13 +273,13 @@ export default function Landing() {
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <TransitionLink
                   to={primaryHref}
-                  className="inline-flex items-center justify-center rounded-[10px] bg-brand-cta px-8 py-3.5 text-sm font-semibold text-surface-base transition-all hover:brightness-110 focus-app"
+                  className="inline-flex items-center justify-center rounded-[10px] bg-brand-cta px-8 h-[48px] text-sm font-semibold text-surface-base transition-all hover:brightness-110 focus-app min-w-[160px]"
                 >
                   {user?.id ? 'Open Dashboard' : 'Get Started Free'}
                 </TransitionLink>
                 <a
                   href="#flow"
-                  className="inline-flex items-center justify-center rounded-[10px] border border-surface-border bg-transparent px-8 py-3.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated"
+                  className="inline-flex items-center justify-center rounded-[10px] border border-surface-border bg-transparent px-8 h-[48px] text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated min-w-[160px]"
                 >
                   See how it works
                 </a>
@@ -548,7 +548,7 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <button className="w-full py-4 rounded-[10px] border border-surface-border bg-surface-raised text-xs font-semibold uppercase tracking-wide text-content-primary hover:bg-surface-elevated transition-colors">
+                <button className="w-full h-[48px] rounded-[10px] border border-surface-border bg-surface-raised text-xs font-semibold uppercase tracking-wide text-content-primary hover:bg-surface-elevated transition-colors">
                   Start Track
                 </button>
               </article>
@@ -571,7 +571,7 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <button className="w-full py-4 rounded-[10px] bg-brand-cta text-xs font-semibold uppercase tracking-wide text-surface-base hover:brightness-110 transition-all">
+                <button className="w-full h-[48px] rounded-[10px] bg-brand-cta text-xs font-semibold uppercase tracking-wide text-surface-base hover:brightness-110 transition-all">
                   Deploy Suite
                 </button>
                 <p className="mt-6 text-xs text-center text-content-tertiary uppercase tracking-wide">14-day trial included</p>
@@ -613,16 +613,16 @@ export default function Landing() {
               Money stress is just<br className="hidden lg:block" />
               <span className="text-content-secondary/40">missing visibility.</span>
             </h2>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <TransitionLink
                 to={primaryHref}
-                className="group relative inline-flex items-center justify-center gap-3 rounded-[10px] bg-brand-cta px-12 py-5 text-sm font-semibold uppercase tracking-wide text-surface-base transition-all duration-300 hover:brightness-110"
+                className="group relative inline-flex items-center justify-center gap-3 rounded-[10px] bg-brand-cta px-8 h-[56px] text-sm font-semibold uppercase tracking-wide text-surface-base transition-all duration-300 hover:brightness-110 min-w-[200px]"
               >
                 {user?.id ? 'Open Command Center' : 'Get Started Free'}
               </TransitionLink>
               <TransitionLink
                 to="/pricing"
-                className="inline-flex items-center justify-center gap-2 rounded-[10px] border border-surface-border bg-transparent px-12 py-5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated"
+                className="inline-flex items-center justify-center gap-2 rounded-[10px] border border-surface-border bg-transparent px-8 h-[56px] text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated min-w-[200px]"
               >
                 Compare Plans
               </TransitionLink>

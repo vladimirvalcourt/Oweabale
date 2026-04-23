@@ -169,14 +169,14 @@ export default function FAQ() {
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <TransitionLink
                   to="/onboarding"
-                  className="inline-flex items-center gap-3 rounded-[10px] bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
+                  className="inline-flex items-center gap-3 rounded-[10px] bg-brand-cta px-7 h-[48px] text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover min-w-[160px] justify-center"
                 >
                   Create free account
                   <ArrowRight className="h-4 w-4" />
                 </TransitionLink>
                 <TransitionLink
                   to="/pricing"
-                  className="inline-flex items-center gap-3 rounded-[10px] border border-surface-border px-7 py-3.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
+                  className="inline-flex items-center gap-3 rounded-[10px] border border-surface-border px-7 h-[48px] text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight min-w-[160px] justify-center"
                 >
                   Compare plans
                 </TransitionLink>
