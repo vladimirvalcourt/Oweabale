@@ -1,8 +1,25 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import Footer from '../components/Footer';
 import PublicHeader from '../components/PublicHeader';
 import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
+
+// Framer Motion Variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
 
 const privacySections = [
   {
@@ -67,16 +84,16 @@ export default function Privacy() {
               <p className="mt-4 text-sm text-content-muted">Last updated April 2026</p>
             </div>
 
-            <div className="mt-12 space-y-6">
+            <motion.div className="mt-12 space-y-6" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }}>
               {privacySections.map((section) => (
-                <section key={section.title} className="public-hover-lift rounded-[12px] border border-surface-border bg-surface-raised p-8 shadow-sm">
+                <motion.section key={section.title} variants={fadeInUp} className="public-hover-lift rounded-[12px] border border-surface-border bg-surface-raised p-8 shadow-sm">
                   <h2 className="text-lg font-semibold text-content-primary mb-3">{section.title}</h2>
                   <p className="text-sm leading-relaxed text-content-secondary">{section.copy}</p>
-                </section>
+                </motion.section>
               ))}
-            </div>
+            </motion.div>
 
-            <div className="public-fade-up public-delay-1 mt-10 rounded-[12px] border border-surface-border bg-surface-highlight p-8">
+            <motion.div className="public-fade-up public-delay-1 mt-10 rounded-[12px] border border-surface-border bg-surface-highlight p-8" variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
               <p className="text-sm leading-relaxed text-content-secondary">
                 For more technical detail, visit the{' '}
                 <TransitionLink to="/security" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
@@ -92,7 +109,7 @@ export default function Privacy() {
                 </TransitionLink>
                 .
               </p>
-            </div>
+            </motion.div>
           </section>
         </div>
       </div>
