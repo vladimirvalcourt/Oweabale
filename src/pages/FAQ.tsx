@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { ArrowRight, Minus, Plus } from 'lucide-react';
 import PublicHeader from '../components/PublicHeader';
 import Footer from '../components/Footer';
