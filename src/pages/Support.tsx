@@ -175,18 +175,18 @@ export default function Support() {
                 Reach out for billing, access, account, product, or technical issues. We usually reply within one business day.
               </p>
               <div className="mt-8 grid gap-6">
-                <div className="public-hover-lift flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8">
+                <div className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8">
                   <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Best for</p>
                   <p className="mt-3 text-sm leading-relaxed text-content-secondary">Account access problems, billing questions, bugs, and anything blocking your workflow.</p>
                 </div>
-                <div className="public-hover-lift flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8">
+                <div className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8">
                   <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Direct email</p>
                   <a href={`mailto:${SUPPORT_EMAIL}`} className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-content-primary hover:text-brand-profit">
                     <Mail className="h-4 w-4" />
                     {SUPPORT_EMAIL}
                   </a>
                 </div>
-                <div className="public-hover-lift flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8">
+                <div className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8">
                   <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Sensitive requests</p>
                   <p className="mt-3 text-sm leading-relaxed text-content-secondary">
                     For privacy or security-specific concerns, include that in your subject line so we can route it quickly.
@@ -196,14 +196,14 @@ export default function Support() {
             </div>
 
             <div className="public-fade-up public-delay-1 grid gap-6">
-              <section className="rounded-2xl border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
+              <section className="rounded-[12px] border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
                 <h2 className="text-2xl font-semibold tracking-tight leading-tight text-content-primary">Send a message</h2>
                 <p className="mt-4 text-base leading-relaxed text-content-secondary">
                   Give us the basics and a little context. The clearer the message, the faster we can help.
                 </p>
 
                 {submitted ? (
-                  <div className="mt-8 rounded-md bg-surface-highlight p-8 text-center">
+                  <div className="mt-8 rounded-[8px] bg-surface-highlight p-8 text-center">
                     <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-surface-base text-brand-profit shadow-sm">
                       <ShieldCheck className="h-8 w-8" />
                     </div>
@@ -213,7 +213,7 @@ export default function Support() {
                     </p>
                     <button
                       onClick={() => setSubmitted(false)}
-                      className="mt-6 inline-flex items-center justify-center rounded-full bg-brand-cta px-6 py-3 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
+                      className="mt-6 inline-flex items-center justify-center rounded-[10px] bg-brand-cta px-6 py-3 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
                     >
                       Send another message
                     </button>
@@ -227,7 +227,7 @@ export default function Support() {
                           type="text"
                           value={formData.name}
                           onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                          className="mt-2 w-full rounded-md border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
+                          className="mt-2 w-full rounded-[8px] border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
                           placeholder="Your name"
                           required
                         />
@@ -238,7 +238,7 @@ export default function Support() {
                           type="email"
                           value={formData.email}
                           onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                          className="mt-2 w-full rounded-md border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
+                          className="mt-2 w-full rounded-[8px] border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
                           placeholder="you@example.com"
                           required
                         />
@@ -251,7 +251,7 @@ export default function Support() {
                         type="text"
                         value={formData.subject}
                         onChange={(e) => setFormData((prev) => ({ ...prev, subject: e.target.value }))}
-                        className="mt-2 w-full rounded-md border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
+                        className="mt-2 w-full rounded-[8px] border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
                         placeholder="Billing, login issue, bug report..."
                       />
                     </label>
@@ -261,7 +261,7 @@ export default function Support() {
                       <textarea
                         value={formData.message}
                         onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
-                        className="mt-2 min-h-[160px] w-full rounded-md border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
+                        className="mt-2 min-h-[160px] w-full rounded-[8px] border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
                         placeholder="Tell us what happened, what you expected, and anything that would help us reproduce or understand the issue."
                         required
                       />

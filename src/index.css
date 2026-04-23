@@ -44,9 +44,25 @@
   --radius-md: 8px;
   --radius-sm: 6px;
   --radius-xl: 12px;
+  
+  /* Global Border Radius System - Soft Industrial Aesthetic */
+  --radius-container: 16px;    /* Main cards, sections, containers */
+  --radius-card: 12px;         /* Standard cards, pricing cards */
+  --radius-button: 10px;       /* Primary/secondary buttons */
+  --radius-icon: 8px;          /* Icon containers, badges */
+  --radius-badge: 9999px;      /* Pill badges, status indicators */
+  --radius-input: 8px;         /* Form inputs, search fields */
 }
 
 @layer utilities {
+  /* Border Radius Utility Classes */
+  .radius-container { border-radius: var(--radius-container); }
+  .radius-card { border-radius: var(--radius-card); }
+  .radius-button { border-radius: var(--radius-button); }
+  .radius-icon { border-radius: var(--radius-icon); }
+  .radius-badge { border-radius: var(--radius-badge); }
+  .radius-input { border-radius: var(--radius-input); }
+  
   .sr-only {
     position: absolute;
     width: 1px;

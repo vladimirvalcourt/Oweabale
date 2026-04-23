@@ -273,13 +273,13 @@ export default function Landing() {
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <TransitionLink
                   to={primaryHref}
-                  className="inline-flex items-center justify-center rounded-lg bg-brand-cta px-8 py-3.5 text-sm font-semibold text-surface-base transition-all hover:brightness-110 focus-app"
+                  className="inline-flex items-center justify-center rounded-[10px] bg-brand-cta px-8 py-3.5 text-sm font-semibold text-surface-base transition-all hover:brightness-110 focus-app"
                 >
                   {user?.id ? 'Open Dashboard' : 'Get Started Free'}
                 </TransitionLink>
                 <a
                   href="#flow"
-                  className="inline-flex items-center justify-center rounded-lg border border-surface-border bg-transparent px-8 py-3.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated"
+                  className="inline-flex items-center justify-center rounded-[10px] border border-surface-border bg-transparent px-8 py-3.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated"
                 >
                   See how it works
                 </a>
@@ -292,8 +292,8 @@ export default function Landing() {
                 heroVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
               }`}
             >
-              <div className="relative rounded-xl border border-surface-border bg-surface-raised p-2 shadow-2xl">
-                <div className="rounded-lg border border-surface-border bg-surface-base overflow-hidden">
+              <div className="relative rounded-[16px] border border-surface-border bg-surface-raised p-2 shadow-2xl">
+                <div className="rounded-[14px] border border-surface-border bg-surface-base overflow-hidden">
                   <HeroPreviewMedia />
                 </div>
               </div>
@@ -328,9 +328,9 @@ export default function Landing() {
                 return (
                   <article
                     key={item.title}
-                    className="group rounded-xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
+                    className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
                   >
-                    <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
+                    <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
                       <Icon className="h-5 w-5" />
                     </div>
                     <h3 className="text-lg font-semibold text-content-primary mb-3">{item.title}</h3>
@@ -365,8 +365,8 @@ export default function Landing() {
                 </p>
                 
                 <div className="mt-12 space-y-3">
-                  <div className="flex items-start gap-4 rounded-lg border border-surface-border bg-surface-raised p-5 transition-colors hover:bg-surface-elevated">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-elevated text-content-primary">
+                  <div className="flex items-start gap-4 rounded-[10px] border border-surface-border bg-surface-raised p-5 transition-colors hover:bg-surface-elevated">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary">
                       <UploadCloud className="h-5 w-5" />
                     </div>
                     <div>
@@ -374,8 +374,8 @@ export default function Landing() {
                       <p className="text-xs leading-relaxed text-content-secondary">Snap statements and bring them into the system automatically.</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-4 rounded-lg border border-surface-border bg-surface-raised p-5 transition-colors hover:bg-surface-elevated">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-elevated text-content-primary">
+                  <div className="flex items-start gap-4 rounded-[10px] border border-surface-border bg-surface-raised p-5 transition-colors hover:bg-surface-elevated">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary">
                       <BookOpen className="h-5 w-5" />
                     </div>
                     <div>
@@ -392,10 +392,10 @@ export default function Landing() {
                   return (
                     <article
                       key={step.title}
-                      className="group rounded-xl border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border/60 hover:shadow-lg"
+                      className="group rounded-[12px] border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border/60 hover:shadow-lg"
                     >
                       <div className="flex items-start gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
                           <Icon className="h-5 w-5" />
                         </div>
                         <div>
@@ -428,9 +428,9 @@ export default function Landing() {
                 return (
                   <article
                     key={column.title}
-                    className="group rounded-xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
+                    className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
                   >
-                    <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
+                    <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
                       <Icon className="h-5 w-5" />
                     </div>
                     <h3 className="text-lg font-semibold text-content-primary mb-6">{column.title}</h3>
@@ -468,10 +468,10 @@ export default function Landing() {
                 {audienceCards.map((item, index) => (
                   <article
                     key={item.title}
-                    className="group rounded-xl border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border/60 hover:shadow-lg md:p-8"
+                    className="group rounded-[12px] border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border/60 hover:shadow-lg md:p-8"
                   >
                     <div className="flex flex-col md:flex-row md:items-start gap-6">
-                      <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
+                      <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
                         {index === 0 && <Users className="h-5 w-5" />}
                         {index === 1 && <Shield className="h-5 w-5" />}
                         {index === 2 && <TrendingUp className="h-5 w-5" />}
@@ -531,7 +531,7 @@ export default function Landing() {
             </div>
 
             <div className="mt-12 grid gap-8 lg:grid-cols-2 max-w-5xl mx-auto">
-              <article className="glass-card group p-10 flex flex-col transition-all hover:bg-surface-highlight">
+              <article className="glass-card group p-10 flex flex-col transition-all hover:bg-surface-highlight rounded-[12px]">
                 <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary mb-6">Free Tracker</p>
                 <div className="flex items-end gap-2 mb-8">
                   <span className="text-6xl font-bold tracking-tight text-content-primary">$0</span>
@@ -548,13 +548,13 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <button className="w-full py-4 rounded-lg border border-surface-border bg-surface-raised text-xs font-semibold uppercase tracking-wide text-content-primary hover:bg-surface-elevated transition-colors">
+                <button className="w-full py-4 rounded-[10px] border border-surface-border bg-surface-raised text-xs font-semibold uppercase tracking-wide text-content-primary hover:bg-surface-elevated transition-colors">
                   Start Track
                 </button>
               </article>
 
-              <article className="relative p-10 flex flex-col rounded-xl border border-brand-profit bg-brand-profit/5 overflow-hidden group">
-                <div className="absolute top-0 right-0 p-3 bg-brand-profit text-surface-base text-xs font-bold uppercase tracking-wide rounded-bl-lg">Best Value</div>
+              <article className="relative p-10 flex flex-col rounded-[12px] border border-brand-profit bg-brand-profit/5 overflow-hidden group">
+                <div className="absolute top-0 right-0 p-3 bg-brand-profit text-surface-base text-xs font-bold uppercase tracking-wide rounded-bl-[10px]">Best Value</div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Full Suite</p>
                 <div className="flex items-end gap-2 mb-8">
                   <span className="text-6xl font-bold tracking-tight text-content-primary">$10.99</span>
@@ -571,7 +571,7 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <button className="w-full py-4 rounded-lg bg-brand-cta text-xs font-semibold uppercase tracking-wide text-surface-base hover:brightness-110 transition-all">
+                <button className="w-full py-4 rounded-[10px] bg-brand-cta text-xs font-semibold uppercase tracking-wide text-surface-base hover:brightness-110 transition-all">
                   Deploy Suite
                 </button>
                 <p className="mt-6 text-xs text-center text-content-tertiary uppercase tracking-wide">14-day trial included</p>
@@ -592,7 +592,7 @@ export default function Landing() {
               {faqItems.map((item) => (
                 <article
                   key={item.q}
-                  className="rounded-xl border border-surface-border bg-surface-raised p-8 transition-all hover:bg-surface-highlight"
+                  className="rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:bg-surface-highlight"
                 >
                   <h3 className="text-sm font-semibold text-content-primary mb-4 tracking-tight">{item.q}</h3>
                   <p className="text-sm leading-relaxed text-content-secondary">{item.a}</p>
@@ -616,13 +616,13 @@ export default function Landing() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <TransitionLink
                 to={primaryHref}
-                className="group relative inline-flex items-center justify-center gap-3 rounded-lg bg-brand-cta px-12 py-5 text-sm font-semibold uppercase tracking-wide text-surface-base transition-all duration-300 hover:brightness-110"
+                className="group relative inline-flex items-center justify-center gap-3 rounded-[10px] bg-brand-cta px-12 py-5 text-sm font-semibold uppercase tracking-wide text-surface-base transition-all duration-300 hover:brightness-110"
               >
                 {user?.id ? 'Open Command Center' : 'Get Started Free'}
               </TransitionLink>
               <TransitionLink
                 to="/pricing"
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-surface-border bg-transparent px-12 py-5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated"
+                className="inline-flex items-center justify-center gap-2 rounded-[10px] border border-surface-border bg-transparent px-12 py-5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated"
               >
                 Compare Plans
               </TransitionLink>

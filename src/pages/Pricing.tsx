@@ -35,7 +35,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="rounded-2xl border border-surface-border bg-surface-raised px-8 py-6">
+    <div className="rounded-[12px] border border-surface-border bg-surface-raised px-8 py-6">
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
@@ -332,8 +332,8 @@ export default function Pricing() {
             }`}
           >
             <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]">
-              <div className="public-hover-lift rounded-md border border-surface-border bg-surface-base p-7 sm:p-8">
-                <div className="flex h-12 w-12 items-center justify-center rounded-md bg-surface-elevated text-content-primary">
+              <div className="public-hover-lift rounded-[8px] border border-surface-border bg-surface-base p-7 sm:p-8">
+                <div className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary">
                   <Wallet className="h-5 w-5" />
                 </div>
                 <p className="mt-6 text-xs font-semibold uppercase tracking-widest text-content-tertiary">Tracker</p>
@@ -351,15 +351,15 @@ export default function Pricing() {
                 </ul>
                 <TransitionLink
                   to="/onboarding"
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-full border border-surface-border px-6 py-3.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
+                  className="mt-8 inline-flex w-full items-center justify-center rounded-[10px] border border-surface-border px-6 py-3.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
                 >
                   Start free
                 </TransitionLink>
               </div>
 
-              <div className="public-hover-lift rounded-md border border-brand-cta bg-brand-cta p-7 sm:p-8 text-surface-base shadow-lg">
+              <div className="public-hover-lift rounded-[8px] border border-brand-cta bg-brand-cta p-7 sm:p-8 text-surface-base shadow-lg">
                 <div className="flex items-center justify-between gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-md bg-surface-base/20 text-surface-base">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-surface-base/20 text-surface-base">
                     <Shield className="h-5 w-5" />
                   </div>
                   <span className="rounded-full bg-surface-base/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-surface-base">

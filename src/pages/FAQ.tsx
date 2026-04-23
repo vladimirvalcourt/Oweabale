@@ -54,7 +54,7 @@ function FaqCard({ question, answer }: { question: string; answer: string }) {
   const panelId = `faq-panel-${question.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 
   return (
-    <article className="rounded-2xl border border-surface-border bg-surface-raised px-8 py-6 shadow-sm">
+    <article className="rounded-[12px] border border-surface-border bg-surface-raised px-8 py-6 shadow-sm">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
@@ -159,7 +159,7 @@ export default function FAQ() {
               ))}
             </div>
 
-            <div className="public-fade-up public-delay-2 mt-14 rounded-2xl border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
+            <div className="public-fade-up public-delay-2 mt-14 rounded-[12px] border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
               <h2 className="text-3xl font-semibold tracking-tight text-content-primary">
                 Want the full picture instead of another patchwork system?
               </h2>
@@ -169,14 +169,14 @@ export default function FAQ() {
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <TransitionLink
                   to="/onboarding"
-                  className="inline-flex items-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
+                  className="inline-flex items-center gap-3 rounded-[10px] bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
                 >
                   Create free account
                   <ArrowRight className="h-4 w-4" />
                 </TransitionLink>
                 <TransitionLink
                   to="/pricing"
-                  className="inline-flex items-center gap-3 rounded-full border border-surface-border px-7 py-3.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
+                  className="inline-flex items-center gap-3 rounded-[10px] border border-surface-border px-7 py-3.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
                 >
                   Compare plans
                 </TransitionLink>

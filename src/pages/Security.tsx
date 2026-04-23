@@ -116,8 +116,8 @@ export default function Security() {
               {securityCards.map((card) => {
                 const Icon = card.icon;
                 return (
-                  <article key={card.title} className="public-hover-lift flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8 shadow-sm">
-                    <div className="flex h-12 w-12 items-start justify-start rounded-xl bg-surface-highlight text-brand-profit">
+                  <article key={card.title} className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8 shadow-sm">
+                    <div className="flex h-12 w-12 items-start justify-start rounded-[8px] bg-surface-highlight text-brand-profit">
                       <Icon className="h-5 w-5" />
                     </div>
                     <h2 className="mt-6 text-xl font-semibold tracking-tight leading-tight text-content-primary">{card.title}</h2>
@@ -127,7 +127,7 @@ export default function Security() {
               })}
             </div>
 
-            <div className="public-fade-up public-delay-1 mt-12 rounded-2xl border border-surface-border bg-surface-raised p-8 sm:p-10">
+            <div className="public-fade-up public-delay-1 mt-12 rounded-[12px] border border-surface-border bg-surface-raised p-8 sm:p-10">
               <div className="space-y-10">
                 {sections.map((section) => (
                   <section key={section.title}>
