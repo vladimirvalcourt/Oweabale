@@ -117,9 +117,6 @@ export default function FAQ() {
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
           <TransitionLink to="/" className="group flex items-center gap-2">
-            <div className="h-6 w-6 rounded-sm bg-content-primary flex items-center justify-center transition-transform group-hover:rotate-12">
-              <div className="h-3 w-3 bg-surface-base rounded-full" />
-            </div>
             <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />
           </TransitionLink>
           <div className="hidden items-center gap-10 text-[11px] font-medium uppercase tracking-[0.15em] text-content-tertiary md:flex">

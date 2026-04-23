@@ -68,9 +68,6 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
         {/* Nav Header */}
         <div className="flex items-center justify-between px-8 py-6 md:px-12">
           <TransitionLink to="/" className="group flex items-center gap-2">
-            <div className="h-6 w-6 rounded-sm bg-content-primary flex items-center justify-center transition-transform group-hover:rotate-12">
-              <div className="h-3 w-3 bg-surface-base rounded-full" />
-            </div>
             <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />
           </TransitionLink>
           <ThemeToggle />

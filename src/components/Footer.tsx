@@ -28,16 +28,10 @@ export default function Footer() {
           {/* Brand Column - Spans 2 columns */}
           <div className="lg:col-span-2">
             <TransitionLink to="/" className="inline-flex items-center gap-2 text-content-primary">
-              <div className="h-6 w-6 rounded-sm bg-content-primary flex items-center justify-center transition-transform hover:rotate-12">
-                <div className="h-3 w-3 bg-surface-base rounded-full" />
-              </div>
               <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em]" />
             </TransitionLink>
             <p className="mt-6 max-w-xs text-sm leading-relaxed text-content-secondary/60">
               Oweable helps you see what is due, what is behind, and what to pay off next so your money stops running on guesswork.
-            </p>
-            <p className="mt-3 max-w-xs text-sm leading-relaxed text-content-secondary/60">
-              Browser-based finance command center for households, debt payoff, and variable income.
             </p>
           </div>
 
