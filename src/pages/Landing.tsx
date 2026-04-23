@@ -572,7 +572,7 @@ export default function Landing() {
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr]">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Social proof</p>
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-brand-profit">Social proof</p>
                 <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-content-primary">
                   The value is emotional before it is technical.
                 </h2>
@@ -581,20 +581,28 @@ export default function Landing() {
                   stop feeling like emergencies.
                 </p>
               </div>
-              <div className="grid gap-6 md:grid-cols-3">
+              <motion.div
+                className="grid gap-6 lg:grid-cols-3"
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-100px' }}
+              >
                 {testimonials.map((item) => (
-                  <article
+                  <motion.article
                     key={item.name}
-                    className="group flex h-full flex-col items-start justify-between rounded-2xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border-subtle hover:shadow-sm"
+                    variants={fadeInUp}
+                    whileHover="hover"
+                    className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
                   >
-                    <p className="text-sm leading-relaxed text-content-primary">"{item.quote}"</p>
-                    <div className="mt-8 border-t border-surface-border pt-5">
+                    <p className="text-sm leading-relaxed text-content-primary mb-6">"{item.quote}"</p>
+                    <div className="border-t border-surface-border pt-5">
                       <p className="text-sm font-semibold text-content-primary">{item.name}</p>
                       <p className="mt-1 text-sm text-content-secondary">{item.label}</p>
                     </div>
-                  </article>
+                  </motion.article>
                 ))}
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
