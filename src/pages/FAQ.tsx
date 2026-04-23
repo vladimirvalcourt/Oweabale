@@ -128,7 +128,7 @@ export default function FAQ() {
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <main className="pt-32 pb-24">
+      <main className="pt-32 pb-24" id="faq">
           <section className="mx-auto max-w-5xl px-6 lg:px-8">
             <div className="text-center">
               <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">FAQ</p>

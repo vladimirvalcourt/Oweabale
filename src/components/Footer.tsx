@@ -2,8 +2,8 @@ import { BrandWordmark } from './BrandWordmark';
 import { TransitionLink } from './TransitionLink';
 
 const platformLinks = [
-  { label: 'Features', href: '/#why' },
-  { label: 'How it works', href: '/#flow' },
+  { label: 'Features', href: '/' },
+  { label: 'How it works', href: '/' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'FAQ', href: '/faq' },
 ];

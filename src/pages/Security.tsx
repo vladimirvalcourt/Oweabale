@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import React from 'react';
-import { Database, Key, ShieldCheck } from 'lucide-react';
 import Footer from '../components/Footer';
 import PublicHeader from '../components/PublicHeader';
 import { useSEO } from '../hooks/useSEO';
@@ -25,17 +24,14 @@ const securityCards = [
   {
     title: 'Encryption in transit and at rest',
     body: 'Sensitive data is protected with strong transport and storage encryption so core financial information is not moving around in plain text.',
-    icon: Database,
   },
   {
     title: 'Controlled access',
     body: 'Access to internal systems is restricted and support workflows are meant to avoid casual browsing of private financial information.',
-    icon: Key,
   },
   {
     title: 'Security operations mindset',
     body: 'Oweable is designed around secure defaults, active monitoring, and fast handling of serious issues when they appear.',
-    icon: ShieldCheck,
   },
 ] as const;
 
@@ -95,28 +91,22 @@ export default function Security() {
             </div>
 
             <motion.div
-              className="mt-12 grid gap-8 md:grid-cols-3"
+              className="mt-12 grid gap-6 lg:grid-cols-3"
               variants={staggerContainer}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: '-100px' }}
             >
-              {securityCards.map((card) => {
-                const Icon = card.icon;
-                return (
-                  <motion.article
-                    key={card.title}
-                    variants={fadeInUp}
-                    className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8 shadow-sm"
-                  >
-                    <div className="flex h-12 w-12 items-start justify-start rounded-[8px] bg-surface-highlight text-brand-profit">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <h2 className="mt-6 text-xl font-semibold tracking-tight leading-tight text-content-primary">{card.title}</h2>
-                    <p className="mt-4 text-base leading-relaxed text-content-secondary">{card.body}</p>
-                  </motion.article>
-                );
-              })}
+              {securityCards.map((card) => (
+                <motion.article
+                  key={card.title}
+                  variants={fadeInUp}
+                  className="public-hover-lift rounded-[12px] border border-surface-border bg-surface-raised p-8 shadow-sm"
+                >
+                  <h2 className="text-lg font-semibold text-content-primary mb-3">{card.title}</h2>
+                  <p className="text-sm leading-relaxed text-content-secondary">{card.body}</p>
+                </motion.article>
+              ))}
             </motion.div>
 
             <div className="public-fade-up public-delay-1 mt-12 rounded-[12px] border border-surface-border bg-surface-raised p-8 sm:p-10">
