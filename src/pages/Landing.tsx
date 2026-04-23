@@ -218,14 +218,14 @@ export default function Landing() {
       <nav
         className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
           scrolled
-            ? 'border-b border-white/5 bg-surface-base/60 backdrop-blur-xl'
+            ? 'border-b border-surface-border bg-surface-base/80 backdrop-blur-xl'
             : 'bg-transparent'
         }`}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
           <TransitionLink to="/" className="group flex items-center gap-2">
-            <div className="h-6 w-6 rounded-sm bg-white flex items-center justify-center transition-transform group-hover:rotate-12">
-              <div className="h-3 w-3 bg-black rounded-full" />
+            <div className="h-6 w-6 rounded-sm bg-content-primary flex items-center justify-center transition-transform group-hover:rotate-12">
+              <div className="h-3 w-3 bg-surface-base rounded-full" />
             </div>
             <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />
           </TransitionLink>
@@ -344,7 +344,7 @@ export default function Landing() {
 
         <section
           id="flow"
-          className="relative py-32 overflow-hidden border-t border-white/5"
+          className="relative py-32 overflow-hidden border-t border-surface-border"
         >
           <div className="absolute inset-0 z-0">
              <div className="absolute top-[20%] right-[-10%] h-[50%] w-[50%] rounded-full bg-brand-profit/5 blur-[120px]" />
@@ -412,7 +412,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="py-32 relative border-t border-white/5">
+        <section className="py-32 relative border-t border-surface-border">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="flex flex-col items-start mb-20">
               <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Capabilities</p>
@@ -449,7 +449,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="py-32 relative overflow-hidden border-t border-white/5">
+        <section className="py-32 relative overflow-hidden border-t border-surface-border">
           <div
             ref={audienceRef}
             className="mx-auto max-w-7xl px-6 lg:px-8 opacity-100 translate-y-0"
@@ -520,7 +520,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section id="pricing" className="py-32 relative border-t border-white/5">
+        <section id="pricing" className="py-32 relative border-t border-surface-border">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="flex flex-col items-center text-center mb-20">
               <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Pricing</p>
@@ -531,7 +531,7 @@ export default function Landing() {
             </div>
 
             <div className="mt-12 grid gap-8 lg:grid-cols-2 max-w-5xl mx-auto">
-              <article className="glass-card group p-10 flex flex-col transition-all hover:bg-white/[0.02]">
+              <article className="glass-card group p-10 flex flex-col transition-all hover:bg-surface-highlight">
                 <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary mb-6">Free Tracker</p>
                 <div className="flex items-end gap-2 mb-8">
                   <span className="text-6xl font-bold tracking-tight text-content-primary">$0</span>
@@ -548,39 +548,39 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <button className="w-full py-4 rounded-full border border-white/10 bg-white/5 text-[10px] font-bold uppercase tracking-[0.2em] text-white hover:bg-white/10 transition-colors">
+                <button className="w-full py-4 rounded-lg border border-surface-border bg-surface-raised text-xs font-semibold uppercase tracking-wide text-content-primary hover:bg-surface-elevated transition-colors">
                   Start Track
                 </button>
               </article>
 
-              <article className="relative p-10 flex flex-col rounded-2xl border border-brand-profit/30 bg-brand-profit/5 overflow-hidden group">
-                <div className="absolute top-0 right-0 p-3 bg-brand-profit text-black text-[9px] font-black uppercase tracking-widest rounded-bl-xl">Best Value</div>
+              <article className="relative p-10 flex flex-col rounded-xl border border-brand-profit bg-brand-profit/5 overflow-hidden group">
+                <div className="absolute top-0 right-0 p-3 bg-brand-profit text-surface-base text-xs font-bold uppercase tracking-wide rounded-bl-lg">Best Value</div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Full Suite</p>
                 <div className="flex items-end gap-2 mb-8">
-                  <span className="text-6xl font-bold tracking-tight text-white">$10.99</span>
+                  <span className="text-6xl font-bold tracking-tight text-content-primary">$10.99</span>
                   <span className="pb-1 text-sm text-brand-profit/70 font-medium">/ month</span>
                 </div>
-                <p className="text-sm leading-relaxed text-white/80 mb-10">
+                <p className="text-sm leading-relaxed text-content-secondary mb-10">
                   The complete operating system: debt, budgets, taxes, and deep cash-flow.
                 </p>
                 <ul className="space-y-4 mb-10 flex-grow">
                   {['Debt payoff engine', 'Advanced analytics', 'Tax planning', 'Variable income tools'].map(f => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-white font-medium">
+                    <li key={f} className="flex items-center gap-3 text-sm text-content-primary font-medium">
                       <Check className="h-4 w-4 text-brand-profit" />
                       {f}
                     </li>
                   ))}
                 </ul>
-                <button className="w-full py-4 rounded-full bg-white text-[10px] font-bold uppercase tracking-[0.2em] text-black hover:scale-[1.02] transition-transform">
+                <button className="w-full py-4 rounded-lg bg-brand-cta text-xs font-semibold uppercase tracking-wide text-surface-base hover:brightness-110 transition-all">
                   Deploy Suite
                 </button>
-                <p className="mt-6 text-[10px] text-center text-white/50 uppercase tracking-widest">14-day trial included</p>
+                <p className="mt-6 text-xs text-center text-content-tertiary uppercase tracking-wide">14-day trial included</p>
               </article>
             </div>
           </div>
         </section>
 
-        <section id="faq" className="py-32 relative border-t border-white/5">
+        <section id="faq" className="py-32 relative border-t border-surface-border">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="flex flex-col items-center text-center mb-20">
               <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">FAQ</p>
@@ -592,7 +592,7 @@ export default function Landing() {
               {faqItems.map((item) => (
                 <article
                   key={item.q}
-                  className="glass-card p-8 transition-all hover:bg-white/[0.03]"
+                  className="rounded-xl border border-surface-border bg-surface-raised p-8 transition-all hover:bg-surface-highlight"
                 >
                   <h3 className="text-sm font-semibold text-content-primary mb-4 tracking-tight">{item.q}</h3>
                   <p className="text-sm leading-relaxed text-content-secondary">{item.a}</p>
@@ -602,7 +602,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="py-40 relative border-t border-white/5 overflow-hidden">
+        <section className="py-40 relative border-t border-surface-border overflow-hidden">
           <div className="absolute inset-0 z-0">
              <div className="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 h-full w-full bg-brand-profit/5 blur-[180px]" />
           </div>
@@ -616,16 +616,15 @@ export default function Landing() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
               <TransitionLink
                 to={primaryHref}
-                className="group relative inline-flex items-center justify-center gap-3 rounded-full bg-white px-12 py-5 text-xs font-bold uppercase tracking-[0.2em] text-black transition-all duration-300 hover:scale-105"
+                className="group relative inline-flex items-center justify-center gap-3 rounded-lg bg-brand-cta px-12 py-5 text-sm font-semibold uppercase tracking-wide text-surface-base transition-all duration-300 hover:brightness-110"
               >
-                {user?.id ? 'Open Command Center' : 'Initialize Account'}
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                {user?.id ? 'Open Command Center' : 'Get Started Free'}
               </TransitionLink>
               <TransitionLink
                 to="/pricing"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-12 py-5 text-xs font-bold uppercase tracking-[0.2em] text-content-primary transition-all hover:bg-white/10"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-surface-border bg-transparent px-12 py-5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated"
               >
-                Compare Systems
+                Compare Plans
               </TransitionLink>
             </div>
           </div>
