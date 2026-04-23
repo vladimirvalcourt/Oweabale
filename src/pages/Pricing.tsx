@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Check, Minus, Plus, Shield, Wallet } from 'lucide-react';
+import { Minus, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { BrandWordmark } from '../components/BrandWordmark';
 import Footer from '../components/Footer';
@@ -328,15 +328,15 @@ export default function Pricing() {
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-content-secondary">
               <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                <Check className="h-4 w-4 text-brand-profit" />
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
                 14-day Full Suite trial
               </span>
               <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                <Check className="h-4 w-4 text-brand-profit" />
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
                 No credit card required
               </span>
               <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                <Check className="h-4 w-4 text-brand-profit" />
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
                 Cancel anytime
               </span>
             </div>
@@ -356,9 +356,6 @@ export default function Pricing() {
           >
             <motion.div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]" variants={staggerContainer}>
               <motion.div variants={fadeInUp} className="public-hover-lift rounded-[8px] border border-surface-border bg-surface-base p-7 sm:p-8">
-                <div className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary">
-                  <Wallet className="h-5 w-5" />
-                </div>
                 <p className="mt-6 text-xs font-semibold uppercase tracking-widest text-content-tertiary">Tracker</p>
                 <div className="mt-4 flex items-end gap-2">
                   <span className="text-5xl font-bold tracking-tight text-content-primary">$0</span>
@@ -368,9 +365,18 @@ export default function Pricing() {
                   Built for immediate clarity around bills, due dates, recurring obligations, and reminders you will actually see.
                 </p>
                 <ul className="mt-6 space-y-3 text-sm text-content-secondary">
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Bills and due-date visibility</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Recurring obligations, subscriptions, tickets, and fines</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Core reminders and account settings</li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
+                    <span>Bills and due-date visibility</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
+                    <span>Recurring obligations, subscriptions, tickets, and fines</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
+                    <span>Core reminders and account settings</span>
+                  </li>
                 </ul>
                 <motion.div variants={springButton} whileHover="hover" whileTap="tap">
                   <TransitionLink
@@ -384,14 +390,11 @@ export default function Pricing() {
 
               <motion.div variants={fadeInUp} className="public-hover-lift rounded-[8px] border border-brand-cta bg-brand-cta p-7 sm:p-8 text-surface-base shadow-lg">
                 <div className="flex items-center justify-between gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-surface-base/20 text-surface-base">
-                    <Shield className="h-5 w-5" />
-                  </div>
+                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-surface-base/80">Full Suite</p>
                   <span className="rounded-full bg-surface-base/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-surface-base">
                     Most complete
                   </span>
                 </div>
-                <p className="mt-6 text-xs font-medium uppercase tracking-[0.18em] text-surface-base/80">Full Suite</p>
 
                 {hasYearlyPricing ? (
                   <div className="mt-5 inline-flex rounded-full border border-surface-base/30 bg-surface-base/10 p-1">
@@ -446,22 +449,33 @@ export default function Pricing() {
                   cash-flow clarity, and tax planning when income gets uneven.
                 </p>
                 <ul className="mt-6 space-y-3 text-sm text-surface-base/90">
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-surface-base" /> Debt payoff engine with Snowball and Avalanche</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-surface-base" /> Budgets, analytics, income ledger, and transaction views</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-surface-base" /> Optional bank sync and broader planning workflows</li>
-                  <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-surface-base" /> Tax estimates and reserve planning for variable income</li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-surface-base" />
+                    <span>Debt payoff engine with Snowball and Avalanche</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-surface-base" />
+                    <span>Budgets, analytics, income ledger, and transaction views</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-surface-base" />
+                    <span>Optional bank sync and broader planning workflows</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-surface-base" />
+                    <span>Tax estimates and reserve planning for variable income</span>
+                  </li>
                 </ul>
                 <motion.button
                   type="button"
                   onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                   disabled={isStartingCheckout}
-                  className="mt-8 inline-flex w-full items-center justify-center gap-3 rounded-full bg-surface-base px-6 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface-base/90 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-surface-base px-6 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface-base/90 disabled:cursor-not-allowed disabled:opacity-70"
                   variants={springButton}
                   whileHover="hover"
                   whileTap="tap"
                 >
                   {isStartingCheckout ? 'Starting checkout...' : 'Unlock Full Suite'}
-                  <ArrowRight className="h-4 w-4" />
                 </motion.button>
                 <p className="mt-4 text-sm text-surface-base/80">
                   Starts with a 14-day free trial. No credit card required to create your account.
