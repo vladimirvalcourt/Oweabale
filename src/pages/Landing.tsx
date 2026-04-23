@@ -4,22 +4,6 @@ import HeroPreviewMedia from '../components/landing/HeroPreviewMedia';
 import { TransitionLink } from '../components/TransitionLink';
 import { BrandWordmark } from '../components/BrandWordmark';
 import { ThemeToggle } from '../components/ThemeToggle';
-import {
-  AlertTriangle,
-  ArrowRight,
-  BarChart2,
-  BookOpen,
-  CalendarClock,
-  Check,
-  CreditCard,
-  Repeat,
-  Shield,
-  Target,
-  TrendingUp,
-  UploadCloud,
-  Users,
-  Wallet,
-} from 'lucide-react';
 import { toast } from 'sonner';
 import { useSEO } from '../hooks/useSEO';
 import { useStore } from '../store/useStore';
@@ -57,19 +41,16 @@ const painPoints = [
     title: 'Bills sneak up on you',
     copy:
       'Rent, cards, subscriptions, tickets, and one-off obligations end up living in five different places. Oweable turns them into one weekly picture.',
-    icon: CalendarClock,
   },
   {
     title: 'Debt feels static until it gets expensive',
     copy:
       'Minimum payments keep the lights on, but they rarely create momentum. Oweable shows your payoff path so your next dollar has a job.',
-    icon: Target,
   },
   {
     title: 'Cash flow lies when it ignores what is due',
     copy:
       'A checking balance is not a plan. Oweable layers due dates, recurring obligations, and reserves on top so you can see what is actually safe.',
-    icon: AlertTriangle,
   },
 ];
 
@@ -79,21 +60,18 @@ const workflowSteps = [
     title: 'Bring your money life into one place',
     copy:
       'Add bills, debts, subscriptions, and recurring obligations manually or connect accounts when you want more automation.',
-    icon: Wallet,
   },
   {
     eyebrow: 'Step 02',
     title: 'See what needs attention this week',
     copy:
       'The dashboard pulls due soon, overdue, and upcoming items into one calm view so you know what must happen next.',
-    icon: Repeat,
   },
   {
     eyebrow: 'Step 03',
     title: 'Follow a plan instead of reacting',
     copy:
       'Use debt payoff guidance, budget guardrails, and reserve targets to move from late-fee management to real progress.',
-    icon: TrendingUp,
   },
 ];
 
@@ -105,7 +83,6 @@ const capabilityColumns = [
       'Overdue detection and reminders before the damage lands',
       'A weekly view that shows what is hitting now versus next',
     ],
-    icon: CalendarClock,
   },
   {
     title: 'Make payoff decisions with confidence',
@@ -114,7 +91,6 @@ const capabilityColumns = [
       'A clearer view of how much interest your current pattern is costing',
       'Progress that feels visible instead of theoretical',
     ],
-    icon: CreditCard,
   },
   {
     title: 'Handle real-life income patterns',
@@ -123,7 +99,6 @@ const capabilityColumns = [
       'Tax estimates and reserve planning when income is uneven',
       'Budgets that respect reality instead of pretending every month matches',
     ],
-    icon: BarChart2,
   },
 ];
 
@@ -302,7 +277,7 @@ export default function Landing() {
           <div className="mx-auto grid max-w-7xl gap-4 px-6 py-6 text-sm text-content-secondary md:grid-cols-3 lg:px-8">
             {proofPoints.map((point) => (
               <div key={point} className="flex items-start gap-3">
-                <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" />
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
                 <p>{point}</p>
               </div>
             ))}
@@ -320,21 +295,15 @@ export default function Landing() {
             </div>
 
             <div className="grid gap-6 lg:grid-cols-3">
-              {painPoints.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <article
-                    key={item.title}
-                    className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
-                  >
-                    <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-content-primary mb-3">{item.title}</h3>
-                    <p className="text-sm leading-relaxed text-content-secondary">{item.copy}</p>
-                  </article>
-                );
-              })}
+              {painPoints.map((item) => (
+                <article
+                  key={item.title}
+                  className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
+                >
+                  <h3 className="text-lg font-semibold text-content-primary mb-3">{item.title}</h3>
+                  <p className="text-sm leading-relaxed text-content-secondary">{item.copy}</p>
+                </article>
+              ))}
             </div>
           </div>
         </section>
@@ -362,43 +331,27 @@ export default function Landing() {
 
             {/* Grid Layout - Matches Capabilities */}
             <div className="grid gap-6 md:grid-cols-3">
-              {workflowSteps.map((step) => {
-                const Icon = step.icon;
-                return (
-                  <article
-                    key={step.title}
-                    className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg flex flex-col"
-                  >
-                    <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <p className="text-xs font-medium uppercase tracking-wide text-brand-profit mb-3">{step.eyebrow}</p>
-                    <h3 className="text-lg font-semibold text-content-primary mb-4">{step.title}</h3>
-                    <p className="text-sm leading-relaxed text-content-secondary flex-grow">{step.copy}</p>
-                  </article>
-                );
-              })}
+              {workflowSteps.map((step) => (
+                <article
+                  key={step.title}
+                  className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg flex flex-col"
+                >
+                  <p className="text-xs font-medium uppercase tracking-wide text-brand-profit mb-3">{step.eyebrow}</p>
+                  <h3 className="text-lg font-semibold text-content-primary mb-4">{step.title}</h3>
+                  <p className="text-sm leading-relaxed text-content-secondary flex-grow">{step.copy}</p>
+                </article>
+              ))}
             </div>
 
             {/* Additional Features - Compact Cards */}
             <div className="mt-6 grid gap-6 md:grid-cols-2">
-              <div className="flex items-start gap-4 rounded-[10px] border border-surface-border bg-surface-raised p-6 transition-colors hover:bg-surface-elevated">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary">
-                  <UploadCloud className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-content-primary mb-1">Bill Capture</p>
-                  <p className="text-xs leading-relaxed text-content-secondary">Snap statements and bring them into the system automatically.</p>
-                </div>
+              <div className="rounded-[10px] border border-surface-border bg-surface-raised p-6 transition-colors hover:bg-surface-elevated">
+                <p className="text-sm font-semibold text-content-primary mb-1">Bill Capture</p>
+                <p className="text-xs leading-relaxed text-content-secondary">Snap statements and bring them into the system automatically.</p>
               </div>
-              <div className="flex items-start gap-4 rounded-[10px] border border-surface-border bg-surface-raised p-6 transition-colors hover:bg-surface-elevated">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary">
-                  <BookOpen className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-content-primary mb-1">Financial Academy</p>
-                  <p className="text-xs leading-relaxed text-content-secondary">Plain-English lessons for the moments when you want more context.</p>
-                </div>
+              <div className="rounded-[10px] border border-surface-border bg-surface-raised p-6 transition-colors hover:bg-surface-elevated">
+                <p className="text-sm font-semibold text-content-primary mb-1">Financial Academy</p>
+                <p className="text-xs leading-relaxed text-content-secondary">Plain-English lessons for the moments when you want more context.</p>
               </div>
             </div>
           </div>
@@ -415,28 +368,22 @@ export default function Landing() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-3">
-              {capabilityColumns.map((column) => {
-                const Icon = column.icon;
-                return (
-                  <article
-                    key={column.title}
-                    className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
-                  >
-                    <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-content-primary mb-6">{column.title}</h3>
-                    <ul className="space-y-3">
-                      {column.items.map((item) => (
-                        <li key={item} className="flex items-start gap-3">
-                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" />
-                          <span className="text-sm leading-relaxed text-content-secondary">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </article>
-                );
-              })}
+              {capabilityColumns.map((column) => (
+                <article
+                  key={column.title}
+                  className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
+                >
+                  <h3 className="text-lg font-semibold text-content-primary mb-6">{column.title}</h3>
+                  <ul className="space-y-3">
+                    {column.items.map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
+                        <span className="text-sm leading-relaxed text-content-secondary">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))}
             </div>
           </div>
         </section>
@@ -457,22 +404,15 @@ export default function Landing() {
                 </p>
               </div>
               <div className="grid gap-4">
-                {audienceCards.map((item, index) => (
+                {audienceCards.map((item) => (
                   <article
                     key={item.title}
                     className="group rounded-[12px] border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border/60 hover:shadow-lg md:p-8"
                   >
-                    <div className="flex flex-col md:flex-row md:items-start gap-6">
-                      <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
-                        {index === 0 && <Users className="h-5 w-5" />}
-                        {index === 1 && <Shield className="h-5 w-5" />}
-                        {index === 2 && <TrendingUp className="h-5 w-5" />}
-                      </div>
-                      <div>
-                        <h3 className="text-base font-semibold text-content-primary mb-2">{item.title}</h3>
-                        <p className="text-sm leading-relaxed text-content-secondary mb-3">{item.copy}</p>
-                        <p className="text-xs font-medium text-brand-profit">{item.accent}</p>
-                      </div>
+                    <div>
+                      <h3 className="text-base font-semibold text-content-primary mb-2">{item.title}</h3>
+                      <p className="text-sm leading-relaxed text-content-secondary mb-3">{item.copy}</p>
+                      <p className="text-xs font-medium text-brand-profit">{item.accent}</p>
                     </div>
                   </article>
                 ))}
@@ -558,7 +498,7 @@ export default function Landing() {
                 <ul className="space-y-4 mb-10 flex-grow">
                   {['Debt payoff engine', 'Advanced analytics', 'Tax planning', 'Variable income tools'].map(f => (
                     <li key={f} className="flex items-center gap-3 text-sm text-content-primary font-medium">
-                      <Check className="h-4 w-4 text-brand-profit" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
                       {f}
                     </li>
                   ))}
