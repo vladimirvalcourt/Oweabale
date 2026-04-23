@@ -264,6 +264,7 @@ export default function Landing() {
 
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('');
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [heroRef, heroVisible] = useInView(0.08);
   const [storyRef, storyVisible] = useInView(0.12);
   const [audienceRef, audienceVisible] = useInView(0.12);
@@ -609,6 +610,7 @@ export default function Landing() {
             </div>
 
             <div className="mt-12 grid gap-8 lg:grid-cols-2 max-w-5xl mx-auto">
+              {/* Free Tier */}
               <article className="glass-card group p-10 flex flex-col transition-all hover:bg-surface-highlight rounded-[12px]">
                 <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary mb-6">Free Tracker</p>
                 <div className="flex items-end gap-2 mb-8">
@@ -631,13 +633,57 @@ export default function Landing() {
                 </button>
               </article>
 
+              {/* Full Suite with Yearly Toggle */}
               <article className="relative p-10 flex flex-col rounded-[12px] border border-brand-profit bg-brand-profit/5 overflow-hidden group">
                 <div className="absolute top-0 right-0 p-3 bg-brand-profit text-surface-base text-xs font-bold uppercase tracking-wide rounded-bl-[10px]">Best Value</div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Full Suite</p>
-                <div className="flex items-end gap-2 mb-8">
-                  <span className="text-6xl font-bold tracking-tight text-content-primary">$10.99</span>
-                  <span className="pb-1 text-sm text-brand-profit/70 font-medium">/ month</span>
+                
+                {/* Billing Toggle */}
+                <div className="inline-flex rounded-full border border-surface-border bg-surface-raised p-1 mb-6">
+                  <button
+                    type="button"
+                    onClick={() => setBillingPeriod('monthly')}
+                    aria-pressed={billingPeriod === 'monthly'}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                      billingPeriod === 'monthly'
+                        ? 'bg-brand-profit text-surface-base'
+                        : 'text-content-secondary hover:text-content-primary'
+                    }`}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBillingPeriod('yearly')}
+                    aria-pressed={billingPeriod === 'yearly'}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                      billingPeriod === 'yearly'
+                        ? 'bg-brand-profit text-surface-base'
+                        : 'text-content-secondary hover:text-content-primary'
+                    }`}
+                  >
+                    Yearly · Save 17%
+                  </button>
                 </div>
+
+                {/* Dynamic Pricing Display */}
+                <div className="flex items-end gap-2 mb-8">
+                  {billingPeriod === 'yearly' ? (
+                    <>
+                      <span className="text-6xl font-bold tracking-tight text-content-primary">$9.16</span>
+                      <div className="pb-1 flex flex-col items-start">
+                        <span className="text-sm text-brand-profit/70 font-medium">per month</span>
+                        <span className="text-xs text-brand-profit font-semibold">Billed $109.99 yearly</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-6xl font-bold tracking-tight text-content-primary">$10.99</span>
+                      <span className="pb-1 text-sm text-brand-profit/70 font-medium">/ month</span>
+                    </>
+                  )}
+                </div>
+
                 <p className="text-sm leading-relaxed text-content-secondary mb-10">
                   The complete operating system: debt, budgets, taxes, and deep cash-flow.
                 </p>
