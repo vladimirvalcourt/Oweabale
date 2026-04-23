@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { ArrowRight, LifeBuoy, Mail, ShieldCheck } from 'lucide-react';
 import Footer from '../components/Footer';
@@ -9,6 +10,27 @@ import { useSEO } from '../hooks/useSEO';
 import { submitSupportContact } from '../lib/supportContact';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
+
+// Framer Motion Variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const springButton = {
+  hover: { scale: 1.03, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
+  tap: { scale: 0.97, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
+};
 
 const SUPPORT_EMAIL = 'support@oweable.com';
 const SUPPORT_PAGE_URL = 'https://www.oweable.com/support';
@@ -278,21 +300,29 @@ export default function Support() {
 
               <section className="rounded-2xl border border-surface-border bg-surface-raised p-8 sm:p-10">
                 <h2 className="text-2xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">Quick answers</h2>
-                <div className="mt-6 grid gap-5">
+                <motion.div
+                  className="mt-6 grid gap-5"
+                  variants={staggerContainer}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: '-100px' }}
+                >
                   {QUICK_HELP.map((item) => (
-                    <div key={item.q} className="rounded-xl bg-surface-highlight p-6">
+                    <motion.div key={item.q} variants={fadeInUp} className="rounded-xl bg-surface-highlight p-6">
                       <h3 className="text-base font-semibold leading-tight text-content-primary">{item.q}</h3>
                       <p className="mt-3 text-sm leading-relaxed text-content-secondary">{item.a}</p>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <TransitionLink
-                    to="/pricing"
-                    className="inline-flex items-center gap-2 rounded-full border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
-                  >
-                    Pricing
-                  </TransitionLink>
+                  <motion.div variants={springButton} whileHover="hover" whileTap="tap">
+                    <TransitionLink
+                      to="/pricing"
+                      className="inline-flex items-center gap-2 rounded-full border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
+                    >
+                      Pricing
+                    </TransitionLink>
+                  </motion.div>
                   <TransitionLink
                     to="/security"
                     className="inline-flex items-center gap-2 rounded-full border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"

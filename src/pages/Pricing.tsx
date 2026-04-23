@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check, Minus, Plus, Shield, Wallet } from 'lucide-react';
 import { toast } from 'sonner';
@@ -9,6 +10,27 @@ import { useJsonLd } from '../hooks/useJsonLd';
 import { useSEO } from '../hooks/useSEO';
 import { createStripeCheckoutSession, type StripeCheckoutPlanKey } from '../lib/stripe';
 import { useStore } from '../store/useStore';
+
+// Framer Motion Variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const springButton = {
+  hover: { scale: 1.03, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
+  tap: { scale: 0.97, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
+};
 
 function useInView(threshold = 0.15) {
   const [isVisible, setIsVisible] = useState(false);
@@ -322,14 +344,18 @@ export default function Pricing() {
         </section>
 
         <section className="border-y border-surface-border bg-surface-raised py-24">
-          <div
+          <motion.div
             ref={plansRef}
             className={`mx-auto max-w-7xl px-6 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
               plansVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
             }`}
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
           >
-            <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]">
-              <div className="public-hover-lift rounded-[8px] border border-surface-border bg-surface-base p-7 sm:p-8">
+            <motion.div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]" variants={staggerContainer}>
+              <motion.div variants={fadeInUp} className="public-hover-lift rounded-[8px] border border-surface-border bg-surface-base p-7 sm:p-8">
                 <div className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary">
                   <Wallet className="h-5 w-5" />
                 </div>
@@ -346,15 +372,17 @@ export default function Pricing() {
                   <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Recurring obligations, subscriptions, tickets, and fines</li>
                   <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" /> Core reminders and account settings</li>
                 </ul>
-                <TransitionLink
-                  to="/onboarding"
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-[10px] border border-surface-border px-6 h-[48px] text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
-                >
-                  Start free
-                </TransitionLink>
-              </div>
+                <motion.div variants={springButton} whileHover="hover" whileTap="tap">
+                  <TransitionLink
+                    to="/onboarding"
+                    className="mt-8 inline-flex w-full items-center justify-center rounded-[10px] border border-surface-border px-6 h-[48px] text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
+                  >
+                    Start free
+                  </TransitionLink>
+                </motion.div>
+              </motion.div>
 
-              <div className="public-hover-lift rounded-[8px] border border-brand-cta bg-brand-cta p-7 sm:p-8 text-surface-base shadow-lg">
+              <motion.div variants={fadeInUp} className="public-hover-lift rounded-[8px] border border-brand-cta bg-brand-cta p-7 sm:p-8 text-surface-base shadow-lg">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-[8px] bg-surface-base/20 text-surface-base">
                     <Shield className="h-5 w-5" />
@@ -423,20 +451,23 @@ export default function Pricing() {
                   <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-surface-base" /> Optional bank sync and broader planning workflows</li>
                   <li className="flex gap-3"><Check className="mt-0.5 h-4 w-4 shrink-0 text-surface-base" /> Tax estimates and reserve planning for variable income</li>
                 </ul>
-                <button
+                <motion.button
                   type="button"
                   onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                   disabled={isStartingCheckout}
                   className="mt-8 inline-flex w-full items-center justify-center gap-3 rounded-full bg-surface-base px-6 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface-base/90 disabled:cursor-not-allowed disabled:opacity-70"
+                  variants={springButton}
+                  whileHover="hover"
+                  whileTap="tap"
                 >
                   {isStartingCheckout ? 'Starting checkout...' : 'Unlock Full Suite'}
                   <ArrowRight className="h-4 w-4" />
-                </button>
+                </motion.button>
                 <p className="mt-4 text-sm text-surface-base/80">
                   Starts with a 14-day free trial. No credit card required to create your account.
                 </p>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             <div className="mt-8 rounded-2xl border border-surface-border bg-surface-raised p-8">
               <p className="text-sm font-semibold leading-tight text-content-primary">Free-tier trust promise</p>
@@ -444,7 +475,7 @@ export default function Pricing() {
                 The free plan is meant to stay genuinely useful. You do not have to upgrade to keep your basic system for bills, due dates, and recurring obligations working.
               </p>
             </div>
-          </div>
+          </motion.div>
         </section>
 
         <section className="bg-surface-base py-24">

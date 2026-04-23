@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import Footer from '../components/Footer';
 import HeroPreviewMedia from '../components/landing/HeroPreviewMedia';
 import { TransitionLink } from '../components/TransitionLink';
@@ -123,6 +124,35 @@ const audienceCards = [
   },
 ];
 
+// Framer Motion Variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const springButton = {
+  hover: { scale: 1.03, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
+  tap: { scale: 0.97, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
+};
+
+const cardHover = {
+  hover: {
+    y: -4,
+    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15)',
+    transition: { type: 'spring' as const, stiffness: 400, damping: 17 },
+  },
+};
+
 const testimonials = [
   {
     quote:
@@ -243,18 +273,22 @@ export default function Landing() {
               </p>
 
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <TransitionLink
-                  to={primaryHref}
-                  className="inline-flex items-center justify-center rounded-[10px] bg-brand-cta px-8 h-[48px] text-sm font-semibold text-surface-base transition-all hover:brightness-110 focus-app min-w-[160px]"
-                >
-                  {user?.id ? 'Open Dashboard' : 'Get Started Free'}
-                </TransitionLink>
-                <a
-                  href="#flow"
-                  className="inline-flex items-center justify-center rounded-[10px] border border-surface-border bg-transparent px-8 h-[48px] text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated min-w-[160px]"
-                >
-                  See how it works
-                </a>
+                <motion.div variants={springButton} whileHover="hover" whileTap="tap">
+                  <TransitionLink
+                    to={primaryHref}
+                    className="inline-flex items-center justify-center rounded-[10px] bg-brand-cta px-8 h-[48px] text-sm font-semibold text-surface-base transition-all hover:brightness-110 focus-app min-w-[160px]"
+                  >
+                    {user?.id ? 'Open Dashboard' : 'Get Started Free'}
+                  </TransitionLink>
+                </motion.div>
+                <motion.div variants={springButton} whileHover="hover" whileTap="tap">
+                  <a
+                    href="#flow"
+                    className="inline-flex items-center justify-center rounded-[10px] border border-surface-border bg-transparent px-8 h-[48px] text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated min-w-[160px]"
+                  >
+                    See how it works
+                  </a>
+                </motion.div>
               </div>
             </div>
 
@@ -294,17 +328,25 @@ export default function Landing() {
               </h2>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-3">
+            <motion.div
+              className="grid gap-6 lg:grid-cols-3"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-100px' }}
+            >
               {painPoints.map((item) => (
-                <article
+                <motion.article
                   key={item.title}
+                  variants={fadeInUp}
+                  whileHover="hover"
                   className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
                 >
                   <h3 className="text-lg font-semibold text-content-primary mb-3">{item.title}</h3>
                   <p className="text-sm leading-relaxed text-content-secondary">{item.copy}</p>
-                </article>
+                </motion.article>
               ))}
-            </div>
+            </motion.div>
           </div>
         </section>
 
@@ -330,18 +372,26 @@ export default function Landing() {
             </div>
 
             {/* Grid Layout - Matches Capabilities */}
-            <div className="grid gap-6 md:grid-cols-3">
+            <motion.div
+              className="grid gap-6 md:grid-cols-3"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-100px' }}
+            >
               {workflowSteps.map((step) => (
-                <article
+                <motion.article
                   key={step.title}
+                  variants={fadeInUp}
+                  whileHover="hover"
                   className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg flex flex-col"
                 >
                   <p className="text-xs font-medium uppercase tracking-wide text-brand-profit mb-3">{step.eyebrow}</p>
                   <h3 className="text-lg font-semibold text-content-primary mb-4">{step.title}</h3>
                   <p className="text-sm leading-relaxed text-content-secondary flex-grow">{step.copy}</p>
-                </article>
+                </motion.article>
               ))}
-            </div>
+            </motion.div>
 
             {/* Additional Features - Compact Cards */}
             <div className="mt-6 grid gap-6 md:grid-cols-2">
@@ -367,10 +417,18 @@ export default function Landing() {
               </h2>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3">
+            <motion.div
+              className="grid gap-6 md:grid-cols-3"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-100px' }}
+            >
               {capabilityColumns.map((column) => (
-                <article
+                <motion.article
                   key={column.title}
+                  variants={fadeInUp}
+                  whileHover="hover"
                   className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
                 >
                   <h3 className="text-lg font-semibold text-content-primary mb-6">{column.title}</h3>
@@ -382,9 +440,9 @@ export default function Landing() {
                       </li>
                     ))}
                   </ul>
-                </article>
+                </motion.article>
               ))}
-            </div>
+            </motion.div>
           </div>
         </section>
 
@@ -403,10 +461,18 @@ export default function Landing() {
                   We don't expect you to have a perfect budget. We expect you to have a life. Oweable is built for households, freelancers, and anyone with "too many moving pieces."
                 </p>
               </div>
-              <div className="grid gap-4">
+              <motion.div
+                className="grid gap-4"
+                variants={staggerContainer}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-100px' }}
+              >
                 {audienceCards.map((item) => (
-                  <article
+                  <motion.article
                     key={item.title}
+                    variants={fadeInUp}
+                    whileHover="hover"
                     className="group rounded-[12px] border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border/60 hover:shadow-lg md:p-8"
                   >
                     <div>
@@ -414,9 +480,9 @@ export default function Landing() {
                       <p className="text-sm leading-relaxed text-content-secondary mb-3">{item.copy}</p>
                       <p className="text-xs font-medium text-brand-profit">{item.accent}</p>
                     </div>
-                  </article>
+                  </motion.article>
                 ))}
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
@@ -546,12 +612,14 @@ export default function Landing() {
               <span className="text-content-secondary/40">missing visibility.</span>
             </h2>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <TransitionLink
-                to={primaryHref}
-                className="group relative inline-flex items-center justify-center gap-3 rounded-[10px] bg-brand-cta px-8 h-[56px] text-sm font-semibold uppercase tracking-wide text-surface-base transition-all duration-300 hover:brightness-110 min-w-[200px]"
-              >
-                {user?.id ? 'Open Command Center' : 'Get Started Free'}
-              </TransitionLink>
+              <motion.div variants={springButton} whileHover="hover" whileTap="tap">
+                <TransitionLink
+                  to={primaryHref}
+                  className="group relative inline-flex items-center justify-center gap-3 rounded-[10px] bg-brand-cta px-8 h-[56px] text-sm font-semibold uppercase tracking-wide text-surface-base transition-all duration-300 hover:brightness-110 min-w-[200px]"
+                >
+                  {user?.id ? 'Open Command Center' : 'Get Started Free'}
+                </TransitionLink>
+              </motion.div>
               <TransitionLink
                 to="/pricing"
                 className="inline-flex items-center justify-center gap-2 rounded-[10px] border border-surface-border bg-transparent px-8 h-[56px] text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated min-w-[200px]"

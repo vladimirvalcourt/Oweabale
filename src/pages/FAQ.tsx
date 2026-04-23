@@ -1,10 +1,32 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { ArrowRight, Check, Minus, Plus } from 'lucide-react';
 import { BrandWordmark } from '../components/BrandWordmark';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
 import { useStore } from '../store/useStore';
+
+// Framer Motion Variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
+
+const springButton = {
+  hover: { scale: 1.03, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
+  tap: { scale: 0.97, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
+};
 
 const FAQ_DATA = [
   {
@@ -150,11 +172,19 @@ export default function FAQ() {
               </p>
             </div>
 
-            <div className="mt-12 grid gap-4">
+            <motion.div
+              className="mt-12 grid gap-4"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-100px' }}
+            >
               {FAQ_DATA.map((item) => (
-                <FaqCard key={item.question} question={item.question} answer={item.answer} />
+                <motion.div key={item.question} variants={fadeInUp}>
+                  <FaqCard question={item.question} answer={item.answer} />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             <div className="public-fade-up public-delay-2 mt-14 rounded-[12px] border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
               <h2 className="text-3xl font-semibold tracking-tight text-content-primary">
@@ -164,13 +194,15 @@ export default function FAQ() {
                 Oweable is built to reduce money fog, not add more interfaces to babysit.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <TransitionLink
-                  to="/onboarding"
-                  className="inline-flex items-center gap-3 rounded-[10px] bg-brand-cta px-7 h-[48px] text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover min-w-[160px] justify-center"
-                >
-                  Create free account
-                  <ArrowRight className="h-4 w-4" />
-                </TransitionLink>
+                <motion.div variants={springButton} whileHover="hover" whileTap="tap">
+                  <TransitionLink
+                    to="/onboarding"
+                    className="inline-flex items-center gap-3 rounded-[10px] bg-brand-cta px-7 h-[48px] text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover min-w-[160px] justify-center"
+                  >
+                    Create free account
+                    <ArrowRight className="h-4 w-4" />
+                  </TransitionLink>
+                </motion.div>
                 <TransitionLink
                   to="/pricing"
                   className="inline-flex items-center gap-3 rounded-[10px] border border-surface-border px-7 h-[48px] text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight min-w-[160px] justify-center"

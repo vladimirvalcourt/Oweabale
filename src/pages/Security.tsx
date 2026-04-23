@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { Database, Key, ShieldCheck } from 'lucide-react';
 import Footer from '../components/Footer';
@@ -6,6 +7,22 @@ import { ThemeToggle } from '../components/ThemeToggle';
 import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
 import { useStore } from '../store/useStore';
+
+// Framer Motion Variants
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } },
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+    },
+  },
+};
 
 const securityCards = [
   {
@@ -109,20 +126,30 @@ export default function Security() {
               </p>
             </div>
 
-            <div className="mt-12 grid gap-8 md:grid-cols-3">
+            <motion.div
+              className="mt-12 grid gap-8 md:grid-cols-3"
+              variants={staggerContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-100px' }}
+            >
               {securityCards.map((card) => {
                 const Icon = card.icon;
                 return (
-                  <article key={card.title} className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8 shadow-sm">
+                  <motion.article
+                    key={card.title}
+                    variants={fadeInUp}
+                    className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8 shadow-sm"
+                  >
                     <div className="flex h-12 w-12 items-start justify-start rounded-[8px] bg-surface-highlight text-brand-profit">
                       <Icon className="h-5 w-5" />
                     </div>
                     <h2 className="mt-6 text-xl font-semibold tracking-tight leading-tight text-content-primary">{card.title}</h2>
                     <p className="mt-4 text-base leading-relaxed text-content-secondary">{card.body}</p>
-                  </article>
+                  </motion.article>
                 );
               })}
-            </div>
+            </motion.div>
 
             <div className="public-fade-up public-delay-1 mt-12 rounded-[12px] border border-surface-border bg-surface-raised p-8 sm:p-10">
               <div className="space-y-10">
