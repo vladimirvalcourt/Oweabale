@@ -300,13 +300,12 @@ export default function Pricing() {
               headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
             }`}
           >
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Pricing that stays honest</p>
-            <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-content-primary sm:text-6xl lg:text-7xl">
+            <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Pricing that stays honest</p>
+            <h1 className="mt-5 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl lg:text-7xl">
               Start simple. Upgrade for full control.
             </h1>
-            <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-content-secondary sm:text-xl">
-              The free tier gives you real value right away. Full Suite adds the planning, payoff, and cash-flow tools
-              that turn visibility into follow-through.
+            <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-content-secondary sm:text-xl">
+              The free tier gives you real value right away. Full Suite adds the planning, payoff, and cash-flow tools that turn visibility into follow-through.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-content-secondary">
               <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
@@ -337,12 +336,12 @@ export default function Pricing() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-md bg-surface-elevated text-content-primary">
                   <Wallet className="h-5 w-5" />
                 </div>
-                <p className="mt-6 text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Tracker</p>
+                <p className="mt-6 text-xs font-semibold uppercase tracking-widest text-content-tertiary">Tracker</p>
                 <div className="mt-4 flex items-end gap-2">
-                  <span className="text-5xl font-semibold tracking-[-0.05em] text-content-primary">$0</span>
+                  <span className="text-5xl font-bold tracking-tight text-content-primary">$0</span>
                   <span className="pb-1 text-sm text-content-secondary">forever free</span>
                 </div>
-                <p className="mt-4 max-w-md text-base leading-7 text-content-secondary">
+                <p className="mt-4 max-w-md text-base leading-relaxed text-content-secondary">
                   Built for immediate clarity around bills, due dates, recurring obligations, and reminders you will actually see.
                 </p>
                 <ul className="mt-6 space-y-3 text-sm text-content-secondary">

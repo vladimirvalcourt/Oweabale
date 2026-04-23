@@ -164,30 +164,30 @@ export default function Support() {
         <div className="mx-auto max-w-7xl">
           <section className="grid gap-10 py-10 sm:py-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-12">
             <div className="public-fade-up">
-              <div className="inline-flex items-center gap-2 rounded-full border border-surface-border bg-surface-raised px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-content-secondary">
+              <div className="inline-flex items-center gap-2 rounded-full border border-surface-border bg-surface-raised px-4 py-2 text-xs font-semibold uppercase tracking-widest text-content-secondary">
                 <LifeBuoy className="h-3.5 w-3.5 text-brand-profit" />
                 Support
               </div>
-              <h1 className="mt-6 text-5xl font-semibold tracking-[-0.06em] text-content-primary sm:text-6xl">
+              <h1 className="mt-6 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl">
                 Help that feels like a real person will read it.
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-content-secondary">
+              <p className="mt-6 max-w-xl text-lg leading-relaxed text-content-secondary">
                 Reach out for billing, access, account, product, or technical issues. We usually reply within one business day.
               </p>
               <div className="mt-8 grid gap-6">
                 <div className="public-hover-lift flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8">
-                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-tertiary">Best for</p>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Best for</p>
                   <p className="mt-3 text-sm leading-relaxed text-content-secondary">Account access problems, billing questions, bugs, and anything blocking your workflow.</p>
                 </div>
                 <div className="public-hover-lift flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8">
-                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-tertiary">Direct email</p>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Direct email</p>
                   <a href={`mailto:${SUPPORT_EMAIL}`} className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-content-primary hover:text-brand-profit">
                     <Mail className="h-4 w-4" />
                     {SUPPORT_EMAIL}
                   </a>
                 </div>
                 <div className="public-hover-lift flex flex-col items-start rounded-2xl border border-surface-border bg-surface-raised p-8">
-                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-tertiary">Sensitive requests</p>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Sensitive requests</p>
                   <p className="mt-3 text-sm leading-relaxed text-content-secondary">
                     For privacy or security-specific concerns, include that in your subject line so we can route it quickly.
                   </p>
@@ -197,7 +197,7 @@ export default function Support() {
 
             <div className="public-fade-up public-delay-1 grid gap-6">
               <section className="rounded-2xl border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
-                <h2 className="text-2xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">Send a message</h2>
+                <h2 className="text-2xl font-semibold tracking-tight leading-tight text-content-primary">Send a message</h2>
                 <p className="mt-4 text-base leading-relaxed text-content-secondary">
                   Give us the basics and a little context. The clearer the message, the faster we can help.
                 </p>

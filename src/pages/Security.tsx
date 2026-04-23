@@ -103,11 +103,11 @@ export default function Security() {
         <div className="mx-auto max-w-6xl">
           <section className="py-12">
             <div className="public-fade-up max-w-3xl">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Security</p>
-              <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-content-primary sm:text-6xl">
+              <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Security</p>
+              <h1 className="mt-5 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl">
                 Security, explained without theater.
               </h1>
-              <p className="mt-6 text-lg leading-8 text-content-secondary">
+              <p className="mt-6 text-lg leading-relaxed text-content-secondary">
                 Oweable handles sensitive financial workflows, so security has to be built into the product, the infrastructure, and the support process.
               </p>
             </div>
@@ -120,7 +120,7 @@ export default function Security() {
                     <div className="flex h-12 w-12 items-start justify-start rounded-xl bg-surface-highlight text-brand-profit">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h2 className="mt-6 text-xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">{card.title}</h2>
+                    <h2 className="mt-6 text-xl font-semibold tracking-tight leading-tight text-content-primary">{card.title}</h2>
                     <p className="mt-4 text-base leading-relaxed text-content-secondary">{card.body}</p>
                   </article>
                 );
@@ -131,8 +131,8 @@ export default function Security() {
               <div className="space-y-10">
                 {sections.map((section) => (
                   <section key={section.title}>
-                    <h2 className="text-2xl font-semibold tracking-[-0.03em] text-content-primary">{section.title}</h2>
-                    <p className="mt-4 max-w-4xl text-base leading-8 text-content-secondary">{section.copy}</p>
+                    <h2 className="text-2xl font-semibold tracking-tight text-content-primary">{section.title}</h2>
+                    <p className="mt-4 max-w-4xl text-base leading-relaxed text-content-secondary">{section.copy}</p>
                   </section>
                 ))}
               </div>

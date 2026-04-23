@@ -144,11 +144,11 @@ export default function FAQ() {
       <main className="pt-32 pb-24">
           <section className="mx-auto max-w-5xl px-6 lg:px-8">
             <div className="text-center">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">FAQ</p>
-              <h1 className="public-fade-up mt-5 text-5xl font-semibold tracking-[-0.06em] text-content-primary sm:text-6xl">
+              <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">FAQ</p>
+              <h1 className="public-fade-up mt-5 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl">
                 The questions people ask before they trust their money to something new.
               </h1>
-              <p className="public-fade-up public-delay-1 mx-auto mt-6 max-w-3xl text-lg leading-8 text-content-secondary">
+              <p className="public-fade-up public-delay-1 mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-content-secondary">
                 Short answers, plain English, and no fake mystery. If you still need help after this, the support page is one click away.
               </p>
             </div>
@@ -160,10 +160,10 @@ export default function FAQ() {
             </div>
 
             <div className="public-fade-up public-delay-2 mt-14 rounded-2xl border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
-              <h2 className="text-3xl font-semibold tracking-[-0.04em] text-content-primary">
+              <h2 className="text-3xl font-semibold tracking-tight text-content-primary">
                 Want the full picture instead of another patchwork system?
               </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-content-secondary">
+              <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-content-secondary">
                 Oweable is built to reduce money fog, not add more interfaces to babysit.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
