@@ -394,7 +394,7 @@ export default function Landing() {
             {proofPoints.map((point) => (
               <div key={point} className="flex items-start gap-3">
                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
-                <p>{point}</p>
+                <p className="text-balance">{point}</p>
               </div>
             ))}
           </div>
