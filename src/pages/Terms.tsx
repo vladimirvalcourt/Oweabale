@@ -1,6 +1,6 @@
 import React from 'react';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
+import PublicHeader from '../components/PublicHeader';
 import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
 
@@ -52,7 +52,13 @@ export default function Terms() {
 
   return (
     <>
-      <Header />
+      <PublicHeader
+        links={[
+          { href: '/pricing', label: 'Pricing' },
+          { href: '/privacy', label: 'Privacy' },
+          { href: '/support', label: 'Support' },
+        ]}
+      />
       <div className="min-h-screen bg-surface-base px-6 pb-20 pt-28 text-content-primary selection:bg-content-primary/15 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <section className="py-12">

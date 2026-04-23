@@ -1,15 +1,13 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
-import { Minus, Plus } from 'lucide-react';
+import { ArrowRight, Minus, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import { BrandWordmark } from '../components/BrandWordmark';
 import Footer from '../components/Footer';
-import { ThemeToggle } from '../components/ThemeToggle';
+import PublicHeader from '../components/PublicHeader';
 import { TransitionLink } from '../components/TransitionLink';
 import { useJsonLd } from '../hooks/useJsonLd';
 import { useSEO } from '../hooks/useSEO';
 import { createStripeCheckoutSession, type StripeCheckoutPlanKey } from '../lib/stripe';
-import { useStore } from '../store/useStore';
 
 // Framer Motion Variants
 const fadeInUp = {
@@ -251,19 +249,11 @@ export default function Pricing() {
     [monthlyPrice, hasYearlyPricing, yearlyTotal, yearlySavingsPct]
   );
 
-  const [scrolled, setScrolled] = useState(false);
   const [isStartingCheckout, setIsStartingCheckout] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [headerRef, headerVisible] = useInView(0.08);
   const [plansRef, plansVisible] = useInView(0.1);
   const [faqRef, faqVisible] = useInView(0.1);
-  const user = useStore((state) => state.user);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   const startCheckout = async (planKey: StripeCheckoutPlanKey) => {
     if (isStartingCheckout) return;
@@ -282,33 +272,13 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
-      <nav
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? 'border-b border-surface-border bg-surface-base/80 backdrop-blur-xl'
-            : 'bg-transparent'
-        }`}
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-          <TransitionLink to="/" className="group flex items-center gap-2">
-            <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />
-          </TransitionLink>
-          <div className="hidden items-center gap-10 text-[11px] font-medium uppercase tracking-[0.15em] text-content-tertiary md:flex">
-            <a href="/#why" className="transition-colors hover:text-content-primary">Why</a>
-            <a href="/faq" className="transition-colors hover:text-content-primary">FAQ</a>
-            <a href="/support" className="transition-colors hover:text-content-primary">Support</a>
-          </div>
-          <div className="flex items-center gap-6">
-            <ThemeToggle />
-            <TransitionLink
-              to={user?.id ? '/dashboard' : '/onboarding'}
-              className="group relative inline-flex items-center justify-center rounded-full bg-content-primary px-6 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-surface-base transition-all duration-300 hover:scale-105"
-            >
-              <span className="relative z-10">{user?.id ? 'Dashboard' : 'Get Started'}</span>
-            </TransitionLink>
-          </div>
-        </div>
-      </nav>
+      <PublicHeader
+        links={[
+          { href: '/#why', label: 'Why' },
+          { href: '/faq', label: 'FAQ' },
+          { href: '/support', label: 'Support' },
+        ]}
+      />
 
       <main>
         <section className="relative overflow-hidden pt-32 sm:pt-36">

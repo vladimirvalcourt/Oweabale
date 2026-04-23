@@ -1,12 +1,8 @@
-import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Minus, Plus } from 'lucide-react';
-import { BrandWordmark } from '../components/BrandWordmark';
 import PublicHeader from '../components/PublicHeader';
-import { ThemeToggle } from '../components/ThemeToggle';
 import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
-import { useStore } from '../store/useStore';
 
 // Framer Motion Variants
 const fadeInUp = {
@@ -99,9 +95,6 @@ function FaqCard({ question, answer }: { question: string; answer: string }) {
 }
 
 export default function FAQ() {
-  const [scrolled, setScrolled] = useState(false);
-  const user = useStore((state) => state.user);
-
   useSEO({
     title: 'Frequently Asked Questions — Oweable',
     description:
@@ -109,12 +102,6 @@ export default function FAQ() {
     canonical: 'https://www.oweable.com/faq',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   const faqSchema = {
     '@context': 'https://schema.org',
@@ -131,33 +118,13 @@ export default function FAQ() {
 
   return (
     <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
-      <nav
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? 'border-b border-surface-border bg-surface-base/80 backdrop-blur-xl'
-            : 'bg-transparent'
-        }`}
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-          <TransitionLink to="/" className="group flex items-center gap-2">
-            <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />
-          </TransitionLink>
-          <div className="hidden items-center gap-10 text-[11px] font-medium uppercase tracking-[0.15em] text-content-tertiary md:flex">
-            <a href="/pricing" className="transition-colors hover:text-content-primary">Plans</a>
-            <a href="/support" className="transition-colors hover:text-content-primary">Support</a>
-            <a href="/security" className="transition-colors hover:text-content-primary">Security</a>
-          </div>
-          <div className="flex items-center gap-6">
-            <ThemeToggle />
-            <TransitionLink
-              to={user?.id ? '/dashboard' : '/onboarding'}
-              className="group relative inline-flex items-center justify-center rounded-full bg-content-primary px-6 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-surface-base transition-all duration-300 hover:scale-105"
-            >
-              <span className="relative z-10">{user?.id ? 'Dashboard' : 'Get Started'}</span>
-            </TransitionLink>
-          </div>
-        </div>
-      </nav>
+      <PublicHeader
+        links={[
+          { href: '/pricing', label: 'Plans' },
+          { href: '/support', label: 'Support' },
+          { href: '/security', label: 'Security' },
+        ]}
+      />
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
