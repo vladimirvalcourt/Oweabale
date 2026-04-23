@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Footer from '../components/Footer';
 import HeroPreviewMedia from '../components/landing/HeroPreviewMedia';
 import { TransitionLink } from '../components/TransitionLink';
@@ -29,6 +29,63 @@ function useInView(threshold = 0.18) {
   }, [threshold]);
 
   return [ref, isVisible] as const;
+}
+
+// Interactive NavLink with cursor-following glow
+function NavLink({
+  href,
+  children,
+  isActive,
+}: {
+  href: string;
+  children: React.ReactNode;
+  isActive?: boolean;
+}) {
+  const ref = useRef<HTMLAnchorElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseXSpring = useSpring(x, { stiffness: 500, damping: 28 });
+  const mouseYSpring = useSpring(y, { stiffness: 500, damping: 28 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    x.set(e.clientX - rect.left);
+    y.set(e.clientY - rect.top);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <a
+      ref={ref}
+      href={href}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={`relative px-2 py-1 text-[11px] font-medium uppercase tracking-[0.15em] transition-colors ${
+        isActive ? 'text-content-primary' : 'text-content-tertiary hover:text-content-primary'
+      }`}
+    >
+      <motion.span
+        className="absolute inset-0 rounded-md bg-content-primary/5"
+        style={{
+          opacity: useTransform(mouseXSpring, [-100, 0, 100], [0, 0.3, 0]),
+          scale: useTransform(mouseXSpring, [-100, 0, 100], [0.8, 1, 0.8]),
+        }}
+      />
+      <span className="relative z-10">{children}</span>
+      {isActive && (
+        <motion.div
+          layoutId="activeNav"
+          className="absolute bottom-0 left-0 right-0 h-px bg-brand-profit"
+          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        />
+      )}
+    </a>
+  );
 }
 
 const proofPoints = [
@@ -127,7 +184,7 @@ const audienceCards = [
 // Framer Motion Variants
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } },
 };
 
 const staggerContainer = {
@@ -206,6 +263,7 @@ export default function Landing() {
   });
 
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
   const [heroRef, heroVisible] = useInView(0.08);
   const [storyRef, storyVisible] = useInView(0.12);
   const [audienceRef, audienceVisible] = useInView(0.12);
@@ -218,33 +276,57 @@ export default function Landing() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Track active section for nav highlighting
+  useEffect(() => {
+    const sections = ['why', 'flow', 'capabilities', 'pricing', 'faq'];
+    const observers: IntersectionObserver[] = [];
+
+    sections.forEach((sectionId) => {
+      const element = document.getElementById(sectionId);
+      if (!element) return;
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setActiveSection(sectionId);
+          }
+        },
+        { threshold: 0.3, rootMargin: '-100px 0px -60% 0px' }
+      );
+
+      observer.observe(element);
+      observers.push(observer);
+    });
+
+    return () => observers.forEach((obs) => obs.disconnect());
+  }, []);
+
   return (
     <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
       <nav
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? 'border-b border-surface-border bg-surface-base/80 backdrop-blur-xl'
-            : 'bg-transparent'
-        }`}
+        className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-surface-base/60 backdrop-blur-xl transition-all duration-300"
       >
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <TransitionLink to="/" className="group flex items-center gap-2">
             <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />
           </TransitionLink>
-          <div className="hidden items-center gap-10 text-[11px] font-medium uppercase tracking-[0.15em] text-content-tertiary md:flex">
-            <a href="#why" className="transition-colors hover:text-content-primary">Why</a>
-            <a href="#flow" className="transition-colors hover:text-content-primary">System</a>
-            <a href="#pricing" className="transition-colors hover:text-content-primary">Plans</a>
-            <a href="#faq" className="transition-colors hover:text-content-primary">FAQ</a>
+          <div className="hidden items-center gap-8 md:flex">
+            <NavLink href="#why" isActive={activeSection === 'why'}>Why</NavLink>
+            <NavLink href="#flow" isActive={activeSection === 'flow'}>System</NavLink>
+            <NavLink href="#capabilities" isActive={activeSection === 'capabilities'}>Capabilities</NavLink>
+            <NavLink href="#pricing" isActive={activeSection === 'pricing'}>Plans</NavLink>
+            <NavLink href="#faq" isActive={activeSection === 'faq'}>FAQ</NavLink>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 sm:gap-6">
             <ThemeToggle />
-            <TransitionLink
-              to={primaryHref}
-              className="group relative inline-flex items-center justify-center rounded-full bg-content-primary px-6 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-surface-base transition-all duration-300 hover:scale-105"
-            >
-              <span className="relative z-10">{user?.id ? 'Dashboard' : 'Get Started'}</span>
-            </TransitionLink>
+            <motion.div variants={springButton} whileHover="hover" whileTap="tap">
+              <TransitionLink
+                to={primaryHref}
+                className="inline-flex items-center justify-center rounded-full bg-content-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-surface-base transition-all duration-300 hover:scale-105 sm:px-6"
+              >
+                <span className="relative z-10">{user?.id ? 'Dashboard' : 'Get Started'}</span>
+              </TransitionLink>
+            </motion.div>
           </div>
         </div>
       </nav>
