@@ -38,8 +38,11 @@ export default function Changelog() {
           <div className="mb-12">
             <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-4">Changelog</p>
             <h1 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
-              Product updates and notable changes.
+              What changed and why it matters.
             </h1>
+            <p className="mt-5 max-w-2xl text-base leading-relaxed text-content-secondary">
+              A simple running log of product updates so you can see what is improving without digging through announcements.
+            </p>
           </div>
 
           <ul className="space-y-6">

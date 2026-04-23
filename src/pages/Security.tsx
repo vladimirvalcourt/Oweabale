@@ -23,11 +23,11 @@ const staggerContainer = {
 const securityCards = [
   {
     title: 'Encryption in transit and at rest',
-    body: 'Sensitive data is protected with strong transport and storage encryption so core financial information is not moving around in plain text.',
+    body: 'Sensitive data is protected with strong transport and storage encryption so the financial details you trust us with are not moving around in plain text.',
   },
   {
     title: 'Controlled access',
-    body: 'Access to internal systems is restricted and support workflows are meant to avoid casual browsing of private financial information.',
+    body: 'Access to internal systems is restricted, and support workflows are meant to avoid casual or unnecessary access to private financial information.',
   },
   {
     title: 'Security operations mindset',
@@ -39,12 +39,12 @@ const sections = [
   {
     title: 'How Oweable approaches security',
     copy:
-      'The product is built for sensitive financial workflows, so security cannot be an afterthought. The current posture focuses on strong encryption, constrained access, and practical response processes.',
+      'Money already makes people feel exposed enough. Oweable is built for sensitive financial workflows, so security cannot be an afterthought. The current posture focuses on strong encryption, constrained access, and practical response processes.',
   },
   {
     title: 'Infrastructure and hosting',
     copy:
-      'Core infrastructure is hosted with managed cloud services and monitored for abnormal activity. Operational controls are intended to reduce unauthorized access and improve visibility into platform health.',
+      'Core infrastructure is hosted with managed cloud services and monitored for abnormal activity. Operational controls are meant to reduce unauthorized access and improve visibility into platform health.',
   },
   {
     title: 'Vulnerability reporting',
@@ -62,7 +62,7 @@ export default function Security() {
   useSEO({
     title: 'Security — Oweable',
     description:
-      'How Oweable protects financial data with encryption, controlled access, infrastructure safeguards, and vulnerability reporting.',
+      'How Oweable protects financial data with encryption, controlled access, infrastructure safeguards, and vulnerability reporting in plain English.',
     canonical: 'https://www.oweable.com/security',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -83,10 +83,10 @@ export default function Security() {
             <div className="public-fade-up max-w-3xl">
               <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Security</p>
               <h1 className="mt-5 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl">
-                Security, explained without theater.
+                Security, explained like it actually matters to your life.
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-content-secondary">
-                Oweable handles sensitive financial workflows, so security has to be built into the product, the infrastructure, and the support process.
+                Oweable handles sensitive financial workflows, so security has to be built into the product, the infrastructure, and the support process, not saved for a marketing page.
               </p>
             </div>
 

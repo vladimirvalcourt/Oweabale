@@ -127,7 +127,7 @@ export default function PublicHeader({ links = [] }: PublicHeaderProps) {
               to={primaryHref}
               className="inline-flex items-center justify-center rounded-full bg-content-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-surface-base transition-all duration-300 hover:scale-105 sm:px-6"
             >
-              <span className="relative z-10">{user?.id ? 'Dashboard' : 'Get Started'}</span>
+              <span className="relative z-10">{user?.id ? 'Dashboard' : 'Start Free'}</span>
             </TransitionLink>
           </motion.div>
         </div>

@@ -30,12 +30,12 @@ const privacySections = [
   {
     title: 'What Oweable does not do',
     copy:
-      'Oweable does not sell your personal financial data. The product is meant to help you organize and understand your money, not turn your money life into an ad-targeting profile.',
+      'Oweable does not sell your personal financial data. The product is meant to help you organize and understand your money, not turn your financial life into an ad-targeting profile.',
   },
   {
     title: 'Encryption and access',
     copy:
-      'Sensitive information is protected with strong encryption in transit and at rest. Internal access is limited and support access is intended to follow a process you initiate.',
+      'Sensitive information is protected with strong encryption in transit and at rest. Internal access is limited, and support access is intended to follow a process you initiate.',
   },
   {
     title: 'Third-party services',
@@ -57,7 +57,7 @@ const privacySections = [
 export default function Privacy() {
   useSEO({
     title: 'Privacy Policy — Oweable',
-    description: 'How Oweable handles data collection, encryption, retention, third-party services, and user privacy rights.',
+    description: 'How Oweable handles data collection, encryption, retention, third-party services, and user privacy rights in plain English.',
     canonical: 'https://www.oweable.com/privacy',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -76,10 +76,10 @@ export default function Privacy() {
             <div className="public-fade-up max-w-3xl">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Privacy</p>
               <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-content-primary sm:text-6xl">
-                Privacy that reads like policy, not camouflage.
+                Privacy that is clear about what happens to your data.
               </h1>
               <p className="mt-6 text-lg leading-8 text-content-secondary">
-                This page is the plain-English summary of how Oweable approaches data handling. It is meant to be understandable before it is impressive.
+                This page is the plain-English summary of how Oweable approaches data handling. It is meant to help you understand what you are trusting us with and how that trust is handled.
               </p>
               <p className="mt-4 text-sm text-content-muted">Last updated April 2026</p>
             </div>

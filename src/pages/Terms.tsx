@@ -62,7 +62,7 @@ const sections = [
 export default function Terms() {
   useSEO({
     title: 'Terms of Service — Oweable',
-    description: 'Terms covering use of Oweable, plan billing, cancellations, platform restrictions, and legal responsibilities.',
+    description: 'Terms covering use of Oweable, plan billing, cancellations, platform restrictions, and legal responsibilities in plain language.',
     canonical: 'https://www.oweable.com/terms',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -82,10 +82,10 @@ export default function Terms() {
             <div className="public-fade-up max-w-3xl">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Terms</p>
               <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-content-primary sm:text-6xl">
-                Terms that are meant to be read by humans.
+                Terms that try to be clear about the rules, not hide them.
               </h1>
               <p className="mt-6 text-lg leading-8 text-content-secondary">
-                This is the plain-language overview of the rules that govern use of Oweable. It is about expectations, billing, fair use, and legal boundaries.
+                This is the plain-language overview of the rules that govern use of Oweable. It covers expectations, billing, fair use, and legal boundaries without trying to bury the point.
               </p>
               <p className="mt-4 text-sm text-content-muted">Last updated April 2026</p>
             </div>
