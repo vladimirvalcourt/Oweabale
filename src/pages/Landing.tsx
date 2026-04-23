@@ -314,7 +314,6 @@ export default function Landing() {
           <div className="hidden items-center gap-8 md:flex">
             <NavLink href="#why" isActive={activeSection === 'why'}>Why</NavLink>
             <NavLink href="#flow" isActive={activeSection === 'flow'}>System</NavLink>
-            <NavLink href="#capabilities" isActive={activeSection === 'capabilities'}>Capabilities</NavLink>
             <NavLink href="#pricing" isActive={activeSection === 'pricing'}>Plans</NavLink>
             <NavLink href="#faq" isActive={activeSection === 'faq'}>FAQ</NavLink>
           </div>
