@@ -380,10 +380,8 @@ export default function Landing() {
                 heroVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
               }`}
             >
-              <div className="relative rounded-[16px] border border-surface-border bg-surface-raised p-2 shadow-2xl">
-                <div className="rounded-[14px] border border-surface-border bg-surface-base overflow-hidden">
-                  <HeroPreviewMedia />
-                </div>
+              <div className="mx-auto max-w-[920px]">
+                <HeroPreviewMedia />
               </div>
             </div>
           </div>
