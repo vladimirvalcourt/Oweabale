@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { toast } from 'sonner';
 import { TransitionLink } from '../components/TransitionLink';
@@ -87,11 +88,13 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
             Sign in or create your account — it's the same button. One click gets you started.
           </p>
 
-          <button
+          <motion.button
             type="button"
             onClick={() => void handleGoogleSignIn()}
             disabled={googleLoading}
-            className="mt-10 flex min-h-12 w-full items-start justify-start gap-3 rounded-lg bg-brand-cta px-4 py-3 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-50 focus-app"
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            className="mt-10 flex h-[48px] w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-zinc-900 px-4 text-sm font-medium tracking-wide text-surface-base shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-200 hover:border-white/30 hover:bg-zinc-800 hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.15)] disabled:cursor-not-allowed disabled:opacity-50 focus-app"
           >
             {googleLoading ? (
               <span className="text-content-secondary">Redirecting…</span>
@@ -106,7 +109,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
                 Continue with Google
               </>
             )}
-          </button>
+          </motion.button>
 
           <div className="mt-8 flex items-center gap-3 border-t border-surface-border pt-8">
             <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" aria-hidden />
