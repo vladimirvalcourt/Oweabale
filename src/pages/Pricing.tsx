@@ -358,24 +358,24 @@ export default function Pricing() {
                 </motion.div>
               </motion.div>
 
-              <motion.div variants={fadeInUp} className="public-hover-lift rounded-[12px] border border-brand-cta bg-brand-cta p-7 sm:p-8 text-surface-base shadow-lg">
+              <motion.div variants={fadeInUp} className="public-hover-lift rounded-[12px] border border-surface-border bg-surface-raised p-7 sm:p-8 shadow-sm">
                 <div className="flex items-center justify-between gap-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-surface-base/80">Full Suite</p>
-                  <span className="rounded-full bg-surface-base/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-surface-base">
+                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Full Suite</p>
+                  <span className="rounded-full bg-brand-profit/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-brand-profit">
                     Most complete
                   </span>
                 </div>
 
                 {hasYearlyPricing ? (
-                  <div className="mt-5 inline-flex rounded-full border border-surface-base/30 bg-surface-base/10 p-1">
+                  <div className="mt-5 inline-flex rounded-full border border-surface-border bg-surface-highlight p-1">
                     <button
                       type="button"
                       onClick={() => setBillingPeriod('monthly')}
                       aria-pressed={billingPeriod === 'monthly'}
                       className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                         billingPeriod === 'monthly'
-                          ? 'bg-surface-base text-surface-base'
-                          : 'text-surface-base/70'
+                          ? 'bg-surface-base text-content-primary shadow-sm'
+                          : 'text-content-secondary'
                       }`}
                     >
                       Monthly
@@ -386,8 +386,8 @@ export default function Pricing() {
                       aria-pressed={billingPeriod === 'yearly'}
                       className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                         billingPeriod === 'yearly'
-                          ? 'bg-surface-base text-surface-base'
-                          : 'text-surface-base/70'
+                          ? 'bg-surface-base text-content-primary shadow-sm'
+                          : 'text-content-secondary'
                       }`}
                     >
                       Yearly{yearlySavingsPct > 0 ? ` · Save ${yearlySavingsPct}%` : ''}
@@ -400,39 +400,39 @@ export default function Pricing() {
                     <>
                       <div className="flex items-end gap-2">
                         <span className="text-5xl font-semibold tracking-[-0.05em]">${yearlyEffectiveMonthly.toFixed(2)}</span>
-                        <span className="pb-1 text-sm text-surface-base/80">per month</span>
+                        <span className="pb-1 text-sm text-content-secondary">per month</span>
                       </div>
-                      <p className="mt-2 text-sm text-surface-base/80">
+                      <p className="mt-2 text-sm text-content-secondary">
                         Billed ${yearlyTotal?.toFixed(2)} yearly
                       </p>
                     </>
                   ) : (
                     <div className="flex items-end gap-2">
                       <span className="text-5xl font-semibold tracking-[-0.05em]">${monthlyPrice.toFixed(2)}</span>
-                      <span className="pb-1 text-sm text-surface-base/80">per month</span>
+                      <span className="pb-1 text-sm text-content-secondary">per month</span>
                     </div>
                   )}
                 </div>
 
-                <p className="mt-4 max-w-md text-base leading-7 text-surface-base/90">
+                <p className="mt-4 max-w-md text-base leading-7 text-content-secondary">
                   For people who want the full financial operating system: payoff strategy, budgets, analytics,
                   cash-flow clarity, and tax planning when income gets uneven.
                 </p>
-                <ul className="mt-6 space-y-3 text-sm text-surface-base/90">
+                <ul className="mt-6 space-y-3 text-sm text-content-secondary">
                   <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-surface-base" />
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
                     <span>Debt payoff engine with Snowball and Avalanche</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-surface-base" />
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
                     <span>Budgets, analytics, income ledger, and transaction views</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-surface-base" />
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
                     <span>Optional bank sync and broader planning workflows</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-surface-base" />
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
                     <span>Tax estimates and reserve planning for variable income</span>
                   </li>
                 </ul>
@@ -440,20 +440,20 @@ export default function Pricing() {
                   type="button"
                   onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                   disabled={isStartingCheckout}
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-surface-base px-6 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-surface-base/90 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-brand-cta px-6 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-70"
                   variants={springButton}
                   whileHover="hover"
                   whileTap="tap"
                 >
                   {isStartingCheckout ? 'Starting checkout...' : 'Unlock Full Suite'}
                 </motion.button>
-                <p className="mt-4 text-sm text-surface-base/80">
+                <p className="mt-4 text-sm text-content-secondary">
                   Starts with a 14-day free trial. No credit card required to create your account.
                 </p>
               </motion.div>
             </motion.div>
 
-            <div className="mt-8 rounded-2xl border border-surface-border bg-surface-raised p-8">
+            <div className="mt-8 rounded-[12px] border border-surface-border bg-surface-raised p-8">
               <p className="text-sm font-semibold leading-tight text-content-primary">Free-tier trust promise</p>
               <p className="mt-3 max-w-3xl text-sm leading-relaxed text-content-secondary">
                 The free plan is meant to stay genuinely useful. You do not have to upgrade to keep your basic system for bills, due dates, and recurring obligations working.
