@@ -11,7 +11,7 @@ const platformLinks = [
 const companyLinks = [
   { label: 'Support', href: '/support' },
   { label: 'Security', href: '/security' },
-  { label: 'Sign in', href: '/dashboard' },
+  { label: 'Sign in', href: '/auth' },
 ];
 
 const legalLinks = [
