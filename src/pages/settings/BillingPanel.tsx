@@ -46,6 +46,7 @@ function BillingPanelInner() {
   const [isWorking, setIsWorking] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'trialing' | 'canceled' | 'incomplete' | null>(null);
   const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
+  const [isProfileTrialOnly, setIsProfileTrialOnly] = useState(false);
   const [immediateCancelOpen, setImmediateCancelOpen] = useState(false);
   // E-05: replaces window.confirm() for "cancel at period end" flow
   const [periodCancelOpen, setPeriodCancelOpen] = useState(false);
@@ -67,7 +68,7 @@ function BillingPanelInner() {
       return false;
     }
 
-    const [{ data: entitlements }, { data: subscriptions }, { data: payments }] = await Promise.all([
+    const [{ data: entitlements }, { data: subscriptions }, { data: payments }, { data: profile }] = await Promise.all([
       supabase
         .from('entitlements')
         .select('feature_key,status,ends_at')
@@ -87,16 +88,37 @@ function BillingPanelInner() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20),
+      supabase
+        .from('profiles')
+        .select('plan, trial_ends_at, trial_expired')
+        .eq('id', user.id)
+        .maybeSingle(),
     ]);
 
     const entitlement = entitlements?.[0];
     const sub = subscriptions?.[0];
-    setSubscriptionStatus((sub?.status as typeof subscriptionStatus) ?? null);
-    setCurrentPeriodEnd(sub?.current_period_end ?? null);
     const paid = isEntitlementActive(entitlement) || isSubscriptionLive(sub);
-    setHasPaidAccess(paid);
+    const activeProfileTrial =
+      profile?.plan === 'trial' &&
+      profile?.trial_expired === false &&
+      !!profile?.trial_ends_at &&
+      new Date(profile.trial_ends_at).getTime() > Date.now();
+    const profileTrialOnly = activeProfileTrial && !paid;
+    setIsProfileTrialOnly(profileTrialOnly);
+    setSubscriptionStatus(
+      profileTrialOnly ? 'trialing' : ((sub?.status as typeof subscriptionStatus) ?? null),
+    );
+    setCurrentPeriodEnd(profileTrialOnly ? profile?.trial_ends_at ?? null : sub?.current_period_end ?? null);
+    setHasPaidAccess(paid || profileTrialOnly);
 
-    if (paid) {
+    if (profileTrialOnly) {
+      setTierLabel('Full Suite Trial');
+      setStatusText(
+        profile?.trial_ends_at
+          ? `Your 14-day Full Suite trial is active until ${new Date(profile.trial_ends_at).toLocaleDateString()}. Add a payment method before then if you want billing to continue without interruption.`
+          : 'Your 14-day Full Suite trial is active.',
+      );
+    } else if (paid) {
       setTierLabel('Full Suite');
       if (sub?.status) {
         const endDate = sub.current_period_end
@@ -297,9 +319,13 @@ function BillingPanelInner() {
         {hasPaidAccess ? (
           <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-lg p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <h4 className="flex items-center gap-2 font-medium text-content-primary">You&apos;re on Full Suite</h4>
+              <h4 className="flex items-center gap-2 font-medium text-content-primary">
+                {isProfileTrialOnly ? 'Your Full Suite trial is active' : 'You&apos;re on Full Suite'}
+              </h4>
               <p className="text-sm text-emerald-200/70 mt-1 max-w-md">
-                Full Suite is active. Update your plan, payment method, or invoices anytime in the billing portal.
+                {isProfileTrialOnly
+                  ? 'You already have Full Suite access during the trial. Start paid billing whenever you are ready so your card is on file before the trial ends.'
+                  : 'Full Suite is active. Update your plan, payment method, or invoices anytime in the billing portal.'}
               </p>
               {subscriptionStatus === 'trialing' && currentPeriodEnd && (
                 <p className="mt-2 text-xs text-emerald-100/80">
@@ -310,41 +336,47 @@ function BillingPanelInner() {
             <div className="flex w-full min-w-0 flex-col items-stretch gap-3 sm:w-auto sm:items-end">
               <button
                 type="button"
-                onClick={onManageBilling}
+                onClick={isProfileTrialOnly ? onUpgrade : onManageBilling}
                 disabled={isWorking}
                 className="shrink-0 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white shadow-none transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isWorking ? 'Working...' : 'Manage billing'}
+                {isWorking ? 'Working...' : isProfileTrialOnly ? 'Add payment method' : 'Manage billing'}
               </button>
               <p className="max-w-sm text-left text-[11px] text-content-tertiary sm:text-right">
-                Manage billing opens Stripe&apos;s customer portal to update payment methods and invoices.
+                {isProfileTrialOnly
+                  ? 'Adding a payment method starts Stripe checkout so your subscription is ready before trial access ends.'
+                  : 'Manage billing opens Stripe&apos;s customer portal to update payment methods and invoices.'}
               </p>
-              <button
-                type="button"
-                onClick={() => onCancelAtPeriodEnd()}
-                disabled={isWorking}
-                className="shrink-0 rounded-lg border border-surface-border bg-surface-raised px-4 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                Cancel at period end
-              </button>
-              {currentPeriodEnd && (
-                <p className="max-w-sm text-left text-[11px] text-content-tertiary sm:text-right">
-                  Access continues until{' '}
-                  {new Date(currentPeriodEnd).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', year: 'numeric' })}
-                  .
-                </p>
+              {!isProfileTrialOnly && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => onCancelAtPeriodEnd()}
+                    disabled={isWorking}
+                    className="shrink-0 rounded-lg border border-surface-border bg-surface-raised px-4 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Cancel at period end
+                  </button>
+                  {currentPeriodEnd && (
+                    <p className="max-w-sm text-left text-[11px] text-content-tertiary sm:text-right">
+                      Access continues until{' '}
+                      {new Date(currentPeriodEnd).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', year: 'numeric' })}
+                      .
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setImmediateCancelOpen(true)}
+                    disabled={isWorking}
+                    className="shrink-0 rounded-lg border border-rose-500/40 bg-transparent px-4 py-2.5 text-sm font-medium text-rose-400 transition-colors hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Cancel immediately
+                  </button>
+                  <p className="max-w-sm text-left text-[11px] text-content-tertiary sm:text-right">
+                    Immediate cancel ends paid access today. Your data is retained for 30 days per policy.
+                  </p>
+                </>
               )}
-              <button
-                type="button"
-                onClick={() => setImmediateCancelOpen(true)}
-                disabled={isWorking}
-                className="shrink-0 rounded-lg border border-rose-500/40 bg-transparent px-4 py-2.5 text-sm font-medium text-rose-400 transition-colors hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                Cancel immediately
-              </button>
-              <p className="max-w-sm text-left text-[11px] text-content-tertiary sm:text-right">
-                Immediate cancel ends paid access today. Your data is retained for 30 days per policy.
-              </p>
             </div>
           </div>
         ) : (
@@ -403,18 +435,20 @@ function BillingPanelInner() {
             {hasPaidAccess ? 'Cards on file' : 'No payment method on file'}
           </p>
           <p className="mt-1 text-xs font-medium text-content-tertiary">
-            {hasPaidAccess
-              ? 'Add, remove, or replace cards in the Stripe Customer Portal.'
-              : 'Free tier — no billing required'}
+            {isProfileTrialOnly
+              ? 'You are in the trial period and do not have a payment method on file yet.'
+              : hasPaidAccess
+                ? 'Add, remove, or replace cards in the Stripe Customer Portal.'
+                : 'Free tier — no billing required'}
           </p>
         </div>
         <button
           type="button"
-          onClick={onManageBilling}
+          onClick={isProfileTrialOnly ? onUpgrade : onManageBilling}
           disabled={isWorking}
           className="text-sm font-medium text-content-primary hover:text-content-secondary transition-colors bg-surface-elevated px-4 py-2 border border-surface-border rounded-lg focus-app"
         >
-          Manage in Stripe Portal
+          {isProfileTrialOnly ? 'Add payment method' : 'Manage in Stripe Portal'}
         </button>
       </CollapsibleModule>
 
