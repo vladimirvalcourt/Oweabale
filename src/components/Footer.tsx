@@ -41,12 +41,12 @@ export default function Footer() {
             <ul className="space-y-3">
               {platformLinks.map((link) => (
                 <li key={link.label}>
-                  <a 
-                    href={link.href} 
+                  <TransitionLink 
+                    to={link.href} 
                     className="text-sm text-content-secondary/60 transition-colors duration-200 hover:text-content-primary"
                   >
                     {link.label}
-                  </a>
+                  </TransitionLink>
                 </li>
               ))}
             </ul>

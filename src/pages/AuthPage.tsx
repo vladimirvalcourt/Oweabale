@@ -127,66 +127,6 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
         </div>
       </div>
 
-      {/* Right Side - Vector Art */}
-      <div className="hidden lg:flex lg:w-[55%] xl:w-[60%] relative items-center justify-center bg-surface-base overflow-hidden p-12">
-        {/* Subtle grid pattern background */}
-        <div 
-          className="absolute inset-0 opacity-[0.03]"
-          style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px)', backgroundSize: '48px 48px' }}
-        />
-        
-        {/* The Meticulous Vector Graphic */}
-        <div className="relative w-full max-w-3xl aspect-[4/3]">
-          <svg viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-2xl">
-            {/* Background App Panel */}
-            <rect x="80" y="80" width="640" height="440" rx="24" fill="#0f172a" stroke="#1e293b" strokeWidth="2" />
-            
-            {/* Decorative Header Bar */}
-            <path d="M80 140 L720 140" stroke="#1e293b" strokeWidth="2" />
-            <circle cx="120" cy="110" r="6" fill="#f43f5e" opacity="0.8" />
-            <circle cx="144" cy="110" r="6" fill="#f59e0b" opacity="0.8" />
-            <circle cx="168" cy="110" r="6" fill="#10b981" opacity="0.8" />
-
-            {/* Dashboard Abstract Elements */}
-            {/* Left Column (Menu) */}
-            <rect x="120" y="180" width="140" height="300" rx="12" fill="#1e293b" />
-            <rect x="140" y="210" width="100" height="12" rx="6" fill="#334155" />
-            <rect x="140" y="240" width="80" height="12" rx="6" fill="#334155" />
-            <rect x="140" y="270" width="90" height="12" rx="6" fill="#334155" />
-            <rect x="140" y="300" width="70" height="12" rx="6" fill="#334155" />
-            
-            <circle cx="160" cy="440" r="16" fill="#334155" />
-            <rect x="190" y="434" width="50" height="12" rx="6" fill="#334155" />
-            
-            {/* Main Content Area */}
-            {/* Top Stat Cards */}
-            <rect x="290" y="180" width="190" height="110" rx="16" fill="#0f766e" opacity="0.9" />
-            <circle cx="330" cy="235" r="24" fill="#14b8a6" opacity="0.5" />
-            <path d="M370 235 Q 390 210 410 245 T 450 220" stroke="#ccfbf1" strokeWidth="4" strokeLinecap="round" fill="none" />
-            
-            <rect x="500" y="180" width="180" height="110" rx="16" fill="#1e293b" stroke="#334155" strokeWidth="2" />
-            <circle cx="540" cy="235" r="24" fill="#334155" opacity="0.5" />
-            <rect x="580" y="225" width="70" height="8" rx="4" fill="#475569" />
-            <rect x="580" y="245" width="50" height="8" rx="4" fill="#475569" />
-
-            {/* Large Chart Area */}
-            <rect x="290" y="320" width="390" height="160" rx="16" fill="#1e293b" stroke="#334155" strokeWidth="2" />
-            <path d="M340 480 L 340 400 L 400 400 L 400 480 Z" fill="#f43f5e" opacity="0.9" />
-            <path d="M420 480 L 420 360 L 480 360 L 480 480 Z" fill="#0f766e" opacity="0.9" />
-            <path d="M500 480 L 500 430 L 560 430 L 560 480 Z" fill="#f59e0b" opacity="0.9" />
-            <path d="M580 480 L 580 380 L 640 380 L 640 480 Z" fill="#8b5cf6" opacity="0.9" />
-
-            {/* Floating Abstract Element to break the grid */}
-            <circle cx="690" cy="490" r="50" fill="#f43f5e" opacity="0.9" />
-            <circle cx="690" cy="490" r="30" fill="#e11d48" opacity="0.9" />
-            
-            <circle cx="100" cy="450" r="30" fill="#8b5cf6" opacity="0.8" />
-            
-            <path d="M600 60 L 750 60 L 675 190 Z" fill="#0f766e" opacity="0.4" />
-          </svg>
-        </div>
-      </div>
-
     </div>
   );
 }
