@@ -354,59 +354,54 @@ export default function Landing() {
             ref={storyRef}
             className="mx-auto max-w-7xl px-6 lg:px-8 relative z-10 opacity-100 translate-y-0"
           >
-            <div className="grid gap-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-8">The System</p>
-                <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl lg:tracking-tighter">
-                  One command center for what your money needs next.
-                </h2>
-                <p className="mt-8 max-w-2xl text-lg leading-relaxed text-content-secondary">
-                  Oweable isn't just a tracker. It's a financial operating system that reduces decision friction by pulling everything into one rhythm.
-                </p>
-                
-                <div className="mt-12 space-y-3">
-                  <div className="flex items-start gap-4 rounded-[10px] border border-surface-border bg-surface-raised p-5 transition-colors hover:bg-surface-elevated">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary">
-                      <UploadCloud className="h-5 w-5" />
+            {/* Section Header */}
+            <div className="flex flex-col items-start mb-20">
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">The System</p>
+              <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl lg:tracking-tighter">
+                One command center for<br className="hidden lg:block" />
+                <span className="text-content-secondary">what your money needs next.</span>
+              </h2>
+            </div>
+
+            {/* Grid Layout - Matches Capabilities */}
+            <div className="grid gap-6 md:grid-cols-3">
+              {workflowSteps.map((step) => {
+                const Icon = step.icon;
+                return (
+                  <article
+                    key={step.title}
+                    className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg flex flex-col"
+                  >
+                    <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
+                      <Icon className="h-5 w-5" />
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold text-content-primary mb-1">Bill Capture</p>
-                      <p className="text-xs leading-relaxed text-content-secondary">Snap statements and bring them into the system automatically.</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4 rounded-[10px] border border-surface-border bg-surface-raised p-5 transition-colors hover:bg-surface-elevated">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary">
-                      <BookOpen className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-content-primary mb-1">Financial Academy</p>
-                      <p className="text-xs leading-relaxed text-content-secondary">Plain-English lessons for the moments when you want more context.</p>
-                    </div>
-                  </div>
+                    <p className="text-xs font-medium uppercase tracking-wide text-brand-profit mb-3">{step.eyebrow}</p>
+                    <h3 className="text-lg font-semibold text-content-primary mb-4">{step.title}</h3>
+                    <p className="text-sm leading-relaxed text-content-secondary flex-grow">{step.copy}</p>
+                  </article>
+                );
+              })}
+            </div>
+
+            {/* Additional Features - Compact Cards */}
+            <div className="mt-6 grid gap-6 md:grid-cols-2">
+              <div className="flex items-start gap-4 rounded-[10px] border border-surface-border bg-surface-raised p-6 transition-colors hover:bg-surface-elevated">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary">
+                  <UploadCloud className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-content-primary mb-1">Bill Capture</p>
+                  <p className="text-xs leading-relaxed text-content-secondary">Snap statements and bring them into the system automatically.</p>
                 </div>
               </div>
-
-              <div className="space-y-4">
-                {workflowSteps.map((step) => {
-                  const Icon = step.icon;
-                  return (
-                    <article
-                      key={step.title}
-                      className="group rounded-[12px] border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border/60 hover:shadow-lg"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
-                          <Icon className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <p className="text-xs font-medium uppercase tracking-wide text-brand-profit mb-2">{step.eyebrow}</p>
-                          <h3 className="text-base font-semibold text-content-primary mb-2">{step.title}</h3>
-                          <p className="text-sm leading-relaxed text-content-secondary">{step.copy}</p>
-                        </div>
-                      </div>
-                    </article>
-                  );
-                })}
+              <div className="flex items-start gap-4 rounded-[10px] border border-surface-border bg-surface-raised p-6 transition-colors hover:bg-surface-elevated">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-surface-elevated text-content-primary">
+                  <BookOpen className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-content-primary mb-1">Financial Academy</p>
+                  <p className="text-xs leading-relaxed text-content-secondary">Plain-English lessons for the moments when you want more context.</p>
+                </div>
               </div>
             </div>
           </div>
