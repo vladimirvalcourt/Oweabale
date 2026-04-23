@@ -328,13 +328,13 @@ export default function Landing() {
                 return (
                   <article
                     key={item.title}
-                    className="glass-card group relative p-10 transition-all hover:bg-white/[0.03]"
+                    className="group rounded-xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
                   >
-                    <div className="h-10 w-10 rounded-lg bg-white/5 flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform">
+                    <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="text-xl font-bold text-content-primary mb-4">{item.title}</h3>
-                    <p className="text-sm leading-relaxed text-content-secondary line-clamp-4">{item.copy}</p>
+                    <h3 className="text-lg font-semibold text-content-primary mb-3">{item.title}</h3>
+                    <p className="text-sm leading-relaxed text-content-secondary">{item.copy}</p>
                   </article>
                 );
               })}
@@ -364,23 +364,23 @@ export default function Landing() {
                   Oweable isn't just a tracker. It's a financial operating system that reduces decision friction by pulling everything into one rhythm.
                 </p>
                 
-                <div className="mt-12 space-y-4">
-                  <div className="glass-card p-6 flex items-start gap-5 group hover:bg-white/[0.03] transition-colors">
-                    <div className="h-10 w-10 rounded-lg bg-white/5 flex items-center justify-center text-white shrink-0">
+                <div className="mt-12 space-y-3">
+                  <div className="flex items-start gap-4 rounded-lg border border-surface-border bg-surface-raised p-5 transition-colors hover:bg-surface-elevated">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-elevated text-content-primary">
                       <UploadCloud className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-content-primary mb-1">Bill Capture</p>
-                      <p className="text-xs text-content-secondary leading-relaxed">Snap statements and bring them into the system automatically.</p>
+                      <p className="text-sm font-semibold text-content-primary mb-1">Bill Capture</p>
+                      <p className="text-xs leading-relaxed text-content-secondary">Snap statements and bring them into the system automatically.</p>
                     </div>
                   </div>
-                  <div className="glass-card p-6 flex items-start gap-5 group hover:bg-white/[0.03] transition-colors">
-                    <div className="h-10 w-10 rounded-lg bg-white/5 flex items-center justify-center text-white shrink-0">
+                  <div className="flex items-start gap-4 rounded-lg border border-surface-border bg-surface-raised p-5 transition-colors hover:bg-surface-elevated">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-elevated text-content-primary">
                       <BookOpen className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-content-primary mb-1">Financial Academy</p>
-                      <p className="text-xs text-content-secondary leading-relaxed">Plain-English lessons for the moments when you want more context.</p>
+                      <p className="text-sm font-semibold text-content-primary mb-1">Financial Academy</p>
+                      <p className="text-xs leading-relaxed text-content-secondary">Plain-English lessons for the moments when you want more context.</p>
                     </div>
                   </div>
                 </div>
@@ -392,15 +392,15 @@ export default function Landing() {
                   return (
                     <article
                       key={step.title}
-                      className="glass-card group p-8 transition-all hover:bg-white/[0.03]"
+                      className="group rounded-xl border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border/60 hover:shadow-lg"
                     >
-                      <div className="flex items-start gap-6">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/5 text-content-primary group-hover:bg-brand-profit/20 group-hover:text-brand-profit transition-all">
+                      <div className="flex items-start gap-4">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
                           <Icon className="h-5 w-5" />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-profit/70 mb-2">{step.eyebrow}</p>
-                          <h3 className="text-xl font-bold text-content-primary mb-3">{step.title}</h3>
+                          <p className="text-xs font-medium uppercase tracking-wide text-brand-profit mb-2">{step.eyebrow}</p>
+                          <h3 className="text-base font-semibold text-content-primary mb-2">{step.title}</h3>
                           <p className="text-sm leading-relaxed text-content-secondary">{step.copy}</p>
                         </div>
                       </div>
@@ -428,17 +428,17 @@ export default function Landing() {
                 return (
                   <article
                     key={column.title}
-                    className="glass-card group p-10 transition-all hover:bg-white/[0.03]"
+                    className="group rounded-xl border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
                   >
-                    <div className="h-10 w-10 rounded-lg bg-white/5 flex items-center justify-center text-white mb-8 group-hover:scale-110 transition-transform">
+                    <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <h3 className="text-lg font-bold text-content-primary mb-6 tracking-tight">{column.title}</h3>
-                    <ul className="space-y-4">
+                    <h3 className="text-lg font-semibold text-content-primary mb-6">{column.title}</h3>
+                    <ul className="space-y-3">
                       {column.items.map((item) => (
-                        <li key={item} className="flex items-start gap-3 group/item">
-                          <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-brand-profit opacity-50 group-hover/item:opacity-100 transition-opacity" />
-                          <span className="text-sm text-content-secondary group-hover/item:text-content-primary transition-colors leading-relaxed font-light">{item}</span>
+                        <li key={item} className="flex items-start gap-3">
+                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-brand-profit" />
+                          <span className="text-sm leading-relaxed text-content-secondary">{item}</span>
                         </li>
                       ))}
                     </ul>
@@ -468,17 +468,19 @@ export default function Landing() {
                 {audienceCards.map((item, index) => (
                   <article
                     key={item.title}
-                    className="glass-card group p-8 flex flex-col md:flex-row md:items-center gap-8 transition-all hover:bg-white/[0.03]"
+                    className="group rounded-xl border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border/60 hover:shadow-lg md:p-8"
                   >
-                    <div className="h-12 w-12 rounded-xl bg-white/5 flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
-                      {index === 0 && <Users className="h-5 w-5" />}
-                      {index === 1 && <Shield className="h-5 w-5" />}
-                      {index === 2 && <TrendingUp className="h-5 w-5" />}
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-content-primary mb-2">{item.title}</h3>
-                      <p className="text-sm text-content-secondary leading-relaxed font-light mb-4">{item.copy}</p>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-brand-profit">{item.accent}</p>
+                    <div className="flex flex-col md:flex-row md:items-start gap-6">
+                      <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-surface-elevated text-content-primary transition-colors group-hover:bg-brand-profit/10 group-hover:text-brand-profit">
+                        {index === 0 && <Users className="h-5 w-5" />}
+                        {index === 1 && <Shield className="h-5 w-5" />}
+                        {index === 2 && <TrendingUp className="h-5 w-5" />}
+                      </div>
+                      <div>
+                        <h3 className="text-base font-semibold text-content-primary mb-2">{item.title}</h3>
+                        <p className="text-sm leading-relaxed text-content-secondary mb-3">{item.copy}</p>
+                        <p className="text-xs font-medium text-brand-profit">{item.accent}</p>
+                      </div>
                     </div>
                   </article>
                 ))}
