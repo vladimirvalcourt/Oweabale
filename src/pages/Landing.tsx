@@ -555,13 +555,11 @@ export default function Landing() {
                     key={item.title}
                     variants={fadeInUp}
                     whileHover="hover"
-                    className="group rounded-[12px] border border-surface-border bg-surface-raised p-6 transition-all hover:border-surface-border/60 hover:shadow-lg md:p-8"
+                    className="group rounded-[12px] border border-surface-border bg-surface-raised p-8 transition-all hover:border-surface-border/60 hover:shadow-lg"
                   >
-                    <div>
-                      <h3 className="text-base font-semibold text-content-primary mb-2">{item.title}</h3>
-                      <p className="text-sm leading-relaxed text-content-secondary mb-3">{item.copy}</p>
-                      <p className="text-xs font-medium text-brand-profit">{item.accent}</p>
-                    </div>
+                    <h3 className="text-lg font-semibold text-content-primary mb-3">{item.title}</h3>
+                    <p className="text-sm leading-relaxed text-content-secondary mb-3">{item.copy}</p>
+                    <p className="text-xs font-medium text-brand-profit">{item.accent}</p>
                   </motion.article>
                 ))}
               </motion.div>
