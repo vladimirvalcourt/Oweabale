@@ -1,7 +1,7 @@
 import React, { useState, startTransition } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, Shield, Vault, Receipt, Activity, Flame, Wallet, FileSearch, Target, Check } from 'lucide-react';
+import { ArrowRight, Shield, Vault, Receipt, Activity, Flame, Wallet, FileSearch, Target, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 import { PrivacyScreenWhenHidden } from '../components/PrivacyScreenWhenHidden';
@@ -340,6 +340,45 @@ export default function Onboarding() {
 
         <main className="relative z-10 flex flex-1 flex-col overflow-hidden">
           <div className="mx-auto flex w-full max-w-lg flex-1 flex-col px-4 py-8 sm:px-6 sm:py-10">
+            {/* Carbon-inspired Progress Stepper */}
+            <div className="mb-8 flex items-center justify-between" aria-label="Onboarding progress">
+              {STEPS.map((step, index) => (
+                <React.Fragment key={step.id}>
+                  <div className="relative flex flex-col items-center">
+                    <motion.div
+                      initial={false}
+                      animate={{
+                        scale: currentStepIndex === index ? 1.1 : 1,
+                        backgroundColor: currentStepIndex > index ? 'var(--color-brand-profit)' : currentStepIndex === index ? 'var(--color-content-primary)' : 'var(--color-surface-border)',
+                      }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                      className={`flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors ${
+                        currentStepIndex > index
+                          ? 'border-brand-profit bg-brand-profit text-surface-base'
+                          : currentStepIndex === index
+                            ? 'border-content-primary bg-content-primary text-surface-base'
+                            : 'border-surface-border bg-surface-base text-content-muted'
+                      }`}
+                    >
+                      {currentStepIndex > index ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : index + 1}
+                    </motion.div>
+                    {index < STEPS.length - 1 && (
+                      <div className="absolute left-8 top-4 h-0.5 w-[calc(100vw/5-2rem)] sm:w-[calc(100%/5-2rem)]">
+                        <motion.div
+                          initial={false}
+                          animate={{
+                            backgroundColor: currentStepIndex > index ? 'var(--color-brand-profit)' : 'var(--color-surface-border)',
+                          }}
+                          transition={{ duration: 0.3 }}
+                          className="h-full"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </React.Fragment>
+              ))}
+            </div>
+
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={currentStep.id}
@@ -508,10 +547,35 @@ export default function Onboarding() {
                 type="button"
                 onClick={() => void handleNext()}
                 disabled={isSubmitting}
-                className="btn-tactile flex min-h-11 items-center gap-2 rounded-lg bg-brand-cta px-6 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app"
+                className="btn-tactile relative flex min-h-11 items-center gap-2 overflow-hidden rounded-lg bg-brand-cta px-6 text-sm font-semibold text-surface-base transition-all duration-200 hover:bg-brand-cta-hover focus-app disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {isSubmitting ? 'Saving…' : currentStepIndex === STEPS.length - 1 ? 'Go to dashboard' : 'Continue'}
-                <ArrowRight className="h-4 w-4" aria-hidden />
+                <AnimatePresence mode="wait">
+                  {isSubmitting ? (
+                    <motion.span
+                      key="loading"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.15 }}
+                      className="flex items-center gap-2"
+                    >
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                      Saving…
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      key="text"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.15 }}
+                      className="flex items-center gap-2"
+                    >
+                      {currentStepIndex === STEPS.length - 1 ? 'Go to dashboard' : 'Continue'}
+                      <ArrowRight className="h-4 w-4" aria-hidden />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
               </button>
             </div>
           </div>
