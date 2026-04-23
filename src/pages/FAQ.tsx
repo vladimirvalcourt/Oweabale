@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Check, Minus, Plus } from 'lucide-react';
+import { ArrowRight, Minus, Plus } from 'lucide-react';
 import { BrandWordmark } from '../components/BrandWordmark';
+import PublicHeader from '../components/PublicHeader';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
@@ -212,11 +213,11 @@ export default function FAQ() {
               </div>
               <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm text-content-secondary">
                 <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                  <Check className="h-4 w-4 text-brand-profit" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
                   No credit card required
                 </span>
                 <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                  <Check className="h-4 w-4 text-brand-profit" />
+                  <span className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
                   Browser-based on desktop and mobile
                 </span>
               </div>
