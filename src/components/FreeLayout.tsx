@@ -30,16 +30,11 @@ import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import { useShallow } from 'zustand/react/shallow';
 import QuickAddModal from './QuickAddModal';
-import { PrivacyScreenWhenHidden } from './PrivacyScreenWhenHidden';
 import { TactileIcon, MorphingMenuIcon } from './ui/TactileIcon';
 import type { Notification } from '../store/useStore';
 import { BrandWordmark } from './BrandWordmark';
 import { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 import { isApplePointerPlatform } from '../lib/platform';
-import SessionWarningModal from './SessionWarningModal';
-import { useAuth } from '../hooks/useAuth';
-import { AppLoader } from './PageSkeleton';
-import { useDataSync } from '../hooks/useDataSync';
 
 // ── Free-only nav items ────────────────────────────────────────────────────
 const FREE_NAV = [
@@ -59,8 +54,6 @@ const FREE_NAV = [
 export default function FreeLayout() {
   const location  = useLocation();
   const navigate  = useNavigate();
-  const { user: authUser, showWarning, timeLeft, extendSession, authLoading } = useAuth();
-  useDataSync({ authUserId: authUser?.id ?? null, authLoading });
 
   const [sidebarOpen,      setSidebarOpen]      = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -225,12 +218,8 @@ export default function FreeLayout() {
     }));
   }, [deferredPathname, deferredQS, deferredHash, dueSoonCount]);
 
-  if (authLoading) return <AppLoader />;
-
   return (
     <div className="min-h-[100dvh] bg-surface-base font-sans text-content-primary flex">
-      <PrivacyScreenWhenHidden />
-
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 bg-black/80 lg:hidden" aria-hidden onClick={closeSidebarMobile} />
@@ -656,10 +645,6 @@ export default function FreeLayout() {
 
       <QuickAddModal isOpen={isQuickAddOpen} onClose={closeQuickAdd} />
       <KeyboardShortcutsDialog open={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
-      <SessionWarningModal
-        isOpen={showWarning} timeLeftSeconds={timeLeft}
-        onExtend={extendSession} onLogout={() => { useStore.getState().signOut(); }}
-      />
     </div>
   );
 }

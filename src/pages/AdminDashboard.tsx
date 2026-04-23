@@ -3,7 +3,6 @@ import { TransitionLink } from '../components/TransitionLink';
 import { ArrowLeft, RefreshCw, LayoutDashboard, LineChart, Users, Landmark } from 'lucide-react';
 import { CollapsibleModule } from '../components/CollapsibleModule';
 import { supabase } from '../lib/supabase';
-import { PrivacyScreenWhenHidden } from '../components/PrivacyScreenWhenHidden';
 import { toast } from 'sonner';
 import { track } from '../lib/analytics';
 import { AdminMetricsBar } from './admin/components/AdminMetricsBar';
@@ -684,8 +683,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-surface-base p-4 text-content-secondary sm:p-8">
-      <PrivacyScreenWhenHidden />
-
       <div className="mx-auto w-full max-w-7xl space-y-6">
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:items-stretch">
           <section className="glass-card flex min-h-[9.5rem] flex-col rounded-2xl p-5 lg:col-span-8">

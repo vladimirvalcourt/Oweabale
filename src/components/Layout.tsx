@@ -14,7 +14,6 @@ import { cn } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import { useShallow } from 'zustand/react/shallow';
 import QuickAddModal from './QuickAddModal';
-import { PrivacyScreenWhenHidden } from './PrivacyScreenWhenHidden';
 import { TactileIcon, MorphingMenuIcon } from './ui/TactileIcon';
 import { HouseholdAvatarStack } from './HouseholdAvatarStack';
 import type { Notification } from '../store/useStore';
@@ -501,7 +500,6 @@ export default function Layout() {
 
   return (
     <div className="min-h-[100dvh] bg-surface-base font-sans text-content-primary flex">
-      <PrivacyScreenWhenHidden />
       <TrialBanner />
       <TrialExpiryModal onDismiss={() => setShowTrialExpiryModal(false)} />
       {/* Mobile sidebar backdrop */}

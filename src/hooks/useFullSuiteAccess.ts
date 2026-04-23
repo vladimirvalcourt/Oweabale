@@ -1,23 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { hasFullSuiteAccess } from '../lib/fullSuiteAccess';
 
 type FullSuiteAccessState = {
   isLoading: boolean;
   hasFullSuite: boolean;
   isAdmin: boolean;
 };
-
-function isEntitlementActive(row: { status: string; ends_at: string | null } | null | undefined) {
-  if (!row || row.status !== 'active') return false;
-  if (!row.ends_at) return true;
-  const end = new Date(row.ends_at).getTime();
-  if (Number.isNaN(end)) return true;
-  return end >= Date.now();
-}
-
-function isSubscriptionLive(row: { status: string } | null | undefined) {
-  return row?.status === 'active' || row?.status === 'trialing';
-}
 
 export function useFullSuiteAccess() {
   const [state, setState] = useState<FullSuiteAccessState>({
@@ -56,22 +45,18 @@ export function useFullSuiteAccess() {
         .maybeSingle(),
     ]);
 
-    const isAdmin = profileRes.data?.is_admin === true;
-    const hasEntitlement = isEntitlementActive(entitlementRes.data);
-    const hasLiveSubscription = isSubscriptionLive(subscriptionRes.data);
-    
-    // Check if user is on active trial
     const profile = profileRes.data;
-    const isOnTrial = 
-      profile?.plan === 'trial' && 
-      !profile?.trial_expired && 
-      profile?.trial_ends_at && 
-      new Date(profile.trial_ends_at).getTime() > Date.now();
+    const isAdmin = profile?.is_admin === true;
 
     setState({
       isLoading: false,
       isAdmin,
-      hasFullSuite: isAdmin || hasEntitlement || hasLiveSubscription || isOnTrial,
+      hasFullSuite: hasFullSuiteAccess({
+        isAdmin,
+        entitlement: entitlementRes.data,
+        subscription: subscriptionRes.data,
+        profile,
+      }),
     });
   }, []);
 

@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Shield, Vault, Receipt, Activity, Flame, Wallet, FileSearch, Target, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
-import { PrivacyScreenWhenHidden } from '../components/PrivacyScreenWhenHidden';
 import { cn } from '../lib/utils';
 import { yieldForPaint } from '../lib/interaction';
 import { BrandWordmark } from '../components/BrandWordmark';
@@ -213,7 +212,6 @@ export default function Onboarding() {
   if (showWelcome) {
     return (
       <>
-        <PrivacyScreenWhenHidden />
         <div className="fixed inset-0 flex flex-col bg-surface-base font-sans text-content-primary selection:bg-content-primary/10">
           <SubtleGrid />
 
@@ -303,7 +301,6 @@ export default function Onboarding() {
 
   return (
     <>
-      <PrivacyScreenWhenHidden />
       <div className="fixed inset-0 flex flex-col bg-surface-base font-sans text-content-primary selection:bg-content-primary/10">
         <SubtleGrid />
 

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AppLoader } from '../components/PageSkeleton';
+import { hasFullSuiteAccess } from '../lib/fullSuiteAccess';
 import { supabase } from '../lib/supabaseClient';
 
 /**
@@ -26,7 +27,11 @@ export default function PlaidCallback() {
       }
 
       const [profileRes, entitlementRes, subscriptionRes] = await Promise.all([
-        supabase.from('profiles').select('is_admin').eq('id', user.id).maybeSingle(),
+        supabase
+          .from('profiles')
+          .select('is_admin, plan, trial_ends_at, trial_expired')
+          .eq('id', user.id)
+          .maybeSingle(),
         supabase
           .from('entitlements')
           .select('status, ends_at')
@@ -45,17 +50,13 @@ export default function PlaidCallback() {
       ]);
 
       if (!mounted) return;
-
-      const isAdmin = profileRes.data?.is_admin === true;
-      const entitlement = entitlementRes.data;
-      const subscription = subscriptionRes.data;
-      const entitlementActive =
-        entitlement?.status === 'active' &&
-        (!entitlement.ends_at ||
-          Number.isNaN(new Date(entitlement.ends_at).getTime()) ||
-          new Date(entitlement.ends_at).getTime() >= Date.now());
-      const subscriptionActive = subscription?.status === 'active' || subscription?.status === 'trialing';
-      const hasFullSuite = isAdmin || entitlementActive || subscriptionActive;
+      const profile = profileRes.data;
+      const hasFullSuite = hasFullSuiteAccess({
+        isAdmin: profile?.is_admin === true,
+        entitlement: entitlementRes.data,
+        subscription: subscriptionRes.data,
+        profile,
+      });
 
       if (!hasFullSuite) {
         navigate('/pricing', { replace: true });

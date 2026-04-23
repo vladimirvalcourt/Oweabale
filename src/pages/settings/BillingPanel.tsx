@@ -5,6 +5,12 @@ import { Building2, Download, CreditCard as CreditCardIcon, RefreshCw } from 'lu
 import { CollapsibleModule } from '../../components/CollapsibleModule';
 import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
+import {
+  hasFullSuiteAccess,
+  isEntitlementActive,
+  isProfileTrialActive,
+  isSubscriptionLive,
+} from '../../lib/fullSuiteAccess';
 import { supabase } from '../../lib/supabase';
 import { loadNotifPrefs } from './constants';
 import { sendWebPushMessage } from '../../lib/webPush';
@@ -16,19 +22,6 @@ import {
   syncStripeBilling,
 } from '../../lib/stripe';
 import { yieldForPaint } from '../../lib/interaction';
-
-function isEntitlementActive(row: { status: string; ends_at: string | null } | undefined) {
-  if (!row || row.status !== 'active') return false;
-  if (row.ends_at) {
-    const end = new Date(row.ends_at).getTime();
-    if (!Number.isNaN(end) && end < Date.now()) return false;
-  }
-  return true;
-}
-
-function isSubscriptionLive(row: { status: string } | undefined) {
-  return row?.status === 'active' || row?.status === 'trialing';
-}
 
 function BillingPanelInner() {
   const BillingIcon = getCustomIcon('billing');
@@ -98,18 +91,20 @@ function BillingPanelInner() {
     const entitlement = entitlements?.[0];
     const sub = subscriptions?.[0];
     const paid = isEntitlementActive(entitlement) || isSubscriptionLive(sub);
-    const activeProfileTrial =
-      profile?.plan === 'trial' &&
-      profile?.trial_expired === false &&
-      !!profile?.trial_ends_at &&
-      new Date(profile.trial_ends_at).getTime() > Date.now();
+    const activeProfileTrial = isProfileTrialActive(profile);
     const profileTrialOnly = activeProfileTrial && !paid;
     setIsProfileTrialOnly(profileTrialOnly);
     setSubscriptionStatus(
       profileTrialOnly ? 'trialing' : ((sub?.status as typeof subscriptionStatus) ?? null),
     );
     setCurrentPeriodEnd(profileTrialOnly ? profile?.trial_ends_at ?? null : sub?.current_period_end ?? null);
-    setHasPaidAccess(paid || profileTrialOnly);
+    setHasPaidAccess(
+      hasFullSuiteAccess({
+        entitlement,
+        subscription: sub,
+        profile,
+      }),
+    );
 
     if (profileTrialOnly) {
       setTierLabel('Full Suite Trial');

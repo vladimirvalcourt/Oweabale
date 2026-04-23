@@ -90,6 +90,7 @@ export default function AuthCallback() {
   const navigate = useNavigate();
   const handledOAuthErrorRef = useRef(false);
   const navigatedRef = useRef(false);
+  const welcomeEmailSentRef = useRef(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -118,28 +119,30 @@ export default function AuthCallback() {
     const finishSignedIn = async (session: NonNullable<Awaited<ReturnType<typeof waitForSession>>>) => {
       await ensureReverseTrial(session);
 
-      // Send welcome email for new users on their first sign-in
-      try {
-        const user = session.user;
-        const firstName =
-          user.user_metadata?.given_name ||
-          user.user_metadata?.first_name ||
-          user.email?.split('@')[0] ||
-          'there';
+      if (isRecentSignup(session.user.created_at) && !welcomeEmailSentRef.current) {
+        welcomeEmailSentRef.current = true;
+        try {
+          const user = session.user;
+          const firstName =
+            user.user_metadata?.given_name ||
+            user.user_metadata?.first_name ||
+            user.email?.split('@')[0] ||
+            'there';
 
-        // Invoke welcome email Edge Function (fire-and-forget, don't block navigation)
-        supabase.functions
-          .invoke('trial-welcome-email', {
-            body: {
-              email: user.email,
-              firstName,
-            },
-          })
-          .catch((error) => {
-            console.error('Failed to send welcome email:', error);
-          });
-      } catch (error) {
-        console.error('Error preparing welcome email:', error);
+          // Invoke welcome email Edge Function (fire-and-forget, don't block navigation)
+          supabase.functions
+            .invoke('trial-welcome-email', {
+              body: {
+                email: user.email,
+                firstName,
+              },
+            })
+            .catch((error) => {
+              console.error('Failed to send welcome email:', error);
+            });
+        } catch (error) {
+          console.error('Error preparing welcome email:', error);
+        }
       }
 
       go(finalRedirect);
