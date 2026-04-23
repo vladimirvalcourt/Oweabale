@@ -389,12 +389,12 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="border-y border-surface-border bg-surface-raised py-8">
-          <div className="mx-auto grid max-w-7xl gap-6 px-6 text-sm text-content-secondary md:grid-cols-3 lg:px-8">
+        <section className="border-y border-surface-border bg-surface-raised py-10">
+          <div className="mx-auto grid max-w-7xl gap-x-8 gap-y-6 px-6 text-sm text-content-secondary md:grid-cols-3 lg:px-8">
             {proofPoints.map((point, index) => (
               <div key={point} className="flex items-start gap-3">
                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
-                <p className={index === 0 ? "whitespace-normal sm:whitespace-nowrap" : "text-balance"}>{point}</p>
+                <p className="leading-relaxed">{point}</p>
               </div>
             ))}
           </div>
