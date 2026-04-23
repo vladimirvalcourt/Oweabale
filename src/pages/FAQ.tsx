@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Minus, Plus } from 'lucide-react';
 import PublicHeader from '../components/PublicHeader';
+import Footer from '../components/Footer';
 import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
 
@@ -191,6 +192,7 @@ export default function FAQ() {
             </div>
           </section>
       </main>
+      <Footer />
     </div>
   );
 }
