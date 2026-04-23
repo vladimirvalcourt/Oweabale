@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useState } from 'react';
-import { ArrowRight, LifeBuoy, Mail, ShieldCheck } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Footer from '../components/Footer';
 import PublicHeader from '../components/PublicHeader';
 import { TransitionLink } from '../components/TransitionLink';
@@ -154,7 +154,6 @@ export default function Support() {
           <section className="grid gap-10 py-10 sm:py-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-12">
             <div className="public-fade-up">
               <div className="inline-flex items-center gap-2 rounded-full border border-surface-border bg-surface-raised px-4 py-2 text-xs font-semibold uppercase tracking-widest text-content-secondary">
-                <LifeBuoy className="h-3.5 w-3.5 text-brand-profit" />
                 Support
               </div>
               <h1 className="mt-6 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl">
@@ -171,7 +170,6 @@ export default function Support() {
                 <div className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8">
                   <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Direct email</p>
                   <a href={`mailto:${SUPPORT_EMAIL}`} className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-content-primary hover:text-brand-profit">
-                    <Mail className="h-4 w-4" />
                     {SUPPORT_EMAIL}
                   </a>
                 </div>
@@ -192,12 +190,9 @@ export default function Support() {
                 </p>
 
                 {submitted ? (
-                  <div className="mt-8 rounded-[8px] bg-surface-highlight p-8 text-center">
-                    <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-surface-base text-brand-profit shadow-sm">
-                      <ShieldCheck className="h-8 w-8" />
-                    </div>
-                    <h3 className="mt-5 text-2xl font-semibold tracking-[-0.03em] text-content-primary">Message sent</h3>
-                    <p className="mt-3 text-base leading-7 text-content-secondary">
+                  <div className="mt-8 rounded-[12px] border border-surface-border bg-surface-highlight p-8 text-center">
+                    <h3 className="text-lg font-semibold text-content-primary mb-3">Message sent</h3>
+                    <p className="text-sm leading-relaxed text-content-secondary">
                       We got your note and will usually reply within one business day.
                     </p>
                     <button

@@ -325,7 +325,7 @@ export default function Pricing() {
             viewport={{ once: true, margin: '-100px' }}
           >
             <motion.div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]" variants={staggerContainer}>
-              <motion.div variants={fadeInUp} className="public-hover-lift rounded-[8px] border border-surface-border bg-surface-base p-7 sm:p-8">
+              <motion.div variants={fadeInUp} className="public-hover-lift rounded-[12px] border border-surface-border bg-surface-base p-7 sm:p-8">
                 <p className="mt-6 text-xs font-semibold uppercase tracking-widest text-content-tertiary">Tracker</p>
                 <div className="mt-4 flex items-end gap-2">
                   <span className="text-5xl font-bold tracking-tight text-content-primary">$0</span>
@@ -358,7 +358,7 @@ export default function Pricing() {
                 </motion.div>
               </motion.div>
 
-              <motion.div variants={fadeInUp} className="public-hover-lift rounded-[8px] border border-brand-cta bg-brand-cta p-7 sm:p-8 text-surface-base shadow-lg">
+              <motion.div variants={fadeInUp} className="public-hover-lift rounded-[12px] border border-brand-cta bg-brand-cta p-7 sm:p-8 text-surface-base shadow-lg">
                 <div className="flex items-center justify-between gap-4">
                   <p className="text-xs font-medium uppercase tracking-[0.18em] text-surface-base/80">Full Suite</p>
                   <span className="rounded-full bg-surface-base/20 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-surface-base">
@@ -471,7 +471,7 @@ export default function Pricing() {
                   Choose based on how much control you want, not how much jargon you can tolerate.
                 </h2>
               </div>
-              <div className="overflow-x-auto rounded-2xl border border-surface-border bg-surface-raised">
+              <div className="overflow-x-auto rounded-[12px] border border-surface-border bg-surface-raised">
                 <div className="grid grid-cols-3 border-b border-surface-border bg-surface-highlight text-sm font-semibold text-content-primary">
                   <div className="min-w-[180px] px-4 py-4">Feature</div>
                   <div className="min-w-[140px] border-l border-surface-border px-4 py-4">Tracker</div>

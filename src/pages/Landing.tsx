@@ -490,7 +490,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="py-32 relative border-t border-surface-border">
+        <section id="capabilities" className="py-32 relative border-t border-surface-border">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="flex flex-col items-start mb-20">
               <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Capabilities</p>
