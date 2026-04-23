@@ -248,58 +248,54 @@ export default function Landing() {
       </nav>
 
       <main id="main-content">
-        <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
-          {/* Advanced Atmospheric Layers (Static) */}
-          <div className="absolute inset-0 z-0">
-            <div className="absolute top-[-10%] left-[-5%] h-[70%] w-[70%] rounded-full bg-brand-profit/10 blur-[150px]" />
-            <div className="absolute bottom-[-10%] right-[-5%] h-[60%] w-[60%] rounded-full bg-white/5 blur-[120px]" />
-            <div className="absolute top-[30%] left-[40%] h-[40%] w-[40%] rounded-full bg-brand-profit/5 blur-[100px]" />
-          </div>
-
-          <div className="mx-auto grid max-w-7xl gap-16 px-6 py-20 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:px-8 relative z-10">
+        <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            {/* Hero Content */}
             <div
               ref={heroRef}
-              className="opacity-100 translate-y-0"
+              className="text-center max-w-4xl mx-auto"
             >
-              <div className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-content-secondary backdrop-blur-md">
+              <div className="inline-flex items-center gap-2 rounded-full border border-surface-border bg-surface-raised px-4 py-1.5 text-xs font-medium text-content-secondary mb-8">
                 <div className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
-                Next-Gen Financial Operating System
+                Free forever · No credit card required
               </div>
               
-              <h1 className="mt-8 text-6xl font-bold tracking-tight text-content-primary sm:text-7xl lg:text-[7rem] lg:leading-[1.0]">
-                Clarity for<br />
-                <span className="bg-gradient-to-r from-white via-white/60 to-white/20 bg-clip-text text-transparent">Complex Money.</span>
+              <h1 className="text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl lg:text-7xl">
+                See your money clearly.
+                <br className="hidden sm:block" />
+                <span className="text-content-secondary">Pay off debt faster.</span>
               </h1>
               
-              <p className="mt-10 max-w-2xl text-lg leading-relaxed text-content-secondary lg:text-xl">
-                Oweable turns your fragmented bills, debt, and uneven income into a single, dependable rhythm. Stop guessing and start knowing what your money needs next.
+              <p className="mt-6 max-w-2xl mx-auto text-lg leading-relaxed text-content-secondary">
+                Oweable brings bills, debt, and subscriptions into one view so you always know what's due and what to pay next.
               </p>
 
-              <div className="mt-12 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <TransitionLink
                   to={primaryHref}
-                  className="group relative inline-flex items-center justify-center gap-3 rounded-full bg-white px-10 py-4 text-xs font-bold uppercase tracking-[0.15em] text-black transition-all duration-300 hover:scale-[1.02]"
+                  className="inline-flex items-center justify-center rounded-lg bg-brand-cta px-8 py-3.5 text-sm font-semibold text-surface-base transition-all hover:brightness-110 focus-app"
                 >
-                  {user?.id ? 'Enter Dashboard' : 'Initialize Account'}
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  {user?.id ? 'Open Dashboard' : 'Get Started Free'}
                 </TransitionLink>
                 <a
                   href="#flow"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-10 py-4 text-xs font-bold uppercase tracking-[0.15em] text-content-primary transition-all hover:bg-white/10"
+                  className="inline-flex items-center justify-center rounded-lg border border-surface-border bg-transparent px-8 py-3.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated"
                 >
-                  System Overview
+                  See how it works
                 </a>
               </div>
             </div>
 
+            {/* Dashboard Preview */}
             <div
-              className={`relative transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] delay-150 ${
+              className={`mt-16 transition-all duration-1000 ease-out ${
                 heroVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
               }`}
             >
-              <div className="absolute inset-6 rounded-[2rem] bg-brand-profit/10 blur-3xl" />
-              <div className="relative rounded-[2rem] border border-white/10 bg-surface-raised/40 backdrop-blur-md p-3 shadow-2xl">
-                <HeroPreviewMedia />
+              <div className="relative rounded-xl border border-surface-border bg-surface-raised p-2 shadow-2xl">
+                <div className="rounded-lg border border-surface-border bg-surface-base overflow-hidden">
+                  <HeroPreviewMedia />
+                </div>
               </div>
             </div>
           </div>
