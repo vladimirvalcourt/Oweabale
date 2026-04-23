@@ -11,10 +11,10 @@ import { guessCategory } from '../lib/categorizer';
 import { yieldForPaint } from '../lib/interaction';
 import { cn } from '../lib/utils';
 import { getCustomIcon } from '../lib/customIcons';
+const IncomeIcon = getCustomIcon('income');
+const PlanningIcon = getCustomIcon('planning');
 
 export default function Income() {
-  const IncomeIcon = getCustomIcon('income');
-  const PlanningIcon = getCustomIcon('planning');
   const { incomes, addIncome, editIncome, deleteIncome, recordIncomeDeposit, user, updateUser } = useStore();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

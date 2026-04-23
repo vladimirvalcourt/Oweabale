@@ -346,9 +346,10 @@ export function computeSafeToSpend(args: {
     windowEndLabel = endOfMonth.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   }
 
+  const windowEndDayMs = startOfDayUtc(new Date(windowEndMs));
   const daysInWindow = Math.max(
     1,
-    Math.ceil((windowEndMs - todayMs) / 86400000)
+    Math.ceil((windowEndDayMs - todayMs) / 86400000)
   );
 
   let scheduled = 0;

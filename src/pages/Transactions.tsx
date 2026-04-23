@@ -12,10 +12,10 @@ const BUTTON_BASE_CLASS =
   'inline-flex min-h-10 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-app disabled:opacity-50 disabled:cursor-not-allowed';
 const BUTTON_SECONDARY_CLASS = `${BUTTON_BASE_CLASS} border border-surface-border bg-transparent text-content-secondary hover:bg-surface-elevated hover:text-content-primary`;
 const BUTTON_PRIMARY_CLASS = `${BUTTON_BASE_CLASS} bg-brand-cta text-surface-base hover:bg-brand-cta-hover`;
+const TransactionsIcon = getCustomIcon('transactions');
+const FiltersIcon = getCustomIcon('filters');
 
 export default function Transactions() {
-  const TransactionsIcon = getCustomIcon('transactions');
-  const FiltersIcon = getCustomIcon('filters');
   const {
     transactions,
     subscriptions,

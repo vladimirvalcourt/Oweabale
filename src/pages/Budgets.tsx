@@ -17,6 +17,8 @@ import { getCustomIcon } from '../lib/customIcons';
 
 const BUDGET_PERIODS: Budget['period'][] = ['Weekly', 'Bi-weekly', 'Monthly', 'Quarterly', 'Yearly'];
 const SAVINGS_TARGET_STORAGE_KEY = 'oweable_budget_monthly_savings_target';
+const BudgetIcon = getCustomIcon('budget');
+const PlanningIcon = getCustomIcon('planning');
 
 function loadMonthlySavingsTarget(): number {
   if (typeof window === 'undefined') return 0;
@@ -26,8 +28,6 @@ function loadMonthlySavingsTarget(): number {
 }
 
 export default function Budgets() {
-  const BudgetIcon = getCustomIcon('budget');
-  const PlanningIcon = getCustomIcon('planning');
   const { budgets, transactions, addBudget, editBudget, deleteBudget, categories, subscriptions } = useStore();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

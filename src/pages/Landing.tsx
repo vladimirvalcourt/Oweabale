@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 import Footer from '../components/Footer';
 import HeroPreviewMedia from '../components/landing/HeroPreviewMedia';
 import { TransitionLink } from '../components/TransitionLink';
@@ -152,12 +153,12 @@ const audienceCards = [
 ];
 
 // Framer Motion Variants
-const fadeInUp = {
+const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 14 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const } },
 };
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -167,9 +168,9 @@ const staggerContainer = {
   },
 };
 
-const springButton = {
-  hover: { scale: 1.01, transition: { duration: 0.18, ease: 'easeOut' } },
-  tap: { scale: 0.99, transition: { duration: 0.12, ease: 'easeOut' } },
+const springButton: Variants = {
+  hover: { scale: 1.01, transition: { duration: 0.18, ease: 'easeOut' as const } },
+  tap: { scale: 0.99, transition: { duration: 0.12, ease: 'easeOut' as const } },
 };
 
 const testimonials = [

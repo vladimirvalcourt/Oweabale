@@ -33,6 +33,13 @@ import { getCustomIcon } from '../lib/customIcons';
 
 type ObligationType = 'recurring' | 'debt' | 'ambush';
 type Strategy = 'avalanche' | 'snowball';
+const RecurringIcon = getCustomIcon('recurring');
+const DebtIcon = getCustomIcon('debt');
+const TicketIcon = getCustomIcon('ticket');
+const PaymentsIcon = getCustomIcon('payments');
+const PlanningIcon = getCustomIcon('planning');
+const CalendarIcon = getCustomIcon('planning');
+const ChartIcon = getCustomIcon('payments');
 
 interface Obligation {
   id: string;
@@ -114,13 +121,6 @@ function monthsToDate(months: number): string {
 }
 
 export default function Obligations() {
-  const RecurringIcon = getCustomIcon('recurring');
-  const DebtIcon = getCustomIcon('debt');
-  const TicketIcon = getCustomIcon('ticket');
-  const PaymentsIcon = getCustomIcon('payments');
-  const PlanningIcon = getCustomIcon('planning');
-  const CalendarIcon = getCustomIcon('planning');
-  const ChartIcon = getCustomIcon('payments');
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { bills, debts, citations, subscriptions, transactions, assets, resolveCitation, openQuickAdd, editBill, editDebt, markBillPaid } = useStore(
@@ -216,7 +216,7 @@ export default function Obligations() {
         icon: TicketIcon,
       })),
     ];
-  }, [bills, debts, citations, scheduleBaseMs, RecurringIcon, DebtIcon, TicketIcon]);
+  }, [bills, debts, citations, scheduleBaseMs]);
 
   const horizonBuckets = useMemo(
     () =>

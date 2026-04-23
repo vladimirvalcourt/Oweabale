@@ -55,7 +55,7 @@ server.tool(
   "get_account_summary",
   "Retrieves a 360-degree financial overview for a specific user ID.",
   { userId: z.string().uuid().describe("The UUID of the user") },
-  async ({ userId }) => {
+  async ({ userId }: { userId: string }) => {
     try {
       console.error("🛡️ MCP TOOL: Loading account summary");
       if (!supabase) {

@@ -12,6 +12,8 @@ type SubFrequency = 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Yearly';
 
 const SUB_FREQUENCIES: SubFrequency[] = ['Weekly', 'Bi-weekly', 'Monthly', 'Yearly'];
 const CANCELLATION_REVIEW_STORAGE_KEY = 'oweable_subscription_cancellation_review_v1';
+const SubscriptionsIcon = getCustomIcon('subscriptions');
+const PlanningIcon = getCustomIcon('planning');
 
 function toSubFrequency(value: string): SubFrequency {
   return SUB_FREQUENCIES.includes(value as SubFrequency) ? (value as SubFrequency) : 'Monthly';
@@ -35,8 +37,6 @@ function nextBillingFromCandidate(c: SubscriptionCandidate): string {
 }
 
 export default function Subscriptions() {
-  const SubscriptionsIcon = getCustomIcon('subscriptions');
-  const PlanningIcon = getCustomIcon('planning');
   const { subscriptions, transactions, addSubscription, editSubscription, deleteSubscription } = useStore();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
