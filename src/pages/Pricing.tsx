@@ -113,7 +113,7 @@ const PRICING_FAQ_STATIC = [
 ] as const;
 
 function getPricingFaqItems(monthlyPrice: number, hasYearlyPricing: boolean) {
-  const items = [...PRICING_FAQ_STATIC];
+  const items: Array<{ question: string; answer: string }> = [...PRICING_FAQ_STATIC];
   if (hasYearlyPricing) {
     items.push({
       question: 'Is there a yearly discount?',
@@ -274,7 +274,7 @@ export default function Pricing() {
     <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
       <PublicHeader
         links={[
-          { href: '/#why', label: 'Why' },
+          { href: '/', label: 'Home' },
           { href: '/faq', label: 'FAQ' },
           { href: '/support', label: 'Support' },
         ]}

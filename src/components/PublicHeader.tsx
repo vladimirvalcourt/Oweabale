@@ -34,10 +34,10 @@ function NavLink({
   };
 
   return (
-    <a
-      ref={ref}
-      href={href}
-      onMouseMove={handleMouseMove}
+    <TransitionLink
+      ref={ref as any}
+      to={href}
+      onMouseMove={handleMouseMove as any}
       onMouseLeave={handleMouseLeave}
       className={`relative px-2 py-1 text-[11px] font-medium uppercase tracking-[0.15em] transition-colors ${
         isActive ? 'text-content-primary' : 'text-content-tertiary hover:text-content-primary'
@@ -58,7 +58,7 @@ function NavLink({
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
         />
       )}
-    </a>
+    </TransitionLink>
   );
 }
 
