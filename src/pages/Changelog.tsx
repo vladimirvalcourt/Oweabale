@@ -1,5 +1,6 @@
 import React from 'react';
-import { ScrollText } from 'lucide-react';
+import Footer from '../components/Footer';
+import PublicHeader from '../components/PublicHeader';
 
 const ENTRIES: { date: string; title: string; bullets: string[] }[] = [
   {
@@ -23,27 +24,40 @@ const ENTRIES: { date: string; title: string; bullets: string[] }[] = [
 
 export default function Changelog() {
   return (
-    <div className="space-y-8 max-w-2xl">
-      <div>
-        <h1 className="mb-1 flex items-center gap-2 text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">
-          <ScrollText className="h-7 w-7 shrink-0 text-content-primary" aria-hidden />
-          Changelog
-        </h1>
-        <p className="text-sm font-medium text-content-secondary">Product updates and notable changes.</p>
-      </div>
-      <ul className="space-y-8">
-        {ENTRIES.map((entry) => (
-          <li key={`${entry.date}-${entry.title}`} className="border border-surface-border rounded-lg bg-surface-raised p-6">
-            <p className="text-xs font-sans text-content-tertiary mb-1">{entry.date}</p>
-            <h2 className="text-lg font-sans font-semibold text-content-primary mb-3">{entry.title}</h2>
-            <ul className="list-disc pl-5 space-y-2 text-sm text-content-secondary leading-relaxed">
-              {entry.bullets.map((b) => (
-                <li key={b}>{b}</li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ul>
+    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
+      <PublicHeader
+        links={[
+          { href: '/pricing', label: 'Plans' },
+          { href: '/support', label: 'Support' },
+          { href: '/faq', label: 'FAQ' },
+        ]}
+      />
+
+      <main className="pt-32 pb-24">
+        <div className="mx-auto max-w-3xl px-6 lg:px-8">
+          <div className="mb-12">
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-4">Changelog</p>
+            <h1 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
+              Product updates and notable changes.
+            </h1>
+          </div>
+
+          <ul className="space-y-6">
+            {ENTRIES.map((entry) => (
+              <li key={`${entry.date}-${entry.title}`} className="rounded-[12px] border border-surface-border bg-surface-raised p-8 shadow-sm">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary mb-3">{entry.date}</p>
+                <h2 className="text-lg font-semibold text-content-primary mb-4">{entry.title}</h2>
+                <ul className="list-disc pl-5 space-y-2 text-sm text-content-secondary leading-relaxed">
+                  {entry.bullets.map((b) => (
+                    <li key={b}>{b}</li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </main>
+      <Footer />
     </div>
   );
 }

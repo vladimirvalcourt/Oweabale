@@ -1,5 +1,4 @@
 import { TransitionLink } from '../components/TransitionLink';
-import { Home, ArrowLeft } from 'lucide-react';
 
 /**
  * Global 404 — matches unknown paths via `<Route path="*" />`.
@@ -17,16 +16,14 @@ export default function NotFound() {
       <div className="flex w-full max-w-sm flex-col gap-3 sm:flex-row sm:justify-center">
         <TransitionLink
           to="/"
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] border border-surface-border bg-surface-raised px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated"
         >
-          <Home className="w-4 h-4 shrink-0" aria-hidden />
           Home
         </TransitionLink>
         <TransitionLink
           to="/dashboard"
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover"
         >
-          <ArrowLeft className="w-4 h-4 rotate-180 shrink-0" aria-hidden />
           Dashboard
         </TransitionLink>
       </div>

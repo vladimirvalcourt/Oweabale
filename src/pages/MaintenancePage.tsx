@@ -1,5 +1,4 @@
 import { TransitionLink } from '../components/TransitionLink';
-import { Construction, LogOut } from 'lucide-react';
 import { useStore } from '../store/useStore';
 
 /**
@@ -10,9 +9,8 @@ export default function MaintenancePage() {
 
   return (
     <div className="min-h-screen bg-surface-base flex flex-col items-center justify-center px-6 py-16">
-      <Construction className="w-12 h-12 text-amber-500/90 mb-6" aria-hidden />
-      <p className="text-xs font-sans font-medium text-content-tertiary mb-4">Maintenance</p>
-      <h1 className="mb-2 text-center text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">
+      <p className="text-xs font-medium uppercase tracking-widest text-brand-profit mb-6">Maintenance</p>
+      <h1 className="mb-2 text-center text-3xl font-semibold tracking-tight text-content-primary sm:text-4xl">
         We&apos;re upgrading Oweable
       </h1>
       <p className="mb-10 max-w-md text-center text-sm font-medium text-content-secondary">
@@ -23,14 +21,13 @@ export default function MaintenancePage() {
         <button
           type="button"
           onClick={() => void signOut()}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-surface-border bg-surface-raised text-sm font-medium text-content-primary hover:bg-surface-elevated transition-colors rounded-lg"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-surface-border bg-surface-raised text-sm font-medium text-content-primary hover:bg-surface-elevated transition-colors rounded-[10px]"
         >
-          <LogOut className="w-4 h-4" />
           Sign out
         </button>
         <TransitionLink
           to="/"
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover"
+          className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover"
         >
           Home
         </TransitionLink>
