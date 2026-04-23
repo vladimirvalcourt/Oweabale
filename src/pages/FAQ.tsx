@@ -31,17 +31,17 @@ const FAQ_DATA = [
   {
     question: 'What is Oweable, exactly?',
     answer:
-      'Oweable is a personal finance command center for bills, debt, recurring obligations, subscriptions, budgets, and uneven income. It is built to help you see what is due, what is behind, and what to pay off next.',
+      'Oweable is a personal finance tool for people who feel like bills, debt, recurring obligations, and uneven income have become too hard to hold together mentally. It helps you see what is due, what is behind, and what needs attention next.',
   },
   {
     question: 'Is Oweable only for freelancers or gig workers?',
     answer:
-      'No. It works for salaried workers, households, freelancers, side gigs, and mixed-income setups. Variable-income tax tools are available when you need them, but they are not the only use case.',
+      'No. It works for salaried workers, households, freelancers, side gigs, and mixed-income setups. The common thread is not your job type. It is needing a calmer way to stay on top of money.',
   },
   {
     question: 'What makes Oweable different from a normal budgeting app?',
     answer:
-      'Most budgeting apps focus on where money went. Oweable focuses on what you owe next, what is overdue, and how to build a realistic payoff and cash-flow plan around that.',
+      'Most budgeting apps focus on where money went. Oweable focuses on what you owe next, what is overdue, and how to make a realistic plan when everything feels equally urgent.',
   },
   {
     question: 'Do I need to connect my bank account?',
@@ -51,22 +51,22 @@ const FAQ_DATA = [
   {
     question: 'Can Oweable help with debt payoff?',
     answer:
-      'Yes. Full Suite includes debt payoff planning with both Snowball and Avalanche strategies, so you can see a clearer path instead of just making minimum payments and hoping for momentum.',
+      'Yes. Full Suite includes debt payoff planning with both Snowball and Avalanche strategies, so you can stop guessing and start seeing a clearer path forward.',
   },
   {
     question: 'Can I use Oweable without downloading an app?',
     answer:
-      'Yes. Oweable works in your browser on desktop and mobile. You do not need to install anything to start organizing your money.',
+      'Yes. Oweable works in your browser on desktop and mobile. You do not need to install another app just to start getting organized.',
   },
   {
     question: 'Is there a free version?',
     answer:
-      'Yes. The free Tracker tier gives you visibility into bills, due dates, and recurring obligations. Full Suite adds the broader planning and payoff tools.',
+      'Yes. The free Tracker tier gives you visibility into bills, due dates, and recurring obligations. Full Suite adds broader planning and payoff tools when you want more help.',
   },
   {
     question: 'How secure is my data?',
     answer:
-      'Oweable uses strong encryption in transit and at rest, and the product is built around keeping your financial information protected. For more detail, the Security page explains the current controls in plain English.',
+      'Oweable uses strong encryption in transit and at rest, and the product is built around protecting your financial information. For more detail, the Security page explains the current controls in plain English.',
   },
 ] as const;
 
@@ -100,7 +100,7 @@ export default function FAQ() {
   useSEO({
     title: 'Frequently Asked Questions — Oweable',
     description:
-      'Answers to common questions about Oweable, including bills, debt payoff, subscriptions, free plans, security, and variable-income workflows.',
+      'Answers to common questions about Oweable, including bills, debt payoff, subscriptions, free plans, security, and uneven-income workflows.',
     canonical: 'https://www.oweable.com/faq',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -135,10 +135,10 @@ export default function FAQ() {
             <div className="text-center">
               <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">FAQ</p>
               <h1 className="public-fade-up mt-5 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl">
-                The questions people ask before they trust their money to something new.
+                The questions people ask when money already feels heavy.
               </h1>
               <p className="public-fade-up public-delay-1 mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-content-secondary">
-                Short answers, plain English, and no fake mystery. If you still need help after this, the support page is one click away.
+                Short answers, plain English, and no fake mystery. If you still need help after this, support is one click away.
               </p>
             </div>
 
@@ -158,10 +158,10 @@ export default function FAQ() {
 
             <div className="public-fade-up public-delay-2 mt-14 rounded-[12px] border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
               <h2 className="text-3xl font-semibold tracking-tight text-content-primary">
-                Want the full picture instead of another patchwork system?
+                Want a system that feels more supportive than stressful?
               </h2>
               <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-content-secondary">
-                Oweable is built to reduce money fog, not add more interfaces to babysit.
+                Oweable is meant to reduce money fog, not give you another interface to babysit.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <motion.div variants={springButton} whileHover="hover" whileTap="tap">

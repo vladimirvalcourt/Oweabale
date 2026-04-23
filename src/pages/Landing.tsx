@@ -89,95 +89,95 @@ function NavLink({
 }
 
 const proofPoints = [
-  'One place for bills, debt, subscriptions, budgets, and due dates',
-  'Built for both steady paychecks and irregular income',
-  'No credit card required to start your free account',
+  'For people tired of keeping their money life together with memory, notes, and stress',
+  'Built for steady paychecks, uneven income, shared households, and messy real life',
+  'Start free with no credit card and no pressure to have everything figured out',
 ];
 
 const painPoints = [
   {
-    title: 'Bills sneak up on you',
+    title: 'You are tired of being surprised by your own bills',
     copy:
-      'Rent, cards, subscriptions, tickets, and one-off obligations end up living in five different places. Oweable turns them into one weekly picture.',
+      'Rent, cards, subscriptions, insurance, tickets, and random one-offs end up scattered across apps, emails, and mental notes. Oweable brings them back into one view so you can breathe again.',
   },
   {
-    title: 'Debt feels static until it gets expensive',
+    title: 'Debt makes you feel stuck even when you are trying',
     copy:
-      'Minimum payments keep the lights on, but they rarely create momentum. Oweable shows your payoff path so your next dollar has a job.',
+      'Making minimum payments can feel like doing your best and still going nowhere. Oweable helps you see a payoff path so your money stops disappearing into something that never seems to move.',
   },
   {
-    title: 'Cash flow lies when it ignores what is due',
+    title: 'Your bank balance does not tell the whole truth',
     copy:
-      'A checking balance is not a plan. Oweable layers due dates, recurring obligations, and reserves on top so you can see what is actually safe.',
+      'Seeing money in checking is not the same as knowing what is actually safe to spend. Oweable layers in due dates, recurring obligations, and reserves so you can make calmer decisions.',
   },
 ];
 
 const workflowSteps = [
   {
     eyebrow: 'Step 01',
-    title: 'Bring your money life into one place',
+    title: 'Gather the pieces that have been living everywhere',
     copy:
-      'Add bills, debts, subscriptions, and recurring obligations manually or connect accounts when you want more automation.',
+      'Bring in bills, debt, subscriptions, and recurring obligations manually or connect accounts when you want less manual work.',
   },
   {
     eyebrow: 'Step 02',
-    title: 'See what needs attention this week',
+    title: 'See what needs your attention before it becomes urgent',
     copy:
-      'The dashboard pulls due soon, overdue, and upcoming items into one calm view so you know what must happen next.',
+      'The dashboard puts due soon, overdue, and upcoming items in one calm place so you know what needs to happen next.',
   },
   {
     eyebrow: 'Step 03',
-    title: 'Follow a plan instead of reacting',
+    title: 'Start responding with a plan instead of panic',
     copy:
-      'Use debt payoff guidance, budget guardrails, and reserve targets to move from late-fee management to real progress.',
+      'Use payoff guidance, budget guardrails, and reserve targets to move from catching up all the time to finally making progress.',
   },
 ];
 
 const capabilityColumns = [
   {
-    title: 'Stay ahead of due dates',
+    title: 'Stay ahead of what is coming',
     items: [
-      'Recurring bills, subscriptions, and one-off obligations',
-      'Overdue detection and reminders before the damage lands',
-      'A weekly view that shows what is hitting now versus next',
+      'Keep recurring bills, subscriptions, and one-off obligations in one place',
+      'Get reminders before a due date turns into a late fee or a missed payment',
+      'See what is hitting now, what is next, and what can wait',
     ],
   },
   {
-    title: 'Make payoff decisions with confidence',
+    title: 'Make debt payoff feel real again',
     items: [
-      'Snowball and Avalanche strategies in the same place as your bills',
-      'A clearer view of how much interest your current pattern is costing',
-      'Progress that feels visible instead of theoretical',
+      'Compare Snowball and Avalanche strategies without leaving your bill view',
+      'See how much interest your current pattern is really costing you',
+      'Watch progress become visible instead of always feeling abstract',
     ],
   },
   {
-    title: 'Handle real-life income patterns',
+    title: 'Work with real income, not ideal income',
     items: [
-      'Works for W-2 households, side gigs, freelance, and mixed income',
-      'Tax estimates and reserve planning when income is uneven',
-      'Budgets that respect reality instead of pretending every month matches',
+      'Built for paychecks, side gigs, freelance work, and mixed-income households',
+      'Plan for taxes and reserves when income is uneven',
+      'Use budgets that respect reality instead of pretending every month looks the same',
     ],
   },
 ];
 
 const audienceCards = [
   {
-    title: 'Individuals with too many moving pieces',
+    title: 'People holding too much in their head',
     copy:
-      'If your money system lives across bank apps, notes, texts, and memory, Oweable turns that noise into a reliable operating view.',
-    accent: 'Bills, subscriptions, debt, and due dates in one rhythm.',
+      'If your money system lives across bank apps, notes, text messages, and memory, Oweable helps turn that mental load into something visible and manageable.',
+    accent: 'Less remembering. More clarity.',
   },
   {
-    title: 'Households sharing obligations',
+    title: 'Households trying to stay on the same page',
     copy:
-      'See the same picture of what is owed, what is coming, and what is being paid down without relying on one person to hold it all in their head.',
+      'See the same picture of what is owed, what is coming, and what is getting paid down without relying on one person to carry the whole system.',
     accent: 'Shared visibility without spreadsheet fatigue.',
   },
   {
-    title: 'Freelancers and variable-income earners',
+    title: 'Anyone whose income does not arrive neatly',
     copy:
-      'Track uneven income, build reserves, and plan for taxes without using a separate workflow for the rest of your money life.',
-    accent: 'Irregular income without irregular systems.',
+      'Track uneven income, build reserves, and plan for taxes without needing one app for earning and another for everything else you owe.',
+    accent: 'Irregular income without a chaotic system.',
   },
 ];
 
@@ -213,19 +213,19 @@ const cardHover = {
 const testimonials = [
   {
     quote:
-      'I stopped using my checking balance as a lie detector. The due-soon view changed how I decide what is safe to spend.',
+      'I stopped checking my bank balance ten times a day just to calm myself down. The due-soon view finally showed me what was actually safe.',
     name: 'Jasmine',
     label: 'W-2 + side gigs',
   },
   {
     quote:
-      'The payoff plan finally made my debt feel finite. Before that, every payment felt like disappearing money.',
+      'The payoff plan made my debt feel like something I could finish. Before that, every payment just felt like money disappearing.',
     name: 'Marcus',
     label: 'Credit cards + student loans',
   },
   {
     quote:
-      'Most apps understood budgets or freelance taxes. Oweable was the first one that understood both at the same time.',
+      'Most apps made me choose between budgeting and managing freelance life. This was the first one that felt like it understood both.',
     name: 'Devin',
     label: 'Freelance designer',
   },
@@ -234,30 +234,30 @@ const testimonials = [
 const faqItems = [
   {
     q: 'Is Oweable free to use?',
-    a: 'Yes. The free Tracker tier gives you bill tracking, due-date visibility, and core reminders. Full Suite adds debt tools, budgets, analytics, optional bank sync, and tax planning for $10.99 per month.',
+    a: 'Yes. The free Tracker tier gives you bill tracking, due-date visibility, and core reminders. Full Suite adds deeper planning tools when you want more support around debt, cash flow, and uneven income.',
   },
   {
     q: 'Is this only for freelancers?',
-    a: 'No. Oweable is for anyone trying to get control over bills, debt, subscriptions, and cash flow. Freelance and tax tools are there when you need them, not as the only use case.',
+    a: 'No. Oweable is for anyone who feels like money is harder to stay on top of than it should be. Freelance and tax tools are there if you need them, but the core problem is broader than that.',
   },
   {
     q: 'Do I need to download an app?',
-    a: 'No. Oweable runs securely in your browser on desktop and mobile. You can still use your phone camera for bill capture and document upload without installing anything.',
+    a: 'No. Oweable runs in your browser on desktop and mobile, so you can start without adding another app to your life.',
   },
   {
     q: 'How is this different from a basic budgeting app?',
-    a: 'Most budgeting tools show where money went. Oweable focuses on what is owed next, what is overdue, and what to pay off first, so the app acts more like a financial operating system than a simple tracker.',
+    a: 'Most budgeting tools focus on where money went. Oweable focuses on what is due next, what is behind, and what to do first when everything feels equally urgent.',
   },
 ];
 
 export default function Landing() {
   useSEO({
-    title: 'Oweable — Stop Losing Money to Bills, Debt & Late Fees',
+    title: 'Oweable — Money Help for When Life Already Feels Full',
     description:
-      'Track bills, debt, subscriptions, and uneven income in one place. Oweable shows what is due, what is behind, and what to pay off next. Start free with no credit card required.',
-    ogTitle: 'Oweable — Stop Guessing What You Owe',
+      'Oweable helps you keep up with bills, debt, subscriptions, and uneven income without trying to hold everything in your head. See what is due, what is behind, and what needs attention next.',
+    ogTitle: 'Oweable — When Money Feels Hard to Hold Together',
     ogDescription:
-      'Oweable gives you a clear weekly view of bills, debt, subscriptions, budgets, and reserves so you can stop running your money by memory.',
+      'A calmer way to manage bills, debt, cash flow, and uneven income when your financial life feels heavier than it should.',
     canonical: 'https://www.oweable.com/',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -341,17 +341,17 @@ export default function Landing() {
             >
               <div className="inline-flex items-center gap-2 rounded-full border border-surface-border bg-surface-raised px-4 py-1.5 text-xs font-medium text-content-secondary mb-8">
                 <div className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
-                Free forever · No credit card required
+                Start free · No credit card required
               </div>
               
               <h1 className="text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl lg:text-7xl">
-                See your money clearly.
+                Money is hard enough.
                 <br className="hidden sm:block" />
-                <span className="text-content-secondary">Pay off debt faster.</span>
+                <span className="text-content-secondary">Your system should help.</span>
               </h1>
               
               <p className="mt-6 max-w-2xl mx-auto text-lg leading-relaxed text-content-secondary">
-                Oweable brings bills, debt, and subscriptions into one view so you always know what's due and what to pay next.
+                Oweable is for people who are tired of keeping bills, debt, subscriptions, and due dates in their head. It helps you see what matters now, what is coming next, and where to start.
               </p>
 
               <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -368,7 +368,7 @@ export default function Landing() {
                     href="#flow"
                     className="inline-flex items-center justify-center rounded-[10px] border border-surface-border bg-transparent px-8 h-[48px] text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated min-w-[160px]"
                   >
-                    See how it works
+                    See how it helps
                   </a>
                 </motion.div>
               </div>
@@ -405,8 +405,8 @@ export default function Landing() {
             <div className="flex flex-col items-center text-center mb-24">
               <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">The Logic</p>
               <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl lg:text-6xl lg:tracking-tighter">
-                The problem isn't spending.<br className="hidden lg:block" />
-                <span className="text-content-secondary">It's financial fog.</span>
+                The stress is not just money.<br className="hidden lg:block" />
+                <span className="text-content-secondary">It is carrying too much alone.</span>
               </h2>
             </div>
 
@@ -448,8 +448,8 @@ export default function Landing() {
             <div className="flex flex-col items-start mb-20">
               <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">The System</p>
               <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl lg:tracking-tighter">
-                One command center for<br className="hidden lg:block" />
-                <span className="text-content-secondary">what your money needs next.</span>
+                One place to see<br className="hidden lg:block" />
+                <span className="text-content-secondary">what your money needs from you.</span>
               </h2>
             </div>
 
@@ -479,11 +479,11 @@ export default function Landing() {
             <div className="mt-6 grid gap-6 md:grid-cols-2">
               <div className="rounded-[10px] border border-surface-border bg-surface-raised p-6 transition-colors hover:bg-surface-elevated">
                 <p className="text-sm font-semibold text-content-primary mb-1">Bill Capture</p>
-                <p className="text-xs leading-relaxed text-content-secondary">Snap statements and bring them into the system automatically.</p>
+                <p className="text-xs leading-relaxed text-content-secondary">Bring paperwork and statements into the system without more manual chasing.</p>
               </div>
               <div className="rounded-[10px] border border-surface-border bg-surface-raised p-6 transition-colors hover:bg-surface-elevated">
                 <p className="text-sm font-semibold text-content-primary mb-1">Financial Academy</p>
-                <p className="text-xs leading-relaxed text-content-secondary">Plain-English lessons for the moments when you want more context.</p>
+                <p className="text-xs leading-relaxed text-content-secondary">Plain-English guidance for the moments when you need clarity, not shame.</p>
               </div>
             </div>
           </div>
@@ -494,8 +494,8 @@ export default function Landing() {
             <div className="flex flex-col items-start mb-20">
               <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Capabilities</p>
               <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl lg:tracking-tighter">
-                Precision engineering for<br className="hidden lg:block" />
-                <span className="text-content-secondary">your money workflow.</span>
+                Support for the parts of money<br className="hidden lg:block" />
+                <span className="text-content-secondary">that tend to pile up fast.</span>
               </h2>
             </div>
 
@@ -540,7 +540,7 @@ export default function Landing() {
                   Built for the messy reality of money.
                 </h2>
                 <p className="mt-8 max-w-2xl text-lg leading-relaxed text-content-secondary">
-                  We don't expect you to have a perfect budget. We expect you to have a life. Oweable is built for households, freelancers, and anyone with "too many moving pieces."
+                  We do not expect you to have a perfect budget, perfect income, or perfect attention span. We expect you to have a life. Oweable is built for that version of money.
                 </p>
               </div>
               <motion.div
@@ -573,11 +573,10 @@ export default function Landing() {
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-brand-profit">Social proof</p>
                 <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-content-primary">
-                  The value is emotional before it is technical.
+                  What people want most is relief.
                 </h2>
                 <p className="mt-6 max-w-lg text-lg leading-8 text-content-secondary">
-                  When people can see what is due, what is late, and what progress looks like, their money decisions
-                  stop feeling like emergencies.
+                  When people can finally see what is due, what is late, and what progress looks like, money decisions stop feeling like small emergencies all day long.
                 </p>
               </div>
               <motion.div
@@ -611,8 +610,8 @@ export default function Landing() {
             <div className="flex flex-col items-center text-center mb-20">
               <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Pricing</p>
               <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl lg:tracking-tighter">
-                Start with essentials.<br className="hidden lg:block" />
-                <span className="text-content-secondary">Upgrade when you're ready.</span>
+                Start with what helps now.<br className="hidden lg:block" />
+                <span className="text-content-secondary">Add more support when you need it.</span>
               </h2>
             </div>
 
@@ -625,7 +624,7 @@ export default function Landing() {
                   <span className="pb-1 text-sm text-content-secondary font-medium">/ month</span>
                 </div>
                 <p className="text-sm leading-relaxed text-content-secondary mb-10">
-                  Immediate visibility into bills, due dates, and core reminders.
+                  A simple starting point for seeing what is due, what is coming, and what you do not want to miss.
                 </p>
                 <ul className="space-y-4 mb-10 flex-grow">
                   {['Bill tracking', 'Due-date visibility', 'Recurring obligations', 'Core reminders'].map(f => (
@@ -636,13 +635,13 @@ export default function Landing() {
                   ))}
                 </ul>
                 <button className="w-full h-[48px] rounded-[10px] border border-surface-border bg-surface-raised text-xs font-semibold uppercase tracking-wide text-content-primary hover:bg-surface-elevated transition-colors">
-                  Start Track
+                  Start free
                 </button>
               </article>
 
               {/* Full Suite with Yearly Toggle */}
               <article className="relative p-10 flex flex-col rounded-[12px] border border-brand-profit bg-brand-profit/5 overflow-hidden group">
-                <div className="absolute top-0 right-0 p-3 bg-brand-profit text-surface-base text-xs font-bold uppercase tracking-wide rounded-bl-[10px]">Best Value</div>
+                <div className="absolute top-0 right-0 p-3 bg-brand-profit text-surface-base text-xs font-bold uppercase tracking-wide rounded-bl-[10px]">More support</div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Full Suite</p>
                 
                 {/* Billing Toggle */}
@@ -692,7 +691,7 @@ export default function Landing() {
                 </div>
 
                 <p className="text-sm leading-relaxed text-content-secondary mb-10">
-                  The complete operating system: debt, budgets, taxes, and deep cash-flow.
+                  For when you want deeper help with payoff planning, budgets, cash flow, and the parts of money that keep pulling you back into stress.
                 </p>
                 <ul className="space-y-4 mb-10 flex-grow">
                   {['Debt payoff engine', 'Advanced analytics', 'Tax planning', 'Variable income tools'].map(f => (
@@ -703,7 +702,7 @@ export default function Landing() {
                   ))}
                 </ul>
                 <button className="w-full h-[48px] rounded-[10px] bg-brand-cta text-xs font-semibold uppercase tracking-wide text-surface-base hover:brightness-110 transition-all">
-                  Deploy Suite
+                  Try Full Suite
                 </button>
                 <p className="mt-6 text-xs text-center text-content-tertiary uppercase tracking-wide">14-day trial included</p>
               </article>
@@ -716,7 +715,7 @@ export default function Landing() {
             <div className="flex flex-col items-center text-center mb-20">
               <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">FAQ</p>
               <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
-                Common inquiries.
+                Questions people ask when they are trying to get unstuck.
               </h2>
             </div>
             <div className="grid gap-4 md:grid-cols-2 max-w-5xl mx-auto">

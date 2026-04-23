@@ -83,32 +83,32 @@ const PRICING_FAQ_STATIC = [
   {
     question: 'Do I need a credit card to try Oweable?',
     answer:
-      'No. You can create an account and start with a 14-day Full Suite trial without adding a card first.',
+      'No. You can create an account and get started without adding a card first. That way you can see whether Oweable actually helps before making another money decision.',
   },
   {
     question: 'What happens when the trial ends?',
     answer:
-      'You drop to the free Tracker tier automatically unless you upgrade. No surprise charges, no forced phone calls, no weird cancellation path.',
+      'If you do nothing, you move to the free Tracker tier automatically unless you choose to upgrade. No surprise charges and no awkward cancellation maze.',
   },
   {
     question: 'Can I cancel anytime?',
     answer:
-      'Yes. If you upgrade, you can manage or cancel your subscription from your account settings.',
+      'Yes. If you upgrade, you can manage or cancel your subscription from your account settings without needing to talk to anyone.',
   },
   {
     question: 'Is this only for freelancers?',
     answer:
-      'No. Oweable works for households, salaried workers, side gigs, freelancers, and mixed-income setups. Variable-income tax tools are there when you need them.',
+      'No. Oweable works for households, salaried workers, side gigs, freelancers, and mixed-income setups. The point is to help people whose money life feels hard to stay on top of.',
   },
   {
     question: 'Do I need to connect my bank account?',
     answer:
-      'No. You can start manually. Account connection is optional and meant to reduce data entry, not block access to the product.',
+      'No. You can start manually. Account connection is optional and is there to reduce effort, not make the product usable.',
   },
   {
     question: 'Is my financial data secure?',
     answer:
-      "Oweable uses bank-level encryption in transit and at rest. Your data is not sold, and connected accounts are designed to stay read-only where applicable.",
+      "Oweable uses strong encryption in transit and at rest. Your data is not sold, and connected accounts are designed to stay read-only where applicable.",
   },
 ] as const;
 
@@ -140,7 +140,7 @@ function buildPricingJsonLd(params: {
       url: pageUrl,
       name: 'Pricing — Oweable',
       description:
-        'Choose between the free Tracker tier and the Full Suite plan for debt payoff, budgets, analytics, cash-flow planning, and optional tax tools.',
+        'Choose between a genuinely useful free plan and deeper planning support for debt payoff, cash flow, budgets, and uneven income.',
     },
     {
       '@type': 'FAQPage',
@@ -162,6 +162,7 @@ function buildPricingJsonLd(params: {
       price: '0',
       priceCurrency: 'USD',
       description: 'Free plan for bills, due dates, recurring obligations, and account basics.',
+      
       url: pageUrl,
     },
     {
@@ -177,7 +178,7 @@ function buildPricingJsonLd(params: {
         unitText: 'MONTH',
       },
       description:
-        'Paid plan with debt payoff tools, budgets, analytics, transaction views, cash-flow planning, and tax estimates when needed.',
+        'Paid plan with deeper support for debt payoff, budgets, analytics, transaction views, cash-flow planning, and tax estimates when needed.',
       url: pageUrl,
     },
   ];
@@ -198,7 +199,7 @@ function buildPricingJsonLd(params: {
       description:
         yearlySavingsPct > 0
           ? `Annual Full Suite plan with about ${yearlySavingsPct}% savings versus twelve monthly renewals.`
-          : 'Annual Full Suite plan.',
+          : 'Annual Full Suite plan with deeper planning support.',
       url: pageUrl,
     });
   }
@@ -232,7 +233,7 @@ export default function Pricing() {
   useSEO({
     title: 'Pricing — Oweable',
     description:
-      'Choose between the free Tracker tier and the Full Suite plan for debt payoff, budgets, analytics, cash-flow planning, and optional tax tools.',
+      'Choose between a free plan that helps you stay on top of bills and a deeper plan for debt payoff, cash flow, budgets, and uneven income.',
     canonical: 'https://www.oweable.com/pricing',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -291,10 +292,10 @@ export default function Pricing() {
           >
             <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Pricing that stays honest</p>
             <h1 className="mt-5 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl lg:text-7xl">
-              Start simple. Upgrade for full control.
+              Pay only for the level of help you need.
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-content-secondary sm:text-xl">
-              The free tier gives you real value right away. Full Suite adds the planning, payoff, and cash-flow tools that turn visibility into follow-through.
+              The free plan helps you stop missing what matters. Full Suite adds deeper support when you are ready for payoff planning, stronger cash-flow decisions, and more structure around the hard parts.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-content-secondary">
               <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
@@ -332,7 +333,7 @@ export default function Pricing() {
                   <span className="pb-1 text-sm text-content-secondary">forever free</span>
                 </div>
                 <p className="mt-4 max-w-md text-base leading-relaxed text-content-secondary">
-                  Built for immediate clarity around bills, due dates, recurring obligations, and reminders you will actually see.
+                  Built for people who need a reliable place to track bills, due dates, recurring obligations, and reminders without paying first.
                 </p>
                 <ul className="mt-6 space-y-3 text-sm text-content-secondary">
                   <li className="flex items-start gap-3">
@@ -362,7 +363,7 @@ export default function Pricing() {
                 <div className="flex items-center justify-between gap-4">
                   <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Full Suite</p>
                   <span className="rounded-full bg-brand-profit/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-brand-profit">
-                    Most complete
+                    Deeper support
                   </span>
                 </div>
 
@@ -415,7 +416,7 @@ export default function Pricing() {
                 </div>
 
                 <p className="mt-4 max-w-md text-base leading-7 text-content-secondary">
-                  For people who want the full financial operating system: payoff strategy, budgets, analytics,
+                  For people who want help turning visibility into action: payoff strategy, budgets, analytics,
                   cash-flow clarity, and tax planning when income gets uneven.
                 </p>
                 <ul className="mt-6 space-y-3 text-sm text-content-secondary">
@@ -448,7 +449,7 @@ export default function Pricing() {
                   {isStartingCheckout ? 'Starting checkout...' : 'Unlock Full Suite'}
                 </motion.button>
                 <p className="mt-4 text-sm text-content-secondary">
-                  Starts with a 14-day free trial. No credit card required to create your account.
+                  Starts with a 14-day free trial. No credit card required to create your account first.
                 </p>
               </motion.div>
             </motion.div>
@@ -456,7 +457,7 @@ export default function Pricing() {
             <div className="mt-8 rounded-[12px] border border-surface-border bg-surface-raised p-8">
               <p className="text-sm font-semibold leading-tight text-content-primary">Free-tier trust promise</p>
               <p className="mt-3 max-w-3xl text-sm leading-relaxed text-content-secondary">
-                The free plan is meant to stay genuinely useful. You do not have to upgrade to keep your basic system for bills, due dates, and recurring obligations working.
+                The free plan is meant to stay genuinely useful. You do not have to upgrade just to keep a basic system for bills, due dates, and recurring obligations working.
               </p>
             </div>
           </motion.div>
@@ -468,7 +469,7 @@ export default function Pricing() {
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Compare plans</p>
                 <h2 className="mt-4 max-w-lg text-4xl font-semibold tracking-[-0.04em] text-content-primary">
-                  Choose based on how much control you want, not how much jargon you can tolerate.
+                  Choose based on how much support you want, not how much marketing language you can tolerate.
                 </h2>
               </div>
               <div className="overflow-x-auto rounded-[12px] border border-surface-border bg-surface-raised">
@@ -499,7 +500,7 @@ export default function Pricing() {
             <div className="max-w-2xl">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">FAQ</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-content-primary">
-                The answers people usually want before they commit.
+                The answers people usually want before trusting something with their money.
               </h2>
             </div>
             <div className="mt-10 space-y-4">
@@ -514,10 +515,10 @@ export default function Pricing() {
           <div className="mx-auto max-w-5xl px-6 text-center lg:px-8">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Ready when you are</p>
             <h2 className="mt-5 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
-              Start with visibility. Upgrade when you want leverage.
+              Start with relief. Upgrade when you want deeper structure.
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-content-secondary">
-              Oweable should feel useful before you pay and powerful when you do.
+              Oweable should help before you pay and feel even steadier when you decide you want more.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <TransitionLink

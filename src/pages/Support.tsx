@@ -36,11 +36,11 @@ const SUPPORT_PAGE_URL = 'https://www.oweable.com/support';
 const QUICK_HELP = [
   {
     q: 'How does billing work for Full Suite?',
-    a: 'Full Suite renews on your billing cycle and can be managed from your settings. Pricing shows the current plan structure and trial details.',
+    a: 'Full Suite renews on your billing cycle and can be managed from your settings. Pricing shows the current plan structure and trial details in plain English.',
   },
   {
     q: 'I cannot access my account. What should I do?',
-    a: 'Use the same sign-in method you originally used. If access still fails, send support the email tied to the account and a short description of what happened.',
+    a: 'Use the same sign-in method you originally used. If access still fails, send support the email tied to the account and a short description of what happened so we can help faster.',
   },
   {
     q: 'How do I cancel my subscription?',
@@ -62,6 +62,7 @@ function buildSupportJsonLd() {
         url: SUPPORT_PAGE_URL,
         name: 'Support — Oweable',
         description: 'Contact Oweable support for billing, access, product, privacy, or technical questions.',
+        
       },
       {
         '@type': 'FAQPage',
@@ -92,10 +93,10 @@ export default function Support() {
 
   useSEO({
     title: 'Support — Oweable',
-    description: 'Contact Oweable support for billing, access, privacy, security, or technical questions.',
+    description: 'Contact Oweable support for billing, access, privacy, security, or technical questions and get help from a real person.',
     canonical: 'https://www.oweable.com/support',
     ogTitle: 'Support — Oweable',
-    ogDescription: 'Get help with account access, billing, subscriptions, and product questions.',
+    ogDescription: 'Get help with account access, billing, subscriptions, and product questions from a real person.',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
 
@@ -157,15 +158,15 @@ export default function Support() {
                 Support
               </div>
               <h1 className="mt-6 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl">
-                Help that feels like a real person will read it.
+                Help for when something is wrong and you do not want to chase it alone.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-content-secondary">
-                Reach out for billing, access, account, product, or technical issues. We usually reply within one business day.
+                Reach out for billing, access, account, product, or technical issues. We usually reply within one business day, and the goal is to be useful, not robotic.
               </p>
               <div className="mt-8 grid gap-6">
                 <div className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8">
                   <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Best for</p>
-                  <p className="mt-3 text-sm leading-relaxed text-content-secondary">Account access problems, billing questions, bugs, and anything blocking your workflow.</p>
+                  <p className="mt-3 text-sm leading-relaxed text-content-secondary">Account access problems, billing questions, bugs, and anything that is making the product harder to use than it should be.</p>
                 </div>
                 <div className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8">
                   <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Direct email</p>
@@ -176,7 +177,7 @@ export default function Support() {
                 <div className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8">
                   <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Sensitive requests</p>
                   <p className="mt-3 text-sm leading-relaxed text-content-secondary">
-                    For privacy or security-specific concerns, include that in your subject line so we can route it quickly.
+                    For privacy or security concerns, include that in your subject line so we can route it quickly and handle it with the right level of care.
                   </p>
                 </div>
               </div>
@@ -186,7 +187,7 @@ export default function Support() {
               <section className="rounded-[12px] border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
                 <h2 className="text-2xl font-semibold tracking-tight leading-tight text-content-primary">Send a message</h2>
                 <p className="mt-4 text-base leading-relaxed text-content-secondary">
-                  Give us the basics and a little context. The clearer the message, the faster we can help.
+                  Give us the basics and a little context. You do not need to write a perfect report. Just tell us what happened and what you needed to get done.
                 </p>
 
                 {submitted ? (
@@ -247,6 +248,7 @@ export default function Support() {
                         onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
                         className="mt-2 min-h-[160px] w-full rounded-[8px] border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
                         placeholder="Tell us what happened, what you expected, and anything that would help us reproduce or understand the issue."
+                        
                         required
                       />
                     </label>
