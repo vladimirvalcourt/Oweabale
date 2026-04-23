@@ -390,7 +390,7 @@ export default function Pricing() {
                           : 'text-content-secondary'
                       }`}
                     >
-                      Yearly{yearlySavingsPct > 0 ? ` · Save ${yearlySavingsPct}%` : ''}
+                      Yearly{yearlySavingsPct > 0 ? ` (-${yearlySavingsPct}%)` : ''}
                     </button>
                   </div>
                 ) : null}
