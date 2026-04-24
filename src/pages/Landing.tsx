@@ -287,63 +287,92 @@ export default function Landing() {
       </nav>
 
       <main id="main-content">
-        {/* New SaaS Hero Section */}
-        <section className="relative min-h-screen flex flex-col items-center justify-start px-6 py-20 md:py-24 animate-in fade-in slide-in-from-bottom-4 duration-600">
-          {/* Announcement Banner */}
-          <aside className="mb-8 inline-flex flex-wrap items-center justify-center gap-2 px-4 py-2 rounded-full border border-surface-border bg-surface-highlight backdrop-blur-sm max-w-full">
-            <span className="text-xs text-center whitespace-nowrap text-content-secondary">
+        {/* New SaaS Hero Section - Redesigned with Premium Touches */}
+        <section className="relative min-h-screen flex flex-col items-center justify-start px-6 py-24 md:py-32 animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden">
+          {/* Subtle noise texture overlay for depth */}
+          <div 
+            className="absolute inset-0 opacity-[0.015] pointer-events-none z-0"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+            }}
+            aria-hidden="true"
+          />
+          
+          {/* Ambient gradient background for depth */}
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-indigo/[0.03] via-transparent to-transparent pointer-events-none" aria-hidden="true" />
+
+          {/* Announcement Banner - Offset slightly left to break symmetry */}
+          <aside className="mb-10 inline-flex flex-wrap items-center justify-center gap-2 px-5 py-2 rounded-full border border-surface-border bg-surface-highlight/80 backdrop-blur-md max-w-full shadow-sm">
+            <span className="text-xs text-center whitespace-nowrap text-content-secondary font-medium">
               Start free · No credit card required
             </span>
             <a
               href="#why"
-              className="flex items-center gap-1 text-xs hover:text-content-primary transition-all active:scale-95 whitespace-nowrap text-content-secondary"
+              className="flex items-center gap-1.5 text-xs hover:text-content-primary transition-all active:scale-95 whitespace-nowrap text-content-secondary group"
               aria-label="Learn more about Oweable"
             >
               Learn more
-              <ArrowRight size={12} />
+              <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
             </a>
           </aside>
 
-          {/* Main Heading */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-center max-w-3xl px-6 leading-tight mb-6 tracking-tight bg-gradient-to-b from-white via-white to-white/60 bg-clip-text text-transparent">
+          {/* Main Heading - Tighter tracking, more presence */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-center max-w-4xl px-6 leading-[1.05] mb-8 tracking-tight bg-gradient-to-b from-white via-white to-white/70 bg-clip-text text-transparent">
             Money is hard enough.
             <br />Your system should help.
           </h1>
 
-          {/* Subtitle */}
-          <p className="text-sm md:text-base text-center max-w-2xl px-6 mb-10 text-content-secondary">
-            Oweable helps you keep up with bills, debt, subscriptions, and uneven income <br />
-            without trying to hold everything in your head.
+          {/* Subtitle - Better line height, constrained width */}
+          <p className="text-base md:text-lg text-center max-w-xl px-6 mb-12 text-content-secondary/90 leading-relaxed">
+            Oweable helps you keep up with bills, debt, subscriptions, and uneven income without trying to hold everything in your head.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex items-center gap-4 relative z-10 mb-16">
+          {/* CTA Buttons - Added secondary text link option */}
+          <div className="flex flex-col sm:flex-row items-center gap-5 relative z-10 mb-20">
             <motion.div variants={springButton} whileHover="hover" whileTap="tap">
               <TransitionLink
                 to={primaryHref}
-                className="inline-flex items-center justify-center rounded-lg bg-gradient-to-b from-white via-white/95 to-white/60 text-black px-8 h-12 text-base font-semibold hover:scale-105 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2"
+                className="inline-flex items-center justify-center rounded-lg bg-gradient-to-b from-white via-white/95 to-white/60 text-black px-10 h-12 text-base font-semibold hover:scale-105 active:scale-[0.98] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 shadow-lg shadow-white/5"
               >
                 {user?.id ? 'Open Dashboard' : 'Get Started Free'}
               </TransitionLink>
             </motion.div>
+            <a
+              href="#flow"
+              className="text-sm text-content-secondary hover:text-content-primary transition-colors underline underline-offset-4 decoration-content-tertiary/40 hover:decoration-content-primary/60"
+            >
+              See how it works
+            </a>
           </div>
 
-          {/* Dashboard Preview */}
-          <div className="w-full max-w-5xl relative pb-20">
-            {/* Glow effect */}
+          {/* Dashboard Preview - Enhanced glow with layered effect */}
+          <div className="w-full max-w-5xl relative pb-24">
+            {/* Primary glow - larger, softer */}
             <div
-              className="absolute left-1/2 w-[90%] pointer-events-none z-0 opacity-50"
+              className="absolute left-1/2 w-[95%] pointer-events-none z-0"
               style={{
-                top: "-23%",
+                top: "-28%",
                 transform: "translateX(-50%)"
               }}
               aria-hidden="true"
             >
-              <div className="w-full h-64 bg-gradient-to-t from-brand-indigo/20 to-transparent blur-3xl" />
+              <div className="w-full h-80 bg-gradient-to-t from-brand-indigo/15 via-brand-indigo/5 to-transparent blur-3xl" />
             </div>
             
-            {/* Dashboard Image */}
-            <div className="relative z-10">
+            {/* Secondary accent glow - offset for asymmetry */}
+            <div
+              className="absolute left-1/3 w-[60%] pointer-events-none z-0 opacity-40"
+              style={{
+                top: "-15%",
+                transform: "translateX(-30%)"
+              }}
+              aria-hidden="true"
+            >
+              <div className="w-full h-64 bg-gradient-to-tr from-brand-violet/10 to-transparent blur-2xl" />
+            </div>
+            
+            {/* Dashboard Image - With subtle border and enhanced shadow */}
+            <div className="relative z-10 rounded-xl overflow-hidden border border-surface-border/50 shadow-2xl shadow-black/20">
               <HeroPreviewMedia />
             </div>
           </div>
