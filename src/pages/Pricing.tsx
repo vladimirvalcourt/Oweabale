@@ -368,15 +368,15 @@ export default function Pricing() {
                 </div>
 
                 {hasYearlyPricing ? (
-                  <div className="mt-5 inline-flex rounded-full border border-surface-border bg-surface-highlight p-1">
+                  <div className="mt-5 inline-flex items-center rounded-full border border-surface-border bg-surface-highlight p-0.5">
                     <button
                       type="button"
                       onClick={() => setBillingPeriod('monthly')}
                       aria-pressed={billingPeriod === 'monthly'}
-                      className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                      className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
                         billingPeriod === 'monthly'
                           ? 'bg-surface-base text-content-primary shadow-sm'
-                          : 'text-content-secondary'
+                          : 'text-content-secondary hover:text-content-primary'
                       }`}
                     >
                       Monthly
@@ -385,10 +385,10 @@ export default function Pricing() {
                       type="button"
                       onClick={() => setBillingPeriod('yearly')}
                       aria-pressed={billingPeriod === 'yearly'}
-                      className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                      className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
                         billingPeriod === 'yearly'
                           ? 'bg-surface-base text-content-primary shadow-sm'
-                          : 'text-content-secondary'
+                          : 'text-content-secondary hover:text-content-primary'
                       }`}
                     >
                       Yearly{yearlySavingsPct > 0 ? ` (-${yearlySavingsPct}%)` : ''}
