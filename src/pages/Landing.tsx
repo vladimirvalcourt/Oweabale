@@ -615,14 +615,14 @@ export default function Landing() {
 
               <article className="flex flex-col rounded-[12px] border border-surface-border bg-surface-raised p-8">
                 <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Full Suite</p>
-                <div className="inline-flex rounded-full border border-surface-border bg-surface-raised p-1 mb-6">
+                <div className="w-fit inline-flex rounded-full border border-surface-border bg-surface-highlight p-1 mb-6">
                   <button
                     type="button"
                     onClick={() => setBillingPeriod('monthly')}
                     aria-pressed={billingPeriod === 'monthly'}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                    className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
                       billingPeriod === 'monthly'
-                        ? 'bg-brand-profit text-surface-base'
+                        ? 'bg-brand-profit text-surface-base shadow-sm'
                         : 'text-content-secondary hover:text-content-primary'
                     }`}
                   >
@@ -632,13 +632,13 @@ export default function Landing() {
                     type="button"
                     onClick={() => setBillingPeriod('yearly')}
                     aria-pressed={billingPeriod === 'yearly'}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                    className={`rounded-full px-5 py-2 text-sm font-medium transition-all ${
                       billingPeriod === 'yearly'
-                        ? 'bg-brand-profit text-surface-base'
+                        ? 'bg-brand-profit text-surface-base shadow-sm'
                         : 'text-content-secondary hover:text-content-primary'
                     }`}
                   >
-                    Yearly · Save 17%
+                    Yearly
                   </button>
                 </div>
 
