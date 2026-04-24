@@ -135,10 +135,10 @@ export default function Reports() {
   }));
 
   const tooltipStyle = {
-    backgroundColor: '#141414',
-    border: '1px solid #262626',
+    backgroundColor: 'var(--color-surface-raised)',
+    border: '1px solid var(--color-surface-border)',
     borderRadius: '8px',
-    color: '#FAFAFA',
+    color: 'var(--color-content-primary)',
     fontFamily: 'monospace',
     fontSize: '11px',
     textTransform: 'uppercase' as const,

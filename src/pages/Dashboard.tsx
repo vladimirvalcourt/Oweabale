@@ -1138,8 +1138,8 @@ export default function Dashboard() {
                   <YAxis axisLine={false} tickLine={false} tick={{ fill: '#888888', fontSize: 11, fontFamily: 'sans-serif' }} tickFormatter={(val) => `$${Number(val ?? 0) / 1000}k`} />
                   <Tooltip 
                     {...rechartsTooltipStableProps}
-                    contentStyle={{ backgroundColor: '#0a0a0a', borderRadius: '8px', border: '1px solid #333333', color: '#fafafa', fontFamily: 'sans-serif', fontSize: '13px' }}
-                    itemStyle={{ color: '#fafafa' }}
+                    contentStyle={{ backgroundColor: 'var(--color-surface-raised)', borderRadius: '8px', border: '1px solid var(--color-surface-border)', color: 'var(--color-content-primary)', fontFamily: 'sans-serif', fontSize: '13px' }}
+                    itemStyle={{ color: 'var(--color-content-primary)' }}
                     formatter={(val) => [`$${Number(val ?? 0).toLocaleString()}`, 'Projected Balance']}
                   />
                   <Area type="monotone" dataKey="balance" stroke="#fafafa" strokeWidth={1.5} fillOpacity={1} fill="url(#colorBalance)" />

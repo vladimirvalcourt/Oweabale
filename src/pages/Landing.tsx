@@ -259,7 +259,7 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
       <nav
-        className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-surface-base/60 backdrop-blur-xl transition-all duration-300"
+        className="fixed inset-x-0 top-0 z-50 border-b border-content-primary/10 bg-surface-base/60 backdrop-blur-xl transition-all duration-300"
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <TransitionLink to="/" className="group flex items-center gap-2">
@@ -373,7 +373,7 @@ export default function Landing() {
                 <motion.article
                   key={item.title}
                   variants={fadeInUp}
-                  className="rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-white/15"
+                  className="rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-content-primary/15"
                 >
                   <h3 className="text-lg font-semibold text-content-primary mb-3">{item.title}</h3>
                   <p className="text-sm leading-relaxed text-content-secondary">{item.copy}</p>
@@ -409,7 +409,7 @@ export default function Landing() {
                 <motion.article
                   key={step.title}
                   variants={fadeInUp}
-                  className="flex flex-col rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-white/15"
+                  className="flex flex-col rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-content-primary/15"
                 >
                   <p className="text-xs font-medium uppercase tracking-wide text-brand-profit mb-3">{step.eyebrow}</p>
                   <h3 className="text-lg font-semibold text-content-primary mb-4">{step.title}</h3>
@@ -419,11 +419,11 @@ export default function Landing() {
             </motion.div>
 
             <div className="mt-6 grid gap-6 md:grid-cols-2">
-              <div className="rounded-[10px] border border-surface-border bg-surface-raised p-6 transition-colors duration-200 hover:border-white/15">
+              <div className="rounded-[10px] border border-surface-border bg-surface-raised p-6 transition-colors duration-200 hover:border-content-primary/15">
                 <p className="text-sm font-semibold text-content-primary mb-1">Bill Capture</p>
                 <p className="text-xs leading-relaxed text-content-secondary">Bring paperwork and statements into the system without more manual chasing.</p>
               </div>
-              <div className="rounded-[10px] border border-surface-border bg-surface-raised p-6 transition-colors duration-200 hover:border-white/15">
+              <div className="rounded-[10px] border border-surface-border bg-surface-raised p-6 transition-colors duration-200 hover:border-content-primary/15">
                 <p className="text-sm font-semibold text-content-primary mb-1">Financial Academy</p>
                 <p className="text-xs leading-relaxed text-content-secondary">Plain-English guidance for the moments when you need clarity, not shame.</p>
               </div>
@@ -452,7 +452,7 @@ export default function Landing() {
                 <motion.article
                   key={column.title}
                   variants={fadeInUp}
-                  className="rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-white/15"
+                  className="rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-content-primary/15"
                 >
                   <h3 className="text-lg font-semibold text-content-primary mb-6">{column.title}</h3>
                   <ul className="space-y-3">
@@ -494,7 +494,7 @@ export default function Landing() {
                   <motion.article
                     key={item.title}
                     variants={fadeInUp}
-                    className="rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-white/15"
+                    className="rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-content-primary/15"
                   >
                     <h3 className="text-lg font-semibold text-content-primary mb-3">{item.title}</h3>
                     <p className="text-sm leading-relaxed text-content-secondary mb-3">{item.copy}</p>
@@ -529,7 +529,7 @@ export default function Landing() {
                   <motion.article
                     key={item.name}
                     variants={fadeInUp}
-                    className="rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-white/15"
+                    className="rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-content-primary/15"
                   >
                     <p className="text-sm leading-relaxed text-content-primary mb-6">"{item.quote}"</p>
                     <div className="border-t border-surface-border pt-5">
@@ -571,12 +571,12 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <button className="h-[48px] w-full rounded-[10px] border border-surface-border bg-surface-base text-xs font-semibold uppercase tracking-wide text-content-primary transition-colors duration-200 hover:border-white/15">
+                <button className="h-[48px] w-full rounded-[10px] border border-surface-border bg-surface-base text-xs font-semibold uppercase tracking-wide text-content-primary transition-colors duration-200 hover:border-content-primary/15">
                   Start free
                 </button>
               </article>
 
-              <article className="flex flex-col rounded-[12px] border border-white/14 bg-surface-raised p-8">
+              <article className="flex flex-col rounded-[12px] border border-surface-border bg-surface-raised p-8">
                 <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Full Suite</p>
                 <div className="inline-flex rounded-full border border-surface-border bg-surface-raised p-1 mb-6">
                   <button
@@ -654,7 +654,7 @@ export default function Landing() {
               {faqItems.map((item) => (
                 <article
                   key={item.q}
-                  className="rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-white/15"
+                  className="rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-content-primary/15"
                 >
                   <h3 className="text-sm font-semibold text-content-primary mb-4 tracking-tight">{item.q}</h3>
                   <p className="text-sm leading-relaxed text-content-secondary">{item.a}</p>
@@ -685,7 +685,7 @@ export default function Landing() {
               </motion.div>
               <TransitionLink
                 to="/pricing"
-                className="inline-flex min-w-[200px] items-center justify-center gap-2 rounded-[10px] border border-surface-border bg-transparent px-8 h-[52px] text-sm font-medium text-content-primary transition-colors duration-200 hover:border-white/15"
+                className="inline-flex min-w-[200px] items-center justify-center gap-2 rounded-[10px] border border-surface-border bg-transparent px-8 h-[52px] text-sm font-medium text-content-primary transition-colors duration-200 hover:border-content-primary/15"
               >
                 Compare Plans
               </TransitionLink>

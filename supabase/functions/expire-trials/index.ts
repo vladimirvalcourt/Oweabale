@@ -6,6 +6,85 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
  * Triggered by Vercel cron or pg_cron
  */
 
+type ExpiredTrialUser = {
+  id: string;
+  email: string;
+  first_name: string | null;
+};
+
+async function fetchExpiredTrials(supabaseAdmin: ReturnType<typeof createClient>): Promise<ExpiredTrialUser[]> {
+  const nowIso = new Date().toISOString();
+
+  // Newer reverse-trial schema.
+  const reverseTrialQuery = await supabaseAdmin
+    .from('profiles')
+    .select('id, email, first_name')
+    .eq('plan', 'trial')
+    .lt('trial_ends_at', nowIso)
+    .eq('trial_expired', false);
+
+  if (!reverseTrialQuery.error) {
+    return (reverseTrialQuery.data ?? []) as ExpiredTrialUser[];
+  }
+
+  const message = reverseTrialQuery.error.message.toLowerCase();
+  const missingReverseTrialColumns =
+    message.includes('column profiles.plan does not exist') ||
+    message.includes('column profiles.trial_ends_at does not exist') ||
+    message.includes('column profiles.trial_expired does not exist');
+
+  if (!missingReverseTrialColumns) {
+    throw new Error(`Query failed: ${reverseTrialQuery.error.message}`);
+  }
+
+  // Legacy live schema fallback: derive trial expiry from created_at and subscription_tier.
+  const legacyCutoffIso = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+  const legacyQuery = await supabaseAdmin
+    .from('profiles')
+    .select('id, email, first_name')
+    .eq('subscription_tier', 'trial')
+    .lt('created_at', legacyCutoffIso);
+
+  if (legacyQuery.error) {
+    throw new Error(`Query failed: ${legacyQuery.error.message}`);
+  }
+
+  return (legacyQuery.data ?? []) as ExpiredTrialUser[];
+}
+
+async function downgradeExpiredTrial(
+  supabaseAdmin: ReturnType<typeof createClient>,
+  userId: string,
+): Promise<void> {
+  const reverseTrialUpdate = await supabaseAdmin
+    .from('profiles')
+    .update({
+      plan: 'tracker',
+      trial_expired: true,
+    })
+    .eq('id', userId);
+
+  if (!reverseTrialUpdate.error) return;
+
+  const message = reverseTrialUpdate.error.message.toLowerCase();
+  const missingReverseTrialColumns =
+    message.includes('column "plan" of relation "profiles" does not exist') ||
+    message.includes('column "trial_expired" of relation "profiles" does not exist');
+
+  if (!missingReverseTrialColumns) {
+    throw new Error(reverseTrialUpdate.error.message);
+  }
+
+  const legacyUpdate = await supabaseAdmin
+    .from('profiles')
+    .update({ subscription_tier: 'tracker' })
+    .eq('id', userId);
+
+  if (legacyUpdate.error) {
+    throw new Error(legacyUpdate.error.message);
+  }
+}
+
 Deno.serve(async (req: Request) => {
   // Verify cron secret for security
   const cronSecret = Deno.env.get('EXPIRE_TRIALS_CRON_SECRET');
@@ -26,16 +105,7 @@ Deno.serve(async (req: Request) => {
     );
 
     // Find all expired trials that haven't been processed yet
-    const { data: expiredTrials, error: queryError } = await supabaseAdmin
-      .from('profiles')
-      .select('id, email, first_name')
-      .eq('plan', 'trial')
-      .lt('trial_ends_at', new Date().toISOString())
-      .eq('trial_expired', false);
-
-    if (queryError) {
-      throw new Error(`Query failed: ${queryError.message}`);
-    }
+    const expiredTrials = await fetchExpiredTrials(supabaseAdmin);
 
     if (!expiredTrials || expiredTrials.length === 0) {
       return new Response(
@@ -49,18 +119,8 @@ Deno.serve(async (req: Request) => {
     // Downgrade each expired trial to tracker
     const results = [];
     for (const user of expiredTrials) {
-      const { error: updateError } = await supabaseAdmin
-        .from('profiles')
-        .update({
-          plan: 'tracker',
-          trial_expired: true
-        })
-        .eq('id', user.id);
-
-      if (updateError) {
-        console.error(`Failed to downgrade user ${user.id}:`, updateError);
-        results.push({ userId: user.id, success: false, error: updateError.message });
-      } else {
+      try {
+        await downgradeExpiredTrial(supabaseAdmin, user.id);
         console.log(`Downgraded user ${user.id} (${user.email}) to tracker`);
         results.push({ userId: user.id, success: true });
         
@@ -88,6 +148,13 @@ Deno.serve(async (req: Request) => {
 
         // TODO: Send Day 14 expiry email here (Section 5 - Email 3)
         // await sendTrialExpiredEmail(user.email, user.first_name);
+      } catch (updateError) {
+        console.error(`Failed to downgrade user ${user.id}:`, updateError);
+        results.push({
+          userId: user.id,
+          success: false,
+          error: updateError instanceof Error ? updateError.message : 'Unknown update error',
+        });
       }
     }
 

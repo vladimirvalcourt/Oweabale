@@ -25,21 +25,21 @@ if (!supabaseUrl || !supabaseKey) {
   // Build DOM nodes manually — no innerHTML so no risk of template-string injection.
   const wrap = document.createElement('div');
   wrap.style.cssText =
-    'display:flex;align-items:center;justify-content:center;min-height:100vh;background:#09090b;font-family:system-ui,sans-serif;color:#f4f4f5;text-align:center;padding:2rem;';
+    'display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--color-surface-base);font-family:system-ui,sans-serif;color:var(--color-content-primary);text-align:center;padding:2rem;';
   const inner = document.createElement('div');
   inner.style.cssText = 'max-width:24rem;';
   const title = document.createElement('p');
   title.style.cssText = 'font-size:1rem;font-weight:600;';
   title.textContent = "This app can't load right now";
   const body = document.createElement('p');
-  body.style.cssText = 'font-size:0.875rem;color:#a1a1aa;margin-top:0.5rem;line-height:1.5;';
+  body.style.cssText = 'font-size:0.875rem;color:var(--color-content-secondary);margin-top:0.5rem;line-height:1.5;';
   body.textContent = 'Please try again in a moment. If it keeps happening, contact support.';
   inner.appendChild(title);
   inner.appendChild(body);
   if (import.meta.env.DEV) {
     const hint = document.createElement('p');
     hint.style.cssText =
-      'font-size:0.75rem;color:#71717a;margin-top:0.75rem;max-width:28rem;';
+      'font-size:0.75rem;color:var(--color-content-muted);margin-top:0.75rem;max-width:28rem;';
     hint.textContent =
       'Developer: add your Supabase project URL and anon key to the environment used by Vite.';
     inner.appendChild(hint);

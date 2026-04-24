@@ -670,7 +670,7 @@ export default function Obligations() {
                                   <YAxis tick={{ fill: '#52525B', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}`} />
                                   <Tooltip
                                     {...rechartsTooltipStableProps}
-                                    contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '8px', fontFamily: 'monospace', fontSize: '11px' }}
+                                    contentStyle={{ backgroundColor: 'var(--color-surface-raised)', borderColor: 'var(--color-surface-border)', borderRadius: '8px', fontFamily: 'monospace', fontSize: '11px' }}
                                     formatter={(value, name) => [`$${Number(value ?? 0).toFixed(2)}`, name === 'principal' ? 'Principal' : 'Interest']}
                                   />
                                   <Bar dataKey="principal" fill="#d4d4d4" stackId="a" />

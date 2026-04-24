@@ -94,7 +94,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
             disabled={googleLoading}
             whileTap={{ scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-            className="mt-10 flex h-[48px] w-full items-center justify-center gap-3 rounded-lg border border-white/10 bg-zinc-900 px-4 text-sm font-medium tracking-wide text-surface-base shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-all duration-200 hover:border-white/30 hover:bg-zinc-800 hover:shadow-[inset_0_1px_2px_rgba(255,255,255,0.15)] disabled:cursor-not-allowed disabled:opacity-50 focus-app"
+            className="mt-10 flex h-[48px] w-full items-center justify-center gap-3 rounded-lg border border-content-primary/10 bg-surface-raised px-4 text-sm font-medium tracking-wide text-content-primary shadow-tactile transition-all duration-200 hover:border-content-primary/30 hover:bg-surface-elevated hover:shadow-tactile-hover disabled:cursor-not-allowed disabled:opacity-50 focus-app"
           >
             {googleLoading ? (
               <span className="text-content-secondary">Redirecting…</span>

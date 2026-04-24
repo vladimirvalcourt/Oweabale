@@ -260,7 +260,7 @@ export default function MobileCapture() {
       </div>
 
       <main className="relative min-h-0 flex-1 overflow-y-auto overscroll-y-contain scrollbar-hide px-6 py-6 sm:px-12">
-        <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+        <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'linear-gradient(var(--color-surface-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-surface-border) 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
 
         <div className="relative mx-auto flex w-full max-w-sm flex-col">
           {!previewUrl ? (

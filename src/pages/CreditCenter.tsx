@@ -503,8 +503,8 @@ ${user.firstName} ${user.lastName}
                   exit={{ opacity: 0, scale: 0.9, rotateX: 10 }}
                   className="w-full max-w-2xl"
                 >
-                  <Dialog.Panel className="bg-brand-cta text-surface-base rounded-lg shadow-2xl p-10 font-serif border border-black/10">
-                <div className="flex justify-between items-start mb-8 border-b border-black/10 pb-4 no-print">
+                  <Dialog.Panel className="bg-brand-cta text-surface-base rounded-lg shadow-2xl p-10 font-serif border border-surface-base/15">
+                <div className="flex justify-between items-start mb-8 border-b border-surface-base/15 pb-4 no-print">
                   <div className="space-y-1">
                     <Dialog.Title className="text-xl font-sans font-black uppercase italic tracking-tighter text-surface-base">
                       Dispute <span className="text-emerald-800">Letter</span>
@@ -517,7 +517,7 @@ ${user.firstName} ${user.lastName}
                         navigator.clipboard.writeText(generateLetter(selectedFix));
                         toast.success('Letter copied to clipboard');
                       }}
-                      className="p-2 bg-black/5 hover:bg-black/10 rounded-full transition-colors text-surface-base"
+                      className="p-2 bg-surface-base/10 hover:bg-surface-base/20 rounded-full transition-colors text-surface-base"
                       title="Copy text"
                       type="button"
                     >
@@ -525,7 +525,7 @@ ${user.firstName} ${user.lastName}
                     </button>
                     <button 
                       onClick={() => window.print()}
-                      className="p-2 bg-black/5 hover:bg-black/10 rounded-full transition-colors text-surface-base"
+                      className="p-2 bg-surface-base/10 hover:bg-surface-base/20 rounded-full transition-colors text-surface-base"
                       title="Print"
                       type="button"
                     >
@@ -541,11 +541,11 @@ ${user.firstName} ${user.lastName}
                   </div>
                 </div>
 
-                <div className="whitespace-pre-wrap text-[11pt] leading-relaxed max-h-[60vh] overflow-y-auto pr-4 text-surface-base scrollbar-thin scrollbar-thumb-black/20">
+                <div className="whitespace-pre-wrap text-[11pt] leading-relaxed max-h-[60vh] overflow-y-auto pr-4 text-surface-base scrollbar-thin scrollbar-thumb-surface-base/20">
                   {generateLetter(selectedFix)}
                 </div>
 
-                <div className="mt-8 pt-8 border-t border-black/5 flex items-center justify-between no-print">
+                <div className="mt-8 pt-8 border-t border-surface-base/10 flex items-center justify-between no-print">
                   <p className="text-[10px] font-sans text-content-tertiary italic">
                     Certified Mail is recommended for all legal disputes.
                   </p>

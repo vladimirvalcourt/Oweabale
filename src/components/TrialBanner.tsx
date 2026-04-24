@@ -39,38 +39,37 @@ export default function TrialBanner() {
     };
   }, [user?.id]);
 
-  // Don't show banner if not loading and no trial
-  if (isLoading || daysRemaining === null || daysRemaining <= 0) {
+  // Show banner only in the final 7 days of the trial
+  if (isLoading || daysRemaining === null || daysRemaining <= 0 || daysRemaining > 7) {
     return null;
   }
 
-  // Determine urgency state
-  const isUrgent = daysRemaining <= 4;
+  const isUrgent = daysRemaining <= 3;
 
   return (
     <div
       className={`w-full py-3 px-4 ${
         isUrgent
-          ? 'bg-amber-500/10 border-b border-amber-500/20'
-          : 'bg-yellow-500/10 border-b border-yellow-500/20'
+          ? 'bg-rose-500/10 border-b border-rose-500/20'
+          : 'bg-amber-500/10 border-b border-amber-500/20'
       }`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {isUrgent ? (
-            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" aria-hidden />
+            <AlertCircle className="w-5 h-5 text-rose-500 shrink-0" aria-hidden />
           ) : (
-            <Clock className="w-5 h-5 text-yellow-600 shrink-0" aria-hidden />
+            <Clock className="w-5 h-5 text-amber-500 shrink-0" aria-hidden />
           )}
-          
-          <p className={`text-sm font-medium truncate ${isUrgent ? 'text-amber-900' : 'text-yellow-900'}`}>
+
+          <p className={`text-sm font-medium truncate ${isUrgent ? 'text-rose-700 dark:text-rose-400' : 'text-amber-700 dark:text-amber-400'}`}>
             {isUrgent ? (
               <span>
-                <strong>{daysRemaining} day{daysRemaining !== 1 ? 's' : ''} left</strong> on your trial — your debt planner and income tools will lock. Keep them for $10/mo
+                <strong>{daysRemaining} day{daysRemaining !== 1 ? 's' : ''} left</strong> — your debt planner and income tools will lock. Keep them for $10/mo
               </span>
             ) : (
               <span>
-                Full Suite trial — <strong>{daysRemaining} day{daysRemaining !== 1 ? 's' : ''} left</strong>. Upgrade to keep access
+                Full Suite trial — <strong>{daysRemaining} days left</strong>. Upgrade anytime to keep everything
               </span>
             )}
           </p>
@@ -80,8 +79,8 @@ export default function TrialBanner() {
           to="/pricing"
           className={`shrink-0 text-sm font-semibold underline underline-offset-2 hover:no-underline ${
             isUrgent
-              ? 'text-amber-700 hover:text-amber-900'
-              : 'text-yellow-700 hover:text-yellow-900'
+              ? 'text-rose-600 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-300'
+              : 'text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300'
           }`}
         >
           {isUrgent ? 'Upgrade now →' : 'View plans →'}

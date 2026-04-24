@@ -104,7 +104,7 @@ export default function PublicHeader({ links = [] }: PublicHeaderProps) {
   };
 
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-surface-base/60 backdrop-blur-xl transition-all duration-300">
+    <nav className="fixed inset-x-0 top-0 z-50 border-b border-content-primary/10 bg-surface-base/60 backdrop-blur-xl transition-all duration-300">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <TransitionLink to="/" className="group flex items-center gap-2">
           <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />

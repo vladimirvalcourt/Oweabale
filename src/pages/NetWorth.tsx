@@ -153,7 +153,7 @@ export default function NetWorth() {
               <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${(Number(v ?? 0) / 1000).toFixed(0)}k`} dx={-10} fontFamily="monospace" />
               <Tooltip
                 {...rechartsTooltipStableProps}
-                contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '8px', color: '#FAFAFA', fontFamily: 'monospace', fontSize: '12px' }}
+                contentStyle={{ backgroundColor: 'var(--color-surface-raised)', borderColor: 'var(--color-surface-border)', borderRadius: '8px', color: 'var(--color-content-primary)', fontFamily: 'monospace', fontSize: '12px' }}
                 formatter={(value) => [`$${Number(value ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`, 'Net Worth']}
               />
               <Area type="monotone" dataKey="value" stroke="#d4d4d4" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" dot={{ fill: '#d4d4d4', strokeWidth: 0, r: 3 }} />
@@ -179,7 +179,7 @@ export default function NetWorth() {
                   </Pie>
                   <Tooltip
                     {...rechartsTooltipStableProps}
-                    contentStyle={{ backgroundColor: '#141414', borderColor: '#262626', borderRadius: '8px', fontFamily: 'monospace', fontSize: '11px' }}
+                    contentStyle={{ backgroundColor: 'var(--color-surface-raised)', borderColor: 'var(--color-surface-border)', borderRadius: '8px', fontFamily: 'monospace', fontSize: '11px' }}
                     formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Value']}
                   />
                 </RechartsPie>
