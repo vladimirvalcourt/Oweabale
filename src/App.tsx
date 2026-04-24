@@ -70,6 +70,7 @@ const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
 const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
 const NotFound       = lazy(() => import('./pages/NotFound'));
 const FreeDashboard  = lazy(() => import('./pages/FreeDashboard'));
+const SAASLandingDemo = lazy(() => import('./pages/SAASLandingDemo'));
 
 /** After sign-in, route users to the correct namespace based on their plan. */
 function SignInRoute({ authUser }: { authUser: User | null }) {
@@ -131,6 +132,7 @@ function AppRoutes() {
       <Route path="/security" element={<Security />} />
       <Route path="/support" element={<Support />} />
       <Route path="/onboarding" element={<AuthPage mode="signup" />} />
+      <Route path="/demo/saas-landing" element={<SAASLandingDemo />} />
 
       {/* ── Auth route — preserve ?redirect= when already signed in ── */}
       <Route path="/auth" element={<SignInRoute authUser={authUser} />} />
