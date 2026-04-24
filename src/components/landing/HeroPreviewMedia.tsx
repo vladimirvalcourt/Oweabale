@@ -3,12 +3,20 @@ import React from 'react';
 export default function HeroPreviewMedia() {
   return (
     <div className="relative w-full">
-      {/* Dashboard Preview with local image for CSP compliance */}
+      {/* Dashboard Preview with local dark/light mode images */}
       <div className="relative w-full rounded-3xl overflow-hidden border shadow-2xl bg-surface-base">
+        {/* Dark mode image */}
         <img
-          src="/screenshots/dashboard.png"
+          src="/screenshots/dashboard-dark.png"
           alt="Oweable Dashboard Preview showing bill tracking and financial overview"
-          className="w-full h-auto object-cover"
+          className="w-full h-auto object-cover hidden dark:block"
+          loading="eager"
+        />
+        {/* Light mode image */}
+        <img
+          src="/screenshots/dashboard-light.png"
+          alt="Oweable Dashboard Preview showing bill tracking and financial overview"
+          className="w-full h-auto object-cover dark:hidden block"
           loading="eager"
         />
       </div>
