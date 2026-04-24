@@ -316,14 +316,14 @@ export default function Landing() {
             </a>
           </aside>
 
-          {/* Main Heading - Tighter tracking, more presence */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-center max-w-4xl px-6 leading-[1.05] mb-8 tracking-tight bg-gradient-to-b from-white via-white to-white/70 bg-clip-text text-transparent">
+          {/* Main Heading - Tighter tracking, more presence with balanced text wrapping */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold text-center max-w-4xl px-6 leading-[1.05] mb-8 tracking-tight bg-gradient-to-b from-white via-white to-white/70 bg-clip-text text-transparent [text-wrap:balance]">
             Money is hard enough.
             <br />Your system should help.
           </h1>
 
-          {/* Subtitle - Better line height, constrained width */}
-          <p className="text-base md:text-lg text-center max-w-xl px-6 mb-12 text-content-secondary/90 leading-relaxed">
+          {/* Subtitle - Better line height, constrained width with balanced wrapping */}
+          <p className="text-base md:text-lg text-center max-w-xl px-6 mb-12 text-content-secondary/90 leading-relaxed [text-wrap:pretty]">
             Oweable helps you keep up with bills, debt, subscriptions, and uneven income without trying to hold everything in your head.
           </p>
 
@@ -378,29 +378,29 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="border-y border-surface-border bg-surface-raised py-8">
-          <div className="mx-auto grid max-w-7xl gap-x-8 gap-y-5 px-6 text-sm text-content-secondary md:grid-cols-3 lg:px-8">
+        <section className="border-y border-surface-border bg-surface-raised py-12 md:py-16">
+          <div className="mx-auto grid max-w-7xl gap-x-12 gap-y-8 px-6 text-sm text-content-secondary md:grid-cols-3 lg:px-8">
             {proofPoints.map((point) => (
-              <div key={point} className="flex items-start gap-3">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
-                <p className="leading-relaxed">{point}</p>
+              <div key={point} className="flex items-start gap-4">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit shadow-sm shadow-brand-profit/50" />
+                <p className="leading-relaxed [text-wrap:pretty]">{point}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section id="why" className="relative py-24">
+        <section id="why" className="relative py-24 md:py-32">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mb-16 flex flex-col items-center text-center">
               <p className="mb-5 text-xs font-semibold uppercase tracking-widest text-brand-profit">The Logic</p>
-              <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
+              <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl [text-wrap:balance]">
                 The stress is not just money.<br className="hidden lg:block" />
                 <span className="text-content-secondary">It is carrying too much alone.</span>
               </h2>
             </div>
 
             <motion.div
-              className="grid gap-6 lg:grid-cols-3"
+              className="grid gap-8 lg:grid-cols-3"
               variants={staggerContainer}
               initial="hidden"
               whileInView="visible"
@@ -410,10 +410,10 @@ export default function Landing() {
                 <motion.article
                   key={item.title}
                   variants={fadeInUp}
-                  className="rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-content-primary/15"
+                  className="group rounded-[16px] border border-surface-border bg-surface-raised p-7 transition-all duration-300 hover:border-content-primary/20 hover:shadow-lg hover:shadow-brand-indigo/5"
                 >
-                  <h3 className="text-lg font-semibold text-content-primary mb-3">{item.title}</h3>
-                  <p className="text-sm leading-relaxed text-content-secondary">{item.copy}</p>
+                  <h3 className="text-lg font-semibold text-content-primary mb-3 [text-wrap:pretty] group-hover:text-brand-profit transition-colors duration-200">{item.title}</h3>
+                  <p className="text-sm leading-relaxed text-content-secondary [text-wrap:pretty]">{item.copy}</p>
                 </motion.article>
               ))}
             </motion.div>
@@ -422,21 +422,21 @@ export default function Landing() {
 
         <section
           id="flow"
-          className="relative border-t border-surface-border py-24"
+          className="relative border-t border-surface-border py-24 md:py-32"
         >
           <div
             className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8"
           >
             <div className="mb-16 flex flex-col items-start">
               <p className="mb-5 text-xs font-semibold uppercase tracking-widest text-brand-profit">The System</p>
-              <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
+              <h2 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl [text-wrap:balance]">
                 One place to see<br className="hidden lg:block" />
                 <span className="text-content-secondary">what your money needs from you.</span>
               </h2>
             </div>
 
             <motion.div
-              className="grid gap-6 md:grid-cols-3"
+              className="grid gap-8 md:grid-cols-3"
               variants={staggerContainer}
               initial="hidden"
               whileInView="visible"
@@ -446,7 +446,7 @@ export default function Landing() {
                 <motion.article
                   key={step.title}
                   variants={fadeInUp}
-                  className="flex flex-col rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-content-primary/15"
+                  className="group flex flex-col rounded-[16px] border border-surface-border bg-surface-raised p-7 transition-all duration-300 hover:border-content-primary/20 hover:shadow-lg hover:shadow-brand-indigo/5"
                 >
                   <p className="text-xs font-medium uppercase tracking-wide text-brand-profit mb-3">{step.eyebrow}</p>
                   <h3 className="text-lg font-semibold text-content-primary mb-4">{step.title}</h3>
@@ -590,30 +590,35 @@ export default function Landing() {
               </h2>
             </div>
 
-            <div className="mx-auto mt-12 grid max-w-5xl gap-6 lg:grid-cols-2">
-              <article className="flex flex-col rounded-[12px] border border-surface-border bg-surface-raised p-8">
+            <div className="mx-auto mt-12 grid max-w-5xl gap-8 lg:grid-cols-2">
+              <article className="group relative flex flex-col rounded-[16px] border border-surface-border bg-surface-raised p-8 transition-all duration-300 hover:border-content-primary/20 hover:shadow-lg hover:shadow-brand-indigo/5">
                 <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary mb-6">Free Tracker</p>
                 <div className="flex items-end gap-2 mb-8">
                   <span className="text-6xl font-bold tracking-tight text-content-primary">$0</span>
                   <span className="pb-1 text-sm text-content-secondary font-medium">/ month</span>
                 </div>
-                <p className="text-sm leading-relaxed text-content-secondary mb-10">
+                <p className="text-sm leading-relaxed text-content-secondary mb-10 [text-wrap:pretty]">
                   A simple starting point for seeing what is due, what is coming, and what you do not want to miss.
                 </p>
                 <ul className="space-y-4 mb-10 flex-grow">
                   {['Bill tracking', 'Due-date visibility', 'Recurring obligations', 'Core reminders'].map(f => (
                     <li key={f} className="flex items-center gap-3 text-sm text-content-secondary font-medium">
-                      <div className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
+                      <div className="h-1.5 w-1.5 rounded-full bg-brand-profit shadow-sm shadow-brand-profit/50" />
                       {f}
                     </li>
                   ))}
                 </ul>
-                <button className="h-[48px] w-full rounded-[10px] border border-surface-border bg-surface-base text-xs font-semibold uppercase tracking-wide text-content-primary transition-colors duration-200 hover:border-content-primary/15">
+                <button className="h-[48px] w-full rounded-[10px] border border-surface-border bg-surface-base text-xs font-semibold uppercase tracking-wide text-content-primary transition-all duration-200 hover:border-content-primary/25 hover:bg-surface-highlight active:scale-[0.98]">
                   Start free
                 </button>
               </article>
 
-              <article className="flex flex-col rounded-[12px] border border-surface-border bg-surface-raised p-8">
+              <article className="group relative flex flex-col rounded-[16px] border border-brand-profit/30 bg-surface-raised p-8 transition-all duration-300 hover:border-brand-profit/50 hover:shadow-xl hover:shadow-brand-profit/10 before:absolute before:inset-0 before:rounded-[16px] before:pointer-events-none before:bg-gradient-to-b before:from-brand-profit/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100">
+                {/* Recommended badge */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-brand-profit text-surface-base text-[10px] font-bold uppercase tracking-wider shadow-sm">
+                  Most Popular
+                </div>
+                
                 <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Full Suite</p>
                 <div className="w-fit inline-flex rounded-full border border-surface-border bg-surface-highlight p-1 mb-6">
                   <button
@@ -670,7 +675,7 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <button className="h-[48px] w-full rounded-[10px] bg-brand-cta text-xs font-semibold uppercase tracking-wide text-surface-base transition-colors duration-200 hover:bg-brand-cta-hover">
+                <button className="h-[48px] w-full rounded-[10px] bg-brand-cta text-xs font-semibold uppercase tracking-wide text-surface-base transition-all duration-200 hover:bg-brand-cta-hover hover:shadow-lg hover:shadow-white/10 active:scale-[0.98]">
                   Try Full Suite
                 </button>
                 <p className="mt-6 text-xs text-center text-content-tertiary uppercase tracking-wide">14-day trial included</p>
@@ -687,14 +692,14 @@ export default function Landing() {
                 Questions people ask when they are trying to get unstuck.
               </h2>
             </div>
-            <div className="grid gap-4 md:grid-cols-2 max-w-5xl mx-auto">
+            <div className="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
               {faqItems.map((item) => (
                 <article
                   key={item.q}
-                  className="rounded-[12px] border border-surface-border bg-surface-raised p-7 transition-colors duration-200 hover:border-content-primary/15"
+                  className="group rounded-[16px] border border-surface-border bg-surface-raised p-7 transition-all duration-300 hover:border-content-primary/20 hover:shadow-lg hover:shadow-brand-indigo/5"
                 >
-                  <h3 className="text-sm font-semibold text-content-primary mb-4 tracking-tight">{item.q}</h3>
-                  <p className="text-sm leading-relaxed text-content-secondary">{item.a}</p>
+                  <h3 className="text-sm font-semibold text-content-primary mb-4 tracking-tight [text-wrap:pretty] group-hover:text-brand-profit transition-colors duration-200">{item.q}</h3>
+                  <p className="text-sm leading-relaxed text-content-secondary [text-wrap:pretty]">{item.a}</p>
                 </article>
               ))}
             </div>
