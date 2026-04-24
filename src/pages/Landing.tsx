@@ -590,10 +590,10 @@ export default function Landing() {
               </h2>
             </div>
 
-            <div className="mx-auto mt-12 grid max-w-5xl gap-8 lg:grid-cols-2">
-              <article className="group relative flex flex-col rounded-[16px] border border-surface-border bg-surface-raised p-8 transition-all duration-300 hover:border-content-primary/20 hover:shadow-lg hover:shadow-brand-indigo/5">
+            <div className="mx-auto mt-12 grid max-w-5xl gap-8 lg:grid-cols-2 items-start">
+              <article className="group relative flex flex-col rounded-[16px] border border-surface-border bg-surface-raised p-8 transition-all duration-300 hover:border-content-primary/20 hover:shadow-lg hover:shadow-brand-indigo/5 h-full">
                 <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary mb-6">Free Tracker</p>
-                <div className="flex items-end gap-2 mb-8">
+                <div className="flex items-end gap-2 mb-8 min-h-[80px]">
                   <span className="text-6xl font-bold tracking-tight text-content-primary">$0</span>
                   <span className="pb-1 text-sm text-content-secondary font-medium">/ month</span>
                 </div>
@@ -613,13 +613,13 @@ export default function Landing() {
                 </button>
               </article>
 
-              <article className="group relative flex flex-col rounded-[16px] border border-brand-profit/30 bg-surface-raised p-8 transition-all duration-300 hover:border-brand-profit/50 hover:shadow-xl hover:shadow-brand-profit/10 before:absolute before:inset-0 before:rounded-[16px] before:pointer-events-none before:bg-gradient-to-b before:from-brand-profit/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100">
+              <article className="group relative flex flex-col rounded-[16px] border border-brand-profit/30 bg-surface-raised p-8 pt-12 transition-all duration-300 hover:border-brand-profit/50 hover:shadow-xl hover:shadow-brand-profit/10 before:absolute before:inset-0 before:rounded-[16px] before:pointer-events-none before:bg-gradient-to-b before:from-brand-profit/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100 h-full">
                 {/* Recommended badge */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-brand-profit text-surface-base text-[10px] font-bold uppercase tracking-wider shadow-sm">
                   Most Popular
                 </div>
                 
-                <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6">Full Suite</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-6 mt-2">Full Suite</p>
                 <div className="w-fit inline-flex rounded-full border border-surface-border bg-surface-highlight p-1 mb-6">
                   <button
                     type="button"
@@ -647,7 +647,7 @@ export default function Landing() {
                   </button>
                 </div>
 
-                <div className="flex items-end gap-2 mb-8">
+                <div className="flex items-baseline gap-2 mb-8 min-h-[80px]">
                   {billingPeriod === 'yearly' ? (
                     <>
                       <span className="text-6xl font-bold tracking-tight text-content-primary">$9.16</span>
