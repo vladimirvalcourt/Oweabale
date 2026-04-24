@@ -1,4 +1,5 @@
 import { corsHeaders } from '../_shared/cors.ts';
+import { enforceRateLimit, rateLimiters } from '../_shared/rateLimiter.ts';
 
 type SupportPayload = {
   name: string;
@@ -19,12 +20,24 @@ Deno.serve(async (req: Request) => {
   const jsonHeaders = { ...c, 'Content-Type': 'application/json' as const };
 
   try {
+    const rl = await enforceRateLimit(req, rateLimiters.public, `support:${req.headers.get('cf-connecting-ip') ?? 'unknown'}`);
+    if (!rl.allowed) {
+      const res = rl.response ?? new Response(JSON.stringify({ error: 'Rate limit exceeded' }), { status: 429 });
+      return new Response(res.body, {
+        status: res.status,
+        headers: { ...jsonHeaders, ...Object.fromEntries(res.headers.entries()) },
+      });
+    }
+
     const payload = (await req.json()) as SupportPayload;
 
     // Validate required fields
     if (!payload.name?.trim()) throw new Error('Name is required');
     if (!payload.email?.trim()) throw new Error('Email is required');
     if (!payload.message?.trim()) throw new Error('Message is required');
+    if (payload.name.trim().length > 120) throw new Error('Name is too long');
+    if ((payload.subject ?? '').trim().length > 200) throw new Error('Subject is too long');
+    if (payload.message.trim().length > 5000) throw new Error('Message is too long');
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

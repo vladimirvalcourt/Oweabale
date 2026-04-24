@@ -437,11 +437,47 @@ CREATE TABLE IF NOT EXISTS document_capture_sessions (
 
 CREATE INDEX IF NOT EXISTS idx_capture_sessions_token ON document_capture_sessions (id, token);
 ALTER TABLE document_capture_sessions ENABLE ROW LEVEL SECURITY;
+
+CREATE OR REPLACE FUNCTION request_x_session_token()
+RETURNS TEXT
+LANGUAGE sql
+STABLE
+AS $$
+  SELECT NULLIF(
+    trim(both FROM (COALESCE(current_setting('request.headers', true), '{}')::jsonb ->> 'x-session-token')),
+    ''
+  );
+$$;
+
+GRANT EXECUTE ON FUNCTION request_x_session_token() TO anon, authenticated;
+
 DROP POLICY IF EXISTS "Users manage own sessions" ON document_capture_sessions;
 CREATE POLICY "Users manage own sessions" ON document_capture_sessions FOR ALL USING (auth.uid() = user_id);
--- Anonymous mobile client can read/update session via token (simplified for web usage)
 DROP POLICY IF EXISTS "Mobile tokens can access sessions" ON document_capture_sessions;
-CREATE POLICY "Mobile tokens can access sessions" ON document_capture_sessions FOR ALL USING (TRUE) WITH CHECK (TRUE);
+DROP POLICY IF EXISTS "document_capture_sessions_anon_select_by_header_token" ON document_capture_sessions;
+DROP POLICY IF EXISTS "document_capture_sessions_anon_update_by_header_token" ON document_capture_sessions;
+CREATE POLICY "document_capture_sessions_anon_select_by_header_token"
+  ON document_capture_sessions
+  FOR SELECT
+  TO anon
+  USING (
+    token IS NOT NULL
+    AND token = request_x_session_token()
+    AND status IN ('idle', 'active')
+  );
+CREATE POLICY "document_capture_sessions_anon_update_by_header_token"
+  ON document_capture_sessions
+  FOR UPDATE
+  TO anon
+  USING (
+    token IS NOT NULL
+    AND token = request_x_session_token()
+    AND status IN ('idle', 'active')
+  )
+  WITH CHECK (
+    token = request_x_session_token()
+    AND user_id IS NOT NULL
+  );
 
 -- 24. AUDIT LOG
 CREATE TABLE IF NOT EXISTS audit_log (

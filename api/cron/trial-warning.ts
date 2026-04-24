@@ -12,7 +12,13 @@ export default async function handler(req: Request) {
   }
 
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && req.headers.get('Authorization') !== `Bearer ${cronSecret}`) {
+  if (!cronSecret) {
+    return new Response(
+      JSON.stringify({ error: 'Server configuration error' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+  if (req.headers.get('Authorization') !== `Bearer ${cronSecret}`) {
     return new Response(
       JSON.stringify({ error: 'Unauthorized' }),
       { status: 401, headers: { 'Content-Type': 'application/json' } }
