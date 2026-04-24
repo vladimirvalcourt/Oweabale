@@ -43,7 +43,7 @@ function NavLink({
   return (
     <a
       href={href}
-      className={`relative px-2 py-1 text-[11px] font-medium uppercase tracking-[0.15em] transition-colors duration-200 ${
+      className={`relative min-h-[48px] px-2 py-1 flex items-center text-[11px] font-medium uppercase tracking-[0.15em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base ${
         isActive ? 'text-content-primary' : 'text-content-tertiary hover:text-content-primary'
       }`}
     >

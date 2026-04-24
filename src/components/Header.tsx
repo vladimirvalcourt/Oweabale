@@ -27,16 +27,16 @@ export default function Header() {
         </TransitionLink>
 
         <div className="hidden items-center gap-8 text-sm text-content-secondary md:flex">
-          <TransitionLink to="/#why" className="transition-colors hover:text-content-primary">
+          <TransitionLink to="/\#why" className="min-h-[48px] px-2 py-1 transition-colors hover:text-content-primary">
             Why it works
           </TransitionLink>
-          <TransitionLink to="/pricing" className="transition-colors hover:text-content-primary">
+          <TransitionLink to="/pricing" className="min-h-[48px] px-2 py-1 transition-colors hover:text-content-primary">
             Pricing
           </TransitionLink>
-          <TransitionLink to="/faq" className="transition-colors hover:text-content-primary">
+          <TransitionLink to="/faq" className="min-h-[48px] px-2 py-1 transition-colors hover:text-content-primary">
             FAQ
           </TransitionLink>
-          <TransitionLink to="/support" className="transition-colors hover:text-content-primary">
+          <TransitionLink to="/support" className="min-h-[48px] px-2 py-1 transition-colors hover:text-content-primary">
             Support
           </TransitionLink>
         </div>
@@ -51,14 +51,14 @@ export default function Header() {
                 useStore.getState().signOut();
                 toast.success('Session terminated');
               }}
-              className="hidden rounded-full border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:border-surface-border-subtle hover:text-content-primary sm:block"
+              className="hidden min-h-[48px] rounded-full border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:border-surface-border-subtle hover:text-content-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base sm:block"
             >
               Sign out
             </button>
           )}
           <TransitionLink
             to={user?.id ? '/dashboard' : '/onboarding'}
-            className="inline-flex items-center gap-2 rounded-full bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
+            className="inline-flex min-h-[48px] items-center gap-2 rounded-full bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
           >
             {user?.id ? 'Open dashboard' : 'Start free'}
           </TransitionLink>

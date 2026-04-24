@@ -128,12 +128,12 @@
   /* Focus — visible keyboard focus (WCAG 2.4.7) + border cues on fields. */
   .focus-app {
     @apply outline-none focus:outline-none;
-    @apply focus-visible:ring-2 focus-visible:ring-content-primary/25 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .focus-app-field {
     @apply outline-none focus:outline-none;
-    @apply focus-visible:ring-2 focus-visible:ring-content-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   /* Shell nav — prefer these over ad hoc text-[10px] / text-[12px] in Layout. */
@@ -186,12 +186,12 @@
   }
 
   .interactive-focus {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-content-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .danger-button {
     @apply transition-[transform,box-shadow,background-color,color,border-color,opacity] duration-200 ease-out active:translate-y-[1px] active:scale-[0.995];
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-content-primary/35 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
     @apply font-medium tracking-[0.01em] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)];
   }
 
