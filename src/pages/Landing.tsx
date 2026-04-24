@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import type { Variants } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import Footer from '../components/Footer';
 import HeroPreviewMedia from '../components/landing/HeroPreviewMedia';
 import { TransitionLink } from '../components/TransitionLink';
@@ -286,57 +287,64 @@ export default function Landing() {
       </nav>
 
       <main id="main-content">
-        <section className="relative pt-32 pb-18 lg:pt-38 lg:pb-24">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            {/* Hero Content */}
-            <div
-              ref={heroRef}
-              className="mx-auto max-w-4xl text-center"
+        {/* New SaaS Hero Section */}
+        <section className="relative min-h-screen flex flex-col items-center justify-start px-6 py-20 md:py-24 animate-in fade-in slide-in-from-bottom-4 duration-600">
+          {/* Announcement Banner */}
+          <aside className="mb-8 inline-flex flex-wrap items-center justify-center gap-2 px-4 py-2 rounded-full border border-surface-border bg-surface-highlight backdrop-blur-sm max-w-full">
+            <span className="text-xs text-center whitespace-nowrap text-content-secondary">
+              Start free · No credit card required
+            </span>
+            <a
+              href="#why"
+              className="flex items-center gap-1 text-xs hover:text-content-primary transition-all active:scale-95 whitespace-nowrap text-content-secondary"
+              aria-label="Learn more about Oweable"
             >
-              <div className="inline-flex items-center gap-2 rounded-full border border-surface-border bg-surface-raised px-4 py-1.5 text-xs font-medium text-content-secondary mb-8">
-                <div className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
-                Start free · No credit card required
-              </div>
-              
-              <h1 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-6xl lg:text-[4.5rem] lg:leading-[0.98]">
-                Money is hard enough.
-                <br className="hidden sm:block" />
-                <span className="text-content-secondary">Your system should help.</span>
-              </h1>
-              
-              <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-content-secondary sm:text-lg">
-                Oweable is for people who are tired of keeping bills, debt, subscriptions, and due dates in their head. It helps you see what matters now, what is coming next, and where to start.
-              </p>
+              Learn more
+              <ArrowRight size={12} />
+            </a>
+          </aside>
 
-              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <motion.div variants={springButton} whileHover="hover" whileTap="tap">
-                  <TransitionLink
-                    to={primaryHref}
-                    className="inline-flex items-center justify-center rounded-[10px] bg-brand-cta px-8 h-[48px] text-sm font-semibold text-surface-base transition-all hover:brightness-110 focus-app min-w-[160px]"
-                  >
-                    {user?.id ? 'Open Dashboard' : 'Get Started Free'}
-                  </TransitionLink>
-                </motion.div>
-                <motion.div variants={springButton} whileHover="hover" whileTap="tap">
-                  <a
-                    href="#flow"
-                    className="inline-flex items-center justify-center rounded-[10px] border border-surface-border bg-transparent px-8 h-[48px] text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated min-w-[160px]"
-                  >
-                    See how it helps
-                  </a>
-                </motion.div>
-              </div>
+          {/* Main Heading */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium text-center max-w-3xl px-6 leading-tight mb-6 tracking-tight bg-gradient-to-b from-white via-white to-white/60 bg-clip-text text-transparent">
+            Money is hard enough.
+            <br />Your system should help.
+          </h1>
+
+          {/* Subtitle */}
+          <p className="text-sm md:text-base text-center max-w-2xl px-6 mb-10 text-content-secondary">
+            Oweable helps you keep up with bills, debt, subscriptions, and uneven income <br />
+            without trying to hold everything in your head.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex items-center gap-4 relative z-10 mb-16">
+            <motion.div variants={springButton} whileHover="hover" whileTap="tap">
+              <TransitionLink
+                to={primaryHref}
+                className="inline-flex items-center justify-center rounded-lg bg-gradient-to-b from-white via-white/95 to-white/60 text-black px-8 h-12 text-base font-semibold hover:scale-105 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2"
+              >
+                {user?.id ? 'Open Dashboard' : 'Get Started Free'}
+              </TransitionLink>
+            </motion.div>
+          </div>
+
+          {/* Dashboard Preview */}
+          <div className="w-full max-w-5xl relative pb-20">
+            {/* Glow effect */}
+            <div
+              className="absolute left-1/2 w-[90%] pointer-events-none z-0 opacity-50"
+              style={{
+                top: "-23%",
+                transform: "translateX(-50%)"
+              }}
+              aria-hidden="true"
+            >
+              <div className="w-full h-64 bg-gradient-to-t from-brand-indigo/20 to-transparent blur-3xl" />
             </div>
-
-            {/* Dashboard Preview */}
-            <div
-              className={`mt-14 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-                heroVisible ? 'translate-y-0 opacity-100' : 'translate-y-5 opacity-0'
-              }`}
-            >
-              <div className="mx-auto max-w-[920px]">
-                <HeroPreviewMedia />
-              </div>
+            
+            {/* Dashboard Image */}
+            <div className="relative z-10">
+              <HeroPreviewMedia />
             </div>
           </div>
         </section>
