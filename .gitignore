@@ -18,7 +18,9 @@ skills-lock.json
 .goose/
 .kiro/
 .windsurf/
+# Ignore root-level skills/ directory but allow .lingma/skills
 skills/
+!.lingma/skills/
 APPLY_FIX_NOW.sql
 .claude/skills/supabase
 .claude/skills/supabase-postgres-best-practices
