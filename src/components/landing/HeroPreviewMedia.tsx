@@ -3,17 +3,13 @@ import React from 'react';
 export default function HeroPreviewMedia() {
   return (
     <div className="relative w-full">
-      {/* Acme-style Dashboard Preview with dark/light mode support */}
-      <div className="relative w-full rounded-3xl overflow-hidden border shadow-2xl">
+      {/* Dashboard Preview with local image for CSP compliance */}
+      <div className="relative w-full rounded-3xl overflow-hidden border shadow-2xl bg-surface-base">
         <img
-          src="https://ui.shadcn.com/examples/dashboard-dark.png"
-          alt="Oweable Dashboard Preview"
-          className="w-full h-full object-center hidden dark:block rounded-3xl"
-        />
-        <img
-          src="https://ui.shadcn.com/examples/dashboard-light.png"
-          alt="Oweable Dashboard Preview"
-          className="w-full h-full object-center dark:hidden block rounded-3xl"
+          src="/screenshots/dashboard.png"
+          alt="Oweable Dashboard Preview showing bill tracking and financial overview"
+          className="w-full h-auto object-cover"
+          loading="eager"
         />
       </div>
       {/* Gradient fade at bottom for depth */}
