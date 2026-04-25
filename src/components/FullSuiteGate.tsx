@@ -57,7 +57,7 @@ export function FullSuiteGateCard({ title, description, compact = false }: FullS
             No pressure: Tracker stays available with core workflows even if you do not upgrade.
           </p>
           <TransitionLink
-            to="/dashboard"
+            to="/free/dashboard"
             className="mt-2 inline-flex text-xs font-medium text-content-secondary underline underline-offset-2 hover:text-content-primary"
           >
             Keep using free tier

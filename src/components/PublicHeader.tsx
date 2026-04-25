@@ -3,7 +3,7 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { BrandWordmark } from './BrandWordmark';
 import { ThemeToggle } from './ThemeToggle';
 import { TransitionLink } from './TransitionLink';
-import { useStore } from '../store/useStore';
+import { useAuth } from '../hooks/useAuth';
 
 // Interactive NavLink with cursor-following glow
 function NavLink({
@@ -68,8 +68,8 @@ interface PublicHeaderProps {
 
 export default function PublicHeader({ links = [] }: PublicHeaderProps) {
   const [activeSection, setActiveSection] = useState('');
-  const user = useStore((state) => state.user);
-  const primaryHref = user?.id ? '/dashboard' : '/onboarding';
+  const { user: authUser } = useAuth();
+  const primaryHref = authUser?.id ? '/dashboard' : '/auth';
 
   // Track active section for nav highlighting
   useEffect(() => {
@@ -127,7 +127,7 @@ export default function PublicHeader({ links = [] }: PublicHeaderProps) {
               to={primaryHref}
               className="inline-flex items-center justify-center rounded-full bg-content-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-surface-base transition-all duration-300 hover:scale-105 sm:px-6"
             >
-              <span className="relative z-10">{user?.id ? 'Dashboard' : 'Start Free'}</span>
+              <span className="relative z-10">{authUser?.id ? 'Dashboard' : 'Start Free'}</span>
             </TransitionLink>
           </motion.div>
         </div>

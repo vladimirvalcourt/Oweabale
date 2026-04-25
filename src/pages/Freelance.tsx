@@ -381,7 +381,7 @@ export default function Freelance() {
                     {!hasTaxState ? (
                       <p className="text-xs text-amber-600/90 dark:text-amber-400/90 leading-relaxed">
                         <TransitionLink
-                          to="/settings?tab=financial#tax-state-preference"
+                          to="/pro/settings?tab=financial#tax-state-preference"
                           className="font-medium underline underline-offset-2"
                         >
                           Set your state

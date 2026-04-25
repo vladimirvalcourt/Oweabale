@@ -351,7 +351,7 @@ export default function Pricing() {
                 </ul>
                 <motion.div variants={springButton} whileHover="hover" whileTap="tap">
                   <TransitionLink
-                    to="/onboarding"
+                    to="/auth"
                     className="mt-8 inline-flex w-full items-center justify-center rounded-[10px] border border-surface-border px-6 h-[48px] text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
                   >
                     Start free
@@ -522,7 +522,7 @@ export default function Pricing() {
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <TransitionLink
-                to="/onboarding"
+                to="/auth"
                 className="inline-flex items-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
               >
                 Create free account

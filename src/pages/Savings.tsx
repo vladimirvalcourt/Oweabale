@@ -119,7 +119,7 @@ export default function Savings() {
             Link your accounts in Settings → Integrations. After sync, pick which accounts to treat as savings below.
           </p>
           <TransitionLink
-            to="/settings?tab=integrations"
+            to="/pro/settings?tab=integrations"
             className="mt-4 inline-flex items-center justify-center rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover"
           >
             Go to Integrations
@@ -203,7 +203,7 @@ export default function Savings() {
             {recentSavingsTx.length === 0 ? (
               <p className="px-4 py-10 text-center text-sm text-content-tertiary">
                 No Plaid transactions on these accounts in the last {DAYS_WINDOW} days. Try syncing or see all activity in{' '}
-                <TransitionLink to="/transactions" className="underline underline-offset-2">
+                <TransitionLink to="/pro/transactions" className="underline underline-offset-2">
                   Transactions
                 </TransitionLink>
                 .

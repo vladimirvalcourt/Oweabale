@@ -220,16 +220,16 @@ export default function Layout() {
         if (gChordAtRef.current !== null && now - gChordAtRef.current < CHORD_MS) {
           if (lower === 'd') {
             e.preventDefault();
-            startTransition(() => navigate('/dashboard'));
+            startTransition(() => navigate('/pro/dashboard'));
           } else if (lower === 't') {
             e.preventDefault();
-            startTransition(() => navigate('/transactions'));
+            startTransition(() => navigate('/pro/transactions'));
           } else if (lower === 'b') {
             e.preventDefault();
-            startTransition(() => navigate('/bills'));
+            startTransition(() => navigate('/pro/bills'));
           } else if (lower === 's') {
             e.preventDefault();
-            startTransition(() => navigate('/settings'));
+            startTransition(() => navigate('/pro/settings'));
           }
           gChordAtRef.current = null;
           return;

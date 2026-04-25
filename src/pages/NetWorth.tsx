@@ -135,7 +135,7 @@ export default function NetWorth() {
         <p className="mb-2 text-xs text-content-secondary leading-relaxed">
           Try adding extra monthly savings in the control above to see your trajectory improve — small increases lift the whole
           curve.{' '}
-          <TransitionLink to="/dashboard#cash-flow" className="text-content-primary underline underline-offset-2">
+          <TransitionLink to="/pro/dashboard#cash-flow" className="text-content-primary underline underline-offset-2">
             View cash flow
           </TransitionLink>
         </p>
@@ -255,4 +255,3 @@ export default function NetWorth() {
     </div>
   );
 }
-

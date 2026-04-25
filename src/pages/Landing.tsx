@@ -8,6 +8,7 @@ import { TransitionLink } from '../components/TransitionLink';
 import { BrandWordmark } from '../components/BrandWordmark';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { useSEO } from '../hooks/useSEO';
+import { useAuth } from '../hooks/useAuth';
 import { useStore } from '../store/useStore';
 
 function useInView(threshold = 0.18) {
@@ -229,8 +230,8 @@ export default function Landing() {
   const [activeSection, setActiveSection] = useState('');
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [heroRef, heroVisible] = useInView(0.08);
-  const user = useStore((state) => state.user);
-  const primaryHref = user?.id ? '/dashboard' : '/onboarding';
+  const { user: authUser } = useAuth();
+  const primaryHref = authUser?.id ? '/dashboard' : '/auth';
 
   // Track active section for nav highlighting
   useEffect(() => {
@@ -279,7 +280,7 @@ export default function Landing() {
                 to={primaryHref}
                 className="inline-flex items-center justify-center rounded-full bg-content-primary px-4 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-surface-base transition-colors duration-200 hover:bg-brand-cta-hover sm:px-6"
               >
-                <span className="relative z-10">{user?.id ? 'Dashboard' : 'Get Started'}</span>
+                <span className="relative z-10">{authUser?.id ? 'Dashboard' : 'Get Started'}</span>
               </TransitionLink>
             </motion.div>
           </div>
@@ -334,7 +335,7 @@ export default function Landing() {
                 to={primaryHref}
                 className="inline-flex items-center justify-center rounded-lg bg-gradient-to-b from-white via-white/95 to-white/60 text-black px-10 h-12 text-base font-semibold hover:scale-105 active:scale-[0.98] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 shadow-lg shadow-white/5"
               >
-                {user?.id ? 'Open Dashboard' : 'Get Started Free'}
+                {authUser?.id ? 'Open Dashboard' : 'Get Started Free'}
               </TransitionLink>
             </motion.div>
             <a
@@ -722,7 +723,7 @@ export default function Landing() {
                   to={primaryHref}
                   className="inline-flex min-w-[200px] items-center justify-center gap-3 rounded-[10px] bg-brand-cta px-8 h-[52px] text-sm font-semibold uppercase tracking-wide text-surface-base transition-colors duration-200 hover:bg-brand-cta-hover"
                 >
-                  {user?.id ? 'Open Command Center' : 'Get Started Free'}
+                  {authUser?.id ? 'Open Command Center' : 'Get Started Free'}
                 </TransitionLink>
               </motion.div>
               <TransitionLink

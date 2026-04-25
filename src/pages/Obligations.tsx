@@ -165,6 +165,9 @@ export default function Obligations() {
   const [editDebtRow, setEditDebtRow] = useState<Debt | null>(null);
   const { hasFullSuite } = useFullSuiteAccess();
   const canUseDebt = canUseDebtActions(hasFullSuite);
+  const cashFlowHref = hasFullSuite ? '/pro/dashboard#cash-flow' : '/free/dashboard';
+  const calendarHref = hasFullSuite ? '/pro/calendar#calendar-view' : '/free/calendar#calendar-view';
+  const analyticsHref = hasFullSuite ? '/pro/analytics' : '/free/dashboard';
 
   useEffect(() => {
     if (location.hash === '#due-soon') {
@@ -433,10 +436,10 @@ export default function Obligations() {
           <div className="mt-2 flex flex-wrap gap-3 text-xs">
             {hasFullSuite ? (
               <>
-                <TransitionLink to="/dashboard#cash-flow" className="text-content-primary hover:text-content-secondary underline underline-offset-2">
+                <TransitionLink to={cashFlowHref} className="text-content-primary hover:text-content-secondary underline underline-offset-2">
                   Open safe-to-spend
                 </TransitionLink>
-                <TransitionLink to="/calendar#calendar-view" className="text-content-primary hover:text-content-secondary underline underline-offset-2">
+                <TransitionLink to={calendarHref} className="text-content-primary hover:text-content-secondary underline underline-offset-2">
                   Open due-date calendar
                 </TransitionLink>
               </>
@@ -493,7 +496,7 @@ export default function Obligations() {
         defaultOpen={false}
         extraHeader={
           <TransitionLink
-            to="/calendar#calendar-view"
+            to={calendarHref}
             className="text-[10px] font-sans font-medium text-content-primary hover:text-content-secondary border border-content-primary/20 rounded-lg px-2 py-0.5"
           >
             Month view →
@@ -504,7 +507,7 @@ export default function Obligations() {
           <p className="text-xs text-content-tertiary leading-relaxed">
             Totals include unpaid bills, active subscriptions, minimum debt payments with a due date, and open fines — same buckets as
             the list below, grouped by days from today. The{' '}
-            <TransitionLink to="/calendar#calendar-view" className="text-content-primary hover:underline">
+            <TransitionLink to={calendarHref} className="text-content-primary hover:underline">
               Calendar
             </TransitionLink>{' '}
             shows the same items on specific dates.
@@ -587,7 +590,7 @@ export default function Obligations() {
                     Add $50/month extra to cut{' '}
                     <span className="font-mono font-medium text-content-primary">{monthsSavedBy50}</span> months off your payoff
                     timeline — adjust &quot;Extra per month&quot; above to model it.{' '}
-                    <TransitionLink to="/dashboard#cash-flow" className="text-content-primary underline underline-offset-2">
+                    <TransitionLink to={cashFlowHref} className="text-content-primary underline underline-offset-2">
                       Tighten cash flow
                     </TransitionLink>
                   </p>
@@ -599,7 +602,7 @@ export default function Obligations() {
                 {payoffResult.totalInterest > 10_000 && (
                   <p className="mt-2 text-[11px] text-content-secondary leading-relaxed">
                     Interest is sensitive to APR and payoff order — even small extra payments compound. Use the slider above or{' '}
-                    <TransitionLink to="/analytics" className="text-content-primary underline underline-offset-2">
+                    <TransitionLink to={analyticsHref} className="text-content-primary underline underline-offset-2">
                       review spending trends
                     </TransitionLink>
                     .

@@ -97,7 +97,7 @@ export default function AuthCallback() {
     const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
     const redirectTarget = params.get('redirect');
     const finalRedirect =
-      redirectTarget && redirectTarget.startsWith('/') ? redirectTarget : '/dashboard';
+      redirectTarget && redirectTarget.startsWith('/') ? redirectTarget : '/auth';
     const oauthError = params.get('error') ?? hashParams.get('error');
     const oauthDesc = params.get('error_description') ?? hashParams.get('error_description');
     if (oauthError && !handledOAuthErrorRef.current) {

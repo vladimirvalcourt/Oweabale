@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
+import { useAuth } from '../hooks/useAuth';
 import { BrandWordmark } from './BrandWordmark';
 import { TransitionLink } from './TransitionLink';
 import { ThemeToggle } from './ThemeToggle';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
-  const user = useStore((state) => state.user);
+  const { user: authUser } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -45,7 +46,7 @@ export default function Header() {
           {/* Theme Toggle */}
           <ThemeToggle />
           
-          {user?.id && (
+          {authUser?.id && (
             <button
               onClick={() => {
                 useStore.getState().signOut();
@@ -57,10 +58,10 @@ export default function Header() {
             </button>
           )}
           <TransitionLink
-            to={user?.id ? '/dashboard' : '/onboarding'}
+            to={authUser?.id ? '/dashboard' : '/auth'}
             className="inline-flex min-h-[48px] items-center gap-2 rounded-full bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
           >
-            {user?.id ? 'Open dashboard' : 'Start free'}
+            {authUser?.id ? 'Open dashboard' : 'Start free'}
           </TransitionLink>
         </div>
       </div>

@@ -11,7 +11,7 @@
  * Supabase queries cached by useFullSuiteAccess).
  */
 import type { ReactNode } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { usePlanRedirect } from '../hooks/usePlanRedirect';
 import { AppLoader } from './PageSkeleton';
@@ -19,12 +19,16 @@ import { AppLoader } from './PageSkeleton';
 export function FreePlanGuard({ children }: { children: ReactNode }) {
   const { user: authUser, authLoading } = useAuth();
   const { plan } = usePlanRedirect();
+  const location = useLocation();
 
   // Auth still resolving
   if (authLoading) return <AppLoader />;
 
   // Not logged in
-  if (!authUser) return <Navigate to="/onboarding" replace />;
+  if (!authUser) {
+    const redirectPath = `${location.pathname}${location.search}${location.hash}`;
+    return <Navigate to={`/auth?redirect=${encodeURIComponent(redirectPath)}`} replace />;
+  }
 
   // Plan check still resolving
   if (plan === 'loading') return <AppLoader />;

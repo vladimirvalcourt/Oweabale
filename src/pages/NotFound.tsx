@@ -1,9 +1,22 @@
 import { TransitionLink } from '../components/TransitionLink';
+import { useAuth } from '../hooks/useAuth';
+import { usePlanRedirect } from '../hooks/usePlanRedirect';
 
 /**
  * Global 404 — matches unknown paths via `<Route path="*" />`.
  */
 export default function NotFound() {
+  const { user: authUser } = useAuth();
+  const { plan } = usePlanRedirect();
+  const primaryHref = !authUser
+    ? '/auth'
+    : plan === 'free'
+      ? '/free/dashboard'
+      : plan === 'pro'
+        ? '/pro/dashboard'
+        : '/';
+  const primaryLabel = authUser ? 'Dashboard' : 'Sign in';
+
   return (
     <div className="min-h-screen bg-surface-base flex flex-col items-center justify-center px-6 py-20">
       <p className="section-label mb-5">404</p>
@@ -21,10 +34,10 @@ export default function NotFound() {
           Home
         </TransitionLink>
         <TransitionLink
-          to="/dashboard"
+          to={primaryHref}
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[10px] bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover"
         >
-          Dashboard
+          {primaryLabel}
         </TransitionLink>
       </div>
     </div>

@@ -166,7 +166,7 @@ export default function FAQ() {
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <motion.div variants={springButton} whileHover="hover" whileTap="tap">
                   <TransitionLink
-                    to="/onboarding"
+                    to="/auth"
                     className="inline-flex items-center gap-3 rounded-[10px] bg-brand-cta px-7 h-[48px] text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover min-w-[160px] justify-center"
                   >
                     Create free account

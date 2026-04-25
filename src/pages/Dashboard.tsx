@@ -520,7 +520,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 gap-3">
             {/* Ingestion Action */}
             {pendingIngestions.length > 0 && (
-              <TransitionLink to="/ingestion" className="block focus-app rounded-lg">
+              <TransitionLink to="/pro/ingestion" className="block focus-app rounded-lg">
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
                   className="bg-surface-raised border border-surface-border p-5 rounded-lg flex items-center justify-between hover:bg-content-primary/[0.03] transition-all shadow-none group"
@@ -541,7 +541,7 @@ export default function Dashboard() {
 
             {/* Overdraft Risk Action */}
             {isOverdraftRisk && (
-              <TransitionLink to="/bills" className="block focus-app rounded-lg">
+              <TransitionLink to="/pro/bills" className="block focus-app rounded-lg">
                 <motion.div 
                   initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
                   className="bg-surface-raised border border-surface-border p-5 rounded-lg flex items-center justify-between hover:bg-content-primary/[0.03] transition-all shadow-none group"
@@ -565,7 +565,7 @@ export default function Dashboard() {
 
             {/* Tax Insolvency Action */}
             {debtsMissingDueDate.length > 0 && (
-              <TransitionLink to="/bills#due-soon" className="block focus-app rounded-lg">
+              <TransitionLink to="/pro/bills#due-soon" className="block focus-app rounded-lg">
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -876,7 +876,7 @@ export default function Dashboard() {
                 <p className="mt-4 text-sm text-content-secondary leading-relaxed max-w-md">
                   Add income or reduce expenses to extend your runway.{' '}
                   <TransitionLink
-                    to="/dashboard#cash-flow"
+                    to="/pro/dashboard#cash-flow"
                     className="text-content-primary font-medium underline underline-offset-2 hover:text-content-secondary"
                   >
                     View cash flow
@@ -1156,7 +1156,7 @@ export default function Dashboard() {
               <div className="bg-surface-raised rounded-lg border border-surface-border shadow-none flex flex-col h-fit max-h-[350px]">
                 <div className="px-6 py-4 border-b border-surface-border flex justify-between items-center bg-transparent">
                   <h3 className="text-xs font-mono font-semibold uppercase tracking-widest text-content-secondary">Upcoming Bills</h3>
-                  <TransitionLink to="/bills" className="inline-flex h-9 items-center rounded-lg px-3 text-sm font-medium text-content-primary hover:bg-content-primary/[0.04] hover:text-content-secondary transition-colors focus-app">
+                  <TransitionLink to="/pro/bills" className="inline-flex h-9 items-center rounded-lg px-3 text-sm font-medium text-content-primary hover:bg-content-primary/[0.04] hover:text-content-secondary transition-colors focus-app">
                     See all
                   </TransitionLink>
                 </div>
