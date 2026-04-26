@@ -3,8 +3,7 @@
  *
  * Wraps every /pro/* route. Three cases:
  *   1. Not authenticated          → /onboarding
- *   2. Authenticated + Free plan  → /free/dashboard  (wrong namespace)
- *   3. Authenticated + Pro plan   → render children ✓
+ *   2. Authenticated              → render children ✓
  *
  * Shows AppLoader while the plan check is in-flight so we never
  * flash the wrong UI.
@@ -12,12 +11,10 @@
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { usePlanRedirect } from '../hooks/usePlanRedirect';
 import { AppLoader } from './PageSkeleton';
 
 export function ProPlanGuard({ children }: { children: ReactNode }) {
   const { user: authUser, authLoading } = useAuth();
-  const { plan } = usePlanRedirect();
   const location = useLocation();
 
   // Auth still resolving
@@ -29,12 +26,7 @@ export function ProPlanGuard({ children }: { children: ReactNode }) {
     return <Navigate to={`/auth?redirect=${encodeURIComponent(redirectPath)}`} replace />;
   }
 
-  // Plan check still resolving
-  if (plan === 'loading') return <AppLoader />;
-
-  // Free user landed on a Pro route → send to Free namespace
-  if (plan === 'free') return <Navigate to="/free/dashboard" replace />;
-
-  // Pro user in the right place
+  // The signed-in app uses one namespace now. Feature-level gates still decide
+  // which advanced controls require paid Full Suite access.
   return <>{children}</>;
 }

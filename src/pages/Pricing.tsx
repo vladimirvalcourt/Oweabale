@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Minus, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import Footer from '../components/Footer';
@@ -88,7 +89,7 @@ const PRICING_FAQ_STATIC = [
   {
     question: 'What happens when the trial ends?',
     answer:
-      'If you do nothing, you move to the free Tracker tier automatically unless you choose to upgrade. No surprise charges and no awkward cancellation maze.',
+      'If you do nothing, you keep access to the core Pay List path unless you choose to upgrade. No surprise charges and no awkward cancellation maze.',
   },
   {
     question: 'Can I cancel anytime?',
@@ -140,7 +141,7 @@ function buildPricingJsonLd(params: {
       url: pageUrl,
       name: 'Pricing — Oweable',
       description:
-        'Choose between a genuinely useful free plan and deeper planning support for debt payoff, cash flow, budgets, and uneven income.',
+        'Full Suite pricing for debt payoff, cash flow, budgets, bills, subscriptions, and uneven income.',
     },
     {
       '@type': 'FAQPage',
@@ -154,16 +155,6 @@ function buildPricingJsonLd(params: {
           text: item.answer,
         },
       })),
-    },
-    {
-      '@type': 'Offer',
-      '@id': `${pageUrl}#offer-tracker`,
-      name: 'Tracker',
-      price: '0',
-      priceCurrency: 'USD',
-      description: 'Free plan for bills, due dates, recurring obligations, and account basics.',
-      
-      url: pageUrl,
     },
     {
       '@type': 'Offer',
@@ -219,6 +210,7 @@ const comparisonRows = [
 ] as const;
 
 export default function Pricing() {
+  const navigate = useNavigate();
   const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
   const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
   const configuredYearly = Number(import.meta.env.VITE_PRICING_YEARLY_DISPLAY);
@@ -233,7 +225,7 @@ export default function Pricing() {
   useSEO({
     title: 'Pricing — Oweable',
     description:
-      'Choose between a free plan that helps you stay on top of bills and a deeper plan for debt payoff, cash flow, budgets, and uneven income.',
+      'Full Suite pricing for staying on top of bills, debt payoff, cash flow, budgets, and uneven income.',
     canonical: 'https://www.oweable.com/pricing',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -261,15 +253,16 @@ export default function Pricing() {
     setIsStartingCheckout(true);
     const response = await createStripeCheckoutSession(planKey);
     if ('error' in response) {
+      if (response.error === 'Please sign in to start checkout.') {
+        navigate(`/onboarding?redirect=${encodeURIComponent('/pro/settings?tab=billing')}`);
+        return;
+      }
       toast.error(response.error);
       setIsStartingCheckout(false);
       return;
     }
     window.location.href = response.checkoutUrl;
   };
-
-  const checkoutPlanKey: StripeCheckoutPlanKey =
-    hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly';
 
   return (
     <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
@@ -295,7 +288,7 @@ export default function Pricing() {
               Pay only for the level of help you need.
             </h1>
             <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-content-secondary sm:text-xl">
-              The free plan helps you stop missing what matters. Full Suite adds deeper support when you are ready for payoff planning, stronger cash-flow decisions, and more structure around the hard parts.
+              Oweable starts as one focused app for staying ahead of bills, debt, subscriptions, tolls, tickets, and the things people forget. Full Suite adds the deeper planning layer when you want more structure.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-content-secondary">
               <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
@@ -325,40 +318,7 @@ export default function Pricing() {
             whileInView="visible"
             viewport={{ once: true, margin: '-100px' }}
           >
-            <motion.div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr]" variants={staggerContainer}>
-              <motion.div variants={fadeInUp} className="public-hover-lift rounded-[12px] border border-surface-border bg-surface-base p-7 sm:p-8">
-                <p className="mt-6 text-xs font-semibold uppercase tracking-widest text-content-tertiary">Tracker</p>
-                <div className="mt-4 flex items-end gap-2">
-                  <span className="text-5xl font-bold tracking-tight text-content-primary">$0</span>
-                  <span className="pb-1 text-sm text-content-secondary">forever free</span>
-                </div>
-                <p className="mt-4 max-w-md text-base leading-relaxed text-content-secondary">
-                  Built for people who need a reliable place to track bills, due dates, recurring obligations, and reminders without paying first.
-                </p>
-                <ul className="mt-6 space-y-3 text-sm text-content-secondary">
-                  <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
-                    <span>Bills and due-date visibility</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
-                    <span>Recurring obligations, subscriptions, tickets, and fines</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
-                    <span>Core reminders and account settings</span>
-                  </li>
-                </ul>
-                <motion.div variants={springButton} whileHover="hover" whileTap="tap">
-                  <TransitionLink
-                    to="/auth"
-                    className="mt-8 inline-flex w-full items-center justify-center rounded-[10px] border border-surface-border px-6 h-[48px] text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
-                  >
-                    Start free
-                  </TransitionLink>
-                </motion.div>
-              </motion.div>
-
+            <motion.div className="mx-auto max-w-3xl" variants={staggerContainer}>
               <motion.div variants={fadeInUp} className="public-hover-lift rounded-[12px] border border-surface-border bg-surface-raised p-7 sm:p-8 shadow-sm">
                 <div className="flex items-center justify-between gap-4">
                   <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Full Suite</p>
@@ -454,12 +414,6 @@ export default function Pricing() {
               </motion.div>
             </motion.div>
 
-            <div className="mt-8 rounded-[12px] border border-surface-border bg-surface-raised p-8">
-              <p className="text-sm font-semibold leading-tight text-content-primary">Free-tier trust promise</p>
-              <p className="mt-3 max-w-3xl text-sm leading-relaxed text-content-secondary">
-                The free plan is meant to stay genuinely useful. You do not have to upgrade just to keep a basic system for bills, due dates, and recurring obligations working.
-              </p>
-            </div>
           </motion.div>
         </section>
 
@@ -467,21 +421,19 @@ export default function Pricing() {
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr]">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Compare plans</p>
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">What you get</p>
                 <h2 className="mt-4 max-w-lg text-4xl font-semibold tracking-[-0.04em] text-content-primary">
-                  Choose based on how much support you want, not how much marketing language you can tolerate.
+                  One app path, clear household money help, deeper tools when you need them.
                 </h2>
               </div>
               <div className="overflow-x-auto rounded-[12px] border border-surface-border bg-surface-raised">
-                <div className="grid grid-cols-3 border-b border-surface-border bg-surface-highlight text-sm font-semibold text-content-primary">
+                <div className="grid grid-cols-2 border-b border-surface-border bg-surface-highlight text-sm font-semibold text-content-primary">
                   <div className="min-w-[180px] px-4 py-4">Feature</div>
-                  <div className="min-w-[140px] border-l border-surface-border px-4 py-4">Tracker</div>
-                  <div className="min-w-[160px] border-l border-surface-border px-4 py-4">Full Suite</div>
+                  <div className="min-w-[160px] border-l border-surface-border px-4 py-4">Oweable</div>
                 </div>
-                {comparisonRows.map(([feature, tracker, suite]) => (
-                  <div key={feature} className="grid grid-cols-3 border-b border-surface-border text-sm last:border-b-0">
+                {comparisonRows.map(([feature, , suite]) => (
+                  <div key={feature} className="grid grid-cols-2 border-b border-surface-border text-sm last:border-b-0">
                     <div className="min-w-[180px] px-4 py-4 text-content-secondary">{feature}</div>
-                    <div className="min-w-[140px] border-l border-surface-border px-4 py-4 text-content-secondary">{tracker}</div>
                     <div className="min-w-[160px] border-l border-surface-border px-4 py-4 text-content-secondary">{suite}</div>
                   </div>
                 ))}
@@ -515,17 +467,17 @@ export default function Pricing() {
           <div className="mx-auto max-w-5xl px-6 text-center lg:px-8">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Ready when you are</p>
             <h2 className="mt-5 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
-              Start with relief. Upgrade when you want deeper structure.
+              Start with relief. Keep the app simple.
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-content-secondary">
-              Oweable should help before you pay and feel even steadier when you decide you want more.
+              The first path is the Pay List. The advanced tools are there when they help, not when they distract.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <TransitionLink
-                to="/auth"
+                to="/onboarding?redirect=/pro/dashboard"
                 className="inline-flex items-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
               >
-                Create free account
+                Try Full Suite
                 <ArrowRight className="h-4 w-4" />
               </TransitionLink>
               <button

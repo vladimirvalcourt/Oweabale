@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { usePlanRedirect } from '../hooks/usePlanRedirect';
 import { AppLoader } from './PageSkeleton';
 
 /**
@@ -10,7 +9,6 @@ import { AppLoader } from './PageSkeleton';
  */
 export default function AdminGuard() {
   const [status, setStatus] = useState<'checking' | 'allowed' | 'denied'>('checking');
-  const { plan } = usePlanRedirect();
 
   useEffect(() => {
     let cancelled = false;
@@ -71,8 +69,7 @@ export default function AdminGuard() {
 
   if (status === 'checking') return <AppLoader />;
   if (status === 'denied') {
-    if (plan === 'loading') return <AppLoader />;
-    return <Navigate to={plan === 'pro' ? '/pro/dashboard' : '/free/dashboard'} replace />;
+    return <Navigate to="/pro/dashboard" replace />;
   }
   return <Outlet />;
 }

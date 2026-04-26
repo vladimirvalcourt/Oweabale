@@ -64,7 +64,7 @@ function NavLink({
 const proofPoints = [
   'For people tired of keeping their money life together with memory, notes, and stress',
   'Built for steady paychecks, uneven income, shared households, and messy real life',
-  'Start free with no credit card and no pressure to have everything figured out',
+  'Start with one Pay List and no pressure to have everything figured out',
 ];
 
 const painPoints = [
@@ -198,8 +198,8 @@ const testimonials = [
 
 const faqItems = [
   {
-    q: 'Is Oweable free to use?',
-    a: 'Yes. The free Tracker tier gives you bill tracking, due-date visibility, and core reminders. Full Suite adds deeper planning tools when you want more support around debt, cash flow, and uneven income.',
+    q: 'Can I start before paying?',
+    a: 'Yes. You can create an account and start with the Pay List path for bills, due-date visibility, and core reminders. Full Suite adds deeper planning tools when you want more support around debt, cash flow, and uneven income.',
   },
   {
     q: 'Is this only for freelancers?',
@@ -305,7 +305,7 @@ export default function Landing() {
           {/* Announcement Banner - Offset slightly left to break symmetry */}
           <aside className="mb-10 inline-flex flex-wrap items-center justify-center gap-2 px-5 py-2 rounded-full border border-surface-border bg-surface-highlight/80 backdrop-blur-md max-w-full shadow-sm">
             <span className="text-xs text-center whitespace-nowrap text-content-secondary font-medium">
-              Start free · No credit card required
+              One Pay List · No credit card required
             </span>
             <a
               href="#why"
@@ -591,30 +591,8 @@ export default function Landing() {
               </h2>
             </div>
 
-            <div className="mx-auto mt-12 grid max-w-5xl gap-8 lg:grid-cols-2 items-start">
-              <article className="group relative flex flex-col rounded-[16px] border border-surface-border bg-surface-raised p-8 transition-all duration-300 hover:border-content-primary/20 hover:shadow-lg hover:shadow-brand-indigo/5 h-full">
-                <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary mb-6">Free Tracker</p>
-                <div className="flex items-end gap-2 mb-8 min-h-[80px]">
-                  <span className="text-6xl font-bold tracking-tight text-content-primary">$0</span>
-                  <span className="pb-1 text-sm text-content-secondary font-medium">/ month</span>
-                </div>
-                <p className="text-sm leading-relaxed text-content-secondary mb-10 [text-wrap:pretty]">
-                  A simple starting point for seeing what is due, what is coming, and what you do not want to miss.
-                </p>
-                <ul className="space-y-4 mb-10 flex-grow">
-                  {['Bill tracking', 'Due-date visibility', 'Recurring obligations', 'Core reminders'].map(f => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-content-secondary font-medium">
-                      <div className="h-1.5 w-1.5 rounded-full bg-brand-profit shadow-sm shadow-brand-profit/50" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <button className="h-[48px] w-full rounded-[10px] border border-surface-border bg-surface-base text-xs font-semibold uppercase tracking-wide text-content-primary transition-all duration-200 hover:border-content-primary/25 hover:bg-surface-highlight active:scale-[0.98]">
-                  Start free
-                </button>
-              </article>
-
-              <article className="group relative flex flex-col rounded-[16px] border border-brand-profit/30 bg-surface-raised p-8 pt-12 transition-all duration-300 hover:border-brand-profit/50 hover:shadow-xl hover:shadow-brand-profit/10 before:absolute before:inset-0 before:rounded-[16px] before:pointer-events-none before:bg-gradient-to-b before:from-brand-profit/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100 h-full">
+            <div className="mx-auto mt-12 max-w-3xl">
+              <article className="group relative flex flex-col rounded-[16px] border border-brand-profit/30 bg-surface-raised p-8 pt-12 transition-all duration-300 hover:border-brand-profit/50 hover:shadow-xl hover:shadow-brand-profit/10 before:absolute before:inset-0 before:rounded-[16px] before:pointer-events-none before:bg-gradient-to-b before:from-brand-profit/5 before:to-transparent before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100">
                 {/* Recommended badge */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-brand-profit text-surface-base text-[10px] font-bold uppercase tracking-wider shadow-sm">
                   Most Popular
@@ -676,9 +654,12 @@ export default function Landing() {
                     </li>
                   ))}
                 </ul>
-                <button className="h-[48px] w-full rounded-[10px] bg-brand-cta text-xs font-semibold uppercase tracking-wide text-surface-base transition-all duration-200 hover:bg-brand-cta-hover hover:shadow-lg hover:shadow-white/10 active:scale-[0.98]">
+                <TransitionLink
+                  to="/onboarding?redirect=/pro/dashboard"
+                  className="inline-flex h-[48px] w-full items-center justify-center rounded-[10px] bg-brand-cta text-xs font-semibold uppercase tracking-wide text-surface-base transition-all duration-200 hover:bg-brand-cta-hover hover:shadow-lg hover:shadow-white/10 active:scale-[0.98]"
+                >
                   Try Full Suite
-                </button>
+                </TransitionLink>
                 <p className="mt-6 text-xs text-center text-content-tertiary uppercase tracking-wide">14-day trial included</p>
               </article>
             </div>

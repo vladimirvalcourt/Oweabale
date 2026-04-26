@@ -59,9 +59,9 @@ const FAQ_DATA = [
       'Yes. Oweable works in your browser on desktop and mobile. You do not need to install another app just to start getting organized.',
   },
   {
-    question: 'Is there a free version?',
+    question: 'Can I start before paying?',
     answer:
-      'Yes. The free Tracker tier gives you visibility into bills, due dates, and recurring obligations. Full Suite adds broader planning and payoff tools when you want more help.',
+      'Yes. You can create an account and start with the Pay List path for bills, due dates, and recurring obligations. Full Suite adds broader planning and payoff tools when you want more help.',
   },
   {
     question: 'How secure is my data?',
@@ -166,10 +166,10 @@ export default function FAQ() {
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <motion.div variants={springButton} whileHover="hover" whileTap="tap">
                   <TransitionLink
-                    to="/auth"
+                    to="/onboarding?redirect=/pro/dashboard"
                     className="inline-flex items-center gap-3 rounded-[10px] bg-brand-cta px-7 h-[48px] text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover min-w-[160px] justify-center"
                   >
-                    Create free account
+                    Try Full Suite
                     <ArrowRight className="h-4 w-4" />
                   </TransitionLink>
                 </motion.div>

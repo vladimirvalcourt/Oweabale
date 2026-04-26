@@ -165,9 +165,9 @@ export default function Obligations() {
   const [editDebtRow, setEditDebtRow] = useState<Debt | null>(null);
   const { hasFullSuite } = useFullSuiteAccess();
   const canUseDebt = canUseDebtActions(hasFullSuite);
-  const cashFlowHref = hasFullSuite ? '/pro/dashboard#safe-spend' : '/free/dashboard';
-  const calendarHref = hasFullSuite ? '/pro/calendar#calendar-view' : '/free/calendar#calendar-view';
-  const analyticsHref = hasFullSuite ? '/pro/analytics' : '/free/dashboard';
+  const cashFlowHref = '/pro/dashboard#safe-spend';
+  const calendarHref = '/pro/calendar#calendar-view';
+  const analyticsHref = hasFullSuite ? '/pro/analytics' : '/pro/dashboard';
 
   useEffect(() => {
     if (location.hash === '#due-soon') {

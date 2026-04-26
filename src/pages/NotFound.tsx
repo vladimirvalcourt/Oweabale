@@ -1,20 +1,12 @@
 import { TransitionLink } from '../components/TransitionLink';
 import { useAuth } from '../hooks/useAuth';
-import { usePlanRedirect } from '../hooks/usePlanRedirect';
 
 /**
  * Global 404 — matches unknown paths via `<Route path="*" />`.
  */
 export default function NotFound() {
   const { user: authUser } = useAuth();
-  const { plan } = usePlanRedirect();
-  const primaryHref = !authUser
-    ? '/auth'
-    : plan === 'free'
-      ? '/free/dashboard'
-      : plan === 'pro'
-        ? '/pro/dashboard'
-        : '/';
+  const primaryHref = authUser ? '/pro/dashboard' : '/auth';
   const primaryLabel = authUser ? 'Dashboard' : 'Sign in';
 
   return (

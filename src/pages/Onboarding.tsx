@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Vault, Receipt, Activity, Flame, Wallet, Clock, Landmark, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
-import { usePlanRedirect } from '../hooks/usePlanRedirect';
 import { cn } from '../lib/utils';
 import { yieldForPaint } from '../lib/interaction';
 import { BrandWordmark } from '../components/BrandWordmark';
@@ -113,8 +112,7 @@ export default function Onboarding() {
 
   const navigate = useNavigate();
   const { addAsset, addBudget, updateUser, addNotification, user } = useStore();
-  const { plan } = usePlanRedirect();
-  const postSetupHref = plan === 'free' ? '/free/dashboard' : '/pro/dashboard';
+  const postSetupHref = '/pro/dashboard';
   const currentStep = STEPS[currentStepIndex];
 
   const persistOnboardingData = async (): Promise<boolean> => {

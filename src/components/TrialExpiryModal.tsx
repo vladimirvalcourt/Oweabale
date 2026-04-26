@@ -92,7 +92,7 @@ export default function TrialExpiryModal({ onDismiss }: TrialExpiryModalProps) {
 
         {/* Body */}
         <p className="text-content-secondary text-center leading-relaxed mb-8">
-          You've been moved to the free Tracker tier. Upgrade to restore your debt payoff planner, income ledger, budgets, and tax tools.
+          Your Pay List is still available. Upgrade to restore the advanced debt payoff planner, income ledger, budgets, and tax tools.
         </p>
 
         {/* CTAs */}
@@ -109,7 +109,7 @@ export default function TrialExpiryModal({ onDismiss }: TrialExpiryModalProps) {
             onClick={handleDismiss}
             className="w-full py-3 px-6 bg-transparent border border-surface-border text-content-secondary hover:text-content-primary hover:bg-content-primary/5 text-sm font-medium text-center rounded-lg transition-colors"
           >
-            Continue with free Tracker
+            Continue to Pay List
           </button>
         </div>
 

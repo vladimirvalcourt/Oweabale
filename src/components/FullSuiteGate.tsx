@@ -54,13 +54,13 @@ export function FullSuiteGateCard({ title, description, compact = false }: FullS
             {isUpgrading ? 'Starting checkout...' : `Upgrade — $${monthlyPrice.toFixed(2)}/mo`}
           </button>
           <p className="mt-2 text-xs text-content-tertiary">
-            No pressure: Tracker stays available with core workflows even if you do not upgrade.
+            No pressure: you can keep using the Pay List and core workflows.
           </p>
           <TransitionLink
-            to="/free/dashboard"
+            to="/pro/dashboard"
             className="mt-2 inline-flex text-xs font-medium text-content-secondary underline underline-offset-2 hover:text-content-primary"
           >
-            Keep using free tier
+            Back to Pay List
           </TransitionLink>
         </div>
       </div>
@@ -83,7 +83,7 @@ export function FullSuiteRouteGuard({ children, featureName }: FullSuiteRouteGua
     <div className="min-h-[60vh] w-full flex items-center justify-center px-4">
       <FullSuiteGateCard
         title={`${featureName} is available on Full Suite`}
-        description="You are currently on Tracker (Free). Upgrade to unlock this feature."
+        description="Upgrade to unlock this advanced tool."
       />
     </div>
   );

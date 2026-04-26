@@ -7,19 +7,16 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import type { User } from '@supabase/supabase-js';
 import { lazy, Suspense } from 'react';
 import Layout from './components/Layout';
-import FreeLayout from './components/FreeLayout';
 import DeviceGuard from './components/DeviceGuard';
 import ErrorBoundary from './components/ErrorBoundary';
 import AuthGuard from './components/AuthGuard';
 import AdminGuard from './components/AdminGuard';
 import MaintenanceGuard from './components/MaintenanceGuard';
-import { FreePlanGuard } from './components/FreePlanGuard';
 import { ProPlanGuard } from './components/ProPlanGuard';
 import { DashboardSkeleton, ListSkeleton, AppLoader } from './components/PageSkeleton';
 import SessionWarningModal from './components/SessionWarningModal';
 import { useStore } from './store/useStore';
 import { useAuth } from './hooks/useAuth';
-import { usePlanRedirect } from './hooks/usePlanRedirect';
 import { usePWAUpdateNotification } from './hooks/usePWAUpdateNotification';
 import { usePWAStandaloneMode } from './hooks/usePWAStandaloneMode';
 import { PWAInstallBanner } from './components/PWAInstallBanner';
@@ -69,13 +66,11 @@ const Analytics      = lazy(() => import('./pages/Analytics'));
 const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
 const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
 const NotFound       = lazy(() => import('./pages/NotFound'));
-const FreeDashboard  = lazy(() => import('./pages/FreeDashboard'));
 const SAASLandingDemo = lazy(() => import('./pages/SAASLandingDemo'));
 
 /** After sign-in, route users to the correct namespace based on their plan. */
 function SignInRoute({ authUser }: { authUser: User | null }) {
   const location = useLocation();
-  const { plan } = usePlanRedirect();
   const { authLoading } = useAuth();
 
   if (authLoading) return <AppLoader />;
@@ -87,10 +82,7 @@ function SignInRoute({ authUser }: { authUser: User | null }) {
     return <Navigate to={raw} replace />;
   }
 
-  // Wait for plan check before redirecting so we don't flash the wrong dashboard
-  if (plan === 'loading') return <AppLoader />;
-
-  return <Navigate to={plan === 'pro' ? '/pro/dashboard' : '/free/dashboard'} replace />;
+  return <Navigate to="/pro/dashboard" replace />;
 }
 
 /**
@@ -98,18 +90,19 @@ function SignInRoute({ authUser }: { authUser: User | null }) {
  * Replaces the old flat /dashboard, /bills etc. routes.
  * Preserves ?search and #hash so deep links keep working.
  */
-function PlanAwareRedirect({ free, pro }: { free: string; pro: string }) {
-  const { plan } = usePlanRedirect();
+function AppRedirect({ to }: { to: string }) {
+  const location = useLocation();
+  return <Navigate to={`${to}${location.search}${location.hash}`} replace />;
+}
+
+function PlanAwareRedirect({ pro }: { free?: string; pro: string }) {
   const location = useLocation();
   const suffix = location.search + location.hash;
-  if (plan === 'loading') return <AppLoader />;
-  const base = plan === 'pro' ? pro : free;
-  return <Navigate to={`${base}${suffix}`} replace />;
+  return <Navigate to={`${pro}${suffix}`} replace />;
 }
 
 function AppRoutes() {
   const { user: authUser, showWarning, timeLeft, extendSession, authLoading } = useAuth();
-  const location = useLocation();
 
   useDataSync({ authUserId: authUser?.id ?? null, authLoading });
   usePWAUpdateNotification();
@@ -140,28 +133,16 @@ function AppRoutes() {
       <Route path="/plaid/callback" element={<PlaidCallback />} />
       <Route path="/capture" element={<MobileCapture />} />
 
-      {/* ────────────────────────────────────────────────────────────────
-           FREE NAMESPACE  /free/*
-           Guarded by FreePlanGuard (pro users → /pro/dashboard).
-           Pages are the same components used by legacy routes — no duplication.
-      ──────────────────────────────────────────────────────────────── */}
-      <Route element={<FreePlanGuard><FreeLayout /></FreePlanGuard>}>
-        <Route
-          path="free/dashboard"
-          element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><FreeDashboard /></Suspense></ErrorBoundary>}
-        />
-        <Route path="free/bills"         element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Obligations /></Suspense></ErrorBoundary>} />
-        <Route path="free/subscriptions" element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Subscriptions /></Suspense></ErrorBoundary>} />
-        <Route path="free/calendar"      element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Calendar /></Suspense></ErrorBoundary>} />
-        <Route
-          path="free/settings"
-          element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Settings /></Suspense></ErrorBoundary>}
-        />
-      </Route>
+      {/* Old free namespace is kept only as redirects so existing links do not break. */}
+      <Route path="free/dashboard" element={<AppRedirect to="/pro/dashboard" />} />
+      <Route path="free/bills" element={<AppRedirect to="/pro/bills" />} />
+      <Route path="free/subscriptions" element={<AppRedirect to="/pro/subscriptions" />} />
+      <Route path="free/calendar" element={<AppRedirect to="/pro/calendar" />} />
+      <Route path="free/settings" element={<AppRedirect to="/pro/settings" />} />
 
       {/* ────────────────────────────────────────────────────────────────
            PRO NAMESPACE  /pro/*
-           Guarded by ProPlanGuard (free users → /free/dashboard).
+           Guarded by ProPlanGuard.
            Re-uses every existing page component — no file duplication.
       ──────────────────────────────────────────────────────────────── */}
       <Route element={<ProPlanGuard><DeviceGuard><Layout /></DeviceGuard></ProPlanGuard>}>
@@ -211,29 +192,29 @@ function AppRoutes() {
              Any old bookmark/hardcoded link (e.g. /dashboard) bounces to the correct namespace.
              PlanAwareRedirect preserves ?search and #hash automatically.
         ── */}
-        <Route path="dashboard"    element={<PlanAwareRedirect free="/free/dashboard"   pro="/pro/dashboard" />} />
-        <Route path="bills"        element={<PlanAwareRedirect free="/free/bills"        pro="/pro/bills" />} />
-        <Route path="income"       element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/income" />} />
-        <Route path="freelance"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/freelance" />} />
-        <Route path="ingestion"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/ingestion" />} />
-        <Route path="transactions" element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/transactions" />} />
-        <Route path="budgets"      element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/budgets" />} />
-        <Route path="net-worth"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/net-worth" />} />
-        <Route path="calendar"     element={<PlanAwareRedirect free="/free/calendar"     pro="/pro/calendar" />} />
-        <Route path="taxes"        element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/taxes" />} />
-        <Route path="goals"        element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/goals" />} />
-        <Route path="savings"      element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/savings" />} />
-        <Route path="education"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/education" />} />
-        <Route path="categories"   element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/categories" />} />
-        <Route path="subscriptions" element={<PlanAwareRedirect free="/free/subscriptions" pro="/pro/subscriptions" />} />
-        <Route path="reports"      element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/reports" />} />
-        <Route path="analytics"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/analytics" />} />
-        <Route path="investments"  element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/investments" />} />
-        <Route path="insurance"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/insurance" />} />
-        <Route path="credit"       element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/credit" />} />
-        <Route path="settings"     element={<PlanAwareRedirect free="/free/settings"     pro="/pro/settings" />} />
-        <Route path="app/support"  element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/app/support" />} />
-        <Route path="changelog"    element={<PlanAwareRedirect free="/free/dashboard"    pro="/pro/changelog" />} />
+        <Route path="dashboard"    element={<PlanAwareRedirect pro="/pro/dashboard" />} />
+        <Route path="bills"        element={<PlanAwareRedirect pro="/pro/bills" />} />
+        <Route path="income"       element={<PlanAwareRedirect pro="/pro/income" />} />
+        <Route path="freelance"    element={<PlanAwareRedirect pro="/pro/freelance" />} />
+        <Route path="ingestion"    element={<PlanAwareRedirect pro="/pro/ingestion" />} />
+        <Route path="transactions" element={<PlanAwareRedirect pro="/pro/transactions" />} />
+        <Route path="budgets"      element={<PlanAwareRedirect pro="/pro/budgets" />} />
+        <Route path="net-worth"    element={<PlanAwareRedirect pro="/pro/net-worth" />} />
+        <Route path="calendar"     element={<PlanAwareRedirect pro="/pro/calendar" />} />
+        <Route path="taxes"        element={<PlanAwareRedirect pro="/pro/taxes" />} />
+        <Route path="goals"        element={<PlanAwareRedirect pro="/pro/goals" />} />
+        <Route path="savings"      element={<PlanAwareRedirect pro="/pro/savings" />} />
+        <Route path="education"    element={<PlanAwareRedirect pro="/pro/education" />} />
+        <Route path="categories"   element={<PlanAwareRedirect pro="/pro/categories" />} />
+        <Route path="subscriptions" element={<PlanAwareRedirect pro="/pro/subscriptions" />} />
+        <Route path="reports"      element={<PlanAwareRedirect pro="/pro/reports" />} />
+        <Route path="analytics"    element={<PlanAwareRedirect pro="/pro/analytics" />} />
+        <Route path="investments"  element={<PlanAwareRedirect pro="/pro/investments" />} />
+        <Route path="insurance"    element={<PlanAwareRedirect pro="/pro/insurance" />} />
+        <Route path="credit"       element={<PlanAwareRedirect pro="/pro/credit" />} />
+        <Route path="settings"     element={<PlanAwareRedirect pro="/pro/settings" />} />
+        <Route path="app/support"  element={<PlanAwareRedirect pro="/pro/app/support" />} />
+        <Route path="changelog"    element={<PlanAwareRedirect pro="/pro/changelog" />} />
 
         </Route>
       </Route>
@@ -277,4 +258,3 @@ function AppShell() {
     </>
   );
 }
-
