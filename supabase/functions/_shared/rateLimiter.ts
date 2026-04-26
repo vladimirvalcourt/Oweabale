@@ -18,6 +18,7 @@ interface RateLimitResult {
 
 class RateLimiter {
   private kv: Deno.Kv | null = null;
+  private memoryStore = new Map<string, { count: number; windowStart: number }>();
   private config: RateLimitConfig;
 
   constructor(config: RateLimitConfig) {
@@ -40,7 +41,13 @@ class RateLimiter {
    * @returns Rate limit result with allowance status
    */
   async checkRateLimit(identifier: string): Promise<RateLimitResult> {
-    const kv = await this.getKv();
+    let kv: Deno.Kv;
+    try {
+      kv = await this.getKv();
+    } catch {
+      return this.checkMemoryRateLimit(identifier);
+    }
+
     const now = Date.now();
     const windowStart = now - this.config.windowMs;
     
@@ -107,6 +114,40 @@ class RateLimiter {
     return {
       allowed: true,
       remaining: this.config.maxRequests - updated.count,
+      resetAt: current.windowStart + this.config.windowMs,
+    };
+  }
+
+  private checkMemoryRateLimit(identifier: string): RateLimitResult {
+    const now = Date.now();
+    const windowStart = now - this.config.windowMs;
+    const key = `${this.config.keyPrefix}:${identifier}`;
+    const current = this.memoryStore.get(key);
+
+    if (!current || current.windowStart < windowStart) {
+      this.memoryStore.set(key, { count: 1, windowStart: now });
+      return {
+        allowed: true,
+        remaining: this.config.maxRequests - 1,
+        resetAt: now + this.config.windowMs,
+      };
+    }
+
+    if (current.count >= this.config.maxRequests) {
+      const resetAt = current.windowStart + this.config.windowMs;
+      return {
+        allowed: false,
+        remaining: 0,
+        resetAt,
+        retryAfter: Math.ceil((resetAt - now) / 1000),
+      };
+    }
+
+    const next = { count: current.count + 1, windowStart: current.windowStart };
+    this.memoryStore.set(key, next);
+    return {
+      allowed: true,
+      remaining: this.config.maxRequests - next.count,
       resetAt: current.windowStart + this.config.windowMs,
     };
   }
