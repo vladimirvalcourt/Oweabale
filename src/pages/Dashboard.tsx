@@ -499,18 +499,66 @@ export default function Dashboard() {
             <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">
               Welcome back, <span className="text-content-primary">{user?.firstName || 'User'}</span>
             </h1>
-            <p className="mt-1 text-sm font-medium text-content-secondary">Here is your financial overview for today.</p>
+            <p className="mt-1 text-sm font-medium text-content-secondary">Here is what needs attention before it becomes stressful.</p>
           </div>
         </div>
-        <button
-          type="button"
-          onClick={toggleCalmMode}
-          className="inline-flex items-center justify-center rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary hover:text-content-primary focus-app"
-        >
-          {calmMode ? 'Calm mode: on' : 'Calm mode: off'}
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <TransitionLink
+            to="/pro/bills"
+            className="inline-flex min-h-10 items-center justify-center rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app"
+          >
+            Add what&apos;s due
+          </TransitionLink>
+          <button
+            type="button"
+            onClick={toggleCalmMode}
+            className="inline-flex min-h-10 items-center justify-center rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary hover:text-content-primary focus-app"
+          >
+            {calmMode ? 'Calm mode: on' : 'Calm mode: off'}
+          </button>
+        </div>
       </div>
 
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <TransitionLink to="/pro/bills#due-soon" className="rounded-lg focus-app">
+          <div className="h-full rounded-lg border border-surface-border bg-surface-raised p-4 transition-colors hover:bg-content-primary/[0.03]">
+            <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary">Due soon</p>
+            <p className="mt-2 text-2xl font-semibold text-content-primary">{upcomingBills.slice(0, 7).length}</p>
+            <p className="mt-1 text-xs text-content-secondary">
+              {overdueBills.length > 0 ? `${overdueBills.length} overdue` : 'Next bills are in view'}
+            </p>
+          </div>
+        </TransitionLink>
+        <TransitionLink to="/pro/dashboard#cash-flow" className="rounded-lg focus-app">
+          <div className="h-full rounded-lg border border-surface-border bg-surface-raised p-4 transition-colors hover:bg-content-primary/[0.03]">
+            <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary">Safe daily spend</p>
+            <p className="mt-2 text-2xl font-semibold text-content-primary">
+              ${safeToSpend.dailySafeToSpend.toFixed(0)}
+            </p>
+            <p className="mt-1 text-xs text-content-secondary">
+              {showSafeToSpendPrompt ? 'Add payday to sharpen this' : `Through ${safeToSpend.windowEndLabel}`}
+            </p>
+          </div>
+        </TransitionLink>
+        <TransitionLink to="/pro/bills?tab=debt" className="rounded-lg focus-app">
+          <div className="h-full rounded-lg border border-surface-border bg-surface-raised p-4 transition-colors hover:bg-content-primary/[0.03]">
+            <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary">Active debt</p>
+            <p className="mt-2 text-2xl font-semibold text-content-primary">${totalDebts.toLocaleString()}</p>
+            <p className="mt-1 text-xs text-content-secondary">
+              {avalancheTarget ? `${avalancheTarget.name} needs priority` : 'No payoff target yet'}
+            </p>
+          </div>
+        </TransitionLink>
+        <TransitionLink to="/pro/subscriptions" className="rounded-lg focus-app">
+          <div className="h-full rounded-lg border border-surface-border bg-surface-raised p-4 transition-colors hover:bg-content-primary/[0.03]">
+            <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary">Subscriptions</p>
+            <p className="mt-2 text-2xl font-semibold text-content-primary">
+              {subscriptions.filter((s) => s.status === 'active').length}
+            </p>
+            <p className="mt-1 text-xs text-content-secondary">Recurring charges to keep honest</p>
+          </div>
+        </TransitionLink>
+      </div>
 
       {/* 2. Action Center (Grouped Urgent Alerts) */}
       {!calmMode && hasActionableAlerts && (
@@ -596,7 +644,7 @@ export default function Dashboard() {
                 className="bg-surface-raised border border-surface-border rounded-lg shadow-none flex flex-col sm:flex-row sm:items-stretch overflow-hidden"
               >
                 <TransitionLink
-                  to="/taxes"
+                  to="/pro/taxes"
                   className="flex flex-1 items-center justify-between gap-4 p-5 min-w-0 hover:bg-content-primary/[0.03] transition-all group focus-app rounded-lg sm:rounded-none"
                 >
                   <div className="flex items-center gap-5 min-w-0">
@@ -615,7 +663,7 @@ export default function Dashboard() {
                 </TransitionLink>
                 <div className="flex flex-col border-t border-surface-border sm:border-t-0 sm:border-l sm:border-surface-border sm:min-w-[11rem]">
                   <TransitionLink
-                    to="/taxes"
+                    to="/pro/taxes"
                     className="inline-flex min-h-10 w-full items-center justify-center px-4 py-2 text-sm font-semibold text-content-primary hover:bg-content-primary/[0.04] transition-colors focus-app"
                   >
                     Go to Taxes →
@@ -656,17 +704,17 @@ export default function Dashboard() {
             </p>
             {/* 3-step mini-progress indicator */}
             <div className="mt-4 flex items-center gap-2 text-xs text-content-tertiary">
-              <span className="rounded-full bg-brand-cta px-2.5 py-0.5 text-surface-base font-medium">Connect bank</span>
+              <span className="rounded-full bg-brand-cta px-2.5 py-0.5 text-surface-base font-medium">Add payday</span>
               <span className="text-content-muted">→</span>
               <span className="rounded-full border border-surface-border px-2.5 py-0.5">Add bills</span>
               <span className="text-content-muted">→</span>
               <span className="rounded-full border border-surface-border px-2.5 py-0.5">Set a budget</span>
             </div>
             <TransitionLink
-              to="/income"
+              to="/pro/income"
               className="mt-4 inline-flex min-h-10 items-center justify-center rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
             >
-              Connect your bank to begin.
+              Add income or payday
             </TransitionLink>
           </div>
         ) : (
@@ -860,7 +908,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      <h2 className="section-label pl-1 mb-3">Core Financials</h2>
+      <h2 className="section-label pl-1 mb-3">Household Snapshot</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Runway Metric Card */}
@@ -908,7 +956,7 @@ export default function Dashboard() {
               {netWorth < 0 && (
                 <p className="mt-2 text-xs text-content-secondary leading-relaxed">
                   Net worth reflects assets minus debts — focus on cash flow and payoff plans to improve trajectory.{' '}
-                  <TransitionLink to="/net-worth" className="text-content-primary underline underline-offset-2">
+                  <TransitionLink to="/pro/net-worth" className="text-content-primary underline underline-offset-2">
                     Explore projection
                   </TransitionLink>
                 </p>
@@ -932,7 +980,7 @@ export default function Dashboard() {
                 <>
                   <p className="metric-label mb-3">Tax Reserve</p>
                   <p className="text-2xl sm:text-4xl font-mono text-content-primary font-bold tabular-nums data-numeric">$0</p>
-                  <TransitionLink to="/taxes" className="mt-2 inline-flex text-xs text-content-secondary hover:text-content-primary">
+                  <TransitionLink to="/pro/taxes" className="mt-2 inline-flex text-xs text-content-secondary hover:text-content-primary">
                     Start saving for taxes →
                   </TransitionLink>
                 </>
@@ -961,7 +1009,7 @@ export default function Dashboard() {
               {cashFlow.surplus < 0 && (
                 <p className="mt-2 text-xs text-content-secondary leading-relaxed">
                   You&apos;re spending more than income this month on paper — trim subscriptions or align bill due dates.{' '}
-                  <TransitionLink to="/budgets" className="text-content-primary underline underline-offset-2">
+                  <TransitionLink to="/pro/budgets" className="text-content-primary underline underline-offset-2">
                     Review budgets
                   </TransitionLink>
                 </p>

@@ -4,12 +4,22 @@ export default function HeroPreviewMedia() {
   return (
     <div className="relative w-full">
       {/* Container that crops the bottom of the dashboard */}
-      <div className="relative w-full overflow-hidden rounded-3xl" style={{ maxHeight: '520px' }}>
-        {/* Dashboard image with theme-aware styling */}
+      <div
+        className="relative w-full overflow-hidden rounded-3xl border bg-surface-base shadow-2xl"
+        style={{ maxHeight: '520px' }}
+      >
+        {/* Preserve light/dark-specific hero art while keeping the cropped framing. */}
         <img
-          src="/screenshots/dashboard-hero.png"
+          src="/screenshots/dashboard-dark.png"
           alt="Oweable Dashboard - Track bills, manage debt, and plan your finances"
-          className="w-full h-auto object-cover"
+          className="hidden w-full h-auto object-cover dark:block"
+          loading="eager"
+          decoding="async"
+        />
+        <img
+          src="/screenshots/dashboard-light.png"
+          alt="Oweable Dashboard - Track bills, manage debt, and plan your finances"
+          className="block w-full h-auto object-cover dark:hidden"
           loading="eager"
           decoding="async"
         />

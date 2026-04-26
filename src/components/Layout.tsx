@@ -6,7 +6,7 @@ import {
   Settings, Repeat, BarChart3, Plus, X, ChevronDown, Inbox,
   Banknote, PieChart, Scale, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, ShieldCheck, Clock, Landmark, AlertCircle,
   TrendingUp,
-  Command, LineChart, Umbrella, PiggyBank, Home, Activity, AlertTriangle
+  Command, LineChart, Umbrella, PiggyBank, Home, Activity, AlertTriangle, MoreHorizontal
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
@@ -32,9 +32,11 @@ import { useTheme } from '../hooks/useTheme';
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
 const NAV_ROUTE_HASHES: Record<string, string[]> = {
-  '/dashboard': ['cash-flow'],
-  '/bills': ['due-soon'],
+  '/pro/dashboard': ['cash-flow'],
+  '/pro/bills': ['due-soon'],
 };
+
+const defaultSimpleMode = true;
 
 /**
  * Fix 4: One-shot hover prefetch — fires the lazy import() on first mouseenter so
@@ -68,9 +70,7 @@ export default function Layout() {
 
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     'Overview': true,
-    'Activity': false,
-    'Planning & Growth': false,
-    'More': false,
+    'Advanced tools': false,
   });
 
   const toggleGroup = useCallback((label: string) => {
@@ -265,37 +265,37 @@ export default function Layout() {
 
     bills.forEach(bill => {
       if (bill.biller.toLowerCase().includes(query) || bill.category.toLowerCase().includes(query)) {
-        results.push({ type: 'Bill', name: bill.biller, detail: `$${bill.amount} - ${bill.status}`, path: '/bills' });
+        results.push({ type: 'Bill', name: bill.biller, detail: `$${bill.amount} - ${bill.status}`, path: '/pro/bills' });
       }
     });
 
     debts.forEach(debt => {
       if (debt.name.toLowerCase().includes(query) || debt.type.toLowerCase().includes(query)) {
-        results.push({ type: 'Debt', name: debt.name, detail: `$${debt.remaining} remaining`, path: '/bills' });
+        results.push({ type: 'Debt', name: debt.name, detail: `$${debt.remaining} remaining`, path: '/pro/bills' });
       }
     });
 
     transactions.forEach(tx => {
       if (tx.name.toLowerCase().includes(query) || tx.category.toLowerCase().includes(query)) {
-        results.push({ type: 'Transaction', name: tx.name, detail: `$${tx.amount} - ${tx.date}`, path: '/transactions' });
+        results.push({ type: 'Transaction', name: tx.name, detail: `$${tx.amount} - ${tx.date}`, path: '/pro/transactions' });
       }
     });
 
     subscriptions.forEach(sub => {
       if (sub.name.toLowerCase().includes(query)) {
-        results.push({ type: 'Subscription', name: sub.name, detail: `$${sub.amount} / ${sub.frequency}`, path: '/subscriptions' });
+        results.push({ type: 'Subscription', name: sub.name, detail: `$${sub.amount} / ${sub.frequency}`, path: '/pro/subscriptions' });
       }
     });
 
     goals.forEach(goal => {
       if (goal.name.toLowerCase().includes(query)) {
-        results.push({ type: 'Goal', name: goal.name, detail: `$${goal.currentAmount} / $${goal.targetAmount}`, path: '/goals' });
+        results.push({ type: 'Goal', name: goal.name, detail: `$${goal.currentAmount} / $${goal.targetAmount}`, path: '/pro/goals' });
       }
     });
 
     incomes.forEach(inc => {
       if (inc.name.toLowerCase().includes(query) || inc.category.toLowerCase().includes(query)) {
-        results.push({ type: 'Income', name: inc.name, detail: `$${inc.amount} / ${inc.frequency}`, path: '/income' });
+        results.push({ type: 'Income', name: inc.name, detail: `$${inc.amount} / ${inc.frequency}`, path: '/pro/income' });
       }
     });
 
@@ -305,7 +305,7 @@ export default function Layout() {
           type: 'Budget',
           name: formatCategoryLabel(b.category),
           detail: `$${b.amount} ${b.period}`,
-          path: '/budgets',
+          path: '/pro/budgets',
         });
       }
     });
@@ -320,7 +320,7 @@ export default function Layout() {
       'Navigation',
       'Help & Support',
       'In-app help desk',
-      '/app/support',
+      '/pro/app/support',
     );
 
     return results.slice(0, 8); // Limit to 8 results
@@ -409,10 +409,8 @@ export default function Layout() {
     });
   }, [navigate]);
 
-  const navGroups = useMemo(
-    (): {
-      label: string;
-      items: {
+  const navGroups = useMemo(() => {
+    type NavItem = {
         name: string;
         path: string;
         icon: typeof Home;
@@ -420,49 +418,59 @@ export default function Layout() {
         hash?: string;
         /** Fix 4: lazy import factory for hover-prefetch; undefined = no chunked page */
         lazyImport?: () => Promise<unknown>;
-      }[];
-    }[] => [
+      };
+
+    const coreNavItems: NavItem[] = [
+      { name: 'Dashboard',      path: '/pro/dashboard',     icon: LayoutDashboard, lazyImport: () => import('../pages/Dashboard') },
+      { name: 'Bills & Debt',   path: '/pro/bills',         icon: Receipt, count: dueSoonCount, lazyImport: () => import('../pages/Obligations') },
+      { name: 'Subscriptions',  path: '/pro/subscriptions', icon: Repeat, lazyImport: () => import('../pages/Subscriptions') },
+      { name: 'Calendar',       path: '/pro/calendar',      icon: CalendarIcon, lazyImport: () => import('../pages/Calendar') },
+    ];
+
+    const advancedNavItems: NavItem[] = [
+      { name: 'Cash flow',        path: '/pro/dashboard',      icon: ArrowRightLeft, hash: 'cash-flow' },
+      { name: 'Due soon',         path: '/pro/bills',          icon: Clock, hash: 'due-soon', count: dueSoonCount },
+      { name: 'Income',           path: '/pro/income',         icon: Banknote, lazyImport: () => import('../pages/Income') },
+      { name: 'Freelance / gigs', path: '/pro/freelance',      icon: Briefcase, lazyImport: () => import('../pages/Freelance') },
+      { name: 'Document Inbox',   path: '/pro/ingestion',      icon: Inbox, count: pendingIngestions.length, lazyImport: () => import('../pages/Ingestion') },
+      { name: 'Transactions',     path: '/pro/transactions',   icon: ArrowRightLeft, lazyImport: () => import('../pages/Transactions') },
+      { name: 'Budgets',          path: '/pro/budgets',        icon: PieChart, lazyImport: () => import('../pages/Budgets') },
+      { name: 'Net Worth',        path: '/pro/net-worth',      icon: Scale, lazyImport: () => import('../pages/NetWorth') },
+      { name: 'Savings',          path: '/pro/savings',        icon: PiggyBank as unknown as typeof LayoutDashboard, lazyImport: () => import('../pages/Savings') },
+      { name: 'Goals',            path: '/pro/goals',          icon: Target, lazyImport: () => import('../pages/Goals') },
+      { name: 'Investments',      path: '/pro/investments',    icon: LineChart, lazyImport: () => import('../pages/Investments') },
+      { name: 'Insurance',        path: '/pro/insurance',      icon: Umbrella, lazyImport: () => import('../pages/Insurance') },
+      { name: 'Academy',          path: '/pro/education',      icon: GraduationCap, lazyImport: () => import('../pages/Education') },
+      { name: 'Credit Workshop',  path: '/pro/credit',         icon: ShieldCheck, lazyImport: () => import('../pages/CreditCenter') },
+      { name: 'Taxes',            path: '/pro/taxes',          icon: Calculator, lazyImport: () => import('../pages/Taxes') },
+      { name: 'Reports',          path: '/pro/reports',        icon: BarChart3, lazyImport: () => import('../pages/Reports') },
+      { name: 'Trends',           path: '/pro/analytics',      icon: TrendingUp, lazyImport: () => import('../pages/Analytics') },
+      { name: 'Categories',       path: '/pro/categories',     icon: MoreHorizontal, lazyImport: () => import('../pages/Categories') },
+      { name: 'Tickets & Fines',  path: '/pro/bills?tab=ambush', icon: AlertCircle },
+      { name: 'Debt details',     path: '/pro/bills?tab=debt', icon: Landmark },
+    ];
+
+    if (defaultSimpleMode) {
+      return [
+        {
+          label: 'Overview',
+          items: coreNavItems,
+        },
+        {
+          label: 'Advanced tools',
+          items: advancedNavItems,
+        },
+      ];
+    }
+
+    return [
       {
         label: 'Overview',
-        items: [
-          { name: 'Dashboard',        path: '/pro/dashboard',         icon: LayoutDashboard,       lazyImport: () => import('../pages/Dashboard') },
-          { name: 'Cash flow',        path: '/pro/dashboard',         icon: ArrowRightLeft,  hash: 'cash-flow' },
-          { name: 'Income',           path: '/pro/income',            icon: Banknote, lazyImport: () => import('../pages/Income') },
-          { name: 'Freelance / gigs', path: '/pro/freelance',         icon: Briefcase,  lazyImport: () => import('../pages/Freelance') },
-          { name: 'Regular Bills',    path: '/pro/bills',             icon: Receipt,   lazyImport: () => import('../pages/Obligations') },
-          { name: 'Tickets & Fines',  path: '/pro/bills?tab=ambush',  icon: AlertCircle },
-          { name: 'Debts & loans',    path: '/pro/bills?tab=debt',    icon: Landmark },
-          { name: 'Due soon',         path: '/pro/bills',             icon: Clock,      hash: 'due-soon', count: dueSoonCount },
-          { name: 'Subscriptions',    path: '/pro/subscriptions',     icon: Repeat,     lazyImport: () => import('../pages/Subscriptions') },
-          { name: 'Document Inbox',   path: '/pro/ingestion',         icon: Inbox,      count: pendingIngestions.length, lazyImport: () => import('../pages/Ingestion') },
-        ],
+        items: coreNavItems,
       },
-      {
-        label: 'Activity',
-        items: [
-          { name: 'Trends',        path: '/pro/analytics',     icon: TrendingUp,  lazyImport: () => import('../pages/Analytics') },
-          { name: 'Reports',       path: '/pro/reports',       icon: BarChart3, lazyImport: () => import('../pages/Reports') },
-          { name: 'Transactions',  path: '/pro/transactions',  icon: ArrowRightLeft,  lazyImport: () => import('../pages/Transactions') },
-        ],
-      },
-      {
-        label: 'Planning & Growth',
-        items: [
-          { name: 'Net Worth',        path: '/pro/net-worth',    icon: Scale,                                        lazyImport: () => import('../pages/NetWorth') },
-          { name: 'Savings',          path: '/pro/savings',      icon: PiggyBank as unknown as typeof LayoutDashboard,           lazyImport: () => import('../pages/Savings') },
-          { name: 'Investments',      path: '/pro/investments',  icon: LineChart,                                      lazyImport: () => import('../pages/Investments') },
-          { name: 'Insurance',        path: '/pro/insurance',    icon: Umbrella,                                        lazyImport: () => import('../pages/Insurance') },
-          { name: 'Budgets',          path: '/pro/budgets',      icon: PieChart,                                      lazyImport: () => import('../pages/Budgets') },
-          { name: 'Academy',          path: '/pro/education',    icon: GraduationCap,                                      lazyImport: () => import('../pages/Education') },
-          { name: 'Calendar',         path: '/pro/calendar',     icon: CalendarIcon,                                  lazyImport: () => import('../pages/Calendar') },
-          { name: 'Goals',            path: '/pro/goals',        icon: Target,                                        lazyImport: () => import('../pages/Goals') },
-          { name: 'Credit Workshop',  path: '/pro/credit',       icon: ShieldCheck,                                        lazyImport: () => import('../pages/CreditCenter') },
-          { name: 'Taxes',            path: '/pro/taxes',        icon: Calculator,                                       lazyImport: () => import('../pages/Taxes') },
-        ],
-      },
-    ],
-    [dueSoonCount, pendingIngestions.length]
-  );
+      { label: 'Advanced tools', items: advancedNavItems },
+    ];
+  }, [dueSoonCount, pendingIngestions.length]);
 
   // Layout is only rendered inside ProPlanGuard — always show all nav groups.
   const visibleNavGroups = navGroups;
@@ -485,8 +493,8 @@ export default function Layout() {
         const tabMatches =
           itemTabParam !== null
             ? currentTabParam === itemTabParam
-            : itemBasePath === '/bills'
-              ? currentTabParam === null || !['ambush', 'recurring', 'debt'].includes(currentTabParam ?? '')
+            : itemBasePath === '/pro/bills'
+              ? item.name === 'Bills & Debt' || currentTabParam === null || !['ambush', 'recurring', 'debt'].includes(currentTabParam ?? '')
               : currentTabParam === null;
         const hashMatches = item.hash
           ? deferredHash === `#${item.hash}`
@@ -682,7 +690,7 @@ export default function Layout() {
                                   )}
                                 </div>
                                 <TransitionLink
-                                  to="/bills#due-soon"
+                                  to="/pro/bills#due-soon"
                                   className="mt-3 inline-flex text-xs text-content-primary hover:text-content-secondary"
                                   onClick={() => setShowDueSoonPreview(false)}
                                 >

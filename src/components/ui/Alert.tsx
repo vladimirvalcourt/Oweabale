@@ -1,32 +1,30 @@
 import * as React from 'react';
-import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
-const alertVariants = cva(
-  'relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7',
-  {
-    variants: {
-      variant: {
-        default: 'bg-surface-raised text-content-primary border-surface-border',
-        destructive:
-          'border-brand-expense/50 bg-brand-expense/10 text-brand-expense [&>svg]:text-brand-expense',
-        success:
-          'border-brand-profit/50 bg-brand-profit/10 text-brand-profit [&>svg]:text-brand-profit',
-        warning:
-          'border-amber-500/50 bg-amber-500/10 text-amber-400 [&>svg]:text-amber-400',
-        info:
-          'border-brand-indigo/50 bg-brand-indigo/10 text-content-primary [&>svg]:text-brand-indigo',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-    },
-  }
-);
+const alertBase =
+  'relative w-full rounded-lg border px-4 py-3 text-sm [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7';
+
+const alertVariantClasses = {
+  default: 'bg-surface-raised text-content-primary border-surface-border',
+  destructive:
+    'border-brand-expense/50 bg-brand-expense/10 text-brand-expense [&>svg]:text-brand-expense',
+  success:
+    'border-brand-profit/50 bg-brand-profit/10 text-brand-profit [&>svg]:text-brand-profit',
+  warning:
+    'border-amber-500/50 bg-amber-500/10 text-amber-400 [&>svg]:text-amber-400',
+  info:
+    'border-brand-indigo/50 bg-brand-indigo/10 text-content-primary [&>svg]:text-brand-indigo',
+} as const;
+
+type AlertVariant = keyof typeof alertVariantClasses;
+
+function alertVariants({ variant = 'default' }: { variant?: AlertVariant }) {
+  return cn(alertBase, alertVariantClasses[variant]);
+}
 
 const Alert = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
+  React.HTMLAttributes<HTMLDivElement> & { variant?: AlertVariant }
 >(({ className, variant, ...props }, ref) => (
   <div
     ref={ref}

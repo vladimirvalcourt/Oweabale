@@ -1,7 +1,7 @@
 import React, { useState, startTransition } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowRight, Shield, Vault, Receipt, Activity, Flame, Wallet, FileSearch, Target, Check, Loader2 } from 'lucide-react';
+import { ArrowRight, Vault, Receipt, Activity, Flame, Wallet, Clock, Landmark, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useStore } from '../store/useStore';
 import { usePlanRedirect } from '../hooks/usePlanRedirect';
@@ -37,15 +37,9 @@ const STEPS: Step[] = [
   },
   {
     id: 'strategy',
-    title: 'What should we optimize first?',
-    subtitle: 'Pick a starting focus',
-    description: 'You can change this later in settings.',
-  },
-  {
-    id: 'freelance',
-    title: 'How do you earn?',
-    subtitle: 'Contractor vs W-2',
-    description: 'This tunes tax and income workflows. You can update it later.',
+    title: 'What needs attention first?',
+    subtitle: 'Pick the kind of relief you want first',
+    description: 'We use this to tune the dashboard toward reminders or debt payoff. You can change it later.',
   },
 ];
 
@@ -114,8 +108,7 @@ export default function Onboarding() {
     cash: '',
     bills: '',
     dailyLimit: '',
-    focus: 'stacking',
-    freelance: null as boolean | null,
+    focus: 'bills',
   });
 
   const navigate = useNavigate();
@@ -143,18 +136,17 @@ export default function Onboarding() {
       );
     }
     await Promise.all(assetPromises);
-    const freelanceOn = formData.freelance === true;
     const saved = await updateUser({
       theme: formData.focus === 'detonation' ? 'Detonation' : 'Dark',
       hasCompletedOnboarding: true,
     });
     if (!saved) return false;
     addNotification({
-      title: freelanceOn ? 'Independent contractor mode' : 'Standard household mode',
+      title: 'Household dashboard ready',
       message:
         formData.focus === 'detonation'
-          ? 'Debt payoff focus is on. Highest-cost debt gets priority in your plan.'
-          : 'Wealth-building focus is on. We’ll emphasize savings and growth where it helps.',
+          ? 'Debt payoff focus is on. Oweable will keep the payoff path closer to the surface.'
+          : 'Bills-first focus is on. Oweable will keep due dates and cash comfort close at hand.',
       type: 'info',
     });
     return true;
@@ -247,15 +239,15 @@ export default function Onboarding() {
                 Welcome, {firstName}
               </h1>
               <p className="mb-8 max-w-md text-pretty text-sm leading-relaxed text-content-secondary">
-                We’ll set up a working dashboard: cash snapshot, bills ceiling, and a default strategy. Everything is optional — skip anytime or refine later in the app.
+                We’ll set up the basics: what cash is available, what bills are coming, and how much daily spending feels safe. Everything is optional — skip anytime or refine later.
               </p>
 
               <div className="mb-10 grid gap-3 sm:grid-cols-2">
                 {[
-                  { icon: Wallet, label: 'Cash & assets', desc: 'See liquidity and net worth in one place.' },
-                  { icon: Receipt, label: 'Bills & debt', desc: 'Due dates, subscriptions, and paydown order.' },
-                  { icon: FileSearch, label: 'Documents', desc: 'Scan statements and receipts when you need them.' },
-                  { icon: Target, label: 'Goals & budgets', desc: 'Targets you can adjust as life changes.' },
+                  { icon: Wallet, label: 'Cash available', desc: 'Start with what you can actually use.' },
+                  { icon: Receipt, label: 'Bills & debt', desc: 'Keep due dates and minimums visible.' },
+                  { icon: Clock, label: 'Spending comfort', desc: 'Set a simple daily number you can live with.' },
+                  { icon: Landmark, label: 'Debt focus', desc: 'Choose whether payoff needs priority now.' },
                 ].map(({ icon: Icon, label, desc }) => (
                   <div
                     key={label}
@@ -278,7 +270,7 @@ export default function Onboarding() {
                   <p className="text-xs text-content-tertiary">Encrypted session · you control your data</p>
                 </div>
                 <p className="mb-6 text-sm text-content-secondary">
-                  <span className="font-medium text-content-primary">Five short steps.</span> Leave fields blank and tap continue, or use Skip setup.
+                  <span className="font-medium text-content-primary">Four short steps.</span> Leave fields blank and tap continue, or use Skip setup.
                 </p>
                 <div className="mb-6 h-1 w-full overflow-hidden rounded-full bg-surface-border">
                   <div
@@ -363,7 +355,7 @@ export default function Onboarding() {
                       {currentStepIndex > index ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : index + 1}
                     </motion.div>
                     {index < STEPS.length - 1 && (
-                      <div className="absolute left-8 top-4 h-0.5 w-[calc(100vw/5-2rem)] sm:w-[calc(100%/5-2rem)]">
+                      <div className="absolute left-8 top-4 h-0.5 w-[calc(100vw/4-2rem)] sm:w-[calc(100%/4-2rem)]">
                         <motion.div
                           initial={false}
                           animate={{
@@ -397,7 +389,6 @@ export default function Onboarding() {
                   {currentStepIndex === 1 && <Receipt className="h-5 w-5 text-content-secondary" aria-hidden />}
                   {currentStepIndex === 2 && <Activity className="h-5 w-5 text-content-secondary" aria-hidden />}
                   {currentStepIndex === 3 && <Flame className="h-5 w-5 text-content-secondary" aria-hidden />}
-                  {currentStepIndex === 4 && <Shield className="h-5 w-5 text-content-secondary" aria-hidden />}
                 </div>
 
                 <h1 id="onboarding-step-title" className="mb-2 text-balance text-2xl font-semibold tracking-tight text-content-primary sm:text-3xl">
@@ -486,44 +477,19 @@ export default function Onboarding() {
                   {currentStep.id === 'strategy' && (
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <ChoiceCard
-                        selected={formData.focus === 'stacking'}
-                        onSelect={() => setFormData({ ...formData, focus: 'stacking' })}
-                        title="Save & grow"
-                        description="Prioritize building reserves and long-term growth."
+                        selected={formData.focus === 'bills'}
+                        onSelect={() => setFormData({ ...formData, focus: 'bills' })}
+                        title="Stay ahead of bills"
+                        description="Prioritize due dates, subscriptions, and cash comfort."
                         accent="neutral"
                       />
                       <ChoiceCard
                         selected={formData.focus === 'detonation'}
                         onSelect={() => setFormData({ ...formData, focus: 'detonation' })}
-                        title="Pay off debt fast"
-                        description="Prioritize high-cost debt and faster payoff order."
+                        title="Pay down debt"
+                        description="Prioritize balances, minimums, and payoff order."
                         accent="rose"
                       />
-                    </div>
-                  )}
-
-                  {currentStep.id === 'freelance' && (
-                    <div className="flex flex-col gap-4">
-                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                        <ChoiceCard
-                          selected={formData.freelance === true}
-                          onSelect={() => setFormData({ ...formData, freelance: true })}
-                          title="Independent contractor"
-                          description="1099-friendly flows: estimates, tax set-aside, and income docs."
-                        />
-                        <ChoiceCard
-                          selected={formData.freelance === false}
-                          onSelect={() => setFormData({ ...formData, freelance: false })}
-                          title="W-2 / household"
-                          description="Standard budgeting and bills for salaried or mixed households."
-                        />
-                      </div>
-                      <div className="rounded-lg border border-surface-border bg-surface-base/80 p-4">
-                        <p className="text-xs font-medium text-emerald-400/95">1099 note</p>
-                        <p className="mt-2 text-xs leading-relaxed text-content-secondary">
-                          Self-employment taxes apply to net gig income. Oweable can help you set aside a realistic reserve; tune rates with your tax pro if needed.
-                        </p>
-                      </div>
                     </div>
                   )}
                 </div>
