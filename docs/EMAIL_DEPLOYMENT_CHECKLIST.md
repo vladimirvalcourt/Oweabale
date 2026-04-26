@@ -11,7 +11,7 @@ Add these to Vercel Dashboard → Settings → Environment Variables:
 NEXT_PUBLIC_CONTACT_EMAIL=hello@oweable.com
 NEXT_PUBLIC_SUPPORT_EMAIL=support@oweable.com
 RESEND_FROM_EMAIL=noreply@oweable.com
-RESEND_API_KEY=re_T42pByXQ_EpZR21RAaFYoCkAkmgMR5ECF  # Mark as SENSITIVE
+RESEND_API_KEY=REDACTED_RESEND_API_KEY  # Mark as SENSITIVE
 ADMIN_ALERTS_FROM_EMAIL=alerts@oweable.com
 ADMIN_ALERTS_TO_EMAIL=support@oweable.com
 SUPPORT_EMAIL=support@oweable.com

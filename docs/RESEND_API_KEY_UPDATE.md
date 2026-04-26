@@ -4,7 +4,7 @@
 
 Your `.env.local` file has been updated with the new Resend API key:
 ```
-RESEND_API_KEY=re_HVdmNvYm_4fVX9WmzgaNiJ1mLH32qh1et
+RESEND_API_KEY=REDACTED_RESEND_API_KEY
 ```
 
 ---
@@ -19,7 +19,7 @@ Since `.env.local` is not committed to Git (for security), you need to manually 
 
 **Update or Add:**
 ```
-RESEND_API_KEY=re_HVdmNvYm_4fVX9WmzgaNiJ1mLH32qh1et
+RESEND_API_KEY=REDACTED_RESEND_API_KEY
 ```
 
 **Settings:**
@@ -41,7 +41,7 @@ vercel env add RESEND_API_KEY preview --sensitive
 
 **Update or Add:**
 ```
-RESEND_API_KEY = re_HVdmNvYm_4fVX9WmzgaNiJ1mLH32qh1et
+RESEND_API_KEY = REDACTED_RESEND_API_KEY
 ```
 
 **Steps:**
@@ -52,7 +52,7 @@ RESEND_API_KEY = re_HVdmNvYm_4fVX9WmzgaNiJ1mLH32qh1et
 
 **Or use Supabase CLI:**
 ```bash
-supabase secrets set RESEND_API_KEY=re_HVdmNvYm_4fVX9WmzgaNiJ1mLH32qh1et --project-ref hjgrslcapdmmgxeppguu
+supabase secrets set RESEND_API_KEY=REDACTED_RESEND_API_KEY --project-ref hjgrslcapdmmgxeppguu
 ```
 
 ---
@@ -127,5 +127,5 @@ After updating all services:
 ---
 
 **Updated:** 2026-04-25  
-**New API Key:** `re_HVdmNvYm_4fVX9WmzgaNiJ1mLH32qh1et`  
+**New API Key:** `REDACTED_RESEND_API_KEY`  
 **From Email:** `noreply@oweable.com`

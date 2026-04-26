@@ -23,8 +23,8 @@ Integrate domain email addresses into Oweable website with security best practic
   ```
 
 #### Resend API Key Updated
-- **Old Key:** `re_T42pByXQ_EpZR21RAaFYoCkAkmgMR5ECF`
-- **New Key:** `re_HVdmNvYm_4fVX9WmzgaNiJ1mLH32qh1et`
+- **Old Key:** `REDACTED_RESEND_API_KEY`
+- **New Key:** `REDACTED_RESEND_API_KEY`
 - **Updated in:**
   - ✅ Local `.env.local`
   - ✅ Vercel Production environment (encrypted)
@@ -326,7 +326,7 @@ const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') ?? 'noreply@oweable.com';
 - **Vercel Dashboard:** https://vercel.com/vlads-projects-826f3240/oweabale
 
 ### Key Configuration
-- **Resend API Key:** `re_HVdmNvYm_4fVX9WmzgaNiJ1mLH32qh1et`
+- **Resend API Key:** `REDACTED_RESEND_API_KEY`
 - **From Email:** `noreply@oweable.com`
 - **Support Email:** `support@oweable.com`
 - **Contact Email:** `hello@oweable.com`
@@ -336,7 +336,7 @@ const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') ?? 'noreply@oweable.com';
 NEXT_PUBLIC_CONTACT_EMAIL=hello@oweable.com
 NEXT_PUBLIC_SUPPORT_EMAIL=support@oweable.com
 RESEND_FROM_EMAIL=noreply@oweable.com
-RESEND_API_KEY=re_HVdmNvYm_4fVX9WmzgaNiJ1mLH32qh1et
+RESEND_API_KEY=REDACTED_RESEND_API_KEY
 ```
 
 ---

@@ -27,7 +27,7 @@ NEXT_PUBLIC_SUPPORT_EMAIL=support@oweable.com
 ### Resend Configuration (Server-side only)
 ```
 RESEND_FROM_EMAIL=noreply@oweable.com
-RESEND_API_KEY=re_T42pByXQ_EpZR21RAaFYoCkAkmgMR5ECF
+RESEND_API_KEY=REDACTED_RESEND_API_KEY
 ```
 - **Environments:** Production, Preview
 - **Type:** 
@@ -66,7 +66,7 @@ NEXT_PUBLIC_SUPPORT_EMAIL=support@oweable.com
 
 # Resend email service
 RESEND_FROM_EMAIL=noreply@oweable.com
-RESEND_API_KEY=re_T42pByXQ_EpZR21RAaFYoCkAkmgMR5ECF  # MARK AS SENSITIVE
+RESEND_API_KEY=REDACTED_RESEND_API_KEY  # MARK AS SENSITIVE
 
 # Admin alerts
 ADMIN_ALERTS_FROM_EMAIL=alerts@oweable.com
