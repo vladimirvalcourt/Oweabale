@@ -14,8 +14,14 @@ export async function submitSupportContact(payload: SupportContactPayload) {
       body: payload,
     });
 
+    const data = res.data as { error?: string } | null;
+
     if (res.error) {
-      throw new Error(res.error.message || 'Failed to send message');
+      throw new Error(data?.error || res.error.message || 'Failed to send message');
+    }
+
+    if (data?.error) {
+      throw new Error(data.error);
     }
 
     return { ok: true };

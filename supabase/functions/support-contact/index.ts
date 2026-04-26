@@ -47,7 +47,10 @@ Deno.serve(async (req: Request) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) throw new Error('Invalid email format');
 
-    await enforceRateLimit(req, rateLimiters.contact, `support:${email}`, c);
+    const emailRateLimit = await enforceRateLimit(req, rateLimiters.contact, `support:${email}`, c);
+    if (!emailRateLimit.allowed) {
+      return emailRateLimit.response!;
+    }
     // TEMPORARILY DISABLED FOR TESTING - Turnstile verification
     // await verifyTurnstile(turnstileToken, getClientIp(req));
 

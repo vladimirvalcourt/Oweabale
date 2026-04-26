@@ -126,14 +126,16 @@ Deno.serve(async (req: Request) => {
     }
 
     // Create pending invite
-    const { error: insertError } = await supabaseAdmin
+    const { data: inviteRow, error: insertError } = await supabaseAdmin
       .from('household_members')
       .insert({
         household_id: householdId,
         invited_email: email,
         role,
         status: 'pending'
-      });
+      })
+      .select('id')
+      .single();
 
     if (insertError) {
       console.error('Failed to create invite:', insertError);
@@ -156,7 +158,22 @@ Deno.serve(async (req: Request) => {
 
     if (emailError) {
       console.warn('Failed to send invite email:', emailError);
-      // Don't fail the request - invite is still created in DB
+      if (inviteRow?.id) {
+        const { error: cleanupError } = await supabaseAdmin
+          .from('household_members')
+          .delete()
+          .eq('id', inviteRow.id)
+          .eq('household_id', householdId);
+        if (cleanupError) {
+          console.error('Failed to clean up unsent household invite:', cleanupError);
+        }
+      }
+      return new Response(JSON.stringify({
+        error: 'Invite email could not be sent. Check Supabase Auth email/SMTP settings and try again.',
+      }), {
+        status: 502,
+        headers: { ...c, 'Content-Type': 'application/json' }
+      });
     }
 
     return new Response(JSON.stringify({ 
