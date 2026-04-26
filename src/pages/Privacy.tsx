@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 import PublicHeader from '../components/PublicHeader';
 import { TransitionLink } from '../components/TransitionLink';
 import { useSEO } from '../hooks/useSEO';
+import { EMAIL_CONFIG } from '../lib/emailObfuscation';
 
 // Framer Motion Variants
 const fadeInUp = {
@@ -50,7 +51,7 @@ const privacySections = [
   {
     title: 'Your privacy rights',
     copy:
-      'You can request access, correction, export, or deletion of eligible data. If you need help, contact support or email privacy@oweable.com.',
+      'You can request access, correction, export, or deletion of eligible data. If you need help, contact support or use the privacy contact form.',
   },
 ] as const;
 
@@ -99,15 +100,13 @@ export default function Privacy() {
                 <TransitionLink to="/security" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
                   Security page
                 </TransitionLink>
-                . For requests involving your data, email{' '}
-                <a href="mailto:privacy@oweable.com" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
-                  privacy@oweable.com
-                </a>
-                {' '}or use the{' '}
+                . For requests involving your data, use the{' '}
                 <TransitionLink to="/support" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
                   support page
                 </TransitionLink>
-                .
+                {' '}or contact us through the support channels.
+              </p>
+            </motion.div>
               </p>
             </motion.div>
           </section>

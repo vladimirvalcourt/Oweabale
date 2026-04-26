@@ -63,7 +63,7 @@ Deno.serve(async (req: Request) => {
       if (!resendApiKey || !alertsEmail) {
         throw new Error('Missing RESEND_API_KEY or ADMIN_ALERTS_TO_EMAIL');
       }
-      const fromEmail = Deno.env.get('ADMIN_ALERTS_FROM_EMAIL') ?? 'alerts@oweable.com';
+      const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') ?? 'noreply@oweable.com';
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {

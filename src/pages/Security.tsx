@@ -3,6 +3,7 @@ import React from 'react';
 import Footer from '../components/Footer';
 import PublicHeader from '../components/PublicHeader';
 import { useSEO } from '../hooks/useSEO';
+import { EMAIL_CONFIG } from '../lib/emailObfuscation';
 
 // Framer Motion Variants
 const fadeInUp = {
@@ -49,7 +50,7 @@ const sections = [
   {
     title: 'Vulnerability reporting',
     copy:
-      'If you discover a security issue, email security@oweable.com with as much detail as you can safely share. Reports are reviewed and prioritized based on severity and user impact.',
+      'If you discover a security issue, use the support contact form with as much detail as you can safely share. Reports are reviewed and prioritized based on severity and user impact.',
   },
   {
     title: 'Data residency and compliance posture',

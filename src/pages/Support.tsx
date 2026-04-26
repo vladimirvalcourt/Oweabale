@@ -7,6 +7,7 @@ import { TransitionLink } from '../components/TransitionLink';
 import { useJsonLd } from '../hooks/useJsonLd';
 import { useSEO } from '../hooks/useSEO';
 import { submitSupportContact } from '../lib/supportContact';
+import { EMAIL_CONFIG } from '../lib/emailObfuscation';
 import { toast } from 'sonner';
 
 // Framer Motion Variants
@@ -30,7 +31,6 @@ const springButton = {
   tap: { scale: 0.97, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
 };
 
-const SUPPORT_EMAIL = 'support@oweable.com';
 const SUPPORT_PAGE_URL = 'https://www.oweable.com/support';
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim();
 
@@ -241,10 +241,12 @@ export default function Support() {
                   <p className="mt-3 text-sm leading-relaxed text-content-secondary">Account access problems, billing questions, bugs, and anything that is making the product harder to use than it should be.</p>
                 </div>
                 <div className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Direct email</p>
-                  <a href={`mailto:${SUPPORT_EMAIL}`} className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-content-primary hover:text-brand-profit">
-                    {SUPPORT_EMAIL}
-                  </a>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Contact Support</p>
+                  {EMAIL_CONFIG.support.createContactLink(
+                    'Get Help',
+                    'mt-3 inline-flex items-center justify-center rounded-[10px] bg-brand-cta px-6 h-[48px] text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover min-w-[160px]',
+                    true
+                  )}
                 </div>
                 <div className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8">
                   <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Sensitive requests</p>

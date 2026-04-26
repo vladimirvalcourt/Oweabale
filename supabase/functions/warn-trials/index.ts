@@ -51,7 +51,7 @@ Deno.serve(async (req: Request) => {
     console.log(`Sending trial warning emails to ${users.length} users`);
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
-    const fromEmail = Deno.env.get('ADMIN_ALERTS_FROM_EMAIL') ?? 'alerts@oweable.com';
+    const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') ?? 'noreply@oweable.com';
 
     const results = [];
     for (const user of users) {
