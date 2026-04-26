@@ -165,6 +165,20 @@ export const rateLimiters = {
     keyPrefix: 'rl_public',
   }),
 
+  // Tight: Public contact/support endpoints (5 requests per 10 minutes)
+  contact: new RateLimiter({
+    windowMs: 10 * 60 * 1000,
+    maxRequests: 5,
+    keyPrefix: 'rl_contact',
+  }),
+
+  // Household invites should be sparse and deliberate.
+  householdInvite: new RateLimiter({
+    windowMs: 60 * 60 * 1000,
+    maxRequests: 6,
+    keyPrefix: 'rl_household_invite',
+  }),
+
   // Very strict: Webhook endpoints (10 requests per minute)
   webhook: new RateLimiter({
     windowMs: 60 * 1000,
@@ -220,7 +234,8 @@ export function createRateLimitHeaders(result: RateLimitResult): Record<string, 
 export async function enforceRateLimit(
   req: Request,
   limiter: RateLimiter,
-  identifier?: string
+  identifier?: string,
+  extraHeaders: Record<string, string> = {}
 ): Promise<{ allowed: boolean; response?: Response }> {
   const clientId = identifier || getClientIp(req);
   const result = await limiter.checkRateLimit(clientId);
@@ -228,6 +243,7 @@ export async function enforceRateLimit(
   if (!result.allowed) {
     const headers = {
       ...createRateLimitHeaders(result),
+      ...extraHeaders,
       'Content-Type': 'application/json',
     };
     

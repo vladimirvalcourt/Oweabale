@@ -14,6 +14,21 @@ interface Scheduler {
 
 interface Window {
   scheduler?: Scheduler;
+  turnstile?: {
+    render(
+      container: string | HTMLElement,
+      options: {
+        sitekey: string;
+        theme?: 'auto' | 'light' | 'dark';
+        callback?: (token: string) => void;
+        'expired-callback'?: () => void;
+        'error-callback'?: () => void;
+      }
+    ): string;
+    reset(widgetId?: string): void;
+    remove(widgetId?: string): void;
+  };
+  __oweableTurnstileScriptLoading?: Promise<void>;
 }
 
 interface ImportMetaEnv {
@@ -37,6 +52,8 @@ interface ImportMetaEnv {
   readonly VITE_PRICING_MONTHLY_DISPLAY?: string;
   /** Marketing: annual total for Full Suite; when set, enables yearly plan toggle on /pricing. */
   readonly VITE_PRICING_YEARLY_DISPLAY?: string;
+  /** Cloudflare Turnstile site key for public forms. */
+  readonly VITE_TURNSTILE_SITE_KEY?: string;
 }
 
 interface ImportMeta {

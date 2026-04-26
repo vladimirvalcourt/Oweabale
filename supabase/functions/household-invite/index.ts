@@ -1,11 +1,24 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { corsHeaders } from '../_shared/cors.ts';
+import { enforceRateLimit, rateLimiters } from '../_shared/rateLimiter.ts';
 
-serve(async (req) => {
+Deno.serve(async (req: Request) => {
+  const c = corsHeaders(req.headers.get('origin'), req.headers);
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: c });
+  }
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...c, 'Content-Type': 'application/json' },
+    });
+  }
+
   try {
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+      { auth: { autoRefreshToken: false, persistSession: false } },
     );
 
     // Get user ID from auth header
@@ -13,7 +26,7 @@ serve(async (req) => {
     if (!authHeader) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { ...c, 'Content-Type': 'application/json' }
       });
     }
 
@@ -23,17 +36,60 @@ serve(async (req) => {
     if (authError || !user) {
       return new Response(JSON.stringify({ error: 'Invalid token' }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { ...c, 'Content-Type': 'application/json' }
       });
     }
 
-    const { householdId, email, role } = await req.json();
+    const inviteRateLimit = await enforceRateLimit(
+      req,
+      rateLimiters.householdInvite,
+      `household-invite:user:${user.id}`,
+      c,
+    );
+    if (!inviteRateLimit.allowed) {
+      return inviteRateLimit.response!;
+    }
+
+    const payload = await req.json() as { householdId?: string; email?: string; role?: string };
+    const householdId = payload.householdId?.trim();
+    const email = payload.email?.trim().toLowerCase();
+    const requestedRole = payload.role?.trim().toLowerCase();
+    const role = requestedRole === 'viewer' ? 'viewer' : requestedRole === 'partner' ? 'partner' : null;
 
     if (!householdId || !email) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
         status: 400,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { ...c, 'Content-Type': 'application/json' }
       });
+    }
+    if (!role) {
+      return new Response(JSON.stringify({ error: 'Invalid role' }), {
+        status: 400,
+        headers: { ...c, 'Content-Type': 'application/json' }
+      });
+    }
+    if (email.length > 320) {
+      return new Response(JSON.stringify({ error: 'Email is too long' }), {
+        status: 400,
+        headers: { ...c, 'Content-Type': 'application/json' }
+      });
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return new Response(JSON.stringify({ error: 'Invalid email address' }), {
+        status: 400,
+        headers: { ...c, 'Content-Type': 'application/json' }
+      });
+    }
+
+    const householdRateLimit = await enforceRateLimit(
+      req,
+      rateLimiters.householdInvite,
+      `household-invite:household:${householdId}`,
+      c,
+    );
+    if (!householdRateLimit.allowed) {
+      return householdRateLimit.response!;
     }
 
     // Verify inviter has permission (owner or partner)
@@ -47,7 +103,7 @@ serve(async (req) => {
     if (memberError || !member || !['owner', 'partner'].includes(member.role)) {
       return new Response(JSON.stringify({ error: 'Unauthorized to invite members' }), {
         status: 403,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { ...c, 'Content-Type': 'application/json' }
       });
     }
 
@@ -65,7 +121,7 @@ serve(async (req) => {
         alreadyExists: true 
       }), {
         status: 409,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { ...c, 'Content-Type': 'application/json' }
       });
     }
 
@@ -75,7 +131,7 @@ serve(async (req) => {
       .insert({
         household_id: householdId,
         invited_email: email,
-        role: role || 'partner',
+        role,
         status: 'pending'
       });
 
@@ -83,7 +139,7 @@ serve(async (req) => {
       console.error('Failed to create invite:', insertError);
       return new Response(JSON.stringify({ error: 'Failed to create invite' }), {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { ...c, 'Content-Type': 'application/json' }
       });
     }
 
@@ -94,7 +150,7 @@ serve(async (req) => {
       data: {
         household_id: householdId,
         invited_by: user.id,
-        role: role || 'partner'
+        role,
       }
     });
 
@@ -107,16 +163,15 @@ serve(async (req) => {
       success: true,
       message: 'Invite sent successfully'
     }), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { ...c, 'Content-Type': 'application/json' }
     });
   } catch (error) {
     console.error('Household invite error:', error);
     return new Response(JSON.stringify({ 
-      error: 'Internal server error',
-      details: error.message 
+      error: 'Request failed',
     }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { ...c, 'Content-Type': 'application/json' }
     });
   }
 });

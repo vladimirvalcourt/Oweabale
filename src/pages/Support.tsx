@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import Footer from '../components/Footer';
 import PublicHeader from '../components/PublicHeader';
@@ -32,6 +32,7 @@ const springButton = {
 
 const SUPPORT_EMAIL = 'support@oweable.com';
 const SUPPORT_PAGE_URL = 'https://www.oweable.com/support';
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim();
 
 const QUICK_HELP = [
   {
@@ -90,6 +91,10 @@ export default function Support() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState('');
+  const [turnstileReady, setTurnstileReady] = useState(false);
+  const widgetContainerRef = useRef<HTMLDivElement | null>(null);
+  const widgetIdRef = useRef<string | null>(null);
 
   useSEO({
     title: 'Support — Oweable',
@@ -101,6 +106,57 @@ export default function Support() {
   });
 
   useJsonLd('support', buildSupportJsonLd, []);
+
+  useEffect(() => {
+    if (!TURNSTILE_SITE_KEY || !widgetContainerRef.current) {
+      return;
+    }
+
+    let cancelled = false;
+
+    loadTurnstileScript()
+      .then(() => {
+        if (cancelled || !widgetContainerRef.current || !window.turnstile) {
+          return;
+        }
+
+        if (widgetIdRef.current) {
+          window.turnstile.remove(widgetIdRef.current);
+          widgetIdRef.current = null;
+        }
+
+        widgetContainerRef.current.innerHTML = '';
+        widgetIdRef.current = window.turnstile.render(widgetContainerRef.current, {
+          sitekey: TURNSTILE_SITE_KEY,
+          theme: 'auto',
+          callback: (token: string) => {
+            setTurnstileToken(token);
+            setTurnstileReady(true);
+          },
+          'expired-callback': () => {
+            setTurnstileToken('');
+            setTurnstileReady(false);
+          },
+          'error-callback': () => {
+            setTurnstileToken('');
+            setTurnstileReady(false);
+          },
+        });
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setTurnstileReady(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      if (widgetIdRef.current && window.turnstile) {
+        window.turnstile.remove(widgetIdRef.current);
+        widgetIdRef.current = null;
+      }
+    };
+  }, []);
 
   const validateForm = () => {
     if (!formData.name.trim()) {
@@ -120,6 +176,14 @@ export default function Support() {
       toast.error('Please enter a message');
       return false;
     }
+    if (!TURNSTILE_SITE_KEY) {
+      toast.error('Support form verification is not configured yet');
+      return false;
+    }
+    if (!turnstileToken) {
+      toast.error('Please complete the security check');
+      return false;
+    }
     return true;
   };
 
@@ -128,7 +192,10 @@ export default function Support() {
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    const result = await submitSupportContact(formData);
+    const result = await submitSupportContact({
+      ...formData,
+      turnstileToken,
+    });
     setIsSubmitting(false);
 
     if ('error' in result) {
@@ -136,6 +203,11 @@ export default function Support() {
     } else {
       setSubmitted(true);
       setFormData({ name: '', email: '', subject: '', message: '' });
+      setTurnstileToken('');
+      setTurnstileReady(false);
+      if (widgetIdRef.current && window.turnstile) {
+        window.turnstile.reset(widgetIdRef.current);
+      }
       toast.success("We got your message and we'll reply within 1 business day.");
     }
   };
@@ -253,9 +325,26 @@ export default function Support() {
                       />
                     </label>
 
+                    <div className="mt-5">
+                      {TURNSTILE_SITE_KEY ? (
+                        <>
+                          <div ref={widgetContainerRef} />
+                          {!turnstileReady && (
+                            <p className="mt-2 text-sm text-content-tertiary">
+                              Complete the verification to send your message.
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-sm text-content-tertiary">
+                          Support form verification is not configured yet.
+                        </p>
+                      )}
+                    </div>
+
                     <button
                       type="submit"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || !turnstileToken || !TURNSTILE_SITE_KEY}
                       className="mt-6 inline-flex items-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       {isSubmitting ? 'Sending...' : 'Send message'}
@@ -311,4 +400,34 @@ export default function Support() {
       <Footer />
     </div>
   );
+}
+
+function loadTurnstileScript() {
+  if (window.turnstile) {
+    return Promise.resolve();
+  }
+
+  if (window.__oweableTurnstileScriptLoading) {
+    return window.__oweableTurnstileScriptLoading;
+  }
+
+  window.__oweableTurnstileScriptLoading = new Promise<void>((resolve, reject) => {
+    const existingScript = document.querySelector<HTMLScriptElement>('script[data-turnstile-script="true"]');
+    if (existingScript) {
+      existingScript.addEventListener('load', () => resolve(), { once: true });
+      existingScript.addEventListener('error', () => reject(new Error('Failed to load Turnstile')), { once: true });
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    script.async = true;
+    script.defer = true;
+    script.dataset.turnstileScript = 'true';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Failed to load Turnstile'));
+    document.head.appendChild(script);
+  });
+
+  return window.__oweableTurnstileScriptLoading;
 }

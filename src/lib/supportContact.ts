@@ -5,6 +5,7 @@ export type SupportContactPayload = {
   email: string;
   subject: string;
   message: string;
+  turnstileToken: string;
 };
 
 export async function submitSupportContact(payload: SupportContactPayload) {

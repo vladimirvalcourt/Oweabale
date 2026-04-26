@@ -20,7 +20,6 @@ const navItems = [
   { to: '/admin/telemetry', label: 'Telemetry', requiredPermission: 'telemetry.read' },
   // ADD 7 + 6
   { to: '/admin/email-blast', label: 'Email Blast', requiredPermission: 'moderation.manage' },
-  { to: '/admin/coupons', label: 'Coupons', requiredPermission: 'dashboard.view' },
 ];
 
 

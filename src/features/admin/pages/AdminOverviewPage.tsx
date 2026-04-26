@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { 
   ArrowRight, Users, GitBranch, CheckCircle, BarChart3, 
   Database, ShieldAlert, Gavel, Activity, FileText, 
-  Scale, Radio, Mail, Ticket, Search
+  Scale, Radio, Mail, Search
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 
@@ -78,12 +78,6 @@ const adminModules = [
     description: 'Send targeted marketing and operational broadcasts.',
     icon: Mail,
     href: '/admin/email-blast',
-  },
-  {
-    title: 'Coupons',
-    description: 'Manage Stripe discount codes and promotional campaigns.',
-    icon: Ticket,
-    href: '/admin/coupons',
   },
 ];
 

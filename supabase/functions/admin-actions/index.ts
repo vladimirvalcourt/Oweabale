@@ -215,7 +215,8 @@ Deno.serve(async (req: Request) => {
       'plaid_items_list', 'set_admin', 'promote_admin', 'plaid_stats',
       'ban', 'unban', 'delete',
       'grant_entitlement', 'revoke_entitlement', 'user_detail', 'impersonate', 'bulk_action',
-      'revenue_chart', 'growth_chart', 'churn_stats', 'webhook_list', 'apply_coupon', 'extend_trial', 'set_feature_flag',
+      'revenue_chart', 'growth_chart', 'churn_stats', 'webhook_list', 'extend_trial', 'set_feature_flag',
+      'grant_entitlement_by_email', 'extend_trial_by_email',
       'admin_roles_permissions', 'revoke_sessions',
       'rbac_context', 'users_query', 'user_timeline', 'compliance_overview', 'compliance_update_status',
       'compliance_force_refresh_plaid', 'telemetry_overview', 'update_platform_controls',
@@ -891,24 +892,42 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ webhooks: data ?? [] }), { headers: jsonHeaders })
     }
 
-    if (action === 'apply_coupon') {
+    if (action === 'grant_entitlement_by_email') {
       requirePermission(adminCtx, 'billing.manage')
-      if (!targetUserId || typeof targetUserId !== 'string') throw new Error('Missing targetUserId')
-      const coupon_id = (body as { coupon_id?: unknown }).coupon_id
-      if (typeof coupon_id !== 'string' || !coupon_id.trim()) throw new Error('coupon_id is required')
-      const { data: subRow } = await supabaseAdmin
-        .from('billing_subscriptions')
-        .select('stripe_customer_id')
-        .eq('user_id', targetUserId)
-        .neq('status', 'canceled')
-        .order('created_at', { ascending: false })
-        .limit(1)
+      const { email, featureKey, durationDays } = body as {
+        email?: unknown
+        featureKey?: unknown
+        durationDays?: unknown
+      }
+      const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : ''
+      const normalizedFeature = featureKey === 'pro' || featureKey === 'full_suite' ? 'full_suite' : null
+      const normalizedDuration = Math.floor(Number(durationDays))
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) throw new Error('Valid email is required')
+      if (!normalizedFeature) throw new Error('Unsupported featureKey')
+      if (!Number.isFinite(normalizedDuration) || normalizedDuration < 1 || normalizedDuration > 3650) {
+        throw new Error('durationDays must be between 1 and 3650')
+      }
+      const { data: profile, error: profileErr } = await supabaseAdmin
+        .from('profiles')
+        .select('id')
+        .eq('email', normalizedEmail)
         .maybeSingle()
-      if (!subRow?.stripe_customer_id) throw new Error('No active subscription found for user')
-      await enforceRateLimit(supabaseAdmin, user.id, 'apply_coupon')
-      await stripePost(`/customers/${subRow.stripe_customer_id}`, { coupon: coupon_id })
-      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'apply_coupon', { targetUserId, coupon_id })
-      return new Response(JSON.stringify({ message: 'Coupon applied.' }), { headers: jsonHeaders })
+      if (profileErr) throw profileErr
+      if (!profile?.id) throw new Error('User not found')
+
+      const endsAt = new Date(Date.now() + normalizedDuration * 24 * 60 * 60 * 1000).toISOString()
+      await enforceRateLimit(supabaseAdmin, user.id, 'grant_entitlement_by_email')
+      await upsertEntitlementRow(supabaseAdmin, profile.id, normalizedFeature, {
+        source: 'admin',
+        status: 'active',
+        ends_at: endsAt,
+      })
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'grant_entitlement_by_email', {
+        email: normalizedEmail,
+        featureKey: normalizedFeature,
+        durationDays: normalizedDuration,
+      })
+      return new Response(JSON.stringify({ message: 'Entitlement granted.' }), { headers: jsonHeaders })
     }
 
     if (action === 'extend_trial') {
@@ -931,6 +950,50 @@ Deno.serve(async (req: Request) => {
       await enforceRateLimit(supabaseAdmin, user.id, 'extend_trial')
       await stripePost(`/subscriptions/${subRow.stripe_subscription_id}`, { trial_end })
       await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'extend_trial', { targetUserId, trial_end })
+      return new Response(JSON.stringify({ message: 'Trial extended.' }), { headers: jsonHeaders })
+    }
+
+    if (action === 'extend_trial_by_email') {
+      requirePermission(adminCtx, 'billing.manage')
+      const { email, additionalDays } = body as {
+        email?: unknown
+        additionalDays?: unknown
+      }
+      const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : ''
+      const normalizedDays = Math.floor(Number(additionalDays))
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) throw new Error('Valid email is required')
+      if (!Number.isFinite(normalizedDays) || normalizedDays < 1 || normalizedDays > 90) {
+        throw new Error('additionalDays must be between 1 and 90')
+      }
+      const { data: profile, error: profileErr } = await supabaseAdmin
+        .from('profiles')
+        .select('id, plan, trial_ends_at')
+        .eq('email', normalizedEmail)
+        .maybeSingle()
+      if (profileErr) throw profileErr
+      if (!profile?.id) throw new Error('User not found')
+      if (profile.plan === 'full_suite') throw new Error('Cannot extend trial for a Full Suite user')
+
+      const baseTime = profile.trial_ends_at && new Date(profile.trial_ends_at).getTime() > Date.now()
+        ? new Date(profile.trial_ends_at).getTime()
+        : Date.now()
+      const nextTrialEndsAt = new Date(baseTime + normalizedDays * 24 * 60 * 60 * 1000).toISOString()
+
+      await enforceRateLimit(supabaseAdmin, user.id, 'extend_trial_by_email')
+      const { error } = await supabaseAdmin
+        .from('profiles')
+        .update({
+          plan: 'trial',
+          trial_expired: false,
+          trial_ends_at: nextTrialEndsAt,
+        })
+        .eq('id', profile.id)
+      if (error) throw error
+      await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'extend_trial_by_email', {
+        email: normalizedEmail,
+        additionalDays: normalizedDays,
+        trialEndsAt: nextTrialEndsAt,
+      })
       return new Response(JSON.stringify({ message: 'Trial extended.' }), { headers: jsonHeaders })
     }
 

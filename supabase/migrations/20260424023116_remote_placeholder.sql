@@ -1,0 +1,3 @@
+-- Remote migration placeholder.
+-- The corresponding SQL was applied directly in Supabase before this local
+-- migration history was reconciled.
