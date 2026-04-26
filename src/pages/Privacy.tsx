@@ -107,8 +107,6 @@ export default function Privacy() {
                 {' '}or contact us through the support channels.
               </p>
             </motion.div>
-              </p>
-            </motion.div>
           </section>
         </div>
       </div>
