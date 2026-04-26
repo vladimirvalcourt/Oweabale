@@ -1,5 +1,5 @@
 /**
- * Bills & Debts — Total Bills & Debt record
+ * Pay List details - bills, debt minimums, subscriptions, tolls, tickets, and fines.
  * Avalanche/Snowball payoff algorithm with projected payoff dates and interest savings.
  */
 import React, { useState, useMemo, useEffect } from 'react';
@@ -165,7 +165,7 @@ export default function Obligations() {
   const [editDebtRow, setEditDebtRow] = useState<Debt | null>(null);
   const { hasFullSuite } = useFullSuiteAccess();
   const canUseDebt = canUseDebtActions(hasFullSuite);
-  const cashFlowHref = hasFullSuite ? '/pro/dashboard#cash-flow' : '/free/dashboard';
+  const cashFlowHref = hasFullSuite ? '/pro/dashboard#safe-spend' : '/free/dashboard';
   const calendarHref = hasFullSuite ? '/pro/calendar#calendar-view' : '/free/calendar#calendar-view';
   const analyticsHref = hasFullSuite ? '/pro/analytics' : '/free/dashboard';
 
@@ -361,17 +361,17 @@ export default function Obligations() {
 
   const tabs: { key: FilterTab; label: string; count: number }[] = [
     { key: 'all', label: 'All', count: allObligations.length },
-    { key: 'recurring', label: 'Regular Bills', count: allObligations.filter(o => o.type === 'recurring').length },
-    { key: 'debt', label: 'Loans & Credit', count: allObligations.filter(o => o.type === 'debt').length },
-    { key: 'ambush', label: 'Tickets & Fines', count: allObligations.filter(o => o.type === 'ambush').length },
+    { key: 'recurring', label: 'Regular bills', count: allObligations.filter(o => o.type === 'recurring').length },
+    { key: 'debt', label: 'Debt minimums', count: allObligations.filter(o => o.type === 'debt').length },
+    { key: 'ambush', label: 'Tolls, tickets & fines', count: allObligations.filter(o => o.type === 'ambush').length },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="mb-1 text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Bills & debts</h1>
-          <p className="text-sm text-content-tertiary">Everything you owe, in one place.</p>
+          <h1 className="mb-1 text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Pay List details</h1>
+          <p className="text-sm text-content-tertiary">Bills, debt minimums, subscriptions, tolls, tickets, and fines in one place.</p>
           {!hasFullSuite && (
             <p className="mt-2 text-xs text-content-secondary max-w-xl leading-relaxed">
               {TRACKER_FREE_TIER_SUMMARY}
@@ -396,7 +396,7 @@ export default function Obligations() {
           }`}
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
-          {activeTab === 'ambush' ? 'Add ticket or fine' : activeTab === 'debt' ? (hasFullSuite ? 'Add debt' : 'Add debt (Full Suite)') : 'Add bill'}
+          {activeTab === 'ambush' ? 'Add toll or ticket' : activeTab === 'debt' ? (hasFullSuite ? 'Add debt payment' : 'Add debt (Full Suite)') : 'Add bill'}
         </button>
       </div>
       {/* Stats */}

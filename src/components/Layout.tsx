@@ -6,7 +6,7 @@ import {
   Settings, Repeat, BarChart3, Plus, X, ChevronDown, Inbox,
   Banknote, PieChart, Scale, Calendar as CalendarIcon, Calculator, Briefcase, GraduationCap, ShieldCheck, Clock, Landmark, AlertCircle,
   TrendingUp,
-  Command, LineChart, Umbrella, PiggyBank, Home, Activity, AlertTriangle, MoreHorizontal
+  Command, LineChart, Umbrella, PiggyBank, Home, Activity, AlertTriangle, MoreHorizontal, Wallet
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
@@ -32,7 +32,7 @@ import { useTheme } from '../hooks/useTheme';
 
 /** Hash fragments for sidebar deep links — default route link stays inactive when one of these is set. */
 const NAV_ROUTE_HASHES: Record<string, string[]> = {
-  '/pro/dashboard': ['cash-flow'],
+  '/pro/dashboard': ['safe-spend'],
   '/pro/bills': ['due-soon'],
 };
 
@@ -316,7 +316,21 @@ export default function Layout() {
       }
     };
     pushNavShortcut(
-      ['support', 'help desk', 'help', 'ticket'],
+      ['pay list', 'dashboard', 'due', 'overdue', 'owe', 'pay'],
+      'Navigation',
+      'Pay List',
+      'Overdue, due soon, debt minimums, and tickets',
+      '/pro/dashboard',
+    );
+    pushNavShortcut(
+      ['toll', 'ticket', 'fine', 'citation'],
+      'Navigation',
+      'Tolls, tickets & fines',
+      'Open fines and citations',
+      '/pro/bills?tab=ambush',
+    );
+    pushNavShortcut(
+      ['support', 'help desk', 'help'],
       'Navigation',
       'Help & Support',
       'In-app help desk',
@@ -421,14 +435,14 @@ export default function Layout() {
       };
 
     const coreNavItems: NavItem[] = [
-      { name: 'Dashboard',      path: '/pro/dashboard',     icon: LayoutDashboard, lazyImport: () => import('../pages/Dashboard') },
-      { name: 'Bills & Debt',   path: '/pro/bills',         icon: Receipt, count: dueSoonCount, lazyImport: () => import('../pages/Obligations') },
+      { name: 'Pay List',       path: '/pro/dashboard',     icon: LayoutDashboard, count: dueSoonCount, lazyImport: () => import('../pages/Dashboard') },
       { name: 'Subscriptions',  path: '/pro/subscriptions', icon: Repeat, lazyImport: () => import('../pages/Subscriptions') },
       { name: 'Calendar',       path: '/pro/calendar',      icon: CalendarIcon, lazyImport: () => import('../pages/Calendar') },
     ];
 
     const advancedNavItems: NavItem[] = [
-      { name: 'Cash flow',        path: '/pro/dashboard',      icon: ArrowRightLeft, hash: 'cash-flow' },
+      { name: 'Spending comfort', path: '/pro/dashboard',      icon: Wallet, hash: 'safe-spend' },
+      { name: 'Bills detail',     path: '/pro/bills',          icon: Receipt, lazyImport: () => import('../pages/Obligations') },
       { name: 'Due soon',         path: '/pro/bills',          icon: Clock, hash: 'due-soon', count: dueSoonCount },
       { name: 'Income',           path: '/pro/income',         icon: Banknote, lazyImport: () => import('../pages/Income') },
       { name: 'Freelance / gigs', path: '/pro/freelance',      icon: Briefcase, lazyImport: () => import('../pages/Freelance') },
@@ -446,8 +460,8 @@ export default function Layout() {
       { name: 'Reports',          path: '/pro/reports',        icon: BarChart3, lazyImport: () => import('../pages/Reports') },
       { name: 'Trends',           path: '/pro/analytics',      icon: TrendingUp, lazyImport: () => import('../pages/Analytics') },
       { name: 'Categories',       path: '/pro/categories',     icon: MoreHorizontal, lazyImport: () => import('../pages/Categories') },
-      { name: 'Tickets & Fines',  path: '/pro/bills?tab=ambush', icon: AlertCircle },
-      { name: 'Debt details',     path: '/pro/bills?tab=debt', icon: Landmark },
+      { name: 'Tolls, tickets & fines', path: '/pro/bills?tab=ambush', icon: AlertCircle },
+      { name: 'Debt minimums',    path: '/pro/bills?tab=debt', icon: Landmark },
     ];
 
     if (defaultSimpleMode) {
@@ -494,7 +508,7 @@ export default function Layout() {
           itemTabParam !== null
             ? currentTabParam === itemTabParam
             : itemBasePath === '/pro/bills'
-              ? item.name === 'Bills & Debt' || currentTabParam === null || !['ambush', 'recurring', 'debt'].includes(currentTabParam ?? '')
+              ? item.name === 'Bills detail' || currentTabParam === null || !['ambush', 'recurring', 'debt'].includes(currentTabParam ?? '')
               : currentTabParam === null;
         const hashMatches = item.hash
           ? deferredHash === `#${item.hash}`

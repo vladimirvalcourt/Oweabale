@@ -189,7 +189,7 @@ export default function Calendar() {
 
   return (
     <div className="space-y-6" onClick={handleContainerClick}>
-      {/* Header — anchor for Bills & debts → Month view */}
+      {/* Header anchor for Pay List details month view */}
       <div
         id="calendar-view"
         className="scroll-mt-24 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
@@ -197,7 +197,7 @@ export default function Calendar() {
         <div>
           <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Financial calendar</h1>
           <p className="text-sm text-content-tertiary mt-1">
-            All financial events plotted in time. Pairs with the 30 / 60 / 90 outlook on Bills & debts.
+            All financial events plotted in time. Pairs with the 30 / 60 / 90 outlook on Pay List details.
           </p>
         </div>
         {/* Legend */}

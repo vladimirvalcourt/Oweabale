@@ -53,7 +53,7 @@ export function KeyboardShortcutsDialog({ open, onClose }: Props) {
                   <kbd className="rounded border border-surface-border bg-surface-elevated px-1.5 py-0.5 font-mono text-xs text-content-primary">
                     D
                   </kbd>
-                  <span className="ml-2 text-content-muted">Dashboard</span>
+                  <span className="ml-2 text-content-muted">Pay List</span>
                 </p>
                 <p>
                   <kbd className="rounded border border-surface-border bg-surface-elevated px-1.5 py-0.5 font-mono text-xs text-content-primary">

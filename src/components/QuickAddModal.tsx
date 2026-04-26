@@ -568,7 +568,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border bg-surface-raised shrink-0">
                   <Dialog.Title className="text-sm font-sans font-semibold text-content-primary">
-                    Quick Entry
+                    Add what&apos;s due
                   </Dialog.Title>
                   <button 
                     onClick={onClose} 
@@ -682,7 +682,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     </div>
                     
                     <textarea
-                      placeholder={hasFullSuite ? "e.g. Coffee 5.50 tomorrow · Amazon refund 42.10 · Comcast bill 120 next Tuesday · 15th 89 gas" : "e.g. Rent 1200 on the 1st · Internet bill 80 next Tuesday · Parking ticket 65 due Friday"}
+                      placeholder={hasFullSuite ? "e.g. Rent 1200 on the 1st · Comcast bill 120 next Tuesday · Parking ticket 65 due Friday" : "e.g. Rent 1200 on the 1st · Internet bill 80 next Tuesday · Parking ticket 65 due Friday"}
                       value={nlpText}
                       onChange={handleNLPInput}
                       className="w-full bg-surface-raised border border-surface-border rounded-lg focus-app-field text-sm font-sans text-content-primary placeholder:text-content-muted p-3 resize-none transition-colors"
@@ -731,7 +731,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         activeTab === 'obligation' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                       } focus-app`}
                     >
-                      {hasFullSuite ? 'Bill/Debt' : 'Bill'}
+                      {hasFullSuite ? 'Bill or debt' : 'Bill'}
                     </button>
                     {hasFullSuite && (
                     <button
@@ -768,7 +768,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       } focus-app`}
                     >
                       <AlertTriangle className="w-3 h-3 shrink-0" aria-hidden />
-                      Ticket
+                      Toll or ticket
                     </button>
                   </div>
 
