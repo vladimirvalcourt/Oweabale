@@ -112,13 +112,21 @@ export function obfuscateEmail(email: string) {
  */
 export const EMAIL_CONFIG = {
   contact: obfuscateEmail(
-    import.meta.env.VITE_CONTACT_EMAIL || import.meta.env.VITE_SUPPORT_EMAIL || 'hello@oweable.com'
+    import.meta.env.VITE_CONTACT_EMAIL ||
+      import.meta.env.VITE_SUPPORT_EMAIL ||
+      import.meta.env.NEXT_PUBLIC_CONTACT_EMAIL ||
+      import.meta.env.NEXT_PUBLIC_SUPPORT_EMAIL ||
+      'hello@oweable.com'
   ),
   support: obfuscateEmail(
-    import.meta.env.VITE_SUPPORT_EMAIL || 'support@oweable.com'
+    import.meta.env.VITE_SUPPORT_EMAIL ||
+      import.meta.env.NEXT_PUBLIC_SUPPORT_EMAIL ||
+      'support@oweable.com'
   ),
   noreply: obfuscateEmail(
-    import.meta.env.VITE_NOREPLY_EMAIL || 'noreply@oweable.com'
+    import.meta.env.VITE_NOREPLY_EMAIL ||
+      import.meta.env.RESEND_FROM_EMAIL ||
+      'noreply@oweable.com'
   ),
 };
 

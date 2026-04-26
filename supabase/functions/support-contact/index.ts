@@ -37,8 +37,6 @@ Deno.serve(async (req: Request) => {
     if (!name) throw new Error('Name is required');
     if (!email) throw new Error('Email is required');
     if (!message) throw new Error('Message is required');
-    // TEMPORARILY DISABLED FOR TESTING - Turnstile token validation
-    // if (!turnstileToken) throw new Error('Security verification is required');
     if (name.length > 120) throw new Error('Name is too long');
     if (subject.length > 160) throw new Error('Subject is too long');
     if (message.length > 5000) throw new Error('Message is too long');
@@ -51,8 +49,14 @@ Deno.serve(async (req: Request) => {
     if (!emailRateLimit.allowed) {
       return emailRateLimit.response!;
     }
-    // TEMPORARILY DISABLED FOR TESTING - Turnstile verification
-    // await verifyTurnstile(turnstileToken, getClientIp(req));
+    // Turnstile is intentionally optional until the public site key is configured
+    // in the frontend environment too. A backend-only secret would block support.
+    if (turnstileToken) {
+      const turnstileSecret = Deno.env.get('CF_TURNSTILE_SECRET_KEY')?.trim();
+      if (turnstileSecret) {
+        await verifyTurnstile(turnstileToken, getClientIp(req), turnstileSecret);
+      }
+    }
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
     const supportEmail = Deno.env.get('SUPPORT_EMAIL') ?? 'support@oweable.com';
@@ -105,12 +109,7 @@ Deno.serve(async (req: Request) => {
   }
 });
 
-async function verifyTurnstile(token: string, remoteIp: string) {
-  const secret = Deno.env.get('CF_TURNSTILE_SECRET_KEY');
-  if (!secret) {
-    throw new Error('Missing CF_TURNSTILE_SECRET_KEY');
-  }
-
+async function verifyTurnstile(token: string, remoteIp: string, secret: string) {
   const formData = new FormData();
   formData.append('secret', secret);
   formData.append('response', token);

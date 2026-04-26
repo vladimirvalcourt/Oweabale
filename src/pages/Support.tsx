@@ -33,6 +33,7 @@ const springButton = {
 
 const SUPPORT_PAGE_URL = 'https://www.oweable.com/support';
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim();
+const TURNSTILE_ENFORCED = Boolean(TURNSTILE_SITE_KEY);
 
 const QUICK_HELP = [
   {
@@ -108,6 +109,10 @@ export default function Support() {
   useJsonLd('support', buildSupportJsonLd, []);
 
   useEffect(() => {
+    if (!TURNSTILE_ENFORCED) {
+      return;
+    }
+
     if (!TURNSTILE_SITE_KEY || !widgetContainerRef.current) {
       return;
     }
@@ -176,15 +181,14 @@ export default function Support() {
       toast.error('Please enter a message');
       return false;
     }
-    // TEMPORARILY DISABLED FOR TESTING - Turnstile validation
-    // if (!TURNSTILE_SITE_KEY) {
-    //   toast.error('Support form verification is not configured yet');
-    //   return false;
-    // }
-    // if (!turnstileToken) {
-    //   toast.error('Please complete the security check');
-    //   return false;
-    // }
+    if (TURNSTILE_ENFORCED && !TURNSTILE_SITE_KEY) {
+      toast.error('Support form verification is not configured yet');
+      return false;
+    }
+    if (TURNSTILE_ENFORCED && !turnstileToken) {
+      toast.error('Please complete the security check');
+      return false;
+    }
     return true;
   };
 
@@ -328,22 +332,24 @@ export default function Support() {
                       />
                     </label>
 
-                    <div className="mt-5">
-                      {TURNSTILE_SITE_KEY ? (
-                        <>
-                          <div ref={widgetContainerRef} />
-                          {!turnstileReady && (
-                            <p className="mt-2 text-sm text-content-tertiary">
-                              Complete the verification to send your message.
-                            </p>
-                          )}
-                        </>
-                      ) : (
-                        <p className="text-sm text-content-tertiary">
-                          Support form verification is not configured yet.
-                        </p>
-                      )}
-                    </div>
+                    {TURNSTILE_ENFORCED && (
+                      <div className="mt-5">
+                        {TURNSTILE_SITE_KEY ? (
+                          <>
+                            <div ref={widgetContainerRef} />
+                            {!turnstileReady && (
+                              <p className="mt-2 text-sm text-content-tertiary">
+                                Complete the verification to send your message.
+                              </p>
+                            )}
+                          </>
+                        ) : (
+                          <p className="text-sm text-content-tertiary">
+                            Support form verification is not configured yet.
+                          </p>
+                        )}
+                      </div>
+                    )}
 
                     <button
                       type="submit"
