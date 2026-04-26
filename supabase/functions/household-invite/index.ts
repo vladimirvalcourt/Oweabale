@@ -3,6 +3,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 serve(async (req) => {
   try {
+    if (req.method !== 'POST') {
+      return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+        status: 405,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
@@ -29,8 +36,18 @@ serve(async (req) => {
 
     const { householdId, email, role } = await req.json();
 
-    if (!householdId || !email) {
+    const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+    const requestedRole = role === 'viewer' ? 'viewer' : role === 'partner' ? 'partner' : null;
+
+    if (!householdId || !normalizedEmail) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
+    if (!requestedRole) {
+      return new Response(JSON.stringify({ error: 'Invalid invite role' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -51,12 +68,22 @@ serve(async (req) => {
       });
     }
 
+    // Server-side role enforcement to prevent privilege escalation:
+    // - partners can only invite viewers
+    // - no one can invite owners via email flow
+    if (member.role === 'partner' && requestedRole !== 'viewer') {
+      return new Response(JSON.stringify({ error: 'Partners can only invite viewers' }), {
+        status: 403,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Check if email is already invited or is a member
     const { data: existingMember } = await supabaseAdmin
       .from('household_members')
       .select('id, status')
       .eq('household_id', householdId)
-      .eq('invited_email', email)
+      .eq('invited_email', normalizedEmail)
       .maybeSingle();
 
     if (existingMember) {
@@ -74,8 +101,8 @@ serve(async (req) => {
       .from('household_members')
       .insert({
         household_id: householdId,
-        invited_email: email,
-        role: role || 'partner',
+        invited_email: normalizedEmail,
+        role: requestedRole,
         status: 'pending'
       });
 
@@ -89,12 +116,12 @@ serve(async (req) => {
 
     // Send invite email via Supabase Auth
     const appUrl = Deno.env.get('APP_URL') || 'http://localhost:5173';
-    const { error: emailError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+    const { error: emailError } = await supabaseAdmin.auth.admin.inviteUserByEmail(normalizedEmail, {
       redirectTo: `${appUrl}/accept-invite?household=${householdId}`,
       data: {
         household_id: householdId,
         invited_by: user.id,
-        role: role || 'partner'
+        role: requestedRole
       }
     });
 
@@ -112,8 +139,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Household invite error:', error);
     return new Response(JSON.stringify({ 
-      error: 'Internal server error',
-      details: error.message 
+      error: 'Internal server error'
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

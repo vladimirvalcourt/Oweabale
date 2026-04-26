@@ -1,280 +1,61 @@
-# Owebale Security Audit Report
+# SECURITY_AUDIT_REPORT
 
-**Date:** April 20, 2026  
-**Auditor:** AI Security Assistant  
-**Scope:** Full application security audit including authentication, authorization, data handling, and infrastructure.
+**Audit date:** April 24, 2026  
+**Scope:** Full repo audit (frontend, Edge Functions, cron API routes, Supabase migrations/schema, server tooling)  
+**Assumption:** App handles sensitive financial + personal data.
 
-## Executive Summary
+## A. Executive Summary
 
-The Owebale financial management platform demonstrates a strong security posture with several well-implemented security controls. The application uses Supabase for authentication and database management, implements proper Row Level Security (RLS) policies, and has robust input validation mechanisms. However, several areas require attention to maintain production-grade security standards.
+Overall posture is **moderate but uneven**: core auth and several webhook paths are strong, but there were critical/high issues in anonymous capture-session authorization, invite privilege boundaries, and cron authentication fail-closed behavior.
 
-### Overall Security Rating: **B+ (Good)**
+### Top 5 risks
+1. **Critical BOLA in mobile capture RLS** — anonymous users could access/update any active document capture session due to permissive `USING (TRUE)` policy shape in applied migration stream.
+2. **High household role-escalation path** — invite API trusted caller-provided `role` without server-side role constraints.
+3. **High cron auth fail-open** — if `CRON_SECRET` is unset, trial-expiry/warning cron endpoints become publicly triggerable.
+4. **Medium support contact abuse risk** — no server-side rate limit or payload bounds; can be abused for spam/cost amplification.
+5. **Medium internal error detail leakage** — household-invite returned raw exception detail to clients.
 
-## Key Findings
-
-### ✅ Strengths
-
-1. **Strong Authentication Implementation**
-   - Uses Supabase Auth with PKCE flow
-   - Proper session management with idle timeout (15 minutes)
-   - Secure Google OAuth integration with proper redirect handling
-   - Session refresh token rotation enabled
-
-2. **Robust Database Security**
-   - Comprehensive RLS policies on all tables
-   - Fixed recursive policy issues using `_internal.is_admin()` function
-   - Proper use of SECURITY DEFINER functions
-   - Atomic webhook event processing to prevent race conditions
-
-3. **Input Validation & Sanitization**
-   - File upload validation with type/size checks
-   - URL sanitization preventing javascript/data URI schemes
-   - Safe file extension handling from MIME types
-   - No innerHTML usage in React components
-
-4. **Security Headers**
-   - Comprehensive CSP policy in vercel.json
-   - HSTS with preload enabled
-   - X-Frame-Options: DENY
-   - Proper CORS configuration for Edge Functions
-
-5. **Environment Security**
-   - Proper .env file handling with gitignore
-   - Secrets stored in Supabase Edge Function secrets
-   - Clear separation between client-safe and server-only variables
-
-### ⚠️ Areas for Improvement
-
-#### High Priority
-
-1. **Mobile Capture Session Security**
-   - `document_capture_sessions` table has overly permissive RLS policy (`USING (TRUE) WITH CHECK (TRUE)`)
-   - Token-based access should be validated more strictly
-   - Consider implementing time-limited tokens
-
-2. **CORS Configuration**
-   - Multiple localhost ports allowed in development
-   - Consider tightening CORS origins in production
-   - Review if all allowed origins are necessary
-
-3. **Error Information Leakage**
-   - Some error messages might reveal internal system details
-   - Ensure consistent error masking in production
-
-#### Medium Priority
-
-4. **Client-Side Storage**
-   - localStorage used for sensitive data (notification preferences, tax reserve settings)
-   - Consider encryption for sensitive cached data
-   - Implement proper cleanup on logout
-
-5. **Webhook Security**
-   - Stripe webhook signature verification is good but could add IP allowlisting
-   - Consider adding rate limiting for webhook endpoints
-
-6. **Admin Access Control**
-   - Single admin email pattern may not scale
-   - Consider implementing proper RBAC with multiple admin roles
-
-#### Low Priority
-
-7. **Performance Indexes**
-   - Some tables lack optimal indexes for common queries
-   - Consider adding composite indexes for frequently queried columns
-
-8. **Audit Logging**
-   - Audit log covers critical tables but could be expanded
-   - Consider logging failed authentication attempts
-
-## Detailed Analysis
-
-### 1. Authentication & Authorization
-
-**Current State:** Excellent
-- Supabase Auth with PKCE flow provides strong security
-- Idle timeout prevents abandoned sessions
-- Proper auth state change handling
-- Google OAuth configured with appropriate scopes
-
-**Recommendations:**
-- Consider implementing MFA for admin accounts
-- Add account lockout after failed login attempts
-- Monitor for suspicious login patterns
-
-### 2. Database Security (RLS Policies)
-
-**Current State:** Very Good
-- All tables have RLS enabled
-- Recursive policy issues resolved with `_internal.is_admin()`
-- Proper user isolation with `auth.uid() = user_id` checks
-- Admin policies use secure function calls
-
-**Critical Finding:**
-```sql
--- Current overly permissive policy
-CREATE POLICY "Mobile tokens can access sessions" 
-ON document_capture_sessions FOR ALL USING (TRUE) WITH CHECK (TRUE);
-```
-
-**Recommendation:** Replace with token-based validation:
-```sql
-CREATE POLICY "Mobile tokens can access sessions" 
-ON document_capture_sessions FOR ALL 
-USING (token IS NOT NULL AND status IN ('idle', 'pending', 'active'))
-WITH CHECK (token IS NOT NULL AND status IN ('idle', 'pending', 'active'));
-```
-
-### 3. Input Validation
-
-**Current State:** Good
-- File validation in `src/lib/security.ts` is comprehensive
-- URL sanitization prevents XSS via malicious URLs
-- Type checking and size limits enforced
-
-**Recommendations:**
-- Add server-side validation for all API inputs
-- Implement request rate limiting
-- Add content-type validation for uploads
-
-### 4. Security Headers
-
-**Current State:** Excellent
-- Comprehensive CSP policy
-- All recommended security headers present
-- Proper frame protection
-
-**Minor Issue:**
-- CSP allows `'unsafe-inline'` for styles - consider moving to nonce-based approach
-
-### 5. Environment Variables
-
-**Current State:** Good
-- Proper separation of client/server variables
-- Secrets managed through Supabase dashboard
-- Clear documentation in .env.example
-
-**Recommendations:**
-- Regular secret rotation schedule
-- Automated secret expiration monitoring
-- Consider using a secrets manager for production
-
-### 6. Third-Party Integrations
-
-**Plaid Integration:**
-- Proper environment separation (sandbox/dev/prod)
-- Webhook signature verification
-- Secure token exchange
-
-**Stripe Integration:**
-- Webhook signature verification implemented
-- Idempotent event processing
-- Proper error handling
-
-**Google OAuth:**
-- RISC (Risk and Incident Sharing and Coordination) support
-- Proper redirect URI validation
-- Cross-account protection enabled
-
-## Compliance Considerations
-
-### Financial Data Protection
-- ✅ User data properly isolated by user_id
-- ✅ Sensitive operations require authentication
-- ✅ Audit trail for critical financial operations
-- ⚠️ Consider additional encryption for financial data at rest
-
-### Privacy
-- ✅ Minimal data collection
-- ✅ User consent for OAuth
-- ✅ Clear privacy policy links
-- ⚠️ Consider GDPR compliance features (data export/delete)
-
-## Recommendations Priority Matrix
-
-### Immediate Actions (Next Sprint)
-1. Fix mobile capture session RLS policy
-2. Implement proper token validation for document sessions
-3. Add rate limiting to Edge Functions
-4. Review and tighten CORS configuration
-
-### Short-term Improvements (Next Month)
-1. Implement MFA for admin accounts
-2. Add automated secret rotation
-3. Enhance audit logging coverage
-4. Add IP allowlisting for webhooks
-
-### Long-term Enhancements (Next Quarter)
-1. Implement comprehensive RBAC system
-2. Add advanced threat detection
-3. Implement data loss prevention measures
-4. Add compliance reporting features
-
-## Conclusion
-
-Owebale demonstrates a mature approach to security with many best practices already implemented. The application architecture follows security-first principles, and the team has addressed common vulnerabilities proactively. The identified issues are primarily refinements rather than fundamental flaws.
-
-With the recommended improvements, particularly around mobile session security and enhanced monitoring, Owebale can achieve an A-level security rating suitable for handling sensitive financial data.
-
-## Implementation Status
-
-### ✅ Completed Fixes (April 20, 2026)
-
-1. **Mobile Capture Session RLS Policy** - FIXED
-   - Created migration: `20260502000000_fix_mobile_capture_session_rls.sql`
-   - Replaced `USING (TRUE) WITH CHECK (TRUE)` with token-based validation
-   - Added 24-hour session expiration
-   - Added index for efficient token lookups
-   - Sessions now require valid token AND appropriate status
-
-2. **CORS Configuration Hardening** - FIXED
-   - Updated `supabase/functions/_shared/cors.ts`
-   - Separated production and development origins
-   - Production environment only allows explicit domains (oweable.com, www.oweable.com)
-   - Localhost origins blocked in production
-   - Environment-aware origin resolution
-
-3. **Rate Limiting Infrastructure** - IMPLEMENTED
-   - Created `supabase/functions/_shared/rateLimiter.ts`
-   - Uses Deno KV for distributed rate limiting
-   - Pre-configured limiters for different endpoint types:
-     - Auth endpoints: 5 requests/minute
-     - API endpoints: 30 requests/minute
-     - Public endpoints: 100 requests/minute
-     - Webhooks: 10 requests/minute
-   - Applied to plaid-link-token endpoint as example
-   - Includes IP extraction and rate limit headers
-
-4. **Error Masking in Production** - IMPLEMENTED
-   - Created `supabase/functions/_shared/errorHandler.ts`
-   - Automatic detection of sensitive information in error messages
-   - Pattern matching for passwords, tokens, keys, stack traces, IPs
-   - Safe error message mapping for common errors
-   - Environment-aware error exposure (detailed in dev, masked in prod)
-   - Request ID generation for support tracking
-   - Wrapper function for easy integration
-
-### 📋 Next Steps for Deployment
-
-1. Apply the database migration:
-   ```bash
-   supabase db push
-   ```
-
-2. Deploy updated Edge Functions:
-   ```bash
-   supabase functions deploy
-   ```
-
-3. Add rate limiting to remaining critical endpoints:
-   - stripe-webhook
-   - plaid-webhook
-   - admin-actions
-   - verify-turnstile
-
-4. Update error handling in existing Edge Functions to use `createSafeErrorResponse`
-
-5. Monitor rate limiting metrics and adjust thresholds as needed
+### Immediate ship blockers
+- Critical capture-session RLS issue.  
+- High cron fail-open auth and household privilege-escalation issue.
 
 ---
 
-*This audit was conducted based on code analysis and configuration review. For production deployment, consider engaging a professional security firm for penetration testing and compliance certification.*
+## B. Findings Table
+
+| ID | Title | Severity | CWE/OWASP | Affected files | Proof from code | Why vulnerable | Realistic attack scenario | Business impact | Exact remediation |
+|---|---|---|---|---|---|---|---|---|---|
+| F-001 | Anonymous capture-session BOLA due to permissive RLS | **Critical** | CWE-284 / OWASP A01 Broken Access Control | `supabase/migrations/20260502000000_fix_mobile_capture_session_rls.sql`, `src/lib/supabase_schema.sql` | Policy allowed anon `FOR ALL` with no request-token equality check | Any anon caller could enumerate/update rows in active states | Attacker probes capture session IDs/timing, marks sessions complete/error, or points uploads to attacker-controlled paths | Document-capture integrity loss, user data exposure risk, workflow disruption | Added migration `20260424160000_resecure_document_capture_session_anon_policy.sql` to replace permissive policy with header-token-bound SELECT/UPDATE policies and scoped checks; aligned schema file to token-bound policy model |
+| F-002 | Household invite role trust enables vertical privilege escalation | **High** | CWE-863 / OWASP A01 | `supabase/functions/household-invite/index.ts` | Request body `role` inserted directly; no server-side restriction by inviter role | Partner caller could invite with elevated role values | Compromised partner account invites attacker as privileged role to gain control over household data/actions | Unauthorized privilege expansion, data manipulation, account takeover in shared household context | Enforced strict role allowlist (`partner`/`viewer`) and server-side rule: partners can invite viewers only; normalized email and removed dynamic role trust |
+| F-003 | Cron endpoints fail open when CRON_SECRET missing | **High** | CWE-306 | `api/cron/expire-trials.ts`, `api/cron/trial-warning.ts` | Authorization check was conditional on secret presence | Misconfigured env turns protected endpoint into public trigger | Internet caller repeatedly invokes expensive trial jobs and outbound email sends | Cost amplification, operational instability, user-impacting state churn | Made both endpoints fail-closed: return 500 when secret missing and always require matching bearer token |
+| F-004 | Support contact endpoint abuse surface (spam/cost DoS) | **Medium** | CWE-770 / OWASP API4 | `supabase/functions/support-contact/index.ts` | No request throttling; unbounded message lengths | Public endpoint can be scripted to spam and inflate email provider costs | Botnet floods support endpoint, creating mail abuse and queue overload | Email reputation damage, support disruption, increased costs | Added server-side rate limiting and strict max lengths for name/subject/message |
+| F-005 | Internal error detail leakage in household invite handler | **Medium** | CWE-209 | `supabase/functions/household-invite/index.ts` | 500 response returned `details: error.message` | Internal failure details can aid attacker recon | Attackers trigger edge-case failures and mine backend error details | Recon value for follow-on attacks | Removed error detail from client response; kept server-side logging |
+
+---
+
+## C. Prioritized Fix Plan
+
+### Fix immediately before deploy
+- F-001 capture-session RLS re-hardening migration + schema alignment.
+- F-002 household invite privilege boundary enforcement.
+- F-003 cron fail-closed auth enforcement.
+
+### Fix this week
+- F-004 support endpoint abuse controls (rate limits + payload bounds).
+- F-005 internal error response sanitization consistency sweep across Edge functions.
+
+### Hardening improvements
+- Add replay/nonces for support/public form flows (Turnstile or signed challenge).
+- Add centralized security tests asserting no permissive anon RLS regressions in migrations.
+- Add deployment guardrail: reject deploy if `CRON_SECRET` missing in prod.
+
+---
+
+## D. Residual Risk / Not Fully Verifiable From Code Alone
+
+1. **Runtime env hygiene**: cannot verify actual production secret presence/rotation, only code paths.
+2. **Supabase live policy drift**: local migrations indicate intent, but live DB could still diverge without schema drift checks in CI.
+3. **Email abuse protections upstream**: provider-level reputation, domain SPF/DKIM/DMARC not verifiable from repo.
+4. **Admin/RBAC data quality**: code checks roles/permissions, but correctness depends on production seed/backfill completeness.
+5. **External integrations**: Stripe/Plaid dashboard-side restrictions (IP allowlists, webhook settings) are out-of-repo.
+
