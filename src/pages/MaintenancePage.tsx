@@ -1,5 +1,5 @@
-import { TransitionLink } from '../components/TransitionLink';
-import { useStore } from '../store/useStore';
+import { TransitionLink } from '../components/common';
+import { useStore } from '../store';
 
 /**
  * Shown when `platform_settings.maintenance_mode` is on for signed-in non-admin users.

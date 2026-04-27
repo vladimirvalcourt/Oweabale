@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '../../../lib/api/supabase';
 
 const STORAGE_KEY = 'oweable_impersonation';
 
@@ -20,7 +20,7 @@ interface ImpersonationContextValue extends ImpersonationState {
   blockIfImpersonating: () => boolean;
 }
 
-const ImpersonationContext = createContext<ImpersonationContextValue>({
+export const ImpersonationContext = createContext<ImpersonationContextValue>({
   impersonating: false,
   impersonated_user_id: null,
   impersonated_email: null,

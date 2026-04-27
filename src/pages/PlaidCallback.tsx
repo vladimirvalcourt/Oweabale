@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AppLoader } from '../components/PageSkeleton';
-import { hasFullSuiteAccess } from '../lib/fullSuiteAccess';
-import { supabase } from '../lib/supabaseClient';
+import { AppLoader } from '../components/common';
+import { hasFullSuiteAccess } from '../app/constants/fullSuiteAccess';
+import { supabase } from '../lib/api/supabase/client';
 
 /**
  * OAuth return landing page for Plaid.

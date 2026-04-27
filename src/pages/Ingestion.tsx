@@ -16,16 +16,16 @@ import {
   Camera
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useStore } from '../store/useStore';
-import { supabase } from '../lib/supabase';
-import MobileSyncModal from '../components/MobileSyncModal';
+import { useStore } from '../store';
+import { supabase } from '../lib/api/supabase';
+import { MobileSyncModal } from '../components/common';
 import { toast } from 'sonner';
-import { validateIngestionFile, sanitizeUrl } from '../lib/security';
-import { buildScanExtraction } from '../lib/ingestionExtraction';
-import { extractDocumentText } from '../lib/ingestionScan';
-import type { PendingIngestion } from '../store/useStore';
-import { yieldForPaint } from '../lib/interaction';
-import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '../lib/quickEntryCategories';
+import { validateIngestionFile, sanitizeUrl } from '../lib/api/security';
+import { buildScanExtraction } from '../lib/api/services/ingestionExtraction';
+import { extractDocumentText } from '../lib/api/services/ingestionScan';
+import type { PendingIngestion } from '../store';
+import { yieldForPaint } from '../lib/utils';
+import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '../lib/api/services/quickEntryCategories';
 
 // Upload rate limiter — max 5 files per 60 seconds
 const uploadTimestamps: number[] = [];
@@ -312,7 +312,7 @@ export default function Ingestion() {
           if (row.source === 'mobile') {
             setRecentlyAddedId(row.id);
             toast.success('Document received', {
-              description: 'Refreshing Review Inbox.',
+              description: 'Refreshing Documents.',
               action: {
                 label: 'View',
                 onClick: () => {
@@ -337,10 +337,10 @@ export default function Ingestion() {
       <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">
-            Review <span className="text-content-secondary">Inbox</span>
+            Documents
           </h1>
           <p className="mt-2 max-w-2xl font-sans text-sm font-medium leading-relaxed text-content-secondary">
-            Uploads are read automatically and saved when amounts are detected. Scanned PDFs (photos of paper) are OCR&apos;d page-by-page; if nothing is found, fill fields manually.
+            Save bills, notices, citations, fines, statements, and payment proof. Oweable reads what it can, then lets you confirm the details before anything lands in the Pay List.
           </p>
         </div>
         <div className="flex w-full flex-col gap-3 md:max-w-2xl md:items-end">
@@ -413,8 +413,8 @@ export default function Ingestion() {
             onClick={() => fileInputRef.current?.click()}
           >
             <UploadCloud className={`w-12 h-12 mx-auto mb-6 transition-colors ${dragActive ? 'text-content-secondary' : 'text-content-muted'}`} />
-            <h3 className="text-lg font-sans font-semibold text-content-primary">Inbox is empty</h3>
-            <p className="text-sm text-content-tertiary mt-2 max-w-md mx-auto">Drop a PDF or photo, or upload from your computer. Scanned PDFs are read page-by-page when needed; very blurry shots may still need manual entry.</p>
+            <h3 className="text-lg font-sans font-semibold text-content-primary">No documents saved yet</h3>
+            <p className="text-sm text-content-tertiary mt-2 max-w-md mx-auto">Drop a bill, toll notice, citation, fine, statement, or payment proof. Scanned PDFs are read page-by-page when needed; very blurry shots may still need manual entry.</p>
             <div className="mt-8 inline-block px-8 py-3 rounded-lg bg-brand-cta text-surface-base text-sm font-sans font-semibold shadow-sm btn-tactile">
               Choose files
             </div>

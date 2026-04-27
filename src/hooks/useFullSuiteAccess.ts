@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { hasFullSuiteAccess } from '../lib/fullSuiteAccess';
+import { supabase } from '../lib/api/supabase';
+import { hasFullSuiteAccess } from '../app/constants/fullSuiteAccess';
 
 type FullSuiteAccessState = {
   isLoading: boolean;

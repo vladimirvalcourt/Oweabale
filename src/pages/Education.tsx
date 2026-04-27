@@ -3,11 +3,11 @@ import { BookOpen, GraduationCap, Video, FileText, ArrowRight, CheckCircle2, Pla
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CollapsibleModule } from '../components/CollapsibleModule';
-import { supabase } from '../lib/supabase';
-import { FullSuiteGateCard } from '../components/FullSuiteGate';
-import { useFullSuiteAccess } from '../hooks/useFullSuiteAccess';
-import { getCustomIcon } from '../lib/customIcons';
+import { CollapsibleModule } from '../components/common';
+import { supabase } from '../lib/api/supabase';
+import { FullSuiteGateCard } from '../components/guards';
+import { useFullSuiteAccess } from '../hooks';
+import { getCustomIcon } from '../lib/utils';
 
 const MODULES = [
   {

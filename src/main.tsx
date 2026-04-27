@@ -1,6 +1,6 @@
 import './instrument';
 import { registerSW } from 'virtual:pwa-register';
-import { initWebVitalsReporting } from './lib/webVitalsReporting';
+import { initWebVitalsReporting } from './lib/utils/webVitalsReporting';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MotionConfig } from 'motion/react';

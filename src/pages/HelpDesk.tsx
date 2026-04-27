@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { LifeBuoy, Plus, MessageSquare, AlertCircle, Clock, CheckCircle2, Send, Radio, Loader2 } from 'lucide-react';
-import { CollapsibleModule } from '../components/CollapsibleModule';
+import { CollapsibleModule } from '../components/common';
 import { Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
-import { supabase } from '../lib/supabase';
-import { yieldForPaint } from '../lib/interaction';
-import { getCustomIcon } from '../lib/customIcons';
+import { supabase } from '../lib/api/supabase';
+import { yieldForPaint } from '../lib/utils';
+import { getCustomIcon } from '../lib/utils';
 
 interface Ticket {
   id: string;

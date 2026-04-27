@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Users, Mail, UserPlus, Trash2, Shield, Eye, Crown, Loader2 } from 'lucide-react';
-import { CollapsibleModule } from '../../components/CollapsibleModule';
-import { useStore } from '../../store/useStore';
+import { CollapsibleModule } from '../../components/common';
+import { useStore } from '../../store';
 import { toast } from 'sonner';
-import { getCustomIcon } from '../../lib/customIcons';
+import { getCustomIcon } from '../../lib/utils/customIcons';
 import type { UserRole } from '../../types/household';
-import { useFullSuiteAccess } from '../../hooks/useFullSuiteAccess';
+import { useFullSuiteAccess } from '../../hooks';
 import { useNavigate } from 'react-router-dom';
 
 export function HouseholdPanel() {

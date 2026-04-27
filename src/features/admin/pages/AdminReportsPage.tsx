@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Download, FileText, TrendingUp, Users, Zap, BarChart3 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '../../../lib/api/supabase';
 
 type ReportRow = {
   date: string;
@@ -23,9 +23,9 @@ type StatCardProps = { label: string; value: string | number; sub?: string; acce
 
 function StatCard({ label, value, sub, accent }: StatCardProps) {
   return (
-    <div className={`rounded-xl border p-3 ${accent ? 'border-brand-cta/40 bg-brand-cta/10' : 'border-surface-border bg-surface-raised'}`}>
+    <div className={`border p-3 ${accent ? 'border-content-primary' : 'border-surface-border'}`}>
       <p className="text-[10px] uppercase tracking-wide text-content-tertiary">{label}</p>
-      <p className={`mt-1 text-lg font-semibold ${accent ? 'text-brand-cta' : 'text-content-primary'}`}>{value}</p>
+      <p className="mt-1 text-lg font-semibold text-content-primary">{value}</p>
       {sub ? <p className="mt-0.5 text-[11px] text-content-muted">{sub}</p> : null}
     </div>
   );
@@ -253,16 +253,16 @@ export default function AdminReportsPage() {
       <div className="flex flex-wrap items-end gap-3">
         <div>
           <label className="mb-1 block text-[10px] uppercase tracking-wider text-content-tertiary">From</label>
-          <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="focus-app-field rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs text-content-primary" />
+          <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="focus-app-field border border-surface-border px-3 py-2 text-xs text-content-primary" />
         </div>
         <div>
           <label className="mb-1 block text-[10px] uppercase tracking-wider text-content-tertiary">To</label>
-          <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="focus-app-field rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs text-content-primary" />
+          <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="focus-app-field border border-surface-border px-3 py-2 text-xs text-content-primary" />
         </div>
-        <button type="button" onClick={exportCsv} className="inline-flex items-center gap-1 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs text-content-secondary">
+        <button type="button" onClick={exportCsv} className="inline-flex items-center gap-1 border border-surface-border px-3 py-2 text-xs text-content-secondary">
           <Download className="h-3.5 w-3.5" /> CSV
         </button>
-        <button type="button" onClick={() => void exportPdf()} disabled={isExportingPdf} className="inline-flex items-center gap-1 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs text-content-secondary disabled:opacity-40">
+        <button type="button" onClick={() => void exportPdf()} disabled={isExportingPdf} className="inline-flex items-center gap-1 border border-surface-border px-3 py-2 text-xs text-content-secondary disabled:opacity-40">
           <FileText className="h-3.5 w-3.5" /> {isExportingPdf ? 'PDF...' : 'PDF'}
         </button>
       </div>
@@ -276,10 +276,10 @@ export default function AdminReportsPage() {
               key={s.key}
               type="button"
               onClick={() => setActiveSection(s.key)}
-              className={`shrink-0 inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium ${
+              className={`shrink-0 inline-flex items-center gap-1.5 border px-3 py-1.5 text-xs font-medium ${
                 activeSection === s.key
-                  ? 'border-brand-cta bg-brand-cta text-surface-base'
-                  : 'border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary'
+                  ? 'border-content-primary text-content-primary'
+                  : 'border-surface-border text-content-secondary hover:text-content-primary'
               }`}
             >
               <Icon className="h-3.5 w-3.5" />
@@ -298,14 +298,14 @@ export default function AdminReportsPage() {
             <StatCard label="Feedback" value={totals.feedback} />
           </div>
 
-          <div className="rounded-xl border border-surface-border bg-surface-raised">
+          <div className="border border-surface-border">
             {isLoading ? <p className="p-4 text-xs text-content-muted">Loading report...</p> : null}
             {error ? <p className="p-4 text-xs text-rose-300">Failed to load report data.</p> : null}
             {!isLoading && !error && rows.length === 0 ? <p className="p-4 text-xs text-content-muted">No data in selected range.</p> : null}
             {!isLoading && !error && rows.length > 0 ? (
               <div className="max-h-[60vh] overflow-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="sticky top-0 bg-surface-base text-content-tertiary">
+                  <thead className="border-b border-surface-border bg-surface-base text-content-tertiary">
                     <tr>
                       <th className="px-3 py-2 font-medium">Date</th>
                       <th className="px-3 py-2 font-medium">Signups</th>
@@ -359,10 +359,10 @@ export default function AdminReportsPage() {
           {funnelSteps.length > 0 ? (
             <div className="space-y-3">
               {funnelSteps.map((step, i) => (
-                <div key={step.label} className="rounded-xl border border-surface-border bg-surface-raised p-4">
+                <div key={step.label} className="border border-surface-border p-4">
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-cta text-[10px] font-bold text-surface-base">{i + 1}</span>
+                      <span className="flex h-5 w-5 items-center justify-center border border-surface-border text-[10px] font-bold text-content-primary">{i + 1}</span>
                       <p className="text-xs font-medium text-content-primary">{step.label}</p>
                     </div>
                     <div className="text-right">
@@ -370,18 +370,18 @@ export default function AdminReportsPage() {
                       <p className="text-[10px] text-content-muted">{step.count} users</p>
                     </div>
                   </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-surface-elevated">
+                  <div className="h-2 w-full overflow-hidden bg-surface-elevated">
                     <div
-                      className="h-full rounded-full bg-brand-cta transition-all duration-500"
+                      className="h-full bg-content-primary transition-all duration-500"
                       style={{ width: `${step.pct}%` }}
                     />
                   </div>
                 </div>
               ))}
               {funnelSteps.length >= 2 ? (
-                <div className="rounded-lg border border-amber-500/35 bg-amber-500/10 p-3 text-xs">
-                  <p className="font-semibold text-amber-200">Biggest drop-off</p>
-                  <p className="mt-1 text-amber-100/80">
+                <div className="border border-amber-500/35 p-3 text-xs">
+                  <p className="font-semibold text-content-primary">Biggest drop-off</p>
+                  <p className="mt-1 text-content-secondary">
                     {(() => {
                       let maxDrop = 0;
                       let dropStep = '';
@@ -428,14 +428,14 @@ export default function AdminReportsPage() {
           {adoptionData ? (
             <div className="space-y-2">
               {Object.entries(adoptionData).map(([feature, pct]) => (
-                <div key={feature} className="rounded-xl border border-surface-border bg-surface-raised p-3">
+                <div key={feature} className="border border-surface-border p-3">
                   <div className="mb-1.5 flex items-center justify-between">
                     <p className="text-xs font-medium capitalize text-content-primary">{feature}</p>
                     <p className="text-xs font-semibold text-content-primary">{pct}%</p>
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-elevated">
+                  <div className="h-1.5 w-full overflow-hidden bg-surface-elevated">
                     <div
-                      className="h-full rounded-full bg-brand-cta/70 transition-all duration-500"
+                      className="h-full bg-content-primary transition-all duration-500"
                       style={{ width: `${pct}%` }}
                     />
                   </div>

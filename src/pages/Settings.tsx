@@ -4,7 +4,7 @@ import { Dialog } from '@headlessui/react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { cn } from '../lib/utils';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 import { toast } from 'sonner';
 import { SETTINGS_TAB_IDS, type SettingsTab } from './settings/constants';
 import { ProfilePanel } from './settings/ProfilePanel';
@@ -17,7 +17,7 @@ import { PrivacyPanel } from './settings/PrivacyPanel';
 import { SupportPanel } from './settings/SupportPanel';
 import { FeedbackPanel } from './settings/FeedbackPanel';
 import { HouseholdPanel } from './settings/HouseholdPanel';
-import { yieldForPaint } from '../lib/interaction';
+import { yieldForPaint } from '../lib/utils';
 
 const tabs = [
   { id: 'profile' as const, name: 'Profile' },

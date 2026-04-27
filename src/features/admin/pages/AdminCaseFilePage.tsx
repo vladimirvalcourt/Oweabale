@@ -11,8 +11,8 @@ import {
   UserRound,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '../../../lib/supabase';
-import { useAdminPermissions } from '../shared/useAdminPermissions';
+import { supabase } from '../../../lib/api/supabase';
+import { useAdminPermissions } from '../shared';
 import { useMemo } from 'react';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -92,12 +92,12 @@ function StatusBadge({ status }: { status: string }) {
   const s = status.toLowerCase();
   const cls =
     s === 'active'
-      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+      ? 'text-emerald-300 border-emerald-500/30'
       : s === 'trialing'
-        ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
+        ? 'text-sky-300 border-sky-500/30'
         : s === 'past_due'
-          ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
-          : 'bg-surface-elevated text-content-muted border-surface-border';
+          ? 'text-amber-300 border-amber-500/30'
+          : 'text-content-muted border-surface-border';
   return (
     <span className={`inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium ${cls}`}>{status}</span>
   );
@@ -261,7 +261,7 @@ export default function AdminCaseFilePage() {
   if (!userIdParam) {
     return (
       <section className="mx-auto max-w-xl space-y-4 px-4 py-8 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-surface-border bg-surface-raised p-6">
+        <div className="border border-surface-border p-6">
           <div className="mb-4 flex items-center gap-2 text-content-primary">
             <UserRound className="h-5 w-5" />
             <h1 className="text-lg font-semibold">User case file</h1>
@@ -278,13 +278,13 @@ export default function AdminCaseFilePage() {
               onChange={(e) => setLookupDraft(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && openLookup()}
               placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-              className="focus-app-field mt-1 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 font-mono text-xs text-content-primary"
+              className="focus-app-field mt-1 w-full border border-surface-border px-3 py-2 font-mono text-xs text-content-primary"
             />
           </label>
           <button
             type="button"
             onClick={() => openLookup()}
-            className="interactive-press interactive-focus mt-3 w-full rounded-lg bg-brand-cta py-2 text-xs font-semibold text-surface-base"
+            className="interactive-press interactive-focus mt-3 w-full border border-content-primary py-2 text-xs font-semibold text-content-primary"
           >
             Open case file
           </button>
@@ -299,13 +299,13 @@ export default function AdminCaseFilePage() {
                 onKeyDown={(e) => e.key === 'Enter' && void handleEmailSearch()}
                 placeholder="user@example.com"
                 type="email"
-                className="focus-app-field flex-1 rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-xs text-content-primary"
+                className="focus-app-field flex-1 border border-surface-border px-3 py-2 text-xs text-content-primary"
               />
               <button
                 type="button"
                 disabled={emailSearchLoading}
                 onClick={() => void handleEmailSearch()}
-                className="interactive-press interactive-focus inline-flex items-center gap-1 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs text-content-secondary disabled:opacity-50"
+                className="interactive-press interactive-focus inline-flex items-center gap-1 border border-surface-border px-3 py-2 text-xs text-content-secondary disabled:opacity-50"
               >
                 {emailSearchLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Search className="h-3 w-3" />}
               </button>
@@ -354,25 +354,25 @@ export default function AdminCaseFilePage() {
         <div className="flex flex-wrap gap-2">
           <Link
             to="/admin"
-            className="interactive-press interactive-focus inline-flex items-center gap-1 rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-[11px] text-content-secondary"
+            className="interactive-press interactive-focus inline-flex items-center gap-1 border border-surface-border px-3 py-1.5 text-[11px] text-content-secondary"
           >
             <Shield className="h-3.5 w-3.5" /> Overview & controls
           </Link>
           <Link
             to="/admin/sessions"
-            className="interactive-press interactive-focus rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-[11px] text-content-secondary"
+            className="interactive-press interactive-focus border border-surface-border px-3 py-1.5 text-[11px] text-content-secondary"
           >
             Sessions
           </Link>
           <Link
             to="/admin/compliance"
-            className="interactive-press interactive-focus rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-[11px] text-content-secondary"
+            className="interactive-press interactive-focus border border-surface-border px-3 py-1.5 text-[11px] text-content-secondary"
           >
             Compliance
           </Link>
           <Link
             to="/admin/telemetry"
-            className="interactive-press interactive-focus rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-[11px] text-content-secondary"
+            className="interactive-press interactive-focus border border-surface-border px-3 py-1.5 text-[11px] text-content-secondary"
           >
             Telemetry
           </Link>
@@ -380,29 +380,29 @@ export default function AdminCaseFilePage() {
       </div>
 
       {detailQuery.isLoading || timelineQuery.isLoading ? (
-        <div className="flex items-center gap-2 rounded-2xl border border-surface-border bg-surface-raised p-8 text-xs text-content-muted">
+        <div className="flex items-center gap-2 border border-surface-border p-8 text-xs text-content-muted">
           <Loader2 className="h-4 w-4 animate-spin" /> Loading case file…
         </div>
       ) : null}
 
       {detailQuery.error ? (
-        <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4 text-xs text-rose-200">
+        <p className="border border-rose-500/30 p-4 text-xs text-rose-200">
           {(detailQuery.error as Error)?.message ?? 'Failed to load user.'}
         </p>
       ) : null}
 
       {!detailQuery.isLoading && detail?.profile ? (
         <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-          <div className="space-y-1 rounded-2xl border border-surface-border bg-surface-raised p-5">
+          <div className="space-y-1 border border-surface-border p-5">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-base font-semibold text-content-primary">{detail.profile.email ?? '(no email)'}</span>
               {detail.profile.is_admin ? (
-                <span className="rounded border border-surface-border bg-surface-base px-1.5 py-0.5 text-[10px] text-content-secondary">
+                <span className="rounded border border-surface-border px-1.5 py-0.5 text-[10px] text-content-secondary">
                   Admin
                 </span>
               ) : null}
               {detail.profile.is_banned ? (
-                <span className="rounded border border-rose-500/40 bg-rose-500/15 px-1.5 py-0.5 text-[10px] text-rose-200">
+                <span className="rounded border border-rose-500/40 px-1.5 py-0.5 text-[10px] text-rose-200">
                   Banned
                 </span>
               ) : null}
@@ -425,9 +425,9 @@ export default function AdminCaseFilePage() {
             <p className="text-xs text-content-tertiary">Member since {fmtDate(detail.profile.created_at)}</p>
 
             {isSuperAdmin ? (
-              <div className="mt-4 rounded-xl border border-amber-500/35 bg-amber-500/10 p-3">
+              <div className="mt-4 border border-amber-500/35 p-3">
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-amber-200">Super-admin actions</p>
-                <p className="mt-1 text-[11px] text-amber-100/90">
+                <p className="mt-1 text-[11px] text-content-secondary">
                   Impersonation signs you in as this user in a new tab (full app access). Use a dedicated browser profile
                   for stricter isolation. Every handoff is audited; magic links are single-use.
                 </p>
@@ -436,7 +436,7 @@ export default function AdminCaseFilePage() {
                   onChange={(e) => setImpersonationReason(e.target.value)}
                   rows={2}
                   placeholder="Reason (min. 8 characters, stored in audit log)"
-                  className="focus-app-field mt-2 w-full rounded-lg border border-surface-border bg-surface-base p-2 text-xs text-content-secondary"
+                  className="focus-app-field mt-2 w-full border border-surface-border p-2 text-xs text-content-secondary"
                 />
                 <div className="mt-2 flex flex-wrap gap-2">
                   <button
@@ -450,7 +450,7 @@ export default function AdminCaseFilePage() {
                       if (!window.confirm('Open a magic link to sign in as this user in a new tab?')) return;
                       impersonateMutation.mutate();
                     }}
-                    className="interactive-press inline-flex items-center gap-1 rounded-lg border border-amber-500/50 bg-amber-500/20 px-3 py-1.5 text-[11px] font-semibold text-amber-100 disabled:opacity-40"
+                    className="interactive-press inline-flex items-center gap-1 border border-amber-500/50 px-3 py-1.5 text-[11px] font-semibold text-amber-100 disabled:opacity-40"
                   >
                     {impersonateMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
                     Impersonate (magic link)
@@ -462,7 +462,7 @@ export default function AdminCaseFilePage() {
                       if (!window.confirm('Revoke all Supabase sessions for this user globally?')) return;
                       revokeSessionsMutation.mutate();
                     }}
-                    className="danger-button rounded-lg border border-rose-500/50 bg-rose-500/15 px-3 py-1.5 text-[11px] font-semibold text-rose-100 disabled:opacity-40"
+                    className="danger-button border border-rose-500/50 px-3 py-1.5 text-[11px] font-semibold text-rose-100 disabled:opacity-40"
                   >
                     {revokeSessionsMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                     Revoke sessions
@@ -477,7 +477,7 @@ export default function AdminCaseFilePage() {
             ) : (
               <ul className="space-y-2">
                 {detail.entitlements.map((ent) => (
-                  <li key={ent.id} className="rounded-lg border border-surface-border bg-surface-base p-2 text-xs">
+                  <li key={ent.id} className="border border-surface-border p-2 text-xs">
                     <span className="font-medium text-content-primary">{ent.feature_key}</span>{' '}
                     <StatusBadge status={ent.status} />
                     <span className="mt-1 block text-content-muted">
@@ -496,7 +496,7 @@ export default function AdminCaseFilePage() {
             ) : (
               <ul className="space-y-1.5 text-xs">
                 {detail.subscriptions.map((s) => (
-                  <li key={s.id} className="rounded border border-surface-border bg-surface-base px-2 py-1.5">
+                  <li key={s.id} className="border border-surface-border px-2 py-1.5">
                     <StatusBadge status={s.status} />
                     <span className="ml-2 text-content-muted">{s.stripe_subscription_id}</span>
                   </li>
@@ -522,7 +522,7 @@ export default function AdminCaseFilePage() {
             ) : (
               <ul className="space-y-2 text-xs">
                 {detail.plaid_items.map((it, i) => (
-                  <li key={i} className="rounded-lg border border-surface-border bg-surface-base p-2">
+                  <li key={i} className="border border-surface-border p-2">
                     <span className="font-medium text-content-primary">{it.institution_name ?? 'Institution'}</span>
                     {it.item_login_required ? (
                       <span className="ml-2 text-amber-300">Needs relink</span>
@@ -552,7 +552,7 @@ export default function AdminCaseFilePage() {
             {detail.compliance ? (
               <>
                 <p className={SECTION}>Compliance snapshot</p>
-                <div className="rounded-lg border border-surface-border bg-surface-base p-3 text-xs text-content-secondary">
+                <div className="border border-surface-border p-3 text-xs text-content-secondary">
                   <p>KYC: {detail.compliance.kyc_status}</p>
                   <p>AML: {detail.compliance.aml_status}</p>
                   <p>Risk score: {detail.compliance.risk_score}</p>
@@ -578,7 +578,7 @@ export default function AdminCaseFilePage() {
             )}
           </div>
 
-          <aside className="space-y-3 rounded-2xl border border-surface-border bg-surface-raised p-4 text-xs text-content-secondary">
+          <aside className="space-y-3 border border-surface-border p-4 text-xs text-content-secondary">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Runbooks</p>
             <ul className="list-inside list-disc space-y-1 text-[11px] text-content-muted">
               <li>Plaid relink: confirm item_login_required, then user reconnects from app.</li>

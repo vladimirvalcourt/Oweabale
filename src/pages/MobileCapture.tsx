@@ -5,10 +5,10 @@ import {
   ShieldCheck, Zap, RefreshCw, X, ArrowRight,
   Sun, Maximize, MousePointer2, Smartphone, FolderOpen
 } from 'lucide-react';
-import { createCaptureSupabaseClient } from '../lib/supabaseCaptureClient';
+import { createCaptureSupabaseClient } from '../lib/api/supabase/captureClient';
 import { toast } from 'sonner';
-import { validateIngestionFile, safeExtFromMime } from '../lib/security';
-import { yieldForPaint } from '../lib/interaction';
+import { validateIngestionFile, safeExtFromMime } from '../lib/api/security';
+import { yieldForPaint } from '../lib/utils';
 
 export default function MobileCapture() {
   const [searchParams] = useSearchParams();
@@ -219,8 +219,8 @@ export default function MobileCapture() {
         </div>
         <h1 className="mb-2 text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Sent</h1>
         <p className="mb-12 max-w-[280px] text-sm font-medium leading-relaxed text-content-secondary">
-          Your document is now being processed in your Review Inbox.<br /><br />
-          You can put your phone away; your desktop dashboard has been updated.
+          Your document is now being processed in Documents.<br /><br />
+          You can put your phone away; your Documents view has been updated.
         </p>
         
         <div className="flex w-full max-w-xs flex-col gap-3">
@@ -388,7 +388,7 @@ export default function MobileCapture() {
                     ) : (
                       <>
                         <Zap className="w-4 h-4" />
-                        Send to Dashboard
+                        Send to Documents
                       </>
                     )}
                   </button>

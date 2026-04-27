@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 import {
   Plus, Target, Hash, ShieldAlert, ShieldCheck,
   Trash2, Briefcase, Calendar, Calculator, Info,
@@ -9,11 +9,11 @@ import {
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
-import { CollapsibleModule } from '../components/CollapsibleModule';
-import { TransitionLink } from '../components/TransitionLink';
-import { IRS_MILEAGE_RATE } from '../lib/finance';
-import { yieldForPaint } from '../lib/interaction';
-import { getCustomIcon } from '../lib/customIcons';
+import { CollapsibleModule } from '../components/common';
+import { TransitionLink } from '../components/common';
+import { IRS_MILEAGE_RATE } from '../lib/api/services/finance';
+import { yieldForPaint } from '../lib/utils';
+import { getCustomIcon } from '../lib/utils';
 
 /** Simplified average federal income rate used for freelance tax estimates. */
 const FED_INCOME_ESTIMATE_RATE = 0.12;

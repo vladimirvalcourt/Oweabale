@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronRight, Monitor, Smartphone } from 'lucide-react';
-import { supabase } from '../../../lib/supabase';
-import { useAdminPermissions } from '../shared/useAdminPermissions';
+import { supabase } from '../../../lib/api/supabase';
+import { useAdminPermissions } from '../shared';
 
 type SessionUser = {
   id: string;
@@ -128,14 +128,14 @@ export default function AdminSessionsPage() {
         </div>
       </div>
       {!canManageSessions ? <p className="mb-4 text-xs text-amber-300">You do not have permission to revoke sessions.</p> : null}
-      <div className="rounded-xl border border-surface-border bg-surface-raised">
+      <div className="border border-surface-border">
         {isLoading ? <p className="p-4 text-xs text-content-muted">Loading sessions...</p> : null}
         {error ? <p className="p-4 text-xs text-rose-300">Failed to load user sessions.</p> : null}
         {!isLoading && !error && users.length === 0 ? <p className="p-4 text-xs text-content-muted">No sessions found.</p> : null}
         {!isLoading && !error && users.length > 0 ? (
           <div className="max-h-[70vh] overflow-auto">
             <table className="w-full text-left text-xs">
-              <thead className="sticky top-0 bg-surface-base text-content-tertiary">
+              <thead className="border-b border-surface-border bg-surface-base text-content-tertiary">
                 <tr>
                   <th className="px-3 py-2 font-medium">User</th>
                   <th className="px-3 py-2 font-medium">Last Sign-in</th>
@@ -199,7 +199,7 @@ export default function AdminSessionsPage() {
                             type="button"
                             disabled={!canManageSessions || revokingUserId === u.id}
                             onClick={() => void revokeSessions(u.id)}
-                            className="rounded-lg bg-rose-500/15 px-2.5 py-1.5 text-[11px] text-rose-300 disabled:opacity-40"
+                            className="border border-rose-500/40 px-2.5 py-1.5 text-[11px] text-rose-300 disabled:opacity-40"
                           >
                             {revokingUserId === u.id ? 'Revoking...' : 'Revoke sessions'}
                           </button>
@@ -213,7 +213,7 @@ export default function AdminSessionsPage() {
                             </p>
                             <div className="space-y-1.5">
                               {userSessions.slice(0, 5).map((sess) => (
-                                <div key={sess.id} className="flex items-center gap-4 rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-[11px]">
+                                <div key={sess.id} className="flex items-center gap-4 border border-surface-border px-3 py-1.5 text-[11px]">
                                   <span className="text-content-muted">{new Date(sess.created_at).toLocaleString()}</span>
                                   <span className="font-mono text-content-tertiary">{sess.ip_address ?? '—'}</span>
                                   <span className="text-content-secondary">

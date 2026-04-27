@@ -8,13 +8,13 @@ import {
   AreaChart, Area, BarChart, Bar, PieChart as RechartsPie, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip
 } from 'recharts';
-import { useStore } from '../store/useStore';
-import { CollapsibleModule } from '../components/CollapsibleModule';
-import { rechartsTooltipStableProps } from '../lib/rechartsTooltip';
+import { useStore } from '../store';
+import { CollapsibleModule } from '../components/common';
+import { rechartsTooltipStableProps } from '../lib/utils';
 import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
-import { buildSpendingRecap } from '../lib/finance';
-import { formatCategoryLabel } from '../lib/categoryDisplay';
-import { getCustomIcon } from '../lib/customIcons';
+import { buildSpendingRecap } from '../lib/api/services/finance';
+import { formatCategoryLabel } from '../lib/api/services/categoryDisplay';
+import { getCustomIcon } from '../lib/utils';
 
 type DateRange = '30d' | '90d' | '1y';
 

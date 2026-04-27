@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../lib/api/supabase';
 import { toast } from 'sonner';
-import { TransitionLink } from '../components/TransitionLink';
-import { useSEO } from '../hooks/useSEO';
-import { runAfterPaint } from '../lib/interaction';
-import { BrandWordmark } from '../components/BrandWordmark';
-import { ThemeToggle } from '../components/ThemeToggle';
+import { TransitionLink } from '../components/common';
+import { useSEO } from '../hooks';
+import { runAfterPaint } from '../lib/utils';
+import { BrandWordmark } from '../components/common';
+import { ThemeToggle } from '../components/common';
 import { CheckCircle2 } from 'lucide-react';
 
 type AuthPageProps = {

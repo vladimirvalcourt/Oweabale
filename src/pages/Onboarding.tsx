@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowRight, Vault, Receipt, Activity, Flame, Wallet, Clock, Landmark, Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 import { cn } from '../lib/utils';
-import { yieldForPaint } from '../lib/interaction';
-import { BrandWordmark } from '../components/BrandWordmark';
+import { yieldForPaint } from '../lib/utils';
+import { BrandWordmark } from '../components/common';
 
 type Step = {
   id: string;

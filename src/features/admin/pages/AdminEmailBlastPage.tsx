@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Mail, Send, Loader2, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '../../../lib/supabase';
-import { useAdminPermissions } from '../shared/useAdminPermissions';
+import { supabase } from '../../../lib/api/supabase';
+import { useAdminPermissions } from '../shared';
 
 type AudienceFilter = 'all' | 'free' | 'pro' | 'lifetime' | 'inactive_30d' | 'needs_relink';
 
@@ -78,7 +78,7 @@ export default function AdminEmailBlastPage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:px-8">
-      <header className="glass-card rounded-2xl p-5">
+      <header className="border border-surface-border p-5">
         <div className="flex items-center gap-2">
           <Mail className="h-5 w-5 text-brand-cta" />
           <h1 className="text-lg font-semibold text-content-primary">Email Blast Tool</h1>
@@ -90,11 +90,11 @@ export default function AdminEmailBlastPage() {
 
       <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
         {/* Compose */}
-        <div className="glass-card rounded-2xl p-5 space-y-4">
+        <div className="border border-surface-border p-5 space-y-4">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Compose</p>
 
           {!canSend ? (
-            <div className="rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-200">
+            <div className="border border-amber-500/40 p-3 text-xs text-amber-200">
               You need super-admin or moderation.manage permission to send email blasts.
             </div>
           ) : null}
@@ -108,10 +108,10 @@ export default function AdminEmailBlastPage() {
                   key={opt.value}
                   type="button"
                   onClick={() => setAudience(opt.value)}
-                  className={`rounded-lg border p-2 text-left transition-colors ${
+                  className={`border p-2 text-left ${
                     audience === opt.value
-                      ? 'border-brand-cta/60 bg-brand-cta/10 text-content-primary'
-                      : 'border-surface-border bg-surface-raised text-content-secondary hover:border-surface-border/80'
+                      ? 'border-content-primary text-content-primary'
+                      : 'border-surface-border text-content-secondary'
                   }`}
                 >
                   <p className="text-[11px] font-semibold">{opt.label}</p>
@@ -130,7 +130,7 @@ export default function AdminEmailBlastPage() {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="e.g. New feature available for you!"
-              className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-xs text-content-primary"
+              className="focus-app-field w-full border border-surface-border px-3 py-2 text-xs text-content-primary"
               maxLength={150}
             />
           </div>
@@ -152,7 +152,7 @@ export default function AdminEmailBlastPage() {
                 srcDoc={body}
                 sandbox=""
                 title="Email preview"
-                className="min-h-32 w-full rounded-lg border border-surface-border bg-surface-base"
+                className="min-h-32 w-full border border-surface-border"
                 style={{ colorScheme: 'light' }}
               />
             ) : (
@@ -161,11 +161,11 @@ export default function AdminEmailBlastPage() {
                 onChange={(e) => setBody(e.target.value)}
                 rows={8}
                 placeholder="Hello {{first_name}}, &#10;&#10;We wanted to let you know..."
-                className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-xs text-content-secondary"
+                className="focus-app-field w-full border border-surface-border px-3 py-2 text-xs text-content-secondary"
               />
             )}
             <p className="mt-1 text-[10px] text-content-muted">
-              Use <code className="bg-surface-elevated px-1 rounded">{'{{first_name}}'}</code> for personalization. HTML is supported.
+              Use <code className="border border-surface-border px-1">{'{{first_name}}'}</code> for personalization. HTML is supported.
             </p>
           </div>
 
@@ -173,7 +173,7 @@ export default function AdminEmailBlastPage() {
             type="button"
             disabled={!canSend || isSending}
             onClick={() => void handleSend()}
-            className="interactive-press inline-flex w-full items-center justify-center gap-2 rounded-lg border border-brand-cta bg-brand-cta px-4 py-2.5 text-sm font-semibold text-surface-base disabled:opacity-40"
+            className="interactive-press inline-flex w-full items-center justify-center gap-2 border border-content-primary px-4 py-2.5 text-sm font-semibold text-content-primary disabled:opacity-40"
           >
             {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             {isSending ? 'Sending…' : 'Send blast'}
@@ -181,7 +181,7 @@ export default function AdminEmailBlastPage() {
         </div>
 
         {/* Blast history */}
-        <div className="glass-card rounded-2xl p-5">
+        <div className="border border-surface-border p-5">
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Sent blasts</p>
           {isLoading ? <p className="text-xs text-content-muted">Loading history…</p> : null}
           {!isLoading && blasts.length === 0 ? (
@@ -193,14 +193,14 @@ export default function AdminEmailBlastPage() {
           {!isLoading && blasts.length > 0 ? (
             <div className="space-y-2">
               {blasts.map((blast) => (
-                <div key={blast.id} className="rounded-lg border border-surface-border bg-surface-raised p-3">
+                <div key={blast.id} className="border border-surface-border p-3">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-xs font-medium text-content-primary truncate">{blast.subject}</p>
-                    <span className={`shrink-0 rounded-md border px-1.5 py-0.5 text-[10px] capitalize ${
+                    <span className={`shrink-0 border px-1.5 py-0.5 text-[10px] capitalize ${
                       blast.status === 'sent'
-                        ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300'
+                        ? 'border-emerald-500/40 text-emerald-300'
                         : blast.status === 'failed'
-                          ? 'border-rose-500/40 bg-rose-500/15 text-rose-300'
+                          ? 'border-rose-500/40 text-rose-300'
                           : 'border-surface-border text-content-muted'
                     }`}>{blast.status}</span>
                   </div>

@@ -2,7 +2,7 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Dialog } from '@headlessui/react';
 import { Building2, Download, CreditCard as CreditCardIcon, RefreshCw } from 'lucide-react';
-import { CollapsibleModule } from '../../components/CollapsibleModule';
+import { CollapsibleModule } from '../../components/common';
 import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
 import {
@@ -10,18 +10,18 @@ import {
   isEntitlementActive,
   isProfileTrialActive,
   isSubscriptionLive,
-} from '../../lib/fullSuiteAccess';
-import { supabase } from '../../lib/supabase';
+} from "../../app/constants/fullSuiteAccess";
+import { supabase } from '../../lib/api/supabase';
 import { loadNotifPrefs } from './constants';
-import { sendWebPushMessage } from '../../lib/webPush';
-import { getCustomIcon } from '../../lib/customIcons';
+import { sendWebPushMessage } from '../../lib/api/services/webPush';
+import { getCustomIcon } from '../../lib/utils/customIcons';
 import {
   cancelStripeSubscription,
   createStripeCheckoutSession,
   createStripePortalSession,
   syncStripeBilling,
-} from '../../lib/stripe';
-import { yieldForPaint } from '../../lib/interaction';
+} from '../../lib/api/stripe';
+import { yieldForPaint } from "../../lib/api/services";
 
 function BillingPanelInner() {
   const BillingIcon = getCustomIcon('billing');

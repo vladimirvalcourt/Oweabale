@@ -1,25 +1,8 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import Footer from '../components/Footer';
-import PublicHeader from '../components/PublicHeader';
-import { TransitionLink } from '../components/TransitionLink';
-import { useSEO } from '../hooks/useSEO';
-
-// Framer Motion Variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-};
+import { Footer } from '../components/layout';
+import { PublicHeader } from '../components/layout';
+import { TransitionLink } from '../components/common';
+import { useSEO } from '../hooks';
 
 const sections = [
   {
@@ -79,9 +62,9 @@ export default function Terms() {
       <div className="min-h-screen bg-surface-base px-6 pb-20 pt-28 text-content-primary selection:bg-content-primary/15 lg:px-8">
         <div className="mx-auto max-w-5xl">
           <section className="py-12">
-            <div className="public-fade-up max-w-3xl">
+            <div className="max-w-3xl">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Terms</p>
-              <h1 className="mt-5 text-5xl font-semibold tracking-[-0.06em] text-content-primary sm:text-6xl">
+              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
                 Terms that try to be clear about the rules, not hide them.
               </h1>
               <p className="mt-6 text-lg leading-8 text-content-secondary">
@@ -90,17 +73,16 @@ export default function Terms() {
               <p className="mt-4 text-sm text-content-muted">Last updated April 2026</p>
             </div>
 
-            <motion.div className="mt-12 space-y-6" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }}>
-              {sections.map((section, index) => (
-                <motion.section key={section.title} variants={fadeInUp} className="public-hover-lift rounded-[12px] border border-surface-border bg-surface-raised p-8 shadow-sm">
-                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Section {index + 1}</p>
-                  <h2 className="mt-3 text-lg font-semibold text-content-primary mb-3">{section.title}</h2>
+            <div className="mt-12 space-y-8 border-t border-surface-border pt-10">
+              {sections.map((section) => (
+                <section key={section.title}>
+                  <h2 className="text-lg font-semibold text-content-primary mb-3">{section.title}</h2>
                   <p className="text-sm leading-relaxed text-content-secondary">{section.copy}</p>
-                </motion.section>
+                </section>
               ))}
-            </motion.div>
+            </div>
 
-            <motion.div className="public-fade-up public-delay-1 mt-10 rounded-[12px] border border-surface-border bg-surface-highlight p-8" variants={fadeInUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+            <div className="mt-10 border-t border-surface-border pt-6">
               <p className="text-sm leading-relaxed text-content-secondary">
                 For billing and plan details, visit{' '}
                 <TransitionLink to="/pricing" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
@@ -116,7 +98,7 @@ export default function Terms() {
                 </TransitionLink>
                 .
               </p>
-            </motion.div>
+            </div>
           </section>
         </div>
       </div>

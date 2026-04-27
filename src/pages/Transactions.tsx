@@ -1,11 +1,11 @@
 import { useState, useMemo, useDeferredValue } from 'react';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
 import { Activity, Search, Filter, ArrowDownRight, ArrowUpRight, Calendar, Hash, Tag, Download, TrendingUp, Ban, ShoppingBag } from 'lucide-react';
-import { CollapsibleModule } from '../components/CollapsibleModule';
-import { BrandLogo } from '../components/BrandLogo';
-import { formatCategoryLabel } from '../lib/categoryDisplay';
-import { getCustomIcon } from '../lib/customIcons';
+import { CollapsibleModule } from '../components/common';
+import { BrandLogo } from '../components/common';
+import { formatCategoryLabel } from '../lib/api/services/categoryDisplay';
+import { getCustomIcon } from '../lib/utils';
 import { toast } from 'sonner';
 
 const BUTTON_BASE_CLASS =

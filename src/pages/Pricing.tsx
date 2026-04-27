@@ -1,56 +1,13 @@
-import { motion } from 'framer-motion';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Minus, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import Footer from '../components/Footer';
-import PublicHeader from '../components/PublicHeader';
-import { TransitionLink } from '../components/TransitionLink';
-import { useJsonLd } from '../hooks/useJsonLd';
-import { useSEO } from '../hooks/useSEO';
-import { createStripeCheckoutSession, type StripeCheckoutPlanKey } from '../lib/stripe';
-
-// Framer Motion Variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-};
-
-const springButton = {
-  hover: { scale: 1.03, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
-  tap: { scale: 0.97, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
-};
-
-function useInView(threshold = 0.15) {
-  const [isVisible, setIsVisible] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      { threshold }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  return [ref, isVisible] as const;
-}
+import { Footer } from '../components/layout';
+import { PublicHeader } from '../components/layout';
+import { TransitionLink } from '../components/common';
+import { useJsonLd } from '../hooks';
+import { useSEO } from '../hooks';
+import { createStripeCheckoutSession, type StripeCheckoutPlanKey } from '../lib/api/stripe';
 
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -244,9 +201,6 @@ export default function Pricing() {
 
   const [isStartingCheckout, setIsStartingCheckout] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
-  const [headerRef, headerVisible] = useInView(0.08);
-  const [plansRef, plansVisible] = useInView(0.1);
-  const [faqRef, faqVisible] = useInView(0.1);
 
   const startCheckout = async (planKey: StripeCheckoutPlanKey) => {
     if (isStartingCheckout) return;
@@ -275,54 +229,29 @@ export default function Pricing() {
       />
 
       <main>
-        <section className="relative overflow-hidden pt-32 sm:pt-36">
-          <div className="absolute inset-x-0 top-0 h-[32rem] bg-gradient-to-b from-surface-highlight to-transparent" />
-          <div
-            ref={headerRef}
-            className={`public-fade-up mx-auto max-w-5xl px-6 pb-16 sm:pb-20 text-center transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
-              headerVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-            }`}
-          >
+        <section className="mx-auto max-w-5xl px-6 pb-16 pt-32 lg:px-8">
+          <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Pricing that stays honest</p>
-            <h1 className="mt-5 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl lg:text-7xl">
+            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
               Pay only for the level of help you need.
             </h1>
-            <p className="mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-content-secondary sm:text-xl">
+            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-content-secondary">
               Oweable starts as one focused app for staying ahead of bills, debt, subscriptions, tolls, tickets, and the things people forget. Full Suite adds the deeper planning layer when you want more structure.
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-content-secondary">
-              <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
-                14-day Full Suite trial
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
-                No credit card required
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
-                Cancel anytime
-              </span>
+            <div className="mt-8 flex flex-wrap gap-6 text-sm text-content-secondary">
+              <span>14-day Full Suite trial</span>
+              <span>No credit card required</span>
+              <span>Cancel anytime</span>
             </div>
           </div>
         </section>
 
-        <section className="border-y border-surface-border bg-surface-raised py-24">
-          <motion.div
-            ref={plansRef}
-            className={`mx-auto max-w-7xl px-6 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
-              plansVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-            }`}
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-100px' }}
-          >
-            <motion.div className="mx-auto max-w-3xl" variants={staggerContainer}>
-              <motion.div variants={fadeInUp} className="public-hover-lift rounded-[12px] border border-surface-border bg-surface-raised p-7 sm:p-8 shadow-sm">
+        <section className="border-y border-surface-border py-16">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="mx-auto max-w-3xl border border-surface-border p-7 sm:p-8">
                 <div className="flex items-center justify-between gap-4">
                   <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Full Suite</p>
-                  <span className="rounded-full bg-brand-profit/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-brand-profit">
+                  <span className="text-xs font-semibold uppercase tracking-[0.14em] text-content-secondary">
                     Deeper support
                   </span>
                 </div>
@@ -335,7 +264,7 @@ export default function Pricing() {
                       aria-pressed={billingPeriod === 'monthly'}
                       className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
                         billingPeriod === 'monthly'
-                          ? 'bg-surface-base text-content-primary shadow-sm'
+                          ? 'bg-surface-base text-content-primary'
                           : 'text-content-secondary hover:text-content-primary'
                       }`}
                     >
@@ -347,7 +276,7 @@ export default function Pricing() {
                       aria-pressed={billingPeriod === 'yearly'}
                       className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
                         billingPeriod === 'yearly'
-                          ? 'bg-surface-base text-content-primary shadow-sm'
+                          ? 'bg-surface-base text-content-primary'
                           : 'text-content-secondary hover:text-content-primary'
                       }`}
                     >
@@ -397,24 +326,19 @@ export default function Pricing() {
                     <span>Tax estimates and reserve planning for variable income</span>
                   </li>
                 </ul>
-                <motion.button
+                <button
                   type="button"
                   onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                   disabled={isStartingCheckout}
-                  className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-brand-cta px-6 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-70"
-                  variants={springButton}
-                  whileHover="hover"
-                  whileTap="tap"
+                  className="mt-8 inline-flex w-full items-center justify-center border border-surface-border bg-content-primary px-6 py-3.5 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {isStartingCheckout ? 'Starting checkout...' : 'Unlock Full Suite'}
-                </motion.button>
+                </button>
                 <p className="mt-4 text-sm text-content-secondary">
                   Starts with a 14-day free trial. No credit card required to create your account first.
                 </p>
-              </motion.div>
-            </motion.div>
-
-          </motion.div>
+            </div>
+          </div>
         </section>
 
         <section className="bg-surface-base py-24">
@@ -426,7 +350,7 @@ export default function Pricing() {
                   One app path, clear household money help, deeper tools when you need them.
                 </h2>
               </div>
-              <div className="overflow-x-auto rounded-[12px] border border-surface-border bg-surface-raised">
+              <div className="overflow-x-auto border border-surface-border">
                 <div className="grid grid-cols-2 border-b border-surface-border bg-surface-highlight text-sm font-semibold text-content-primary">
                   <div className="min-w-[180px] px-4 py-4">Feature</div>
                   <div className="min-w-[160px] border-l border-surface-border px-4 py-4">Oweable</div>
@@ -442,13 +366,8 @@ export default function Pricing() {
           </div>
         </section>
 
-        <section id="faq" className="border-y border-surface-border bg-surface-raised py-24">
-          <div
-            ref={faqRef}
-            className={`mx-auto max-w-5xl px-6 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)] lg:px-8 ${
-              faqVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-            }`}
-          >
+        <section id="faq" className="border-y border-surface-border py-24">
+          <div className="mx-auto max-w-5xl px-6 lg:px-8">
             <div className="max-w-2xl">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">FAQ</p>
               <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-content-primary">
@@ -463,7 +382,7 @@ export default function Pricing() {
           </div>
         </section>
 
-        <section className="overflow-hidden bg-surface-offset py-24 text-content-primary">
+        <section className="py-24 text-content-primary">
           <div className="mx-auto max-w-5xl px-6 text-center lg:px-8">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Ready when you are</p>
             <h2 className="mt-5 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
@@ -475,7 +394,7 @@ export default function Pricing() {
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <TransitionLink
                 to="/onboarding?redirect=/pro/dashboard"
-                className="inline-flex items-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover"
+                className="inline-flex items-center gap-3 border border-surface-border bg-content-primary px-7 py-3.5 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover"
               >
                 Try Full Suite
                 <ArrowRight className="h-4 w-4" />

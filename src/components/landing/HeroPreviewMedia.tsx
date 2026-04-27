@@ -11,14 +11,14 @@ export default function HeroPreviewMedia() {
         {/* Preserve light/dark-specific hero art while keeping the cropped framing. */}
         <img
           src="/screenshots/dashboard-dark.png"
-          alt="Oweable Dashboard - Track bills, manage debt, and plan your finances"
+          alt="Oweable Pay List - Track bills, debt minimums, and due dates"
           className="hidden w-full h-auto object-cover dark:block"
           loading="eager"
           decoding="async"
         />
         <img
           src="/screenshots/dashboard-light.png"
-          alt="Oweable Dashboard - Track bills, manage debt, and plan your finances"
+          alt="Oweable Pay List - Track bills, debt minimums, and due dates"
           className="block w-full h-auto object-cover dark:hidden"
           loading="eager"
           decoding="async"

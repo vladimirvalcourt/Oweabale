@@ -1,13 +1,13 @@
 import React, { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { Mail, BellRing, BrainCircuit, Loader2, Zap } from 'lucide-react';
-import { CollapsibleModule } from '../../components/CollapsibleModule';
+import { CollapsibleModule } from '../../components/common';
 import { toast } from 'sonner';
 import { useShallow } from 'zustand/react/shallow';
-import { useStore } from '../../store/useStore';
+import { useStore } from '../../store';
 import { NOTIF_PREFS_STORAGE_KEY, type NotifPrefKey, loadNotifPrefs } from './constants';
-import { useFullSuiteAccess } from '../../hooks/useFullSuiteAccess';
-import { FullSuiteGateCard } from '../../components/FullSuiteGate';
-import { getCustomIcon } from '../../lib/customIcons';
+import { useFullSuiteAccess } from '../../hooks';
+import { FullSuiteGateCard } from '../../components/guards';
+import { getCustomIcon } from '../../lib/utils/customIcons';
 import {
   getVapidPublicKey,
   hasActivePushSubscription,
@@ -15,7 +15,7 @@ import {
   sendTestWebPush,
   subscribeWebPush,
   unsubscribeWebPush,
-} from '../../lib/webPush';
+} from '../../lib/api/services/webPush';
 
 function deferToast(fn: () => void) {
   requestAnimationFrame(() => {

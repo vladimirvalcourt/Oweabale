@@ -10,7 +10,7 @@ import {
   useLocation,
   useNavigationType,
 } from 'react-router-dom';
-import { isStaleDynamicImportError } from './lib/dynamicImportErrors';
+import { isStaleDynamicImportError } from './lib/utils/dynamicImportErrors';
 
 const dsn = typeof import.meta.env.VITE_SENTRY_DSN === 'string' ? import.meta.env.VITE_SENTRY_DSN.trim() : '';
 

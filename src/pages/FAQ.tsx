@@ -1,31 +1,8 @@
-import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { ArrowRight, Minus, Plus } from 'lucide-react';
-import PublicHeader from '../components/PublicHeader';
-import Footer from '../components/Footer';
-import { TransitionLink } from '../components/TransitionLink';
-import { useSEO } from '../hooks/useSEO';
-
-// Framer Motion Variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-};
-
-const springButton = {
-  hover: { scale: 1.03, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
-  tap: { scale: 0.97, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
-};
+import { Minus, Plus } from 'lucide-react';
+import { PublicHeader } from '../components/layout';
+import { Footer } from '../components/layout';
+import { useSEO } from '../hooks';
 
 const FAQ_DATA = [
   {
@@ -75,7 +52,7 @@ function FaqCard({ question, answer }: { question: string; answer: string }) {
   const panelId = `faq-panel-${question.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 
   return (
-    <article className="rounded-[12px] border border-surface-border bg-surface-raised px-8 py-6 shadow-sm">
+    <article className="border-b border-surface-border py-6">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
@@ -131,65 +108,21 @@ export default function FAQ() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <main className="pt-32 pb-24" id="faq">
-          <section className="mx-auto max-w-5xl px-6 lg:px-8">
-            <div className="text-center">
+          <section className="mx-auto max-w-4xl px-6 lg:px-8">
+            <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">FAQ</p>
-              <h1 className="public-fade-up mt-5 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl">
+              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
                 The questions people ask when money already feels heavy.
               </h1>
-              <p className="public-fade-up public-delay-1 mx-auto mt-6 max-w-3xl text-lg leading-relaxed text-content-secondary">
+              <p className="mt-6 max-w-3xl text-lg leading-relaxed text-content-secondary">
                 Short answers, plain English, and no fake mystery. If you still need help after this, support is one click away.
               </p>
             </div>
 
-            <motion.div
-              className="mt-12 grid gap-4"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-100px' }}
-            >
+            <div className="mt-12">
               {FAQ_DATA.map((item) => (
-                <motion.div key={item.question} variants={fadeInUp}>
-                  <FaqCard question={item.question} answer={item.answer} />
-                </motion.div>
+                <FaqCard key={item.question} question={item.question} answer={item.answer} />
               ))}
-            </motion.div>
-
-            <div className="public-fade-up public-delay-2 mt-14 rounded-[12px] border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
-              <h2 className="text-3xl font-semibold tracking-tight text-content-primary">
-                Want a system that feels more supportive than stressful?
-              </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-content-secondary">
-                Oweable is meant to reduce money fog, not give you another interface to babysit.
-              </p>
-              <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <motion.div variants={springButton} whileHover="hover" whileTap="tap">
-                  <TransitionLink
-                    to="/onboarding?redirect=/pro/dashboard"
-                    className="inline-flex items-center gap-3 rounded-[10px] bg-brand-cta px-7 h-[48px] text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover min-w-[160px] justify-center"
-                  >
-                    Try Full Suite
-                    <ArrowRight className="h-4 w-4" />
-                  </TransitionLink>
-                </motion.div>
-                <TransitionLink
-                  to="/pricing"
-                  className="inline-flex items-center gap-3 rounded-[10px] border border-surface-border px-7 h-[48px] text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight min-w-[160px] justify-center"
-                >
-                  Compare plans
-                </TransitionLink>
-              </div>
-              <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-sm text-content-secondary">
-                <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
-                  No credit card required
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-full bg-surface-raised px-3 py-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-brand-profit" />
-                  Browser-based on desktop and mobile
-                </span>
-              </div>
             </div>
           </section>
       </main>

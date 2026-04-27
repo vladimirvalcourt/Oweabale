@@ -6,20 +6,9 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import type { User } from '@supabase/supabase-js';
 import { lazy, Suspense } from 'react';
-import Layout from './components/Layout';
-import DeviceGuard from './components/DeviceGuard';
-import ErrorBoundary from './components/ErrorBoundary';
-import AuthGuard from './components/AuthGuard';
-import AdminGuard from './components/AdminGuard';
-import MaintenanceGuard from './components/MaintenanceGuard';
-import { ProPlanGuard } from './components/ProPlanGuard';
-import { DashboardSkeleton, ListSkeleton, AppLoader } from './components/PageSkeleton';
-import SessionWarningModal from './components/SessionWarningModal';
-import { useStore } from './store/useStore';
-import { useAuth } from './hooks/useAuth';
-import { usePWAUpdateNotification } from './hooks/usePWAUpdateNotification';
-import { usePWAStandaloneMode } from './hooks/usePWAStandaloneMode';
-import { PWAInstallBanner } from './components/PWAInstallBanner';
+import { Layout, DeviceGuard, ErrorBoundary, AuthGuard, AdminGuard, MaintenanceGuard, ProPlanGuard, DashboardSkeleton, ListSkeleton, AppLoader, SessionWarningModal, PWAInstallBanner } from './components';
+import { useStore } from './store';
+import { useAuth, usePWAUpdateNotification, usePWAStandaloneMode } from './hooks';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Fix 1: Dashboard is now lazy — this keeps recharts + motion/react OUT of the initial
@@ -57,9 +46,8 @@ const Education      = lazy(() => import('./pages/Education'));
 const HelpDesk       = lazy(() => import('./pages/HelpDesk'));
 import AuthCallback from './pages/AuthCallback';
 import PlaidCallback from './pages/PlaidCallback';
-import { useDataSync } from './hooks/useDataSync';
-import { ThemedToaster } from './components/ThemedToaster';
-import { UnsupportedBrowserBanner } from './components/UnsupportedBrowserBanner';
+import { useDataSync } from './hooks';
+import { ThemedToaster, UnsupportedBrowserBanner } from './components';
 
 const Changelog      = lazy(() => import('./pages/Changelog'));
 const Analytics      = lazy(() => import('./pages/Analytics'));
@@ -154,6 +142,7 @@ function AppRoutes() {
         <Route path="pro/income"         element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Income /></Suspense></ErrorBoundary>} />
         <Route path="pro/freelance"      element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Freelance /></Suspense></ErrorBoundary>} />
         <Route path="pro/ingestion"      element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Ingestion /></Suspense></ErrorBoundary>} />
+        <Route path="pro/documents"      element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Ingestion /></Suspense></ErrorBoundary>} />
         <Route path="pro/transactions"   element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={8} />}><Transactions /></Suspense></ErrorBoundary>} />
         <Route path="pro/budgets"        element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><Budgets /></Suspense></ErrorBoundary>} />
         <Route path="pro/net-worth"      element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><NetWorth /></Suspense></ErrorBoundary>} />
@@ -197,6 +186,7 @@ function AppRoutes() {
         <Route path="income"       element={<PlanAwareRedirect pro="/pro/income" />} />
         <Route path="freelance"    element={<PlanAwareRedirect pro="/pro/freelance" />} />
         <Route path="ingestion"    element={<PlanAwareRedirect pro="/pro/ingestion" />} />
+        <Route path="documents"    element={<PlanAwareRedirect pro="/pro/documents" />} />
         <Route path="transactions" element={<PlanAwareRedirect pro="/pro/transactions" />} />
         <Route path="budgets"      element={<PlanAwareRedirect pro="/pro/budgets" />} />
         <Route path="net-worth"    element={<PlanAwareRedirect pro="/pro/net-worth" />} />

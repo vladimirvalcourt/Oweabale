@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 import { Tags, Plus, Edit2, Trash2, Tag } from 'lucide-react';
-import { CollapsibleModule } from '../components/CollapsibleModule';
+import { CollapsibleModule } from '../components/common';
 import { toast } from 'sonner';
-import { getCustomIcon } from '../lib/customIcons';
+import { getCustomIcon } from '../lib/utils';
 export default function Categories() {
   const CategoriesIcon = getCustomIcon('categories');
   const { categories, addCategory, editCategory, deleteCategory } = useStore();

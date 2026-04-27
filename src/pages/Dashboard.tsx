@@ -16,11 +16,11 @@ import {
   Wallet,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { AppPageShell } from '../components/AppPageShell';
-import { ProWelcomeModal } from '../components/ProWelcomeModal';
-import { TransitionLink } from '../components/TransitionLink';
-import { computeSafeToSpend, calcMonthlyCashFlow } from '../lib/finance';
-import { useStore, type Bill, type Citation, type Debt, type Subscription } from '../store/useStore';
+import { AppPageShell } from '../components/layout';
+import { ProWelcomeModal } from '../components/common';
+import { TransitionLink } from '../components/common';
+import { computeSafeToSpend, calcMonthlyCashFlow } from '../lib/api/services/finance';
+import { useStore, type Bill, type Citation, type Debt, type Subscription } from '../store';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const PAY_LIST_SNOOZE_KEY = 'oweable_pay_list_snoozed_v1';
@@ -220,7 +220,7 @@ function PayListIcon({ kind }: { kind: PayListKind }) {
 
 function EmptyPayList({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="rounded-lg border border-dashed border-surface-border bg-surface-raised p-8 text-center">
+    <div className="border border-dashed border-surface-border p-8 text-center">
       <ListChecks className="mx-auto h-8 w-8 text-content-tertiary" aria-hidden />
       <h2 className="mt-4 text-lg font-semibold text-content-primary">Nothing urgent is tracked yet</h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-content-secondary">
@@ -229,7 +229,7 @@ function EmptyPayList({ onAdd }: { onAdd: () => void }) {
       <button
         type="button"
         onClick={onAdd}
-        className="mt-5 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app"
+        className="mt-5 inline-flex min-h-10 items-center justify-center gap-2 border border-content-primary px-4 py-2 text-sm font-semibold text-content-primary focus-app"
       >
         <Plus className="h-4 w-4" aria-hidden />
         Add what&apos;s due
@@ -251,7 +251,7 @@ function PayListRow({
 }) {
   const isUrgent = item.status === 'overdue' || item.status === 'today';
   return (
-    <li className="rounded-lg border border-surface-border bg-surface-raised p-4">
+    <li className="border border-surface-border p-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           <div
@@ -452,10 +452,10 @@ export default function Dashboard() {
       <AppPageShell>
         <div className="space-y-6 animate-pulse">
           <div className="h-8 w-48 rounded-lg bg-surface-border" />
-          <div className="h-44 rounded-lg border border-surface-border bg-surface-raised" />
+          <div className="h-44 border border-surface-border" />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {[1, 2, 3].map((item) => (
-              <div key={item} className="h-28 rounded-lg border border-surface-border bg-surface-raised" />
+              <div key={item} className="h-28 border border-surface-border" />
             ))}
           </div>
         </div>
@@ -481,7 +481,7 @@ export default function Dashboard() {
             <button
               type="button"
               onClick={() => openQuickAdd('obligation')}
-              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app"
+              className="inline-flex min-h-10 items-center justify-center gap-2 border border-content-primary px-4 py-2 text-sm font-semibold text-content-primary focus-app"
             >
               <Plus className="h-4 w-4" aria-hidden />
               Add what&apos;s due
@@ -489,7 +489,7 @@ export default function Dashboard() {
             <button
               type="button"
               onClick={() => openQuickAdd('citation')}
-              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
+              className="inline-flex min-h-10 items-center justify-center gap-2 border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary focus-app"
             >
               <AlertTriangle className="h-4 w-4" aria-hidden />
               Add toll or ticket
@@ -497,8 +497,42 @@ export default function Dashboard() {
           </div>
         </header>
 
+        <section aria-label="Quick add choices" className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {[
+            { label: 'Bill', detail: 'Rent, utility, loan notice', icon: Receipt, action: () => openQuickAdd('obligation') },
+            { label: 'Debt payment', detail: 'Minimum due or balance', icon: CreditCard, action: () => openQuickAdd('obligation') },
+            { label: 'Subscription', detail: 'Renewal you may forget', icon: Repeat, to: '/pro/subscriptions' },
+            { label: 'Toll / ticket / fine', detail: 'Citation, parking, penalty', icon: AlertTriangle, action: () => openQuickAdd('citation') },
+          ].map((choice) => {
+            const Icon = choice.icon;
+            const inner = (
+              <div className="flex h-full min-h-[5.5rem] items-start gap-3 border border-surface-border p-4 text-left">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center border border-surface-border text-content-secondary">
+                  <Icon className="h-4 w-4" aria-hidden />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold text-content-primary">{choice.label}</span>
+                  <span className="mt-1 block text-xs leading-relaxed text-content-tertiary">{choice.detail}</span>
+                </span>
+              </div>
+            );
+            if ('to' in choice && choice.to) {
+              return (
+                <TransitionLink key={choice.label} to={choice.to} className="rounded-lg focus-app">
+                  {inner}
+                </TransitionLink>
+              );
+            }
+            return (
+              <button key={choice.label} type="button" onClick={choice.action} className="rounded-lg focus-app">
+                {inner}
+              </button>
+            );
+          })}
+        </section>
+
         <section className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.55fr)]">
-          <div className="rounded-lg border border-surface-border bg-surface-raised p-5">
+          <div className="border border-surface-border p-5">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
@@ -519,7 +553,7 @@ export default function Dashboard() {
                   </>
                 )}
               </div>
-              <div className="rounded-lg border border-surface-border bg-surface-base p-4 lg:min-w-56">
+              <div className="border border-surface-border p-4 lg:min-w-56">
                 <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary">Due this week</p>
                 <p className="mt-2 text-3xl font-mono font-semibold tabular-nums text-content-primary">{formatMoney(totalDueThisWeek)}</p>
                 <p className="mt-1 text-xs text-content-secondary">
@@ -533,7 +567,7 @@ export default function Dashboard() {
                   <button
                     type="button"
                     onClick={() => handleMarkPaid(topPriority.sourceId)}
-                    className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app"
+                    className="inline-flex min-h-10 items-center justify-center gap-2 border border-content-primary px-4 py-2 text-sm font-semibold text-content-primary focus-app"
                   >
                     <CheckCircle2 className="h-4 w-4" aria-hidden />
                     Mark paid
@@ -543,7 +577,7 @@ export default function Dashboard() {
                   <button
                     type="button"
                     onClick={() => handleResolveCitation(topPriority.sourceId)}
-                    className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app"
+                    className="inline-flex min-h-10 items-center justify-center gap-2 border border-content-primary px-4 py-2 text-sm font-semibold text-content-primary focus-app"
                   >
                     <CheckCircle2 className="h-4 w-4" aria-hidden />
                     Resolve now
@@ -551,7 +585,7 @@ export default function Dashboard() {
                 )}
                 <TransitionLink
                   to={topPriority.route}
-                  className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
+                  className="inline-flex min-h-10 items-center justify-center gap-2 border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary focus-app"
                 >
                   View details
                   <ArrowRight className="h-4 w-4" aria-hidden />
@@ -559,7 +593,7 @@ export default function Dashboard() {
                 <button
                   type="button"
                   onClick={() => handleSnooze(topPriority.id)}
-                  className="inline-flex min-h-10 items-center justify-center rounded-lg border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
+                  className="inline-flex min-h-10 items-center justify-center border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary focus-app"
                 >
                   Snooze
                 </button>
@@ -569,7 +603,7 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 xl:grid-cols-1">
             <TransitionLink to="/pro/bills" className="rounded-lg focus-app">
-              <div className="h-full rounded-lg border border-surface-border bg-surface-raised p-4 transition-colors hover:bg-content-primary/[0.03]">
+              <div className="h-full border border-surface-border p-4">
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                   <Clock className="h-3.5 w-3.5" aria-hidden />
                   Overdue
@@ -578,7 +612,7 @@ export default function Dashboard() {
               </div>
             </TransitionLink>
             <TransitionLink to="/pro/dashboard#safe-spend" className="rounded-lg focus-app">
-              <div className="h-full rounded-lg border border-surface-border bg-surface-raised p-4 transition-colors hover:bg-content-primary/[0.03]">
+              <div className="h-full border border-surface-border p-4">
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                   <Wallet className="h-3.5 w-3.5" aria-hidden />
                   Daily comfort
@@ -587,7 +621,7 @@ export default function Dashboard() {
               </div>
             </TransitionLink>
             <TransitionLink to="/pro/bills?tab=debt" className="rounded-lg focus-app">
-              <div className="h-full rounded-lg border border-surface-border bg-surface-raised p-4 transition-colors hover:bg-content-primary/[0.03]">
+              <div className="h-full border border-surface-border p-4">
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                   <Landmark className="h-3.5 w-3.5" aria-hidden />
                   Debt mins
@@ -596,7 +630,7 @@ export default function Dashboard() {
               </div>
             </TransitionLink>
             <TransitionLink to="/pro/bills?tab=ambush" className="rounded-lg focus-app">
-              <div className="h-full rounded-lg border border-surface-border bg-surface-raised p-4 transition-colors hover:bg-content-primary/[0.03]">
+              <div className="h-full border border-surface-border p-4">
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                   <ShieldAlert className="h-3.5 w-3.5" aria-hidden />
                   Tolls & fines
@@ -647,7 +681,7 @@ export default function Dashboard() {
             </div>
 
             <aside className="space-y-4">
-              <section id="safe-spend" className="rounded-lg border border-surface-border bg-surface-raised p-4">
+              <section id="safe-spend" className="border border-surface-border p-4">
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                   <Wallet className="h-4 w-4" aria-hidden />
                   Spending comfort
@@ -661,20 +695,20 @@ export default function Dashboard() {
                 </p>
               </section>
 
-              <section className="rounded-lg border border-surface-border bg-surface-raised p-4">
+              <section className="border border-surface-border p-4">
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                   <CreditCard className="h-4 w-4" aria-hidden />
-                  Debt focus
+                  Debt minimums first
                 </p>
                 {nextDebtTarget ? (
                   <>
                     <h2 className="mt-3 text-sm font-semibold text-content-primary">{nextDebtTarget.name}</h2>
                     <p className="mt-1 text-xs text-content-secondary">
-                      Highest APR tracked at {(nextDebtTarget.apr || 0).toFixed(2)}%. Keep the minimum paid first, then attack extra principal here.
+                      Highest APR tracked at {(nextDebtTarget.apr || 0).toFixed(2)}%. Oweable keeps the minimum visible first; extra payoff comes after urgent dues are handled.
                     </p>
                     <TransitionLink
                       to="/pro/bills?tab=debt"
-                      className="mt-4 inline-flex min-h-9 items-center justify-center rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
+                      className="mt-4 inline-flex min-h-9 items-center justify-center border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary focus-app"
                     >
                       Review debt
                     </TransitionLink>
@@ -685,7 +719,7 @@ export default function Dashboard() {
               </section>
 
               {unscheduledItems.length > 0 && (
-                <section className="rounded-lg border border-amber-500/25 bg-amber-500/5 p-4">
+                <section className="border border-amber-500/25 p-4">
                   <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-amber-300">
                     <CalendarDays className="h-4 w-4" aria-hidden />
                     Missing due dates
@@ -695,7 +729,7 @@ export default function Dashboard() {
                   </p>
                   <TransitionLink
                     to="/pro/bills?tab=debt"
-                    className="mt-4 inline-flex min-h-9 items-center justify-center rounded-lg border border-amber-500/25 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-500/10 focus-app"
+                    className="mt-4 inline-flex min-h-9 items-center justify-center border border-amber-500/25 px-3 py-1.5 text-xs font-medium text-amber-200 focus-app"
                   >
                     Add due dates
                   </TransitionLink>

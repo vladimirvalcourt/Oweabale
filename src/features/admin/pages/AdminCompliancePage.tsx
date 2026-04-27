@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '../../../lib/supabase';
-import { useAdminPermissions } from '../shared/useAdminPermissions';
+import { supabase } from '../../../lib/api/supabase';
+import { useAdminPermissions } from '../shared';
 
 type ComplianceStatusRow = {
   user_id: string;
@@ -74,7 +74,7 @@ export default function AdminCompliancePage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
-      <header className="glass-card rounded-2xl p-4 sm:p-5">
+      <header className="border border-surface-border p-4 sm:p-5">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h1 className="text-lg font-semibold text-content-primary">Compliance Command Center</h1>
@@ -86,7 +86,7 @@ export default function AdminCompliancePage() {
             type="button"
             disabled={!canManage || refreshingPlaid}
             onClick={() => void triggerPlaidRefresh()}
-            className="danger-button rounded-lg border border-amber-500/40 bg-amber-500/15 px-3 py-2 text-xs font-medium text-amber-200 disabled:opacity-40"
+            className="danger-button border border-amber-500/40 px-3 py-2 text-xs font-medium text-amber-200 disabled:opacity-40"
           >
             {refreshingPlaid ? 'Refreshing Plaid…' : 'Force-refresh stale Plaid items'}
           </button>
@@ -94,26 +94,26 @@ export default function AdminCompliancePage() {
       </header>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-xl border border-surface-border bg-surface-raised p-4">
+        <div className="border border-surface-border p-4">
           <p className="text-[11px] uppercase tracking-wide text-content-tertiary">KYC manual review</p>
           <p className="mt-1 text-2xl font-semibold text-content-primary">{summary.kycManual}</p>
         </div>
-        <div className="rounded-xl border border-surface-border bg-surface-raised p-4">
+        <div className="border border-surface-border p-4">
           <p className="text-[11px] uppercase tracking-wide text-content-tertiary">AML flagged users</p>
           <p className="mt-1 text-2xl font-semibold text-content-primary">{summary.amlFlagged}</p>
         </div>
-        <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-4">
+        <div className="border border-rose-500/30 p-4">
           <p className="text-[11px] uppercase tracking-wide text-rose-200">Critical flags open</p>
-          <p className="mt-1 text-2xl font-semibold text-rose-100">{summary.criticalFlags}</p>
+          <p className="mt-1 text-2xl font-semibold text-content-primary">{summary.criticalFlags}</p>
         </div>
-        <div className="rounded-xl border border-surface-border bg-surface-raised p-4">
+        <div className="border border-surface-border p-4">
           <p className="text-[11px] uppercase tracking-wide text-content-tertiary">High risk users (75+)</p>
           <p className="mt-1 text-2xl font-semibold text-content-primary">{summary.highRisk}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1.5fr_1fr]">
-        <div className="glass-card rounded-2xl">
+        <div className="border border-surface-border">
           <div className="border-b border-surface-border px-3 py-2">
             <h2 className="text-sm font-semibold text-content-primary">Compliance Status Matrix</h2>
           </div>
@@ -152,7 +152,7 @@ export default function AdminCompliancePage() {
           ) : null}
         </div>
 
-        <div className="glass-card rounded-2xl">
+        <div className="border border-surface-border">
           <div className="border-b border-surface-border px-3 py-2">
             <h2 className="text-sm font-semibold text-content-primary">Flagged Activity Queue</h2>
           </div>
@@ -166,12 +166,12 @@ export default function AdminCompliancePage() {
                   <div className="flex items-center justify-between gap-2">
                     <p className="truncate text-xs font-medium text-content-primary">{item.user_id}</p>
                     <span
-                      className={`rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wide ${
+                      className={`border px-2 py-0.5 text-[10px] uppercase tracking-wide ${
                         item.severity === 'critical'
-                          ? 'border-rose-500/40 bg-rose-500/20 text-rose-200'
+                          ? 'border-rose-500/40 text-rose-200'
                           : item.severity === 'high'
-                            ? 'border-amber-500/40 bg-amber-500/15 text-amber-200'
-                            : 'border-surface-border bg-surface-base text-content-tertiary'
+                            ? 'border-amber-500/40 text-amber-200'
+                            : 'border-surface-border text-content-tertiary'
                       }`}
                     >
                       {item.severity}

@@ -1,6 +1,6 @@
 import React from 'react';
-import Footer from '../components/Footer';
-import PublicHeader from '../components/PublicHeader';
+import { Footer } from '../components/layout';
+import { PublicHeader } from '../components/layout';
 
 const ENTRIES: { date: string; title: string; bullets: string[] }[] = [
   {
@@ -36,7 +36,7 @@ export default function Changelog() {
       <main className="pt-32 pb-24">
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
           <div className="mb-12">
-            <p className="text-xs font-semibold uppercase tracking-widest text-brand-profit mb-4">Changelog</p>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-content-tertiary">Changelog</p>
             <h1 className="text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
               What changed and why it matters.
             </h1>
@@ -45,11 +45,11 @@ export default function Changelog() {
             </p>
           </div>
 
-          <ul className="space-y-6">
+          <ul className="space-y-10 border-t border-surface-border pt-8">
             {ENTRIES.map((entry) => (
-              <li key={`${entry.date}-${entry.title}`} className="rounded-[12px] border border-surface-border bg-surface-raised p-8 shadow-sm">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary mb-3">{entry.date}</p>
-                <h2 className="text-lg font-semibold text-content-primary mb-4">{entry.title}</h2>
+              <li key={`${entry.date}-${entry.title}`}>
+                <p className="mb-3 text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">{entry.date}</p>
+                <h2 className="mb-4 text-lg font-semibold text-content-primary">{entry.title}</h2>
                 <ul className="list-disc pl-5 space-y-2 text-sm text-content-secondary leading-relaxed">
                   {entry.bullets.map((b) => (
                     <li key={b}>{b}</li>

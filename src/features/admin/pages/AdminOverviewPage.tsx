@@ -5,7 +5,7 @@ import {
   Database, ShieldAlert, Gavel, Activity, FileText, 
   Scale, Radio, Mail, Search
 } from 'lucide-react';
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '../../../lib/api/supabase';
 
 type FunnelStep = {
   label: string;
@@ -139,8 +139,6 @@ export default function AdminOverviewPage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-      
-      {/* Navigation Cards */}
       <div className="space-y-4">
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-semibold text-content-primary">Admin Modules</h2>
@@ -150,20 +148,20 @@ export default function AdminOverviewPage() {
             <Link
               key={module.href}
               to={module.href}
-              className="group flex flex-col justify-between rounded-2xl border border-surface-border bg-surface-raised p-5 transition-all duration-200 hover:-translate-y-1 hover:border-brand-cta/30 hover:shadow-md"
+              className="flex flex-col justify-between border border-surface-border p-4"
             >
               <div>
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-surface-elevated text-content-secondary group-hover:bg-brand-cta/10 group-hover:text-brand-cta transition-colors">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center border border-surface-border text-content-secondary">
                   <module.icon className="h-5 w-5" />
                 </div>
-                <h3 className="text-sm font-semibold text-content-primary group-hover:text-brand-cta transition-colors">
+                <h3 className="text-sm font-semibold text-content-primary">
                   {module.title}
                 </h3>
                 <p className="mt-2 text-xs text-content-tertiary leading-relaxed">
                   {module.description}
                 </p>
               </div>
-              <div className="mt-4 flex items-center text-[11px] font-medium text-content-muted group-hover:text-brand-cta transition-colors">
+              <div className="mt-4 flex items-center text-[11px] font-medium text-content-muted">
                 Open module <ArrowRight className="ml-1 h-3 w-3" />
               </div>
             </Link>
@@ -171,8 +169,7 @@ export default function AdminOverviewPage() {
         </div>
       </div>
 
-      {/* Onboarding Funnel */}
-      <div className="glass-card rounded-2xl p-5 mt-8">
+      <div className="border border-surface-border p-5">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
@@ -185,9 +182,9 @@ export default function AdminOverviewPage() {
           </div>
           <div className="flex items-center gap-3">
             {data ? (
-              <div className="rounded-xl border border-brand-cta/30 bg-brand-cta/10 px-3 py-2">
-                <p className="text-[10px] uppercase tracking-wide text-brand-cta">Completion rate</p>
-                <p className="mt-0.5 text-lg font-bold text-brand-cta">
+              <div className="border border-surface-border px-3 py-2">
+                <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Completion rate</p>
+                <p className="mt-0.5 text-lg font-bold text-content-primary">
                   {data.total_signups > 0 ? Math.round((data.completed_onboarding / data.total_signups) * 100) : 0}%
                 </p>
               </div>
@@ -206,7 +203,7 @@ export default function AdminOverviewPage() {
         ) : (
           <div className="space-y-2">
             {steps.map((step, i) => (
-              <div key={step.label} className="group rounded-xl border border-surface-border bg-surface-raised p-3 transition-colors hover:border-brand-cta/30">
+              <div key={step.label} className="border border-surface-border p-3">
                 <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <div className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
@@ -224,9 +221,9 @@ export default function AdminOverviewPage() {
                     <p className="text-[10px] text-content-muted">{step.count.toLocaleString()} users</p>
                   </div>
                 </div>
-                <div className="relative h-2 w-full overflow-hidden rounded-full bg-surface-elevated">
+                <div className="relative h-2 w-full overflow-hidden bg-surface-elevated">
                   <div
-                    className={`h-full rounded-full transition-all duration-700 ${i === steps.length - 1 ? 'bg-emerald-500' : 'bg-brand-cta'}`}
+                    className={`h-full transition-all duration-700 ${i === steps.length - 1 ? 'bg-emerald-500' : 'bg-content-primary'}`}
                     style={{ width: `${step.pct}%` }}
                   />
                 </div>
@@ -244,12 +241,12 @@ export default function AdminOverviewPage() {
             ))}
 
             {biggestDrop && biggestDrop.drop > 0 ? (
-              <div className="mt-2 rounded-lg border border-amber-500/35 bg-amber-500/10 p-3 text-xs">
+              <div className="mt-2 border border-amber-500/35 p-3 text-xs">
                 <div className="flex items-center gap-2">
                   <BarChart3 className="h-3.5 w-3.5 text-amber-300" />
-                  <p className="font-semibold text-amber-200">Highest drop-off</p>
+                  <p className="font-semibold text-content-primary">Highest drop-off</p>
                 </div>
-                <p className="mt-1 text-amber-100/80">
+                <p className="mt-1 text-content-secondary">
                   <strong>&quot;{biggestDrop.step}&quot;</strong> — {biggestDrop.drop}% of users don't reach this step.
                   Focus product and growth efforts here.
                 </p>
@@ -263,7 +260,7 @@ export default function AdminOverviewPage() {
       {data && !isLoading ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6 mt-4">
           {steps.map((step) => (
-            <div key={step.label} className="rounded-xl border border-surface-border bg-surface-raised px-3 py-2">
+            <div key={step.label} className="border border-surface-border px-3 py-2">
               <p className="text-[10px] truncate uppercase tracking-wide text-content-tertiary">{step.label}</p>
               <p className="mt-1 text-base font-semibold text-content-primary">{step.count.toLocaleString()}</p>
               <p className="text-[10px] text-content-muted">{step.pct}%</p>
@@ -274,7 +271,7 @@ export default function AdminOverviewPage() {
 
       {/* Empty state message */}
       {!isLoading && !error && (!data || data.total_signups === 0) ? (
-        <div className="flex flex-col items-center gap-3 rounded-2xl border border-surface-border bg-surface-raised py-16 text-center mt-4">
+        <div className="flex flex-col items-center gap-3 border border-surface-border py-16 text-center mt-4">
           <Users className="h-10 w-10 text-content-muted" />
           <p className="text-sm text-content-secondary">No users yet — funnel will populate as signups come in.</p>
         </div>

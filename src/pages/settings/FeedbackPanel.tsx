@@ -1,11 +1,11 @@
 import React, { memo, useEffect, useState } from 'react';
 import { ThumbsUp, MessageSquare, Send, Loader2, Star } from 'lucide-react';
-import { CollapsibleModule } from '../../components/CollapsibleModule';
-import { supabase } from '../../lib/supabase';
+import { CollapsibleModule } from '../../components/common';
+import { supabase } from '../../lib/api/supabase';
 import { toast } from 'sonner';
 import type { UserFeedback } from './types';
-import { yieldForPaint } from '../../lib/interaction';
-import { getCustomIcon } from '../../lib/customIcons';
+import { yieldForPaint } from "../../lib/api/services";
+import { getCustomIcon } from '../../lib/utils/customIcons';
 
 function FeedbackPanelInner() {
   const SupportIcon = getCustomIcon('support');

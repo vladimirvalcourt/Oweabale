@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { useStore, type Subscription } from '../store/useStore';
-import { normalizeToMonthly, detectUnusedSubscriptions } from '../lib/finance';
-import { detectSubscriptionCandidates, type SubscriptionCandidate } from '../lib/subscriptionCandidates';
+import { useStore, type Subscription } from '../store';
+import { normalizeToMonthly, detectUnusedSubscriptions } from '../lib/api/services/finance';
+import { detectSubscriptionCandidates, type SubscriptionCandidate } from '../lib/api/services/subscriptionCandidates';
 import { Repeat, Plus, Edit2, Trash2, TrendingUp, X, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
-import { CollapsibleModule } from '../components/CollapsibleModule';
-import { BrandLogo } from '../components/BrandLogo';
-import { yieldForPaint } from '../lib/interaction';
-import { getCustomIcon } from '../lib/customIcons';
+import { CollapsibleModule } from '../components/common';
+import { BrandLogo } from '../components/common';
+import { yieldForPaint } from '../lib/utils';
+import { getCustomIcon } from '../lib/utils';
 type SubFrequency = 'Weekly' | 'Bi-weekly' | 'Monthly' | 'Yearly';
 
 const SUB_FREQUENCIES: SubFrequency[] = ['Weekly', 'Bi-weekly', 'Monthly', 'Yearly'];

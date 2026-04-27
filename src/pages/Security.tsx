@@ -1,25 +1,8 @@
-import { motion } from 'framer-motion';
 import React from 'react';
-import Footer from '../components/Footer';
-import PublicHeader from '../components/PublicHeader';
-import { useSEO } from '../hooks/useSEO';
-import { EMAIL_CONFIG } from '../lib/emailObfuscation';
-
-// Framer Motion Variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
-};
+import { Footer } from '../components/layout';
+import { PublicHeader } from '../components/layout';
+import { useSEO } from '../hooks';
+import { EMAIL_CONFIG } from '../lib/utils/emailObfuscation';
 
 const securityCards = [
   {
@@ -78,12 +61,12 @@ export default function Security() {
         ]}
       />
 
-      <main className="pt-28 pb-20">
-        <div className="mx-auto max-w-6xl">
+      <main className="px-6 pb-20 pt-28 lg:px-8">
+        <div className="mx-auto max-w-5xl">
           <section className="py-12">
-            <div className="public-fade-up max-w-3xl">
+            <div className="max-w-3xl">
               <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Security</p>
-              <h1 className="mt-5 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl">
+              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
                 Security, explained like it actually matters to your life.
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-content-secondary">
@@ -91,26 +74,16 @@ export default function Security() {
               </p>
             </div>
 
-            <motion.div
-              className="mt-12 grid gap-6 lg:grid-cols-3"
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-100px' }}
-            >
+            <div className="mt-12 grid gap-8 lg:grid-cols-3">
               {securityCards.map((card) => (
-                <motion.article
-                  key={card.title}
-                  variants={fadeInUp}
-                  className="public-hover-lift rounded-[12px] border border-surface-border bg-surface-raised p-8 shadow-sm"
-                >
+                <article key={card.title} className="border-t border-surface-border pt-6">
                   <h2 className="text-lg font-semibold text-content-primary mb-3">{card.title}</h2>
                   <p className="text-sm leading-relaxed text-content-secondary">{card.body}</p>
-                </motion.article>
+                </article>
               ))}
-            </motion.div>
+            </div>
 
-            <div className="public-fade-up public-delay-1 mt-12 rounded-[12px] border border-surface-border bg-surface-raised p-8 sm:p-10">
+            <div className="mt-12 space-y-10 border-t border-surface-border pt-10">
               <div className="space-y-10">
                 {sections.map((section) => (
                   <section key={section.title}>

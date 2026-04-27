@@ -1,5 +1,5 @@
-import { TransitionLink } from '../components/TransitionLink';
-import { useAuth } from '../hooks/useAuth';
+import { TransitionLink } from '../components/common';
+import { useAuth } from '../hooks';
 
 /**
  * Global 404 — matches unknown paths via `<Route path="*" />`.
@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 export default function NotFound() {
   const { user: authUser } = useAuth();
   const primaryHref = authUser ? '/pro/dashboard' : '/auth';
-  const primaryLabel = authUser ? 'Dashboard' : 'Sign in';
+  const primaryLabel = authUser ? 'Pay List' : 'Sign in';
 
   return (
     <div className="min-h-screen bg-surface-base flex flex-col items-center justify-center px-6 py-20">

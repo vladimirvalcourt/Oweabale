@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '../../../lib/api/supabase';
 
 type TelemetryPayload = {
   telemetry: {
@@ -53,7 +53,7 @@ export default function AdminTelemetryPage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
-      <header className="glass-card rounded-2xl p-4 sm:p-5">
+      <header className="border border-surface-border p-4 sm:p-5">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h1 className="text-lg font-semibold text-content-primary">System Telemetry</h1>
@@ -62,15 +62,15 @@ export default function AdminTelemetryPage() {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            <div className="rounded-xl border border-surface-border bg-surface-base px-3 py-2 transition-colors duration-200 hover:border-content-secondary/40">
+            <div className="border border-surface-border px-3 py-2">
               <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Refresh</p>
               <p className="mt-1 text-sm font-semibold text-content-primary">30s</p>
             </div>
-            <div className="rounded-xl border border-surface-border bg-surface-base px-3 py-2 transition-colors duration-200 hover:border-content-secondary/40">
+            <div className="border border-surface-border px-3 py-2">
               <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Warnings</p>
               <p className="mt-1 text-sm font-semibold text-content-primary">{warningCount}</p>
             </div>
-            <div className="rounded-xl border border-surface-border bg-surface-base px-3 py-2 transition-colors duration-200 hover:border-content-secondary/40">
+            <div className="border border-surface-border px-3 py-2">
               <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Status</p>
               <p className="mt-1 text-sm font-semibold text-content-primary">
                 {warningCount > 0 ? 'Attention needed' : 'Nominal'}
@@ -86,14 +86,14 @@ export default function AdminTelemetryPage() {
       {!isLoading && !error && telemetry ? (
         <>
           <div className="grid grid-cols-1 gap-3 xl:grid-cols-3">
-            <div className="rounded-2xl border border-surface-border bg-surface-raised p-4">
+            <div className="border border-surface-border p-4">
               <div className="flex items-start justify-between gap-2">
                 <p className="text-[11px] uppercase tracking-wide text-content-tertiary">Plaid sync health</p>
                 <span
-                  className={`rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wide ${
+                  className={`border px-2 py-0.5 text-[10px] uppercase tracking-wide ${
                     plaidWarning
-                      ? 'border-rose-500/40 bg-rose-500/20 text-rose-200'
-                      : 'border-emerald-500/40 bg-emerald-500/20 text-emerald-200'
+                      ? 'border-rose-500/40 text-rose-200'
+                      : 'border-emerald-500/40 text-emerald-200'
                   }`}
                 >
                   {plaidWarning ? 'Warning' : 'Healthy'}
@@ -107,14 +107,14 @@ export default function AdminTelemetryPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-surface-border bg-surface-raised p-4">
+            <div className="border border-surface-border p-4">
               <div className="flex items-start justify-between gap-2">
                 <p className="text-[11px] uppercase tracking-wide text-content-tertiary">Stripe webhooks</p>
                 <span
-                  className={`rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wide ${
+                  className={`border px-2 py-0.5 text-[10px] uppercase tracking-wide ${
                     stripeWarning
-                      ? 'border-amber-500/40 bg-amber-500/15 text-amber-200'
-                      : 'border-surface-border bg-surface-base text-content-tertiary'
+                      ? 'border-amber-500/40 text-amber-200'
+                      : 'border-surface-border text-content-tertiary'
                   }`}
                 >
                   {stripeWarning ? 'Dense cadence' : 'Normal cadence'}
@@ -127,12 +127,12 @@ export default function AdminTelemetryPage() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-surface-border bg-surface-raised p-4">
+            <div className="border border-surface-border p-4">
               <div className="flex items-start justify-between gap-2">
                 <p className="text-[11px] uppercase tracking-wide text-content-tertiary">Admin edge traffic</p>
                 <span
-                  className={`rounded-md border px-2 py-0.5 text-[10px] uppercase tracking-wide ${
-                    edgeBurst ? 'border-amber-500/40 bg-amber-500/15 text-amber-200' : 'border-surface-border bg-surface-base text-content-tertiary'
+                  className={`border px-2 py-0.5 text-[10px] uppercase tracking-wide ${
+                    edgeBurst ? 'border-amber-500/40 text-amber-200' : 'border-surface-border text-content-tertiary'
                   }`}
                 >
                   {edgeBurst ? 'Elevated' : 'Baseline'}
@@ -143,16 +143,16 @@ export default function AdminTelemetryPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-surface-border bg-surface-raised p-4">
+          <div className="border border-surface-border p-4">
             <h2 className="text-sm font-semibold text-content-primary">Operational Notes</h2>
             <div className="mt-3 grid grid-cols-1 gap-2 md:grid-cols-3">
-              <div className="rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-xs text-content-secondary">
+              <div className="border border-surface-border px-3 py-2 text-xs text-content-secondary">
                 Plaid syncs are healthy when error and relink queues stay near zero.
               </div>
-              <div className="rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-xs text-content-secondary">
+              <div className="border border-surface-border px-3 py-2 text-xs text-content-secondary">
                 Stripe spacing values trending down can indicate burst retries or delivery spikes.
               </div>
-              <div className="rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-xs text-content-secondary">
+              <div className="border border-surface-border px-3 py-2 text-xs text-content-secondary">
                 Edge admin action counts help distinguish routine operations from incident response periods.
               </div>
             </div>

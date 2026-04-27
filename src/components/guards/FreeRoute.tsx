@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useFullSuiteAccess } from '../../hooks/useFullSuiteAccess';
-import { AppLoader } from '../PageSkeleton';
+import { useFullSuiteAccess } from '../../hooks';
+import { AppLoader } from '../common';
 
 /**
  * FreeRoute — plan guard for /free/* routes.

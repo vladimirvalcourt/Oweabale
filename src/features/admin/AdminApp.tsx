@@ -10,7 +10,7 @@ import AdminCompliancePage from './pages/AdminCompliancePage';
 import AdminTelemetryPage from './pages/AdminTelemetryPage';
 import AdminCaseFilePage from './pages/AdminCaseFilePage';
 import AdminEmailBlastPage from './pages/AdminEmailBlastPage';
-import { AdminPermissionGate } from './shared/AdminPermissionGate';
+import { AdminPermissionGate } from './shared';
 
 export default function AdminApp() {
   return (

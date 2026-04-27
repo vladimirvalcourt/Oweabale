@@ -1,16 +1,16 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Plus, MoreHorizontal, X, Vault, Edit2, Trash2, ArrowDownCircle, TrendingUp, PiggyBank, Save } from 'lucide-react';
-import { CollapsibleModule } from '../components/CollapsibleModule';
-import { BrandLogo } from '../components/BrandLogo';
-import { TransitionLink } from '../components/TransitionLink';
-import { useStore, IncomeSource } from '../store/useStore';
+import { CollapsibleModule } from '../components/common';
+import { BrandLogo } from '../components/common';
+import { TransitionLink } from '../components/common';
+import { useStore, IncomeSource } from '../store';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { toast } from 'sonner';
-import { guessCategory } from '../lib/categorizer';
-import { yieldForPaint } from '../lib/interaction';
+import { guessCategory } from '../lib/api/services/categorizer';
+import { yieldForPaint } from '../lib/utils';
 import { cn } from '../lib/utils';
-import { getCustomIcon } from '../lib/customIcons';
+import { getCustomIcon } from '../lib/utils';
 const IncomeIcon = getCustomIcon('income');
 const PlanningIcon = getCustomIcon('planning');
 

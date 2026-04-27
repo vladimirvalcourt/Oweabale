@@ -1,7 +1,7 @@
 import React from 'react';
 
 /**
- * Custom Oweable Dashboard Preview Component
+ * Custom Oweable Pay List Preview Component
  * Renders a branded dashboard mockup for the hero section
  * Works in both dark and light modes with proper theming
  */
@@ -28,7 +28,7 @@ export default function OweableDashboardPreview() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-content-primary">Dashboard</h3>
+            <h3 className="text-lg font-semibold text-content-primary">Pay List</h3>
             <p className="text-xs text-content-secondary mt-1">Welcome back, track your finances</p>
           </div>
           <div className="flex items-center gap-2">

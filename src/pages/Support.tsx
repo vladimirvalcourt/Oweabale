@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import Footer from '../components/Footer';
-import PublicHeader from '../components/PublicHeader';
-import { TransitionLink } from '../components/TransitionLink';
-import { useJsonLd } from '../hooks/useJsonLd';
-import { useSEO } from '../hooks/useSEO';
-import { submitSupportContact } from '../lib/supportContact';
-import { EMAIL_CONFIG } from '../lib/emailObfuscation';
+import { Footer } from '../components/layout';
+import { PublicHeader } from '../components/layout';
+import { TransitionLink } from '../components/common';
+import { useJsonLd } from '../hooks';
+import { useSEO } from '../hooks';
+import { submitSupportContact } from '../app/constants';
+import { EMAIL_CONFIG } from '../lib/utils/emailObfuscation';
 import { toast } from 'sonner';
 
 // Framer Motion Variants
@@ -228,32 +228,30 @@ export default function Support() {
       />
 
       <main>
-        <div className="mx-auto max-w-7xl">
-          <section className="grid gap-10 py-10 sm:py-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-12">
-            <div className="public-fade-up">
-              <div className="inline-flex items-center gap-2 rounded-full border border-surface-border bg-surface-raised px-4 py-2 text-xs font-semibold uppercase tracking-widest text-content-secondary">
-                Support
-              </div>
-              <h1 className="mt-6 text-5xl font-semibold tracking-tight text-content-primary sm:text-6xl">
+        <div className="mx-auto max-w-7xl px-6 pt-28 lg:px-8">
+          <section className="grid gap-10 py-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-12">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Support</p>
+              <h1 className="mt-6 text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
                 Help for when something is wrong and you do not want to chase it alone.
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-content-secondary">
                 Reach out for billing, access, account, product, or technical issues. We usually reply within one business day, and the goal is to be useful, not robotic.
               </p>
               <div className="mt-8 grid gap-6">
-                <div className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8">
+                <div className="border-t border-surface-border pt-6">
                   <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Best for</p>
                   <p className="mt-3 text-sm leading-relaxed text-content-secondary">Account access problems, billing questions, bugs, and anything that is making the product harder to use than it should be.</p>
                 </div>
-                <div className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8">
+                <div className="border-t border-surface-border pt-6">
                   <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Contact Support</p>
                   {EMAIL_CONFIG.support.createContactLink(
                     'Get Help',
-                    'mt-3 inline-flex items-center justify-center rounded-[10px] bg-brand-cta px-6 h-[48px] text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover min-w-[160px]',
+                    'mt-3 inline-flex items-center justify-center border border-surface-border bg-content-primary px-6 h-[48px] text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover min-w-[160px]',
                     true
                   )}
                 </div>
-                <div className="public-hover-lift flex flex-col items-start rounded-[12px] border border-surface-border bg-surface-raised p-8">
+                <div className="border-t border-surface-border pt-6">
                   <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Sensitive requests</p>
                   <p className="mt-3 text-sm leading-relaxed text-content-secondary">
                     For privacy or security concerns, include that in your subject line so we can route it quickly and handle it with the right level of care.
@@ -262,22 +260,22 @@ export default function Support() {
               </div>
             </div>
 
-            <div className="public-fade-up public-delay-1 grid gap-6">
-              <section className="rounded-[12px] border border-surface-border bg-surface-raised p-8 sm:p-10 shadow-sm">
+            <div className="grid gap-6">
+              <section className="border border-surface-border p-8 sm:p-10">
                 <h2 className="text-2xl font-semibold tracking-tight leading-tight text-content-primary">Send a message</h2>
                 <p className="mt-4 text-base leading-relaxed text-content-secondary">
                   Give us the basics and a little context. You do not need to write a perfect report. Just tell us what happened and what you needed to get done.
                 </p>
 
                 {submitted ? (
-                  <div className="mt-8 rounded-[12px] border border-surface-border bg-surface-highlight p-8 text-center">
+                  <div className="mt-8 border border-surface-border p-8 text-center">
                     <h3 className="text-lg font-semibold text-content-primary mb-3">Message sent</h3>
                     <p className="text-sm leading-relaxed text-content-secondary">
                       We got your note and will usually reply within one business day.
                     </p>
                     <button
                       onClick={() => setSubmitted(false)}
-                      className="mt-6 inline-flex items-center justify-center rounded-[10px] bg-brand-cta px-6 h-[48px] text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover min-w-[160px]"
+                      className="mt-6 inline-flex h-[48px] min-w-[160px] items-center justify-center border border-surface-border bg-content-primary px-6 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover"
                     >
                       Send another message
                     </button>
@@ -354,7 +352,7 @@ export default function Support() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="mt-6 inline-flex items-center gap-3 rounded-full bg-brand-cta px-7 py-3.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-70"
+                      className="mt-6 inline-flex items-center gap-3 border border-surface-border bg-content-primary px-7 py-3.5 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       {isSubmitting ? 'Sending...' : 'Send message'}
                       <ArrowRight className="h-4 w-4" />
@@ -363,7 +361,7 @@ export default function Support() {
                 )}
               </section>
 
-              <section className="rounded-2xl border border-surface-border bg-surface-raised p-8 sm:p-10">
+              <section className="border border-surface-border p-8 sm:p-10">
                 <h2 className="text-2xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">Quick answers</h2>
                 <motion.div
                   className="mt-6 grid gap-5"
@@ -373,7 +371,7 @@ export default function Support() {
                   viewport={{ once: true, margin: '-100px' }}
                 >
                   {QUICK_HELP.map((item) => (
-                    <motion.div key={item.q} variants={fadeInUp} className="rounded-xl bg-surface-highlight p-6">
+                    <motion.div key={item.q} variants={fadeInUp} className="border-t border-surface-border pt-5">
                       <h3 className="text-base font-semibold leading-tight text-content-primary">{item.q}</h3>
                       <p className="mt-3 text-sm leading-relaxed text-content-secondary">{item.a}</p>
                     </motion.div>
@@ -383,20 +381,20 @@ export default function Support() {
                   <motion.div variants={springButton} whileHover="hover" whileTap="tap">
                     <TransitionLink
                       to="/pricing"
-                      className="inline-flex items-center gap-2 rounded-full border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
+                      className="inline-flex items-center gap-2 border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
                     >
                       Pricing
                     </TransitionLink>
                   </motion.div>
                   <TransitionLink
                     to="/security"
-                    className="inline-flex items-center gap-2 rounded-full border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
+                    className="inline-flex items-center gap-2 border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
                   >
                     Security
                   </TransitionLink>
                   <TransitionLink
                     to="/privacy"
-                    className="inline-flex items-center gap-2 rounded-full border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:border-surface-border-subtle hover:bg-surface-highlight"
+                    className="inline-flex items-center gap-2 border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
                   >
                     Privacy
                   </TransitionLink>

@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
 import { PiggyBank, RefreshCw, ArrowDownRight, ArrowUpRight, Landmark } from 'lucide-react';
-import { CollapsibleModule } from '../components/CollapsibleModule';
-import { TransitionLink } from '../components/TransitionLink';
-import { formatCategoryLabel } from '../lib/categoryDisplay';
+import { CollapsibleModule } from '../components/common';
+import { TransitionLink } from '../components/common';
+import { formatCategoryLabel } from '../lib/api/services/categoryDisplay';
 import { toast } from 'sonner';
-import { getCustomIcon } from '../lib/customIcons';
+import { getCustomIcon } from '../lib/utils';
 
 const DAYS_WINDOW = 90;
 

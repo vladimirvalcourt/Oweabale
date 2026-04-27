@@ -1,12 +1,12 @@
-import { Bell, Shield } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../lib/supabase';
-import { useAdminPermissions } from './shared/useAdminPermissions';
-import { ThemeToggle } from '../../components/ThemeToggle';
-import { BrandWordmark } from '../../components/BrandWordmark';
-import { TransitionLink } from '../../components/TransitionLink';
+import { supabase } from '../../lib/api/supabase';
+import { useAdminPermissions } from './shared';
+import { ThemeToggle } from '../../components/common';
+import { BrandWordmark } from '../../components/common';
+import { TransitionLink } from '../../components/common';
 
 const navItems = [
   { to: '/admin', label: 'Overview', end: true, requiredPermission: 'dashboard.view' },
@@ -42,23 +42,20 @@ export function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-surface-base text-content-secondary">
-      <header className="sticky top-0 z-20 border-b border-surface-border bg-surface-base/85 shadow-sm backdrop-blur-xl">
+      <header className="border-b border-surface-border">
         <div className="mx-auto flex max-w-7xl min-h-[3.25rem] items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex min-h-[3rem] items-center gap-3">
-            <TransitionLink to="/pro/dashboard" className="group flex items-center gap-2">
-              <div className="h-6 w-6 rounded-sm bg-content-primary flex items-center justify-center transition-transform group-hover:rotate-12">
-                <div className="h-3 w-3 bg-surface-base rounded-full" />
-              </div>
-              <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />
+            <TransitionLink to="/pro/dashboard" className="flex items-center gap-2">
+              <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.08em] text-content-primary" />
             </TransitionLink>
-            <span className="shrink-0 rounded-md border border-surface-border bg-surface-raised/80 px-2 py-0.5 text-[10px] uppercase tracking-wider text-content-tertiary">
+            <span className="shrink-0 border border-surface-border px-2 py-0.5 text-[10px] uppercase tracking-wider text-content-tertiary">
               {envLabel}
             </span>
           </div>
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <div
-              className="relative rounded-lg border border-surface-border bg-surface-raised/80 p-2 shadow-sm transition-colors duration-200 hover:border-content-secondary/40"
+              className="relative border border-surface-border p-2"
               role="status"
               aria-live="polite"
               aria-atomic="true"
@@ -78,7 +75,7 @@ export function AdminLayout() {
           </div>
         </div>
         <nav
-          className="mx-auto flex min-h-10 max-w-7xl flex-nowrap items-center gap-2 overflow-x-auto px-4 pb-3 scrollbar-hide sm:px-6 lg:px-8"
+          className="mx-auto flex min-h-10 max-w-7xl flex-nowrap items-center gap-2 overflow-x-auto px-4 py-3 scrollbar-hide sm:px-6 lg:px-8"
           aria-label="Admin sections"
         >
           {permissionsLoading ? (
@@ -99,10 +96,10 @@ export function AdminLayout() {
                   to={item.to}
                   end={item.end}
                   className={({ isActive }) =>
-                    `shrink-0 rounded-lg border px-3 py-1.5 text-xs interactive-hover interactive-press interactive-focus ${
+                    `shrink-0 border px-3 py-1.5 text-xs ${
                       isActive
-                        ? 'border-brand-cta/40 bg-brand-cta text-surface-base shadow-sm'
-                        : 'border-surface-border bg-surface-raised/80 text-content-secondary hover:bg-surface-raised hover:text-content-primary'
+                        ? 'border-content-primary text-content-primary'
+                        : 'border-surface-border text-content-secondary hover:text-content-primary'
                     }`
                   }
                 >

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '../../../lib/api/supabase';
 
 type AuditRow = {
   id: string;
@@ -39,10 +39,10 @@ export default function AdminAuditLogsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Filter by action..."
-          className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs text-content-primary sm:w-64"
+          className="focus-app-field w-full border border-surface-border px-3 py-2 text-xs text-content-primary sm:w-64"
         />
       </div>
-      <div className="rounded-xl border border-surface-border bg-surface-raised">
+      <div className="border border-surface-border">
         {isLoading ? <p className="p-4 text-xs text-content-muted">Loading logs...</p> : null}
         {error ? <p className="p-4 text-xs text-rose-300">Failed to load audit logs.</p> : null}
         {!isLoading && !error && grouped.length === 0 ? (
@@ -51,7 +51,7 @@ export default function AdminAuditLogsPage() {
         {!isLoading && !error && grouped.length > 0 ? (
           <div className="max-h-[70vh] overflow-auto">
             <table className="w-full text-left text-xs">
-              <thead className="sticky top-0 bg-surface-base text-content-tertiary">
+              <thead className="border-b border-surface-border bg-surface-base text-content-tertiary">
                 <tr>
                   <th className="px-3 py-2 font-medium">When</th>
                   <th className="px-3 py-2 font-medium">Action</th>

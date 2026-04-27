@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '../../../lib/supabase';
+import { supabase } from '../../../lib/api/supabase';
 
 type ModerationRow = {
   id: string;
@@ -43,7 +43,7 @@ export default function AdminModerationPage() {
   return (
     <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       <h1 className="mb-4 text-lg font-semibold text-content-primary">Content Moderation</h1>
-      <div className="rounded-xl border border-surface-border bg-surface-raised">
+      <div className="border border-surface-border">
         {isLoading ? <p className="p-4 text-xs text-content-muted">Loading moderation queue...</p> : null}
         {error ? <p className="p-4 text-xs text-rose-300">Failed to load moderation queue.</p> : null}
         {!isLoading && !error && (data?.length ?? 0) === 0 ? (
@@ -52,10 +52,10 @@ export default function AdminModerationPage() {
         {(data?.length ?? 0) > 0 ? (
           <div className="space-y-2 p-3">
             {data?.map((row) => (
-              <div key={row.id} className="rounded-lg border border-surface-border bg-surface-base p-3">
+              <div key={row.id} className="border border-surface-border p-3">
                 <div className="mb-1 flex flex-wrap items-center gap-2">
                   <span className="text-[10px] uppercase tracking-wide text-content-tertiary">{row.entity_type}</span>
-                  <span className="rounded-md border border-surface-border px-1.5 py-0.5 text-[10px] text-content-secondary">
+                  <span className="border border-surface-border px-1.5 py-0.5 text-[10px] text-content-secondary">
                     {row.status}
                   </span>
                   <span className="ml-auto text-[10px] text-content-muted">{new Date(row.created_at).toLocaleString()}</span>
@@ -67,7 +67,7 @@ export default function AdminModerationPage() {
                     type="button"
                     disabled={savingId === row.id}
                     onClick={() => void setStatus(row.id, 'approved')}
-                    className="rounded-lg bg-emerald-500/15 px-2.5 py-1.5 text-[11px] text-emerald-300 disabled:opacity-40"
+                    className="border border-emerald-500/40 px-2.5 py-1.5 text-[11px] text-emerald-300 disabled:opacity-40"
                   >
                     Approve
                   </button>
@@ -75,7 +75,7 @@ export default function AdminModerationPage() {
                     type="button"
                     disabled={savingId === row.id}
                     onClick={() => void setStatus(row.id, 'rejected')}
-                    className="rounded-lg bg-rose-500/15 px-2.5 py-1.5 text-[11px] text-rose-300 disabled:opacity-40"
+                    className="border border-rose-500/40 px-2.5 py-1.5 text-[11px] text-rose-300 disabled:opacity-40"
                   >
                     Reject
                   </button>
@@ -83,7 +83,7 @@ export default function AdminModerationPage() {
                     type="button"
                     disabled={savingId === row.id}
                     onClick={() => void setStatus(row.id, 'flagged')}
-                    className="rounded-lg bg-amber-500/15 px-2.5 py-1.5 text-[11px] text-amber-300 disabled:opacity-40"
+                    className="border border-amber-500/40 px-2.5 py-1.5 text-[11px] text-amber-300 disabled:opacity-40"
                   >
                     Flag
                   </button>

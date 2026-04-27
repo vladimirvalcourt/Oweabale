@@ -8,12 +8,12 @@
  * Includes a persistent Upgrade banner at the bottom.
  */
 import React, { useMemo, useState } from 'react';
-import { TransitionLink } from '../components/TransitionLink';
-import { useStore } from '../store/useStore';
+import { TransitionLink } from '../components/common';
+import { useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
-import { useSEO } from '../hooks/useSEO';
+import { useSEO } from '../hooks';
 import { Receipt, Clock, AlertCircle, Landmark, Plus, Star, Loader2, ArrowRight } from 'lucide-react';
-import { createStripeCheckoutSession } from '../lib/stripe';
+import { createStripeCheckoutSession } from '../lib/api/stripe';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 

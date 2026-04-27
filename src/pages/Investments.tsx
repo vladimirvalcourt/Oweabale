@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useStore, type InvestmentAccount } from '../store/useStore';
+import { useStore, type InvestmentAccount } from '../store';
 import {
   TrendingUp,
   Plus,
@@ -13,11 +13,11 @@ import {
   HeartPulse,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { AppPageShell } from '../components/AppPageShell';
+import { AppPageShell } from '../components/layout';
 import { Dialog } from '@headlessui/react';
-import { yieldForPaint } from '../lib/interaction';
+import { yieldForPaint } from '../lib/utils';
 import { cn } from '../lib/utils';
-import { TransitionLink } from '../components/TransitionLink';
+import { TransitionLink } from '../components/common';
 
 const TYPE_LABELS: Record<InvestmentAccount['type'], string> = {
   brokerage: 'Brokerage',

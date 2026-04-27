@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useStore, type MileageLogEntry } from '../store/useStore';
+import { useStore, type MileageLogEntry } from '../store';
 import {
   Calculator,
   Clock,
@@ -16,11 +16,11 @@ import {
   Landmark,
   Info,
 } from 'lucide-react';
-import { CollapsibleModule } from '../components/CollapsibleModule';
-import { TransitionLink } from '../components/TransitionLink';
+import { CollapsibleModule } from '../components/common';
+import { TransitionLink } from '../components/common';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
-import { getCustomIcon } from '../lib/customIcons';
+import { getCustomIcon } from '../lib/utils';
 
 function defaultIrsRateForPurpose(purpose: MileageLogEntry['purpose']): number {
   switch (purpose) {

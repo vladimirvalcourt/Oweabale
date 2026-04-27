@@ -7,11 +7,11 @@ import {
   Mail, ExternalLink, Calendar, Calculator, Plus, Trash2, Edit3, Send,
   FileText, Download, Copy, ShieldAlert, X
 } from 'lucide-react';
-import { useStore } from '../store/useStore';
+import { useStore } from '../store';
 import { toast } from 'sonner';
-import { AppPageShell } from '../components/AppPageShell';
-import { TransitionLink } from '../components/TransitionLink';
-import { yieldForPaint } from '../lib/interaction';
+import { AppPageShell } from '../components/layout';
+import { TransitionLink } from '../components/common';
+import { yieldForPaint } from '../lib/utils';
 
 export default function CreditCenter() {
   const { credit, updateCreditScore, addCreditFix, updateCreditFix, deleteCreditFix, debts, user } = useStore();

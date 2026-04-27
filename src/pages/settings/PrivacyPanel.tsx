@@ -1,10 +1,10 @@
 import React, { memo } from 'react';
 import { Download, AlertTriangle } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
-import { CollapsibleModule } from '../../components/CollapsibleModule';
+import { CollapsibleModule } from '../../components/common';
 import { toast } from 'sonner';
-import { useStore } from '../../store/useStore';
-import { getCustomIcon } from '../../lib/customIcons';
+import { useStore } from '../../store';
+import { getCustomIcon } from '../../lib/utils/customIcons';
 
 function escapeCsvCell(v: unknown): string {
   const s = String(v ?? '');

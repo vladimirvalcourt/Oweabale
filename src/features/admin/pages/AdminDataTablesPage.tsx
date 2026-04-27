@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { Download } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { getAdminActionErrorMessage } from '../../../lib/adminActionsInvoke';
-import { supabase } from '../../../lib/supabase';
+import { getAdminActionErrorMessage } from '../../../lib/api/adminActions';
+import { supabase } from '../../../lib/api/supabase';
 
 type EntityConfig = {
   key: string;
@@ -264,7 +264,7 @@ export default function AdminDataTablesPage() {
 
   return (
     <section className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
-      <header className="rounded-2xl border border-surface-border bg-surface-raised p-4 sm:p-5">
+      <header className="border border-surface-border p-4 sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h1 className="text-lg font-semibold text-content-primary">Entity Data Tables</h1>
@@ -273,19 +273,19 @@ export default function AdminDataTablesPage() {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <div className="rounded-xl border border-surface-border bg-surface-base px-3 py-2">
+            <div className="border border-surface-border px-3 py-2">
               <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Active table</p>
               <p className="mt-1 text-sm font-semibold text-content-primary">{config.key}</p>
             </div>
-            <div className="rounded-xl border border-surface-border bg-surface-base px-3 py-2">
+            <div className="border border-surface-border px-3 py-2">
               <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Rows loaded</p>
               <p className="mt-1 text-sm font-semibold text-content-primary">{rows.length}</p>
             </div>
-            <div className="rounded-xl border border-surface-border bg-surface-base px-3 py-2">
+            <div className="border border-surface-border px-3 py-2">
               <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Selected</p>
               <p className="mt-1 text-sm font-semibold text-content-primary">{selectedIds.length}</p>
             </div>
-            <div className="rounded-xl border border-surface-border bg-surface-base px-3 py-2">
+            <div className="border border-surface-border px-3 py-2">
               <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Page</p>
               <p className="mt-1 text-sm font-semibold text-content-primary">{page + 1}</p>
             </div>
@@ -293,7 +293,7 @@ export default function AdminDataTablesPage() {
         </div>
       </header>
 
-      <div className="rounded-2xl border border-surface-border bg-surface-raised p-3">
+      <div className="border border-surface-border p-3">
         <div className="flex gap-2 overflow-x-auto pb-1">
           {ENTITY_CONFIGS.map((entity) => (
             <button
@@ -306,10 +306,10 @@ export default function AdminDataTablesPage() {
                 setPage(0);
                 setSelectedIds([]);
               }}
-              className={`interactive-press interactive-focus shrink-0 rounded-lg border px-3 py-1.5 text-xs font-medium ${
+              className={`interactive-press interactive-focus shrink-0 border px-3 py-1.5 text-xs font-medium ${
                 activeKey === entity.key
-                  ? 'border-brand-cta bg-brand-cta text-surface-base'
-                  : 'border-surface-border bg-surface-base text-content-secondary hover:text-content-primary'
+                  ? 'border-content-primary text-content-primary'
+                  : 'border-surface-border text-content-secondary hover:text-content-primary'
               }`}
             >
               {entity.key}
@@ -319,7 +319,7 @@ export default function AdminDataTablesPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1fr_auto]">
-        <div className="rounded-2xl border border-surface-border bg-surface-raised p-3 sm:p-4">
+        <div className="border border-surface-border p-3 sm:p-4">
           <p className="mb-3 text-[10px] uppercase tracking-wide text-content-tertiary">Filters</p>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {profilesView ? (
@@ -330,7 +330,7 @@ export default function AdminDataTablesPage() {
                     setPlanFilter(e.target.value as 'any' | 'free' | 'pro' | 'lifetime');
                     setPage(0);
                   }}
-                  className="focus-app-field rounded-lg border border-surface-border bg-surface-base px-2 py-2 text-xs text-content-primary"
+                  className="focus-app-field border border-surface-border px-2 py-2 text-xs text-content-primary"
                 >
                   <option value="any">Any plan</option>
                   <option value="free">Free</option>
@@ -343,7 +343,7 @@ export default function AdminDataTablesPage() {
                     setPlaidFilter(e.target.value as 'any' | 'healthy' | 'error' | 'relink');
                     setPage(0);
                   }}
-                  className="focus-app-field rounded-lg border border-surface-border bg-surface-base px-2 py-2 text-xs text-content-primary"
+                  className="focus-app-field border border-surface-border px-2 py-2 text-xs text-content-primary"
                 >
                   <option value="any">Any Plaid</option>
                   <option value="healthy">Healthy</option>
@@ -358,7 +358,7 @@ export default function AdminDataTablesPage() {
                 setPageSize(Number(e.target.value));
                 setPage(0);
               }}
-              className="focus-app-field rounded-lg border border-surface-border bg-surface-base px-2 py-2 text-xs text-content-primary"
+              className="focus-app-field border border-surface-border px-2 py-2 text-xs text-content-primary"
             >
               <option value={10}>10 rows / page</option>
               <option value={25}>25 rows / page</option>
@@ -368,18 +368,18 @@ export default function AdminDataTablesPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Filter current table..."
-              className="focus-app-field rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-xs text-content-primary sm:col-span-2 lg:col-span-1"
+              className="focus-app-field border border-surface-border px-3 py-2 text-xs text-content-primary sm:col-span-2 lg:col-span-1"
             />
           </div>
         </div>
 
-        <div className="rounded-2xl border border-surface-border bg-surface-raised p-3 sm:p-4">
+        <div className="border border-surface-border p-3 sm:p-4">
           <p className="mb-3 text-[10px] uppercase tracking-wide text-content-tertiary">Actions</p>
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleExportCsv}
-              className="interactive-press interactive-focus inline-flex items-center gap-1 rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-xs text-content-secondary hover:text-content-primary"
+              className="interactive-press interactive-focus inline-flex items-center gap-1 border border-surface-border px-3 py-2 text-xs text-content-secondary hover:text-content-primary"
             >
               <Download className="h-3.5 w-3.5" /> Export CSV
             </button>
@@ -388,14 +388,14 @@ export default function AdminDataTablesPage() {
                 <button
                   type="button"
                   onClick={() => void handleProfileBulkAction('ban')}
-                  className="danger-button rounded-lg border border-rose-500/40 bg-rose-500/15 px-3 py-2 text-xs text-rose-200"
+                  className="danger-button border border-rose-500/40 px-3 py-2 text-xs text-rose-200"
                 >
                   Ban selected
                 </button>
                 <button
                   type="button"
                   onClick={() => void handleProfileBulkAction('unban')}
-                  className="interactive-press interactive-focus rounded-lg border border-emerald-500/40 bg-emerald-500/15 px-3 py-2 text-xs text-emerald-200"
+                  className="interactive-press interactive-focus border border-emerald-500/40 px-3 py-2 text-xs text-emerald-200"
                 >
                   Unban selected
                 </button>
@@ -405,7 +405,7 @@ export default function AdminDataTablesPage() {
               type="button"
               onClick={() => void handleBulkDelete()}
               disabled={selectedIds.length === 0 || profilesView}
-              className="danger-button rounded-lg border border-rose-500/50 bg-rose-500/20 px-3 py-2 text-xs font-medium text-rose-100 disabled:opacity-40"
+              className="danger-button border border-rose-500/50 px-3 py-2 text-xs font-medium text-rose-100 disabled:opacity-40"
             >
               Delete selected
             </button>
@@ -413,7 +413,7 @@ export default function AdminDataTablesPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-surface-border bg-surface-raised">
+      <div className="border border-surface-border">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-surface-border px-3 py-2 text-[11px] text-content-tertiary">
           <p>
             {profilesView && total > 0 ? `Showing ${rows.length} of ${total} records` : `Showing ${rows.length} records`}
@@ -426,7 +426,7 @@ export default function AdminDataTablesPage() {
         {!isLoading && !error && rows.length > 0 ? (
           <div className="max-h-[70vh] overflow-auto">
             <table className="w-full text-left text-xs">
-              <thead className="sticky top-0 bg-surface-base text-content-tertiary">
+              <thead className="border-b border-surface-border bg-surface-base text-content-tertiary">
                 <tr>
                   <th className="px-3 py-2 font-medium">
                     <label className="inline-flex items-center gap-2">
@@ -501,7 +501,7 @@ export default function AdminDataTablesPage() {
                       <button
                         type="button"
                         onClick={() => openEdit(row)}
-                        className="interactive-press interactive-focus rounded-md border border-surface-border bg-surface-base px-2 py-1 text-[10px] text-content-tertiary"
+                        className="interactive-press interactive-focus border border-surface-border px-2 py-1 text-[10px] text-content-tertiary"
                       >
                         Edit
                       </button>
@@ -523,7 +523,7 @@ export default function AdminDataTablesPage() {
             type="button"
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={page === 0}
-            className="interactive-press interactive-focus rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-xs text-content-secondary disabled:opacity-40"
+            className="interactive-press interactive-focus border border-surface-border px-3 py-1.5 text-xs text-content-secondary disabled:opacity-40"
           >
             Prev
           </button>
@@ -532,7 +532,7 @@ export default function AdminDataTablesPage() {
             type="button"
             onClick={() => setPage((p) => p + 1)}
             disabled={profilesView ? rows.length < pageSize || ((page + 1) * pageSize >= total && total > 0) : rows.length < pageSize}
-            className="interactive-press interactive-focus rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-xs text-content-secondary disabled:opacity-40"
+            className="interactive-press interactive-focus border border-surface-border px-3 py-1.5 text-xs text-content-secondary disabled:opacity-40"
           >
             Next
           </button>
@@ -550,7 +550,7 @@ export default function AdminDataTablesPage() {
                   <input
                     value={String(draftEdit[column] ?? '')}
                     onChange={(e) => setDraftEdit((prev) => ({ ...prev, [column]: e.target.value }))}
-                    className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs text-content-primary"
+                    className="focus-app-field w-full border border-surface-border px-3 py-2 text-xs text-content-primary"
                   />
                 </label>
               ))}
@@ -559,14 +559,14 @@ export default function AdminDataTablesPage() {
               <button
                 type="button"
                 onClick={() => setEditingRow(null)}
-                className="interactive-press interactive-focus rounded-lg border border-surface-border px-3 py-2 text-xs text-content-secondary"
+                className="interactive-press interactive-focus border border-surface-border px-3 py-2 text-xs text-content-secondary"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={() => void saveEdit()}
-                className="interactive-press interactive-focus rounded-lg bg-brand-cta px-3 py-2 text-xs font-semibold text-surface-base"
+                className="interactive-press interactive-focus border border-content-primary px-3 py-2 text-xs font-semibold text-content-primary"
               >
                 Save
               </button>

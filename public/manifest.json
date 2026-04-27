@@ -1,7 +1,7 @@
 {
   "name": "Oweable",
   "short_name": "Oweable",
-  "description": "Bills, budgets, debt & net worth in one command center",
+  "description": "A Pay List for bills, debt minimums, subscriptions, tolls, tickets, fines, and forgotten obligations.",
   "start_url": "/pro/dashboard",
   "scope": "/",
   "display": "standalone",
@@ -65,26 +65,26 @@
       "sizes": "1280x800",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Oweable Dashboard"
+      "label": "Oweable Pay List"
     }
   ],
   "shortcuts": [
     {
-      "name": "Bills",
-      "short_name": "Bills",
-      "url": "/pro/bills",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
+      "name": "Pay List",
+      "short_name": "Pay List",
       "url": "/pro/dashboard",
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     },
     {
-      "name": "Budgets",
-      "short_name": "Budgets",
-      "url": "/pro/budgets",
+      "name": "Documents",
+      "short_name": "Documents",
+      "url": "/pro/documents",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Add what is due",
+      "short_name": "Add due",
+      "url": "/pro/dashboard",
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     }
   ]
