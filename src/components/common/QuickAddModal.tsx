@@ -1200,7 +1200,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         )}
                         <div className="grid grid-cols-2 gap-2 flex-1 min-w-0 sm:min-w-[260px]">
                           {/* Camera Button (keep native for mobile camera access) */}
-                          <label className={`relative flex min-h-[2.5rem] w-full items-center justify-center gap-2 px-3 py-2 rounded-lg border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none text-center leading-tight
+                          <label className={`relative flex min-h-[2.5rem] w-full items-center justify-center gap-2 px-3 py-2 rounded-lg border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none text-center leading-tight overflow-hidden
                             ${isScanning
                               ? 'border-surface-border bg-content-primary/[0.06] text-content-secondary cursor-not-allowed'
                               : 'border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary hover:bg-content-primary/[0.04]'
@@ -1210,12 +1210,12 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               type="file"
                               accept="image/*"
                               capture="environment"
-                              className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full"
+                              className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full z-10"
                               onChange={handleScanFile}
                               disabled={isScanning}
                             />
-                            <Camera className="w-3.5 h-3.5 shrink-0" aria-hidden />
-                            <span>Camera</span>
+                            <Camera className="w-3.5 h-3.5 shrink-0 relative z-0" aria-hidden />
+                            <span className="relative z-0">Camera</span>
                           </label>
                           
                           {/* File Upload using FormFileUpload component */}
@@ -1247,13 +1247,13 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
                           transition={{ duration: 0.15 }}
-                          className="border-t border-surface-border"
+                          className="border-t border-surface-border relative z-0"
                         >
-                          <div className="relative flex min-h-[7rem] max-h-[min(14rem,42svh)] w-full items-center justify-center border-surface-border bg-surface-base px-2 py-3">
+                          <div className="relative flex min-h-[7rem] max-h-[min(14rem,42svh)] w-full items-center justify-center bg-surface-base px-2 py-3">
                             <img
                               src={scannedPreviewUrl}
                               alt="Scanned document"
-                              className="max-h-[min(14rem,42svh)] w-full object-contain object-center"
+                              className="max-h-[min(14rem,42svh)] w-full object-contain object-center relative z-0"
                             />
                           </div>
                         </motion.div>
