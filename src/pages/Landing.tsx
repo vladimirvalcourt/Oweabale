@@ -38,13 +38,13 @@ const payListRows = [
 const activityRows = [
   {
     name: 'Mara',
-    image: 'https://i.pravatar.cc/80?img=32',
+    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face',
     text: 'Marked rent reserve as protected',
     time: '2 min ago',
   },
   {
     name: 'Jon',
-    image: 'https://i.pravatar.cc/80?img=12',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face',
     text: 'Added toll notice to the Pay List',
     time: 'just now',
   },
