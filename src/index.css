@@ -59,10 +59,7 @@
   --button-height-lg: 56px;    /* Prominent buttons (hero CTAs) */
 }
 
-/* Noise texture overlay for video backgrounds */
-.noise-overlay {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.5'/%3E%3C/svg%3E");
-}
+
 
 @layer utilities {
   /* Border Radius Utility Classes */
@@ -450,60 +447,7 @@ body {
   }
 }
 
-/* Theme Variants */
-:root[data-theme="terminal"] {
-  --color-brand-indigo: #10b981;
-  --color-brand-violet: #34d399;
-  --color-surface-base: #050607;
-  --color-surface-raised: #0a0c0e;
-  --color-surface-elevated: #111418;
-  --shadow-glow-indigo: 0 0 15px rgba(16, 185, 129, 0.2);
-}
 
-:root[data-theme="solar"] {
-  --color-brand-indigo: #f59e0b;
-  --color-brand-violet: #fbbf24;
-  --color-surface-base: #0f0d0a;
-  --color-surface-raised: #1a1611;
-  --color-surface-elevated: #241e18;
-  --shadow-glow-indigo: 0 0 15px rgba(245, 158, 11, 0.2);
-}
-
-:root[data-theme="nordic"] {
-  --color-brand-indigo: #06b6d4;
-  --color-brand-violet: #22d3ee;
-  --color-surface-base: #0b0f14;
-  --color-surface-raised: #121820;
-  --color-surface-elevated: #1a222d;
-  --shadow-glow-indigo: 0 0 15px rgba(6, 182, 212, 0.2);
-}
-
-:root[data-theme="crimson"] {
-  --color-brand-indigo: #ef4444;
-  --color-brand-violet: #f87171;
-  --color-surface-base: #0a0505;
-  --color-surface-raised: #140a0a;
-  --color-surface-elevated: #1e0f0f;
-  --shadow-glow-indigo: 0 0 15px rgba(239, 68, 68, 0.2);
-}
-
-:root[data-theme="ghost"] {
-  --color-brand-indigo: #ffffff;
-  --color-brand-violet: #d4d4d4;
-  --color-surface-base: #0a0a0a;
-  --color-surface-raised: #111111;
-  --color-surface-elevated: #181818;
-  --shadow-glow-indigo: 0 0 15px rgba(255, 255, 255, 0.1);
-}
-
-:root[data-theme="neon"] {
-  --color-brand-indigo: #d946ef;
-  --color-brand-violet: #f472b6;
-  --color-surface-base: #0b0114;
-  --color-surface-raised: #140324;
-  --color-surface-elevated: #1d0534;
-  --shadow-glow-indigo: 0 0 15px rgba(217, 70, 239, 0.2);
-}
 
 @property --gradient-angle {
   syntax: "<angle>";

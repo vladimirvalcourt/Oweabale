@@ -31,14 +31,17 @@ import type {
 
 type StoreSlice<T> = StateCreator<AppState, [['zustand/persist', unknown]], [], T>;
 
-export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase2Hydrated' | 'fetchData'>> =
+export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase2Hydrated' | 'fetchData' | 'loadMoreTransactions'>> =
   (set, get) => ({
     isLoading: false,
     phase2Hydrated: false,
 
-    fetchData: async (userId?: string, options?: { background?: boolean }) => {
+    fetchData: async (userId?: string, options?: { background?: boolean; loadMore?: boolean }) => {
       const background = options?.background === true;
-      if (!background) set({ isLoading: true, phase2Hydrated: false });
+      const loadMore = options?.loadMore === true;
+      
+      // Only show loading spinner on initial fetch, not when loading more
+      if (!background && !loadMore) set({ isLoading: true, phase2Hydrated: false });
 
       const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
       if (!resolvedUserId) {
@@ -56,6 +59,22 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         const { error } = await supabase.rpc('flip_overdue_bills');
         if (error) console.warn('[fetchData] flip_overdue_bills RPC failed:', error.message);
       })();
+
+      // Transaction pagination: fetch in pages of 100
+      const TRANSACTION_PAGE_SIZE = 100;
+      const lastCursor = get().lastTransactionCursor;
+      
+      let transactionsQuery = supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', resolvedUserId)
+        .order('date', { ascending: false })
+        .limit(TRANSACTION_PAGE_SIZE);
+      
+      // If loading more, use cursor-based pagination
+      if (loadMore && lastCursor) {
+        transactionsQuery = transactionsQuery.lt('date', lastCursor);
+      }
 
       const phase2Promise = Promise.all([
         supabase.from('goals').select('*').eq('user_id', resolvedUserId),
@@ -83,7 +102,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           { data: profile, error: profileError },
           { data: bills, error: billsError },
           { data: debts, error: debtsError },
-          { data: transactions, error: transactionsError },
+          { data: transactionsPage, error: transactionsError },
           { data: assets, error: assetsError },
           { data: incomes, error: incomesError },
           { data: subscriptions, error: subscriptionsError },
@@ -143,29 +162,38 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
             originationDate: (debt.origination_date ?? undefined) as string | undefined,
             termMonths: (debt.term_months ?? undefined) as number | undefined,
           })),
-          transactions: (transactions || []).map((transaction: Record<string, unknown>) => ({
-            id: transaction.id as string,
-            name: transaction.name as string,
-            category: (transaction.category ?? '') as string,
-            date: transaction.date as string,
-            amount: transaction.amount as number,
-            type: (transaction.type ?? 'expense') as Transaction['type'],
-            platformTag: (() => {
-              const platformTag = transaction.platform_tag ?? transaction.platformTag;
-              const value = typeof platformTag === 'string' ? platformTag.trim() : '';
-              return value || undefined;
-            })(),
-            notes: (() => {
-              const notes = transaction.notes;
-              if (notes == null) return undefined;
-              const value = String(notes).trim();
-              return value || undefined;
-            })(),
-            plaidAccountId: (() => {
-              const plaidAccountId = transaction.plaid_account_id ?? transaction.plaidAccountId;
-              return typeof plaidAccountId === 'string' && plaidAccountId.length > 0 ? plaidAccountId : undefined;
-            })(),
-          })),
+          // Handle pagination: append new transactions or replace existing
+          transactions: (() => {
+            const newTransactions = (transactionsPage || []).map((transaction: Record<string, unknown>) => ({
+              id: transaction.id as string,
+              name: transaction.name as string,
+              category: (transaction.category ?? '') as string,
+              date: transaction.date as string,
+              amount: transaction.amount as number,
+              type: (transaction.type ?? 'expense') as Transaction['type'],
+              platformTag: (() => {
+                const platformTag = transaction.platform_tag ?? transaction.platformTag;
+                const value = typeof platformTag === 'string' ? platformTag.trim() : '';
+                return value || undefined;
+              })(),
+              notes: (() => {
+                const notes = transaction.notes;
+                if (notes == null) return undefined;
+                const value = String(notes).trim();
+                return value || undefined;
+              })(),
+              plaidAccountId: (() => {
+                const plaidAccountId = transaction.plaid_account_id ?? transaction.plaidAccountId;
+                return typeof plaidAccountId === 'string' && plaidAccountId.length > 0 ? plaidAccountId : undefined;
+              })(),
+            }));
+            
+            // If loading more, append to existing; otherwise replace
+            if (loadMore) {
+              return [...get().transactions, ...newTransactions];
+            }
+            return newTransactions;
+          })(),
           plaidAccounts: (plaidAccountsRows || []).map((row: Record<string, unknown>) => ({
             id: row.id as string,
             plaidAccountId: row.plaid_account_id as string,
@@ -210,6 +238,11 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           plaidInstitutionName: profile ? (((profile as Record<string, unknown>).plaid_institution_name as string | null) ?? null) : null,
           plaidLastSyncAt: profile ? (((profile as Record<string, unknown>).plaid_last_sync_at as string | null) ?? null) : null,
           plaidNeedsRelink: profile ? ((profile as Record<string, unknown>).plaid_needs_relink === true) : false,
+          // Update pagination cursors
+          hasMoreTransactions: (transactionsPage?.length ?? 0) === TRANSACTION_PAGE_SIZE,
+          lastTransactionCursor: transactionsPage && transactionsPage.length > 0 
+            ? transactionsPage[transactionsPage.length - 1].date as string 
+            : get().lastTransactionCursor,
           credit: profile
             ? {
                 ...get().credit,
@@ -520,7 +553,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         const recordCount =
           (bills?.length ?? 0) +
           (debts?.length ?? 0) +
-          (transactions?.length ?? 0) +
+          ((loadMore ? transactionsPage?.length : get().transactions.length) ?? 0) +
           (assets?.length ?? 0) +
           (incomes?.length ?? 0) +
           (subscriptions?.length ?? 0) +
@@ -535,5 +568,16 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           if (!get().phase2Hydrated) set({ phase2Hydrated: true });
         }
       }
+    },
+
+    loadMoreTransactions: async () => {
+      // Check if there are more transactions to load
+      if (!get().hasMoreTransactions) {
+        console.log('[loadMoreTransactions] No more transactions to load');
+        return;
+      }
+
+      console.log('[loadMoreTransactions] Loading next page...');
+      await get().fetchData(undefined, { loadMore: true });
     },
   });

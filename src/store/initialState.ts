@@ -14,6 +14,8 @@ export const initialData: Pick<
   | 'bills'
   | 'debts'
   | 'transactions'
+  | 'hasMoreTransactions'
+  | 'lastTransactionCursor'
   | 'assets'
   | 'subscriptions'
   | 'goals'
@@ -51,6 +53,8 @@ export const initialData: Pick<
   bills: [],
   debts: [],
   transactions: [],
+  hasMoreTransactions: false,
+  lastTransactionCursor: undefined,
   assets: [],
   subscriptions: [],
   goals: [],

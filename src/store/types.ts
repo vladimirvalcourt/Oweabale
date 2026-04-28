@@ -276,6 +276,8 @@ export interface AppState {
   bills: Bill[];
   debts: Debt[];
   transactions: Transaction[];
+  hasMoreTransactions: boolean;
+  lastTransactionCursor?: string;
   assets: Asset[];
   subscriptions: Subscription[];
   goals: Goal[];
@@ -424,7 +426,8 @@ export interface AppState {
   updatePendingIngestion: (id: string, updates: Partial<PendingIngestion>) => void;
   removePendingIngestion: (id: string) => void;
   commitIngestion: (id: string) => Promise<boolean>;
-  fetchData: (userId?: string, options?: { background?: boolean }) => Promise<void>;
+  fetchData: (userId?: string, options?: { background?: boolean; loadMore?: boolean }) => Promise<void>;
+  loadMoreTransactions: () => Promise<void>;
   isLoading: boolean;
   phase2Hydrated: boolean;
   addNotification: (note: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void;
