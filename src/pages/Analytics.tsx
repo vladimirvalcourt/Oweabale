@@ -27,7 +27,7 @@ interface Snapshot {
 }
 
 const CHART_COLORS = [
-  '#d4d4d4', '#34D399', '#F59E0B', '#EF4444',
+  'var(--color-content-secondary)', 'var(--color-brand-profit)', '#F59E0B', 'var(--color-brand-expense)',
   '#737373', '#a3a3a3', '#78716c', '#64748b', '#525252',
 ];
 

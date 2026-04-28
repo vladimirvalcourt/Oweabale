@@ -1,4 +1,5 @@
 import type { StateCreator } from 'zustand';
+import { toast } from 'sonner';
 import { supabase } from '../../lib/api/supabase';
 import {
   normalizeFinancialAlertPrefs,
@@ -42,7 +43,10 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
       const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
       if (!resolvedUserId) {
         console.warn('[fetchData] No user ID available — skipping load');
-        if (!background) set({ isLoading: false, phase2Hydrated: true });
+        if (!background) {
+          toast.error('Session expired. Please sign in again.');
+          set({ isLoading: false, phase2Hydrated: true });
+        }
         return;
       }
 

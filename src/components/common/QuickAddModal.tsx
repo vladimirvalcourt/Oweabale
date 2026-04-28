@@ -228,7 +228,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
             setDate(dateStr);
             if (activeTab === 'obligation') setDueDate(dateStr);
           }
-        } catch {}
+        } catch (error) {
+          console.warn('[QuickAdd] Date parsing failed:', error);
+          toast.warning('Could not detect date — please enter manually');
+        }
       }
 
       if (!hasFullSuite && !isCitationDoc) {

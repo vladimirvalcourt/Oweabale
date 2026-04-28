@@ -24,8 +24,8 @@ export async function plaidPost<T = Record<string, unknown>>(
       secret,
       ...body,
     }),
-    timeoutMs: 20_000,
-    retries: 1,
+    timeoutMs: 30_000,
+    retries: 2,
   });
   const json = (await res.json()) as T & {
     error_message?: string;

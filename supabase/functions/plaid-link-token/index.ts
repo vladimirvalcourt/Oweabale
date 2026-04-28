@@ -114,6 +114,7 @@ Deno.serve(async (req: Request) => {
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Server error';
+    console.error('[plaid-link-token] Error:', msg, e);
     const safe = /unauthorized|missing authorization header|method not allowed/i.test(msg)
       ? msg
       : 'Request failed';

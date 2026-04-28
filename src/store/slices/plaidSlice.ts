@@ -34,13 +34,30 @@ export const createPlaidSlice: StoreSlice<
       return false;
     }
 
-    // Small delay to ensure Edge Function DB writes are fully committed
-    // before we fetch the updated data. Prevents race conditions where
+    // Poll for data changes to ensure Edge Function DB writes are fully committed
+    // before we consider the sync complete. Prevents race conditions where
     // fetchData() reads stale data immediately after sync completes.
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    const previousTransactionCount = get().transactions.length;
+    let attempts = 0;
+    const maxAttempts = 5;
     
-    console.log('[Plaid Sync] Fetching updated data after sync...', { processed: result.processed, errors: result.errors });
-    await get().fetchData();
+    while (attempts < maxAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      console.log(`[Plaid Sync] Polling for updates (attempt ${attempts + 1}/${maxAttempts})...`);
+      await get().fetchData();
+      
+      const newTransactionCount = get().transactions.length;
+      if (newTransactionCount !== previousTransactionCount) {
+        console.log('[Plaid Sync] Data updated successfully');
+        break;
+      }
+      
+      attempts++;
+    }
+    
+    if (attempts === maxAttempts) {
+      console.warn('[Plaid Sync] Max polling attempts reached — data may not have changed');
+    }
 
     if (!opts?.quiet) {
       if (result.product_not_ready) {

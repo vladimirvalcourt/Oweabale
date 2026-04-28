@@ -41,7 +41,11 @@ function readFromStorage(): ImpersonationState {
 }
 
 function writeToStorage(state: ImpersonationState) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.warn('[Impersonation] Storage write failed:', error);
+  }
 }
 
 function clearStorage() {

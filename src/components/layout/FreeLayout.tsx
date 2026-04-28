@@ -291,7 +291,9 @@ export default function FreeLayout() {
                             const li = item as typeof item & { lazyImport?: () => Promise<unknown> };
                             if (li.lazyImport && !prefetchedPaths.current.has(item.path)) {
                               prefetchedPaths.current.add(item.path);
-                              li.lazyImport().catch(() => {});
+                              li.lazyImport().catch((error) => {
+                                console.warn('[FreeLayout] Lazy module import failed:', error);
+                              });
                             }
                           }}
                         >

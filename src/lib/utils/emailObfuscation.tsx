@@ -114,13 +114,10 @@ export const EMAIL_CONFIG = {
   contact: obfuscateEmail(
     import.meta.env.VITE_CONTACT_EMAIL ||
       import.meta.env.VITE_SUPPORT_EMAIL ||
-      import.meta.env.NEXT_PUBLIC_CONTACT_EMAIL ||
-      import.meta.env.NEXT_PUBLIC_SUPPORT_EMAIL ||
       'hello@oweable.com'
   ),
   support: obfuscateEmail(
     import.meta.env.VITE_SUPPORT_EMAIL ||
-      import.meta.env.NEXT_PUBLIC_SUPPORT_EMAIL ||
       'support@oweable.com'
   ),
   noreply: obfuscateEmail(

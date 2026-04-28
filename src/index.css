@@ -597,6 +597,24 @@ body {
   --color-status-emerald-text: #166534;
 }
 
+/* Dark mode status colors (default) */
+:root:not(.theme-light) {
+  /* Rose/Red states */
+  --color-status-rose-bg: rgba(244, 63, 94, 0.1);
+  --color-status-rose-border: rgba(244, 63, 94, 0.35);
+  --color-status-rose-text: #fb7185;
+  
+  /* Amber/Yellow states */
+  --color-status-amber-bg: rgba(245, 158, 11, 0.1);
+  --color-status-amber-border: rgba(245, 158, 11, 0.35);
+  --color-status-amber-text: #fbbf24;
+  
+  /* Emerald/Green states */
+  --color-status-emerald-bg: rgba(16, 185, 129, 0.1);
+  --color-status-emerald-border: rgba(16, 185, 129, 0.35);
+  --color-status-emerald-text: #34d399;
+}
+
 /*
  * WCAG AA: default Tailwind zinc-400/500/600 are below 4.5:1 on dark surfaces.
  * Lift only when not in theme-light (gray text on light backgrounds must stay darker).

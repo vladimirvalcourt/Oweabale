@@ -413,24 +413,24 @@ export default function Obligations() {
             <DebtIcon className="w-3.5 h-3.5" />
             <span className="metric-label normal-case text-[11px]">Total debt</span>
           </div>
-          <p className="text-2xl font-mono dark:text-amber-400 text-amber-600 font-bold">${activePrincipal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+          <p className="text-2xl font-mono text-[var(--color-status-amber-text)] font-bold">${activePrincipal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
-        <div className={`bg-surface-elevated border p-5 rounded-lg relative overflow-hidden ${urgentTotal > 0 ? 'dark:border-rose-500/50 border-rose-500/60' : 'border-surface-border'}`}>
-          {urgentTotal > 0 && <div className="absolute inset-0 dark:bg-rose-500/3 bg-rose-500/5" />}
+        <div className={`bg-surface-elevated border p-5 rounded-lg relative overflow-hidden ${urgentTotal > 0 ? 'border-[var(--color-status-rose-border)]' : 'border-surface-border'}`}>
+          {urgentTotal > 0 && <div className="absolute inset-0 bg-[var(--color-status-rose-bg)]" />}
           <div className="flex items-center gap-2 text-content-tertiary mb-3 relative z-10">
-            <AlertTriangle className="w-3.5 h-3.5 dark:text-rose-400 text-rose-600" />
+            <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-status-rose-text)]" />
             <span className="metric-label normal-case text-[11px]">Urgent tickets</span>
-            {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold dark:text-rose-400 text-rose-600 dark:border-rose-500/50 border-rose-500/60 px-1 rounded-lg ml-auto">{urgentCitations.length} DUE</span>}
+            {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold text-[var(--color-status-rose-text)] border-[var(--color-status-rose-border)] px-1 rounded-lg ml-auto">{urgentCitations.length} DUE</span>}
           </div>
-          <p className={`text-2xl font-mono font-bold relative z-10 ${urgentTotal > 0 ? 'dark:text-rose-400 text-rose-600' : 'dark:text-emerald-400 text-emerald-600'}`}>
+          <p className={`text-2xl font-mono font-bold relative z-10 ${urgentTotal > 0 ? 'text-[var(--color-status-rose-text)]' : 'text-[var(--color-status-emerald-text)]'}`}>
             ${urgentTotal.toFixed(2)}
           </p>
         </div>
       </div>
 
       {isLowBalanceWeekRisk && (
-        <div className="rounded-lg dark:border-rose-500/30 border-rose-500/40 dark:bg-rose-500/10 bg-rose-500/15 p-4">
-          <p className="text-sm font-medium dark:text-rose-300 text-rose-700">
+        <div className="rounded-lg border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] p-4">
+          <p className="text-sm font-medium text-[var(--color-status-rose-text)]">
             Low-balance warning: ${liquidCash.toFixed(0)} cash vs ${weekAheadDueTotal.toFixed(0)} due in the next 7 days.
           </p>
           <div className="mt-2 flex flex-wrap gap-3 text-xs">
@@ -453,8 +453,8 @@ export default function Obligations() {
       )}
 
       {billAmountChanges.size > 0 && (
-        <div className="rounded-lg dark:border-amber-500/30 border-amber-500/40 dark:bg-amber-500/10 bg-amber-500/15 p-4">
-          <p className="text-sm font-medium dark:text-amber-300 text-amber-700">
+        <div className="rounded-lg border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] p-4">
+          <p className="text-sm font-medium text-[var(--color-status-amber-text)]">
             {billAmountChanges.size} bill {billAmountChanges.size === 1 ? 'has' : 'have'} increased based on recent charges.
           </p>
           <p className="mt-1 text-xs text-content-secondary">
@@ -480,7 +480,7 @@ export default function Obligations() {
                     </p>
                     <p className="mt-1 text-xs text-content-tertiary">{suggestion.action}</p>
                   </div>
-                  <span className="rounded-lg dark:border-emerald-500/30 border-emerald-500/40 dark:bg-emerald-500/10 bg-emerald-500/15 px-2 py-1 text-xs font-mono dark:text-emerald-300 text-emerald-700">
+                  <span className="rounded-lg border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-2 py-1 text-xs font-mono text-[var(--color-status-emerald-text)]">
                     Est. save ${suggestion.estimatedMonthlySavings.toFixed(0)}/mo
                   </span>
                 </div>
@@ -544,8 +544,8 @@ export default function Obligations() {
           }
         >
           <div className="p-0">
-            <div className="mb-4 rounded-lg dark:border-emerald-500/30 border-emerald-500/40 dark:bg-emerald-500/10 bg-emerald-500/15 p-3">
-              <p className="text-sm font-medium dark:text-emerald-300 text-emerald-700">
+            <div className="mb-4 rounded-lg border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] p-3">
+              <p className="text-sm font-medium text-[var(--color-status-emerald-text)]">
                 Debt progress milestone: {unlockedMilestone > 0 ? `${unlockedMilestone}% unlocked` : 'Starting strong'}.
               </p>
               <p className="mt-1 text-xs text-content-secondary">
@@ -609,9 +609,9 @@ export default function Obligations() {
                   </p>
                 )}
               </div>
-              <div className="bg-surface-elevated border dark:border-emerald-500/20 border-emerald-500/30 rounded-lg p-4">
+              <div className="bg-surface-elevated border border-[var(--color-status-emerald-border)] rounded-lg p-4">
                 <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Saved</p>
-                <p className="text-lg font-mono font-bold dark:text-emerald-400 text-emerald-600">${interestSaved.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                <p className="text-lg font-mono font-bold text-[var(--color-status-emerald-text)]">${interestSaved.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                 <p className="text-[10px] font-mono text-content-muted">vs. minimum payments only</p>
               </div>
             </div>
@@ -669,15 +669,15 @@ export default function Obligations() {
                             <div className="h-[120px] w-full min-h-0 overflow-visible relative isolate">
                               <SafeResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={120}>
                                 <BarChart data={chartData} margin={{ top: 6, right: 4, left: 4, bottom: 10 }} barSize={8}>
-                                  <XAxis dataKey="name" tick={{ fill: '#52525B', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} />
-                                  <YAxis tick={{ fill: '#52525B', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}`} />
+                                  <XAxis dataKey="name" tick={{ fill: 'var(--color-content-tertiary)', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} />
+                                  <YAxis tick={{ fill: 'var(--color-content-tertiary)', fontSize: 9, fontFamily: 'monospace' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v}`} />
                                   <Tooltip
                                     {...rechartsTooltipStableProps}
                                     contentStyle={{ backgroundColor: 'var(--color-surface-raised)', borderColor: 'var(--color-surface-border)', borderRadius: '8px', fontFamily: 'monospace', fontSize: '11px' }}
                                     formatter={(value, name) => [`$${Number(value ?? 0).toFixed(2)}`, name === 'principal' ? 'Principal' : 'Interest']}
                                   />
-                                  <Bar dataKey="principal" fill="#d4d4d4" stackId="a" />
-                                  <Bar dataKey="interest" fill="#EF4444" stackId="a" />
+                                  <Bar dataKey="principal" fill="var(--color-content-secondary)" stackId="a" />
+                                  <Bar dataKey="interest" fill="var(--color-brand-expense)" stackId="a" />
                                 </BarChart>
                               </SafeResponsiveContainer>
                             </div>
@@ -782,8 +782,8 @@ export default function Obligations() {
                     key={ob.id} 
                     className={cn(
                       'hover:bg-surface-highlight transition-colors',
-                      overdueBand === 'warn' && 'dark:bg-amber-500/[0.08] dark:border-l-amber-500 bg-amber-500/[0.12] border-l-[3px] border-l-amber-500/60',
-                      overdueBand === 'critical' && 'dark:bg-rose-500/[0.1] dark:border-l-rose-500 bg-rose-500/[0.15] border-l-[3px] border-l-rose-500/60',
+                      overdueBand === 'warn' && 'bg-[var(--color-status-amber-bg)] border-l-[3px] border-l-[var(--color-status-amber-border)]',
+                      overdueBand === 'critical' && 'bg-[var(--color-status-rose-bg)] border-l-[3px] border-l-[var(--color-status-rose-border)]',
                     )}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -850,7 +850,7 @@ export default function Obligations() {
                               const d = debts.find((x) => x.id === ob.id);
                               if (d) setEditDebtRow(d);
                             }}
-                            className="inline-flex items-center gap-1 self-start text-[11px] font-medium text-amber-600 dark:text-amber-400 hover:underline"
+                            className="inline-flex items-center gap-1 self-start text-[11px] font-medium text-[var(--color-status-amber-text)] hover:underline"
                           >
                             <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden />
                             Add due date
