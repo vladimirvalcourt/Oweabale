@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, AlertCircle, Loader2, Camera, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { X, AlertCircle, Loader2, Camera, Eye, EyeOff, AlertTriangle, Upload } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { toast } from 'sonner';
 import { useStore, type IncomeSource, type TabType } from '../../store';
@@ -14,6 +14,7 @@ import { formatLocalISODate, parseQuickEntryDateHint } from '../../lib/api/servi
 import { useFullSuiteAccess } from '../../hooks';
 import { clampQuickAddTabForTier, canUseQuickAddTab, isTrackerObligationDebtBlocked } from '../../app/constants';
 import { getCustomIcon } from '../../lib/utils';
+import { FormInput, FormCurrency, FormAutocomplete } from '../forms';
 
 interface QuickAddModalProps {
   isOpen: boolean;
@@ -22,72 +23,6 @@ interface QuickAddModalProps {
 
 /** Quick Add → Bill/Debt: bill cadence or debt instrument (card vs loan). */
 type ObligationKind = 'bill-weekly' | 'bill-biweekly' | 'bill-monthly' | 'debt-card' | 'debt-loan';
-
-/** Reusable form input with label, error handling, and ARIA support */
-interface FormInputProps {
-  id: string;
-  label: string;
-  type?: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  placeholder?: string;
-  error?: string;
-  required?: boolean;
-  disabled?: boolean;
-  className?: string;
-  inputMode?: 'text' | 'numeric' | 'decimal';
-  step?: string;
-  min?: string;
-}
-
-function FormInput({
-  id,
-  label,
-  type = 'text',
-  value,
-  onChange,
-  placeholder,
-  error,
-  required,
-  disabled,
-  className = '',
-  inputMode,
-  step,
-  min,
-}: FormInputProps) {
-  const errorId = `${id}-error`;
-  const hasError = !!error;
-
-  return (
-    <div>
-      <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
-        {label}
-        {required && <span className="text-rose-500 ml-0.5">*</span>}
-      </label>
-      <input
-        id={id}
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        required={required}
-        disabled={disabled}
-        inputMode={inputMode}
-        step={step}
-        min={min}
-        aria-invalid={hasError}
-        aria-describedby={hasError ? errorId : undefined}
-        className={`w-full bg-surface-base border ${hasError ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border ${className}`}
-      />
-      {hasError && (
-        <p id={errorId} className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5" role="alert" aria-live="polite">
-          <AlertCircle className="w-3 h-3" aria-hidden />
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
 
 /** Reusable select field with label and ARIA support */
 interface FormSelectProps {
@@ -123,6 +58,7 @@ function FormSelect({
         onChange={onChange}
         required={required}
         disabled={disabled}
+        aria-required={required}
         className={`w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer transition-colors hover:border-content-primary/15 disabled:opacity-40 ${className}`}
       >
         {children}
@@ -169,6 +105,7 @@ function FormDate({
         disabled={disabled}
         aria-invalid={hasError}
         aria-describedby={hasError ? errorId : undefined}
+        aria-required={required}
         className={`input-date-dark w-full bg-surface-base border ${hasError ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
       />
       {hasError && (
@@ -176,6 +113,505 @@ function FormDate({
           {error}
         </p>
       )}
+    </div>
+  );
+}
+
+/** Reusable tab button with ARIA support */
+interface FormTabProps {
+  id: string;
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+  icon?: React.ReactNode;
+  variant?: 'default' | 'citation';
+}
+
+function FormTab({ id, label, isActive, onClick, icon, variant = 'default' }: FormTabProps) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      id={id}
+      aria-selected={isActive}
+      aria-controls="quick-add-form"
+      tabIndex={isActive ? 0 : -1}
+      onClick={onClick}
+      className={`min-w-[5.5rem] flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg focus-app ${
+        variant === 'citation'
+          ? isActive
+            ? 'bg-content-primary/[0.08] text-content-primary border border-surface-border'
+            : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
+          : isActive
+            ? 'bg-brand-cta text-surface-base'
+            : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
+      }`}
+    >
+      {icon && <span className="inline-flex items-center gap-1.5">{icon}{label}</span>}
+      {!icon && label}
+    </button>
+  );
+}
+
+/** Reusable checkbox with label and ARIA support */
+interface FormCheckboxProps {
+  id: string;
+  label: string | React.ReactNode;
+  checked: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
+  className?: string;
+  description?: string;
+}
+
+function FormCheckbox({ id, label, checked, onChange, disabled, className = '', description }: FormCheckboxProps) {
+  return (
+    <label
+      htmlFor={id}
+      className={`flex items-start gap-2.5 text-xs text-content-secondary cursor-pointer ${className}`}
+    >
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+        disabled={disabled}
+        aria-describedby={description ? `${id}-desc` : undefined}
+        className="mt-0.5 rounded border-surface-border bg-surface-base focus-app disabled:opacity-40"
+      />
+      <span>
+        {label}
+        {description && (
+          <span id={`${id}-desc`} className="sr-only">
+            {description}
+          </span>
+        )}
+      </span>
+    </label>
+  );
+}
+
+/** Reusable textarea with label, character count, and ARIA support */
+interface FormTextareaProps {
+  id: string;
+  label: string | React.ReactNode;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  placeholder?: string;
+  error?: string;
+  required?: boolean;
+  disabled?: boolean;
+  rows?: number;
+  maxLength?: number;
+  hint?: string;
+}
+
+function FormTextarea({
+  id,
+  label,
+  value,
+  onChange,
+  placeholder,
+  error,
+  required,
+  disabled,
+  rows = 2,
+  maxLength,
+  hint,
+}: FormTextareaProps) {
+  const errorId = `${id}-error`;
+  const hintId = hint ? `${id}-hint` : undefined;
+  const hasError = !!error;
+  const charCount = value.length;
+  const showProgress = maxLength !== undefined;
+  const progressPercentage = maxLength ? (charCount / maxLength) * 100 : 0;
+  const isNearLimit = progressPercentage > 75;
+
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
+        {label}
+        {required && <span className="text-rose-500 ml-0.5">*</span>}
+      </label>
+      <textarea
+        id={id}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        required={required}
+        disabled={disabled}
+        rows={rows}
+        maxLength={maxLength}
+        aria-invalid={hasError}
+        aria-describedby={[hasError ? errorId : undefined, hintId, maxLength ? `${id}-count` : undefined].filter(Boolean).join(' ') || undefined}
+        aria-required={required}
+        className={`w-full bg-surface-base border ${hasError ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted resize-none transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
+      />
+      {hint && <p id={hintId} className="text-[10px] text-content-muted mt-1">{hint}</p>}
+      {hasError && (
+        <p id={errorId} className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5" role="alert" aria-live="polite">
+          <AlertCircle className="w-3 h-3" aria-hidden />
+          {error}
+        </p>
+      )}
+      {showProgress && (
+        <div className="mt-1.5">
+          <div className="flex items-center justify-between mb-1">
+            <p id={`${id}-count`} className={`text-[10px] font-mono ${isNearLimit ? 'text-amber-400' : 'text-content-muted'}`} aria-live="polite">
+              {charCount}/{maxLength} characters
+            </p>
+            {isNearLimit && (
+              <div className="flex-1 ml-2 h-1 bg-surface-raised rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-200 ${progressPercentage > 90 ? 'bg-red-500' : 'bg-amber-400'}`}
+                  style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+                  role="progressbar"
+                  aria-valuenow={charCount}
+                  aria-valuemin={0}
+                  aria-valuemax={maxLength}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Reusable radio group with ARIA support */
+interface RadioOption {
+  value: string;
+  label: string;
+}
+
+interface FormRadioGroupProps {
+  id: string;
+  name: string;
+  label: string | React.ReactNode;
+  value: string;
+  onChange: (value: string) => void;
+  options: RadioOption[];
+  required?: boolean;
+  disabled?: boolean;
+  hint?: string;
+}
+
+function FormRadioGroup({ id, name, label, value, onChange, options, required, disabled, hint }: FormRadioGroupProps) {
+  const groupId = `${id}-group`;
+  const hintId = hint ? `${id}-hint` : undefined;
+
+  return (
+    <fieldset id={groupId} className="rounded-lg border border-surface-border bg-surface-base p-3" role="radiogroup" aria-required={required}>
+      <legend className="text-xs font-sans font-medium text-content-tertiary mb-2">
+        {label}
+        {required && <span className="text-rose-500 ml-0.5">*</span>}
+      </legend>
+      <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex rounded-lg border border-surface-border p-0.5 bg-surface-raised gap-0.5">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              role="radio"
+              aria-checked={value === option.value}
+              tabIndex={value === option.value ? 0 : -1}
+              onClick={() => !disabled && onChange(option.value)}
+              disabled={disabled}
+              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-sans font-medium transition-colors focus-app ${
+                value === option.value
+                  ? 'bg-brand-cta text-surface-base'
+                  : 'text-content-tertiary hover:text-content-primary'
+              } disabled:opacity-40`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {hint && <p id={hintId} className="text-[10px] text-content-muted mt-2 leading-snug">{hint}</p>}
+    </fieldset>
+  );
+}
+
+/** Reusable fieldset wrapper for grouping related inputs */
+interface FormFieldsetProps {
+  legend: string;
+  children: React.ReactNode;
+  className?: string;
+  hint?: string;
+}
+
+function FormFieldset({ legend, children, className = '', hint }: FormFieldsetProps) {
+  const hintId = hint ? `fieldset-${legend.toLowerCase().replace(/\s+/g, '-')}-hint` : undefined;
+
+  return (
+    <fieldset className={`rounded-lg border border-surface-border bg-surface-base p-3 ${className}`}>
+      <legend className="text-xs font-sans font-medium text-content-tertiary mb-2">{legend}</legend>
+      {children}
+      {hint && <p id={hintId} className="text-[10px] text-content-muted mt-2 leading-snug">{hint}</p>}
+    </fieldset>
+  );
+}
+
+/** Tooltip component for complex fields */
+interface TooltipProps {
+  content: string;
+  children: React.ReactNode;
+}
+
+function Tooltip({ content, children }: TooltipProps) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  return (
+    <div className="relative inline-flex items-center gap-1">
+      {children}
+      <button
+        type="button"
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => setIsVisible(false)}
+        onFocus={() => setIsVisible(true)}
+        onBlur={() => setIsVisible(false)}
+        className="text-content-muted hover:text-content-secondary transition-colors focus-app rounded"
+        aria-label={`More information about ${content}`}
+        aria-describedby={isVisible ? 'tooltip-content' : undefined}
+      >
+        <AlertCircle className="w-3.5 h-3.5" />
+      </button>
+      {isVisible && (
+        <div
+          id="tooltip-content"
+          role="tooltip"
+          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-surface-elevated border border-surface-border radius-card text-xs text-content-secondary shadow-lg z-50 max-w-[200px] text-center"
+        >
+          {content}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-1">
+            <div className="border-4 border-transparent border-t-surface-border" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Enhanced date picker with calendar widget support */
+interface FormDatePickerProps {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  required?: boolean;
+  disabled?: boolean;
+  min?: string;
+  max?: string;
+  hint?: string;
+  showDaysLeft?: boolean;
+}
+
+function FormDatePicker({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+  required,
+  disabled,
+  min,
+  max,
+  hint,
+  showDaysLeft = false,
+}: FormDatePickerProps) {
+  const errorId = `${id}-error`;
+  const hintId = hint ? `${id}-hint` : undefined;
+  const hasError = !!error;
+
+  const calculateDaysLeft = () => {
+    if (!value) return null;
+    const targetDate = new Date(value);
+    const today = new Date();
+    const diffTime = targetDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const daysLeft = showDaysLeft ? calculateDaysLeft() : null;
+
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
+        {label}
+        {required && <span className="text-rose-500 ml-0.5">*</span>}
+      </label>
+      <input
+        id={id}
+        type="date"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
+        disabled={disabled}
+        min={min}
+        max={max}
+        aria-invalid={hasError}
+        aria-describedby={[hintId, hasError ? errorId : undefined].filter(Boolean).join(' ') || undefined}
+        aria-required={required}
+        className={`input-date-dark w-full bg-surface-base border ${hasError ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
+      />
+      {daysLeft !== null && (
+        <p className={`text-[10px] font-mono mt-1 ${daysLeft < 0 ? 'text-red-400' : daysLeft <= 7 ? 'text-amber-400' : 'text-content-muted'}`} aria-live="polite">
+          {daysLeft < 0 ? `${Math.abs(daysLeft)} days overdue` : daysLeft === 0 ? 'Due today' : `${daysLeft} days remaining`}
+        </p>
+      )}
+      {hint && !showDaysLeft && <p id={hintId} className="text-[10px] text-content-muted mt-1">{hint}</p>}
+      {hasError && (
+        <p id={errorId} className="text-xs text-red-400 mt-1.5" role="alert" aria-live="polite">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** File upload with preview support */
+interface FormFileUploadProps {
+  id: string;
+  label: string;
+  onFileSelect: (file: File | null) => void;
+  accept?: string;
+  maxSize?: number; // in MB
+  error?: string;
+  required?: boolean;
+  disabled?: boolean;
+  hint?: string;
+  previewUrl?: string | null;
+  onPreviewToggle?: () => void;
+  showPreview?: boolean;
+}
+
+function FormFileUpload({
+  id,
+  label,
+  onFileSelect,
+  accept = 'image/*,.pdf',
+  maxSize = 10,
+  error,
+  required,
+  disabled,
+  hint,
+  previewUrl,
+  onPreviewToggle,
+  showPreview = false,
+}: FormFileUploadProps) {
+  const errorId = `${id}-error`;
+  const hintId = hint ? `${id}-hint` : undefined;
+  const hasError = !!error;
+  const [fileName, setFileName] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) {
+      onFileSelect(null);
+      setFileName('');
+      return;
+    }
+
+    // Validate file size
+    if (file.size > maxSize * 1024 * 1024) {
+      toast.error(`File too large. Maximum size is ${maxSize}MB.`);
+      onFileSelect(null);
+      setFileName('');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    setFileName(file.name);
+    onFileSelect(file);
+  };
+
+  const clearFile = () => {
+    setFileName('');
+    onFileSelect(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
+        {label}
+        {required && <span className="text-rose-500 ml-0.5">*</span>}
+      </label>
+      
+      <div className="space-y-2">
+        <div className="flex gap-2">
+          <label
+            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 radius-input border cursor-pointer transition-all ${
+              disabled
+                ? 'border-surface-border bg-surface-raised text-content-muted cursor-not-allowed'
+                : fileName
+                  ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400'
+                  : 'border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary hover:bg-content-primary/[0.04]'
+            }`}
+          >
+            <input
+              ref={fileInputRef}
+              id={id}
+              type="file"
+              accept={accept}
+              onChange={handleFileChange}
+              disabled={disabled}
+              required={required && !fileName}
+              className="hidden"
+              aria-describedby={[hintId, hasError ? errorId : undefined].filter(Boolean).join(' ') || undefined}
+            />
+            {fileName ? (
+              <>
+                <span className="text-xs truncate max-w-[200px]">{fileName}</span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    clearFile();
+                  }}
+                  className="ml-auto text-content-muted hover:text-content-primary"
+                  aria-label="Remove file"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4 shrink-0" aria-hidden />
+                <span className="text-xs">Choose file</span>
+              </>
+            )}
+          </label>
+          
+          {previewUrl && onPreviewToggle && (
+            <button
+              type="button"
+              onClick={onPreviewToggle}
+              className={`px-3 py-2.5 radius-input border transition-all ${
+                showPreview
+                  ? 'border-surface-border text-content-primary bg-content-primary/[0.06]'
+                  : 'border-surface-border text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
+              }`}
+              title={showPreview ? 'Hide preview' : 'Show preview'}
+            >
+              {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          )}
+        </div>
+
+        {hint && <p id={hintId} className="text-[10px] text-content-muted">{hint}</p>}
+        
+        {hasError && (
+          <p id={errorId} className="flex items-center gap-1.5 text-xs text-red-400" role="alert" aria-live="polite">
+            <AlertCircle className="w-3 h-3" aria-hidden />
+            {error}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
@@ -766,6 +1202,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           </button>
                         )}
                         <div className="grid grid-cols-2 gap-2 flex-1 min-w-0 sm:min-w-[260px]">
+                          {/* Camera Button (keep native for mobile camera access) */}
                           <label className={`relative flex min-h-[2.5rem] w-full items-center justify-center gap-2 px-3 py-2 rounded-lg border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none text-center leading-tight
                             ${isScanning
                               ? 'border-surface-border bg-content-primary/[0.06] text-content-secondary cursor-not-allowed'
@@ -783,31 +1220,24 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             <Camera className="w-3.5 h-3.5 shrink-0" aria-hidden />
                             <span>Camera</span>
                           </label>
-                          <label className={`relative flex min-h-[2.5rem] w-full items-center justify-center gap-2 px-3 py-2 rounded-lg border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none text-center leading-tight
-                            ${isScanning
-                              ? 'border-surface-border bg-content-primary/[0.06] text-content-secondary cursor-not-allowed'
-                              : 'border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary hover:bg-content-primary/[0.04]'
-                            }`}>
-                            <input
-                              ref={scanFileInputRef}
-                              type="file"
-                              accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
-                              className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full"
-                              onChange={handleScanFile}
-                              disabled={isScanning}
-                            />
-                            {isScanning ? (
-                              <>
-                                <Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin" aria-hidden />
-                                <span>Scanning...</span>
-                              </>
-                            ) : (
-                              <>
-                                <UploadIcon className="w-3.5 h-3.5 shrink-0" aria-hidden />
-                                <span>{scannedPreviewUrl ? 'Rescan file' : 'Upload file'}</span>
-                              </>
-                            )}
-                          </label>
+                          
+                          {/* File Upload using FormFileUpload component */}
+                          <FormFileUpload
+                            id="scan-file"
+                            label=""
+                            onFileSelect={(file) => {
+                              if (file) {
+                                const event = { target: { files: [file] } } as unknown as React.ChangeEvent<HTMLInputElement>;
+                                handleScanFile(event);
+                              }
+                            }}
+                            accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
+                            maxSize={10}
+                            disabled={isScanning}
+                            previewUrl={scannedPreviewUrl}
+                            onPreviewToggle={() => setShowPreview(!showPreview)}
+                            showPreview={showPreview}
+                          />
                         </div>
                       </div>
                     </div>
@@ -858,78 +1288,47 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       className="flex flex-wrap border-b border-surface-border bg-surface-raised p-1 gap-1"
                     >
                     {hasFullSuite && (
-                    <button
-                      type="button"
-                      role="tab"
-                      id="qa-tab-transaction"
-                      aria-selected={activeTab === 'transaction'}
-                      aria-controls="quick-add-form"
-                      tabIndex={activeTab === 'transaction' ? 0 : -1}
-                      onClick={() => {
-                        setActiveTab('transaction');
-                        setErrors({});
-                      }}
-                      className={`min-w-[5.5rem] flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg ${
-                        activeTab === 'transaction' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
-                      } focus-app`}
-                    >
-                      Expense
-                    </button>
+                      <FormTab
+                        id="qa-tab-transaction"
+                        label="Expense"
+                        isActive={activeTab === 'transaction'}
+                        onClick={() => {
+                          setActiveTab('transaction');
+                          setErrors({});
+                        }}
+                      />
                     )}
-                    <button
-                      type="button"
-                      role="tab"
+                    <FormTab
                       id="qa-tab-obligation"
-                      aria-selected={activeTab === 'obligation'}
-                      aria-controls="quick-add-form"
-                      tabIndex={activeTab === 'obligation' ? 0 : -1}
+                      label={hasFullSuite ? 'Bill or debt' : 'Bill'}
+                      isActive={activeTab === 'obligation'}
                       onClick={() => {
                         setActiveTab('obligation');
                         setErrors({});
                       }}
-                      className={`min-w-[5.5rem] flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg ${
-                        activeTab === 'obligation' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
-                      } focus-app`}
-                    >
-                      {hasFullSuite ? 'Bill or debt' : 'Bill'}
-                    </button>
+                    />
                     {hasFullSuite && (
-                    <button
-                      type="button"
-                      role="tab"
-                      id="qa-tab-income"
-                      aria-selected={activeTab === 'income'}
-                      aria-controls="quick-add-form"
-                      tabIndex={activeTab === 'income' ? 0 : -1}
-                      onClick={() => {
-                        setActiveTab('income');
-                        setErrors({});
-                      }}
-                      className={`min-w-[5.5rem] flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg ${
-                        activeTab === 'income' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
-                      } focus-app`}
-                    >
-                      Income
-                    </button>
+                      <FormTab
+                        id="qa-tab-income"
+                        label="Income"
+                        isActive={activeTab === 'income'}
+                        onClick={() => {
+                          setActiveTab('income');
+                          setErrors({});
+                        }}
+                      />
                     )}
-                    <button
-                      type="button"
-                      role="tab"
+                    <FormTab
                       id="qa-tab-citation"
-                      aria-selected={activeTab === 'citation'}
-                      aria-controls="quick-add-form"
-                      tabIndex={activeTab === 'citation' ? 0 : -1}
+                      label="Toll or ticket"
+                      isActive={activeTab === 'citation'}
                       onClick={() => {
                         setActiveTab('citation');
                         setErrors({});
                       }}
-                      className={`min-w-[5.5rem] flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg flex items-center justify-center gap-1.5 ${
-                        activeTab === 'citation' ? 'bg-content-primary/[0.08] text-content-primary border border-surface-border' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
-                      } focus-app`}
-                    >
-                      <AlertTriangle className="w-3 h-3 shrink-0" aria-hidden />
-                      Toll or ticket
-                    </button>
+                      icon={<AlertTriangle className="w-3 h-3 shrink-0" aria-hidden />}
+                      variant="citation"
+                    />
                   </div>
 
                   {/* Form Body */}
@@ -939,27 +1338,20 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     role="tabpanel"
                     aria-labelledby={`qa-tab-${activeTab}`}
                     aria-live="polite"
+                    aria-busy={isSubmitting}
                     className="p-6 space-y-5"
                   >
                     
                     {/* AMOUNT FIELD (ALWAYS PRESENT) */}
-                    <div className="relative">
-                      <FormInput
-                        id="amount"
-                        label="Amount"
-                        type="number"
-                        value={amount}
-                        onChange={(e) => { setAmount(e.target.value); if(errors.amount) setErrors({...errors, amount: ''}); }}
-                        placeholder="0.00"
-                        error={errors.amount}
-                        required
-                        inputMode="decimal"
-                        step="0.01"
-                        min="0"
-                        className="pl-7 text-base font-semibold"
-                      />
-                      <span className="absolute left-3 top-[calc(1.5rem+1.25rem)] -translate-y-1/2 text-content-tertiary font-medium pointer-events-none">$</span>
-                    </div>
+                    <FormCurrency
+                      id="amount"
+                      label="Amount"
+                      value={amount}
+                      onChange={(value) => { setAmount(value); if(errors.amount) setErrors({...errors, amount: ''}); }}
+                      placeholder="0.00"
+                      error={errors.amount}
+                      required
+                    />
 
                     {/* TRANSACTION (expense or income/refund) */}
                     {activeTab === 'transaction' && (
@@ -1003,6 +1395,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 placeholder="E.g., Whole Foods"
                                 error={errors.description}
                                 required
+                                maxLength={100}
                               />
                             </div>
                             {description.length > 2 && (
@@ -1013,42 +1406,18 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           </div>
                         </div>
 
-                        <div className="rounded-lg border border-surface-border bg-surface-base p-3">
-                          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                            <span className="text-xs font-medium text-content-tertiary">Ledger</span>
-                            <div
-                              className="flex rounded-lg border border-surface-border p-0.5 bg-surface-raised gap-0.5"
-                              role="group"
-                              aria-label="Expense or income"
-                            >
-                              <button
-                                type="button"
-                                onClick={() => setTransactionLedgerKind('expense')}
-                                className={`flex-1 rounded-md px-3 py-1.5 text-xs font-sans font-medium transition-colors ${
-                                  transactionLedgerKind === 'expense'
-                                    ? 'bg-brand-cta text-surface-base'
-                                    : 'text-content-tertiary hover:text-content-primary'
-                                } focus-app`}
-                              >
-                                Expense
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setTransactionLedgerKind('income')}
-                                className={`flex-1 rounded-md px-3 py-1.5 text-xs font-sans font-medium transition-colors ${
-                                  transactionLedgerKind === 'income'
-                                    ? 'bg-brand-cta text-surface-base'
-                                    : 'text-content-tertiary hover:text-content-primary'
-                                } focus-app`}
-                              >
-                                Income / refund
-                              </button>
-                            </div>
-                          </div>
-                          <p className="text-[10px] text-content-muted mt-2 leading-snug">
-                            Refunds and deposits save as income; choose the category that matches the source.
-                          </p>
-                        </div>
+                        <FormRadioGroup
+                          id="ledger-kind"
+                          name="ledgerKind"
+                          label="Ledger"
+                          value={transactionLedgerKind}
+                          onChange={(value) => setTransactionLedgerKind(value as 'expense' | 'income')}
+                          options={[
+                            { value: 'expense', label: 'Expense' },
+                            { value: 'income', label: 'Income / refund' }
+                          ]}
+                          hint="Refunds and deposits save as income; choose the category that matches the source."
+                        />
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
@@ -1078,30 +1447,29 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             </FormSelect>
                           </div>
                           <div>
-                            <FormDate
+                            <FormDatePicker
                               id="date"
                               label="Date"
                               value={date}
-                              onChange={(e) => setDate(e.target.value)}
+                              onChange={setDate}
                             />
                           </div>
                         </div>
 
-                        <div>
-                          <label htmlFor="memoNotes" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
-                            Notes <span className="text-content-muted font-normal">(optional)</span>
-                          </label>
-                          <textarea
-                            id="memoNotes"
-                            value={memoNotes}
-                            onChange={(e) => setMemoNotes(e.target.value)}
-                            placeholder="Split with roommate, business trip, etc."
-                            rows={2}
-                            aria-describedby="memo-hint"
-                            className="w-full bg-surface-base border border-surface-border radius-input focus-app-field text-sm font-sans text-content-primary placeholder:text-content-muted p-3 resize-none transition-colors hover:border-content-primary/15"
-                          />
-                          <p id="memo-hint" className="sr-only">Optional notes about this transaction</p>
-                        </div>
+                        <FormTextarea
+                          id="memoNotes"
+                          label={
+                            <span>
+                              Notes <span className="text-content-muted font-normal">(optional)</span>
+                            </span>
+                          }
+                          value={memoNotes}
+                          onChange={(e) => setMemoNotes(e.target.value)}
+                          placeholder="Split with roommate, business trip, etc."
+                          rows={2}
+                          maxLength={200}
+                          hint="Add context to help you remember this transaction later"
+                        />
                       </>
                     )}
 
@@ -1137,53 +1505,57 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             </p>
                           </div>
                           <div>
-                            <FormDate
+                            <FormDatePicker
                               id="dueDate"
                               label={obligationKind.startsWith('debt-') ? 'Payment due date' : 'Due Date'}
                               value={dueDate}
-                              onChange={(e) => { setDueDate(e.target.value); if(errors.dueDate) setErrors({...errors, dueDate: ''}); }}
+                              onChange={(val) => { setDueDate(val); if(errors.dueDate) setErrors({...errors, dueDate: ''}); }}
                               error={errors.dueDate}
                               disabled={obligationKind.startsWith('debt-') && debtNoPaymentDue}
+                              showDaysLeft={obligationKind.startsWith('bill-')}
                             />
                             {obligationKind.startsWith('debt-') && (
-                              <label className="mt-2 flex items-center gap-2 text-[11px] text-content-tertiary cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={debtNoPaymentDue}
-                                  onChange={(e) => {
-                                    setDebtNoPaymentDue(e.target.checked);
-                                    if (e.target.checked && errors.dueDate) setErrors({ ...errors, dueDate: '' });
-                                  }}
-                                  aria-describedby="dueDate-error"
-                                  className="rounded border-surface-border focus-app"
-                                />
-                                No payment due date (closed card, charge-off, etc.)
-                              </label>
+                              <FormCheckbox
+                                id="no-payment-due"
+                                label="No payment due date (closed card, charge-off, etc.)"
+                                checked={debtNoPaymentDue}
+                                onChange={(e) => {
+                                  setDebtNoPaymentDue(e.target.checked);
+                                  if (e.target.checked && errors.dueDate) setErrors({ ...errors, dueDate: '' });
+                                }}
+                                description="Skip payment due date for closed accounts"
+                                className="mt-2"
+                              />
                             )}
                           </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label htmlFor="vendor" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Biller Name</label>
-                            <div className="flex gap-3">
-                              <div className="flex-1">
-                                <FormInput
-                                  id="vendor"
-                                  label=""
-                                  value={vendor}
-                                  onChange={(e) => { setVendor(e.target.value); if(errors.vendor) setErrors({...errors, vendor: ''}); }}
-                                  placeholder={
-                                    obligationKind.startsWith('bill-')
-                                      ? 'E.g., AT&T'
-                                      : obligationKind === 'debt-card'
-                                        ? 'E.g., Chase Sapphire'
-                                        : 'E.g., SoFi Personal Loan'
-                                  }
-                                  error={errors.vendor}
-                                  required
-                                />
-                              </div>
-                            </div>
+                            <FormAutocomplete
+                              id="vendor"
+                              label="Biller Name"
+                              value={vendor}
+                              onChange={(value) => { setVendor(value); if(errors.vendor) setErrors({...errors, vendor: ''}); }}
+                              placeholder={
+                                obligationKind.startsWith('bill-')
+                                  ? 'E.g., AT&T'
+                                  : obligationKind === 'debt-card'
+                                    ? 'E.g., Chase Sapphire'
+                                    : 'E.g., SoFi Personal Loan'
+                              }
+                              error={errors.vendor}
+                              required
+                              maxLength={80}
+                              suggestions={[
+                                'AT&T', 'Verizon', 'Comcast', 'T-Mobile', 'Sprint',
+                                'Electric Company', 'Water Utility', 'Gas Company',
+                                'Internet Provider', 'Phone Service', 'Insurance',
+                                'Rent', 'Mortgage', 'Car Payment', 'Student Loan',
+                                'Chase', 'Bank of America', 'Wells Fargo', 'Citibank',
+                                'Capital One', 'American Express', 'Discover'
+                              ]}
+                              hint="Start typing to see suggestions from your previous entries"
+                            />
                           </div>
                           <div>
                             <FormSelect
@@ -1205,32 +1577,42 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           </div>
                         </div>
                         {obligationKind.startsWith('debt-') && (
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <label htmlFor="apr" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">APR (%)</label>
-                              <input
-                                id="apr"
-                                type="number"
-                                step="0.01"
-                                value={apr}
-                                onChange={(e) => setApr(e.target.value)}
-                                placeholder="19.99"
-                                className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans text-content-primary transition-colors hover:border-content-primary/15"
-                              />
+                          <FormFieldset legend="Debt Details" hint="Optional details help calculate interest and track payments">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label htmlFor="apr" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
+                                  <Tooltip content="Annual Percentage Rate - the yearly cost of borrowing money">
+                                    APR (%)
+                                  </Tooltip>
+                                </label>
+                                <input
+                                  id="apr"
+                                  type="number"
+                                  step="0.01"
+                                  value={apr}
+                                  onChange={(e) => setApr(e.target.value)}
+                                  placeholder="19.99"
+                                  aria-describedby="apr-hint"
+                                  className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans text-content-primary transition-colors hover:border-content-primary/15"
+                                />
+                                <p id="apr-hint" className="sr-only">Enter the annual interest rate as a percentage</p>
+                              </div>
+                              <div>
+                                <FormCurrency
+                                  id="minPayment"
+                                  label={
+                                    <Tooltip content="Minimum monthly payment required to avoid late fees">
+                                      Min Payment ($)
+                                    </Tooltip>
+                                  }
+                                  value={minPayment}
+                                  onChange={setMinPayment}
+                                  placeholder="Auto"
+                                  hint="Leave blank to calculate automatically based on balance and APR"
+                                />
+                              </div>
                             </div>
-                            <div>
-                              <label htmlFor="minPayment" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Min Payment ($)</label>
-                              <input
-                                id="minPayment"
-                                type="number"
-                                step="0.01"
-                                value={minPayment}
-                                onChange={(e) => setMinPayment(e.target.value)}
-                                placeholder="Auto"
-                                className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans text-content-primary transition-colors hover:border-content-primary/15"
-                              />
-                            </div>
-                          </div>
+                          </FormFieldset>
                         )}
                       </>
                     )}
@@ -1238,98 +1620,121 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     {/* CITATION FIELDS */}
                     {activeTab === 'citation' && (
                       <>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Type</label>
-                            <select
-                              value={citationType}
-                              onChange={(e) => setCitationType(e.target.value)}
-                              className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer transition-colors hover:border-content-primary/15"
-                            >
-                              <option value="Toll Violation">Toll Violation</option>
-                              <option value="Traffic Citation">Traffic Citation</option>
-                              <option value="Parking Ticket">Parking Ticket</option>
-                              <option value="Speed Camera">Speed Camera</option>
-                              <option value="Red Light Camera">Red Light Camera</option>
-                              <option value="HOV Violation">HOV Violation</option>
-                              <option value="Other Fine">Other Fine</option>
-                            </select>
+                        <FormFieldset legend="Citation Information" hint="Details from your toll violation or traffic ticket">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Type</label>
+                              <select
+                                value={citationType}
+                                onChange={(e) => setCitationType(e.target.value)}
+                                aria-describedby="citation-type-hint"
+                                className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer transition-colors hover:border-content-primary/15"
+                              >
+                                <option value="Toll Violation">Toll Violation</option>
+                                <option value="Traffic Citation">Traffic Citation</option>
+                                <option value="Parking Ticket">Parking Ticket</option>
+                                <option value="Speed Camera">Speed Camera</option>
+                                <option value="Red Light Camera">Red Light Camera</option>
+                                <option value="HOV Violation">HOV Violation</option>
+                                <option value="Other Fine">Other Fine</option>
+                              </select>
+                              <p id="citation-type-hint" className="sr-only">Select the type of violation or fine</p>
+                            </div>
+                            <div>
+                              <FormDatePicker
+                                id="citation-due-date"
+                                label="Payment Due Date"
+                                value={citationDueDate}
+                                onChange={(val) => {
+                                  setCitationDueDate(val);
+                                  if (val) {
+                                    const days = Math.max(0, Math.round((new Date(val).getTime() - Date.now()) / 86400000));
+                                    setDaysLeft(String(days));
+                                  }
+                                }}
+                                showDaysLeft
+                                hint="Date by which payment must be made to avoid additional penalties"
+                              />
+                            </div>
                           </div>
                           <div>
-                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
-                              Payment Due Date
-                            </label>
-                            <input
-                              type="date"
-                              value={citationDueDate}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                setCitationDueDate(val);
-                                if (val) {
-                                  const days = Math.max(0, Math.round((new Date(val).getTime() - Date.now()) / 86400000));
-                                  setDaysLeft(String(days));
-                                }
-                              }}
-                              className="input-date-dark w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15"
+                            <FormAutocomplete
+                              id="jurisdiction"
+                              label={
+                                <span>
+                                  Issuing Jurisdiction <span className="text-rose-500">*</span>
+                                </span>
+                              }
+                              value={jurisdiction}
+                              onChange={(value) => { setJurisdiction(value); if (errors.jurisdiction) setErrors({ ...errors, jurisdiction: '' }); }}
+                              placeholder="E.g., Dallas County, TX"
+                              error={errors.jurisdiction}
+                              required
+                              maxLength={100}
+                              suggestions={[
+                                'Dallas County, TX', 'Harris County, TX', 'Tarrant County, TX',
+                                'Bexar County, TX', 'Travis County, TX', 'Collin County, TX',
+                                'Los Angeles County, CA', 'San Diego County, CA', 'Orange County, CA',
+                                'Cook County, IL', 'DuPage County, IL', 'Lake County, IL',
+                                'Maricopa County, AZ', 'Pima County, AZ',
+                                'King County, WA', 'Pierce County, WA',
+                                'Miami-Dade County, FL', 'Broward County, FL',
+                                'New York County, NY', 'Kings County, NY', 'Queens County, NY'
+                              ]}
+                              hint="Start typing to see common jurisdictions"
                             />
                           </div>
-                        </div>
-                        <div>
-                          <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
-                            Issuing Jurisdiction <span className="text-rose-500">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={jurisdiction}
-                            onChange={(e) => { setJurisdiction(e.target.value); if (errors.jurisdiction) setErrors({ ...errors, jurisdiction: '' }); }}
-                            placeholder="E.g., Dallas County, TX"
-                            className={`w-full bg-surface-base border ${errors.jurisdiction ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15`}
-                          />
-                          {errors.jurisdiction && (
-                            <p className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5"><AlertCircle className="w-3 h-3" /> {errors.jurisdiction}</p>
-                          )}
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Citation / Ticket #</label>
-                            <input
-                              type="text"
-                              value={citationNumber}
-                              onChange={(e) => setCitationNumber(e.target.value)}
-                              placeholder="E.g., TN-20394857"
-                              className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2.5 text-sm font-mono text-content-primary placeholder:text-content-muted transition-colors uppercase hover:border-content-primary/15"
-                            />
+                        </FormFieldset>
+
+                        <FormFieldset legend="Payment Details" hint="Financial information and reference numbers">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Citation / Ticket #</label>
+                              <input
+                                type="text"
+                                value={citationNumber}
+                                onChange={(e) => setCitationNumber(e.target.value)}
+                                placeholder="E.g., TN-20394857"
+                                maxLength={50}
+                                aria-describedby="citation-number-count"
+                                className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2.5 text-sm font-mono text-content-primary placeholder:text-content-muted transition-colors uppercase hover:border-content-primary/15"
+                              />
+                              <p id="citation-number-count" className="text-[10px] font-mono text-content-muted mt-1" aria-live="polite">
+                                {citationNumber.length}/50 characters
+                              </p>
+                            </div>
+                            <div>
+                              <FormCurrency
+                                id="penaltyFee"
+                                label="Penalty / Late Fee ($)"
+                                value={penaltyFee}
+                                onChange={setPenaltyFee}
+                                placeholder="0.00"
+                                hint="Additional fees charged for late payment"
+                              />
+                            </div>
                           </div>
-                          <div>
-                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Penalty / Late Fee ($)</label>
+                          <div className="mt-4">
+                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Payment URL <span className="text-content-muted">(optional)</span></label>
                             <input
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              value={penaltyFee}
-                              onChange={(e) => setPenaltyFee(e.target.value)}
-                              placeholder="0.00"
+                              type="url"
+                              value={paymentUrl}
+                              onChange={(e) => setPaymentUrl(e.target.value)}
+                              placeholder="https://..."
+                              aria-describedby="payment-url-hint"
                               className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15"
                             />
+                            <p id="payment-url-hint" className="text-[10px] text-content-muted mt-1">Direct link to the payment portal</p>
                           </div>
-                        </div>
+                        </FormFieldset>
+
                         <div>
-                          <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Payment URL <span className="text-content-muted">(optional)</span></label>
-                          <input
-                            type="url"
-                            value={paymentUrl}
-                            onChange={(e) => setPaymentUrl(e.target.value)}
-                            placeholder="https://..."
-                            className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Incident Date</label>
-                          <input
-                            type="date"
+                          <FormDatePicker
+                            id="incident-date"
+                            label="Incident Date"
                             value={date}
-                            onChange={(e) => setDate(e.target.value)}
-                            className="input-date-dark w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15"
+                            onChange={setDate}
+                            hint="Date when the violation occurred"
                           />
                         </div>
                       </>
@@ -1377,25 +1782,25 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           </div>
                         </div>
                         <div>
-                          <label htmlFor="incDate" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Next pay date</label>
-                          <input
+                          <FormDatePicker
                             id="incDate"
-                            type="date"
+                            label="Next pay date"
                             value={date}
-                            onChange={(e) => { setDate(e.target.value); if(errors.date) setErrors({...errors, date: ''}); }}
-                            className={`input-date-dark w-full bg-surface-base border ${errors.date ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15`}
+                            onChange={(val) => { setDate(val); if(errors.date) setErrors({...errors, date: ''}); }}
+                            error={errors.date}
                           />
-                          {errors.date && <p className="text-xs text-red-400 mt-1.5">{errors.date}</p>}
                         </div>
-                        <label className="flex items-start gap-2.5 text-xs text-content-secondary cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={incomeTaxWithheld}
-                            onChange={(e) => setIncomeTaxWithheld(e.target.checked)}
-                            className="mt-0.5 rounded border-surface-border bg-surface-base focus-app"
-                          />
-                          <span>Taxes withheld (typical W-2 paycheck). Leave off for gross 1099 or contract pay.</span>
-                        </label>
+                        <FormCheckbox
+                          id="tax-withheld"
+                          label={
+                            <>
+                              Taxes withheld (typical W-2 paycheck). Leave off for gross 1099 or contract pay.
+                            </>
+                          }
+                          checked={incomeTaxWithheld}
+                          onChange={(e) => setIncomeTaxWithheld(e.target.checked)}
+                          description="Indicates whether taxes are automatically deducted"
+                        />
                       </>
                     )}
 
@@ -1408,6 +1813,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     type="button"
                     onClick={onClose}
                     disabled={isSubmitting}
+                    aria-busy={isSubmitting}
                     className="px-4 py-2 text-sm font-sans font-medium text-content-tertiary hover:text-content-primary transition-colors focus-app rounded"
                   >
                     Cancel
@@ -1416,14 +1822,15 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     type="button"
                     onClick={() => void submitEntry(true)}
                     disabled={isSubmitting}
+                    aria-busy={isSubmitting}
                     className="px-4 py-2 radius-button text-sm font-sans font-medium border border-surface-border text-content-secondary hover:text-content-primary hover:bg-surface-elevated transition-colors focus-app disabled:opacity-50"
                   >
                     {isSubmitting ? 'Getting things ready...' : 'Save & add another'}
                   </button>
                   <button
-                    type="button"
-                    onClick={() => void submitEntry(false)}
+                    type="submit"
                     disabled={isSubmitting}
+                    aria-busy={isSubmitting}
                     className={`px-5 py-2 radius-button text-sm font-sans font-medium transition-colors focus-app disabled:opacity-50 ${
                       activeTab === 'citation'
                         ? 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover border border-surface-border'
