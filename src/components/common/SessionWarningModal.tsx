@@ -2,6 +2,7 @@ import React from 'react';
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AlertTriangle, Clock, Shield } from 'lucide-react';
+import { ThemeBackdrop } from './ThemeBackdrop';
 
 interface SessionWarningModalProps {
   isOpen: boolean;
@@ -20,13 +21,7 @@ export default function SessionWarningModal({ isOpen, timeLeftSeconds, onExtend,
           className="relative z-[9999]"
         >
           {/* Backdrop */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/80" 
-            aria-hidden="true" 
-          />
+          <ThemeBackdrop />
 
           <div className="fixed inset-0 flex items-center justify-center p-4">
             <motion.div

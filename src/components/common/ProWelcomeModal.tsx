@@ -12,6 +12,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { Zap, BarChart2, DollarSign, Target, Shield, X } from 'lucide-react';
 import { TransitionLink } from './TransitionLink';
+import { ThemeBackdrop } from './ThemeBackdrop';
 
 const STORAGE_KEY = 'oweable_pro_welcome_shown_v1';
 
@@ -55,7 +56,7 @@ export function ProWelcomeModal() {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/75 backdrop-blur-sm" aria-hidden="true" />
+          <ThemeBackdrop />
         </Transition.Child>
 
         {/* Panel */}

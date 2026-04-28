@@ -1,5 +1,6 @@
 import { Dialog } from '@headlessui/react';
 import { isApplePointerPlatform } from '../../lib/utils';
+import { ThemeBackdrop } from './ThemeBackdrop';
 
 type Props = {
   open: boolean;
@@ -11,9 +12,9 @@ export function KeyboardShortcutsDialog({ open, onClose }: Props) {
 
   return (
     <Dialog open={open} onClose={onClose} className="relative z-[70]">
-      <div className="fixed inset-0 bg-black/90" aria-hidden />
+      <ThemeBackdrop />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="mx-auto max-w-md rounded-lg border border-surface-border bg-surface-raised p-6 shadow-[0_20px_50px_rgba(0,0,0,0.55)]">
+        <Dialog.Panel className="mx-auto max-w-md rounded-lg border border-surface-border bg-surface-raised p-6 shadow-elevated">
           <Dialog.Title className="font-sans text-lg font-semibold tracking-tight text-content-primary">
             Keyboard shortcuts
           </Dialog.Title>

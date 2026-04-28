@@ -400,7 +400,7 @@ export default function Layout() {
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/80 lg:hidden"
+          className="fixed inset-0 z-40 backdrop-overlay lg:hidden"
           aria-hidden="true"
           onClick={closeSidebarMobile}
         />
@@ -1160,9 +1160,9 @@ export default function Layout() {
 
       {/* Global Reset Confirmation */}
       <Dialog open={isResetOpen} onClose={() => setIsResetOpen(false)} className="relative z-[70]">
-        <div className="fixed inset-0 bg-black/90" aria-hidden="true" />
+        <div className="fixed inset-0 backdrop-overlay" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-sm rounded-lg bg-surface-raised border border-surface-border p-6 shadow-[0_20px_50px_rgba(0,0,0,0.55)]">
+          <Dialog.Panel className="mx-auto max-w-sm rounded-lg bg-surface-raised border border-surface-border p-6 shadow-elevated">
             <div className="flex items-center gap-4 mb-4">
               <div className="flex-shrink-0 w-10 h-10 rounded-full border border-amber-500/30 flex items-center justify-center bg-amber-500/5">
                 <AlertTriangle className="w-5 h-5 text-amber-500" />

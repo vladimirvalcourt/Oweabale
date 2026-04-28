@@ -578,11 +578,11 @@ body {
   --color-content-tertiary: #888888;
   --color-content-muted: #999999;
 
-  /* Brand colors adapted for light backgrounds */
-  --color-brand-indigo: #000000;
-  --color-brand-violet: #404040;
-  --color-brand-cta: #000000;
-  --color-brand-cta-hover: #1a1a1a;
+  /* Brand colors - maintain violet identity in light mode */
+  --color-brand-indigo: #5e6ad2;
+  --color-brand-violet: #7170ff;
+  --color-brand-cta: #5e6ad2;
+  --color-brand-cta-hover: #7170ff;
   --color-brand-profit: #16a34a;
   --color-brand-expense: #dc2626;
   --color-brand-tax: #525252;

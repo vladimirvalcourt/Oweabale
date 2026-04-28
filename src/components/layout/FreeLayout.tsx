@@ -222,7 +222,7 @@ export default function FreeLayout() {
     <div className="min-h-[100dvh] bg-surface-base font-sans text-content-primary flex">
       {/* Mobile backdrop */}
       {sidebarOpen && (
-        <div className="fixed inset-0 z-40 bg-black/80 lg:hidden" aria-hidden onClick={closeSidebarMobile} />
+        <div className="fixed inset-0 z-40 backdrop-overlay lg:hidden" aria-hidden onClick={closeSidebarMobile} />
       )}
 
       {/* ── Sidebar ── */}

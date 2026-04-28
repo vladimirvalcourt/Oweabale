@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getUserProfile } from '../../app/constants';
 import { useStore } from '../../store';
 import { Lock } from 'lucide-react';
+import { ThemeBackdrop } from './ThemeBackdrop';
 
 interface TrialExpiryModalProps {
   onDismiss: () => void;
@@ -43,8 +44,9 @@ export default function TrialExpiryModal({ onDismiss }: TrialExpiryModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-lg bg-surface-base border border-surface-border rounded-xl shadow-2xl p-8 animate-in fade-in zoom-in-95 duration-200">
+    <>
+      <ThemeBackdrop />
+      <div className="relative z-[100] w-full max-w-lg bg-surface-base border border-surface-border rounded-xl shadow-2xl p-8 animate-in fade-in zoom-in-95 duration-200">
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-amber-500/10 flex items-center justify-center">
           <Lock className="h-7 w-7 text-amber-500" aria-hidden />
         </div>
@@ -83,6 +85,6 @@ export default function TrialExpiryModal({ onDismiss }: TrialExpiryModalProps) {
           Your data is retained; billing restores access immediately after Stripe confirms payment.
         </p>
       </div>
-    </div>
+    </>
   );
 }
