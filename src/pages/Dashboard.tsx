@@ -376,6 +376,7 @@ export default function Dashboard() {
   const citations = useStore((state) => state.citations);
   const incomes = useStore((state) => state.incomes);
   const assets = useStore((state) => state.assets);
+  const transactions = useStore((state) => state.transactions);
   const user = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
   const openQuickAdd = useStore((state) => state.openQuickAdd);

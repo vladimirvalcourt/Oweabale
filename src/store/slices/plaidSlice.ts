@@ -29,10 +29,17 @@ export const createPlaidSlice: StoreSlice<
   syncPlaidTransactions: async (opts?: { quiet?: boolean }) => {
     const result = await invokePlaidSync();
     if ('error' in result) {
+      console.error('[Plaid Sync] Error:', result.error);
       if (!opts?.quiet) toast.error(result.error);
       return false;
     }
 
+    // Small delay to ensure Edge Function DB writes are fully committed
+    // before we fetch the updated data. Prevents race conditions where
+    // fetchData() reads stale data immediately after sync completes.
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    
+    console.log('[Plaid Sync] Fetching updated data after sync...', { processed: result.processed, errors: result.errors });
     await get().fetchData();
 
     if (!opts?.quiet) {
