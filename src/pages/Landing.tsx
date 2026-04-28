@@ -9,11 +9,11 @@ import gsap from 'gsap';
 const proofPoints = ['Bills', 'Debt', 'Subscriptions', 'Tolls', 'Tickets', 'Taxes'];
 
 const peopleAvatars = {
-  mara: '/people/mara.svg',
-  jon: '/people/jon.svg',
-  sarah: '/people/sarah.svg',
-  james: '/people/james.svg',
-  emily: '/people/emily.svg',
+  mara: '/people/mara.png',
+  jon: '/people/jon.png',
+  sarah: '/people/sarah.png',
+  james: '/people/james.png',
+  emily: '/people/emily.png',
 };
 
 const featureRows = [
