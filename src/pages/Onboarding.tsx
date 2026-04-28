@@ -18,21 +18,21 @@ type Step = {
 const STEPS: Step[] = [
   {
     id: 'assets',
-    title: 'Your cash & bank',
+    title: "What's available now",
     subtitle: 'Checking, savings, and cash on hand',
     description: 'Tell us how much you have available right now.',
   },
   {
     id: 'obligations',
-    title: 'Monthly bills',
+    title: 'Regular monthly costs',
     subtitle: 'Rent, utilities, and fixed costs',
     description: 'Rough total of regular monthly expenses.',
   },
   {
     id: 'velocity',
-    title: 'Daily spending comfort',
+    title: 'Daily spending that feels good',
     subtitle: 'Optional daily target',
-    description: 'We turn this into a monthly “Flexible spending” budget you can edit anytime.',
+    description: 'We turn this into a monthly "Flexible spending" budget you can edit anytime.',
   },
   {
     id: 'strategy',
@@ -72,7 +72,7 @@ function ChoiceCard({ selected, onSelect, title, description, accent = 'neutral'
       onClick={onSelect}
       aria-pressed={selected}
       className={cn(
-        'relative flex min-h-[7.5rem] flex-col rounded-[10px] border p-5 text-left transition-colors focus-app sm:min-h-[8.25rem]',
+        'relative flex min-h-[7.5rem] flex-col radius-card border p-5 text-left transition-colors focus-app sm:min-h-[8.25rem]',
         selected
           ? accent === 'rose'
             ? 'border-rose-500/50 bg-surface-elevated ring-2 ring-rose-500/30'
@@ -163,7 +163,7 @@ export default function Onboarding() {
         setIsSubmitting(false);
         return;
       }
-      toast.success('Setup complete. Welcome to Oweable.');
+      toast.success("You're all set. Welcome to Oweable!");
       startTransition(() => navigate(postSetupHref));
     }
   };
@@ -198,7 +198,7 @@ export default function Onboarding() {
   const skipSetup = async () => {
     const ok = await updateUser({ hasCompletedOnboarding: true });
     if (!ok) return;
-    toast.success('Setup skipped.');
+    toast.success('No problem. You can always set this up later.');
     startTransition(() => navigate(postSetupHref));
   };
 
@@ -230,14 +230,14 @@ export default function Onboarding() {
               className="w-full max-w-lg"
             >
               <p className="mb-4 text-[11px] font-mono font-medium uppercase tracking-[0.14em] text-content-muted">
-                Quick setup · ~2 min
+                Takes about 2 minutes
               </p>
 
               <h1 className="mb-3 text-balance text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
                 Welcome, {firstName}
               </h1>
               <p className="mb-8 max-w-md text-pretty text-sm leading-6 text-content-tertiary">
-                We’ll set up the basics: what cash is available, what bills are coming, and how much daily spending feels safe. Everything is optional — skip anytime or refine later.
+                We'll ask about what cash you can use, bills coming up, and a daily spending amount that feels comfortable. Leave anything blank — you can fill it in later.
               </p>
 
               <div className="mb-10 grid gap-3 sm:grid-cols-2">
@@ -249,7 +249,7 @@ export default function Onboarding() {
                 ].map(({ icon: Icon, label, desc }) => (
                   <div
                     key={label}
-                    className="flex gap-3 rounded-[10px] border border-surface-border-subtle bg-white/[0.022] p-4 transition-colors hover:border-content-primary/10"
+                    className="flex gap-3 radius-card border border-surface-border-subtle bg-surface-highlight/50 p-4 transition-colors hover:border-content-primary/10"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-surface-border bg-surface-elevated">
                       <Icon className="h-4 w-4 text-content-secondary" aria-hidden />
@@ -262,7 +262,7 @@ export default function Onboarding() {
                 ))}
               </div>
 
-              <div className="rounded-[10px] border border-surface-border bg-white/[0.018] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
+              <div className="radius-card border border-surface-border bg-surface-highlight/30 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
                 <div className="mb-6 flex items-center gap-2">
                   <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden />
                   <p className="text-xs text-content-tertiary">Encrypted session · you control your data</p>
@@ -353,7 +353,7 @@ export default function Onboarding() {
                       {currentStepIndex > index ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : index + 1}
                     </motion.div>
                     {index < STEPS.length - 1 && (
-                      <div className="absolute left-8 top-4 h-0.5 w-[calc(100vw/4-2rem)] sm:w-[calc(100%/4-2rem)]">
+                      <div className="absolute left-8 top-4 h-0.5 w-16 sm:w-20 lg:w-24">
                         <motion.div
                           initial={false}
                           animate={{
@@ -379,10 +379,11 @@ export default function Onboarding() {
                 exit="exit"
                 transition={{ duration: 0.28, ease: [0.19, 1, 0.22, 1] }}
                 className="flex flex-1 flex-col"
-                role="group"
+                role="region"
                 aria-labelledby="onboarding-step-title"
+                aria-live="polite"
               >
-                <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-[10px] border border-surface-border bg-surface-raised">
+                <div className="mb-2 flex h-11 w-11 items-center justify-center radius-card border border-surface-border bg-surface-raised">
                   {currentStepIndex === 0 && <Vault className="h-5 w-5 text-content-secondary" aria-hidden />}
                   {currentStepIndex === 1 && <Receipt className="h-5 w-5 text-content-secondary" aria-hidden />}
                   {currentStepIndex === 2 && <Activity className="h-5 w-5 text-content-secondary" aria-hidden />}
@@ -400,14 +401,14 @@ export default function Onboarding() {
                   ) : null}
                 </p>
 
-                <div className="rounded-[10px] border border-surface-border bg-white/[0.018] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
+                <div className="radius-card border border-surface-border bg-surface-highlight/30 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
                   {currentStep.id === 'assets' && (
                     <div className="space-y-3">
                       <label className="sr-only" htmlFor="onboard-cash">
                         Cash and bank balance
                       </label>
-                      <div className="flex items-end border-b border-surface-border pb-1 transition-colors focus-within:border-content-primary/25">
-                        <span className="select-none pb-2 pr-1 font-sans text-3xl leading-none text-content-tertiary sm:text-5xl">$</span>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 select-none font-sans text-lg text-content-tertiary sm:text-xl">$</span>
                         <input
                           id="onboard-cash"
                           autoFocus
@@ -416,7 +417,7 @@ export default function Onboarding() {
                           placeholder="0.00"
                           value={formData.cash}
                           onChange={(e) => setFormData({ ...formData, cash: e.target.value })}
-                          className="focus-app-field w-full bg-transparent py-2 font-mono text-3xl text-content-primary placeholder:text-content-muted tnum leading-none focus:outline-none sm:text-5xl sm:py-3"
+                          className="focus-app-field w-full rounded-md border border-surface-border bg-surface-raised px-3 py-2 pl-8 font-mono text-sm text-content-primary placeholder:text-content-muted tnum transition-colors hover:border-content-primary/15 focus:border-content-primary/25 sm:text-base"
                         />
                       </div>
                       <p className="text-xs text-content-tertiary">Liquid balances only (checking, savings, cash).</p>
@@ -428,8 +429,8 @@ export default function Onboarding() {
                       <label className="sr-only" htmlFor="onboard-bills">
                         Monthly bills total
                       </label>
-                      <div className="flex items-end border-b border-surface-border pb-1 transition-colors focus-within:border-content-primary/25">
-                        <span className="select-none pb-2 pr-1 font-sans text-3xl leading-none text-content-tertiary sm:text-5xl">$</span>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 select-none font-sans text-lg text-content-tertiary sm:text-xl">$</span>
                         <input
                           id="onboard-bills"
                           autoFocus
@@ -438,7 +439,7 @@ export default function Onboarding() {
                           placeholder="0.00"
                           value={formData.bills}
                           onChange={(e) => setFormData({ ...formData, bills: e.target.value })}
-                          className="focus-app-field w-full bg-transparent py-2 font-mono text-3xl text-content-primary placeholder:text-content-muted tnum leading-none focus:outline-none sm:text-5xl sm:py-3"
+                          className="focus-app-field w-full rounded-md border border-surface-border bg-surface-raised px-3 py-2 pl-8 font-mono text-sm text-content-primary placeholder:text-content-muted tnum transition-colors hover:border-content-primary/15 focus:border-content-primary/25 sm:text-base"
                         />
                       </div>
                       <p className="text-xs text-content-tertiary">Rent, utilities, subscriptions, loan minimums — one monthly total is fine.</p>
@@ -450,8 +451,8 @@ export default function Onboarding() {
                       <label className="sr-only" htmlFor="onboard-daily">
                         Daily spending target
                       </label>
-                      <div className="flex items-end border-b border-surface-border pb-1 transition-colors focus-within:border-content-primary/25">
-                        <span className="select-none pb-2 pr-1 font-sans text-3xl leading-none text-content-tertiary sm:text-5xl">$</span>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 select-none font-sans text-lg text-content-tertiary sm:text-xl">$</span>
                         <input
                           id="onboard-daily"
                           autoFocus
@@ -460,7 +461,7 @@ export default function Onboarding() {
                           placeholder="0.00"
                           value={formData.dailyLimit}
                           onChange={(e) => setFormData({ ...formData, dailyLimit: e.target.value })}
-                          className="focus-app-field w-full bg-transparent py-2 font-mono text-3xl text-content-primary placeholder:text-content-muted tnum leading-none focus:outline-none sm:text-5xl sm:py-3"
+                          className="focus-app-field w-full rounded-md border border-surface-border bg-surface-raised px-3 py-2 pl-8 font-mono text-sm text-content-primary placeholder:text-content-muted tnum transition-colors hover:border-content-primary/15 focus:border-content-primary/25 sm:text-base"
                         />
                       </div>
                       <div className="rounded-lg border border-surface-border bg-surface-base/80 p-4">
@@ -524,7 +525,7 @@ export default function Onboarding() {
                       className="flex items-center gap-2"
                     >
                       <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                      Saving…
+                      Getting things ready...
                     </motion.span>
                   ) : (
                     <motion.span
