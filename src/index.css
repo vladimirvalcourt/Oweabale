@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
+/* Global smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
 @theme {
   /* Default theme: Linear-inspired dark system */
   --color-surface-base: #08090a;

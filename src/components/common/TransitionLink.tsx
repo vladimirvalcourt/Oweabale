@@ -19,6 +19,15 @@ export const TransitionLink = forwardRef<HTMLAnchorElement, TransitionLinkProps>
       if (props.reloadDocument) return;
       if (props.target === '_blank') return;
       if (props.download !== undefined) return;
+      
+      // Allow default browser behavior for anchor/hash links (e.g., #flow, #why)
+      const to = String(props.to);
+      if (to.startsWith('#')) {
+        // For anchor links on the same page, let the browser handle scrolling
+        // The CSS scroll-behavior: smooth will provide smooth scrolling
+        return;
+      }
+      
       e.preventDefault();
       startTransition(() => {
         navigate(props.to, {
