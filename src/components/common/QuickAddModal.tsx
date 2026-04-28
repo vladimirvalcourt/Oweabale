@@ -24,6 +24,8 @@ interface QuickAddModalProps {
 /** Quick Add → Bill/Debt: bill cadence or debt instrument (card vs loan). */
 type ObligationKind = 'bill-weekly' | 'bill-biweekly' | 'bill-monthly' | 'debt-card' | 'debt-loan';
 
+const parseCurrencyInput = (value: string) => parseFloat(value.replace(/,/g, ''));
+
 /** Reusable select field with label and ARIA support */
 interface FormSelectProps {
   id: string;
@@ -890,7 +892,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    const parsedAmount = parseFloat(amount);
+    const parsedAmount = parseCurrencyInput(amount);
     if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) newErrors.amount = "Please enter a valid amount greater than zero.";
     
     if (activeTab === 'transaction') {
@@ -999,7 +1001,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       }
     }
 
-    const numAmount = parseFloat(amount);
+    const numAmount = parseCurrencyInput(amount);
 
     setIsSubmitting(true);
     await yieldForPaint();
@@ -1044,7 +1046,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
             type: obligationKind === 'debt-card' ? 'Credit Card' : 'Loan',
             apr: parseFloat(apr) || 0,
             remaining: numAmount,
-            minPayment: parseFloat(minPayment) || 0,
+            minPayment: parseCurrencyInput(minPayment) || 0,
             paid: 0,
             paymentDueDate: debtNoPaymentDue ? null : dueDate || null,
           });
@@ -1069,7 +1071,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
           jurisdiction: jurisdiction.trim(),
           daysLeft: parseInt(daysLeft) || 30,
           amount: numAmount,
-          penaltyFee: parseFloat(penaltyFee) || 0,
+          penaltyFee: parseCurrencyInput(penaltyFee) || 0,
           date: date,
           citationNumber: citationNumber.trim(),
           paymentUrl: (() => {

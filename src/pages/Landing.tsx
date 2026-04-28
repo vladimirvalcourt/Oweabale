@@ -8,6 +8,14 @@ import gsap from 'gsap';
 
 const proofPoints = ['Bills', 'Debt', 'Subscriptions', 'Tolls', 'Tickets', 'Taxes'];
 
+const peopleAvatars = {
+  mara: '/people/mara.svg',
+  jon: '/people/jon.svg',
+  sarah: '/people/sarah.svg',
+  james: '/people/james.svg',
+  emily: '/people/emily.svg',
+};
+
 const featureRows = [
   {
     icon: Clock3,
@@ -41,13 +49,13 @@ const payListRows = [
 const activityRows = [
   {
     name: 'Mara',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face&q=80',
+    image: peopleAvatars.mara,
     text: 'Marked rent reserve as protected',
     time: '2 min ago',
   },
   {
     name: 'Jon',
-    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face&q=80',
+    image: peopleAvatars.jon,
     text: 'Added toll notice to the Pay List',
     time: 'just now',
   },
@@ -58,19 +66,19 @@ const testimonials = [
     quote: "Finally, a financial tool that doesn't make me feel overwhelmed. The Pay List is exactly what I needed.",
     author: 'Sarah M.',
     role: 'Freelance Designer',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face&q=80',
+    avatar: peopleAvatars.sarah,
   },
   {
     quote: "I've tried every budgeting app. Oweable is the only one that stuck because it focuses on what actually matters - paying bills on time.",
     author: 'James K.',
     role: 'Software Engineer',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face&q=80',
+    avatar: peopleAvatars.james,
   },
   {
     quote: "The clarity this gives me is incredible. No more late fees, no more anxiety about what's due when.",
     author: 'Emily R.',
     role: 'Small Business Owner',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop&crop=face&q=80',
+    avatar: peopleAvatars.emily,
   },
 ];
 
@@ -280,16 +288,17 @@ export default function Landing() {
               <div className="mt-8 flex items-center gap-4">
                 <div className="flex -space-x-2">
                   {[
-                    'photo-1494790108377-be9c29b29330',
-                    'photo-1507003211169-0a1dd7228f2d',
-                    'photo-1438761681033-6461ffad8d80',
-                    'photo-1472099645785-5658abf4ff4e'
-                  ].map((photoId, index) => (
+                    peopleAvatars.mara,
+                    peopleAvatars.jon,
+                    peopleAvatars.sarah,
+                    peopleAvatars.james,
+                  ].map((avatar, index) => (
                     <img
                       key={index}
-                      src={`https://images.unsplash.com/${photoId}?w=40&h=40&fit=crop&crop=face&q=80`}
+                      src={avatar}
                       alt=""
                       className="h-8 w-8 rounded-full border-2 border-surface-base object-cover"
+                      loading="lazy"
                     />
                   ))}
                 </div>
