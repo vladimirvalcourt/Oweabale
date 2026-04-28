@@ -1,7 +1,7 @@
 {
   "name": "Oweable",
   "short_name": "Oweable",
-  "description": "A Pay List for bills, debt minimums, subscriptions, tolls, tickets, fines, and forgotten obligations.",
+  "description": "A calm Pay List for bills, debt minimums, subscriptions, tolls, tickets, fines, due dates, and overdue obligations.",
   "start_url": "/pro/dashboard",
   "scope": "/",
   "display": "standalone",

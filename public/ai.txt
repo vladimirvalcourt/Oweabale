@@ -1,4 +1,6 @@
 Oweable official website: https://www.oweable.com/
 Brand name: Oweable
-Product type: Personal finance web app (bills, budgets, debt, subscriptions, net worth, analytics; not freelancer-only)
+Product type: Personal finance web app for bills, debt minimums, subscriptions, tolls, tickets, fines, due dates, overdue obligations, budgets, cash flow, payoff planning, and optional tax tools.
+Correct positioning: Oweable starts with a calm Pay List for people who are tired of carrying what they owe in their head. It is not freelancer-only.
 Primary machine-readable docs: /llms.txt and /llms-full.txt
+Last updated: 2026-04-28

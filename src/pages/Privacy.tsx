@@ -8,7 +8,7 @@ const privacySections = [
   {
     title: 'What data Oweable collects',
     copy:
-      'Oweable collects the information needed to operate the product, such as account details, financial entries you add, and optional connected-data inputs when you choose to use them.',
+      'Oweable collects the information needed to operate the product, such as account details, bills, debt entries, financial notes you add, and optional connected-data inputs when you choose to use them.',
   },
   {
     title: 'What Oweable does not do',
@@ -40,7 +40,7 @@ const privacySections = [
 export default function Privacy() {
   useSEO({
     title: 'Privacy Policy — Oweable',
-    description: 'How Oweable handles data collection, encryption, retention, third-party services, and user privacy rights in plain English.',
+    description: 'How Oweable handles bill, debt, and financial planning data collection, encryption, retention, third-party services, and privacy rights.',
     canonical: 'https://www.oweable.com/privacy',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -59,10 +59,10 @@ export default function Privacy() {
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Privacy</p>
               <h1 className="mt-5 max-w-3xl text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
-                Privacy that is clear about what happens to your data.
+                Privacy for the money details you should not have to wonder about.
               </h1>
               <p className="mt-7 max-w-xl text-base leading-7 text-content-tertiary">
-                This page is the plain-English summary of how Oweable approaches data handling. It is meant to help you understand what you are trusting us with and how that trust is handled.
+                This page is the plain-English summary of how Oweable approaches data handling, so you can understand what you are trusting us with and how that trust is handled.
               </p>
               <p className="mt-4 text-sm text-content-muted">Last updated April 2026</p>
             </div>

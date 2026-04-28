@@ -8,12 +8,12 @@ const FAQ_DATA = [
   {
     question: 'What is Oweable, exactly?',
     answer:
-      'Oweable is a personal finance tool for people who feel like bills, debt, recurring obligations, and uneven income have become too hard to hold together mentally. It helps you see what is due, what is behind, and what needs attention next.',
+      'Oweable is a personal finance tool for people who are tired of carrying bills, debt, due dates, and late-fee anxiety in their head. It helps you see what is due, what is behind, and what needs attention next.',
   },
   {
     question: 'Is Oweable only for freelancers or gig workers?',
     answer:
-      'No. It works for salaried workers, households, freelancers, side gigs, and mixed-income setups. The common thread is not your job type. It is needing a calmer way to stay on top of money.',
+      'No. It works for salaried workers, households, freelancers, side gigs, and mixed-income setups. The common thread is not your job type. It is needing a calmer way to manage what you owe.',
   },
   {
     question: 'What makes Oweable different from a normal budgeting app?',
@@ -38,7 +38,7 @@ const FAQ_DATA = [
   {
     question: 'Can I start before paying?',
     answer:
-      'Yes. You can create an account and start with the Pay List path for bills, due dates, and recurring obligations. Full Suite adds broader planning and payoff tools when you want more help.',
+      'Yes. You can create an account and start with the Pay List path for bills, due dates, and recurring obligations. Full Suite adds broader planning and payoff tools when you want more structure.',
   },
   {
     question: 'How secure is my data?',
@@ -65,7 +65,7 @@ function FaqCard({ question, answer }: { question: string; answer: string }) {
       </button>
       <div
         id={panelId}
-        className={`overflow-hidden transition-all duration-300 ease-out ${open ? 'mt-4 max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
+        className={`overflow-hidden transition-all duration-300 ease-out ${open ? 'mt-4 max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}
       >
         <p className="text-base leading-relaxed text-content-tertiary">{answer}</p>
       </div>
@@ -77,7 +77,7 @@ export default function FAQ() {
   useSEO({
     title: 'Frequently Asked Questions — Oweable',
     description:
-      'Answers to common questions about Oweable, including bills, debt payoff, subscriptions, free plans, security, and uneven-income workflows.',
+      'Plain-English answers about how Oweable helps with bills, debt payoff, subscriptions, free plans, security, and uneven-income workflows.',
     canonical: 'https://www.oweable.com/faq',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -115,7 +115,7 @@ export default function FAQ() {
                 The questions people ask when money already feels heavy.
               </h1>
               <p className="mt-7 max-w-3xl text-lg leading-8 text-content-tertiary">
-                Short answers, plain English, and no fake mystery. If you still need help after this, support is one click away.
+                Short answers, plain English, and no fake mystery. If money already feels heavy, this page should make the next step easier.
               </p>
             </div>
 

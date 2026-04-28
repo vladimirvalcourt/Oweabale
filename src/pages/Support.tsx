@@ -99,7 +99,7 @@ export default function Support() {
 
   useSEO({
     title: 'Support — Oweable',
-    description: 'Contact Oweable support for billing, access, privacy, security, or technical questions and get help from a real person.',
+    description: 'Contact Oweable support for billing, access, privacy, security, or product questions when bills, debt, or account issues need a real answer.',
     canonical: 'https://www.oweable.com/support',
     ogTitle: 'Support — Oweable',
     ogDescription: 'Get help with account access, billing, subscriptions, and product questions from a real person.',
@@ -233,15 +233,15 @@ export default function Support() {
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Support</p>
               <h1 className="mt-5 max-w-3xl text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
-                Help for when something is wrong and you do not want to chase it alone.
+                Help for when money admin already feels heavy.
               </h1>
               <p className="mt-7 max-w-xl text-base leading-7 text-content-tertiary">
-                Reach out for billing, access, account, product, or technical issues. We usually reply within one business day, and the goal is to be useful, not robotic.
+                Reach out for billing, access, account, product, or technical issues. Tell us what you were trying to do and where it got stuck. We usually reply within one business day.
               </p>
               <div className="mt-10 grid gap-3">
                 <div className="rounded-[10px] border border-surface-border-subtle bg-white/[0.022] p-5">
                   <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Best for</p>
-                  <p className="mt-3 text-sm leading-6 text-content-tertiary">Account access problems, billing questions, bugs, and anything that is making the product harder to use than it should be.</p>
+                  <p className="mt-3 text-sm leading-6 text-content-tertiary">Account access problems, billing questions, bugs, and anything that is getting in the way while you are trying to manage bills or debt.</p>
                 </div>
                 <div className="rounded-[10px] border border-surface-border-subtle bg-white/[0.022] p-5">
                   <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Contact Support</p>
@@ -264,7 +264,7 @@ export default function Support() {
               <section className="rounded-[10px] border border-surface-border bg-white/[0.018] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
                 <h2 className="text-2xl font-medium tracking-[-0.03em] leading-tight text-content-primary">Send a message</h2>
                 <p className="mt-4 text-sm leading-6 text-content-tertiary">
-                  Give us the basics and a little context. You do not need to write a perfect report. Just tell us what happened and what you needed to get done.
+                  Give us the basics and a little context. You do not need a perfect report. Just tell us what happened, what you were trying to get done, and what felt blocked.
                 </p>
 
                 {submitted ? (

@@ -21,8 +21,8 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
   useSEO({
     title: isSignupMode ? 'Create your free account — Oweable' : 'Sign in — Oweable',
     description: isSignupMode
-      ? 'Create your free Oweable account to start your financial OS with no credit card required.'
-      : 'Sign in to Oweable with Google. Secure access to your financial OS for freelancers, gig workers, and the self-employed.',
+      ? 'Create your free Oweable account to start organizing bills, debt, due dates, and what needs attention next.'
+      : 'Sign in to Oweable with Google for secure access to your Pay List, debt plan, subscriptions, and cash-flow tools.',
     canonical: isSignupMode ? 'https://www.oweable.com/onboarding' : 'https://www.oweable.com/auth',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });

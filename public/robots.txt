@@ -5,6 +5,7 @@
 User-agent: *
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -38,6 +39,7 @@ Disallow: /capture
 User-agent: GPTBot
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -50,6 +52,7 @@ Allow: /ai.txt
 User-agent: PerplexityBot
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -62,6 +65,7 @@ Allow: /ai.txt
 User-agent: ClaudeBot
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -72,6 +76,7 @@ Allow: /ai.txt
 User-agent: anthropic-ai
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -83,6 +88,7 @@ Allow: /ai.txt
 User-agent: Google-Extended
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -94,6 +100,7 @@ Allow: /ai.txt
 User-agent: Meta-ExternalAgent
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -105,6 +112,7 @@ Allow: /ai.txt
 User-agent: cohere-ai
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -116,6 +124,7 @@ Allow: /ai.txt
 User-agent: YouBot
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -127,6 +136,7 @@ Allow: /ai.txt
 User-agent: CCBot
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -135,6 +145,7 @@ Allow: /terms
 User-agent: OAI-SearchBot
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -147,6 +158,7 @@ Allow: /ai.txt
 User-agent: ChatGPT-User
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -160,6 +172,7 @@ Allow: /.well-known/
 User-agent: Bingbot
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -170,6 +183,7 @@ Allow: /ai.txt
 User-agent: msnbot
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -180,6 +194,7 @@ Allow: /ai.txt
 User-agent: Applebot
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -191,6 +206,7 @@ Allow: /ai.txt
 User-agent: Applebot-Extended
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -204,6 +220,7 @@ Allow: /.well-known/
 User-agent: DuckDuckBot
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms
@@ -214,6 +231,7 @@ Allow: /ai.txt
 User-agent: Slurp
 Allow: /
 Allow: /pricing
+Allow: /faq
 Allow: /security
 Allow: /privacy
 Allow: /terms

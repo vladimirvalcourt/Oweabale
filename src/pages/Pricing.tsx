@@ -28,7 +28,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
       </button>
       <div
         className={`overflow-hidden transition-all duration-300 ease-out ${
-          isOpen ? 'mt-4 max-h-48 opacity-100' : 'max-h-0 opacity-0'
+          isOpen ? 'mt-4 max-h-72 opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
         <p className="max-w-3xl text-base leading-7 text-content-secondary">{answer}</p>
@@ -41,7 +41,7 @@ const PRICING_FAQ_STATIC = [
   {
     question: 'Do I need a credit card to try Oweable?',
     answer:
-      'No. You can create an account and get started without adding a card first. That way you can see whether Oweable actually helps before making another money decision.',
+      'No. You can create an account and get oriented before adding a card. The point is to feel whether the Pay List lowers the pressure before you make another money decision.',
   },
   {
     question: 'What happens when the trial ends?',
@@ -56,7 +56,7 @@ const PRICING_FAQ_STATIC = [
   {
     question: 'Is this only for freelancers?',
     answer:
-      'No. Oweable works for households, salaried workers, side gigs, freelancers, and mixed-income setups. The point is to help people whose money life feels hard to stay on top of.',
+      'No. Oweable works for households, salaried workers, side gigs, freelancers, and mixed-income setups. The common problem is bills, debt, and due dates becoming too much to hold in your head.',
   },
   {
     question: 'Do I need to connect my bank account?',
@@ -98,7 +98,7 @@ function buildPricingJsonLd(params: {
       url: pageUrl,
       name: 'Pricing — Oweable',
       description:
-        'Full Suite pricing for debt payoff, cash flow, budgets, bills, subscriptions, and uneven income.',
+        'Pricing for Oweable: bill tracking, debt payoff planning, subscriptions, cash-flow clarity, budgets, and help when money feels hard to hold together.',
     },
     {
       '@type': 'FAQPage',
@@ -126,7 +126,7 @@ function buildPricingJsonLd(params: {
         unitText: 'MONTH',
       },
       description:
-        'Paid plan with deeper support for debt payoff, budgets, analytics, transaction views, cash-flow planning, and tax estimates when needed.',
+        'Paid plan for people who need deeper support with bills, debt payoff, budgets, analytics, transaction views, cash-flow planning, and tax estimates when needed.',
       url: pageUrl,
     },
   ];
@@ -182,7 +182,7 @@ export default function Pricing() {
   useSEO({
     title: 'Pricing — Oweable',
     description:
-      'Full Suite pricing for staying on top of bills, debt payoff, cash flow, budgets, and uneven income.',
+      'Oweable pricing for staying on top of bills, debt payoff, subscriptions, cash flow, budgets, and uneven income without adding more noise.',
     canonical: 'https://www.oweable.com/pricing',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -231,12 +231,12 @@ export default function Pricing() {
       <main>
         <section className="mx-auto max-w-6xl px-6 pb-20 pt-36 lg:px-8">
           <div>
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Pricing that stays honest</p>
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Pricing without another surprise</p>
             <h1 className="mt-5 max-w-5xl text-5xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-6xl md:text-7xl">
-              Pay only for the level of help you need.
+              Start where the pressure is. Pay when you need the deeper plan.
             </h1>
             <p className="mt-7 max-w-3xl text-lg leading-8 text-content-tertiary">
-              Oweable starts as one focused app for staying ahead of bills, debt, subscriptions, tolls, tickets, and the things people forget. Full Suite adds the deeper planning layer when you want more structure.
+              Oweable starts with a focused Pay List for bills, debt, subscriptions, tolls, tickets, and the obligations that keep slipping into the back of your mind. Full Suite adds payoff planning, budgets, analytics, and cash-flow structure when you are ready.
             </p>
             <div className="mt-8 flex flex-wrap gap-3 text-sm text-content-secondary">
               <span className="rounded-full border border-surface-border-subtle bg-white/[0.025] px-4 py-2">14-day Full Suite trial</span>
@@ -262,7 +262,7 @@ export default function Pricing() {
                       type="button"
                       onClick={() => setBillingPeriod('monthly')}
                       aria-pressed={billingPeriod === 'monthly'}
-                      className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
+                    className={`rounded-[6px] px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
                         billingPeriod === 'monthly'
                           ? 'bg-brand-indigo text-white'
                           : 'text-content-tertiary hover:text-content-primary'
@@ -274,7 +274,7 @@ export default function Pricing() {
                       type="button"
                       onClick={() => setBillingPeriod('yearly')}
                       aria-pressed={billingPeriod === 'yearly'}
-                      className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
+                    className={`rounded-[6px] px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
                         billingPeriod === 'yearly'
                           ? 'bg-brand-indigo text-white'
                           : 'text-content-tertiary hover:text-content-primary'
@@ -305,7 +305,7 @@ export default function Pricing() {
                 </div>
 
                 <p className="mt-5 max-w-md text-base leading-7 text-content-tertiary">
-                  For people who want help turning visibility into action: payoff strategy, budgets, analytics,
+                  For people who need more than a reminder: payoff strategy, budgets, analytics,
                   cash-flow clarity, and tax planning when income gets uneven.
                 </p>
                 <ul className="mt-7 space-y-3 text-sm text-content-secondary">
@@ -346,8 +346,8 @@ export default function Pricing() {
             <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr]">
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">What you get</p>
-                <h2 className="mt-4 max-w-lg text-4xl font-medium tracking-[-0.044em] text-content-primary">
-                  One app path, clear household money help, deeper tools when you need them.
+                <h2 className="mt-4 max-w-lg text-4xl font-medium leading-tight tracking-[-0.044em] text-content-primary">
+                  One calmer path for bills, debt, and the planning work behind them.
                 </h2>
               </div>
               <div className="overflow-x-auto rounded-[22px] border border-surface-border bg-white/[0.03]">
@@ -371,7 +371,7 @@ export default function Pricing() {
             <div className="max-w-2xl">
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">FAQ</p>
               <h2 className="mt-4 text-4xl font-medium tracking-[-0.044em] text-content-primary">
-                The answers people usually want before trusting something with their money.
+                The answers people usually need before trusting a tool with bills and debt.
               </h2>
             </div>
             <div className="mt-10 space-y-4">
@@ -386,10 +386,10 @@ export default function Pricing() {
           <div className="mx-auto max-w-5xl px-6 text-center lg:px-8">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">Ready when you are</p>
             <h2 className="mt-5 text-4xl font-medium tracking-[-0.044em] sm:text-6xl">
-              Start with relief. Keep the app simple.
+              Start with relief. Keep the system simple.
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-content-tertiary">
-              The first path is the Pay List. The advanced tools are there when they help, not when they distract.
+              The first path is the Pay List. The advanced tools are there when they reduce pressure, not when they distract.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <TransitionLink

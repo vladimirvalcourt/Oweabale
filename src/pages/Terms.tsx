@@ -65,7 +65,7 @@ export default function Terms() {
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Terms</p>
               <h1 className="mt-5 max-w-3xl text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
-                Terms that try to be clear about the rules, not hide them.
+                Clear rules for a tool people use around real financial stress.
               </h1>
               <p className="mt-7 max-w-xl text-base leading-7 text-content-tertiary">
                 This is the plain-language overview of the rules that govern use of Oweable. It covers expectations, billing, fair use, and legal boundaries without trying to bury the point.

@@ -3,4 +3,5 @@ canonical: https://www.oweable.com/llms.txt
 full: https://www.oweable.com/llms-full.txt
 site: https://www.oweable.com/
 brand: Oweable
-updated: 2026-04-19
+summary: Oweable helps people manage bills, debt minimums, subscriptions, due dates, overdue obligations, budgets, cash flow, payoff planning, and optional tax tools. It is not freelancer-only.
+updated: 2026-04-28

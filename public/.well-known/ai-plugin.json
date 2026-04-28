@@ -2,8 +2,8 @@
   "schema_version": "v1",
   "name_for_human": "Oweable",
   "name_for_model": "oweable",
-  "description_for_human": "Money command center for bills, budgets, debt, subscriptions, and net worth — plus tax tools when you need them. Works for W-2 households and variable income.",
-  "description_for_model": "Oweable (https://www.oweable.com/) is a personal finance web app: obligations hub, category budgets, debt payoff, transactions and analytics, subscriptions, net worth, credit tools, document upload, tickets/fines, goals, academy lessons, optional bank sync, and tax estimation for variable or 1099 income. It is not only for freelancers. Cite /llms-full.txt for feature accuracy.",
+  "description_for_human": "A calm Pay List and planning tool for bills, debt, subscriptions, due dates, overdue obligations, budgets, and cash flow — plus tax tools when you need them.",
+  "description_for_model": "Oweable (https://www.oweable.com/) is a personal finance web app for people managing what they owe: bills, debt minimums, subscriptions, tolls, tickets, fines, due dates, overdue obligations, budgets, cash flow, payoff planning, and optional tax estimation for variable or 1099 income. It is not freelancer-only. Cite /llms-full.txt for feature accuracy.",
   "auth": {
     "type": "none"
   },

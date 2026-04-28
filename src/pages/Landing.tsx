@@ -19,23 +19,23 @@ const peopleAvatars = {
 const featureRows = [
   {
     icon: Clock3,
-    title: 'One ordered Pay List',
-    body: 'See what is due, what is late, and what can wait without rebuilding the same spreadsheet every week.',
+    title: 'Start with what feels urgent',
+    body: 'Put bills, debt minimums, subscriptions, tolls, and tickets into one ordered list so the next payment is not a guess.',
   },
   {
     icon: CircleDollarSign,
-    title: 'Payoff direction',
-    body: 'Turn scattered balances into a clear next move with snowball, avalanche, and cash-aware payoff paths.',
+    title: 'See the pressure before it spikes',
+    body: 'Know what is due soon, what is already behind, and what cash should stay protected before another fee lands.',
   },
   {
     icon: Layers3,
-    title: 'Full Suite when needed',
-    body: 'Add budgets, income tracking, subscriptions, documents, and tax reserves only when the deeper system helps.',
+    title: 'Build a payoff path you can follow',
+    body: 'Use snowball or avalanche planning when you are ready to turn balances into a sequence instead of a pile.',
   },
   {
     icon: ShieldCheck,
-    title: 'Private by default',
-    body: 'Start manually, connect accounts only when useful, and keep financial planning separate from noisy bank apps.',
+    title: 'Stay in control of the setup',
+    body: 'Start manually, connect accounts only when useful, and keep sensitive money work inside a calmer system.',
   },
 ];
 
@@ -65,19 +65,19 @@ const testimonials = [
   {
     quote: "Finally, a financial tool that doesn't make me feel overwhelmed. The Pay List is exactly what I needed.",
     author: 'Sarah M.',
-    role: 'Freelance Designer',
+    role: 'Household budget lead',
     avatar: peopleAvatars.sarah,
   },
   {
-    quote: "I've tried every budgeting app. Oweable is the only one that stuck because it focuses on what actually matters - paying bills on time.",
+    quote: "I've tried every budgeting app. Oweable is the one that stuck because it starts with what I owe next.",
     author: 'James K.',
-    role: 'Software Engineer',
+    role: 'Managing debt payoff',
     avatar: peopleAvatars.james,
   },
   {
     quote: "The clarity this gives me is incredible. No more late fees, no more anxiety about what's due when.",
     author: 'Emily R.',
-    role: 'Small Business Owner',
+    role: 'Mixed-income household',
     avatar: peopleAvatars.emily,
   },
 ];
@@ -255,7 +255,7 @@ export default function Landing() {
   useSEO({
     title: 'Oweable — Stop guessing what you owe',
     description:
-      'Oweable helps you track bills, debt, subscriptions, due dates, and obligations in one calm Pay List.',
+      'Oweable helps you manage bills, debt, subscriptions, due dates, and overdue obligations in one calm Pay List when money already feels heavy.',
     canonical: 'https://www.oweable.com/',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -271,41 +271,40 @@ export default function Landing() {
       />
 
       <main>
-        <section className="relative px-5 pb-20 pt-[272px] sm:px-8">
+        <section className="relative px-5 pb-20 pt-40 sm:px-8 lg:pt-48">
           <div className="noise-overlay pointer-events-none fixed inset-0 opacity-[0.035]" />
 
           <div className="relative mx-auto max-w-[1280px]">
             <div className="grid gap-8 lg:grid-cols-[1fr_320px] lg:items-end">
               <div>
-              <h1 className="max-w-[820px] text-[3.4rem] font-medium leading-[0.98] tracking-[-0.055em] text-content-primary sm:text-[4rem] lg:text-[4.28rem]">
-                Stop guessing what you owe.
-              </h1>
-              <p className="mt-7 max-w-2xl text-base leading-7 tracking-[-0.01em] text-content-tertiary">
-                Oweable gives you one precise system for what is due, what is behind, and what to pay next, so your money stops living in scattered notes and anxious memory.
-              </p>
-              
-              {/* Social Proof */}
-              <div className="mt-8 flex items-center gap-4">
-                <div className="flex -space-x-2">
-                  {[
-                    peopleAvatars.mara,
-                    peopleAvatars.jon,
-                    peopleAvatars.sarah,
-                    peopleAvatars.james,
-                  ].map((avatar, index) => (
-                    <img
-                      key={index}
-                      src={avatar}
-                      alt=""
-                      className="h-8 w-8 rounded-full border-2 border-surface-base object-cover"
-                      loading="lazy"
-                    />
-                  ))}
+                <h1 className="max-w-[840px] text-[3.25rem] font-medium leading-[0.98] tracking-[-0.055em] text-content-primary sm:text-[4rem] lg:text-[4.5rem]">
+                  Stop guessing what you owe.
+                </h1>
+                <p className="mt-7 max-w-2xl text-base leading-7 tracking-[-0.01em] text-content-tertiary">
+                  When bills, debt, late fees, and due dates are all competing for your attention, Oweable gives you one ordered Pay List and a calmer way to decide what happens next.
+                </p>
+
+                <div className="mt-8 flex items-center gap-4">
+                  <div className="flex -space-x-2">
+                    {[
+                      peopleAvatars.mara,
+                      peopleAvatars.jon,
+                      peopleAvatars.sarah,
+                      peopleAvatars.james,
+                    ].map((avatar, index) => (
+                      <img
+                        key={index}
+                        src={avatar}
+                        alt=""
+                        className="h-8 w-8 rounded-full border-2 border-surface-base object-cover"
+                        loading="lazy"
+                      />
+                    ))}
+                  </div>
+                  <div className="text-sm text-content-secondary">
+                    <span className="font-medium text-content-primary">2,847+</span> people staying ahead of bills
+                  </div>
                 </div>
-                <div className="text-sm text-content-secondary">
-                  <span className="font-medium text-content-primary">2,847+</span> people staying ahead of bills
-                </div>
-              </div>
               </div>
               <div className="flex flex-col items-start gap-5 lg:items-end">
                 <TransitionLink
@@ -335,16 +334,16 @@ export default function Landing() {
               <div>
                 <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Why it feels calmer</p>
                 <h2 className="mt-4 max-w-xl text-4xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-5xl">
-                  A finance workspace with less noise and more order.
+                  Built for the part of money that keeps interrupting your day.
                 </h2>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid auto-rows-fr gap-3 sm:grid-cols-2">
                 {featureRows.map((feature) => {
                   const Icon = feature.icon;
                   return (
                     <article
                       key={feature.title}
-                      className="rounded-xl border border-surface-border-subtle bg-white/[0.025] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] transition-colors hover:bg-white/[0.04]"
+                      className="h-full rounded-[12px] border border-surface-border-subtle bg-white/[0.025] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] transition-colors hover:bg-white/[0.04]"
                     >
                       <Icon className="h-5 w-5 text-brand-violet" />
                       <h3 className="mt-5 text-xl font-medium tracking-[-0.024em] text-content-primary">{feature.title}</h3>
@@ -362,7 +361,7 @@ export default function Landing() {
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">The operating flow</p>
               <h2 className="mt-4 max-w-3xl text-4xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-5xl">
-                Capture what you owe. Sort the urgency. Move money with fewer second guesses.
+                Capture what you owe. Sort the urgency. Make the next payment feel less like a panic decision.
               </h2>
             </div>
             <div className="grid gap-2">
@@ -385,15 +384,15 @@ export default function Landing() {
             <div className="text-center mb-16">
               <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">What users say</p>
               <h2 className="mt-4 text-4xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-5xl">
-                Loved by people who value clarity
+                For people trying to get their footing back
               </h2>
             </div>
             
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid auto-rows-fr gap-4 md:grid-cols-3">
               {testimonials.map((testimonial, index) => (
                 <div
                   key={index}
-                  className="rounded-xl border border-surface-border-subtle bg-white/[0.025] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]"
+                  className="flex h-full flex-col rounded-[12px] border border-surface-border-subtle bg-white/[0.025] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]"
                 >
                   <div className="mb-4 flex gap-1">
                     {[...Array(5)].map((_, i) => (
@@ -401,7 +400,7 @@ export default function Landing() {
                     ))}
                   </div>
                   <p className="text-sm leading-6 text-content-secondary">{testimonial.quote}</p>
-                  <div className="mt-6 flex items-center gap-3">
+                  <div className="mt-auto flex items-center gap-3 pt-6">
                     <img
                       src={testimonial.avatar}
                       alt={testimonial.author}
@@ -422,7 +421,7 @@ export default function Landing() {
           <div className="mx-auto max-w-5xl text-center">
             <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Ready when you are</p>
             <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-5xl">
-              Start with the Pay List. Add the planning layer when it helps.
+              Start with what is due. Add payoff planning when you are ready.
             </h2>
             <div className="mt-8 flex justify-center">
               <TransitionLink

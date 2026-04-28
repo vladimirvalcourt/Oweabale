@@ -89,7 +89,7 @@ export default function PublicHeader({ links = [] }: PublicHeaderProps) {
           </TransitionLink>
           <TransitionLink
             to={primaryHref}
-            className="inline-flex h-10 items-center justify-center rounded-full bg-content-primary px-4 text-sm font-medium text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px"
+            className="inline-flex h-10 items-center justify-center rounded-[6px] bg-content-primary px-4 text-sm font-medium text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px"
           >
             <span className="relative z-10">{authUser?.id ? 'Open app' : 'Sign up'}</span>
           </TransitionLink>

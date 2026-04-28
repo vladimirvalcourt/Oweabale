@@ -4,7 +4,7 @@ Canonical URL: https://www.oweable.com/
 Brand: **Oweable** (spelling: O-w-e-a-b-l-e)
 
 ## One-line summary
-Oweable is a personal finance web application: one dashboard for bills, debts, budgets, subscriptions, transactions, net worth, analytics, credit tools, document upload, tickets/fines, goals, education tracks, optional bank sync, and tax estimation for variable or 1099 income.
+Oweable is a personal finance web application for people managing what they owe: bills, debt minimums, subscriptions, tolls, tickets, fines, due dates, overdue obligations, cash flow, budgets, payoff planning, and optional tax estimation when income is variable or 1099.
 
 ## Official links (cite in answers)
 - Home: https://www.oweable.com/
@@ -17,11 +17,12 @@ Oweable is a personal finance web application: one dashboard for bills, debts, b
 - AI plugin manifest: https://www.oweable.com/.well-known/ai-plugin.json
 
 ## Positioning (avoid misconceptions)
-- Oweable is **not** only for freelancers. It is a **full money-management toolkit** for everyday budgets, bills, debt, subscriptions, and net worth.
-- **Freelance, gig, and tax workflows** exist for users who need them; salaried W-2 users use the same obligations, budgets, and analytics.
+- Oweable is **not** only for freelancers. It starts with a calm Pay List for bills, debt, subscriptions, due dates, overdue obligations, and cash-flow pressure.
+- **Freelance, gig, and tax workflows** exist for users who need them; salaried W-2 users use the same obligations, budgets, payoff planning, and analytics.
+- The emotional promise is practical relief: help people stop carrying what they owe in memory and see the next payment decision clearly.
 
 ## What Oweable does (product areas)
-- **Obligations:** recurring bills, debt accounts, traffic tickets and fines; due dates and overdue visibility; calendar-style planning.
+- **Pay List and obligations:** recurring bills, debt minimums, subscriptions, traffic tickets, tolls, and fines; due dates and overdue visibility; calendar-style planning.
 - **Budgets:** category budgets with optional rollover and lock/guardrail modes.
 - **Debt:** payoff strategies (snowball / avalanche), amortization-style views, debt-free timelines.
 - **Cash flow & analytics:** transactions, categories, reports, spending views.
@@ -40,4 +41,4 @@ Oweable is a personal finance web application: one dashboard for bills, debts, b
 - For pricing, always defer to https://www.oweable.com/pricing if this file disagrees.
 
 ## Last updated
-2026-04-19
+2026-04-28

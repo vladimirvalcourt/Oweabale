@@ -46,7 +46,7 @@ export default function Security() {
   useSEO({
     title: 'Security — Oweable',
     description:
-      'How Oweable protects financial data with encryption, controlled access, infrastructure safeguards, and vulnerability reporting in plain English.',
+      'How Oweable protects sensitive bill, debt, and financial planning data with encryption, controlled access, infrastructure safeguards, and vulnerability reporting.',
     canonical: 'https://www.oweable.com/security',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -67,10 +67,10 @@ export default function Security() {
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Security</p>
               <h1 className="mt-5 max-w-3xl text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
-                Security, explained like it actually matters to your life.
+                Security for the financial details you are trusting us to hold.
               </h1>
               <p className="mt-7 max-w-xl text-base leading-7 text-content-tertiary">
-                Oweable handles sensitive financial workflows, so security has to be built into the product, the infrastructure, and the support process, not saved for a marketing page.
+                Bills, debt, income, and account details are personal. Oweable is built so security sits inside the product, the infrastructure, and the support process, not just on this page.
               </p>
             </div>
 
