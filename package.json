@@ -108,7 +108,7 @@
     "vite-plugin-checker": "^0.12.0",
     "vite-plugin-pwa": "^1.2.0",
     "vite-plugin-remove-console": "^2.2.0",
-    "vitest": "^3.2.4",
+    "vitest": "^4.1.5",
     "workbox-window": "^7.4.0"
   }
 }
