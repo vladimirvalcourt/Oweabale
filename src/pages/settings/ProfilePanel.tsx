@@ -472,7 +472,7 @@ function ProfilePanelInner() {
                   type="button"
                   onClick={handleDiscard}
                   disabled={saveVisual === 'saving'}
-                  className="rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-white/[0.04] disabled:opacity-50"
+                  className="rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-elevated disabled:opacity-50"
                 >
                   Discard
                 </button>
@@ -514,7 +514,7 @@ function ProfilePanelInner() {
               <button
                 type="button"
                 onClick={() => setOtpOpen(false)}
-                className="rounded-md border border-surface-border px-4 py-2 text-sm text-content-secondary transition-colors hover:bg-white/[0.04]"
+                className="rounded-md border border-surface-border px-4 py-2 text-sm text-content-secondary transition-colors hover:bg-surface-elevated"
               >
                 Cancel
               </button>
@@ -566,7 +566,7 @@ function ProfilePanelInner() {
               <button
                 type="button"
                 onClick={closeCrop}
-                className="rounded-md border border-surface-border px-4 py-2 text-sm text-content-secondary transition-colors hover:bg-white/[0.04]"
+                className="rounded-md border border-surface-border px-4 py-2 text-sm text-content-secondary transition-colors hover:bg-surface-elevated"
               >
                 Cancel
               </button>

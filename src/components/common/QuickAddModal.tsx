@@ -1156,7 +1156,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="w-full sm:max-w-md"
             >
-              <Dialog.Panel className="flex max-h-[90vh] min-h-0 flex-col overflow-hidden rounded-lg border border-surface-border bg-surface-elevated shadow-[0_20px_50px_rgba(0,0,0,0.55)]">
+              <Dialog.Panel className="flex max-h-[90vh] min-h-0 flex-col overflow-hidden rounded-lg border border-surface-border bg-surface-elevated shadow-elevated">
                 
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border bg-surface-raised shrink-0">

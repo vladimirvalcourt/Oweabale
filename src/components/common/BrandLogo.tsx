@@ -41,7 +41,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({ name, className, size = 'm
     return (
       <div
         className={cn(
-          'flex items-center justify-center rounded-md bg-surface-raised border border-surface-border shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] shrink-0',
+          'flex items-center justify-center rounded-md bg-surface-raised border border-surface-border shadow-card shrink-0',
           sizeClasses[size],
           className
         )}

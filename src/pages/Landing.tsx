@@ -265,7 +265,7 @@ export default function Landing() {
       <PublicHeader
         links={[
           { href: '#why', label: 'Why', id: 'why' },
-          { href: '#flow', label: 'Flow', id: 'flow' },
+          { href: '#flow', label: 'How it works', id: 'flow' },
           { href: '/pricing', label: 'Pricing' },
         ]}
       />
@@ -328,7 +328,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section id="why" className="px-4 py-24 sm:px-6 lg:px-8">
+        <section id="why" className="scroll-mt-24 px-4 py-24 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
@@ -356,7 +356,7 @@ export default function Landing() {
           </div>
         </section>
 
-        <section id="flow" className="border-y border-surface-border-subtle bg-surface-raised/36 px-4 py-24 sm:px-6 lg:px-8">
+        <section id="flow" className="scroll-mt-24 border-y border-surface-border-subtle bg-surface-raised/36 px-4 py-24 sm:px-6 lg:px-8">
           <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">The operating flow</p>

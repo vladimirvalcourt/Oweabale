@@ -257,7 +257,7 @@ export default function Pricing() {
                 </div>
 
                 {hasYearlyPricing ? (
-                  <div className="mt-5 inline-flex items-center rounded-md border border-surface-border-subtle bg-white/[0.025] p-0.5">
+                  <div className="mt-5 inline-flex items-center rounded-md border border-surface-border-subtle bg-surface-raised p-0.5">
                     <button
                       type="button"
                       onClick={() => setBillingPeriod('monthly')}
@@ -350,8 +350,8 @@ export default function Pricing() {
                   One calmer path for bills, debt, and the planning work behind them.
                 </h2>
               </div>
-              <div className="overflow-x-auto rounded-[22px] border border-surface-border bg-white/[0.03]">
-                <div className="grid grid-cols-2 border-b border-surface-border-subtle bg-white/[0.035] text-sm font-medium text-content-primary">
+              <div className="overflow-x-auto rounded-[22px] border border-surface-border bg-surface-raised">
+                <div className="grid grid-cols-2 border-b border-surface-border-subtle bg-surface-elevated text-sm font-medium text-content-primary">
                   <div className="min-w-[180px] px-4 py-4">Feature</div>
                   <div className="min-w-[160px] border-l border-surface-border px-4 py-4">Oweable</div>
                 </div>
@@ -403,7 +403,7 @@ export default function Pricing() {
                 type="button"
                 onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                 disabled={isStartingCheckout}
-                className="inline-flex min-h-12 items-center gap-3 rounded-md border border-surface-border bg-white/[0.02] px-7 text-sm font-medium text-content-primary transition-colors hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:opacity-70"
+                className="inline-flex min-h-12 items-center gap-3 rounded-md border border-surface-border bg-surface-raised px-7 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-70"
               >
                 Start Full Suite
               </button>

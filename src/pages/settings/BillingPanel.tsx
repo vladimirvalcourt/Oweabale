@@ -293,7 +293,7 @@ function BillingPanelInner() {
         icon={BillingIcon}
         defaultOpen
         extraHeader={
-          <span className="inline-flex items-center rounded-md border border-surface-border-subtle bg-white/[0.025] px-3 py-1.5 text-xs font-medium tracking-[-0.006em] text-content-secondary">
+          <span className="inline-flex items-center rounded-md border border-surface-border-subtle bg-surface-raised px-3 py-1.5 text-xs font-medium tracking-[-0.006em] text-content-secondary">
             {tierLabel}
           </span>
         }
@@ -306,7 +306,7 @@ function BillingPanelInner() {
             type="button"
             onClick={() => void loadBillingState({ stripeSyncFirst: true })}
             disabled={isLoading || isWorking}
-            className="shrink-0 self-start inline-flex items-center justify-center gap-2 rounded-md border border-surface-border bg-white/[0.025] px-3 py-2 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-white/[0.04] hover:text-content-primary focus-app disabled:cursor-not-allowed disabled:opacity-50"
+            className="shrink-0 self-start inline-flex items-center justify-center gap-2 rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-surface-elevated hover:text-content-primary focus-app disabled:cursor-not-allowed disabled:opacity-50"
           >
             <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} aria-hidden />
             Refresh status
@@ -358,7 +358,7 @@ function BillingPanelInner() {
                     type="button"
                     onClick={() => onCancelAtPeriodEnd()}
                     disabled={isWorking}
-                    className="shrink-0 rounded-md border border-surface-border bg-white/[0.025] px-4 py-2.5 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="shrink-0 rounded-md border border-surface-border bg-surface-raised px-4 py-2.5 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Cancel at period end
                   </button>
@@ -385,7 +385,7 @@ function BillingPanelInner() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-between gap-4 rounded-md border border-surface-border bg-white/[0.025] p-5 sm:flex-row">
+          <div className="flex flex-col items-center justify-between gap-4 rounded-md border border-surface-border bg-surface-raised p-5 sm:flex-row">
             <div>
               <h4 className="flex items-center gap-2 text-sm font-medium tracking-[-0.006em] text-content-primary">
                 {isLockedTrial ? 'Pick a plan to continue' : 'Upgrade to Full Suite'}
@@ -473,7 +473,7 @@ function BillingPanelInner() {
               <button
                 type="button"
                 onClick={() => setImmediateCancelOpen(false)}
-                className="rounded-md border border-surface-border px-4 py-2 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-white/[0.04]"
+                className="rounded-md border border-surface-border px-4 py-2 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-surface-elevated"
               >
                 Keep subscription
               </button>
@@ -514,7 +514,7 @@ function BillingPanelInner() {
                 type="button"
                 onClick={() => void onCancelAtPeriodEndConfirmed()}
                 disabled={isWorking}
-                className="rounded-md border border-surface-border px-4 py-2 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-white/[0.04] disabled:opacity-60"
+                className="rounded-md border border-surface-border px-4 py-2 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-surface-elevated disabled:opacity-60"
               >
                 {isWorking ? 'Working…' : 'Yes, cancel at period end'}
               </button>

@@ -70,7 +70,7 @@ export function ProWelcomeModal() {
             leaveFrom="opacity-100 scale-100 translate-y-0"
             leaveTo="opacity-0 scale-[0.96] translate-y-2"
           >
-            <Dialog.Panel className="relative mx-auto w-full max-w-lg rounded-2xl border border-surface-border bg-surface-raised shadow-[0_30px_80px_rgba(0,0,0,0.6)] overflow-hidden">
+            <Dialog.Panel className="relative mx-auto w-full max-w-lg rounded-2xl border border-surface-border bg-surface-raised shadow-elevated overflow-hidden">
               {/* Dismiss button */}
               <button
                 type="button"

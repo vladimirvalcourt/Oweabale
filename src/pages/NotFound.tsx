@@ -21,7 +21,7 @@ export default function NotFound() {
       <div className="flex w-full max-w-sm flex-col gap-3 sm:flex-row sm:justify-center">
         <TransitionLink
           to="/"
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-surface-border bg-white/[0.02] px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-surface-border bg-surface-raised px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
         >
           Home
         </TransitionLink>
