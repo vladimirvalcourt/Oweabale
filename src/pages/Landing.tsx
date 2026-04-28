@@ -1,8 +1,8 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { TransitionLink } from '../components/TransitionLink';
-import { BrandWordmark } from '../components/BrandWordmark';
+import { TransitionLink } from '../components/common/TransitionLink';
+import { BrandWordmark } from '../components/common/BrandWordmark';
 import { useSEO } from '../hooks/useSEO';
 import { useAuth } from '../hooks/useAuth';
 
