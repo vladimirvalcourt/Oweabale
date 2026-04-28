@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { supabase } from '../lib/api/supabase';
 import { toast } from 'sonner';
 import { TransitionLink } from '../components/common';
-import { useSEO } from '../hooks';
+import { useSEO, trackEvent } from '../hooks';
 import { runAfterPaint } from '../lib/utils';
 import { BrandWordmark } from '../components/common';
 import { CheckCircle2, LockKeyhole, ReceiptText, WalletCards } from 'lucide-react';
@@ -30,6 +30,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
   const handleGoogleSignIn = async () => {
     if (googleLoading) return;
     setGoogleLoading(true);
+    trackEvent('auth_signup_started', { method: 'google' });
     try {
       const redirectTarget = new URLSearchParams(location.search).get('redirect');
       const callbackRedirect =

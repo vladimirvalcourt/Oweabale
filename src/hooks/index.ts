@@ -15,3 +15,4 @@ export { usePWAUpdateNotification } from './usePWAUpdateNotification';
 export { useSEO } from './useSEO';
 export { useTheme } from './useTheme';
 export { useWindowSizeClass } from './useWindowSizeClass';
+export { usePostHogIdentity, trackEvent } from './usePostHog';

@@ -8,7 +8,7 @@ import type { User } from '@supabase/supabase-js';
 import { lazy, Suspense } from 'react';
 import { Layout, DeviceGuard, ErrorBoundary, AuthGuard, AdminGuard, MaintenanceGuard, ProPlanGuard, DashboardSkeleton, ListSkeleton, AppLoader, SessionWarningModal, PWAInstallBanner } from './components';
 import { useStore } from './store';
-import { useAuth, usePWAUpdateNotification, usePWAStandaloneMode } from './hooks';
+import { useAuth, usePWAUpdateNotification, usePWAStandaloneMode, usePostHogIdentity } from './hooks';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Fix 1: Dashboard is now lazy — this keeps recharts + motion/react OUT of the initial
@@ -48,6 +48,8 @@ import AuthCallback from './pages/AuthCallback';
 import PlaidCallback from './pages/PlaidCallback';
 import { useDataSync } from './hooks';
 import { ThemedToaster, UnsupportedBrowserBanner } from './components';
+import { PostHogProvider } from './hooks/usePostHog';
+import CrispChat from './components/common/CrispChat';
 
 const Changelog      = lazy(() => import('./pages/Changelog'));
 const Analytics      = lazy(() => import('./pages/Analytics'));
@@ -226,8 +228,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppShell />
-      <SpeedInsights />
+      <PostHogProvider>
+        <AppShell />
+        <SpeedInsights />
+        <CrispChat />
+      </PostHogProvider>
     </BrowserRouter>
   );
 }
@@ -237,6 +242,10 @@ function AppShell() {
   const { user: authUser } = useAuth();
   const location = useLocation();
   const isProRoute = location.pathname.startsWith('/pro');
+  
+  // Track user identity in PostHog
+  usePostHogIdentity();
+  
   return (
     <>
       <UnsupportedBrowserBanner />

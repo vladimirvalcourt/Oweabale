@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
-import { ArrowRight, Check, CircleDollarSign, Clock3, Layers3, ShieldCheck } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowRight, Check, CircleDollarSign, Clock3, Layers3, ShieldCheck, Star } from 'lucide-react';
 import { Footer, PublicHeader } from '../components/layout';
 import { TransitionLink } from '../components/common';
-import { useAuth, useSEO } from '../hooks';
+import ExitIntentModal from '../components/common/ExitIntentModal';
+import { useAuth, useSEO, trackEvent } from '../hooks';
 import gsap from 'gsap';
 
 const proofPoints = ['Bills', 'Debt', 'Subscriptions', 'Tolls', 'Tickets', 'Taxes'];
@@ -49,6 +50,27 @@ const activityRows = [
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face',
     text: 'Added toll notice to the Pay List',
     time: 'just now',
+  },
+];
+
+const testimonials = [
+  {
+    quote: "Finally, a financial tool that doesn't make me feel overwhelmed. The Pay List is exactly what I needed.",
+    author: 'Sarah M.',
+    role: 'Freelance Designer',
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face',
+  },
+  {
+    quote: "I've tried every budgeting app. Oweable is the only one that stuck because it focuses on what actually matters - paying bills on time.",
+    author: 'James K.',
+    role: 'Software Engineer',
+    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face',
+  },
+  {
+    quote: "The clarity this gives me is incredible. No more late fees, no more anxiety about what's due when.",
+    author: 'Emily R.',
+    role: 'Small Business Owner',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop&crop=face',
   },
 ];
 
@@ -205,6 +227,22 @@ function ProductPreview() {
 export default function Landing() {
   const { user: authUser } = useAuth();
   const primaryHref = authUser?.id ? '/pro/dashboard' : '/auth?mode=signup';
+  const [showExitModal, setShowExitModal] = useState(false);
+  const [hasShownExitModal, setHasShownExitModal] = useState(false);
+
+  // Exit intent detection
+  useEffect(() => {
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0 && !hasShownExitModal && !authUser) {
+        setShowExitModal(true);
+        setHasShownExitModal(true);
+        trackEvent('exit_intent_triggered');
+      }
+    };
+
+    document.addEventListener('mouseleave', handleMouseLeave);
+    return () => document.removeEventListener('mouseleave', handleMouseLeave);
+  }, [hasShownExitModal, authUser]);
 
   useSEO({
     title: 'Oweable — Stop guessing what you owe',
@@ -237,6 +275,25 @@ export default function Landing() {
               <p className="mt-7 max-w-2xl text-base leading-7 tracking-[-0.01em] text-content-tertiary">
                 Oweable gives you one precise system for what is due, what is behind, and what to pay next, so your money stops living in scattered notes and anxious memory.
               </p>
+              
+              {/* Social Proof */}
+              <div className="mt-8 flex items-center gap-4">
+                <div className="flex -space-x-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <img
+                      key={i}
+                      src={`https://images.unsplash.com/photo-${
+                        [1494790108377, 1507003211169, 1438761681033, 1472099645785][i - 1]
+                      }?w=40&h=40&fit=crop&crop=face`}
+                      alt=""
+                      className="h-8 w-8 rounded-full border-2 border-surface-base object-cover"
+                    />
+                  ))}
+                </div>
+                <div className="text-sm text-content-secondary">
+                  <span className="font-medium text-content-primary">2,847+</span> people staying ahead of bills
+                </div>
+              </div>
               </div>
               <div className="flex flex-col items-start gap-5 lg:items-end">
                 <TransitionLink
@@ -310,6 +367,45 @@ export default function Landing() {
           </div>
         </section>
 
+        {/* Testimonials Section */}
+        <section className="border-t border-surface-border-subtle px-4 py-24 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="text-center mb-16">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">What users say</p>
+              <h2 className="mt-4 text-4xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-5xl">
+                Loved by people who value clarity
+              </h2>
+            </div>
+            
+            <div className="grid gap-6 md:grid-cols-3">
+              {testimonials.map((testimonial, index) => (
+                <div
+                  key={index}
+                  className="rounded-xl border border-surface-border-subtle bg-white/[0.025] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]"
+                >
+                  <div className="mb-4 flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-brand-violet text-brand-violet" />
+                    ))}
+                  </div>
+                  <p className="text-sm leading-6 text-content-secondary">{testimonial.quote}</p>
+                  <div className="mt-6 flex items-center gap-3">
+                    <img
+                      src={testimonial.avatar}
+                      alt={testimonial.author}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                    <div>
+                      <p className="text-sm font-medium text-content-primary">{testimonial.author}</p>
+                      <p className="text-xs text-content-tertiary">{testimonial.role}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="px-4 py-24 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-5xl text-center">
             <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Ready when you are</p>
@@ -319,9 +415,10 @@ export default function Landing() {
             <div className="mt-8 flex justify-center">
               <TransitionLink
                 to={primaryHref}
+                onClick={() => trackEvent('landing_cta_clicked', { location: 'bottom' })}
                 className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-brand-indigo px-5 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px"
               >
-                {authUser?.id ? 'Open app' : 'Start free'}
+                {authUser?.id ? 'Open app' : 'Get started free'}
                 <ArrowRight className="h-4 w-4" />
               </TransitionLink>
             </div>
@@ -330,6 +427,9 @@ export default function Landing() {
       </main>
 
       <Footer />
+      
+      {/* Exit Intent Modal */}
+      <ExitIntentModal isOpen={showExitModal} onClose={() => setShowExitModal(false)} />
     </div>
   );
 }
