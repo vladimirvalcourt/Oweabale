@@ -138,7 +138,7 @@ function FeedbackPanelInner() {
               <textarea
                 value={feedbackForm.message}
                 onChange={(e) => setFeedbackForm((f) => ({ ...f, message: e.target.value }))}
-                className="focus-app-field h-28 w-full resize-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary placeholder:text-content-muted"
+                className="focus-app-field h-28 w-full resize-none rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary placeholder:text-content-muted"
                 placeholder="Tell us what's working, what's not, or what you'd like to see..."
               />
             </div>
@@ -146,7 +146,7 @@ function FeedbackPanelInner() {
               <button
                 type="submit"
                 disabled={isSubmittingFeedback}
-                className="flex items-center gap-2 rounded-lg bg-brand-cta px-6 py-2.5 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover disabled:opacity-50"
+                className="flex items-center gap-2 rounded-md bg-brand-indigo px-6 py-2.5 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:opacity-50"
               >
                 {isSubmittingFeedback ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                 {isSubmittingFeedback ? 'Sending...' : 'Send Feedback'}
@@ -182,7 +182,7 @@ function FeedbackPanelInner() {
                 <div key={fb.id} className="p-5 hover:bg-surface-elevated transition-colors">
                   <div className="flex items-center justify-between mb-2">
                     <span
-                      className={`rounded-lg border px-1.5 py-0.5 text-xs font-medium ${
+                      className={`rounded-md border px-1.5 py-0.5 text-xs font-medium ${
                         fb.type === 'bug'
                           ? 'border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400'
                           : fb.type === 'feature_request'

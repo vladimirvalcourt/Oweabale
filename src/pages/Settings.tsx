@@ -190,7 +190,7 @@ export default function Settings() {
               <div className="flex-shrink-0 w-10 h-10 rounded-full border border-amber-500/50 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-amber-500" />
               </div>
-              <Dialog.Title className="text-lg font-semibold tracking-tight text-content-primary">Reset Data?</Dialog.Title>
+              <Dialog.Title className="text-lg font-medium tracking-[-0.024em] text-content-primary">Reset Data?</Dialog.Title>
             </div>
             <Dialog.Description className="text-sm text-content-tertiary mb-4">
               This will permanently delete all your bills, debts, assets, and transactions. Your account will remain active, but you
@@ -241,7 +241,7 @@ export default function Settings() {
               <div className="flex-shrink-0 w-10 h-10 rounded-full border border-red-900 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-brand-expense" />
               </div>
-              <Dialog.Title className="text-lg font-semibold tracking-tight text-content-primary">Delete account</Dialog.Title>
+              <Dialog.Title className="text-lg font-medium tracking-[-0.024em] text-content-primary">Delete account</Dialog.Title>
             </div>
             {deletionReceipt ? (
               <>

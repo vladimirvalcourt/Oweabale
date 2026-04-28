@@ -354,11 +354,11 @@ function ProfilePanelInner() {
           <form onSubmit={(e) => void handleProfileSubmit(e)} className="space-y-6">
             <div className="flex items-center gap-6 pb-6 border-b border-surface-border">
               <div className="relative h-16 w-16 shrink-0">
-                <div className="h-16 w-16 rounded-lg bg-surface-elevated border border-surface-border flex items-center justify-center overflow-hidden shadow-inner">
+                <div className="h-16 w-16 rounded-md bg-surface-elevated border border-surface-border flex items-center justify-center overflow-hidden shadow-inner">
                   {user.avatar ? (
                     <img src={user.avatar} alt="" className="h-full w-full object-cover" data-no-invert />
                   ) : (
-                    <span className="text-xl font-semibold text-content-tertiary">
+                    <span className="text-xl font-medium text-content-tertiary">
                       {(user.firstName || '?').charAt(0)}
                       {(user.lastName || '?').charAt(0)}
                     </span>
@@ -387,7 +387,7 @@ function ProfilePanelInner() {
                   <button
                     type="button"
                     onClick={() => void handleCopyUserId()}
-                    className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-surface-border text-content-tertiary hover:text-content-primary focus-app"
+                    className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-surface-border text-content-tertiary hover:text-content-primary focus-app"
                     aria-label="Copy full user ID"
                   >
                     <Copy className="h-3.5 w-3.5" />
@@ -408,7 +408,7 @@ function ProfilePanelInner() {
                   value={formData.firstName}
                   onChange={handleChange}
                   required
-                  className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
+                  className="focus-app-field block w-full rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
                 />
               </div>
 
@@ -422,7 +422,7 @@ function ProfilePanelInner() {
                   value={formData.lastName}
                   onChange={handleChange}
                   required
-                  className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
+                  className="focus-app-field block w-full rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
                 />
               </div>
 
@@ -432,7 +432,7 @@ function ProfilePanelInner() {
                   {/* SET-02: tooltip explaining read-only email */}
                   <span className="relative ml-0.5 inline-flex cursor-default items-center group">
                     <Info className="h-3 w-3 text-content-muted" aria-hidden />
-                    <span className="pointer-events-none absolute left-full top-1/2 z-20 ml-2 w-56 -translate-y-1/2 rounded-lg border border-surface-border bg-surface-raised px-2.5 py-1.5 text-[11px] font-normal leading-snug text-content-secondary opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+                    <span className="pointer-events-none absolute left-full top-1/2 z-20 ml-2 w-56 -translate-y-1/2 rounded-md border border-surface-border bg-surface-raised px-2.5 py-1.5 text-[11px] font-normal leading-snug text-content-secondary opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
                       This email comes from your Google sign-in. To change it, update your Google account.
                     </span>
                   </span>
@@ -442,7 +442,7 @@ function ProfilePanelInner() {
                   id="email"
                   value={formData.email}
                   readOnly
-                  className="block w-full cursor-not-allowed select-none rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-tertiary focus-app-field"
+                  className="block w-full cursor-not-allowed select-none rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-tertiary focus-app-field"
                 />
               </div>
 
@@ -454,7 +454,7 @@ function ProfilePanelInner() {
                   id="timezone"
                   value={formData.timezone}
                   onChange={handleChange}
-                  className="focus-app-field block max-h-48 w-full overflow-auto rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
+                  className="focus-app-field block max-h-48 w-full overflow-auto rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
                 >
                   {IANA_ZONES.map((z) => (
                     <option key={z} value={z}>
@@ -472,7 +472,7 @@ function ProfilePanelInner() {
                   type="button"
                   onClick={handleDiscard}
                   disabled={saveVisual === 'saving'}
-                  className="rounded-lg border border-surface-border px-5 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-raised disabled:opacity-50"
+                  className="rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-white/[0.04] disabled:opacity-50"
                 >
                   Discard
                 </button>
@@ -480,7 +480,7 @@ function ProfilePanelInner() {
                   type="submit"
                   disabled={saveVisual === 'saving'}
                   className={cn(
-                    'flex min-h-10 items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-medium shadow-none transition-colors disabled:cursor-not-allowed disabled:opacity-60',
+                    'flex min-h-10 items-center gap-2 rounded-md px-6 py-2.5 text-sm font-medium shadow-none transition-[background-color,transform] disabled:cursor-not-allowed disabled:opacity-60',
                     saveVisual === 'saved'
                       ? 'bg-emerald-600 text-white hover:bg-emerald-500'
                       : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover',
@@ -499,13 +499,13 @@ function ProfilePanelInner() {
       <Dialog open={otpOpen} onClose={() => setOtpOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/80" aria-hidden />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="w-full max-w-sm rounded-lg border border-surface-border bg-surface-raised p-6 shadow-xl">
-            <Dialog.Title className="text-lg font-semibold text-content-primary">Enter verification code</Dialog.Title>
+          <Dialog.Panel className="w-full max-w-sm rounded-md border border-surface-border bg-surface-raised p-6 shadow-xl">
+            <Dialog.Title className="text-lg font-medium tracking-[-0.024em] text-content-primary">Enter verification code</Dialog.Title>
             <p className="mt-2 text-sm text-content-tertiary">We sent a code to your phone. Enter it below.</p>
             <input
               value={otpCode}
               onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
-              className="mt-4 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+              className="mt-4 w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
               placeholder="6-digit code"
               inputMode="numeric"
               autoComplete="one-time-code"
@@ -514,7 +514,7 @@ function ProfilePanelInner() {
               <button
                 type="button"
                 onClick={() => setOtpOpen(false)}
-                className="rounded-lg border border-surface-border px-4 py-2 text-sm text-content-secondary"
+                className="rounded-md border border-surface-border px-4 py-2 text-sm text-content-secondary transition-colors hover:bg-white/[0.04]"
               >
                 Cancel
               </button>
@@ -522,7 +522,7 @@ function ProfilePanelInner() {
                 type="button"
                 disabled={otpVerifying}
                 onClick={() => void submitOtp()}
-                className="rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base disabled:opacity-50"
+                className="rounded-md bg-brand-indigo px-4 py-2 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:opacity-50"
               >
                 {otpVerifying ? 'Checking…' : 'Confirm'}
               </button>
@@ -534,10 +534,10 @@ function ProfilePanelInner() {
       <Dialog open={cropOpen} onClose={closeCrop} className="relative z-50">
         <div className="fixed inset-0 bg-black/80" aria-hidden />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="flex w-full max-w-lg flex-col rounded-lg border border-surface-border bg-surface-raised p-4 shadow-xl">
-            <Dialog.Title className="text-lg font-semibold text-content-primary">Crop profile photo</Dialog.Title>
+          <Dialog.Panel className="flex w-full max-w-lg flex-col rounded-md border border-surface-border bg-surface-raised p-4 shadow-xl">
+            <Dialog.Title className="text-lg font-medium tracking-[-0.024em] text-content-primary">Crop profile photo</Dialog.Title>
             <p className="mt-1 text-xs text-content-tertiary">Drag and zoom to frame your face.</p>
-            <div className="relative mt-4 h-64 w-full overflow-hidden rounded-lg bg-black md:h-80">
+            <div className="relative mt-4 h-64 w-full overflow-hidden rounded-md bg-black md:h-80">
               {cropSrc && (
                 <Cropper
                   image={cropSrc}
@@ -566,7 +566,7 @@ function ProfilePanelInner() {
               <button
                 type="button"
                 onClick={closeCrop}
-                className="rounded-lg border border-surface-border px-4 py-2 text-sm text-content-secondary"
+                className="rounded-md border border-surface-border px-4 py-2 text-sm text-content-secondary transition-colors hover:bg-white/[0.04]"
               >
                 Cancel
               </button>
@@ -574,7 +574,7 @@ function ProfilePanelInner() {
                 type="button"
                 disabled={cropApplying}
                 onClick={() => void applyCrop()}
-                className="flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base disabled:opacity-50"
+                className="flex items-center gap-2 rounded-md bg-brand-indigo px-4 py-2 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:opacity-50"
               >
                 {cropApplying && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Save photo

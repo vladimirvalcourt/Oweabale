@@ -175,7 +175,7 @@ function SupportPanelInner() {
                 type="text"
                 value={supportForm.subject}
                 onChange={(e) => setSupportForm((f) => ({ ...f, subject: e.target.value }))}
-                className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary placeholder:text-content-muted"
+                className="focus-app-field w-full rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary placeholder:text-content-muted"
                 placeholder="Brief summary of your issue or question..."
               />
             </div>
@@ -188,7 +188,7 @@ function SupportPanelInner() {
                 <select
                   value={supportForm.department}
                   onChange={(e) => setSupportForm((f) => ({ ...f, department: e.target.value }))}
-                  className="focus-app-field w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary"
+                  className="focus-app-field w-full appearance-none rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary"
                 >
                   <option>General Support</option>
                   <option>Integrations</option>
@@ -203,7 +203,7 @@ function SupportPanelInner() {
                 <select
                   value={supportForm.priority}
                   onChange={(e) => setSupportForm((f) => ({ ...f, priority: e.target.value }))}
-                  className="focus-app-field w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary"
+                  className="focus-app-field w-full appearance-none rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary"
                 >
                   <option value="Low">Low — general question</option>
                   <option value="Normal">Normal</option>
@@ -219,7 +219,7 @@ function SupportPanelInner() {
               <textarea
                 value={supportForm.description}
                 onChange={(e) => setSupportForm((f) => ({ ...f, description: e.target.value }))}
-                className="focus-app-field min-h-[8rem] w-full resize-y rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary placeholder:text-content-muted"
+                className="focus-app-field min-h-[8rem] w-full resize-y rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary placeholder:text-content-muted"
                 placeholder="Include steps to reproduce, what you expected vs what happened, and any relevant details..."
               />
             </div>
@@ -228,7 +228,7 @@ function SupportPanelInner() {
               <button
                 type="submit"
                 disabled={isSubmittingTicket}
-                className="flex items-center gap-2 rounded-lg bg-brand-cta px-6 py-2.5 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover disabled:opacity-50"
+                className="flex items-center gap-2 rounded-md bg-brand-indigo px-6 py-2.5 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:opacity-50"
               >
                 {isSubmittingTicket ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                 {isSubmittingTicket ? 'Sending...' : 'Submit Request'}

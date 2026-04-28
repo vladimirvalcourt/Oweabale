@@ -201,14 +201,14 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
               <button
                 type="button"
                 onClick={handleExportData}
-                className="rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app"
+                className="rounded-md bg-brand-indigo px-5 py-2.5 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px focus-app"
               >
                 Download JSON
               </button>
               <button
                 type="button"
                 onClick={handleExportCsv}
-                className="rounded-lg border border-surface-border bg-surface-base px-5 py-2.5 text-sm font-semibold text-content-primary transition-colors hover:bg-surface-elevated focus-app"
+                className="rounded-md border border-surface-border bg-surface-base px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-white/[0.04] focus-app"
               >
                 Download CSV
               </button>

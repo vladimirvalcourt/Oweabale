@@ -364,7 +364,7 @@ export default function Ingestion() {
             <button 
               type="button"
               onClick={() => cameraInputRef.current?.click()}
-              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-4 py-2.5 text-xs font-sans font-semibold text-content-secondary transition-colors hover:bg-surface-elevated btn-tactile"
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-md border border-surface-border bg-surface-raised px-4 py-2.5 text-xs font-sans font-medium text-content-secondary transition-colors hover:bg-surface-elevated btn-tactile"
             >
               <Camera className="h-4 w-4 shrink-0" aria-hidden />
               <span className="text-center leading-tight">Camera</span>
@@ -372,7 +372,7 @@ export default function Ingestion() {
             <button 
               type="button"
               onClick={() => setIsSyncOpen(true)}
-              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-lg border border-content-primary/20 bg-content-primary/[0.06] px-4 py-2.5 text-xs font-sans font-semibold text-content-primary transition-colors hover:bg-content-primary/[0.1] btn-tactile"
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-md border border-content-primary/20 bg-content-primary/[0.06] px-4 py-2.5 text-xs font-sans font-medium text-content-primary transition-colors hover:bg-content-primary/[0.1] btn-tactile"
             >
               <Smartphone className="h-4 w-4 shrink-0" aria-hidden />
               <span className="text-center leading-tight">Scan via phone</span>
@@ -380,7 +380,7 @@ export default function Ingestion() {
             <button 
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-4 py-2.5 text-xs font-sans font-semibold text-content-secondary transition-colors hover:bg-surface-elevated btn-tactile"
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-md border border-surface-border bg-surface-raised px-4 py-2.5 text-xs font-sans font-medium text-content-secondary transition-colors hover:bg-surface-elevated btn-tactile"
             >
               <UploadCloud className="h-4 w-4 shrink-0" aria-hidden />
               <span className="text-center leading-tight">Upload documents</span>
@@ -391,7 +391,7 @@ export default function Ingestion() {
             <button 
               type="button"
               onClick={handleBulkCommit}
-              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-lg bg-brand-cta px-4 py-2.5 text-xs font-sans font-semibold text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover btn-tactile sm:ml-auto sm:w-auto sm:min-w-[12rem]"
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-md bg-brand-indigo px-4 py-2.5 text-xs font-sans font-medium text-white shadow-none transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px btn-tactile sm:ml-auto sm:w-auto sm:min-w-[12rem]"
             >
               <FileCheck className="h-4 w-4 shrink-0" aria-hidden />
               Save all ready
@@ -413,9 +413,9 @@ export default function Ingestion() {
             onClick={() => fileInputRef.current?.click()}
           >
             <UploadCloud className={`w-12 h-12 mx-auto mb-6 transition-colors ${dragActive ? 'text-content-secondary' : 'text-content-muted'}`} />
-            <h3 className="text-lg font-sans font-semibold text-content-primary">No documents saved yet</h3>
+            <h3 className="text-lg font-sans font-medium text-content-primary">No documents saved yet</h3>
             <p className="text-sm text-content-tertiary mt-2 max-w-md mx-auto">Drop a bill, toll notice, citation, fine, statement, or payment proof. Scanned PDFs are read page-by-page when needed; very blurry shots may still need manual entry.</p>
-            <div className="mt-8 inline-block px-8 py-3 rounded-lg bg-brand-cta text-surface-base text-sm font-sans font-semibold shadow-sm btn-tactile">
+            <div className="mt-8 inline-block px-8 py-3 rounded-md bg-brand-indigo text-white text-sm font-sans font-medium shadow-sm transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px btn-tactile">
               Choose files
             </div>
           </div>
@@ -449,11 +449,11 @@ export default function Ingestion() {
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <p className="text-xs font-mono font-bold text-content-primary truncate">{item.extractedData.biller || item.extractedData.name || item.originalFile?.name || 'Uploaded File'}</p>
+                        <p className="text-xs font-mono font-medium text-content-primary truncate">{item.extractedData.biller || item.extractedData.name || item.originalFile?.name || 'Uploaded File'}</p>
                         {item.source === 'mobile' && (
                           <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-content-primary/[0.06] border border-content-primary/15" title="Source: Mobile Capture">
                              <Smartphone className="w-2.5 h-2.5 text-content-secondary" />
-                             <span className="text-[7px] font-mono font-bold text-content-secondary uppercase">Sync</span>
+                             <span className="text-[7px] font-mono font-medium text-content-secondary uppercase">Sync</span>
                           </div>
                         )}
                       </div>
@@ -470,7 +470,7 @@ export default function Ingestion() {
                             })
                           }
                           onClick={(e) => e.stopPropagation()}
-                          className="w-full max-w-[200px] bg-surface-raised border border-surface-border text-[9px] font-mono font-bold uppercase tracking-widest text-content-tertiary rounded-lg px-2 py-1 focus-app-field"
+                          className="w-full max-w-[200px] bg-surface-raised border border-surface-border text-[9px] font-mono font-medium uppercase tracking-widest text-content-tertiary rounded-md px-2 py-1 focus-app-field"
                         >
                           <option value="transaction">Transaction</option>
                           <option value="bill">Bill</option>
@@ -518,7 +518,7 @@ export default function Ingestion() {
                   </div>
 
                   <div className="hidden md:block md:col-span-2">
-                    <p className="text-sm font-mono font-bold text-content-primary">
+                    <p className="text-sm font-mono font-medium text-content-primary">
                       ${item.extractedData.amount?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                     </p>
                   </div>

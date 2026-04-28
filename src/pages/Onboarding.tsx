@@ -82,7 +82,7 @@ function ChoiceCard({ selected, onSelect, title, description, accent = 'neutral'
       )}
     >
       <span className="flex items-start justify-between gap-3">
-        <span className="text-sm font-semibold text-content-primary">{title}</span>
+        <span className="text-sm font-medium text-content-primary">{title}</span>
         <span
           className={cn(
             'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors',
@@ -299,7 +299,7 @@ export default function Onboarding() {
 
         <header className="relative z-20 flex h-[72px] shrink-0 items-center gap-3 border-b border-surface-border-subtle bg-surface-base/90 px-5 backdrop-blur-xl sm:gap-4 sm:px-8">
           <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
-            <span className="shrink-0 text-sm font-semibold tracking-tight text-content-primary">Getting started</span>
+            <span className="shrink-0 text-sm font-medium tracking-tight text-content-primary">Getting started</span>
             <div
               className="h-1.5 w-full max-w-[200px] overflow-hidden rounded-full bg-surface-border sm:max-w-[280px]"
               role="progressbar"
@@ -342,7 +342,7 @@ export default function Onboarding() {
                         backgroundColor: currentStepIndex > index ? 'var(--color-brand-profit)' : currentStepIndex === index ? 'var(--color-content-primary)' : 'var(--color-surface-border)',
                       }}
                       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                      className={`flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors ${
+                      className={`flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-medium transition-colors ${
                         currentStepIndex > index
                           ? 'border-brand-violet bg-brand-violet text-white'
                           : currentStepIndex === index

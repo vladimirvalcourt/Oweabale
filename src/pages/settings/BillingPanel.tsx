@@ -293,47 +293,47 @@ function BillingPanelInner() {
         icon={BillingIcon}
         defaultOpen
         extraHeader={
-          <span className="inline-flex items-center rounded-lg border border-surface-border bg-surface-raised px-2.5 py-1 text-xs font-medium text-content-secondary">
+          <span className="inline-flex items-center rounded-md border border-surface-border-subtle bg-white/[0.025] px-3 py-1.5 text-xs font-medium tracking-[-0.006em] text-content-secondary">
             {tierLabel}
           </span>
         }
       >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 mb-6">
-          <p className="text-sm text-content-tertiary flex-1 min-w-0">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <p className="min-w-0 flex-1 text-sm leading-6 tracking-[-0.006em] text-content-tertiary">
             {isLoading ? 'Loading billing status...' : statusText}
           </p>
           <button
             type="button"
             onClick={() => void loadBillingState({ stripeSyncFirst: true })}
             disabled={isLoading || isWorking}
-            className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm font-medium text-content-secondary transition-colors hover:text-content-primary focus-app disabled:cursor-not-allowed disabled:opacity-50"
+            className="shrink-0 self-start inline-flex items-center justify-center gap-2 rounded-md border border-surface-border bg-white/[0.025] px-3 py-2 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-white/[0.04] hover:text-content-primary focus-app disabled:cursor-not-allowed disabled:opacity-50"
           >
             <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} aria-hidden />
             Refresh status
           </button>
         </div>
         {isLockedTrial && !hasPaidAccess && (
-          <div className="mb-5 rounded-lg border border-amber-500/30 bg-amber-500/10 p-5">
-            <h4 className="font-medium text-content-primary">Your 14-day trial ended</h4>
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-content-secondary">
+          <div className="mb-5 rounded-md border border-amber-500/30 bg-amber-500/10 p-5">
+            <h4 className="text-sm font-medium tracking-[-0.006em] text-content-primary">Your 14-day trial ended</h4>
+            <p className="mt-1 max-w-2xl text-sm leading-6 tracking-[-0.006em] text-content-secondary">
               Your account is locked until billing is active. Start a subscription to continue using your Pay List,
               documents, calendar, and settings.
             </p>
           </div>
         )}
         {hasPaidAccess ? (
-          <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-lg p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col items-center justify-between gap-4 rounded-md border border-emerald-500/25 bg-emerald-500/10 p-5 sm:flex-row">
             <div>
-              <h4 className="flex items-center gap-2 font-medium text-content-primary">
-                {isProfileTrialOnly ? 'Your Full Suite trial is active' : 'You&apos;re on Full Suite'}
+              <h4 className="flex items-center gap-2 text-sm font-medium tracking-[-0.006em] text-content-primary">
+                {isProfileTrialOnly ? 'Your Full Suite trial is active' : "You're on Full Suite"}
               </h4>
-              <p className="text-sm text-emerald-200/70 mt-1 max-w-md">
+              <p className="mt-1 max-w-md text-sm tracking-[-0.006em] text-emerald-200/70">
                 {isProfileTrialOnly
                   ? 'You already have Full Suite access during the trial. Start paid billing whenever you are ready so your card is on file before the trial ends.'
                   : 'Full Suite is active. Update your plan, payment method, or invoices anytime in the billing portal.'}
               </p>
               {subscriptionStatus === 'trialing' && currentPeriodEnd && (
-                <p className="mt-2 text-xs text-emerald-100/80">
+                <p className="mt-2 text-xs tracking-[-0.006em] text-emerald-100/80">
                   Trial active until {new Date(currentPeriodEnd).toLocaleDateString()}. Enable pre-charge reminders in Notifications.
                 </p>
               )}
@@ -343,14 +343,14 @@ function BillingPanelInner() {
                 type="button"
                 onClick={isProfileTrialOnly ? onUpgrade : onManageBilling}
                 disabled={isWorking}
-                className="shrink-0 rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white shadow-none transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                className="shrink-0 rounded-md bg-emerald-600 px-5 py-2.5 text-sm font-medium tracking-[-0.006em] text-white shadow-none transition-[background-color,transform] hover:bg-emerald-500 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isWorking ? 'Working...' : isProfileTrialOnly ? 'Add payment method' : 'Manage billing'}
               </button>
-              <p className="max-w-sm text-left text-[11px] text-content-tertiary sm:text-right">
+              <p className="max-w-sm text-left text-[11px] tracking-[-0.006em] text-content-tertiary sm:text-right">
                 {isProfileTrialOnly
                   ? 'Adding a payment method starts Stripe checkout so your subscription is ready before trial access ends.'
-                  : 'Manage billing opens Stripe&apos;s customer portal to update payment methods and invoices.'}
+                  : "Manage billing opens Stripe's customer portal to update payment methods and invoices."}
               </p>
               {!isProfileTrialOnly && (
                 <>
@@ -358,12 +358,12 @@ function BillingPanelInner() {
                     type="button"
                     onClick={() => onCancelAtPeriodEnd()}
                     disabled={isWorking}
-                    className="shrink-0 rounded-lg border border-surface-border bg-surface-raised px-4 py-2.5 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-60"
+                    className="shrink-0 rounded-md border border-surface-border bg-white/[0.025] px-4 py-2.5 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Cancel at period end
                   </button>
                   {currentPeriodEnd && (
-                    <p className="max-w-sm text-left text-[11px] text-content-tertiary sm:text-right">
+                    <p className="max-w-sm text-left text-[11px] tracking-[-0.006em] text-content-tertiary sm:text-right">
                       Access continues until{' '}
                       {new Date(currentPeriodEnd).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', year: 'numeric' })}
                       .
@@ -373,11 +373,11 @@ function BillingPanelInner() {
                     type="button"
                     onClick={() => setImmediateCancelOpen(true)}
                     disabled={isWorking}
-                    className="shrink-0 rounded-lg border border-rose-500/40 bg-transparent px-4 py-2.5 text-sm font-medium text-rose-400 transition-colors hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="shrink-0 rounded-md border border-rose-500/40 bg-transparent px-4 py-2.5 text-sm font-medium tracking-[-0.006em] text-rose-400 transition-colors hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     Cancel immediately
                   </button>
-                  <p className="max-w-sm text-left text-[11px] text-content-tertiary sm:text-right">
+                  <p className="max-w-sm text-left text-[11px] tracking-[-0.006em] text-content-tertiary sm:text-right">
                     Immediate cancel ends paid access today. Your data is retained for 30 days per policy.
                   </p>
                 </>
@@ -385,12 +385,12 @@ function BillingPanelInner() {
             </div>
           </div>
         ) : (
-          <div className="bg-content-primary/[0.05] border border-surface-border rounded-lg p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col items-center justify-between gap-4 rounded-md border border-surface-border bg-white/[0.025] p-5 sm:flex-row">
             <div>
-              <h4 className="flex items-center gap-2 font-medium text-content-primary">
+              <h4 className="flex items-center gap-2 text-sm font-medium tracking-[-0.006em] text-content-primary">
                 {isLockedTrial ? 'Subscribe to continue' : 'Upgrade to Full Suite'}
               </h4>
-              <p className="text-sm text-content-secondary/70 mt-1 max-w-md">
+              <p className="mt-1 max-w-md text-sm tracking-[-0.006em] text-content-secondary/70">
                 {isLockedTrial
                   ? `Start Full Suite for $${monthlyPrice.toFixed(2)}/month to unlock your account again.`
                   : `Unlock Full Suite: unlimited account sync, debt payoff planner, subscription alerts, and freelancer tax tools for $${monthlyPrice.toFixed(2)}/month.`}
@@ -400,7 +400,7 @@ function BillingPanelInner() {
               type="button"
               onClick={onUpgrade}
               disabled={isWorking}
-              className="shrink-0 rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-60"
+              className="shrink-0 rounded-md bg-brand-indigo px-5 py-2.5 text-sm font-medium tracking-[-0.006em] text-white shadow-none transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isWorking ? 'Working...' : `Upgrade — $${monthlyPrice.toFixed(2)}/mo`}
             </button>
@@ -409,21 +409,21 @@ function BillingPanelInner() {
       </CollapsibleModule>
 
       <CollapsibleModule title="Billing History" icon={BillingIcon} defaultOpen={false}>
-        <p className="text-sm text-content-tertiary mb-6">View and download your previous invoices.</p>
+        <p className="mb-6 text-sm tracking-[-0.006em] text-content-tertiary">View and download your previous invoices.</p>
         {paymentHistory.length === 0 ? (
-          <div className="border border-surface-border border-dashed rounded-lg p-8 flex flex-col items-center justify-center text-center bg-surface-base">
-            <Download className="w-7 h-7 text-content-muted mb-3" />
-            <p className="text-sm font-medium text-content-secondary">No billing history</p>
-            <p className="mt-1 text-xs font-medium text-content-tertiary">
+          <div className="flex flex-col items-center justify-center rounded-md border border-dashed border-surface-border bg-surface-base p-8 text-center">
+            <Download className="mb-3 h-7 w-7 text-content-muted" />
+            <p className="text-sm font-medium tracking-[-0.006em] text-content-secondary">No billing history</p>
+            <p className="mt-1 text-xs font-medium tracking-[-0.006em] text-content-tertiary">
               {hasPaidAccess
                 ? 'Invoices from Stripe will appear here after your first charge.'
                 : 'No charges have been made yet.'}
             </p>
           </div>
         ) : (
-          <div className="border border-surface-border rounded-lg bg-surface-base divide-y divide-surface-border">
+          <div className="divide-y divide-surface-border rounded-md border border-surface-border bg-surface-base">
             {paymentHistory.map((payment) => (
-              <div key={payment.id} className="flex items-center justify-between px-4 py-3 text-xs font-medium">
+              <div key={payment.id} className="flex items-center justify-between px-4 py-3 text-xs font-medium tracking-[-0.006em]">
                 <span className="text-content-secondary">{new Date(payment.created_at).toLocaleDateString()}</span>
                 <span className="tabular-nums text-content-primary">
                   ${(payment.amount_total / 100).toFixed(2)} {payment.currency.toUpperCase()}
@@ -436,13 +436,13 @@ function BillingPanelInner() {
       </CollapsibleModule>
 
       <CollapsibleModule title="Payment Methods" icon={BillingIcon} defaultOpen={false}>
-        <p className="text-sm text-content-tertiary mb-6">Manage payment methods used for your subscriptions.</p>
-        <div className="border border-surface-border border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center mb-4 bg-surface-base">
-          <CreditCardIcon className="w-8 h-8 text-content-muted mb-3" />
-          <p className="text-sm font-medium text-content-secondary">
+        <p className="mb-6 text-sm tracking-[-0.006em] text-content-tertiary">Manage payment methods used for your subscriptions.</p>
+        <div className="mb-4 flex flex-col items-center justify-center rounded-md border border-dashed border-surface-border bg-surface-base p-6 text-center">
+          <CreditCardIcon className="mb-3 h-8 w-8 text-content-muted" />
+          <p className="text-sm font-medium tracking-[-0.006em] text-content-secondary">
             {hasPaidAccess ? 'Cards on file' : 'No payment method on file'}
           </p>
-          <p className="mt-1 text-xs font-medium text-content-tertiary">
+          <p className="mt-1 text-xs font-medium tracking-[-0.006em] text-content-tertiary">
             {isProfileTrialOnly
               ? 'You are in the trial period and do not have a payment method on file yet.'
               : hasPaidAccess
@@ -454,7 +454,7 @@ function BillingPanelInner() {
           type="button"
           onClick={isProfileTrialOnly ? onUpgrade : onManageBilling}
           disabled={isWorking}
-          className="text-sm font-medium text-content-primary hover:text-content-secondary transition-colors bg-surface-elevated px-4 py-2 border border-surface-border rounded-lg focus-app"
+          className="focus-app rounded-md border border-surface-border bg-surface-elevated px-4 py-2 text-sm font-medium tracking-[-0.006em] text-content-primary transition-colors hover:text-content-secondary"
         >
           {isProfileTrialOnly ? 'Add payment method' : 'Manage in Stripe Portal'}
         </button>
@@ -463,9 +463,9 @@ function BillingPanelInner() {
       <Dialog open={immediateCancelOpen} onClose={() => setImmediateCancelOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-md rounded-lg border border-surface-border bg-surface-raised p-6 shadow-xl">
-            <Dialog.Title className="text-lg font-semibold text-content-primary">Cancel immediately?</Dialog.Title>
-            <Dialog.Description className="mt-2 text-sm text-content-tertiary">
+          <Dialog.Panel className="mx-auto max-w-md rounded-md border border-surface-border bg-surface-raised p-6 shadow-xl">
+            <Dialog.Title className="text-lg font-semibold tracking-[-0.024em] text-content-primary">Cancel immediately?</Dialog.Title>
+            <Dialog.Description className="mt-2 text-sm tracking-[-0.006em] text-content-tertiary">
               Your Full Suite access ends today. Your data will be retained for 30 days. This is separate from canceling at
               period end.
             </Dialog.Description>
@@ -473,7 +473,7 @@ function BillingPanelInner() {
               <button
                 type="button"
                 onClick={() => setImmediateCancelOpen(false)}
-                className="rounded-lg border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary hover:bg-surface-elevated"
+                className="rounded-md border border-surface-border px-4 py-2 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-white/[0.04]"
               >
                 Keep subscription
               </button>
@@ -481,7 +481,7 @@ function BillingPanelInner() {
                 type="button"
                 onClick={() => void onCancelImmediatelyConfirmed()}
                 disabled={isWorking}
-                className="rounded-lg bg-brand-expense px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-60"
+                className="rounded-md bg-brand-expense px-4 py-2 text-sm font-medium tracking-[-0.006em] text-white transition-[background-color,transform] hover:bg-red-700 active:translate-y-px disabled:opacity-60"
               >
                 {isWorking ? 'Working…' : 'End access today'}
               </button>
@@ -494,9 +494,9 @@ function BillingPanelInner() {
       <Dialog open={periodCancelOpen} onClose={() => setPeriodCancelOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-md rounded-lg border border-surface-border bg-surface-raised p-6 shadow-xl">
-            <Dialog.Title className="text-lg font-semibold text-content-primary">Cancel at end of billing period?</Dialog.Title>
-            <Dialog.Description className="mt-2 text-sm text-content-tertiary">
+          <Dialog.Panel className="mx-auto max-w-md rounded-md border border-surface-border bg-surface-raised p-6 shadow-xl">
+            <Dialog.Title className="text-lg font-semibold tracking-[-0.024em] text-content-primary">Cancel at end of billing period?</Dialog.Title>
+            <Dialog.Description className="mt-2 text-sm tracking-[-0.006em] text-content-tertiary">
               You keep Full Suite access until{' '}
               {currentPeriodEnd
                 ? new Date(currentPeriodEnd).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
@@ -506,7 +506,7 @@ function BillingPanelInner() {
               <button
                 type="button"
                 onClick={() => setPeriodCancelOpen(false)}
-                className="rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base hover:bg-brand-cta-hover"
+                className="rounded-md bg-brand-indigo px-4 py-2 text-sm font-medium tracking-[-0.006em] text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px"
               >
                 Keep my plan
               </button>
@@ -514,7 +514,7 @@ function BillingPanelInner() {
                 type="button"
                 onClick={() => void onCancelAtPeriodEndConfirmed()}
                 disabled={isWorking}
-                className="rounded-lg border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary hover:bg-surface-elevated disabled:opacity-60"
+                className="rounded-md border border-surface-border px-4 py-2 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-white/[0.04] disabled:opacity-60"
               >
                 {isWorking ? 'Working…' : 'Yes, cancel at period end'}
               </button>
@@ -524,10 +524,10 @@ function BillingPanelInner() {
       </Dialog>
 
       <CollapsibleModule title="Billing Transparency Center" icon={BillingIcon} defaultOpen={false}>
-        <div className="space-y-3 text-sm text-content-secondary">
+        <div className="space-y-3 text-sm tracking-[-0.006em] text-content-secondary">
           <p>
-            Cancel from this app: use <strong className="font-medium text-content-primary">Cancel at period end</strong> to keep
-            access until the date shown, or <strong className="font-medium text-content-primary">Cancel immediately</strong> to end
+            Cancel from this app: use <strong className="font-medium tracking-[-0.006em] text-content-primary">Cancel at period end</strong> to keep
+            access until the date shown, or <strong className="font-medium tracking-[-0.006em] text-content-primary">Cancel immediately</strong> to end
             paid access today.
           </p>
           <p>
@@ -536,7 +536,7 @@ function BillingPanelInner() {
           <p>
             You can export data anytime and delete your account immediately from `Data & Privacy`, with a downloadable deletion receipt.
           </p>
-          <p className="text-xs text-content-tertiary">
+          <p className="text-xs tracking-[-0.006em] text-content-tertiary">
             No phone calls or support tickets are required for basic billing cancellation and account deletion flows.
           </p>
         </div>

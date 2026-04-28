@@ -19,7 +19,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         onClick={() => setIsOpen((prev) => !prev)}
         className="flex w-full items-start justify-between gap-4 text-left"
       >
-        <span className="text-lg font-semibold tracking-[-0.02em] leading-tight text-content-primary">{question}</span>
+        <span className="text-lg font-medium tracking-[-0.024em] leading-tight text-content-primary">{question}</span>
         {isOpen ? (
           <Minus className="h-5 w-5 shrink-0 text-content-secondary" />
         ) : (
