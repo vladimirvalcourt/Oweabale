@@ -52,7 +52,7 @@ function FaqCard({ question, answer }: { question: string; answer: string }) {
   const panelId = `faq-panel-${question.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 
   return (
-    <article className="border-b border-surface-border py-6">
+    <article className="border-b border-surface-border-subtle py-6 last:border-b-0">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
@@ -60,14 +60,14 @@ function FaqCard({ question, answer }: { question: string; answer: string }) {
         aria-controls={panelId}
         className="flex w-full items-start justify-between gap-4 text-left"
       >
-        <h3 className="text-lg font-semibold tracking-[-0.02em] leading-tight text-content-primary">{question}</h3>
-        {open ? <Minus className="h-5 w-5 shrink-0 text-content-secondary" /> : <Plus className="h-5 w-5 shrink-0 text-content-secondary" />}
+        <h3 className="text-lg font-medium leading-tight tracking-[-0.024em] text-content-primary">{question}</h3>
+        {open ? <Minus className="h-5 w-5 shrink-0 text-content-tertiary" /> : <Plus className="h-5 w-5 shrink-0 text-content-tertiary" />}
       </button>
       <div
         id={panelId}
         className={`overflow-hidden transition-all duration-300 ease-out ${open ? 'mt-4 max-h-40 opacity-100' : 'max-h-0 opacity-0'}`}
       >
-        <p className="text-base leading-relaxed text-content-secondary">{answer}</p>
+        <p className="text-base leading-relaxed text-content-tertiary">{answer}</p>
       </div>
     </article>
   );
@@ -96,7 +96,7 @@ export default function FAQ() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
+    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-brand-violet/25">
       <PublicHeader
         links={[
           { href: '/pricing', label: 'Plans' },
@@ -107,19 +107,19 @@ export default function FAQ() {
 
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <main className="pt-32 pb-24" id="faq">
-          <section className="mx-auto max-w-4xl px-6 lg:px-8">
+      <main className="pb-28 pt-36" id="faq">
+          <section className="mx-auto max-w-5xl px-6 lg:px-8">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">FAQ</p>
-              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">FAQ</p>
+              <h1 className="mt-5 max-w-4xl text-5xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-6xl md:text-7xl">
                 The questions people ask when money already feels heavy.
               </h1>
-              <p className="mt-6 max-w-3xl text-lg leading-relaxed text-content-secondary">
+              <p className="mt-7 max-w-3xl text-lg leading-8 text-content-tertiary">
                 Short answers, plain English, and no fake mystery. If you still need help after this, support is one click away.
               </p>
             </div>
 
-            <div className="mt-12">
+            <div className="mt-14 rounded-[22px] border border-surface-border bg-white/[0.03] px-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:px-8">
               {FAQ_DATA.map((item) => (
                 <FaqCard key={item.question} question={item.question} answer={item.answer} />
               ))}

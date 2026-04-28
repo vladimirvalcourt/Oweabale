@@ -29,8 +29,9 @@ function BillingPanelInner() {
   const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
   const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
   const [searchParams, setSearchParams] = useSearchParams();
-  const [tierLabel, setTierLabel] = useState('Tracker (Free)');
-  const [statusText, setStatusText] = useState('You are on the free Tracker tier with core account and bill tracking.');
+  const isLockedTrial = searchParams.get('locked') === 'trial';
+  const [tierLabel, setTierLabel] = useState('Access locked');
+  const [statusText, setStatusText] = useState('Subscribe to continue using Oweable.');
   const [hasPaidAccess, setHasPaidAccess] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState<
     Array<{ id: string; amount_total: number; currency: string; status: string; created_at: string }>
@@ -128,8 +129,8 @@ function BillingPanelInner() {
         setStatusText('Full Suite access is active.');
       }
     } else {
-      setTierLabel('Tracker (Free)');
-      setStatusText('You are on the free Tracker tier with core account and bill tracking.');
+      setTierLabel('Access locked');
+      setStatusText('Your 14-day trial ended. Subscribe to continue using Oweable.');
     }
 
     setPaymentHistory(
@@ -311,6 +312,15 @@ function BillingPanelInner() {
             Refresh status
           </button>
         </div>
+        {isLockedTrial && !hasPaidAccess && (
+          <div className="mb-5 rounded-lg border border-amber-500/30 bg-amber-500/10 p-5">
+            <h4 className="font-medium text-content-primary">Your 14-day trial ended</h4>
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-content-secondary">
+              Your account is locked until billing is active. Start a subscription to continue using your Pay List,
+              documents, calendar, and settings.
+            </p>
+          </div>
+        )}
         {hasPaidAccess ? (
           <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-lg p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
@@ -377,10 +387,13 @@ function BillingPanelInner() {
         ) : (
           <div className="bg-content-primary/[0.05] border border-surface-border rounded-lg p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <h4 className="flex items-center gap-2 font-medium text-content-primary">Upgrade to Full Suite</h4>
+              <h4 className="flex items-center gap-2 font-medium text-content-primary">
+                {isLockedTrial ? 'Subscribe to continue' : 'Upgrade to Full Suite'}
+              </h4>
               <p className="text-sm text-content-secondary/70 mt-1 max-w-md">
-                Unlock Full Suite: unlimited account sync, debt payoff planner, subscription alerts,
-                and freelancer tax tools for ${monthlyPrice.toFixed(2)}/month.
+                {isLockedTrial
+                  ? `Start Full Suite for $${monthlyPrice.toFixed(2)}/month to unlock your account again.`
+                  : `Unlock Full Suite: unlimited account sync, debt payoff planner, subscription alerts, and freelancer tax tools for $${monthlyPrice.toFixed(2)}/month.`}
               </p>
             </div>
             <button
@@ -404,7 +417,7 @@ function BillingPanelInner() {
             <p className="mt-1 text-xs font-medium text-content-tertiary">
               {hasPaidAccess
                 ? 'Invoices from Stripe will appear here after your first charge.'
-                : 'You are on the free tier — no charges have been made.'}
+                : 'No charges have been made yet.'}
             </p>
           </div>
         ) : (
@@ -434,7 +447,7 @@ function BillingPanelInner() {
               ? 'You are in the trial period and do not have a payment method on file yet.'
               : hasPaidAccess
                 ? 'Add, remove, or replace cards in the Stripe Customer Portal.'
-                : 'Free tier — no billing required'}
+                : 'Add a payment method by starting Full Suite.'}
           </p>
         </div>
         <button
@@ -487,7 +500,7 @@ function BillingPanelInner() {
               You keep Full Suite access until{' '}
               {currentPeriodEnd
                 ? new Date(currentPeriodEnd).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
-                : 'your period end date'}. After that, your account reverts to the free Tracker tier. Your data is retained.
+                : 'your period end date'}. After that, app access locks until billing is active again. Your data is retained.
             </Dialog.Description>
             <div className="mt-6 flex justify-end gap-3">
               <button

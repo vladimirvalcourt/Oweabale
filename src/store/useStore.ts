@@ -22,20 +22,20 @@ export type * from './types';
 
 export const useStore = create<AppState>()(
   persist(
-    (set, get) => ({
+    (set, get, store) => ({
   ...initialData,
-  ...createUiSlice(set, get),
-  ...createAccountSlice(set, get),
-  ...createPlaidSlice(set, get),
-  ...createHouseholdSlice(set, get),
-  ...createRecordsSlice(set, get),
-  ...createObligationsSlice(set, get),
-  ...createPlanningSlice(set, get),
-  ...createEarningsSlice(set, get),
-  ...createCategorizationSlice(set, get),
-  ...createWealthSlice(set, get),
-  ...createIngestionSlice(set, get),
-  ...createDataSyncSlice(set, get),
+  ...createUiSlice(set, get, store),
+  ...createAccountSlice(set, get, store),
+  ...createPlaidSlice(set, get, store),
+  ...createHouseholdSlice(set, get, store),
+  ...createRecordsSlice(set, get, store),
+  ...createObligationsSlice(set, get, store),
+  ...createPlanningSlice(set, get, store),
+  ...createEarningsSlice(set, get, store),
+  ...createCategorizationSlice(set, get, store),
+  ...createWealthSlice(set, get, store),
+  ...createIngestionSlice(set, get, store),
+  ...createDataSyncSlice(set, get, store),
 
     }),
     {

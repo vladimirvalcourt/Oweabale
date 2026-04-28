@@ -59,45 +59,45 @@ export default function Terms() {
           { href: '/support', label: 'Support' },
         ]}
       />
-      <div className="min-h-screen bg-surface-base px-6 pb-20 pt-28 text-content-primary selection:bg-content-primary/15 lg:px-8">
-        <div className="mx-auto max-w-5xl">
-          <section className="py-12">
-            <div className="max-w-3xl">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Terms</p>
-              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
+      <div className="min-h-screen bg-surface-base px-5 pb-24 pt-36 text-content-primary selection:bg-brand-violet/25 sm:px-8">
+        <div className="mx-auto max-w-[1280px]">
+          <section className="grid gap-12 py-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Terms</p>
+              <h1 className="mt-5 max-w-3xl text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
                 Terms that try to be clear about the rules, not hide them.
               </h1>
-              <p className="mt-6 text-lg leading-8 text-content-secondary">
+              <p className="mt-7 max-w-xl text-base leading-7 text-content-tertiary">
                 This is the plain-language overview of the rules that govern use of Oweable. It covers expectations, billing, fair use, and legal boundaries without trying to bury the point.
               </p>
               <p className="mt-4 text-sm text-content-muted">Last updated April 2026</p>
             </div>
 
-            <div className="mt-12 space-y-8 border-t border-surface-border pt-10">
+            <div className="divide-y divide-white/[0.06] rounded-[10px] border border-surface-border bg-white/[0.018]">
               {sections.map((section) => (
-                <section key={section.title}>
-                  <h2 className="text-lg font-semibold text-content-primary mb-3">{section.title}</h2>
-                  <p className="text-sm leading-relaxed text-content-secondary">{section.copy}</p>
+                <section key={section.title} className="p-5">
+                  <h2 className="text-lg font-medium tracking-[-0.024em] text-content-primary mb-3">{section.title}</h2>
+                  <p className="text-sm leading-6 text-content-tertiary">{section.copy}</p>
                 </section>
               ))}
-            </div>
 
-            <div className="mt-10 border-t border-surface-border pt-6">
-              <p className="text-sm leading-relaxed text-content-secondary">
+              <div className="p-5">
+              <p className="text-sm leading-6 text-content-tertiary">
                 For billing and plan details, visit{' '}
-                <TransitionLink to="/pricing" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
+                <TransitionLink to="/pricing" className="font-medium text-content-primary underline underline-offset-4 hover:text-brand-violet">
                   Pricing
                 </TransitionLink>
                 . For data handling, use{' '}
-                <TransitionLink to="/privacy" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
+                <TransitionLink to="/privacy" className="font-medium text-content-primary underline underline-offset-4 hover:text-brand-violet">
                   Privacy
                 </TransitionLink>
                 . If something is unclear, contact{' '}
-                <TransitionLink to="/support" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
+                <TransitionLink to="/support" className="font-medium text-content-primary underline underline-offset-4 hover:text-brand-violet">
                   Support
                 </TransitionLink>
                 .
               </p>
+              </div>
             </div>
           </section>
         </div>

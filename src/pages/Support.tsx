@@ -218,7 +218,7 @@ export default function Support() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
+    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-brand-violet/25">
       <PublicHeader
         links={[
           { href: '/pricing', label: 'Plans' },
@@ -228,32 +228,32 @@ export default function Support() {
       />
 
       <main>
-        <div className="mx-auto max-w-7xl px-6 pt-28 lg:px-8">
-          <section className="grid gap-10 py-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start lg:gap-12">
+        <div className="mx-auto max-w-[1280px] px-5 pt-36 sm:px-8">
+          <section className="grid gap-12 py-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Support</p>
-              <h1 className="mt-6 text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Support</p>
+              <h1 className="mt-5 max-w-3xl text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
                 Help for when something is wrong and you do not want to chase it alone.
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-relaxed text-content-secondary">
+              <p className="mt-7 max-w-xl text-base leading-7 text-content-tertiary">
                 Reach out for billing, access, account, product, or technical issues. We usually reply within one business day, and the goal is to be useful, not robotic.
               </p>
-              <div className="mt-8 grid gap-6">
-                <div className="border-t border-surface-border pt-6">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Best for</p>
-                  <p className="mt-3 text-sm leading-relaxed text-content-secondary">Account access problems, billing questions, bugs, and anything that is making the product harder to use than it should be.</p>
+              <div className="mt-10 grid gap-3">
+                <div className="rounded-[10px] border border-surface-border-subtle bg-white/[0.022] p-5">
+                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Best for</p>
+                  <p className="mt-3 text-sm leading-6 text-content-tertiary">Account access problems, billing questions, bugs, and anything that is making the product harder to use than it should be.</p>
                 </div>
-                <div className="border-t border-surface-border pt-6">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Contact Support</p>
+                <div className="rounded-[10px] border border-surface-border-subtle bg-white/[0.022] p-5">
+                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Contact Support</p>
                   {EMAIL_CONFIG.support.createContactLink(
                     'Get Help',
-                    'mt-3 inline-flex items-center justify-center border border-surface-border bg-content-primary px-6 h-[48px] text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover min-w-[160px]',
+                    'mt-3 inline-flex h-11 min-w-[140px] items-center justify-center rounded-md bg-content-primary px-5 text-sm font-medium text-surface-base transition-colors hover:bg-content-secondary',
                     true
                   )}
                 </div>
-                <div className="border-t border-surface-border pt-6">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Sensitive requests</p>
-                  <p className="mt-3 text-sm leading-relaxed text-content-secondary">
+                <div className="rounded-[10px] border border-surface-border-subtle bg-white/[0.022] p-5">
+                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Sensitive requests</p>
+                  <p className="mt-3 text-sm leading-6 text-content-tertiary">
                     For privacy or security concerns, include that in your subject line so we can route it quickly and handle it with the right level of care.
                   </p>
                 </div>
@@ -261,21 +261,21 @@ export default function Support() {
             </div>
 
             <div className="grid gap-6">
-              <section className="border border-surface-border p-8 sm:p-10">
-                <h2 className="text-2xl font-semibold tracking-tight leading-tight text-content-primary">Send a message</h2>
-                <p className="mt-4 text-base leading-relaxed text-content-secondary">
+              <section className="rounded-[10px] border border-surface-border bg-white/[0.018] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
+                <h2 className="text-2xl font-medium tracking-[-0.03em] leading-tight text-content-primary">Send a message</h2>
+                <p className="mt-4 text-sm leading-6 text-content-tertiary">
                   Give us the basics and a little context. You do not need to write a perfect report. Just tell us what happened and what you needed to get done.
                 </p>
 
                 {submitted ? (
-                  <div className="mt-8 border border-surface-border p-8 text-center">
-                    <h3 className="text-lg font-semibold text-content-primary mb-3">Message sent</h3>
-                    <p className="text-sm leading-relaxed text-content-secondary">
+                  <div className="mt-8 rounded-[8px] border border-surface-border-subtle bg-surface-base/60 p-8 text-center">
+                    <h3 className="text-lg font-medium text-content-primary mb-3">Message sent</h3>
+                    <p className="text-sm leading-relaxed text-content-tertiary">
                       We got your note and will usually reply within one business day.
                     </p>
                     <button
                       onClick={() => setSubmitted(false)}
-                      className="mt-6 inline-flex h-[48px] min-w-[160px] items-center justify-center border border-surface-border bg-content-primary px-6 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover"
+                      className="mt-6 inline-flex h-11 min-w-[160px] items-center justify-center rounded-md bg-content-primary px-6 text-sm font-medium text-surface-base transition-colors hover:bg-content-secondary"
                     >
                       Send another message
                     </button>
@@ -289,7 +289,7 @@ export default function Support() {
                           type="text"
                           value={formData.name}
                           onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                          className="mt-2 w-full rounded-[8px] border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
+                          className="mt-2 w-full rounded-md border border-surface-border bg-surface-raised/80 px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-brand-violet/40"
                           placeholder="Your name"
                           required
                         />
@@ -300,7 +300,7 @@ export default function Support() {
                           type="email"
                           value={formData.email}
                           onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                          className="mt-2 w-full rounded-[8px] border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
+                          className="mt-2 w-full rounded-md border border-surface-border bg-surface-raised/80 px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-brand-violet/40"
                           placeholder="you@example.com"
                           required
                         />
@@ -313,7 +313,7 @@ export default function Support() {
                         type="text"
                         value={formData.subject}
                         onChange={(e) => setFormData((prev) => ({ ...prev, subject: e.target.value }))}
-                        className="mt-2 w-full rounded-[8px] border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
+                        className="mt-2 w-full rounded-md border border-surface-border bg-surface-raised/80 px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-brand-violet/40"
                         placeholder="Billing, login issue, bug report..."
                       />
                     </label>
@@ -323,7 +323,7 @@ export default function Support() {
                       <textarea
                         value={formData.message}
                         onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
-                        className="mt-2 min-h-[160px] w-full rounded-[8px] border border-surface-border bg-surface-raised px-4 py-3 text-content-primary outline-none transition-colors focus:border-surface-border-subtle"
+                        className="mt-2 min-h-[160px] w-full rounded-md border border-surface-border bg-surface-raised/80 px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-brand-violet/40"
                         placeholder="Tell us what happened, what you expected, and anything that would help us reproduce or understand the issue."
                         
                         required
@@ -352,7 +352,7 @@ export default function Support() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="mt-6 inline-flex items-center gap-3 border border-surface-border bg-content-primary px-7 py-3.5 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-70"
+                      className="mt-6 inline-flex h-11 items-center gap-3 rounded-md bg-content-primary px-6 text-sm font-medium text-surface-base transition-colors hover:bg-content-secondary disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       {isSubmitting ? 'Sending...' : 'Send message'}
                       <ArrowRight className="h-4 w-4" />
@@ -361,8 +361,8 @@ export default function Support() {
                 )}
               </section>
 
-              <section className="border border-surface-border p-8 sm:p-10">
-                <h2 className="text-2xl font-semibold tracking-[-0.03em] leading-tight text-content-primary">Quick answers</h2>
+              <section className="rounded-[10px] border border-surface-border bg-white/[0.018] p-6 sm:p-8">
+                <h2 className="text-2xl font-medium tracking-[-0.03em] leading-tight text-content-primary">Quick answers</h2>
                 <motion.div
                   className="mt-6 grid gap-5"
                   variants={staggerContainer}
@@ -371,9 +371,9 @@ export default function Support() {
                   viewport={{ once: true, margin: '-100px' }}
                 >
                   {QUICK_HELP.map((item) => (
-                    <motion.div key={item.q} variants={fadeInUp} className="border-t border-surface-border pt-5">
-                      <h3 className="text-base font-semibold leading-tight text-content-primary">{item.q}</h3>
-                      <p className="mt-3 text-sm leading-relaxed text-content-secondary">{item.a}</p>
+                    <motion.div key={item.q} variants={fadeInUp} className="border-t border-surface-border-subtle pt-5">
+                      <h3 className="text-base font-medium leading-tight tracking-[-0.018em] text-content-primary">{item.q}</h3>
+                      <p className="mt-3 text-sm leading-6 text-content-tertiary">{item.a}</p>
                     </motion.div>
                   ))}
                 </motion.div>
@@ -381,20 +381,20 @@ export default function Support() {
                   <motion.div variants={springButton} whileHover="hover" whileTap="tap">
                     <TransitionLink
                       to="/pricing"
-                      className="inline-flex items-center gap-2 border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
+                      className="inline-flex items-center gap-2 rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
                     >
                       Pricing
                     </TransitionLink>
                   </motion.div>
                   <TransitionLink
                     to="/security"
-                    className="inline-flex items-center gap-2 border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
+                    className="inline-flex items-center gap-2 rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
                   >
                     Security
                   </TransitionLink>
                   <TransitionLink
                     to="/privacy"
-                    className="inline-flex items-center gap-2 border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
+                    className="inline-flex items-center gap-2 rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
                   >
                     Privacy
                   </TransitionLink>

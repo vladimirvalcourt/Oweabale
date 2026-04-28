@@ -7,8 +7,7 @@ import { TransitionLink } from '../components/common';
 import { useSEO } from '../hooks';
 import { runAfterPaint } from '../lib/utils';
 import { BrandWordmark } from '../components/common';
-import { ThemeToggle } from '../components/common';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, LockKeyhole, ReceiptText, WalletCards } from 'lucide-react';
 
 type AuthPageProps = {
   mode?: 'signin' | 'signup';
@@ -61,31 +60,33 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
   };
 
   return (
-    <div className="flex min-h-screen bg-black text-content-primary font-sans selection:bg-content-primary/15">
-      
-      {/* Left Side - Auth Form */}
-      <div className="flex w-full flex-col lg:w-[45%] xl:w-[40%] relative z-10 border-r border-surface-border bg-surface-base">
-        
-        {/* Nav Header */}
-        <div className="flex items-center justify-between px-8 py-6 md:px-12">
-          <TransitionLink to="/" className="group flex items-center gap-2">
-            <BrandWordmark textClassName="text-sm font-semibold uppercase tracking-[0.1em] text-content-primary" />
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-brand-violet/25">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-surface-border-subtle bg-surface-base/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-5 sm:px-8">
+          <TransitionLink to="/" className="group flex items-center gap-2 text-content-primary">
+            <BrandWordmark
+              logoClassName="h-5 w-5 rounded-[4px]"
+              textClassName="text-xl font-medium normal-case tracking-[-0.035em] text-content-primary"
+            />
           </TransitionLink>
-          <ThemeToggle />
+          <TransitionLink to="/pricing" className="text-sm text-content-secondary/72 transition-colors hover:text-content-primary">
+            Pricing
+          </TransitionLink>
         </div>
+      </header>
 
-        {/* Auth Container */}
-        <div className="flex flex-1 flex-col justify-start px-6 sm:px-8 md:px-12 lg:px-16 max-w-xl w-full pt-12 pb-20">
-          <div className="mb-8 inline-flex w-fit items-center gap-2 rounded-full border border-surface-border bg-surface-raised px-3 py-1.5 text-xs font-medium text-content-secondary">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />
-            Free · No credit card required
-          </div>
+      <main className="mx-auto grid min-h-screen max-w-[1280px] gap-12 px-5 pb-16 pt-36 sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
+        <section className="max-w-md">
+          <p className="inline-flex items-center gap-2 rounded-full border border-surface-border-subtle bg-white/[0.025] px-3 py-1 text-xs text-content-secondary">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-indigo" aria-hidden />
+            Free to start · Google sign-in
+          </p>
 
-          <h1 className="text-left text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
-            Welcome to Oweable
+          <h1 className="mt-7 text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
+            {isSignupMode ? 'Create your account.' : 'Welcome back.'}
           </h1>
-          <p className="mt-4 text-left text-base leading-relaxed text-content-secondary max-w-sm">
-            Sign in or create your account — it's the same button. One click gets you started.
+          <p className="mt-6 text-base leading-7 text-content-tertiary">
+            One secure entry point for your Pay List, debt plan, subscriptions, and cash checks. New accounts are created automatically.
           </p>
 
           <motion.button
@@ -94,10 +95,10 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
             disabled={googleLoading}
             whileTap={{ scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-            className="mt-10 flex h-[48px] w-full items-center justify-center gap-3 rounded-lg border border-content-primary/10 bg-surface-raised px-4 text-sm font-medium tracking-wide text-content-primary shadow-tactile transition-all duration-200 hover:border-content-primary/30 hover:bg-surface-elevated hover:shadow-tactile-hover disabled:cursor-not-allowed disabled:opacity-50 focus-app"
+            className="mt-10 flex h-11 w-full items-center justify-center gap-3 rounded-md bg-content-primary px-4 text-sm font-medium tracking-normal text-surface-base transition-[background-color,transform] hover:bg-content-secondary disabled:cursor-not-allowed disabled:opacity-50 focus-app"
           >
             {googleLoading ? (
-              <span className="text-content-secondary">Redirecting…</span>
+              <span>Redirecting…</span>
             ) : (
               <>
                 <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" aria-hidden>
@@ -111,8 +112,8 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
             )}
           </motion.button>
 
-          <div className="mt-8 flex items-center gap-3 border-t border-surface-border pt-8">
-            <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" aria-hidden />
+          <div className="mt-8 flex items-center gap-3 border-t border-surface-border-subtle pt-8">
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-brand-violet" aria-hidden />
             <p className="text-sm text-content-secondary">
               New here? Signing in creates your account automatically.
             </p>
@@ -124,9 +125,56 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
             {' '}and{' '}
             <TransitionLink to="/privacy" className="text-content-tertiary underline underline-offset-2 hover:text-content-primary">Privacy Policy</TransitionLink>.
           </p>
-        </div>
-      </div>
+        </section>
 
+        <section className="hidden lg:block">
+          <div className="overflow-hidden rounded-[10px] border border-surface-border bg-white/[0.018] shadow-[inset_0_1px_0_rgba(255,255,255,0.035),0_40px_160px_rgba(0,0,0,0.42)]">
+            <div className="flex h-12 items-center justify-between border-b border-surface-border-subtle bg-surface-raised/70 px-5">
+              <div className="flex items-center gap-2">
+                <span className="h-4 w-4 rounded-[4px] border border-surface-border bg-white/[0.04]" />
+                <span className="text-sm font-medium text-content-primary">Oweable</span>
+                <span className="text-content-muted">/</span>
+                <span className="text-sm text-content-tertiary">Account setup</span>
+              </div>
+              <span className="text-xs text-content-muted">Secure session</span>
+            </div>
+            <div className="grid min-h-[460px] grid-cols-[240px_1fr]">
+              <aside className="border-r border-surface-border-subtle bg-surface-raised/36 p-5">
+                {[
+                  ['Pay List', ReceiptText],
+                  ['Cash overview', WalletCards],
+                  ['Private access', LockKeyhole],
+                ].map(([label, Icon], index) => {
+                  const IconComponent = Icon as typeof ReceiptText;
+                  return (
+                    <div key={label as string} className={`mb-1 flex items-center gap-3 rounded-md px-3 py-2 text-sm ${index === 2 ? 'bg-white/[0.055] text-content-primary' : 'text-content-tertiary'}`}>
+                      <IconComponent className="h-4 w-4" />
+                      {label as string}
+                    </div>
+                  );
+                })}
+              </aside>
+              <div className="p-10">
+                <p className="text-sm text-content-muted">AUTH-014</p>
+                <h2 className="mt-8 text-2xl font-medium tracking-[-0.03em] text-content-primary">Start with one secure account</h2>
+                <p className="mt-3 max-w-lg text-sm leading-6 text-content-tertiary">
+                  Connect the basics first. Oweable keeps the onboarding path short, then lets the dashboard handle the deeper setup.
+                </p>
+                <div className="mt-10 divide-y divide-white/[0.06] rounded-[8px] border border-surface-border-subtle bg-surface-base/50">
+                  {['Google OAuth redirect', 'Trial profile activation', 'Dashboard routing'].map((item, index) => (
+                    <div key={item} className="flex items-center justify-between px-4 py-4">
+                      <span className="text-sm text-content-secondary">{item}</span>
+                      <span className="rounded-md border border-surface-border-subtle px-2 py-1 text-xs text-content-muted">
+                        {index === 0 ? 'Ready' : index === 1 ? 'Auto' : 'Next'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

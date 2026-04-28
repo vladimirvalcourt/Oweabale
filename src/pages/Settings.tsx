@@ -8,28 +8,18 @@ import { useStore } from '../store';
 import { toast } from 'sonner';
 import { SETTINGS_TAB_IDS, type SettingsTab } from './settings/constants';
 import { ProfilePanel } from './settings/ProfilePanel';
-import { NotificationsPanel } from './settings/NotificationsPanel';
 import { SecurityPanel } from './settings/SecurityPanel';
 import { BillingPanel } from './settings/BillingPanel';
-import { FinancialPanel } from './settings/FinancialPanel';
 import { IntegrationsPanel } from './settings/IntegrationsPanel';
 import { PrivacyPanel } from './settings/PrivacyPanel';
-import { SupportPanel } from './settings/SupportPanel';
-import { FeedbackPanel } from './settings/FeedbackPanel';
-import { HouseholdPanel } from './settings/HouseholdPanel';
 import { yieldForPaint } from '../lib/utils';
 
 const tabs = [
   { id: 'profile' as const, name: 'Profile' },
-  { id: 'household' as const, name: 'Household' },
+  { id: 'billing' as const, name: 'Plan' },
+  { id: 'integrations' as const, name: 'Connections' },
   { id: 'security' as const, name: 'Security' },
-  { id: 'notifications' as const, name: 'Notifications' },
-  { id: 'financial' as const, name: 'Tax' },
-  { id: 'billing' as const, name: 'Billing' },
-  { id: 'integrations' as const, name: 'Integrations' },
-  { id: 'privacy' as const, name: 'Data & Privacy' },
-  { id: 'support' as const, name: 'Support' },
-  { id: 'feedback' as const, name: 'Feedback' },
+  { id: 'privacy' as const, name: 'Data' },
 ];
 
 const BUTTON_BASE_CLASS =
@@ -160,7 +150,7 @@ export default function Settings() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Settings</h1>
-          <p className="mt-1 text-sm font-medium text-content-secondary">Account, billing, security, and tax.</p>
+          <p className="mt-1 text-sm font-medium text-content-secondary">Account, plan, connections, security, and data.</p>
         </div>
       </div>
 
@@ -171,10 +161,8 @@ export default function Settings() {
 
         <div className="flex-1 space-y-6">
           {activeTab === 'profile' && <ProfilePanel />}
-          {activeTab === 'notifications' && <NotificationsPanel />}
           {activeTab === 'security' && <SecurityPanel />}
           {activeTab === 'billing' && <BillingPanel />}
-          {activeTab === 'financial' && <FinancialPanel />}
           {activeTab === 'integrations' && <IntegrationsPanel />}
           {activeTab === 'privacy' && (
             <PrivacyPanel
@@ -187,8 +175,6 @@ export default function Settings() {
               }}
             />
           )}
-          {activeTab === 'support' && <SupportPanel />}
-          {activeTab === 'feedback' && <FeedbackPanel />}
         </div>
       </div>
 

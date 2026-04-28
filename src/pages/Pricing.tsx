@@ -46,7 +46,7 @@ const PRICING_FAQ_STATIC = [
   {
     question: 'What happens when the trial ends?',
     answer:
-      'If you do nothing, you keep access to the core Pay List path unless you choose to upgrade. No surprise charges and no awkward cancellation maze.',
+      'If you do nothing, your signed-in app locks after 14 days. You can add billing before the trial ends or subscribe later to continue using Oweable. No surprise charges.',
   },
   {
     question: 'Can I cancel anytime?',
@@ -219,7 +219,7 @@ export default function Pricing() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
+    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-brand-violet/25">
       <PublicHeader
         links={[
           { href: '/', label: 'Home' },
@@ -229,43 +229,43 @@ export default function Pricing() {
       />
 
       <main>
-        <section className="mx-auto max-w-5xl px-6 pb-16 pt-32 lg:px-8">
+        <section className="mx-auto max-w-6xl px-6 pb-20 pt-36 lg:px-8">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Pricing that stays honest</p>
-            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Pricing that stays honest</p>
+            <h1 className="mt-5 max-w-5xl text-5xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-6xl md:text-7xl">
               Pay only for the level of help you need.
             </h1>
-            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-content-secondary">
+            <p className="mt-7 max-w-3xl text-lg leading-8 text-content-tertiary">
               Oweable starts as one focused app for staying ahead of bills, debt, subscriptions, tolls, tickets, and the things people forget. Full Suite adds the deeper planning layer when you want more structure.
             </p>
-            <div className="mt-8 flex flex-wrap gap-6 text-sm text-content-secondary">
-              <span>14-day Full Suite trial</span>
-              <span>No credit card required</span>
-              <span>Cancel anytime</span>
+            <div className="mt-8 flex flex-wrap gap-3 text-sm text-content-secondary">
+              <span className="rounded-full border border-surface-border-subtle bg-white/[0.025] px-4 py-2">14-day Full Suite trial</span>
+              <span className="rounded-full border border-surface-border-subtle bg-white/[0.025] px-4 py-2">No credit card required</span>
+              <span className="rounded-full border border-surface-border-subtle bg-white/[0.025] px-4 py-2">Cancel anytime</span>
             </div>
           </div>
         </section>
 
-        <section className="border-y border-surface-border py-16">
+        <section className="border-y border-surface-border-subtle bg-surface-raised/36 py-20">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl border border-surface-border p-7 sm:p-8">
+            <div className="mx-auto max-w-3xl rounded-[22px] border border-surface-border bg-white/[0.035] p-7 text-content-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_40px_120px_rgba(0,0,0,0.36)] sm:p-8">
                 <div className="flex items-center justify-between gap-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Full Suite</p>
-                  <span className="text-xs font-semibold uppercase tracking-[0.14em] text-content-secondary">
+                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">Full Suite</p>
+                  <span className="text-xs font-medium uppercase tracking-[0.14em] text-content-tertiary">
                     Deeper support
                   </span>
                 </div>
 
                 {hasYearlyPricing ? (
-                  <div className="mt-5 inline-flex items-center rounded-full border border-surface-border bg-surface-highlight p-0.5">
+                  <div className="mt-5 inline-flex items-center rounded-md border border-surface-border-subtle bg-white/[0.025] p-0.5">
                     <button
                       type="button"
                       onClick={() => setBillingPeriod('monthly')}
                       aria-pressed={billingPeriod === 'monthly'}
                       className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
                         billingPeriod === 'monthly'
-                          ? 'bg-surface-base text-content-primary'
-                          : 'text-content-secondary hover:text-content-primary'
+                          ? 'bg-brand-indigo text-white'
+                          : 'text-content-tertiary hover:text-content-primary'
                       }`}
                     >
                       Monthly
@@ -276,8 +276,8 @@ export default function Pricing() {
                       aria-pressed={billingPeriod === 'yearly'}
                       className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
                         billingPeriod === 'yearly'
-                          ? 'bg-surface-base text-content-primary'
-                          : 'text-content-secondary hover:text-content-primary'
+                          ? 'bg-brand-indigo text-white'
+                          : 'text-content-tertiary hover:text-content-primary'
                       }`}
                     >
                       Yearly{yearlySavingsPct > 0 ? ` (-${yearlySavingsPct}%)` : ''}
@@ -289,40 +289,40 @@ export default function Pricing() {
                   {hasYearlyPricing && billingPeriod === 'yearly' && yearlyEffectiveMonthly !== null ? (
                     <>
                       <div className="flex items-end gap-2">
-                        <span className="text-5xl font-semibold tracking-[-0.05em]">${yearlyEffectiveMonthly.toFixed(2)}</span>
-                        <span className="pb-1 text-sm text-content-secondary">per month</span>
+                        <span className="font-mono text-6xl font-medium tracking-[-0.055em]">${yearlyEffectiveMonthly.toFixed(2)}</span>
+                        <span className="pb-2 text-sm text-content-tertiary">per month</span>
                       </div>
-                      <p className="mt-2 text-sm text-content-secondary">
+                      <p className="mt-2 text-sm text-content-tertiary">
                         Billed ${yearlyTotal?.toFixed(2)} yearly
                       </p>
                     </>
                   ) : (
                     <div className="flex items-end gap-2">
-                      <span className="text-5xl font-semibold tracking-[-0.05em]">${monthlyPrice.toFixed(2)}</span>
-                      <span className="pb-1 text-sm text-content-secondary">per month</span>
+                      <span className="font-mono text-6xl font-medium tracking-[-0.055em]">${monthlyPrice.toFixed(2)}</span>
+                      <span className="pb-2 text-sm text-content-tertiary">per month</span>
                     </div>
                   )}
                 </div>
 
-                <p className="mt-4 max-w-md text-base leading-7 text-content-secondary">
+                <p className="mt-5 max-w-md text-base leading-7 text-content-tertiary">
                   For people who want help turning visibility into action: payoff strategy, budgets, analytics,
                   cash-flow clarity, and tax planning when income gets uneven.
                 </p>
-                <ul className="mt-6 space-y-3 text-sm text-content-secondary">
+                <ul className="mt-7 space-y-3 text-sm text-content-secondary">
                   <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-violet" />
                     <span>Debt payoff engine with Snowball and Avalanche</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-violet" />
                     <span>Budgets, analytics, income ledger, and transaction views</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-violet" />
                     <span>Optional bank sync and broader planning workflows</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-profit" />
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-violet" />
                     <span>Tax estimates and reserve planning for variable income</span>
                   </li>
                 </ul>
@@ -330,35 +330,35 @@ export default function Pricing() {
                   type="button"
                   onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                   disabled={isStartingCheckout}
-                  className="mt-8 inline-flex w-full items-center justify-center border border-surface-border bg-content-primary px-6 py-3.5 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-70"
+                  className="mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-md bg-brand-indigo px-6 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {isStartingCheckout ? 'Starting checkout...' : 'Unlock Full Suite'}
                 </button>
-                <p className="mt-4 text-sm text-content-secondary">
+                <p className="mt-4 text-sm text-content-tertiary">
                   Starts with a 14-day free trial. No credit card required to create your account first.
                 </p>
             </div>
           </div>
         </section>
 
-        <section className="bg-surface-base py-24">
+        <section className="bg-surface-base py-28">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr]">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">What you get</p>
-                <h2 className="mt-4 max-w-lg text-4xl font-semibold tracking-[-0.04em] text-content-primary">
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">What you get</p>
+                <h2 className="mt-4 max-w-lg text-4xl font-medium tracking-[-0.044em] text-content-primary">
                   One app path, clear household money help, deeper tools when you need them.
                 </h2>
               </div>
-              <div className="overflow-x-auto border border-surface-border">
-                <div className="grid grid-cols-2 border-b border-surface-border bg-surface-highlight text-sm font-semibold text-content-primary">
+              <div className="overflow-x-auto rounded-[22px] border border-surface-border bg-white/[0.03]">
+                <div className="grid grid-cols-2 border-b border-surface-border-subtle bg-white/[0.035] text-sm font-medium text-content-primary">
                   <div className="min-w-[180px] px-4 py-4">Feature</div>
                   <div className="min-w-[160px] border-l border-surface-border px-4 py-4">Oweable</div>
                 </div>
                 {comparisonRows.map(([feature, , suite]) => (
                   <div key={feature} className="grid grid-cols-2 border-b border-surface-border text-sm last:border-b-0">
-                    <div className="min-w-[180px] px-4 py-4 text-content-secondary">{feature}</div>
-                    <div className="min-w-[160px] border-l border-surface-border px-4 py-4 text-content-secondary">{suite}</div>
+                    <div className="min-w-[180px] px-4 py-4 text-content-tertiary">{feature}</div>
+                    <div className="min-w-[160px] border-l border-surface-border-subtle px-4 py-4 text-content-secondary">{suite}</div>
                   </div>
                 ))}
               </div>
@@ -366,11 +366,11 @@ export default function Pricing() {
           </div>
         </section>
 
-        <section id="faq" className="border-y border-surface-border py-24">
+        <section id="faq" className="border-y border-surface-border-subtle bg-surface-raised/36 py-28">
           <div className="mx-auto max-w-5xl px-6 lg:px-8">
             <div className="max-w-2xl">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">FAQ</p>
-              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.04em] text-content-primary">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">FAQ</p>
+              <h2 className="mt-4 text-4xl font-medium tracking-[-0.044em] text-content-primary">
                 The answers people usually want before trusting something with their money.
               </h2>
             </div>
@@ -382,19 +382,19 @@ export default function Pricing() {
           </div>
         </section>
 
-        <section className="py-24 text-content-primary">
+        <section className="bg-surface-base py-28 text-content-primary">
           <div className="mx-auto max-w-5xl px-6 text-center lg:px-8">
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Ready when you are</p>
-            <h2 className="mt-5 text-4xl font-semibold tracking-[-0.05em] sm:text-5xl">
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">Ready when you are</p>
+            <h2 className="mt-5 text-4xl font-medium tracking-[-0.044em] sm:text-6xl">
               Start with relief. Keep the app simple.
             </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-content-secondary">
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-content-tertiary">
               The first path is the Pay List. The advanced tools are there when they help, not when they distract.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <TransitionLink
                 to="/onboarding?redirect=/pro/dashboard"
-                className="inline-flex items-center gap-3 border border-surface-border bg-content-primary px-7 py-3.5 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover"
+                className="inline-flex min-h-12 items-center gap-3 rounded-md bg-brand-indigo px-7 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px"
               >
                 Try Full Suite
                 <ArrowRight className="h-4 w-4" />
@@ -403,7 +403,7 @@ export default function Pricing() {
                 type="button"
                 onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                 disabled={isStartingCheckout}
-                className="inline-flex items-center gap-3 rounded-full border border-surface-border px-7 py-3.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight disabled:cursor-not-allowed disabled:opacity-70"
+                className="inline-flex min-h-12 items-center gap-3 rounded-md border border-surface-border bg-white/[0.02] px-7 text-sm font-medium text-content-primary transition-colors hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 Upgrade to Full Suite
               </button>

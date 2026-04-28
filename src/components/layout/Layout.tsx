@@ -3,7 +3,8 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { TransitionLink } from '../common/TransitionLink';
 import { 
   Bell, Search, Settings, Plus, X, ChevronDown,
-  Command, Home, Activity, AlertTriangle, MoreHorizontal
+  Command, Home, Activity, AlertTriangle, MoreHorizontal,
+  LayoutDashboard, CalendarDays, Inbox
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
@@ -19,10 +20,8 @@ import { formatCategoryLabel } from '../../lib/api/services/categoryDisplay';
 import { BrandWordmark } from '../common/BrandWordmark';
 import { KeyboardShortcutsDialog } from '../common/KeyboardShortcutsDialog';
 import { isApplePointerPlatform } from '../../lib/utils';
-import { canAccessAppPath } from '../../app/constants';
 import type { HouseholdMember } from '../../types';
 import TrialBanner from '../common/TrialBanner';
-import TrialExpiryModal from '../common/TrialExpiryModal';
 import { ThemeToggle } from '../common/ThemeToggle';
 import { useTheme } from '../../hooks';
 import {
@@ -48,7 +47,6 @@ export default function Layout() {
   const prefetchedPaths = usePrefetchedSet(); // Fix 4
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [showTrialExpiryModal, setShowTrialExpiryModal] = useState(true);
   
   // Initialize theme system
   const { theme } = useTheme();
@@ -324,10 +322,10 @@ export default function Layout() {
       '/pro/bills?tab=ambush',
     );
     pushNavShortcut(
-      ['document', 'documents', 'notice', 'proof', 'scan', 'upload'],
+      ['document', 'documents', 'notice', 'proof', 'scan', 'upload', 'form', 'forms', 'form filler', 'autofill', 'fill', 'w-9', 'w9', '1099'],
       'Navigation',
       'Documents',
-      'Bills, notices, citations, fines, and payment proof',
+      'Bills, notices, forms, citations, fines, and payment proof',
       '/pro/documents',
     );
     pushNavShortcut(
@@ -365,8 +363,19 @@ export default function Layout() {
     [dueSoonCount, pendingIngestions.length],
   );
 
-  // Layout is only rendered inside ProPlanGuard — always show all nav groups.
-  const visibleNavGroups = navGroups;
+  const lockedToBilling = !checkingFullSuite && !hasFullSuite;
+  const visibleNavGroups = useMemo(
+    () =>
+      lockedToBilling
+        ? navGroups
+            .map((group) => ({
+              ...group,
+              items: group.items.filter((item) => item.path === '/pro/settings'),
+            }))
+            .filter((group) => group.items.length > 0)
+        : navGroups,
+    [lockedToBilling, navGroups],
+  );
 
   /* Defer location so active-nav recalculation does not block the click→paint frame (INP).
      Tradeoff: active highlight can lag one frame after navigation — intentional. */
@@ -388,7 +397,6 @@ export default function Layout() {
   return (
     <div className="min-h-[100dvh] bg-surface-base font-sans text-content-primary flex">
       <TrialBanner />
-      <TrialExpiryModal onDismiss={() => setShowTrialExpiryModal(false)} />
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
         <div
@@ -656,7 +664,7 @@ export default function Layout() {
             {/* Global Search (Desktop) */}
             <div className="hidden md:flex flex-col max-w-md w-full" ref={searchRef}>
               <label htmlFor="layout-global-search" className="sr-only">
-                Search Pay List items, documents, subscriptions, and advanced tools
+                Search Pay List items, documents, subscriptions, and settings
               </label>
               <div className="relative w-full">
               <Search className="w-4 h-4 text-content-tertiary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden />
@@ -1034,13 +1042,16 @@ export default function Layout() {
         aria-label="Mobile app navigation"
       >
         <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
-          {[
-            { name: 'Pay List', to: '/pro/dashboard', icon: LayoutDashboard },
-            { name: 'Calendar', to: '/pro/calendar', icon: CalendarIcon },
-            { name: 'Documents', to: '/pro/documents', icon: Inbox },
-          ].map((item) => {
+          {(lockedToBilling
+            ? [{ name: 'Plan', to: '/pro/settings?tab=billing', icon: Settings }]
+            : [
+                { name: 'Pay List', to: '/pro/dashboard', icon: LayoutDashboard },
+                { name: 'Calendar', to: '/pro/calendar', icon: CalendarDays },
+                { name: 'Documents', to: '/pro/documents', icon: Inbox },
+              ]
+          ).map((item) => {
             const Icon = item.icon;
-            const active = location.pathname === item.to;
+            const active = `${location.pathname}${location.search}` === item.to || location.pathname === item.to;
             return (
               <TransitionLink
                 key={item.name}
@@ -1056,14 +1067,16 @@ export default function Layout() {
               </TransitionLink>
             );
           })}
-          <button
-            type="button"
-            onClick={() => openQuickAdd('obligation')}
-            className="focus-app flex min-h-12 flex-col items-center justify-center gap-1 rounded-lg bg-brand-cta px-1 text-[10px] font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
-          >
-            <Plus className="h-4 w-4" aria-hidden />
-            <span className="max-w-full truncate">Add</span>
-          </button>
+          {!lockedToBilling && (
+            <button
+              type="button"
+              onClick={() => openQuickAdd('obligation')}
+              className="focus-app flex min-h-12 flex-col items-center justify-center gap-1 rounded-lg bg-brand-cta px-1 text-[10px] font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
+            >
+              <Plus className="h-4 w-4" aria-hidden />
+              <span className="max-w-full truncate">Add</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
@@ -1080,7 +1093,7 @@ export default function Layout() {
         <div className="fixed inset-0 z-[60] bg-black/80 md:hidden flex flex-col">
           <div className="p-4 bg-surface-raised border-b border-surface-border flex items-center gap-3">
             <label htmlFor="layout-mobile-search" className="sr-only">
-              Search Pay List items, documents, subscriptions, and advanced tools
+              Search Pay List items, documents, subscriptions, and settings
             </label>
             <Search className="w-5 h-5 text-content-tertiary shrink-0" aria-hidden />
             <input

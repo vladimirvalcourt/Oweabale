@@ -1,157 +1,293 @@
-import { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Check, CircleDollarSign, Clock3, Layers3, ShieldCheck } from 'lucide-react';
+import { Footer, PublicHeader } from '../components/layout';
 import { TransitionLink } from '../components/common';
-import { BrandWordmark } from '../components/common';
-import { useSEO } from '../hooks';
-import { useAuth } from '../hooks';
+import { useAuth, useSEO } from '../hooks';
 
-interface WordsPullUpProps {
-  text: string;
-  className?: string;
-  showAsterisk?: boolean;
-  style?: React.CSSProperties;
-}
+const proofPoints = ['Bills', 'Debt', 'Subscriptions', 'Tolls', 'Tickets', 'Taxes'];
 
-function WordsPullUp({ text, className = '', showAsterisk = false, style }: WordsPullUpProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true });
-  const words = text.split(' ');
+const featureRows = [
+  {
+    icon: Clock3,
+    title: 'One ordered Pay List',
+    body: 'See what is due, what is late, and what can wait without rebuilding the same spreadsheet every week.',
+  },
+  {
+    icon: CircleDollarSign,
+    title: 'Payoff direction',
+    body: 'Turn scattered balances into a clear next move with snowball, avalanche, and cash-aware payoff paths.',
+  },
+  {
+    icon: Layers3,
+    title: 'Full Suite when needed',
+    body: 'Add budgets, income tracking, subscriptions, documents, and tax reserves only when the deeper system helps.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Private by default',
+    body: 'Start manually, connect accounts only when useful, and keep financial planning separate from noisy bank apps.',
+  },
+];
 
+const payListRows = [
+  { label: 'Rent', due: 'Apr 30', state: 'Ready', amount: '$1,842.00' },
+  { label: 'Student loan', due: 'May 02', state: 'Next', amount: '$318.44' },
+  { label: 'Car insurance', due: 'May 06', state: 'Watch', amount: '$186.17' },
+  { label: 'Toll notice', due: 'May 09', state: 'New', amount: '$47.20' },
+];
+
+const activityRows = [
+  {
+    name: 'Mara',
+    image: 'https://i.pravatar.cc/80?img=32',
+    text: 'Marked rent reserve as protected',
+    time: '2 min ago',
+  },
+  {
+    name: 'Jon',
+    image: 'https://i.pravatar.cc/80?img=12',
+    text: 'Added toll notice to the Pay List',
+    time: 'just now',
+  },
+];
+
+function ProductPreview() {
   return (
-    <div ref={ref} className={`inline-flex flex-wrap ${className}`} style={style}>
-      {words.map((word, index) => {
-        const isLast = index === words.length - 1;
-        return (
-          <motion.span
-            key={`${word}-${index}`}
-            initial={{ y: 20, opacity: 0 }}
-            animate={isInView ? { y: 0, opacity: 1 } : {}}
-            transition={{ duration: 0.6, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
-            className="relative inline-block"
-            style={{ marginRight: isLast ? 0 : '0.25em' }}
-          >
-            {word}
-            {showAsterisk && isLast && (
-              <span className="absolute top-[0.65em] -right-[0.3em] text-[0.31em]">*</span>
-            )}
-          </motion.span>
-        );
-      })}
+    <div className="relative mx-auto max-w-[1320px] overflow-hidden rounded-[10px] border border-surface-border bg-white/[0.018] shadow-[inset_0_1px_0_rgba(255,255,255,0.035),0_40px_160px_rgba(0,0,0,0.5)]">
+      <div className="flex h-12 items-center justify-between border-b border-surface-border-subtle bg-surface-raised/70 px-5">
+        <div className="flex items-center gap-2">
+          <span className="h-4 w-4 rounded-[4px] border border-surface-border bg-white/[0.04]" />
+          <span className="text-sm font-medium text-content-primary">Oweable</span>
+          <span className="text-content-muted">/</span>
+          <span className="hidden text-sm text-content-tertiary sm:inline">Pay List</span>
+        </div>
+        <div className="hidden items-center gap-5 text-sm text-content-muted sm:flex">
+          <span>02 / 145</span>
+          <span>⌃</span>
+          <span>⌄</span>
+        </div>
+      </div>
+
+      <div className="grid min-h-[500px] gap-0 lg:grid-cols-[240px_1fr_320px]">
+        <aside className="hidden border-r border-surface-border-subtle bg-surface-raised/36 p-5 lg:block">
+          <div className="space-y-1 text-sm">
+            {['Inbox', 'Pay List', 'Debt plan', 'Calendar', 'Subscriptions'].map((item, index) => (
+              <div key={item} className={`rounded-md px-3 py-2 ${index === 1 ? 'bg-white/[0.055] text-content-primary' : 'text-content-tertiary'}`}>
+                {item}
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 px-3 text-xs text-content-muted">Favorites</p>
+          <div className="mt-2 space-y-1 text-sm text-content-tertiary">
+            {['Rent and utilities', 'Student loan', 'Tax reserve'].map((item) => (
+              <div key={item} className="rounded-md px-3 py-2">{item}</div>
+            ))}
+          </div>
+        </aside>
+
+        <div className="p-7 sm:p-10">
+          <div className="mb-10 flex items-start justify-between border-b border-surface-border-subtle pb-8">
+            <div>
+              <p className="text-sm text-content-muted">ENG-2703</p>
+              <h2 className="mt-8 text-2xl font-medium tracking-[-0.03em] text-content-primary">Pay List clarity</h2>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-content-tertiary">
+                Sort upcoming bills by cash impact, due date, and whether a payment can safely move today.
+              </p>
+            </div>
+            <span className="hidden rounded-md border border-surface-border-subtle px-3 py-1 text-xs text-content-tertiary sm:inline-flex">
+              In Progress
+            </span>
+          </div>
+
+          <div className="divide-y divide-white/[0.06] rounded-[8px] border border-surface-border-subtle bg-surface-base/50">
+            {payListRows.map((row) => (
+              <div key={row.label} className="grid grid-cols-[1fr_auto] gap-4 px-4 py-4 sm:grid-cols-[1fr_auto_auto_auto]">
+                <div>
+                  <p className="text-sm font-medium text-content-primary">{row.label}</p>
+                  <p className="text-xs text-content-muted">Due {row.due}</p>
+                </div>
+                <span className="hidden self-center rounded-md border border-surface-border-subtle px-2 py-1 text-xs text-content-tertiary sm:inline-flex">
+                  {row.state}
+                </span>
+                <span className="self-center font-mono text-sm text-content-secondary">{row.amount}</span>
+                <Check className="hidden h-4 w-4 self-center text-brand-violet sm:block" />
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8">
+            <p className="mb-3 text-sm font-medium text-content-primary">Activity</p>
+            <div className="space-y-3">
+              {activityRows.map((row) => (
+                <div key={row.name} className="flex items-center gap-3 text-sm">
+                  <img
+                    src={row.image}
+                    alt={`${row.name} avatar`}
+                    className="h-7 w-7 rounded-full border border-surface-border object-cover"
+                    loading="lazy"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-content-secondary">
+                      <span className="text-content-primary">{row.name}</span> {row.text}
+                    </p>
+                    <p className="text-xs text-content-muted">{row.time}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <aside className="hidden border-l border-surface-border-subtle bg-surface-raised/24 p-7 lg:block">
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Cash ready</p>
+          <div className="mt-5 font-mono text-3xl tracking-[-0.04em] text-content-primary">$2,417</div>
+          <div className="mt-8 space-y-5 text-sm">
+            <div>
+              <p className="text-content-muted">Status</p>
+              <p className="mt-1 text-content-secondary">Ready to move</p>
+            </div>
+            <div>
+              <p className="text-content-muted">Next review</p>
+              <p className="mt-1 text-content-secondary">Friday morning</p>
+            </div>
+            <div>
+              <p className="text-content-muted">Risk</p>
+              <p className="mt-1 text-content-secondary">Rent reserve protected</p>
+            </div>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }
 
-const navItems = [
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'FAQ', href: '/faq' },
-  { label: 'Support', href: '/support' },
-  { label: 'Sign in', href: '/auth' },
-];
-
 export default function Landing() {
+  const { user: authUser } = useAuth();
+  const primaryHref = authUser?.id ? '/pro/dashboard' : '/auth?mode=signup';
+
   useSEO({
     title: 'Oweable — Stop guessing what you owe',
     description:
-      'Oweable helps you track bills, debt, subscriptions, due dates, and uneven income in one clear Pay List.',
-    ogTitle: 'Oweable — Stop guessing what you owe',
-    ogDescription:
-      'A clearer way to see what is due, what is behind, and what to pay first.',
+      'Oweable helps you track bills, debt, subscriptions, due dates, and obligations in one calm Pay List.',
     canonical: 'https://www.oweable.com/',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
 
-  const { user: authUser } = useAuth();
-  const primaryHref = authUser?.id ? '/dashboard' : '/auth';
-
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
-      <main>
-        <section className="h-screen w-full bg-black p-2">
-          <div className="relative h-full w-full overflow-hidden rounded-2xl md:rounded-[2rem]">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute inset-0 h-full w-full object-cover opacity-80"
-              src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_170732_8a9ccda6-5cff-4628-b164-059c500a2b41.mp4"
-            />
-            <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.45] mix-blend-overlay" />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/30 via-black/5 to-black/70" />
+    <div className="min-h-screen overflow-hidden bg-surface-base text-content-primary selection:bg-brand-violet/25">
+      <PublicHeader
+        links={[
+          { href: '#why', label: 'Why', id: 'why' },
+          { href: '#flow', label: 'Flow', id: 'flow' },
+          { href: '/pricing', label: 'Pricing' },
+        ]}
+      />
 
-            <nav className="absolute left-1/2 top-0 z-20 -translate-x-1/2">
-              <div className="flex items-center gap-3 rounded-b-2xl bg-black px-4 py-2 sm:gap-6 md:gap-10 md:rounded-b-3xl md:px-8">
-                <TransitionLink to="/" className="hidden items-center text-[#E1E0CC] sm:inline-flex">
-                  <BrandWordmark
-                    logoClassName="h-4 w-4"
-                    textClassName="text-xs font-semibold uppercase text-[#E1E0CC]"
-                  />
+      <main>
+        <section className="relative px-5 pb-20 pt-[272px] sm:px-8">
+          <div className="noise-overlay pointer-events-none fixed inset-0 opacity-[0.035]" />
+
+          <div className="relative mx-auto max-w-[1280px]">
+            <div className="grid gap-8 lg:grid-cols-[1fr_320px] lg:items-end">
+              <div>
+              <h1 className="max-w-[820px] text-[3.4rem] font-medium leading-[0.98] tracking-[-0.055em] text-content-primary sm:text-[4rem] lg:text-[4.28rem]">
+                Stop guessing what you owe.
+              </h1>
+              <p className="mt-7 max-w-2xl text-base leading-7 tracking-[-0.01em] text-content-tertiary">
+                Oweable gives you one precise system for what is due, what is behind, and what to pay next, so your money stops living in scattered notes and anxious memory.
+              </p>
+              </div>
+              <div className="flex flex-col items-start gap-5 lg:items-end">
+                <TransitionLink
+                  to="/pricing"
+                  className="inline-flex items-center gap-3 text-sm text-content-secondary transition-colors hover:text-content-primary"
+                >
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-violet opacity-20" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brand-indigo" />
+                  </span>
+                  <span>Stay ahead of bills</span>
+                  <span className="text-content-muted">oweable.com/pricing</span>
+                  <ArrowRight className="h-4 w-4 text-content-muted" />
                 </TransitionLink>
-                {navItems.map((item) => {
+              </div>
+            </div>
+
+            <div className="mt-20">
+              <ProductPreview />
+            </div>
+          </div>
+        </section>
+
+        <section id="why" className="px-4 py-24 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Why it feels calmer</p>
+                <h2 className="mt-4 max-w-xl text-4xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-5xl">
+                  A finance workspace with less noise and more order.
+                </h2>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {featureRows.map((feature) => {
+                  const Icon = feature.icon;
                   return (
-                    <a
-                      key={item.label}
-                      href={item.href}
-                      className="text-[10px] text-[#E1E0CC]/70 transition-colors hover:text-[#E1E0CC] sm:text-xs md:text-sm"
+                    <article
+                      key={feature.title}
+                      className="rounded-xl border border-surface-border-subtle bg-white/[0.025] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] transition-colors hover:bg-white/[0.04]"
                     >
-                      {item.label}
-                    </a>
+                      <Icon className="h-5 w-5 text-brand-violet" />
+                      <h3 className="mt-5 text-xl font-medium tracking-[-0.024em] text-content-primary">{feature.title}</h3>
+                      <p className="mt-3 text-sm leading-6 text-content-tertiary">{feature.body}</p>
+                    </article>
                   );
                 })}
-              </div>
-            </nav>
-
-            <div className="absolute bottom-0 left-0 right-0 px-4 pb-3 sm:px-6 md:px-10">
-              <div className="grid grid-cols-12 items-end gap-4">
-                <div className="col-span-12 lg:col-span-8">
-                  <h1
-                    className="font-medium leading-[0.85] tracking-[-0.07em] text-[22vw] sm:text-[20vw] md:text-[18vw] lg:text-[15vw] xl:text-[14vw]"
-                    style={{ color: '#E1E0CC' }}
-                  >
-                    <WordsPullUp text="Oweable" showAsterisk />
-                  </h1>
-                </div>
-
-                <div className="col-span-12 flex flex-col gap-5 pb-6 lg:col-span-4 lg:pb-10">
-                  <motion.p
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                    className="max-w-xl text-sm text-[#E1E0CC]/80 sm:text-base"
-                    style={{ lineHeight: 1.25 }}
-                  >
-                    Stop guessing what you owe. Oweable gives you one clear Pay List for bills, debt, subscriptions, due dates, and obligations that are easy to miss.
-                  </motion.p>
-
-                  <motion.div
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                    className="flex flex-col gap-3 sm:flex-row"
-                  >
-                    <TransitionLink
-                      to={primaryHref}
-                      className="group inline-flex items-center gap-2 self-start rounded-full bg-[#E1E0CC] py-1 pl-5 pr-1 text-sm font-medium text-black transition-all hover:gap-3 sm:text-base"
-                    >
-                      {authUser?.id ? 'Open Oweable' : 'Start free'}
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-black transition-transform group-hover:scale-110 sm:h-10 sm:w-10">
-                        <ArrowRight className="h-4 w-4 text-[#E1E0CC]" />
-                      </span>
-                    </TransitionLink>
-                    <TransitionLink
-                      to="/pricing"
-                      className="inline-flex h-11 items-center justify-center self-start rounded-full border border-[#E1E0CC]/25 px-5 text-sm font-medium text-[#E1E0CC] transition-colors hover:bg-[#E1E0CC]/10 sm:h-12"
-                    >
-                      View pricing
-                    </TransitionLink>
-                  </motion.div>
-                </div>
               </div>
             </div>
           </div>
         </section>
+
+        <section id="flow" className="border-y border-surface-border-subtle bg-surface-raised/36 px-4 py-24 sm:px-6 lg:px-8">
+          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">The operating flow</p>
+              <h2 className="mt-4 max-w-3xl text-4xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-5xl">
+                Capture what you owe. Sort the urgency. Move money with fewer second guesses.
+              </h2>
+            </div>
+            <div className="grid gap-2">
+              {proofPoints.map((item, index) => (
+                <div
+                  key={item}
+                  className="flex items-center justify-between rounded-md border border-surface-border-subtle bg-white/[0.025] px-4 py-3"
+                >
+                  <span className="text-sm text-content-secondary">{item}</span>
+                  <span className="font-mono text-xs text-content-muted">0{index + 1}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="px-4 py-24 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-5xl text-center">
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Ready when you are</p>
+            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-5xl">
+              Start with the Pay List. Add the planning layer when it helps.
+            </h2>
+            <div className="mt-8 flex justify-center">
+              <TransitionLink
+                to={primaryHref}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-brand-indigo px-5 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px"
+              >
+                {authUser?.id ? 'Open app' : 'Start free'}
+                <ArrowRight className="h-4 w-4" />
+              </TransitionLink>
+            </div>
+          </div>
+        </section>
       </main>
+
+      <Footer />
     </div>
   );
 }

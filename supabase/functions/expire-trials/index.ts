@@ -138,7 +138,7 @@ Deno.serve(async (req: Request) => {
                 from: Deno.env.get('RESEND_FROM_EMAIL') ?? 'noreply@oweable.com',
                 to: [user.email],
                 subject: 'Your Full Suite trial has ended',
-                html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;"><h1>Your trial has ended${user.first_name ? `, ${escapeHtml(user.first_name)}` : ''}</h1><p>Your 14-day Full Suite trial has ended. You've been moved to our free Tracker tier.</p><p><a href="https://www.oweable.com/pricing" style="display: inline-block; background-color: #f59e0b; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px;">Upgrade to Full Suite — $10.99/mo</a></p></div>`,
+                html: `<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;"><h1>Your trial has ended${user.first_name ? `, ${escapeHtml(user.first_name)}` : ''}</h1><p>Your 14-day Full Suite trial has ended. App access is locked until billing is active.</p><p><a href="https://www.oweable.com/pricing" style="display: inline-block; background-color: #f59e0b; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px;">Upgrade to Full Suite — $10.99/mo</a></p></div>`,
               }),
             });
           }

@@ -328,8 +328,7 @@ function ProfilePanelInner() {
   const isDirty =
     formData.firstName !== (user.firstName || '') ||
     formData.lastName !== (user.lastName || '') ||
-    formData.timezone !== normalizeTimezoneToIana(user.timezone) ||
-    nationalDigits !== nationalDigitsFromStored(user.phone);
+    formData.timezone !== normalizeTimezoneToIana(user.timezone);
 
   const handleDiscard = useCallback(() => {
     setFormData({
@@ -338,7 +337,6 @@ function ProfilePanelInner() {
       email: user.email || '',
       timezone: normalizeTimezoneToIana(user.timezone),
     });
-    setNationalDigits(nationalDigitsFromStored(user.phone));
   }, [user]);
 
   return (
@@ -349,11 +347,6 @@ function ProfilePanelInner() {
         extraHeader={
           <span className="text-xs font-medium text-content-tertiary">
             {signInProviderLabel ? `${signInProviderLabel} sign-in` : 'Sign-in'}
-            {authPhoneConfirmed ? (
-              <span className="ml-2 text-emerald-500">· Phone verified</span>
-            ) : (
-              <span className="ml-2 text-content-muted">· Phone not verified</span>
-            )}
           </span>
         }
       >
@@ -451,70 +444,6 @@ function ProfilePanelInner() {
                   readOnly
                   className="block w-full cursor-not-allowed select-none rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-tertiary focus-app-field"
                 />
-              </div>
-
-              <div className="sm:col-span-4">
-                <span className="mb-2 block text-xs font-medium text-content-secondary">Phone number</span>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
-                  {/* E-07: Combobox-style country code selector with search */}
-                  <div className="relative w-full sm:w-44 shrink-0">
-                    <input
-                      type="text"
-                      list="dial-code-list"
-                      id="dial-code-search"
-                      value={dialSearch}
-                      placeholder="+1 or country…"
-                      aria-label="Country code search"
-                      autoComplete="off"
-                      className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary"
-                      onChange={(e) => {
-                        const raw = e.target.value;
-                        setDialSearch(raw);
-                        // Match by label or numeric dial code
-                        const match = FULL_DIAL_OPTIONS.find(
-                          (o) =>
-                            o.label.toLowerCase() === raw.toLowerCase() ||
-                            `+${o.value}` === raw.trim() ||
-                            o.value === raw.replace(/^\+/, '').trim(),
-                        );
-                        if (match) setDialCode(match.value);
-                      }}
-                    />
-                    <datalist id="dial-code-list">
-                      {FULL_DIAL_OPTIONS.map((o) => (
-                        <option key={o.value} value={o.label} />
-                      ))}
-                    </datalist>
-                  </div>
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    autoComplete="tel-national"
-                    placeholder="(555) 000-0000"
-                    value={dialCode === '1' ? formatUsNational(nationalDigits) : nationalDigits}
-                    onChange={(e) => {
-                      const raw = e.target.value.replace(/\D/g, '');
-                      setNationalDigits(dialCode === '1' ? raw.slice(0, 10) : raw.slice(0, 15));
-                    }}
-                    className="focus-app-field min-w-0 flex-1 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary"
-                  />
-                </div>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => void startPhoneVerification()}
-                    disabled={otpSending}
-                    className="rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-xs font-medium text-content-primary hover:bg-surface-elevated disabled:opacity-50"
-                  >
-                    {otpSending ? 'Sending…' : 'Verify phone'}
-                  </button>
-                  {authPhoneConfirmed && (
-                    <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-500">
-                      <Check className="h-3.5 w-3.5" aria-hidden />
-                      Verified
-                    </span>
-                  )}
-                </div>
               </div>
 
               <div className="sm:col-span-6">

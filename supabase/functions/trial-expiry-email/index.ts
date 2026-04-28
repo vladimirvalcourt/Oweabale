@@ -44,20 +44,17 @@ Deno.serve(async (req: Request) => {
             <h1 style="color: #1a1a1a; font-size: 24px; margin-bottom: 20px;">Your trial has ended, ${escapeHtml(firstName)}</h1>
             
             <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6;">
-              Your 14-day Full Suite trial has ended. You've been moved to our free Tracker tier.
+              Your 14-day Full Suite trial has ended. App access is locked until billing is active.
             </p>
 
             <div style="background-color: #f3f4f6; border-left: 4px solid #6b7280; padding: 16px; margin: 24px 0;">
               <p style="color: #374151; font-size: 14px; margin: 0;">
-                <strong>What you still have (free forever):</strong><br/>
-                ✓ Recurring bill tracking<br/>
-                ✓ Due-date alerts<br/>
-                ✓ Ticket & fine management<br/>
-                ✓ Account settings
+                <strong>What happens next:</strong><br/>
+                Your data is retained. Subscribe to unlock your Pay List, documents, calendar, and settings again.
               </p>
             </div>
 
-            <h2 style="color: #1a1a1a; font-size: 20px; margin-top: 30px; margin-bottom: 15px;">What you're missing without Full Suite:</h2>
+            <h2 style="color: #1a1a1a; font-size: 20px; margin-top: 30px; margin-bottom: 15px;">Full Suite includes:</h2>
             
             <ul style="color: #4a4a4a; font-size: 16px; line-height: 1.8; padding-left: 20px;">
               <li>Debt Payoff Planner (avalanche & snowball strategies)</li>
@@ -84,7 +81,7 @@ Deno.serve(async (req: Request) => {
             </p>
           </div>
         `,
-        text: `Your Full Suite trial has ended\n\nHi ${firstName},\n\nYour 14-day Full Suite trial has ended. You've been moved to our free Tracker tier.\n\nYou still have (free):\n- Recurring bill tracking\n- Due-date alerts\n- Ticket & fine management\n\nUpgrade to get back:\n- Debt Payoff Planner\n- Income & Transaction Ledger\n- Tax Estimation & Reserves\n- Budgets & Analytics\n\nUpgrade: https://www.oweable.com/pricing\n\nMonthly: $10.99 | Annual: $92.32/year (save 30%)`,
+        text: `Your Full Suite trial has ended\n\nHi ${firstName},\n\nYour 14-day Full Suite trial has ended. App access is locked until billing is active.\n\nYour data is retained. Subscribe to unlock your Pay List, documents, calendar, and settings again.\n\nFull Suite includes:\n- Debt Payoff Planner\n- Income & Transaction Ledger\n- Tax Estimation & Reserves\n- Budgets & Analytics\n\nUpgrade: https://www.oweable.com/pricing\n\nMonthly: $10.99 | Annual: $92.32/year (save 30%)`,
       }),
     });
 

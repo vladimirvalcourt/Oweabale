@@ -53,41 +53,41 @@ export default function Privacy() {
           { href: '/support', label: 'Support' },
         ]}
       />
-      <div className="min-h-screen bg-surface-base px-6 pb-20 pt-28 text-content-primary selection:bg-content-primary/15 lg:px-8">
-        <div className="mx-auto max-w-5xl">
-          <section className="py-12">
-            <div className="max-w-3xl">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-tertiary">Privacy</p>
-              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
+      <div className="min-h-screen bg-surface-base px-5 pb-24 pt-36 text-content-primary selection:bg-brand-violet/25 sm:px-8">
+        <div className="mx-auto max-w-[1280px]">
+          <section className="grid gap-12 py-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Privacy</p>
+              <h1 className="mt-5 max-w-3xl text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
                 Privacy that is clear about what happens to your data.
               </h1>
-              <p className="mt-6 text-lg leading-8 text-content-secondary">
+              <p className="mt-7 max-w-xl text-base leading-7 text-content-tertiary">
                 This page is the plain-English summary of how Oweable approaches data handling. It is meant to help you understand what you are trusting us with and how that trust is handled.
               </p>
               <p className="mt-4 text-sm text-content-muted">Last updated April 2026</p>
             </div>
 
-            <div className="mt-12 space-y-8 border-t border-surface-border pt-10">
+            <div className="divide-y divide-white/[0.06] rounded-[10px] border border-surface-border bg-white/[0.018]">
               {privacySections.map((section) => (
-                <section key={section.title}>
-                  <h2 className="text-lg font-semibold text-content-primary mb-3">{section.title}</h2>
-                  <p className="text-sm leading-relaxed text-content-secondary">{section.copy}</p>
+                <section key={section.title} className="p-5">
+                  <h2 className="text-lg font-medium tracking-[-0.024em] text-content-primary mb-3">{section.title}</h2>
+                  <p className="text-sm leading-6 text-content-tertiary">{section.copy}</p>
                 </section>
               ))}
-            </div>
 
-            <div className="mt-10 border-t border-surface-border pt-6">
-              <p className="text-sm leading-relaxed text-content-secondary">
+              <div className="p-5">
+              <p className="text-sm leading-6 text-content-tertiary">
                 For more technical detail, visit the{' '}
-                <TransitionLink to="/security" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
+                <TransitionLink to="/security" className="font-medium text-content-primary underline underline-offset-4 hover:text-brand-violet">
                   Security page
                 </TransitionLink>
                 . For requests involving your data, use the{' '}
-                <TransitionLink to="/support" className="font-semibold text-content-primary underline underline-offset-4 hover:text-brand-profit">
+                <TransitionLink to="/support" className="font-medium text-content-primary underline underline-offset-4 hover:text-brand-violet">
                   support page
                 </TransitionLink>
                 {' '}or contact us through the support channels.
               </p>
+              </div>
             </div>
           </section>
         </div>

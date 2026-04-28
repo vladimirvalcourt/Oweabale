@@ -52,7 +52,7 @@ export default function Security() {
   });
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
+    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-brand-violet/25">
       <PublicHeader
         links={[
           { href: '/pricing', label: 'Plans' },
@@ -61,34 +61,34 @@ export default function Security() {
         ]}
       />
 
-      <main className="px-6 pb-20 pt-28 lg:px-8">
-        <div className="mx-auto max-w-5xl">
-          <section className="py-12">
-            <div className="max-w-3xl">
-              <p className="text-xs font-semibold uppercase tracking-widest text-content-tertiary">Security</p>
-              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-content-primary sm:text-5xl">
+      <main className="px-5 pb-24 pt-36 sm:px-8">
+        <div className="mx-auto max-w-[1280px]">
+          <section className="grid gap-12 py-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Security</p>
+              <h1 className="mt-5 max-w-3xl text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
                 Security, explained like it actually matters to your life.
               </h1>
-              <p className="mt-6 text-lg leading-relaxed text-content-secondary">
+              <p className="mt-7 max-w-xl text-base leading-7 text-content-tertiary">
                 Oweable handles sensitive financial workflows, so security has to be built into the product, the infrastructure, and the support process, not saved for a marketing page.
               </p>
             </div>
 
-            <div className="mt-12 grid gap-8 lg:grid-cols-3">
-              {securityCards.map((card) => (
-                <article key={card.title} className="border-t border-surface-border pt-6">
-                  <h2 className="text-lg font-semibold text-content-primary mb-3">{card.title}</h2>
-                  <p className="text-sm leading-relaxed text-content-secondary">{card.body}</p>
+            <div>
+              <div className="grid gap-3">
+                {securityCards.map((card) => (
+                <article key={card.title} className="rounded-[10px] border border-surface-border-subtle bg-white/[0.022] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+                  <h2 className="text-lg font-medium tracking-[-0.024em] text-content-primary mb-3">{card.title}</h2>
+                  <p className="text-sm leading-relaxed text-content-tertiary">{card.body}</p>
                 </article>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            <div className="mt-12 space-y-10 border-t border-surface-border pt-10">
-              <div className="space-y-10">
+              <div className="mt-10 divide-y divide-white/[0.06] rounded-[10px] border border-surface-border bg-white/[0.018]">
                 {sections.map((section) => (
-                  <section key={section.title}>
-                    <h2 className="text-2xl font-semibold tracking-tight text-content-primary">{section.title}</h2>
-                    <p className="mt-4 max-w-4xl text-base leading-relaxed text-content-secondary">{section.copy}</p>
+                  <section key={section.title} className="p-5">
+                    <h2 className="text-xl font-medium tracking-[-0.03em] text-content-primary">{section.title}</h2>
+                    <p className="mt-4 max-w-4xl text-sm leading-6 text-content-tertiary">{section.copy}</p>
                   </section>
                 ))}
               </div>

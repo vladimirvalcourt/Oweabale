@@ -1,14 +1,9 @@
 export type SettingsTab =
   | 'profile'
-  | 'household'
-  | 'notifications'
   | 'security'
   | 'billing'
-  | 'financial'
   | 'privacy'
-  | 'integrations'
-  | 'support'
-  | 'feedback';
+  | 'integrations';
 
 export const NOTIF_PREFS_STORAGE_KEY = 'oweable_notification_prefs_v1';
 
@@ -67,12 +62,8 @@ export function loadNotifPrefs(): Record<NotifPrefKey, boolean> {
 
 export const SETTINGS_TAB_IDS: SettingsTab[] = [
   'profile',
-  'notifications',
-  'security',
   'billing',
-  'financial',
-  'privacy',
   'integrations',
-  'support',
-  'feedback',
+  'security',
+  'privacy',
 ];

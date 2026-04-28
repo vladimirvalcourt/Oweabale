@@ -192,7 +192,7 @@ export default function MobileCapture() {
 
   if (status === 'error') {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-surface-base p-8 text-center font-sans">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-surface-base p-8 text-center font-sans selection:bg-brand-violet/25">
         <AlertCircle className="mb-6 h-12 w-12 text-rose-500" />
         <h1 className="mb-2 text-2xl font-medium tracking-tight text-content-primary">Connection error</h1>
         <p className="mb-10 max-w-sm text-sm font-medium leading-relaxed text-content-secondary">
@@ -201,7 +201,7 @@ export default function MobileCapture() {
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="flex w-full max-w-xs items-center justify-center gap-2 rounded-lg border border-surface-border bg-surface-raised py-3.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated active:scale-[0.99]"
+          className="flex w-full max-w-xs items-center justify-center gap-2 rounded-md border border-surface-border bg-surface-raised py-3.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated active:scale-[0.99]"
         >
           <RefreshCw className="h-4 w-4 shrink-0" aria-hidden />
           Restart session
@@ -212,7 +212,7 @@ export default function MobileCapture() {
 
   if (status === 'completed') {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-surface-base p-8 text-center font-sans">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-surface-base p-8 text-center font-sans selection:bg-brand-violet/25">
         <div className="relative mb-8">
            <div className="absolute inset-0 animate-pulse rounded-full bg-emerald-500/20 blur-2xl" />
            <CheckCircle2 className="relative h-24 w-24 text-emerald-500" />
@@ -227,7 +227,7 @@ export default function MobileCapture() {
           <button 
             type="button"
             onClick={() => { setPreviewUrl(null); setStatus('idle'); }}
-            className="w-full rounded-lg bg-brand-cta py-3.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover active:scale-[0.99]"
+            className="w-full rounded-md bg-content-primary py-3.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-content-secondary active:scale-[0.99]"
           >
             Capture another
           </button>
@@ -244,9 +244,9 @@ export default function MobileCapture() {
   }
 
   return (
-    <div className="flex h-[100dvh] min-h-0 flex-col bg-surface-base font-sans">
+    <div className="flex h-[100dvh] min-h-0 flex-col bg-surface-base font-sans selection:bg-brand-violet/25">
       {/* Dynamic Header */}
-      <div className="flex h-20 shrink-0 items-center justify-between border-b border-surface-border bg-surface-base px-6">
+      <div className="flex h-[72px] shrink-0 items-center justify-between border-b border-surface-border-subtle bg-surface-base/90 px-6 backdrop-blur-xl">
         <div className="flex flex-col gap-0.5">
           <span className="text-sm font-medium text-content-primary">Syncing to Oweable desktop</span>
           <div className="flex items-center gap-1.5">
@@ -254,7 +254,7 @@ export default function MobileCapture() {
              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400/90">Secure connection active</span>
           </div>
         </div>
-        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-surface-border bg-surface-raised">
+        <div className="flex h-10 w-10 items-center justify-center rounded-md border border-surface-border bg-surface-raised">
            <Smartphone className="h-4 w-4 text-content-tertiary" aria-hidden />
         </div>
       </div>
@@ -268,7 +268,7 @@ export default function MobileCapture() {
               {/* Instructions Section */}
               <div className="space-y-8 mt-4">
                  <div className="flex gap-5 group">
-                    <div className="shrink-0 w-8 h-8 rounded-lg bg-content-primary/5 border border-content-primary/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
+                    <div className="shrink-0 w-8 h-8 rounded-md bg-content-primary/5 border border-content-primary/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
                        <Sun className="w-4 h-4 text-content-tertiary group-hover:text-content-primary" />
                     </div>
                     <div className="space-y-1">
@@ -277,7 +277,7 @@ export default function MobileCapture() {
                     </div>
                  </div>
                  <div className="flex gap-5 group text-left">
-                    <div className="shrink-0 w-8 h-8 rounded-lg bg-content-primary/5 border border-content-primary/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
+                    <div className="shrink-0 w-8 h-8 rounded-md bg-content-primary/5 border border-content-primary/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
                        <Maximize className="w-4 h-4 text-content-tertiary group-hover:text-content-primary" />
                     </div>
                     <div className="space-y-1">
@@ -286,7 +286,7 @@ export default function MobileCapture() {
                     </div>
                  </div>
                  <div className="flex gap-5 group text-left">
-                    <div className="shrink-0 w-8 h-8 rounded-lg bg-content-primary/5 border border-content-primary/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
+                    <div className="shrink-0 w-8 h-8 rounded-md bg-content-primary/5 border border-content-primary/10 flex items-center justify-center group-hover:border-content-primary/50 transition-colors">
                        <MousePointer2 className="w-4 h-4 text-content-tertiary group-hover:text-content-primary" />
                     </div>
                     <div className="space-y-1">
@@ -299,7 +299,7 @@ export default function MobileCapture() {
               {/* Capture Options */}
               <div className="mt-auto mb-8 flex flex-col gap-4">
                 {/* Option 1: Take Photo with Camera */}
-                <div className="relative p-10 bg-surface-base border border-dashed border-content-primary/[0.1] rounded-lg group active:scale-[0.98] transition-all overflow-hidden">
+                <div className="relative p-10 bg-surface-base border border-dashed border-content-primary/[0.1] rounded-[10px] group active:scale-[0.98] transition-all overflow-hidden">
                   <input
                     type="file"
                     accept="image/*"
@@ -308,7 +308,7 @@ export default function MobileCapture() {
                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                   />
                   <div className="flex items-center gap-5 relative z-1">
-                    <div className="w-14 h-14 rounded-full bg-content-primary/[0.05] border border-content-primary/20 flex items-center justify-center group-hover:border-content-primary/35 transition-all shrink-0">
+                    <div className="w-14 h-14 rounded-[10px] bg-content-primary/[0.05] border border-content-primary/20 flex items-center justify-center group-hover:border-content-primary/35 transition-all shrink-0">
                       <Camera className="w-6 h-6 text-content-primary" />
                     </div>
                     <div>
@@ -320,7 +320,7 @@ export default function MobileCapture() {
                 </div>
 
                 {/* Option 2: Upload from Gallery or Files */}
-                <div className="relative p-10 bg-surface-base border border-dashed border-content-primary/[0.1] rounded-lg group active:scale-[0.98] transition-all overflow-hidden">
+                <div className="relative p-10 bg-surface-base border border-dashed border-content-primary/[0.1] rounded-[10px] group active:scale-[0.98] transition-all overflow-hidden">
                   <input
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
@@ -328,7 +328,7 @@ export default function MobileCapture() {
                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                   />
                   <div className="flex items-center gap-5 relative z-1">
-                    <div className="w-14 h-14 rounded-full bg-content-primary/[0.03] border border-content-primary/10 flex items-center justify-center group-hover:border-content-primary/20 transition-all shrink-0">
+                    <div className="w-14 h-14 rounded-[10px] bg-content-primary/[0.03] border border-content-primary/10 flex items-center justify-center group-hover:border-content-primary/20 transition-all shrink-0">
                       <FolderOpen className="w-6 h-6 text-content-tertiary" />
                     </div>
                     <div>
@@ -348,10 +348,10 @@ export default function MobileCapture() {
                  </p>
               </div>
 
-               <div className="relative flex min-h-[min(52vh,22rem)] w-full flex-1 flex-col overflow-hidden rounded-lg border border-content-primary/[0.12] bg-surface-base shadow-2xl">
+               <div className="relative flex min-h-[min(52vh,22rem)] w-full flex-1 flex-col overflow-hidden rounded-[10px] border border-content-primary/[0.12] bg-surface-base shadow-2xl">
                  {capturedFileType === 'application/pdf' ? (
                    <div className="flex w-full flex-1 flex-col items-center justify-center gap-4 bg-surface-base p-6">
-                     <div className="w-20 h-20 rounded-lg border border-content-primary/30 bg-content-primary/5 flex items-center justify-center">
+                     <div className="w-20 h-20 rounded-[10px] border border-content-primary/30 bg-content-primary/5 flex items-center justify-center">
                        <FolderOpen className="w-10 h-10 text-content-primary" />
                      </div>
                      <p className="text-xs font-medium text-content-secondary">PDF ready to send</p>
@@ -378,7 +378,7 @@ export default function MobileCapture() {
                   <button 
                     onClick={handleUpload}
                     disabled={status === 'uploading'}
-                    className="flex w-full items-center justify-center gap-3 rounded-lg bg-brand-cta py-4 text-sm font-medium text-surface-base shadow-none transition-all hover:bg-brand-cta-hover active:scale-[0.98] disabled:bg-surface-raised disabled:text-content-tertiary"
+                    className="flex w-full items-center justify-center gap-3 rounded-md bg-content-primary py-4 text-sm font-medium text-surface-base shadow-none transition-all hover:bg-content-secondary active:scale-[0.98] disabled:bg-surface-raised disabled:text-content-tertiary"
                   >
                     {status === 'uploading' ? (
                       <>
@@ -400,7 +400,7 @@ export default function MobileCapture() {
                         setStatus('idle');
                     }}
                     disabled={status === 'uploading'}
-                    className="w-full rounded-lg border border-surface-border bg-surface-raised py-3.5 text-sm font-medium text-content-secondary transition-colors hover:border-content-muted hover:text-content-primary"
+                    className="w-full rounded-md border border-surface-border bg-surface-raised py-3.5 text-sm font-medium text-content-secondary transition-colors hover:border-content-muted hover:text-content-primary"
                   >
                     Retake Photo
                   </button>
@@ -410,7 +410,7 @@ export default function MobileCapture() {
         </div>
       </main>
 
-      <div className="shrink-0 border-t border-surface-border bg-surface-base p-6 text-center">
+      <div className="shrink-0 border-t border-surface-border-subtle bg-surface-base p-6 text-center">
         <span className="text-xs font-medium text-content-tertiary">Secure capture session</span>
       </div>
     </div>

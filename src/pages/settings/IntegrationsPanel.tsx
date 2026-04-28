@@ -1,7 +1,9 @@
 import React, { Suspense, lazy, memo } from 'react';
 import { Loader2 } from 'lucide-react';
 
-const BankConnection = lazy(() => import("../../components/common"));
+const BankConnection = lazy(() =>
+  import('../../components/common').then((module) => ({ default: module.BankConnection }))
+);
 
 function IntegrationsPanelInner() {
   return (

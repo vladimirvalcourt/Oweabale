@@ -72,11 +72,11 @@ function ChoiceCard({ selected, onSelect, title, description, accent = 'neutral'
       onClick={onSelect}
       aria-pressed={selected}
       className={cn(
-        'relative flex min-h-[7.5rem] flex-col rounded-xl border p-5 text-left transition-colors focus-app sm:min-h-[8.25rem]',
+        'relative flex min-h-[7.5rem] flex-col rounded-[10px] border p-5 text-left transition-colors focus-app sm:min-h-[8.25rem]',
         selected
           ? accent === 'rose'
-            ? 'border-rose-500/50 bg-surface-elevated ring-2 ring-rose-500/35'
-            : 'border-content-primary/25 bg-surface-elevated ring-2 ring-content-primary/20'
+            ? 'border-rose-500/50 bg-surface-elevated ring-2 ring-rose-500/30'
+            : 'border-brand-violet/50 bg-surface-elevated ring-2 ring-brand-violet/25'
           : 'border-surface-border bg-surface-base hover:border-content-primary/15 hover:bg-surface-raised/80',
         className,
       )}
@@ -205,18 +205,18 @@ export default function Onboarding() {
   if (showWelcome) {
     return (
       <>
-        <div className="fixed inset-0 flex flex-col bg-surface-base font-sans text-content-primary selection:bg-content-primary/10">
+        <div className="fixed inset-0 flex flex-col bg-surface-base font-sans text-content-primary selection:bg-brand-violet/25">
           <SubtleGrid />
 
-          <header className="relative z-20 flex h-14 shrink-0 items-center justify-between border-b border-surface-border bg-surface-base/90 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/75 sm:px-6">
+          <header className="relative z-20 flex h-[72px] shrink-0 items-center justify-between border-b border-surface-border-subtle bg-surface-base/90 px-5 backdrop-blur-xl sm:px-8">
             <BrandWordmark
-              textClassName="text-sm font-semibold tracking-tight text-content-primary"
-              logoClassName="h-4 w-4"
+              textClassName="text-xl font-medium normal-case tracking-[-0.035em] text-content-primary"
+              logoClassName="h-5 w-5 rounded-[4px]"
             />
             <button
               type="button"
               onClick={() => void skipSetup()}
-              className="min-h-10 rounded-lg border border-surface-border px-4 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-raised hover:text-content-primary focus-app"
+              className="min-h-10 rounded-md border border-surface-border px-4 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-raised hover:text-content-primary focus-app"
             >
               Skip setup
             </button>
@@ -229,14 +229,14 @@ export default function Onboarding() {
               transition={{ duration: 0.45, ease: [0.19, 1, 0.22, 1] }}
               className="w-full max-w-lg"
             >
-              <p className="mb-4 text-[11px] font-mono font-medium uppercase tracking-[0.14em] text-content-tertiary">
+              <p className="mb-4 text-[11px] font-mono font-medium uppercase tracking-[0.14em] text-content-muted">
                 Quick setup · ~2 min
               </p>
 
-              <h1 className="mb-3 text-balance text-3xl font-semibold tracking-tight text-content-primary sm:text-4xl">
+              <h1 className="mb-3 text-balance text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
                 Welcome, {firstName}
               </h1>
-              <p className="mb-8 max-w-md text-pretty text-sm leading-relaxed text-content-secondary">
+              <p className="mb-8 max-w-md text-pretty text-sm leading-6 text-content-tertiary">
                 We’ll set up the basics: what cash is available, what bills are coming, and how much daily spending feels safe. Everything is optional — skip anytime or refine later.
               </p>
 
@@ -249,9 +249,9 @@ export default function Onboarding() {
                 ].map(({ icon: Icon, label, desc }) => (
                   <div
                     key={label}
-                    className="flex gap-3 rounded-xl border border-surface-border bg-surface-raised/90 p-4 transition-colors hover:border-content-primary/10"
+                    className="flex gap-3 rounded-[10px] border border-surface-border-subtle bg-white/[0.022] p-4 transition-colors hover:border-content-primary/10"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-surface-border bg-surface-elevated">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-surface-border bg-surface-elevated">
                       <Icon className="h-4 w-4 text-content-secondary" aria-hidden />
                     </div>
                     <div className="min-w-0">
@@ -262,7 +262,7 @@ export default function Onboarding() {
                 ))}
               </div>
 
-              <div className="rounded-xl border border-surface-border bg-surface-raised p-6 sm:p-8">
+              <div className="rounded-[10px] border border-surface-border bg-white/[0.018] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
                 <div className="mb-6 flex items-center gap-2">
                   <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden />
                   <p className="text-xs text-content-tertiary">Encrypted session · you control your data</p>
@@ -279,7 +279,7 @@ export default function Onboarding() {
                 <button
                   type="button"
                   onClick={() => setShowWelcome(false)}
-                  className="btn-tactile flex min-h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-cta px-6 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app sm:w-auto"
+                  className="btn-tactile flex min-h-11 w-full items-center justify-center gap-2 rounded-md bg-content-primary px-6 text-sm font-medium text-surface-base transition-colors hover:bg-content-secondary focus-app sm:w-auto"
                 >
                   Get started
                   <ArrowRight className="h-4 w-4" aria-hidden />
@@ -294,10 +294,10 @@ export default function Onboarding() {
 
   return (
     <>
-      <div className="fixed inset-0 flex flex-col bg-surface-base font-sans text-content-primary selection:bg-content-primary/10">
+      <div className="fixed inset-0 flex flex-col bg-surface-base font-sans text-content-primary selection:bg-brand-violet/25">
         <SubtleGrid />
 
-        <header className="relative z-20 flex h-14 shrink-0 items-center gap-3 border-b border-surface-border bg-surface-base/90 px-4 backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/75 sm:gap-4 sm:px-6">
+        <header className="relative z-20 flex h-[72px] shrink-0 items-center gap-3 border-b border-surface-border-subtle bg-surface-base/90 px-5 backdrop-blur-xl sm:gap-4 sm:px-8">
           <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
             <span className="shrink-0 text-sm font-semibold tracking-tight text-content-primary">Getting started</span>
             <div
@@ -321,7 +321,7 @@ export default function Onboarding() {
             <button
               type="button"
               onClick={() => void skipSetup()}
-              className="min-h-10 whitespace-nowrap rounded-lg border border-surface-border px-3 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-raised hover:text-content-primary focus-app sm:px-4"
+              className="min-h-10 whitespace-nowrap rounded-md border border-surface-border px-3 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-raised hover:text-content-primary focus-app sm:px-4"
             >
               Skip
             </button>
@@ -344,7 +344,7 @@ export default function Onboarding() {
                       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       className={`flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors ${
                         currentStepIndex > index
-                          ? 'border-brand-profit bg-brand-profit text-surface-base'
+                          ? 'border-brand-violet bg-brand-violet text-white'
                           : currentStepIndex === index
                             ? 'border-content-primary bg-content-primary text-surface-base'
                             : 'border-surface-border bg-surface-base text-content-muted'
@@ -382,14 +382,14 @@ export default function Onboarding() {
                 role="group"
                 aria-labelledby="onboarding-step-title"
               >
-                <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl border border-surface-border bg-surface-raised">
+                <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-[10px] border border-surface-border bg-surface-raised">
                   {currentStepIndex === 0 && <Vault className="h-5 w-5 text-content-secondary" aria-hidden />}
                   {currentStepIndex === 1 && <Receipt className="h-5 w-5 text-content-secondary" aria-hidden />}
                   {currentStepIndex === 2 && <Activity className="h-5 w-5 text-content-secondary" aria-hidden />}
                   {currentStepIndex === 3 && <Flame className="h-5 w-5 text-content-secondary" aria-hidden />}
                 </div>
 
-                <h1 id="onboarding-step-title" className="mb-2 text-balance text-2xl font-semibold tracking-tight text-content-primary sm:text-3xl">
+                <h1 id="onboarding-step-title" className="mb-2 text-balance text-3xl font-medium tracking-[-0.04em] text-content-primary sm:text-4xl">
                   {currentStep.title}
                 </h1>
                 <p className="mb-1 text-sm font-medium text-content-secondary">{currentStep.subtitle}</p>
@@ -400,7 +400,7 @@ export default function Onboarding() {
                   ) : null}
                 </p>
 
-                <div className="rounded-xl border border-surface-border bg-surface-raised p-5 sm:p-8">
+                <div className="rounded-[10px] border border-surface-border bg-white/[0.018] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
                   {currentStep.id === 'assets' && (
                     <div className="space-y-3">
                       <label className="sr-only" htmlFor="onboard-cash">
@@ -499,7 +499,7 @@ export default function Onboarding() {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="min-h-11 text-sm font-medium text-content-secondary transition-colors hover:text-content-primary focus-app rounded-lg px-2 -ml-2"
+                  className="min-h-11 text-sm font-medium text-content-secondary transition-colors hover:text-content-primary focus-app rounded-md px-2 -ml-2"
                 >
                   Back
                 </button>
@@ -511,7 +511,7 @@ export default function Onboarding() {
                 type="button"
                 onClick={() => void handleNext()}
                 disabled={isSubmitting}
-                className="btn-tactile relative flex min-h-11 items-center gap-2 overflow-hidden rounded-lg bg-brand-cta px-6 text-sm font-semibold text-surface-base transition-all duration-200 hover:bg-brand-cta-hover focus-app disabled:cursor-not-allowed disabled:opacity-70"
+                className="btn-tactile relative flex min-h-11 items-center gap-2 overflow-hidden rounded-md bg-content-primary px-6 text-sm font-medium text-surface-base transition-all duration-200 hover:bg-content-secondary focus-app disabled:cursor-not-allowed disabled:opacity-70"
               >
                 <AnimatePresence mode="wait">
                   {isSubmitting ? (

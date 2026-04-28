@@ -3,6 +3,8 @@ import type { NotificationPrefsRecord } from '../lib/api/services/notificationPr
 import type { CategorizationRule, CategorizationExclusion } from '../lib/api/services/categorizationRules';
 import type { Household, HouseholdMember, UserRole } from '../types';
 
+export type { CategorizationRule, CategorizationExclusion };
+
 export interface Bill {
   id: string;
   biller: string;

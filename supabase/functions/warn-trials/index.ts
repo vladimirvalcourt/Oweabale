@@ -76,12 +76,12 @@ Deno.serve(async (req: Request) => {
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                   <h1 style="color: #1a1a1a; font-size: 24px; margin-bottom: 20px;">${daysRemaining} days left, ${escapeHtml(firstName)}</h1>
                   <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6;">
-                    Your Full Suite trial ends in ${daysRemaining} days. After that, you'll automatically move to our free Tracker tier.
+                    Your Full Suite trial ends in ${daysRemaining} days. After that, app access locks unless billing is active.
                   </p>
                   <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
                     <p style="color: #92400e; font-size: 14px; margin: 0;">
                       <strong>What happens next?</strong><br/>
-                      You'll keep bill tracking and due-date alerts for free. To keep your debt planner, income ledger, and tax tools, upgrade to Full Suite.
+                      Add billing before the trial ends to keep using your Pay List, documents, calendar, and settings without interruption.
                     </p>
                   </div>
                   <div style="margin: 30px 0; text-align: center;">
@@ -91,7 +91,7 @@ Deno.serve(async (req: Request) => {
                     </a>
                   </div>
                   <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin-top: 30px;">
-                    No pressure — the free Tracker tier is useful for managing bills and fines. But if you want the full toolkit, now's the time.
+                    No surprise charges. You can add billing now, or subscribe later to unlock the app again.
                   </p>
                   <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;" />
                   <p style="color: #9ca3af; font-size: 12px;">
@@ -99,7 +99,7 @@ Deno.serve(async (req: Request) => {
                   </p>
                 </div>
               `,
-              text: `${daysRemaining} days left on your Full Suite trial\n\nHi ${firstName},\n\nYour Full Suite trial ends in ${daysRemaining} days. After that, you'll move to the free Tracker tier.\n\nUpgrade: https://www.oweable.com/pricing`,
+              text: `${daysRemaining} days left on your Full Suite trial\n\nHi ${firstName},\n\nYour Full Suite trial ends in ${daysRemaining} days. After that, app access locks unless billing is active.\n\nUpgrade: https://www.oweable.com/pricing`,
             }),
           });
 

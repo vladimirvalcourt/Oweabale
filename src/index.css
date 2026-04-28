@@ -2,26 +2,26 @@
 @plugin "tailwindcss-animate";
 
 @theme {
-  /* Default theme: Dark mode (Vercel-dashboard–inspired) */
-  --color-surface-base: #000000;
-  --color-surface-raised: #0a0a0a;
-  --color-surface-elevated: #111111;
-  --color-surface-highlight: rgba(255, 255, 255, 0.04);
-  --color-surface-border: #333333;
-  --color-surface-border-subtle: #1a1a1a;
+  /* Default theme: Linear-inspired dark system */
+  --color-surface-base: #08090a;
+  --color-surface-raised: #0f1011;
+  --color-surface-elevated: #191a1b;
+  --color-surface-highlight: rgba(255, 255, 255, 0.05);
+  --color-surface-border: rgba(255, 255, 255, 0.08);
+  --color-surface-border-subtle: rgba(255, 255, 255, 0.05);
   /* Skeleton / shimmer base — slightly lifted from elevated for contrast */
   --color-surface-offset: #161616;
 
-  --color-content-primary: #ffffff;
-  --color-content-secondary: #888888;
-  --color-content-tertiary: #737373;
-  --color-content-muted: #666666;
+  --color-content-primary: #f7f8f8;
+  --color-content-secondary: #d0d6e0;
+  --color-content-tertiary: #8a8f98;
+  --color-content-muted: #62666d;
 
-  /* Brand colors - neutral accent system */
-  --color-brand-indigo: #fafafa;
-  --color-brand-violet: #a3a3a3;
-  --color-brand-cta: #ffffff;
-  --color-brand-cta-hover: #e5e5e5;
+  /* Brand colors - restrained Linear-style violet system */
+  --color-brand-indigo: #5e6ad2;
+  --color-brand-violet: #7170ff;
+  --color-brand-cta: #5e6ad2;
+  --color-brand-cta-hover: #828fff;
   --color-brand-profit: #22c55e;
   --color-brand-expense: #ef4444;
   --color-brand-tax: #a3a3a3;
@@ -36,9 +36,9 @@
   --leading-ui-body: 1.5;
   --leading-ui-tight: 1.25;
   
-  --shadow-tactile: 0 1px 0 rgba(255, 255, 255, 0.06);
-  --shadow-tactile-hover: 0 1px 0 rgba(255, 255, 255, 0.1);
-  --shadow-glow-indigo: 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --shadow-tactile: 0 1px 0 rgba(255, 255, 255, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-tactile-hover: 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --shadow-glow-indigo: 0 0 0 1px rgba(113, 112, 255, 0.28), 0 16px 48px rgba(94, 106, 210, 0.18);
 
   --radius-lg: 8px;
   --radius-md: 8px;
@@ -46,10 +46,10 @@
   --radius-xl: 12px;
   
   /* Global Border Radius System - Soft Industrial Aesthetic */
-  --radius-container: 16px;    /* Main cards, sections, containers */
+  --radius-container: 22px;    /* Main cards, sections, containers */
   --radius-card: 12px;         /* Standard cards, pricing cards */
-  --radius-button: 10px;       /* Primary/secondary buttons */
-  --radius-icon: 8px;          /* Icon containers, badges */
+  --radius-button: 6px;        /* Primary/secondary buttons */
+  --radius-icon: 6px;          /* Icon containers, badges */
   --radius-badge: 9999px;      /* Pill badges, status indicators */
   --radius-input: 8px;         /* Form inputs, search fields */
   
@@ -57,6 +57,11 @@
   --button-height-sm: 40px;    /* Compact buttons (icon-only, tags) */
   --button-height-md: 48px;    /* Standard buttons (primary actions) */
   --button-height-lg: 56px;    /* Prominent buttons (hero CTAs) */
+}
+
+/* Noise texture overlay for video backgrounds */
+.noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.5'/%3E%3C/svg%3E");
 }
 
 @layer utilities {
@@ -230,6 +235,15 @@
   @keyframes marquee-vertical {
     0% { transform: translateY(0); }
     100% { transform: translateY(-50%); }
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-marquee {
+    animation: marquee 28s linear infinite;
   }
   @keyframes scan-y {
     0%, 100% { transform: translateY(0); }

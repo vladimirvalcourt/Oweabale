@@ -63,7 +63,7 @@ Deno.serve(async (req: Request) => {
             </div>
 
             <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin-top: 30px;">
-              After 14 days, you'll automatically move to our free Tracker tier (recurring bills + tickets/fines). Upgrade anytime to keep Full Suite for $10.99/mo.
+              After 14 days, app access locks unless billing is active. Upgrade anytime during the trial to keep Full Suite for $10.99/mo.
             </p>
 
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;" />
@@ -73,7 +73,7 @@ Deno.serve(async (req: Request) => {
             </p>
           </div>
         `,
-        text: `Welcome to Oweable, ${firstName}!\n\nYour 14-day Full Suite trial is now active. No credit card required.\n\nHere's what you can do:\n- Debt Payoff Planner\n- Income & Transaction Ledger\n- Tax Estimation & Reserves\n\nGo to your dashboard: https://www.oweable.com/dashboard\n\nAfter 14 days, you'll move to the free Tracker tier. Upgrade anytime to keep Full Suite for $10.99/mo.`,
+        text: `Welcome to Oweable, ${firstName}!\n\nYour 14-day Full Suite trial is now active. No credit card required.\n\nHere's what you can do:\n- Debt Payoff Planner\n- Income & Transaction Ledger\n- Tax Estimation & Reserves\n\nGo to your dashboard: https://www.oweable.com/dashboard\n\nAfter 14 days, app access locks unless billing is active. Upgrade anytime during the trial to keep Full Suite for $10.99/mo.`,
       }),
     });
 
