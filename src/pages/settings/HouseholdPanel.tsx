@@ -21,8 +21,8 @@ export function HouseholdPanel() {
   // Pro gating
   if (!hasFullSuite) {
     return (
-      <div className="rounded-lg dark:border-amber-500/30 border-amber-500/40 dark:bg-amber-500/10 bg-amber-500/15 p-6">
-        <h3 className="text-sm font-medium dark:text-amber-300 text-amber-700 mb-2">Pro Feature</h3>
+      <div className="rounded-lg border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] p-6">
+        <h3 className="text-sm font-medium text-[var(--color-status-amber-text)] mb-2">Pro Feature</h3>
         <p className="text-xs text-content-secondary mb-4">
           Multi-user households are available with the Full Suite plan. Upgrade to invite partners and share your financial data.
         </p>
@@ -97,9 +97,9 @@ export function HouseholdPanel() {
   const getRoleBadgeColor = (role: UserRole) => {
     switch (role) {
       case 'owner':
-        return 'dark:bg-amber-500/15 dark:text-amber-300 bg-amber-500/20 text-amber-700 dark:border-amber-500/30 border-amber-500/40';
+        return 'bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)] border-[var(--color-status-amber-border)]';
       case 'partner':
-        return 'dark:bg-emerald-500/15 dark:text-emerald-300 bg-emerald-500/20 text-emerald-700 dark:border-emerald-500/30 border-emerald-500/40';
+        return 'bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)] border-[var(--color-status-emerald-border)]';
       case 'viewer':
         return 'bg-slate-500/15 text-slate-700 dark:text-slate-300 border-slate-500/30';
     }
@@ -241,7 +241,7 @@ export function HouseholdPanel() {
                       <button
                         type="button"
                         onClick={() => handleRemoveMember(member.id, member.invited_email || undefined)}
-                        className="ml-3 p-2 text-content-tertiary hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors"
+                        className="ml-3 p-2 text-content-tertiary hover:text-[var(--color-status-rose-text)] hover:bg-[var(--color-status-rose-bg)] rounded-lg transition-colors"
                         title="Revoke invite"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -327,7 +327,7 @@ export function HouseholdPanel() {
                             <button
                               type="button"
                               onClick={() => handleRemoveMember(member.id, displayName)}
-                              className="p-2 text-content-tertiary hover:text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                              className="p-2 text-content-tertiary hover:text-[var(--color-status-rose-text)] hover:bg-[var(--color-status-rose-bg)] rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                               title="Remove member"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -347,13 +347,13 @@ export function HouseholdPanel() {
             <h4 className="text-xs font-medium text-content-secondary mb-2">Permissions</h4>
             <ul className="space-y-2 text-xs text-content-tertiary">
               <li className="flex items-start gap-2">
-                <Crown className="w-3.5 h-3.5 dark:text-amber-500 text-amber-600 mt-0.5 shrink-0" />
+                <Crown className="w-3.5 h-3.5 text-[var(--color-status-amber-text)] mt-0.5 shrink-0" />
                 <span>
                   <strong className="text-content-secondary">Owner:</strong> Full control — manage members, edit all data, billing
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <Users className="w-3.5 h-3.5 dark:text-emerald-500 text-emerald-600 mt-0.5 shrink-0" />
+                <Users className="w-3.5 h-3.5 text-[var(--color-status-emerald-text)] mt-0.5 shrink-0" />
                 <span>
                   <strong className="text-content-secondary">Partner:</strong> Full access — add/edit bills, transactions, budgets, goals
                 </span>

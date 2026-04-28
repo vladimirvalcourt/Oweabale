@@ -100,7 +100,7 @@ export function FormAutocomplete({
     <div className="relative">
       <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
         {label}
-        {required && <span className="text-rose-500 ml-0.5">*</span>}
+        {required && <span className="ml-0.5 text-[var(--color-status-rose-text)]">*</span>}
       </label>
       <input
         id={id}
@@ -121,7 +121,7 @@ export function FormAutocomplete({
         aria-expanded={showSuggestions}
         aria-controls={`${id}-suggestions`}
         aria-activedescendant={highlightedIndex >= 0 ? `${id}-option-${highlightedIndex}` : undefined}
-        className={`w-full bg-surface-base border ${hasError ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
+        className={`w-full bg-surface-base border ${hasError ? 'border-[var(--color-status-rose-border)]' : 'border-surface-border'} radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
       />
       {showSuggestions && (
         <ul
@@ -151,7 +151,7 @@ export function FormAutocomplete({
       )}
       {hint && <p id={hintId} className="text-[10px] text-content-muted mt-1">{hint}</p>}
       {hasError && (
-        <p id={errorId} className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5" role="alert" aria-live="polite">
+        <p id={errorId} className="mt-1.5 flex items-center gap-1.5 text-xs text-[var(--color-status-rose-text)]" role="alert" aria-live="polite">
           <AlertCircle className="w-3 h-3" aria-hidden />
           {error}
         </p>
@@ -159,13 +159,13 @@ export function FormAutocomplete({
       {showProgress && (
         <div className="mt-1.5">
           <div className="flex items-center justify-between mb-1">
-            <p id={`${id}-count`} className={`text-[10px] font-mono ${isNearLimit ? 'text-amber-400' : 'text-content-muted'}`} aria-live="polite">
+            <p id={`${id}-count`} className={`text-[10px] font-mono ${isNearLimit ? 'text-[var(--color-status-amber-text)]' : 'text-content-muted'}`} aria-live="polite">
               {charCount}/{maxLength} characters
             </p>
             {isNearLimit && (
               <div className="flex-1 ml-2 h-1 bg-surface-raised rounded-full overflow-hidden">
                 <div
-                  className={`h-full transition-all duration-200 ${progressPercentage > 90 ? 'bg-red-500' : 'bg-amber-400'}`}
+                  className={`h-full transition-all duration-200 ${progressPercentage > 90 ? 'bg-[var(--color-status-rose-text)]' : 'bg-[var(--color-status-amber-text)]'}`}
                   style={{ width: `${Math.min(progressPercentage, 100)}%` }}
                   role="progressbar"
                   aria-valuenow={charCount}

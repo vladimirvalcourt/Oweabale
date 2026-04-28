@@ -19,9 +19,22 @@ import { getCustomIcon } from '../lib/utils';
 type DateRange = '30d' | '90d' | '1y';
 
 const CATEGORY_COLORS = [
-  '#d4d4d4', '#34D399', '#F59E0B', '#EF4444', '#737373',
-  '#a3a3a3', '#64748b', '#78716c', '#525252', '#404040',
+  'var(--color-content-secondary)',
+  'var(--color-status-emerald-text)',
+  'var(--color-status-amber-text)',
+  'var(--color-status-rose-text)',
+  'var(--color-content-tertiary)',
+  'var(--color-content-muted)',
+  'var(--color-brand-indigo)',
+  'var(--color-brand-violet)',
+  'var(--color-brand-tax)',
+  'var(--color-surface-border)',
 ];
+const chartGridColor = 'var(--color-surface-border)';
+const chartTickColor = 'var(--color-content-tertiary)';
+const chartNeutralColor = 'var(--color-content-secondary)';
+const chartProfitColor = 'var(--color-status-emerald-text)';
+const chartExpenseColor = 'var(--color-status-rose-text)';
 
 function exportCSV(data: { date: string; name: string; category: string; amount: string; type: string }[], filename: string) {
   const headers = ['Date', 'Name', 'Category', 'Amount', 'Type'];
@@ -185,10 +198,10 @@ export default function Reports() {
       <CollapsibleModule title="Financial Summary" icon={OverviewIcon}>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 -mx-6 -my-6 p-6">
           {[
-            { label: 'Total Income', value: `$${filteredTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'text-emerald-400' },
-            { label: 'Total Expenses', value: `$${filteredTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'text-red-400' },
+            { label: 'Total Income', value: `$${filteredTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'text-[var(--color-status-emerald-text)]' },
+            { label: 'Total Expenses', value: `$${filteredTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'text-[var(--color-status-rose-text)]' },
             { label: 'Net Savings', value: `$${(filteredTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0) - filteredTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0)).toLocaleString(undefined, { maximumFractionDigits: 0 })}`, color: 'text-content-primary' },
-            { label: 'Transactions', value: filteredTx.length.toString(), color: 'text-amber-400' },
+            { label: 'Transactions', value: filteredTx.length.toString(), color: 'text-[var(--color-status-amber-text)]' },
           ].map(card => (
             <div key={card.label} className="bg-surface-elevated border border-surface-border rounded-lg p-5">
               <p className="metric-label normal-case text-content-tertiary mb-2">{card.label}</p>
@@ -210,7 +223,7 @@ export default function Reports() {
               <p className="mt-2 text-3xl font-bold font-mono tabular-nums text-content-primary data-numeric">
                 ${recap.totalSpent.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </p>
-              <p className={`mt-1 text-xs font-medium ${recap.isIncrease ? 'text-amber-400' : 'text-emerald-400'}`}>
+              <p className={`mt-1 text-xs font-medium ${recap.isIncrease ? 'text-[var(--color-status-amber-text)]' : 'text-[var(--color-status-emerald-text)]'}`}>
                 {recap.isIncrease ? 'Up' : 'Down'} {Math.abs(recap.changePercent).toFixed(1)}% vs {compareTo}
               </p>
               {recap.topCategory ? (
@@ -236,17 +249,17 @@ export default function Reports() {
           <div className="flex flex-col">
             <SafeResponsiveContainer width="100%" height={220} minWidth={0} minHeight={120}>
               <BarChart data={monthlyData} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridColor} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
                 <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v, name) => [`$${Number(v ?? 0).toLocaleString()}`, name === 'income' ? 'Income' : 'Expenses']} />
-                <Bar dataKey="income" fill="#34D399" radius={0} />
-                <Bar dataKey="expenses" fill="#EF4444" radius={0} />
+                <Bar dataKey="income" fill={chartProfitColor} radius={0} />
+                <Bar dataKey="expenses" fill={chartExpenseColor} radius={0} />
               </BarChart>
             </SafeResponsiveContainer>
             <div className="flex gap-4 mt-3">
-              <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-emerald-400 rounded-none inline-block shrink-0" aria-hidden /> Income</div>
-              <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-red-400 rounded-none inline-block shrink-0" aria-hidden /> Expenses</div>
+              <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-[var(--color-status-emerald-text)] rounded-none inline-block shrink-0" aria-hidden /> Income</div>
+              <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-[var(--color-status-rose-text)] rounded-none inline-block shrink-0" aria-hidden /> Expenses</div>
             </div>
           </div>
         </CollapsibleModule>
@@ -295,15 +308,15 @@ export default function Reports() {
           <AreaChart data={netWorthHistory} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
             <defs>
               <linearGradient id="nwGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#d4d4d4" stopOpacity={0.15} />
-                <stop offset="95%" stopColor="#d4d4d4" stopOpacity={0} />
+                <stop offset="5%" stopColor={chartNeutralColor} stopOpacity={0.15} />
+                <stop offset="95%" stopColor={chartNeutralColor} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
-            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridColor} />
+            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
             <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Net Worth']} />
-            <Area type="monotone" dataKey="netWorth" stroke="#d4d4d4" strokeWidth={2} fillOpacity={1} fill="url(#nwGradient)" dot={{ fill: '#d4d4d4', strokeWidth: 0, r: 3 }} />
+            <Area type="monotone" dataKey="netWorth" stroke={chartNeutralColor} strokeWidth={2} fillOpacity={1} fill="url(#nwGradient)" dot={{ fill: chartNeutralColor, strokeWidth: 0, r: 3 }} />
           </AreaChart>
         </SafeResponsiveContainer>
       </CollapsibleModule>

@@ -272,10 +272,10 @@ function SupportPanelInner() {
                     <div
                       className={`p-1.5 border rounded-lg shrink-0 ${
                         ticket.status === 'Resolved'
-                          ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
+                          ? 'bg-[var(--color-status-emerald-bg)] border-[var(--color-status-emerald-border)] text-[var(--color-status-emerald-text)]'
                           : ticket.status === 'In Progress'
                             ? 'bg-content-primary/[0.05] border-surface-border text-content-primary'
-                            : 'bg-amber-500/10 border-amber-500/20 text-amber-500'
+                            : 'bg-[var(--color-status-amber-bg)] border-[var(--color-status-amber-border)] text-[var(--color-status-amber-text)]'
                       }`}
                     >
                       {ticket.status === 'Resolved' ? (
@@ -292,7 +292,7 @@ function SupportPanelInner() {
                         <span
                           className={`rounded-lg border px-1.5 py-0.5 text-xs font-medium ${
                             ticket.priority === 'Urgent'
-                              ? 'border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                              ? 'border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]'
                               : 'border-surface-border bg-surface-elevated text-content-secondary'
                           }`}
                         >

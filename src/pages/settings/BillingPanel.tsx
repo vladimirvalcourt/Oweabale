@@ -1,8 +1,16 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Dialog } from '@headlessui/react';
-import { Building2, Download, CreditCard as CreditCardIcon, RefreshCw } from 'lucide-react';
-import { CollapsibleModule } from '../../components/common';
+import {
+  AlertTriangle,
+  CalendarClock,
+  CheckCircle2,
+  CreditCard as CreditCardIcon,
+  Download,
+  FileText,
+  RefreshCw,
+  ShieldCheck,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '../../lib/utils';
 import {
@@ -286,179 +294,232 @@ function BillingPanelInner() {
     setIsWorking(false);
   };
 
+  const periodEndLabel = currentPeriodEnd
+    ? new Date(currentPeriodEnd).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : null;
+  const accessLabel = isLoading
+    ? 'Checking access'
+    : hasPaidAccess
+      ? isProfileTrialOnly
+        ? 'Trial active'
+        : 'Active'
+      : isLockedTrial
+        ? 'Trial ended'
+        : 'Not upgraded';
+  const primaryActionLabel = isWorking
+    ? 'Working...'
+    : hasPaidAccess && !isProfileTrialOnly
+      ? 'Open billing portal'
+      : isProfileTrialOnly
+        ? 'Add payment details'
+        : `Upgrade - $${monthlyPrice.toFixed(2)}/mo`;
+  const primaryAction = hasPaidAccess && !isProfileTrialOnly ? onManageBilling : onUpgrade;
+  const statusTone = hasPaidAccess
+    ? 'border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)]'
+    : isLockedTrial
+      ? 'border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]'
+      : 'border-brand-indigo/25 bg-brand-indigo/[0.08] text-brand-indigo dark:text-brand-violet';
+
   return (
-    <div className="space-y-6">
-      <CollapsibleModule
-        title="Subscription Plan"
-        icon={BillingIcon}
-        defaultOpen
-        extraHeader={
-          <span className="inline-flex items-center rounded-md border border-surface-border-subtle bg-surface-raised px-3 py-1.5 text-xs font-medium tracking-[-0.006em] text-content-secondary">
-            {tierLabel}
-          </span>
-        }
-      >
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-          <p className="min-w-0 flex-1 text-sm leading-6 tracking-[-0.006em] text-content-tertiary">
-            {isLoading ? 'Loading billing status...' : statusText}
-          </p>
-          <button
-            type="button"
-            onClick={() => void loadBillingState({ stripeSyncFirst: true })}
-            disabled={isLoading || isWorking}
-            className="shrink-0 self-start inline-flex items-center justify-center gap-2 rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-surface-elevated hover:text-content-primary focus-app disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} aria-hidden />
-            Refresh status
-          </button>
-        </div>
-        {isLockedTrial && !hasPaidAccess && (
-          <div className="mb-5 rounded-md border border-amber-500/30 bg-amber-500/10 p-5">
-            <h4 className="text-sm font-medium tracking-[-0.006em] text-content-primary">Your 14-day trial ended</h4>
-            <p className="mt-1 max-w-2xl text-sm leading-6 tracking-[-0.006em] text-content-secondary">
-              Your account is paused until you pick a plan. Start a subscription to get back to your Pay List,
-              documents, calendar, and settings.
-            </p>
-          </div>
-        )}
-        {hasPaidAccess ? (
-          <div className="flex flex-col items-center justify-between gap-4 rounded-md border border-emerald-500/25 bg-emerald-500/10 p-5 sm:flex-row">
-            <div>
-              <h4 className="flex items-center gap-2 text-sm font-medium tracking-[-0.006em] text-content-primary">
-                {isProfileTrialOnly ? 'Your Full Suite trial is active' : "You're on Full Suite"}
-              </h4>
-              <p className="mt-1 max-w-md text-sm tracking-[-0.006em] text-emerald-200/70">
-                {isProfileTrialOnly
-                  ? 'You already have Full Suite access during the trial. Start paid billing whenever you are ready so everything keeps working after the trial ends.'
-                  : 'Full Suite is active. Update your plan, payment method, or invoices anytime in the billing portal.'}
-              </p>
-              {subscriptionStatus === 'trialing' && currentPeriodEnd && (
-                <p className="mt-2 text-xs tracking-[-0.006em] text-emerald-100/80">
-                  Trial active until {new Date(currentPeriodEnd).toLocaleDateString()}. Enable pre-charge reminders in Notifications.
-                </p>
-              )}
+    <div className="space-y-5">
+      <section className="overflow-hidden rounded-lg border border-surface-border bg-surface-raised shadow-card">
+        <div className="grid gap-0 lg:grid-cols-[1fr_260px]">
+          <div className="p-6 sm:p-7">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className={cn('inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium', statusTone)}>
+                {hasPaidAccess ? <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> : <BillingIcon className="h-3.5 w-3.5" aria-hidden />}
+                {accessLabel}
+              </span>
+              <span className="inline-flex items-center rounded-md border border-surface-border-subtle bg-surface-base px-3 py-1.5 text-xs font-medium text-content-secondary">
+                {tierLabel}
+              </span>
             </div>
-            <div className="flex w-full min-w-0 flex-col items-stretch gap-3 sm:w-auto sm:items-end">
+
+            <div className="mt-8 max-w-2xl">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Plan & access</p>
+              <h2 className="mt-3 text-3xl font-medium tracking-[-0.045em] text-content-primary sm:text-4xl">
+                {hasPaidAccess
+                  ? isProfileTrialOnly
+                    ? 'Your trial is active.'
+                    : 'Full Suite is ready.'
+                  : isLockedTrial
+                    ? 'Pick a plan to continue.'
+                    : 'Start Full Suite when you need more room.'}
+              </h2>
+              <p className="mt-4 text-sm leading-6 tracking-[-0.006em] text-content-tertiary">
+                {isLoading ? 'Loading billing status...' : statusText}
+              </p>
+            </div>
+
+            {isLockedTrial && !hasPaidAccess && (
+              <div className="mt-6 flex gap-3 rounded-md border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] p-4">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-[var(--color-status-amber-text)]" aria-hidden />
+                <div>
+                  <p className="text-sm font-medium text-content-primary">Your app access is paused.</p>
+                  <p className="mt-1 text-sm leading-6 text-content-secondary">
+                    Start Full Suite to reopen your Pay List, documents, calendar, and settings.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <aside className="border-t border-surface-border bg-surface-base/50 p-6 lg:border-l lg:border-t-0">
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Current plan</p>
+            <div className="mt-4 font-mono text-4xl tracking-[-0.05em] text-content-primary">
+              ${monthlyPrice.toFixed(2)}
+              <span className="ml-1 text-sm font-sans font-medium tracking-[-0.006em] text-content-muted">/mo</span>
+            </div>
+            <dl className="mt-6 space-y-4 text-sm">
+              <div className="flex items-start justify-between gap-4">
+                <dt className="text-content-muted">Status</dt>
+                <dd className="text-right font-medium text-content-primary">{accessLabel}</dd>
+              </div>
+              <div className="flex items-start justify-between gap-4">
+                <dt className="text-content-muted">{isProfileTrialOnly ? 'Trial ends' : 'Access through'}</dt>
+                <dd className="text-right font-medium text-content-primary">{periodEndLabel ?? 'Not scheduled'}</dd>
+              </div>
+            </dl>
+            <div className="mt-6 flex flex-col gap-2">
               <button
                 type="button"
-                onClick={isProfileTrialOnly ? onUpgrade : onManageBilling}
-                disabled={isWorking}
-                className="shrink-0 rounded-md bg-emerald-600 px-5 py-2.5 text-sm font-medium tracking-[-0.006em] text-white shadow-none transition-[background-color,transform] hover:bg-emerald-500 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
+                onClick={primaryAction}
+                disabled={isWorking || isLoading}
+                className="focus-app inline-flex min-h-11 items-center justify-center rounded-md bg-brand-indigo px-4 py-2 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isWorking ? 'Working...' : isProfileTrialOnly ? 'Add payment details' : 'Open billing portal'}
+                {primaryActionLabel}
               </button>
-              <p className="max-w-sm text-left text-[11px] tracking-[-0.006em] text-content-tertiary sm:text-right">
-                {isProfileTrialOnly
-                  ? 'Adding payment details starts checkout so your subscription is ready before trial access ends.'
-                  : "Open billing portal to update payment methods and view invoices."}
-              </p>
-              {!isProfileTrialOnly && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => onCancelAtPeriodEnd()}
-                    disabled={isWorking}
-                    className="shrink-0 rounded-md border border-surface-border bg-surface-raised px-4 py-2.5 text-sm font-medium tracking-[-0.006em] text-content-secondary transition-colors hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    Cancel at period end
-                  </button>
-                  {currentPeriodEnd && (
-                    <p className="max-w-sm text-left text-[11px] tracking-[-0.006em] text-content-tertiary sm:text-right">
-                      Access continues until{' '}
-                      {new Date(currentPeriodEnd).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric', year: 'numeric' })}
-                      .
-                    </p>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setImmediateCancelOpen(true)}
-                    disabled={isWorking}
-                    className="shrink-0 rounded-md border border-rose-500/40 bg-transparent px-4 py-2.5 text-sm font-medium tracking-[-0.006em] text-rose-400 transition-colors hover:bg-rose-500/10 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    Cancel immediately
-                  </button>
-                  <p className="max-w-sm text-left text-[11px] tracking-[-0.006em] text-content-tertiary sm:text-right">
-                    Immediate cancel ends paid access today. We'll keep your data safe for 30 days so you can come back if needed.
-                  </p>
-                </>
-              )}
+              <button
+                type="button"
+                onClick={() => void loadBillingState({ stripeSyncFirst: true })}
+                disabled={isLoading || isWorking}
+                className="focus-app inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-elevated hover:text-content-primary disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <RefreshCw className={cn('h-3.5 w-3.5', isLoading && 'animate-spin')} aria-hidden />
+                Refresh status
+              </button>
             </div>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-between gap-4 rounded-md border border-surface-border bg-surface-raised p-5 sm:flex-row">
-            <div>
-              <h4 className="flex items-center gap-2 text-sm font-medium tracking-[-0.006em] text-content-primary">
-                {isLockedTrial ? 'Pick a plan to continue' : 'Upgrade to Full Suite'}
-              </h4>
-              <p className="mt-1 max-w-md text-sm tracking-[-0.006em] text-content-secondary/70">
-                {isLockedTrial
-                  ? `Start Full Suite for $${monthlyPrice.toFixed(2)}/month to get back into your account.`
-                  : `Unlock Full Suite: unlimited account sync, debt payoff planner, subscription alerts, and freelancer tax tools for $${monthlyPrice.toFixed(2)}/month.`}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={onUpgrade}
-              disabled={isWorking}
-              className="shrink-0 rounded-md bg-brand-indigo px-5 py-2.5 text-sm font-medium tracking-[-0.006em] text-white shadow-none transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {isWorking ? 'Working...' : `Upgrade — $${monthlyPrice.toFixed(2)}/mo`}
-            </button>
-          </div>
-        )}
-      </CollapsibleModule>
-
-      <CollapsibleModule title="Billing History" icon={BillingIcon} defaultOpen={false}>
-        <p className="mb-6 text-sm tracking-[-0.006em] text-content-tertiary">View and download your previous invoices.</p>
-        {paymentHistory.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-md border border-dashed border-surface-border bg-surface-base p-8 text-center">
-            <Download className="mb-3 h-7 w-7 text-content-muted" />
-            <p className="text-sm font-medium tracking-[-0.006em] text-content-secondary">No billing history</p>
-            <p className="mt-1 text-xs font-medium tracking-[-0.006em] text-content-tertiary">
-              {hasPaidAccess
-                ? 'Invoices from Stripe will appear here after your first charge.'
-                : 'No charges have been made yet.'}
-            </p>
-          </div>
-        ) : (
-          <div className="divide-y divide-surface-border rounded-md border border-surface-border bg-surface-base">
-            {paymentHistory.map((payment) => (
-              <div key={payment.id} className="flex items-center justify-between px-4 py-3 text-xs font-medium tracking-[-0.006em]">
-                <span className="text-content-secondary">{new Date(payment.created_at).toLocaleDateString()}</span>
-                <span className="tabular-nums text-content-primary">
-                  ${(payment.amount_total / 100).toFixed(2)} {payment.currency.toUpperCase()}
-                </span>
-                <span className="capitalize text-content-tertiary">{payment.status}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </CollapsibleModule>
-
-      <CollapsibleModule title="Payment Methods" icon={BillingIcon} defaultOpen={false}>
-        <p className="mb-6 text-sm tracking-[-0.006em] text-content-tertiary">Manage payment methods used for your subscriptions.</p>
-        <div className="mb-4 flex flex-col items-center justify-center rounded-md border border-dashed border-surface-border bg-surface-base p-6 text-center">
-          <CreditCardIcon className="mb-3 h-8 w-8 text-content-muted" />
-          <p className="text-sm font-medium tracking-[-0.006em] text-content-secondary">
-            {hasPaidAccess ? 'Payment methods' : 'No payment method yet'}
-          </p>
-          <p className="mt-1 text-xs font-medium tracking-[-0.006em] text-content-tertiary">
-            {isProfileTrialOnly
-              ? 'You are in the trial period and do not need to add payment details yet.'
-              : hasPaidAccess
-                ? 'Update or change your card anytime in the billing portal.'
-                : 'Add your payment details when you start Full Suite.'}
-          </p>
+          </aside>
         </div>
-        <button
-          type="button"
-          onClick={isProfileTrialOnly ? onUpgrade : onManageBilling}
-          disabled={isWorking}
-          className="focus-app rounded-md border border-surface-border bg-surface-elevated px-4 py-2 text-sm font-medium tracking-[-0.006em] text-content-primary transition-colors hover:text-content-secondary"
-        >
-          {isProfileTrialOnly ? 'Add payment details' : 'Open billing portal'}
-        </button>
-      </CollapsibleModule>
+      </section>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <section className="rounded-lg border border-surface-border bg-surface-raised p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-surface-border-subtle bg-surface-base">
+              <CreditCardIcon className="h-4 w-4 text-content-tertiary" aria-hidden />
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-sm font-medium tracking-[-0.006em] text-content-primary">Payment method</h3>
+              <p className="mt-1 text-sm leading-6 text-content-tertiary">
+                {isProfileTrialOnly
+                  ? 'No card is required during the trial. Add one only when you want paid access queued up.'
+                  : hasPaidAccess
+                    ? 'Update cards, invoices, and billing details in Stripe.'
+                    : 'Add payment details when you start Full Suite.'}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={isProfileTrialOnly || !hasPaidAccess ? onUpgrade : onManageBilling}
+            disabled={isWorking || isLoading}
+            className="focus-app mt-5 inline-flex min-h-10 items-center justify-center rounded-md border border-surface-border bg-surface-elevated px-4 py-2 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isProfileTrialOnly || !hasPaidAccess ? 'Add payment details' : 'Open billing portal'}
+          </button>
+        </section>
+
+        <section className="rounded-lg border border-surface-border bg-surface-raised p-5">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-surface-border-subtle bg-surface-base">
+              <Download className="h-4 w-4 text-content-tertiary" aria-hidden />
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-sm font-medium tracking-[-0.006em] text-content-primary">Invoices</h3>
+              <p className="mt-1 text-sm leading-6 text-content-tertiary">
+                {paymentHistory.length > 0
+                  ? `${paymentHistory.length} recent payment${paymentHistory.length === 1 ? '' : 's'} synced from Stripe.`
+                  : hasPaidAccess
+                    ? 'Invoices appear here after the first charge posts.'
+                    : 'No charges have been made yet.'}
+              </p>
+            </div>
+          </div>
+          <div className="mt-5 overflow-hidden rounded-md border border-surface-border bg-surface-base">
+            {paymentHistory.length === 0 ? (
+              <div className="flex items-center gap-3 p-4 text-sm text-content-tertiary">
+                <FileText className="h-4 w-4 shrink-0 text-content-muted" aria-hidden />
+                No billing history yet.
+              </div>
+            ) : (
+              paymentHistory.slice(0, 5).map((payment) => (
+                <div key={payment.id} className="grid grid-cols-[1fr_auto_auto] items-center gap-3 border-b border-surface-border px-4 py-3 text-xs last:border-b-0">
+                  <span className="text-content-secondary">{new Date(payment.created_at).toLocaleDateString()}</span>
+                  <span className="font-mono text-content-primary">
+                    ${(payment.amount_total / 100).toFixed(2)} {payment.currency.toUpperCase()}
+                  </span>
+                  <span className="capitalize text-content-tertiary">{payment.status}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </section>
+      </div>
+
+      <section className="rounded-lg border border-surface-border bg-surface-raised p-5">
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="flex gap-3">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-content-tertiary" aria-hidden />
+            <p className="text-sm leading-6 text-content-secondary">Cancel from the app without a support ticket.</p>
+          </div>
+          <div className="flex gap-3">
+            <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-content-tertiary" aria-hidden />
+            <p className="text-sm leading-6 text-content-secondary">Trial reminders use your Notifications preference.</p>
+          </div>
+          <div className="flex gap-3">
+            <FileText className="mt-0.5 h-4 w-4 shrink-0 text-content-tertiary" aria-hidden />
+            <p className="text-sm leading-6 text-content-secondary">Data export and account deletion live in the Data tab.</p>
+          </div>
+        </div>
+      </section>
+
+      {hasPaidAccess && !isProfileTrialOnly && (
+        <section className="rounded-lg border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] p-5">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--color-status-rose-text)]">Danger zone</p>
+              <h3 className="mt-2 text-base font-medium tracking-[-0.018em] text-content-primary">Change or end paid access</h3>
+              <p className="mt-2 text-sm leading-6 text-content-tertiary">
+                Cancel at period end to keep access through {periodEndLabel ?? 'your period end date'}, or cancel immediately to end paid access today.
+                Your data stays safe for 30 days.
+              </p>
+            </div>
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-56">
+              <button
+                type="button"
+                onClick={onCancelAtPeriodEnd}
+                disabled={isWorking}
+                className="focus-app inline-flex min-h-10 items-center justify-center rounded-md border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Cancel at period end
+              </button>
+              <button
+                type="button"
+                onClick={() => setImmediateCancelOpen(true)}
+                disabled={isWorking}
+                className="focus-app inline-flex min-h-10 items-center justify-center rounded-md border border-[var(--color-status-rose-border)] bg-transparent px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:bg-[var(--color-status-rose-bg)] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                Cancel immediately
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
 
       <Dialog open={immediateCancelOpen} onClose={() => setImmediateCancelOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
@@ -481,7 +542,7 @@ function BillingPanelInner() {
                 type="button"
                 onClick={() => void onCancelImmediatelyConfirmed()}
                 disabled={isWorking}
-                className="rounded-md bg-brand-expense px-4 py-2 text-sm font-medium tracking-[-0.006em] text-white transition-[background-color,transform] hover:bg-red-700 active:translate-y-px disabled:opacity-60"
+                className="rounded-md bg-brand-expense px-4 py-2 text-sm font-medium tracking-[-0.006em] text-white transition-[filter,transform] hover:brightness-90 active:translate-y-px disabled:opacity-60"
               >
                 {isWorking ? 'Working…' : 'End access today'}
               </button>
@@ -523,24 +584,6 @@ function BillingPanelInner() {
         </div>
       </Dialog>
 
-      <CollapsibleModule title="Billing Transparency Center" icon={BillingIcon} defaultOpen={false}>
-        <div className="space-y-3 text-sm tracking-[-0.006em] text-content-secondary">
-          <p>
-            Cancel from this app: use <strong className="font-medium tracking-[-0.006em] text-content-primary">Cancel at period end</strong> to keep
-            access until the date shown, or <strong className="font-medium tracking-[-0.006em] text-content-primary">Cancel immediately</strong> to end
-            paid access today.
-          </p>
-          <p>
-            Trial reminders are sent before first charge when enabled in Notifications (`Trial-to-paid reminder`).
-          </p>
-          <p>
-            You can export data anytime and delete your account immediately from `Data & Privacy`, with a downloadable deletion receipt.
-          </p>
-          <p className="text-xs tracking-[-0.006em] text-content-tertiary">
-            No phone calls or support tickets are required for basic billing cancellation and account deletion flows.
-          </p>
-        </div>
-      </CollapsibleModule>
     </div>
   );
 }

@@ -54,10 +54,10 @@ function SecurityPanelInner() {
 
       {/* E-02: Show trust badge for SSO users instead of a misleading 0/2 score */}
       {isSsoOnly ? (
-        <div className="flex items-start gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
-          <ShieldCheck className="w-5 h-5 shrink-0 text-emerald-500 mt-0.5" aria-hidden />
+        <div className="flex items-start gap-3 rounded-lg border border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-4 py-3">
+          <ShieldCheck className="w-5 h-5 shrink-0 text-[var(--color-status-emerald-text)] mt-0.5" aria-hidden />
           <div>
-            <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+            <p className="text-sm font-medium text-[var(--color-status-emerald-text)]">
               Secured via Google
             </p>
             <p className="mt-1 text-xs text-content-secondary leading-relaxed">
@@ -200,8 +200,8 @@ function SecurityPanelInner() {
       >
         {mfaEnabled ? (
           <div className="flex items-start gap-3 border border-surface-border rounded-lg p-4 bg-surface-elevated/50">
-            <div className="w-10 h-10 shrink-0 border rounded-full flex items-center justify-center border-emerald-500/30 bg-emerald-500/10">
-              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+            <div className="w-10 h-10 shrink-0 border rounded-full flex items-center justify-center border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)]">
+              <CheckCircle2 className="w-5 h-5 text-[var(--color-status-emerald-text)]" />
             </div>
             <div className="min-w-0">
               <p className="text-sm font-medium text-content-primary">Authenticator 2FA is enabled</p>

@@ -13,11 +13,11 @@ const badgeVariantClasses = {
     'border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80',
   outline: 'text-foreground',
   success:
-    'border-transparent bg-brand-profit/10 text-brand-profit hover:bg-brand-profit/20',
+    'border-transparent bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)] hover:bg-[var(--color-status-emerald-bg)]',
   warning:
-    'border-transparent bg-amber-500/10 text-amber-400 hover:bg-amber-500/20',
+    'border-transparent bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)] hover:bg-[var(--color-status-amber-bg)]',
   error:
-    'border-transparent bg-brand-expense/10 text-brand-expense hover:bg-brand-expense/20',
+    'border-transparent bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)] hover:bg-[var(--color-status-rose-bg)]',
 } as const;
 
 type BadgeVariant = keyof typeof badgeVariantClasses;

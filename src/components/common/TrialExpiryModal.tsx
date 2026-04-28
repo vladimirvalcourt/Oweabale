@@ -47,8 +47,8 @@ export default function TrialExpiryModal({ onDismiss }: TrialExpiryModalProps) {
     <>
       <ThemeBackdrop />
       <div className="relative z-[100] w-full max-w-lg bg-surface-base border border-surface-border rounded-xl shadow-2xl p-8 animate-in fade-in zoom-in-95 duration-200">
-        <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-amber-500/10 flex items-center justify-center">
-          <Lock className="h-7 w-7 text-amber-500" aria-hidden />
+        <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[var(--color-status-amber-bg)] flex items-center justify-center">
+          <Lock className="h-7 w-7 text-[var(--color-status-amber-text)]" aria-hidden />
         </div>
 
         {/* Title */}

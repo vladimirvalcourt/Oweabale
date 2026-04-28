@@ -28,13 +28,13 @@ export default function SessionWarningModal({ isOpen, timeLeftSeconds, onExtend,
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 10 }}
-              className="w-full max-w-sm bg-surface-elevated border-2 border-amber-500/30 rounded shadow-2xl overflow-hidden"
+              className="w-full max-w-sm bg-surface-elevated border-2 border-[var(--color-status-amber-border)] rounded shadow-2xl overflow-hidden"
             >
-              <div className="bg-amber-500/10 p-6 flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mb-4 relative">
-                  <Clock className="w-8 h-8 text-amber-500" />
+              <div className="bg-[var(--color-status-amber-bg)] p-6 flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-[var(--color-status-amber-bg)] rounded-full flex items-center justify-center mb-4 relative">
+                  <Clock className="w-8 h-8 text-[var(--color-status-amber-text)]" />
                   <motion.div 
-                    className="absolute inset-0 border-2 border-amber-500 rounded-full"
+                    className="absolute inset-0 border-2 border-[var(--color-status-amber-border)] rounded-full"
                     initial={{ scale: 1, opacity: 0.5 }}
                     animate={{ scale: 1.5, opacity: 0 }}
                     transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
@@ -44,8 +44,8 @@ export default function SessionWarningModal({ isOpen, timeLeftSeconds, onExtend,
                 <h2 className="text-xl font-sans font-bold text-content-primary mb-2 uppercase tracking-tight">
                   Session Expiring
                 </h2>
-                <div className="bg-black/40 px-3 py-1 border border-content-primary/5 rounded-lg mb-4">
-                  <span className="text-2xl font-mono font-bold text-amber-500 tabular-nums">
+                <div className="bg-surface-raised px-3 py-1 border border-surface-border rounded-lg mb-4">
+                  <span className="text-2xl font-mono font-bold text-[var(--color-status-amber-text)] tabular-nums">
                     {Math.floor(timeLeftSeconds / 60)}:{String(timeLeftSeconds % 60).padStart(2, '0')}
                   </span>
                 </div>
@@ -57,7 +57,7 @@ export default function SessionWarningModal({ isOpen, timeLeftSeconds, onExtend,
                 <div className="w-full space-y-3">
                   <button
                     onClick={onExtend}
-                    className="w-full bg-amber-500 hover:bg-amber-400 text-surface-base py-3 rounded-lg font-mono font-bold text-xs uppercase tracking-widest transition-all active:scale-95"
+                    className="w-full bg-[var(--color-status-amber-text)] text-white py-3 rounded-lg font-mono font-bold text-xs uppercase tracking-widest transition-all hover:brightness-95 active:scale-95"
                   >
                     Extend Session
                   </button>
@@ -70,7 +70,7 @@ export default function SessionWarningModal({ isOpen, timeLeftSeconds, onExtend,
                 </div>
               </div>
 
-              <div className="bg-black/60 px-6 py-4 border-t border-content-primary/5 flex items-center gap-3">
+              <div className="bg-surface-base px-6 py-4 border-t border-surface-border flex items-center gap-3">
                 <Shield className="w-4 h-4 text-content-muted" />
                 <span className="text-[9px] font-mono text-content-muted uppercase tracking-widest">
                   Enterprise-grade session isolation active

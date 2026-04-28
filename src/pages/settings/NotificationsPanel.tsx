@@ -114,7 +114,7 @@ function NotificationsPanelInner() {
                     setPref(item.id, checked);
                     deferToast(() => toast.success(`${item.label} ${checked ? 'enabled' : 'disabled'}`));
                   }}
-                  className="h-4 w-4 cursor-pointer rounded border-surface-border bg-surface-base text-emerald-500 transition-colors focus-app"
+                  className="h-4 w-4 cursor-pointer rounded border-surface-border bg-surface-base text-[var(--color-status-emerald-text)] transition-colors focus-app"
                 />
               </div>
             </div>
@@ -132,7 +132,7 @@ function NotificationsPanelInner() {
           <p className="mb-4 text-xs font-medium text-content-muted">Your browser does not support web push.</p>
         )}
         {isWebPushSupported() && !vapidConfigured && (
-          <p className="mb-4 text-xs font-medium leading-relaxed dark:text-amber-400/90 text-amber-700">
+          <p className="mb-4 text-xs font-medium leading-relaxed text-[var(--color-status-amber-text)]">
             Web push is not configured yet (add{' '}
             <code className="rounded-md border border-surface-border bg-surface-raised px-1.5 py-0.5 font-mono text-[11px] text-content-primary">
               VITE_VAPID_PUBLIC_KEY
@@ -202,7 +202,7 @@ function NotificationsPanelInner() {
                       setWebPushReady(false);
                       toast.success('Browser push disabled on this device');
                     }}
-                    className="inline-flex items-center gap-2 rounded-lg dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300 border-rose-500/40 bg-rose-500/15 text-rose-700 px-4 py-2 text-sm font-medium transition-colors hover:bg-rose-500/20 disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:brightness-95 disabled:opacity-60"
                   >
                     Turn off
                   </button>
@@ -321,7 +321,7 @@ function NotificationsPanelInner() {
                   type="checkbox"
                   checked={item.checked}
                   onChange={(e) => void item.onChange(e.target.checked)}
-                  className="h-4 w-4 cursor-pointer rounded border-surface-border bg-surface-base text-emerald-500 transition-colors focus-app"
+                  className="h-4 w-4 cursor-pointer rounded border-surface-border bg-surface-base text-[var(--color-status-emerald-text)] transition-colors focus-app"
                 />
               </div>
             </div>
@@ -354,7 +354,7 @@ function NotificationsPanelInner() {
                       setPref(item.id, checked);
                       deferToast(() => toast.success(`${item.label} ${checked ? 'enabled' : 'disabled'}`));
                     }}
-                    className="h-4 w-4 cursor-pointer rounded border-surface-border bg-surface-base text-emerald-500 transition-colors focus-app"
+                    className="h-4 w-4 cursor-pointer rounded border-surface-border bg-surface-base text-[var(--color-status-emerald-text)] transition-colors focus-app"
                   />
                 </div>
               </div>

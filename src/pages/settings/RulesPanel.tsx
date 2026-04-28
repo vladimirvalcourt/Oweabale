@@ -270,7 +270,7 @@ function RulesPanelInner() {
               {reviewSuggestions.length > 0 && (
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" aria-hidden />
+                    <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-status-amber-text)] shrink-0" aria-hidden />
                     <p className="text-sm font-medium text-content-primary">Needs your review</p>
                   </div>
                   <p className="text-xs text-content-tertiary mb-4">
@@ -280,7 +280,7 @@ function RulesPanelInner() {
                     {reviewSuggestions.map((s) => (
                       <li
                         key={s.from}
-                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-500/25 bg-amber-500/5 px-3 py-2"
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] px-3 py-2"
                       >
                         <span className="text-xs text-content-secondary">
                           <span className="font-medium text-content-primary">{s.to}</span>
@@ -417,14 +417,14 @@ function RulesPanelInner() {
                     </span>
                     <span className="truncate text-sm font-medium text-content-primary">{rule.match_value}</span>
                     <span className="shrink-0 text-xs text-content-muted">→</span>
-                    <span className="truncate text-xs font-medium text-emerald-500">
+                    <span className="truncate text-xs font-medium text-[var(--color-status-emerald-text)]">
                       {formatCategoryLabel(rule.category)}
                     </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => deleteCategorizationRule(rule.id)}
-                    className="ml-4 text-content-muted hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
+                    className="ml-4 text-content-muted hover:text-[var(--color-status-rose-text)] transition-colors opacity-0 group-hover:opacity-100 shrink-0"
                     title="Delete rule"
                   >
                     <Trash2 className="w-4 h-4" />

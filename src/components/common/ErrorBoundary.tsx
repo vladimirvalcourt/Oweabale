@@ -76,18 +76,18 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="min-h-[400px] flex items-center justify-center p-8">
-          <div className="relative max-w-md w-full border border-red-900/50 bg-surface-base p-8 text-center">
+          <div className="relative max-w-md w-full border border-[var(--color-status-rose-border)] bg-surface-base p-8 text-center">
             {/* Corner markers */}
-            <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-red-500" />
-            <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-red-500" />
+            <div className="absolute left-0 top-0 h-2 w-2 border-l border-t border-[var(--color-status-rose-border)]" />
+            <div className="absolute right-0 top-0 h-2 w-2 border-r border-t border-[var(--color-status-rose-border)]" />
 
             <div className="flex justify-center mb-5">
-              <div className="w-12 h-12 border border-red-900 flex items-center justify-center bg-red-950/30">
-                <AlertTriangle className="w-5 h-5 text-red-500" />
+              <div className="flex h-12 w-12 items-center justify-center border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)]">
+                <AlertTriangle className="h-5 w-5 text-[var(--color-status-rose-text)]" />
               </div>
             </div>
 
-            <h2 className="text-[11px] font-mono font-bold text-red-400 uppercase tracking-[0.3em] mb-2">
+            <h2 className="mb-2 text-[11px] font-mono font-bold uppercase tracking-[0.3em] text-[var(--color-status-rose-text)]">
               {import.meta.env.DEV ? 'Render fault detected' : 'Something went wrong'}
             </h2>
             <p className="text-sm text-content-tertiary mb-3 leading-relaxed">
@@ -97,7 +97,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </p>
 
             {import.meta.env.DEV && this.state.error && (
-              <pre className="text-left text-[9px] font-mono text-amber-200/90 bg-black/50 border border-surface-border p-3 mb-3 overflow-auto max-h-28 text-wrap break-words">
+              <pre className="mb-3 max-h-28 overflow-auto border border-surface-border bg-surface-elevated p-3 text-left text-[9px] font-mono text-[var(--color-status-amber-text)] text-wrap break-words">
                 {this.state.error.message}
               </pre>
             )}

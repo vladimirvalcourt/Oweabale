@@ -73,7 +73,7 @@ function BankConnectionGated() {
             type="button"
             onClick={handleDisconnect}
             disabled={isDisconnecting}
-            className="mt-3 inline-flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-700 transition-colors hover:bg-rose-500/20 disabled:opacity-60 dark:text-rose-300"
+            className="mt-3 inline-flex items-center gap-2 rounded-lg border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:bg-[var(--color-status-rose-bg)] disabled:opacity-60"
           >
             {isDisconnecting ? <Loader2 className="h-4 w-4 animate-spin shrink-0" aria-hidden /> : <Unplug className="h-4 w-4 shrink-0" aria-hidden />}
             Disconnect bank
@@ -260,9 +260,9 @@ function BankConnectionPlaid() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               {syncHealth.state === 'healthy' ? (
-                <ShieldCheck className="h-4 w-4 text-emerald-400" aria-hidden />
+                <ShieldCheck className="h-4 w-4 text-[var(--color-status-emerald-text)]" aria-hidden />
               ) : syncHealth.state === 'needs_attention' ? (
-                <ShieldAlert className="h-4 w-4 text-amber-400" aria-hidden />
+                <ShieldAlert className="h-4 w-4 text-[var(--color-status-amber-text)]" aria-hidden />
               ) : (
                 <Clock3 className="h-4 w-4 text-content-tertiary" aria-hidden />
               )}
@@ -276,7 +276,7 @@ function BankConnectionPlaid() {
           <div className="mt-3 h-2 w-full overflow-hidden rounded-full border border-surface-border bg-surface-raised">
             <div
               className={`h-full transition-all ${
-                syncHealth.score >= 90 ? 'bg-emerald-500' : syncHealth.score >= 70 ? 'bg-amber-500' : 'bg-rose-500'
+                syncHealth.score >= 90 ? 'bg-brand-profit' : syncHealth.score >= 70 ? 'bg-[var(--color-status-amber-text)]' : 'bg-brand-expense'
               }`}
               style={{ width: `${Math.max(8, syncHealth.score)}%` }}
             />
@@ -336,7 +336,7 @@ function BankConnectionPlaid() {
             )}
           </button>
           {!plaidGloballyEnabled && (
-            <p className="text-xs font-medium text-amber-700 dark:text-amber-400/90">Bank linking is disabled by the platform.</p>
+            <p className="text-xs font-medium text-[var(--color-status-amber-text)]">Bank linking is disabled by the platform.</p>
           )}
           {plaidGloballyEnabled && !checkingAccess && !hasFullSuite && (
             <div className="rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-xs font-medium text-content-secondary">
@@ -352,7 +352,7 @@ function BankConnectionPlaid() {
             </div>
           )}
           {plaidFlow.stage === 'error' && plaidFlow.errorMessage && (
-            <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-800 dark:text-rose-200">
+            <div className="rounded-lg border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] px-3 py-2 text-xs font-medium text-[var(--color-status-rose-text)]">
               {plaidFlow.errorMessage}
               <button
                 type="button"
@@ -367,10 +367,10 @@ function BankConnectionPlaid() {
       ) : (
         <div className="space-y-4">
           {plaidNeedsRelink && (
-            <div className="flex items-start gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-4">
-              <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" aria-hidden />
+            <div className="flex items-start gap-3 rounded-lg border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] p-4">
+              <AlertTriangle className="h-5 w-5 shrink-0 text-[var(--color-status-amber-text)]" aria-hidden />
               <div className="min-w-0">
-                <p className="text-sm font-medium text-amber-900 dark:text-amber-100">Bank needs attention</p>
+                <p className="text-sm font-medium text-[var(--color-status-amber-text)]">Bank needs attention</p>
                 <p className="mt-1 text-xs font-medium text-content-secondary">
                   Your institution needs you to sign in again. Use Fix connection to reconnect securely.
                 </p>
@@ -378,7 +378,7 @@ function BankConnectionPlaid() {
                   type="button"
                   onClick={handleFixConnectionClick}
                   disabled={plaidFlow.isBusy || !plaidEnabledForUser}
-                  className="mt-3 rounded-lg border border-amber-500/35 bg-amber-500/15 px-4 py-2 text-sm font-medium text-amber-900 transition-colors hover:bg-amber-500/25 disabled:opacity-60 dark:text-amber-100"
+                  className="mt-3 rounded-lg border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] px-4 py-2 text-sm font-medium text-[var(--color-status-amber-text)] transition-colors hover:bg-[var(--color-status-amber-bg)] disabled:opacity-60"
                 >
                   {plaidFlow.isBusy && plaidFlow.activeIntent === 'update' ? 'Opening…' : 'Fix connection'}
                 </button>
@@ -389,7 +389,7 @@ function BankConnectionPlaid() {
           <div className="rounded-lg border border-surface-border bg-surface-base p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex min-w-0 flex-wrap items-center gap-2">
-                <span className="inline-flex shrink-0 items-center rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                <span className="inline-flex shrink-0 items-center rounded-full border border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-2.5 py-0.5 text-xs font-medium text-[var(--color-status-emerald-text)]">
                   Active
                 </span>
                 <span className="truncate text-sm font-medium text-content-primary">{displayName}</span>
@@ -450,13 +450,13 @@ function BankConnectionPlaid() {
                 type="button"
                 onClick={() => void handleDisconnectClick()}
                 disabled={isDisconnecting}
-                className="text-xs font-medium text-content-muted underline-offset-2 hover:text-rose-400 hover:underline disabled:opacity-60"
+                className="text-xs font-medium text-content-muted underline-offset-2 hover:text-[var(--color-status-rose-text)] hover:underline disabled:opacity-60"
               >
                 {isDisconnecting ? 'Disconnecting…' : 'Disconnect this bank'}
               </button>
             </div>
             {plaidFlow.stage === 'error' && plaidFlow.errorMessage && (
-              <div className="mt-3 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs font-medium text-rose-800 dark:text-rose-200">
+              <div className="mt-3 rounded-lg border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] px-3 py-2 text-xs font-medium text-[var(--color-status-rose-text)]">
                 {plaidFlow.errorMessage}
                 <button
                   type="button"

@@ -7,11 +7,11 @@ const alertBase =
 const alertVariantClasses = {
   default: 'bg-surface-raised text-content-primary border-surface-border',
   destructive:
-    'border-brand-expense/50 bg-brand-expense/10 text-brand-expense [&>svg]:text-brand-expense',
+    'border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)] [&>svg]:text-[var(--color-status-rose-text)]',
   success:
-    'border-brand-profit/50 bg-brand-profit/10 text-brand-profit [&>svg]:text-brand-profit',
+    'border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)] [&>svg]:text-[var(--color-status-emerald-text)]',
   warning:
-    'border-amber-500/50 bg-amber-500/10 text-amber-400 [&>svg]:text-amber-400',
+    'border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)] [&>svg]:text-[var(--color-status-amber-text)]',
   info:
     'border-brand-indigo/50 bg-brand-indigo/10 text-content-primary [&>svg]:text-brand-indigo',
 } as const;

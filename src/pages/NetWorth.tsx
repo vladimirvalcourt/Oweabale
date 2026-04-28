@@ -63,7 +63,17 @@ export default function NetWorth() {
   }, [assets, debts, incomes, bills, subscriptions, extraMonthly]);
 
   // Asset allocation by type
-  const ASSET_COLORS = ['#d4d4d4', '#34D399', '#F59E0B', '#737373', '#a3a3a3', '#525252'];
+  const ASSET_COLORS = [
+    'var(--color-content-secondary)',
+    'var(--color-status-emerald-text)',
+    'var(--color-status-amber-text)',
+    'var(--color-content-tertiary)',
+    'var(--color-content-muted)',
+    'var(--color-brand-indigo)',
+  ];
+  const chartGridColor = 'var(--color-surface-border)';
+  const chartTickColor = 'var(--color-content-tertiary)';
+  const chartNeutralColor = 'var(--color-content-secondary)';
   const assetAllocation = useMemo(() => {
     const map = new Map<string, number>();
     assets.forEach(a => map.set(a.type, (map.get(a.type) || 0) + a.value));
@@ -83,10 +93,10 @@ export default function NetWorth() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <div className="bg-surface-raised rounded-lg border border-surface-border p-6 relative overflow-hidden">
           <p className="metric-label mb-2 normal-case font-semibold">Total net worth</p>
-          <p className={`text-4xl font-bold font-mono tabular-nums data-numeric ${netWorth >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+          <p className={`text-4xl font-bold font-mono tabular-nums data-numeric ${netWorth >= 0 ? 'text-[var(--color-status-emerald-text)]' : 'text-[var(--color-status-rose-text)]'}`}>
             $<AnimatedValue value={netWorth} decimals={2} />
           </p>
-          <div className="mt-3 flex items-center text-sm text-emerald-400 font-sans">
+          <div className="mt-3 flex items-center text-sm text-[var(--color-status-emerald-text)] font-sans">
             <TrendingUp className="w-4 h-4 mr-1" />
             <span>+2.4% from last month</span>
           </div>
@@ -144,19 +154,19 @@ export default function NetWorth() {
             <AreaChart data={projectionData} margin={{ top: 12, right: 12, left: 8, bottom: 12 }}>
               <defs>
                 <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#d4d4d4" stopOpacity={0.2}/>
-                  <stop offset="95%" stopColor="#d4d4d4" stopOpacity={0}/>
+                  <stop offset="5%" stopColor={chartNeutralColor} stopOpacity={0.2}/>
+                  <stop offset="95%" stopColor={chartNeutralColor} stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1F1F1F" vertical={false} />
-              <XAxis dataKey="name" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} dy={10} fontFamily="monospace" />
-              <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${(Number(v ?? 0) / 1000).toFixed(0)}k`} dx={-10} fontFamily="monospace" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} vertical={false} />
+              <XAxis dataKey="name" stroke={chartTickColor} fontSize={10} tickLine={false} axisLine={false} dy={10} fontFamily="monospace" />
+              <YAxis stroke={chartTickColor} fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v) => `$${(Number(v ?? 0) / 1000).toFixed(0)}k`} dx={-10} fontFamily="monospace" />
               <Tooltip
                 {...rechartsTooltipStableProps}
                 contentStyle={{ backgroundColor: 'var(--color-surface-raised)', borderColor: 'var(--color-surface-border)', borderRadius: '8px', color: 'var(--color-content-primary)', fontFamily: 'monospace', fontSize: '12px' }}
                 formatter={(value) => [`$${Number(value ?? 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`, 'Net Worth']}
               />
-              <Area type="monotone" dataKey="value" stroke="#d4d4d4" strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" dot={{ fill: '#d4d4d4', strokeWidth: 0, r: 3 }} />
+              <Area type="monotone" dataKey="value" stroke={chartNeutralColor} strokeWidth={2} fillOpacity={1} fill="url(#colorValue)" dot={{ fill: chartNeutralColor, strokeWidth: 0, r: 3 }} />
             </AreaChart>
           </SafeResponsiveContainer>
         </div>

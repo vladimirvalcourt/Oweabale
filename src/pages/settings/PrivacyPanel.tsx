@@ -215,15 +215,15 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
             </div>
           </div>
 
-          <div className="dark:border-rose-500/25 border-rose-500/35 rounded-lg p-4 dark:bg-rose-500/5 bg-rose-500/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="rounded-lg border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h4 className="text-sm font-medium dark:text-rose-300 text-rose-700">Reset Account Data</h4>
+              <h4 className="text-sm font-medium text-[var(--color-status-rose-text)]">Reset Account Data</h4>
               <p className="text-xs text-content-tertiary mt-1">Wipe bills, debts, assets, and transactions — account stays open.</p>
             </div>
             <button
               type="button"
               onClick={onOpenResetDialog}
-              className="shrink-0 rounded-lg dark:border-rose-500/50 border-rose-500/60 dark:bg-rose-500/15 bg-rose-500/20 px-4 py-2 text-sm font-medium dark:text-rose-300 text-rose-700 transition-colors hover:bg-rose-500/25 focus-app"
+              className="shrink-0 rounded-lg border border-[var(--color-status-rose-border)] bg-surface-base px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:bg-[var(--color-status-rose-bg)] focus-app"
             >
               Reset data
             </button>
@@ -231,7 +231,7 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
         </div>
       </CollapsibleModule>
 
-      <CollapsibleModule title="Danger Zone" icon={SecurityIcon} defaultOpen={false} className="dark:border-red-900/50 border-red-900/60 dark:bg-red-500/5 bg-red-500/10">
+      <CollapsibleModule title="Danger Zone" icon={SecurityIcon} defaultOpen={false} className="border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h4 className="text-sm font-medium text-content-primary">Delete Account</h4>
@@ -240,7 +240,7 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
           <button
             type="button"
             onClick={onOpenDeleteDialog}
-            className="rounded-lg dark:border-red-500/50 border-red-500/60 dark:bg-red-500/10 bg-red-500/15 px-4 py-2 text-sm font-medium dark:text-red-400 text-red-700 transition-colors hover:bg-red-500 hover:text-white focus-app"
+            className="rounded-lg border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:bg-brand-expense hover:text-white focus-app"
           >
             Delete account
           </button>

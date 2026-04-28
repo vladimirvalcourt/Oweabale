@@ -482,7 +482,7 @@ function ProfilePanelInner() {
                   className={cn(
                     'flex min-h-10 items-center gap-2 rounded-md px-6 py-2.5 text-sm font-medium shadow-none transition-[background-color,transform] disabled:cursor-not-allowed disabled:opacity-60',
                     saveVisual === 'saved'
-                      ? 'dark:bg-emerald-600 dark:text-white dark:hover:bg-emerald-500 bg-emerald-600 text-white hover:bg-emerald-500'
+                      ? 'bg-[var(--color-status-emerald-text)] text-white hover:brightness-95'
                       : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover',
                   )}
                 >

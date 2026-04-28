@@ -27,9 +27,20 @@ interface Snapshot {
 }
 
 const CHART_COLORS = [
-  'var(--color-content-secondary)', 'var(--color-brand-profit)', '#F59E0B', 'var(--color-brand-expense)',
-  '#737373', '#a3a3a3', '#78716c', '#64748b', '#525252',
+  'var(--color-content-secondary)',
+  'var(--color-status-emerald-text)',
+  'var(--color-status-amber-text)',
+  'var(--color-status-rose-text)',
+  'var(--color-content-tertiary)',
+  'var(--color-content-muted)',
+  'var(--color-brand-indigo)',
+  'var(--color-brand-violet)',
+  'var(--color-brand-tax)',
 ];
+const chartGridColor = 'var(--color-surface-border)';
+const chartTickColor = 'var(--color-content-tertiary)';
+const chartNeutralColor = 'var(--color-content-secondary)';
+const chartProfitColor = 'var(--color-status-emerald-text)';
 
 const tooltipStyle = {
   backgroundColor: 'var(--color-surface-raised)',
@@ -281,7 +292,7 @@ export default function Analytics() {
           <p className="metric-label normal-case text-content-tertiary mb-2">Current Net Worth</p>
           <p
             className={`text-2xl font-mono font-bold tabular-nums data-numeric ${
-              latestSnapshot && latestSnapshot.net_worth >= 0 ? 'text-emerald-400' : 'text-red-400'
+              latestSnapshot && latestSnapshot.net_worth >= 0 ? 'text-[var(--color-status-emerald-text)]' : 'text-[var(--color-status-rose-text)]'
             }`}
           >
             {latestSnapshot ? fmt(latestSnapshot.net_worth) : '—'}
@@ -295,7 +306,7 @@ export default function Analytics() {
           <p className="metric-label normal-case text-content-tertiary mb-2">Net Worth Δ ({period})</p>
           <p
             className={`text-2xl font-mono font-bold tabular-nums data-numeric ${
-              isPositiveDelta ? 'text-emerald-400' : netWorthDelta !== null ? 'text-red-400' : 'text-content-tertiary'
+              isPositiveDelta ? 'text-[var(--color-status-emerald-text)]' : netWorthDelta !== null ? 'text-[var(--color-status-rose-text)]' : 'text-content-tertiary'
             }`}
           >
             {netWorthDelta !== null ? `${isPositiveDelta ? '+' : ''}${fmt(netWorthDelta)}` : '—'}
@@ -315,7 +326,7 @@ export default function Analytics() {
 
         <div className="bg-surface-elevated border border-surface-border rounded-lg p-5">
           <p className="metric-label normal-case text-content-tertiary mb-2">YTD Saved</p>
-          <p className={`text-2xl font-mono font-bold tabular-nums data-numeric ${ytdMetrics.saved >= 0 ? 'text-content-primary' : 'text-red-400'}`}>
+          <p className={`text-2xl font-mono font-bold tabular-nums data-numeric ${ytdMetrics.saved >= 0 ? 'text-content-primary' : 'text-[var(--color-status-rose-text)]'}`}>
             {fmt(ytdMetrics.saved)}
           </p>
           <p className="text-xs text-content-tertiary mt-1">Income {fmt(ytdMetrics.income)} · Spend {fmt(ytdMetrics.expenses)}</p>
@@ -333,7 +344,7 @@ export default function Analytics() {
           <p className="metric-label normal-case text-content-tertiary mb-2">Avg Savings Rate</p>
           <p
             className={`text-2xl font-mono font-bold tabular-nums data-numeric ${
-              ytdMetrics.rate >= savingsGoalPct ? 'text-emerald-400' : ytdMetrics.rate >= 10 ? 'text-amber-400' : 'text-red-400'
+              ytdMetrics.rate >= savingsGoalPct ? 'text-[var(--color-status-emerald-text)]' : ytdMetrics.rate >= 10 ? 'text-[var(--color-status-amber-text)]' : 'text-[var(--color-status-rose-text)]'
             }`}
           >
             {ytdMetrics.rate.toFixed(1)}%
@@ -370,26 +381,26 @@ export default function Analytics() {
             <AreaChart data={chartSnapshots} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
               <defs>
                 <linearGradient id="nwGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#d4d4d4" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="#d4d4d4" stopOpacity={0} />
+                  <stop offset="5%"  stopColor={chartNeutralColor} stopOpacity={0.25} />
+                  <stop offset="95%" stopColor={chartNeutralColor} stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="assetsGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%"  stopColor="#34D399" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="#34D399" stopOpacity={0} />
+                  <stop offset="5%"  stopColor={chartProfitColor} stopOpacity={0.15} />
+                  <stop offset="95%" stopColor={chartProfitColor} stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
-              <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval="preserveStartEnd" />
-              <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={fmt} width={58} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridColor} />
+              <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} interval="preserveStartEnd" />
+              <YAxis axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} tickFormatter={fmt} width={58} />
               <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v: any, name: any) => [fmt(Number(v)), name === 'net_worth' ? 'Net Worth' : name === 'assets' ? 'Assets' : 'Debts']} labelFormatter={(l) => l} />
-              <Area type="monotone" dataKey="assets"    stroke="#34D399" strokeWidth={1.5} fill="url(#assetsGrad)" dot={false} />
-              <Area type="monotone" dataKey="net_worth" stroke="#d4d4d4" strokeWidth={2}   fill="url(#nwGrad)"     dot={false} />
+              <Area type="monotone" dataKey="assets"    stroke={chartProfitColor} strokeWidth={1.5} fill="url(#assetsGrad)" dot={false} />
+              <Area type="monotone" dataKey="net_worth" stroke={chartNeutralColor} strokeWidth={2}   fill="url(#nwGrad)"     dot={false} />
             </AreaChart>
           </SafeResponsiveContainer>
         )}
         <div className="flex gap-5 mt-3">
           <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-brand-cta inline-block shrink-0" aria-hidden /> Net worth</div>
-          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-emerald-400 inline-block shrink-0" aria-hidden /> Assets</div>
+          <div className="flex items-center gap-1.5 text-xs text-content-tertiary"><span className="w-2 h-2 bg-[var(--color-status-emerald-text)] inline-block shrink-0" aria-hidden /> Assets</div>
         </div>
       </CollapsibleModule>
 
@@ -403,9 +414,9 @@ export default function Analytics() {
           <>
             <SafeResponsiveContainer width="100%" height={260} minWidth={0} minHeight={120}>
               <BarChart data={monthlySpend} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
-                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval={1} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={fmt} width={52} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridColor} />
+                <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} interval={1} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} tickFormatter={fmt} width={52} />
                 <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v: any, name: any) => [`$${Number(v).toLocaleString()}`, formatCategoryLabel(String(name))]} />
                 {topCategories.map((cat, i) => (
                   <Bar key={cat} dataKey={cat} stackId="stack" fill={CHART_COLORS[i % CHART_COLORS.length]} radius={0} />
@@ -454,7 +465,7 @@ export default function Analytics() {
                 <p className="text-[10px] font-mono uppercase tracking-widest text-content-muted mb-1">Change</p>
                 <p
                   className={`text-xl font-mono font-bold tabular-nums ${
-                    spendingBenchmark.totalDelta <= 0 ? 'text-emerald-400' : 'text-amber-400'
+                    spendingBenchmark.totalDelta <= 0 ? 'text-[var(--color-status-emerald-text)]' : 'text-[var(--color-status-amber-text)]'
                   }`}
                 >
                   {spendingBenchmark.totalDelta === 0
@@ -479,7 +490,7 @@ export default function Analytics() {
                     <span className="text-sm text-content-primary">{formatCategoryLabel(row.cat)}</span>
                     <span
                       className={`text-sm font-mono tabular-nums ${
-                        row.delta > 0 ? 'text-amber-400' : row.delta < 0 ? 'text-emerald-400' : 'text-content-tertiary'
+                        row.delta > 0 ? 'text-[var(--color-status-amber-text)]' : row.delta < 0 ? 'text-[var(--color-status-emerald-text)]' : 'text-content-tertiary'
                       }`}
                     >
                       {row.delta === 0
@@ -498,12 +509,12 @@ export default function Analytics() {
       <CollapsibleModule title="Monthly Savings Rate" icon={ChartIcon}>
         <SafeResponsiveContainer width="100%" height={200} minWidth={0} minHeight={120}>
           <LineChart data={cashFlowData} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1F1F1F" />
-            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} interval={1} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fill: '#52525B', fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `${v}%`} width={42} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridColor} />
+            <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} interval={1} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `${v}%`} width={42} />
             <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v: any) => [`${Number(v).toFixed(1)}%`, 'Savings Rate']} />
-            <ReferenceLine y={20} stroke="#3f3f46" strokeWidth={1} strokeDasharray="4 4" />
-            <Line type="monotone" dataKey="rate" stroke="#d4d4d4" strokeWidth={2} dot={{ r: 3, fill: '#d4d4d4' }} />
+            <ReferenceLine y={20} stroke="var(--color-content-muted)" strokeWidth={1} strokeDasharray="4 4" />
+            <Line type="monotone" dataKey="rate" stroke={chartNeutralColor} strokeWidth={2} dot={{ r: 3, fill: chartNeutralColor }} />
           </LineChart>
         </SafeResponsiveContainer>
         <div className="flex gap-5 mt-3">

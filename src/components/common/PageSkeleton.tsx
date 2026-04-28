@@ -91,7 +91,7 @@ export function AppLoader({ message = 'Syncing financial data' }: { message?: st
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage:
-            'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
+            'linear-gradient(var(--color-surface-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-surface-border) 1px, transparent 1px)',
           backgroundSize: '48px 48px',
         }}
         aria-hidden
@@ -99,7 +99,7 @@ export function AppLoader({ message = 'Syncing financial data' }: { message?: st
       <div className="relative mb-8">
         <div className="flex h-10 items-center justify-center rounded-lg border border-surface-border bg-surface-raised px-3 animate-pulse-highlight [animation-duration:2.8s]">
           <span
-            className="text-[10px] font-semibold tracking-[0.24em] text-content-primary animate-pulse [animation-duration:2.8s] [text-shadow:0_0_16px_rgba(255,255,255,0.45)]"
+            className="text-[10px] font-semibold tracking-[0.24em] text-content-primary animate-pulse [animation-duration:2.8s] [text-shadow:0_0_16px_var(--color-content-muted)]"
             aria-hidden
           >
             OWEABLE

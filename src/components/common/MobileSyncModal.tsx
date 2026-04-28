@@ -147,7 +147,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
 
               <div className="mt-8">
                  <div className="flex items-center gap-2 mb-2">
-                    <ShieldCheck className="w-3 h-3 text-emerald-500" />
+                    <ShieldCheck className="w-3 h-3 text-[var(--color-status-emerald-text)]" />
                     <span className="text-[9px] font-mono text-content-muted uppercase tracking-widest">Secure connection</span>
                  </div>
                  <div className="w-full h-0.5 bg-surface-border rounded-full overflow-hidden">
@@ -177,8 +177,8 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                                : <div className="w-[200px] h-[200px] flex items-center justify-center"><Loader2 className="w-6 h-6 text-content-secondary animate-spin" /></div>
                           ) : (
                              <div className="w-[200px] h-[200px] flex flex-col items-center justify-center bg-content-primary/[0.04] gap-3 border-4 border-content-primary/15 animate-pulse">
-                                <Zap className={`w-8 h-8 ${status === 'completed' ? 'text-content-primary' : 'text-emerald-400'}`} />
-                                <span className={`text-[9px] font-mono font-bold uppercase tracking-widest text-center ${status === 'completed' ? 'text-content-primary' : 'text-emerald-400'}`}>
+                                <Zap className={`w-8 h-8 ${status === 'completed' ? 'text-content-primary' : 'text-[var(--color-status-emerald-text)]'}`} />
+                                <span className={`text-[9px] font-mono font-bold uppercase tracking-widest text-center ${status === 'completed' ? 'text-content-primary' : 'text-[var(--color-status-emerald-text)]'}`}>
                                    {status === 'completed' ? 'RECEIVING DATA' : 'SESSION ACTIVE'}
                                 </span>
                              </div>
@@ -190,7 +190,7 @@ export default function MobileSyncModal({ isOpen, onClose, onSuccess }: MobileSy
                        
                        <div className="mt-8 text-center min-h-[50px] flex flex-col items-center justify-center">
                           {status === 'waiting' && <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest leading-relaxed">Scan to upload document.</p>}
-                          {status === 'active' && <p className="text-[10px] font-mono text-emerald-400 animate-pulse uppercase tracking-[0.2em] leading-relaxed">📱 Phone connected... waiting for photo.</p>}
+                          {status === 'active' && <p className="text-[10px] font-mono text-[var(--color-status-emerald-text)] animate-pulse uppercase tracking-[0.2em] leading-relaxed">Phone connected... waiting for photo.</p>}
                           {status === 'completed' && <p className="text-[10px] font-mono text-content-secondary animate-pulse uppercase tracking-[0.2em] leading-relaxed">Receiving document...</p>}
                        </div>
                     </motion.div>

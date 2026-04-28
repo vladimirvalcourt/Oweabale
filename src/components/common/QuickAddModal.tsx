@@ -53,7 +53,7 @@ function FormSelect({
     <div>
       <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
         {label}
-        {required && <span className="text-rose-500 ml-0.5">*</span>}
+        {required && <span className="ml-0.5 text-[var(--color-status-rose-text)]">*</span>}
       </label>
       <select
         id={id}
@@ -97,7 +97,7 @@ function FormDate({
     <div>
       <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
         {label}
-        {required && <span className="text-rose-500 ml-0.5">*</span>}
+        {required && <span className="ml-0.5 text-[var(--color-status-rose-text)]">*</span>}
       </label>
       <input
         id={id}
@@ -109,10 +109,10 @@ function FormDate({
         aria-invalid={hasError}
         aria-describedby={hasError ? errorId : undefined}
         aria-required={required}
-        className={`input-date-dark w-full bg-surface-base border ${hasError ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
+        className={`input-date-dark w-full bg-surface-base border ${hasError ? 'border-[var(--color-status-rose-border)]' : 'border-surface-border'} radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
       />
       {hasError && (
-        <p id={errorId} className="text-xs text-red-400 mt-1.5" role="alert" aria-live="polite">
+        <p id={errorId} className="mt-1.5 text-xs text-[var(--color-status-rose-text)]" role="alert" aria-live="polite">
           {error}
         </p>
       )}
@@ -140,7 +140,7 @@ function FormTab({ id, label, isActive, onClick, icon, variant = 'default' }: Fo
       aria-controls="quick-add-form"
       tabIndex={isActive ? 0 : -1}
       onClick={onClick}
-      className={`min-w-[5.5rem] flex-1 py-2 text-xs font-sans font-medium transition-all rounded-lg focus-app ${
+      className={`min-h-10 min-w-0 px-3 py-2 text-xs font-sans font-medium transition-all rounded-lg focus-app ${
         variant === 'citation'
           ? isActive
             ? 'bg-content-primary/[0.08] text-content-primary border border-surface-border'
@@ -150,8 +150,8 @@ function FormTab({ id, label, isActive, onClick, icon, variant = 'default' }: Fo
             : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
       }`}
     >
-      {icon && <span className="inline-flex items-center gap-1.5">{icon}{label}</span>}
-      {!icon && label}
+      {icon && <span className="inline-flex min-w-0 items-center justify-center gap-1.5">{icon}<span className="truncate">{label}</span></span>}
+      {!icon && <span className="truncate">{label}</span>}
     </button>
   );
 }
@@ -234,7 +234,7 @@ function FormTextarea({
     <div>
       <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
         {label}
-        {required && <span className="text-rose-500 ml-0.5">*</span>}
+        {required && <span className="ml-0.5 text-[var(--color-status-rose-text)]">*</span>}
       </label>
       <textarea
         id={id}
@@ -248,11 +248,11 @@ function FormTextarea({
         aria-invalid={hasError}
         aria-describedby={[hasError ? errorId : undefined, hintId, maxLength ? `${id}-count` : undefined].filter(Boolean).join(' ') || undefined}
         aria-required={required}
-        className={`w-full bg-surface-base border ${hasError ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted resize-none transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
+        className={`w-full bg-surface-base border ${hasError ? 'border-[var(--color-status-rose-border)]' : 'border-surface-border'} radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted resize-none transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
       />
       {hint && <p id={hintId} className="text-[10px] text-content-muted mt-1">{hint}</p>}
       {hasError && (
-        <p id={errorId} className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5" role="alert" aria-live="polite">
+        <p id={errorId} className="mt-1.5 flex items-center gap-1.5 text-xs text-[var(--color-status-rose-text)]" role="alert" aria-live="polite">
           <AlertCircle className="w-3 h-3" aria-hidden />
           {error}
         </p>
@@ -260,13 +260,13 @@ function FormTextarea({
       {showProgress && (
         <div className="mt-1.5">
           <div className="flex items-center justify-between mb-1">
-            <p id={`${id}-count`} className={`text-[10px] font-mono ${isNearLimit ? 'text-amber-400' : 'text-content-muted'}`} aria-live="polite">
+            <p id={`${id}-count`} className={`text-[10px] font-mono ${isNearLimit ? 'text-[var(--color-status-amber-text)]' : 'text-content-muted'}`} aria-live="polite">
               {charCount}/{maxLength} characters
             </p>
             {isNearLimit && (
               <div className="flex-1 ml-2 h-1 bg-surface-raised rounded-full overflow-hidden">
                 <div
-                  className={`h-full transition-all duration-200 ${progressPercentage > 90 ? 'bg-red-500' : 'bg-amber-400'}`}
+                  className={`h-full transition-all duration-200 ${progressPercentage > 90 ? 'bg-[var(--color-status-rose-text)]' : 'bg-[var(--color-status-amber-text)]'}`}
                   style={{ width: `${Math.min(progressPercentage, 100)}%` }}
                   role="progressbar"
                   aria-valuenow={charCount}
@@ -308,7 +308,7 @@ function FormRadioGroup({ id, name, label, value, onChange, options, required, d
     <fieldset id={groupId} className="rounded-lg border border-surface-border bg-surface-base p-3" role="radiogroup" aria-required={required}>
       <legend className="text-xs font-sans font-medium text-content-tertiary mb-2">
         {label}
-        {required && <span className="text-rose-500 ml-0.5">*</span>}
+        {required && <span className="ml-0.5 text-[var(--color-status-rose-text)]">*</span>}
       </legend>
       <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex rounded-lg border border-surface-border p-0.5 bg-surface-raised gap-0.5">
@@ -444,7 +444,7 @@ function FormDatePicker({
     <div>
       <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
         {label}
-        {required && <span className="text-rose-500 ml-0.5">*</span>}
+        {required && <span className="ml-0.5 text-[var(--color-status-rose-text)]">*</span>}
       </label>
       <input
         id={id}
@@ -458,16 +458,16 @@ function FormDatePicker({
         aria-invalid={hasError}
         aria-describedby={[hintId, hasError ? errorId : undefined].filter(Boolean).join(' ') || undefined}
         aria-required={required}
-        className={`input-date-dark w-full bg-surface-base border ${hasError ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
+        className={`input-date-dark w-full bg-surface-base border ${hasError ? 'border-[var(--color-status-rose-border)]' : 'border-surface-border'} radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
       />
       {daysLeft !== null && (
-        <p className={`text-[10px] font-mono mt-1 ${daysLeft < 0 ? 'text-red-400' : daysLeft <= 7 ? 'text-amber-400' : 'text-content-muted'}`} aria-live="polite">
+        <p className={`mt-1 text-[10px] font-mono ${daysLeft < 0 ? 'text-[var(--color-status-rose-text)]' : daysLeft <= 7 ? 'text-[var(--color-status-amber-text)]' : 'text-content-muted'}`} aria-live="polite">
           {daysLeft < 0 ? `${Math.abs(daysLeft)} days overdue` : daysLeft === 0 ? 'Due today' : `${daysLeft} days remaining`}
         </p>
       )}
       {hint && !showDaysLeft && <p id={hintId} className="text-[10px] text-content-muted mt-1">{hint}</p>}
       {hasError && (
-        <p id={errorId} className="text-xs text-red-400 mt-1.5" role="alert" aria-live="polite">
+        <p id={errorId} className="mt-1.5 text-xs text-[var(--color-status-rose-text)]" role="alert" aria-live="polite">
           {error}
         </p>
       )}
@@ -479,6 +479,7 @@ function FormDatePicker({
 interface FormFileUploadProps {
   id: string;
   label: string;
+  buttonLabel?: string;
   onFileSelect: (file: File | null) => void;
   accept?: string;
   maxSize?: number; // in MB
@@ -494,6 +495,7 @@ interface FormFileUploadProps {
 function FormFileUpload({
   id,
   label,
+  buttonLabel = 'Choose file',
   onFileSelect,
   accept = 'image/*,.pdf',
   maxSize = 10,
@@ -539,20 +541,22 @@ function FormFileUpload({
   };
 
   return (
-    <div>
-      <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
-        {label}
-        {required && <span className="text-rose-500 ml-0.5">*</span>}
-      </label>
+    <div className="min-w-0">
+      {label ? (
+        <label htmlFor={id} className="mb-1.5 block text-xs font-sans font-medium text-content-tertiary">
+          {label}
+          {required && <span className="ml-0.5 text-[var(--color-status-rose-text)]">*</span>}
+        </label>
+      ) : null}
       
       <div className="space-y-2">
-        <div className="flex gap-2">
+        <div className="flex min-w-0 gap-2">
           <label
-            className={`flex-1 flex items-center justify-center gap-2 px-3 py-2.5 radius-input border cursor-pointer transition-all ${
+            className={`flex min-h-10 min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 overflow-hidden border px-3 py-2.5 transition-all radius-input ${
               disabled
                 ? 'border-surface-border bg-surface-raised text-content-muted cursor-not-allowed'
                 : fileName
-                  ? 'border-emerald-500/50 bg-emerald-500/10 text-emerald-400'
+                  ? 'border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)]'
                   : 'border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary hover:bg-content-primary/[0.04]'
             }`}
           >
@@ -569,7 +573,7 @@ function FormFileUpload({
             />
             {fileName ? (
               <>
-                <span className="text-xs truncate max-w-[200px]">{fileName}</span>
+                <span className="min-w-0 max-w-full truncate text-xs">{fileName}</span>
                 <button
                   type="button"
                   onClick={(e) => {
@@ -585,7 +589,7 @@ function FormFileUpload({
             ) : (
               <>
                 <Upload className="w-4 h-4 shrink-0" aria-hidden />
-                <span className="text-xs">Choose file</span>
+                <span className="truncate text-xs">{buttonLabel}</span>
               </>
             )}
           </label>
@@ -594,7 +598,7 @@ function FormFileUpload({
             <button
               type="button"
               onClick={onPreviewToggle}
-              className={`px-3 py-2.5 radius-input border transition-all ${
+              className={`min-h-10 shrink-0 border px-3 py-2.5 transition-all radius-input ${
                 showPreview
                   ? 'border-surface-border text-content-primary bg-content-primary/[0.06]'
                   : 'border-surface-border text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
@@ -609,7 +613,7 @@ function FormFileUpload({
         {hint && <p id={hintId} className="text-[10px] text-content-muted">{hint}</p>}
         
         {hasError && (
-          <p id={errorId} className="flex items-center gap-1.5 text-xs text-red-400" role="alert" aria-live="polite">
+          <p id={errorId} className="flex items-center gap-1.5 text-xs text-[var(--color-status-rose-text)]" role="alert" aria-live="polite">
             <AlertCircle className="w-3 h-3" aria-hidden />
             {error}
           </p>
@@ -1154,7 +1158,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.98 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="w-full sm:max-w-md"
+              className="w-full sm:max-w-xl"
             >
               <Dialog.Panel className="flex max-h-[90vh] min-h-0 flex-col overflow-hidden rounded-lg border border-surface-border bg-surface-elevated shadow-elevated">
                 
@@ -1175,32 +1179,32 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                 <div className="min-h-0 flex-1 overflow-y-auto scrollbar-hide w-full">
                   {/* Scan Document Strip */}
                   <div className="bg-surface-base border-b border-surface-border">
-                    <div className="px-6 py-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="grid gap-3 px-5 py-4 sm:grid-cols-[minmax(0,1fr)_minmax(16rem,18rem)] sm:items-start sm:px-6">
                       <div className="min-w-0">
-                        <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">
+                        <p className="text-[11px] font-sans font-medium uppercase tracking-[0.08em] text-content-secondary">
                           Scan receipt, image or PDF
                         </p>
-                        <p className="text-[8px] font-mono text-content-muted uppercase tracking-widest mt-0.5">
+                        <p className="mt-1 text-[10px] font-mono uppercase tracking-[0.12em] text-content-muted">
                           JPG · PNG · WEBP · PDF
                         </p>
-                        <p className="text-[10px] font-sans text-content-muted mt-2 leading-snug max-w-md">
+                        <p className="mt-2 max-w-prose text-xs leading-5 text-content-tertiary">
                           Review amount, entry type, and category before saving — OCR can misread symbols or merchants.
                         </p>
                       </div>
-                      <div className="flex flex-wrap items-center gap-2 sm:justify-end min-w-0 w-full sm:w-auto">
+                      <div className="flex min-w-0 items-start gap-2 sm:justify-end">
                         {scannedPreviewUrl && (
                           <button
                             type="button"
                             onClick={() => setShowPreview(p => !p)}
-                            className={`shrink-0 p-2 rounded-lg border transition-all ${showPreview ? 'border-surface-border text-content-primary bg-content-primary/[0.06]' : 'border-surface-border text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'}`}
+                            className={`min-h-10 shrink-0 rounded-lg border px-3 transition-all ${showPreview ? 'border-surface-border text-content-primary bg-content-primary/[0.06]' : 'border-surface-border text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'}`}
                             title={showPreview ? 'Hide document' : 'Show document'}
                           >
                             {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                           </button>
                         )}
-                        <div className="grid grid-cols-2 gap-2 flex-1 min-w-0 sm:min-w-[260px]">
+                        <div className="grid min-w-0 flex-1 grid-cols-2 gap-2">
                           {/* Camera Button (keep native for mobile camera access) */}
-                          <label className={`relative flex min-h-[2.5rem] w-full items-center justify-center gap-2 px-3 py-2 rounded-lg border text-[10px] font-mono font-bold uppercase tracking-widest transition-all cursor-pointer select-none text-center leading-tight overflow-hidden
+                          <label className={`relative flex min-h-10 w-full cursor-pointer select-none items-center justify-center gap-2 overflow-hidden rounded-lg border px-3 py-2 text-center text-xs font-sans font-medium transition-all
                             ${isScanning
                               ? 'border-surface-border bg-content-primary/[0.06] text-content-secondary cursor-not-allowed'
                               : 'border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary hover:bg-content-primary/[0.04]'
@@ -1210,18 +1214,19 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               type="file"
                               accept="image/*"
                               capture="environment"
-                              className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed w-full h-full z-10"
+                              className="absolute inset-0 z-20 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed"
                               onChange={handleScanFile}
                               disabled={isScanning}
                             />
-                            <Camera className="w-3.5 h-3.5 shrink-0 relative z-0" aria-hidden />
-                            <span className="relative z-0">Camera</span>
+                            <Camera className="relative z-10 h-3.5 w-3.5 shrink-0" aria-hidden />
+                            <span className="relative z-10 truncate">Camera</span>
                           </label>
                           
                           {/* File Upload using FormFileUpload component */}
                           <FormFileUpload
                             id="scan-file"
                             label=""
+                            buttonLabel="Upload"
                             onFileSelect={(file) => {
                               if (file) {
                                 const event = { target: { files: [file] } } as unknown as React.ChangeEvent<HTMLInputElement>;
@@ -1231,9 +1236,6 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             accept="image/jpeg,image/png,image/webp,image/gif,application/pdf"
                             maxSize={10}
                             disabled={isScanning}
-                            previewUrl={scannedPreviewUrl}
-                            onPreviewToggle={() => setShowPreview(!showPreview)}
-                            showPreview={showPreview}
                           />
                         </div>
                       </div>
@@ -1265,7 +1267,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   <div className="bg-surface-base p-6 border-b border-surface-border">
                     <div className="flex items-center gap-2 mb-3">
                       <NlpIcon className="w-4 h-4 text-content-secondary" />
-                      <span className="text-xs font-sans font-medium text-content-secondary">Natural Language Speed Input</span>
+                      <span className="text-xs font-sans font-medium text-content-secondary">Natural language speed input</span>
                     </div>
                     
                     <textarea
@@ -1282,7 +1284,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       role="tablist"
                       aria-label="Record type"
                       onKeyDown={onTabListKeyDown}
-                      className="flex flex-wrap border-b border-surface-border bg-surface-raised p-1 gap-1"
+                      className="grid grid-cols-[repeat(auto-fit,minmax(7.25rem,1fr))] gap-1 border-b border-surface-border bg-surface-raised p-1"
                     >
                     {hasFullSuite && (
                       <FormTab
@@ -1336,7 +1338,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     aria-labelledby={`qa-tab-${activeTab}`}
                     aria-live="polite"
                     aria-busy={isSubmitting}
-                    className="p-6 space-y-5"
+                    className="space-y-5 p-5 sm:p-6"
                   >
                     
                     {/* AMOUNT FIELD (ALWAYS PRESENT) */}
@@ -1357,8 +1359,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           <div
                             className={`rounded-lg border px-3 py-2 text-xs ${
                               lastBudgetGuardrail.type === 'hard'
-                                ? 'border-red-500/35 bg-red-500/10 text-red-200'
-                                : 'border-amber-500/35 bg-amber-500/10 text-amber-100'
+                                ? 'border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]'
+                                : 'border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]'
                             }`}
                           >
                             <p className="font-medium">{lastBudgetGuardrail.message}</p>
@@ -1372,7 +1374,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                   type="checkbox"
                                   checked={allowBudgetOverride}
                                   onChange={(e) => setAllowBudgetOverride(e.target.checked)}
-                                  className="h-3.5 w-3.5 rounded border-surface-border bg-surface-base text-amber-400 focus-app"
+                                  className="h-3.5 w-3.5 rounded border-surface-border bg-surface-base text-[var(--color-status-amber-text)] focus-app"
                                 />
                                 Save anyway for this one transaction
                               </label>
@@ -1381,12 +1383,11 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         )}
 
                         <div>
-                          <label htmlFor="description" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Description</label>
                           <div className="flex gap-3">
-                            <div className="flex-1">
+                            <div className="min-w-0 flex-1">
                               <FormInput
                                 id="description"
-                                label=""
+                                label="Description"
                                 value={description}
                                 onChange={(e) => { setDescription(e.target.value); if(errors.description) setErrors({...errors, description: ''}); }}
                                 placeholder="E.g., Whole Foods"
@@ -1416,7 +1417,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           hint="Refunds and deposits save as income; choose the category that matches the source."
                         />
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                           <div>
                             <FormSelect
                               id="transaction-category"
@@ -1473,7 +1474,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     {/* OBLIGATION FIELDS */}
                     {activeTab === 'obligation' && (
                       <>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                           <div>
                             <FormSelect
                               id="obligation-kind"
@@ -1526,7 +1527,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             )}
                           </div>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                           <div>
                             <FormAutocomplete
                               id="vendor"
@@ -1575,7 +1576,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         </div>
                         {obligationKind.startsWith('debt-') && (
                           <FormFieldset legend="Debt Details" hint="Optional details help calculate interest and track payments">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                               <div>
                                 <label htmlFor="apr" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
                                   <Tooltip content="Annual Percentage Rate - the yearly cost of borrowing money">
@@ -1618,7 +1619,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     {activeTab === 'citation' && (
                       <>
                         <FormFieldset legend="Citation Information" hint="Details from your toll violation or traffic ticket">
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                               <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Type</label>
                               <select
@@ -1659,7 +1660,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               id="jurisdiction"
                               label={
                                 <span>
-                                  Issuing Jurisdiction <span className="text-rose-500">*</span>
+                                  Issuing Jurisdiction <span className="text-[var(--color-status-rose-text)]">*</span>
                                 </span>
                               }
                               value={jurisdiction}
@@ -1684,7 +1685,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         </FormFieldset>
 
                         <FormFieldset legend="Payment Details" hint="Financial information and reference numbers">
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <div>
                               <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Citation / Ticket #</label>
                               <input
@@ -1751,7 +1752,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15"
                           />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                           <div>
                             <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Income category</label>
                             <select
@@ -1805,13 +1806,13 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                 </div>
 
                 {/* Footer Controls */}
-                <div className="px-6 py-4 border-t border-surface-border bg-surface-raised shrink-0 flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-surface-border bg-surface-raised px-5 py-4 sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:px-6">
                   <button
                     type="button"
                     onClick={onClose}
                     disabled={isSubmitting}
                     aria-busy={isSubmitting}
-                    className="px-4 py-2 text-sm font-sans font-medium text-content-tertiary hover:text-content-primary transition-colors focus-app rounded"
+                    className="min-h-10 rounded px-4 py-2 text-sm font-sans font-medium text-content-tertiary transition-colors hover:text-content-primary focus-app"
                   >
                     Cancel
                   </button>
@@ -1820,15 +1821,16 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     onClick={() => void submitEntry(true)}
                     disabled={isSubmitting}
                     aria-busy={isSubmitting}
-                    className="px-4 py-2 radius-button text-sm font-sans font-medium border border-surface-border text-content-secondary hover:text-content-primary hover:bg-surface-elevated transition-colors focus-app disabled:opacity-50"
+                    className="min-h-10 border border-surface-border px-4 py-2 text-sm font-sans font-medium text-content-secondary transition-colors radius-button hover:bg-surface-elevated hover:text-content-primary focus-app disabled:opacity-50"
                   >
                     {isSubmitting ? 'Getting things ready...' : 'Save & add another'}
                   </button>
                   <button
+                    form="quick-add-form"
                     type="submit"
                     disabled={isSubmitting}
                     aria-busy={isSubmitting}
-                    className={`px-5 py-2 radius-button text-sm font-sans font-medium transition-colors focus-app disabled:opacity-50 ${
+                    className={`min-h-10 px-5 py-2 text-sm font-sans font-medium transition-colors radius-button focus-app disabled:opacity-50 ${
                       activeTab === 'citation'
                         ? 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover border border-surface-border'
                         : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover'

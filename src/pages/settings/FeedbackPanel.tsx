@@ -118,9 +118,9 @@ function FeedbackPanelInner() {
                         type="button"
                         title={star === 1 ? 'Poor' : star === 5 ? 'Excellent' : `Rating ${star}`}
                         onClick={() => setFeedbackForm((f) => ({ ...f, rating: f.rating === star ? 0 : star }))}
-                        className="text-content-muted hover:text-amber-400 transition-colors"
+                        className="text-content-muted hover:text-[var(--color-status-amber-text)] transition-colors"
                       >
-                        <Star className={`w-5 h-5 ${feedbackForm.rating >= star ? 'fill-amber-400 text-amber-400' : ''}`} />
+                        <Star className={`w-5 h-5 ${feedbackForm.rating >= star ? 'fill-[var(--color-status-amber-text)] text-[var(--color-status-amber-text)]' : ''}`} />
                       </button>
                     ))}
                   </div>
@@ -184,7 +184,7 @@ function FeedbackPanelInner() {
                     <span
                       className={`rounded-md border px-1.5 py-0.5 text-xs font-medium ${
                         fb.type === 'bug'
-                          ? 'border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                          ? 'border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]'
                           : fb.type === 'feature_request'
                             ? 'border-surface-border bg-content-primary/[0.05] text-content-primary'
                             : 'border-surface-border bg-surface-elevated text-content-secondary'
@@ -196,7 +196,7 @@ function FeedbackPanelInner() {
                       {fb.rating ? (
                         <div className="flex items-center gap-0.5">
                           {[1, 2, 3, 4, 5].map((s) => (
-                            <Star key={s} className={`w-3 h-3 ${s <= fb.rating! ? 'fill-amber-400 text-amber-400' : 'text-content-muted'}`} />
+                            <Star key={s} className={`w-3 h-3 ${s <= fb.rating! ? 'fill-[var(--color-status-amber-text)] text-[var(--color-status-amber-text)]' : 'text-content-muted'}`} />
                           ))}
                         </div>
                       ) : null}

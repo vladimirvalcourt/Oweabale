@@ -50,19 +50,19 @@ export default function TrialBanner() {
     <div
       className={`w-full py-3 px-4 ${
         isUrgent
-          ? 'bg-rose-500/10 border-b border-rose-500/20'
-          : 'bg-amber-500/10 border-b border-amber-500/20'
+          ? 'border-b border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)]'
+          : 'border-b border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)]'
       }`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           {isUrgent ? (
-            <AlertCircle className="w-5 h-5 text-rose-500 shrink-0" aria-hidden />
+            <AlertCircle className="w-5 h-5 text-[var(--color-status-rose-text)] shrink-0" aria-hidden />
           ) : (
-            <Clock className="w-5 h-5 text-amber-500 shrink-0" aria-hidden />
+            <Clock className="w-5 h-5 text-[var(--color-status-amber-text)] shrink-0" aria-hidden />
           )}
 
-          <p className={`text-sm font-medium truncate ${isUrgent ? 'text-rose-700 dark:text-rose-400' : 'text-amber-700 dark:text-amber-400'}`}>
+          <p className={`text-sm font-medium truncate ${isUrgent ? 'text-[var(--color-status-rose-text)]' : 'text-[var(--color-status-amber-text)]'}`}>
             {isUrgent ? (
               <span>
                 <strong>{daysRemaining} day{daysRemaining !== 1 ? 's' : ''} left</strong> — your debt planner and income tools will lock. Keep them for $10/mo
@@ -79,8 +79,8 @@ export default function TrialBanner() {
           to="/pricing"
           className={`shrink-0 text-sm font-semibold underline underline-offset-2 hover:no-underline ${
             isUrgent
-              ? 'text-rose-600 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-300'
-              : 'text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300'
+              ? 'text-[var(--color-status-rose-text)] hover:text-brand-expense'
+              : 'text-[var(--color-status-amber-text)] hover:text-content-primary'
           }`}
         >
           {isUrgent ? 'Upgrade now →' : 'View plans →'}

@@ -25,8 +25,8 @@ const tabs = [
 const BUTTON_BASE_CLASS =
   'inline-flex min-h-10 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-app disabled:opacity-60 disabled:cursor-not-allowed';
 const BUTTON_SECONDARY_CLASS = `${BUTTON_BASE_CLASS} border border-surface-border bg-transparent text-content-secondary hover:bg-surface-elevated`;
-const BUTTON_WARNING_CLASS = `${BUTTON_BASE_CLASS} dark:bg-amber-600 dark:text-white dark:hover:bg-amber-500 bg-amber-600 text-white hover:bg-amber-500`;
-const BUTTON_DESTRUCTIVE_CLASS = `${BUTTON_BASE_CLASS} bg-brand-expense text-white hover:bg-red-700`;
+const BUTTON_WARNING_CLASS = `${BUTTON_BASE_CLASS} bg-[var(--color-status-amber-text)] text-white hover:bg-amber-600`;
+const BUTTON_DESTRUCTIVE_CLASS = `${BUTTON_BASE_CLASS} bg-brand-expense text-white hover:bg-rose-700`;
 
 const SettingsNav = memo(function SettingsNav({
   activeTab,
@@ -238,7 +238,7 @@ export default function Settings() {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-sm rounded-lg bg-surface-raised border border-surface-border p-6 shadow-xl">
             <div className="flex items-center gap-4 mb-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full border border-red-900 flex items-center justify-center">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)]">
                 <AlertTriangle className="w-5 h-5 text-brand-expense" />
               </div>
               <Dialog.Title className="text-lg font-medium tracking-[-0.024em] text-content-primary">Delete account</Dialog.Title>
