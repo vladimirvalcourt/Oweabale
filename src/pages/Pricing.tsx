@@ -239,16 +239,16 @@ export default function Pricing() {
               Oweable starts with a focused Pay List for bills, debt, subscriptions, tolls, tickets, and the obligations that keep slipping into the back of your mind. Full Suite adds payoff planning, budgets, analytics, and cash-flow structure when you are ready.
             </p>
             <div className="mt-8 flex flex-wrap gap-3 text-sm text-content-secondary">
-              <span className="rounded-full border border-surface-border-subtle bg-white/[0.025] px-4 py-2">14-day Full Suite trial</span>
-              <span className="rounded-full border border-surface-border-subtle bg-white/[0.025] px-4 py-2">No credit card required</span>
-              <span className="rounded-full border border-surface-border-subtle bg-white/[0.025] px-4 py-2">Cancel anytime</span>
+              <span className="rounded-full border border-surface-border-subtle bg-surface-raised px-4 py-2">14-day Full Suite trial</span>
+              <span className="rounded-full border border-surface-border-subtle bg-surface-raised px-4 py-2">No credit card required</span>
+              <span className="rounded-full border border-surface-border-subtle bg-surface-raised px-4 py-2">Cancel anytime</span>
             </div>
           </div>
         </section>
 
         <section className="border-y border-surface-border-subtle bg-surface-raised/36 py-20">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl rounded-[22px] border border-surface-border bg-white/[0.035] p-7 text-content-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_40px_120px_rgba(0,0,0,0.36)] sm:p-8">
+            <div className="mx-auto max-w-3xl rounded-[22px] border border-surface-border bg-surface-raised p-7 text-content-primary shadow-panel sm:p-8">
                 <div className="flex items-center justify-between gap-4">
                   <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">Full Suite</p>
                   <span className="text-xs font-medium uppercase tracking-[0.14em] text-content-tertiary">

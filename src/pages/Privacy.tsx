@@ -67,7 +67,7 @@ export default function Privacy() {
               <p className="mt-4 text-sm text-content-muted">Last updated April 2026</p>
             </div>
 
-            <div className="divide-y divide-white/[0.06] rounded-[10px] border border-surface-border bg-white/[0.018]">
+            <div className="divide-y divide-surface-border rounded-[10px] border border-surface-border bg-surface-raised">
               {privacySections.map((section) => (
                 <section key={section.title} className="p-5">
                   <h2 className="text-lg font-medium tracking-[-0.024em] text-content-primary mb-3">{section.title}</h2>

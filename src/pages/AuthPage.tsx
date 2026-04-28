@@ -78,7 +78,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
 
       <main className="mx-auto grid min-h-screen max-w-[1280px] gap-12 px-5 pb-16 pt-36 sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
         <section className="max-w-md">
-          <p className="inline-flex items-center gap-2 rounded-full border border-surface-border-subtle bg-white/[0.025] px-3 py-1 text-xs text-content-secondary">
+          <p className="inline-flex items-center gap-2 rounded-full border border-surface-border-subtle bg-surface-raised px-3 py-1 text-xs text-content-secondary">
             <span className="h-1.5 w-1.5 rounded-full bg-brand-indigo" aria-hidden />
             Free to start · Google sign-in
           </p>
@@ -129,10 +129,10 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
         </section>
 
         <section className="hidden lg:block">
-          <div className="overflow-hidden rounded-[10px] border border-surface-border bg-white/[0.018] shadow-[inset_0_1px_0_rgba(255,255,255,0.035),0_40px_160px_rgba(0,0,0,0.42)]">
+          <div className="overflow-hidden rounded-[10px] border border-surface-border bg-surface-raised shadow-panel">
             <div className="flex h-12 items-center justify-between border-b border-surface-border-subtle bg-surface-raised/70 px-5">
               <div className="flex items-center gap-2">
-                <span className="h-4 w-4 rounded-[4px] border border-surface-border bg-white/[0.04]" />
+                <span className="h-4 w-4 rounded-[4px] border border-surface-border bg-surface-elevated" />
                 <span className="text-sm font-medium text-content-primary">Oweable</span>
                 <span className="text-content-muted">/</span>
                 <span className="text-sm text-content-tertiary">Account setup</span>
@@ -148,7 +148,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
                 ].map(([label, Icon], index) => {
                   const IconComponent = Icon as typeof ReceiptText;
                   return (
-                    <div key={label as string} className={`mb-1 flex items-center gap-3 rounded-md px-3 py-2 text-sm ${index === 2 ? 'bg-white/[0.055] text-content-primary' : 'text-content-tertiary'}`}>
+                    <div key={label as string} className={`mb-1 flex items-center gap-3 rounded-md px-3 py-2 text-sm ${index === 2 ? 'bg-surface-elevated text-content-primary' : 'text-content-tertiary'}`}>
                       <IconComponent className="h-4 w-4" />
                       {label as string}
                     </div>

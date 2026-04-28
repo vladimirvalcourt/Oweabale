@@ -239,11 +239,11 @@ export default function Support() {
                 Reach out for billing, access, account, product, or technical issues. Tell us what you were trying to do and where it got stuck. We usually reply within one business day.
               </p>
               <div className="mt-10 grid gap-3">
-                <div className="rounded-[10px] border border-surface-border-subtle bg-white/[0.022] p-5">
+                <div className="rounded-[10px] border border-surface-border-subtle bg-surface-raised p-5">
                   <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Best for</p>
                   <p className="mt-3 text-sm leading-6 text-content-tertiary">Account access problems, billing questions, bugs, and anything that is getting in the way while you are trying to manage bills or debt.</p>
                 </div>
-                <div className="rounded-[10px] border border-surface-border-subtle bg-white/[0.022] p-5">
+                <div className="rounded-[10px] border border-surface-border-subtle bg-surface-raised p-5">
                   <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Contact Support</p>
                   {EMAIL_CONFIG.support.createContactLink(
                     'Get Help',
@@ -251,7 +251,7 @@ export default function Support() {
                     true
                   )}
                 </div>
-                <div className="rounded-[10px] border border-surface-border-subtle bg-white/[0.022] p-5">
+                <div className="rounded-[10px] border border-surface-border-subtle bg-surface-raised p-5">
                   <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Sensitive requests</p>
                   <p className="mt-3 text-sm leading-6 text-content-tertiary">
                     For privacy or security concerns, include that in your subject line so we can route it quickly and handle it with the right level of care.
@@ -261,7 +261,7 @@ export default function Support() {
             </div>
 
             <div className="grid gap-6">
-              <section className="rounded-[10px] border border-surface-border bg-white/[0.018] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
+              <section className="rounded-[10px] border border-surface-border bg-surface-raised p-6 shadow-card sm:p-8">
                 <h2 className="text-2xl font-medium tracking-[-0.03em] leading-tight text-content-primary">Send a message</h2>
                 <p className="mt-4 text-sm leading-6 text-content-tertiary">
                   Give us the basics and a little context. You do not need a perfect report. Just tell us what happened, what you were trying to get done, and what felt blocked.
@@ -361,7 +361,7 @@ export default function Support() {
                 )}
               </section>
 
-              <section className="rounded-[10px] border border-surface-border bg-white/[0.018] p-6 sm:p-8">
+              <section className="rounded-[10px] border border-surface-border bg-surface-raised p-6 sm:p-8">
                 <h2 className="text-2xl font-medium tracking-[-0.03em] leading-tight text-content-primary">Quick answers</h2>
                 <motion.div
                   className="mt-6 grid gap-5"

@@ -77,14 +77,14 @@ export default function Security() {
             <div>
               <div className="grid gap-3">
                 {securityCards.map((card) => (
-                <article key={card.title} className="rounded-[10px] border border-surface-border-subtle bg-white/[0.022] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
+                <article key={card.title} className="rounded-[10px] border border-surface-border-subtle bg-surface-raised p-5 shadow-card">
                   <h2 className="text-lg font-medium tracking-[-0.024em] text-content-primary mb-3">{card.title}</h2>
                   <p className="text-sm leading-relaxed text-content-tertiary">{card.body}</p>
                 </article>
                 ))}
               </div>
 
-              <div className="mt-10 divide-y divide-white/[0.06] rounded-[10px] border border-surface-border bg-white/[0.018]">
+              <div className="mt-10 divide-y divide-surface-border rounded-[10px] border border-surface-border bg-surface-raised">
                 {sections.map((section) => (
                   <section key={section.title} className="p-5">
                     <h2 className="text-xl font-medium tracking-[-0.03em] text-content-primary">{section.title}</h2>

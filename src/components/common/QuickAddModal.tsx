@@ -3,6 +3,7 @@ import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, AlertCircle, Loader2, Camera, Eye, EyeOff, AlertTriangle, Upload } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
+import { ThemeBackdrop } from './ThemeBackdrop';
 import { toast } from 'sonner';
 import { useStore, type IncomeSource, type TabType } from '../../store';
 import { guessCategory } from '../../lib/api/services/categorizer';
@@ -1145,13 +1146,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
           className="relative z-50"
         >
           {/* Backdrop */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60" 
-            aria-hidden="true" 
-          />
+          <ThemeBackdrop />
 
           <div className="fixed inset-0 flex items-center justify-center p-4 sm:p-0">
             <motion.div

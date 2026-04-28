@@ -116,10 +116,10 @@ function ProductPreview() {
   }, []);
 
   return (
-    <div className="relative mx-auto max-w-[1320px] overflow-hidden rounded-[10px] border border-surface-border bg-white/[0.018] shadow-[inset_0_1px_0_rgba(255,255,255,0.035),0_40px_160px_rgba(0,0,0,0.5)]">
+    <div className="relative mx-auto max-w-[1320px] overflow-hidden rounded-[10px] border border-surface-border bg-surface-raised shadow-panel">
       <div className="flex h-12 items-center justify-between border-b border-surface-border-subtle bg-surface-raised/70 px-5">
         <div className="flex items-center gap-2">
-          <span className="h-4 w-4 rounded-[4px] border border-surface-border bg-white/[0.04]" />
+          <span className="h-4 w-4 rounded-[4px] border border-surface-border bg-surface-elevated" />
           <span className="text-sm font-medium text-content-primary">Oweable</span>
           <span className="text-content-muted">/</span>
           <span className="hidden text-sm text-content-tertiary sm:inline">Pay List</span>
@@ -135,7 +135,7 @@ function ProductPreview() {
         <aside className="hidden border-r border-surface-border-subtle bg-surface-raised/36 p-5 lg:block">
           <div className="space-y-1 text-sm">
             {['Inbox', 'Pay List', 'Debt plan', 'Calendar', 'Subscriptions'].map((item, index) => (
-              <div key={item} className={`rounded-md px-3 py-2 ${index === 1 ? 'bg-white/[0.055] text-content-primary' : 'text-content-tertiary'}`}>
+              <div key={item} className={`rounded-md px-3 py-2 ${index === 1 ? 'bg-surface-elevated text-content-primary' : 'text-content-tertiary'}`}>
                 {item}
               </div>
             ))}
@@ -343,7 +343,7 @@ export default function Landing() {
                   return (
                     <article
                       key={feature.title}
-                      className="h-full rounded-[12px] border border-surface-border-subtle bg-white/[0.025] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)] transition-colors hover:bg-white/[0.04]"
+                      className="h-full rounded-[12px] border border-surface-border-subtle bg-surface-raised p-5 shadow-card transition-colors hover:bg-surface-elevated"
                     >
                       <Icon className="h-5 w-5 text-brand-violet" />
                       <h3 className="mt-5 text-xl font-medium tracking-[-0.024em] text-content-primary">{feature.title}</h3>
@@ -368,7 +368,7 @@ export default function Landing() {
               {proofPoints.map((item, index) => (
                 <div
                   key={item}
-                  className="flex items-center justify-between rounded-md border border-surface-border-subtle bg-white/[0.025] px-4 py-3"
+                  className="flex items-center justify-between rounded-md border border-surface-border-subtle bg-surface-raised px-4 py-3"
                 >
                   <span className="text-sm text-content-secondary">{item}</span>
                   <span className="font-mono text-xs text-content-muted">0{index + 1}</span>
@@ -392,7 +392,7 @@ export default function Landing() {
               {testimonials.map((testimonial, index) => (
                 <div
                   key={index}
-                  className="flex h-full flex-col rounded-[12px] border border-surface-border-subtle bg-white/[0.025] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.035)]"
+                  className="flex h-full flex-col rounded-[12px] border border-surface-border-subtle bg-surface-raised p-6 shadow-card"
                 >
                   <div className="mb-4 flex gap-1">
                     {[...Array(5)].map((_, i) => (

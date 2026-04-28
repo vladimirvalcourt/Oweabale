@@ -119,7 +119,7 @@ export default function FAQ() {
               </p>
             </div>
 
-            <div className="mt-14 rounded-[22px] border border-surface-border bg-white/[0.03] px-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] sm:px-8">
+            <div className="mt-14 rounded-[22px] border border-surface-border bg-surface-raised px-5 shadow-card sm:px-8">
               {FAQ_DATA.map((item) => (
                 <FaqCard key={item.question} question={item.question} answer={item.answer} />
               ))}
