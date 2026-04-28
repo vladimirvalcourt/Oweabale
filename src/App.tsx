@@ -54,7 +54,6 @@ import CrispChat from './components/common/CrispChat';
 const Changelog      = lazy(() => import('./pages/Changelog'));
 const Analytics      = lazy(() => import('./pages/Analytics'));
 const CreditCenter   = lazy(() => import('./pages/CreditCenter'));
-const MobileCapture  = lazy(() => import('./pages/MobileCapture'));
 const NotFound       = lazy(() => import('./pages/NotFound'));
 const SAASLandingDemo = lazy(() => import('./pages/SAASLandingDemo'));
 
@@ -121,7 +120,6 @@ function AppRoutes() {
       <Route path="/auth" element={<SignInRoute authUser={authUser} />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/plaid/callback" element={<PlaidCallback />} />
-      <Route path="/capture" element={<MobileCapture />} />
 
       {/* Old free namespace is kept only as redirects so existing links do not break. */}
       <Route path="free/dashboard" element={<AppRedirect to="/pro/dashboard" />} />

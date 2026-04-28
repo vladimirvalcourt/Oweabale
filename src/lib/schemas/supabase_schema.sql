@@ -424,25 +424,6 @@ ALTER TABLE credit_factors ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Users view own factors" ON credit_factors;
 CREATE POLICY "Users view own factors" ON credit_factors FOR SELECT USING (auth.uid() = user_id);
 
--- 23. DOCUMENT CAPTURE SESSIONS (Mobile Sync)
-CREATE TABLE IF NOT EXISTS document_capture_sessions (
-  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id           UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-  token             TEXT NOT NULL DEFAULT gen_random_uuid()::text,
-  status            TEXT NOT NULL DEFAULT 'idle' CHECK (status IN ('idle', 'active', 'completed', 'error')),
-  uploaded_file_url TEXT,
-  created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_capture_sessions_token ON document_capture_sessions (id, token);
-ALTER TABLE document_capture_sessions ENABLE ROW LEVEL SECURITY;
-DROP POLICY IF EXISTS "Users manage own sessions" ON document_capture_sessions;
-CREATE POLICY "Users manage own sessions" ON document_capture_sessions FOR ALL USING (auth.uid() = user_id);
--- Anonymous mobile client can read/update session via token (simplified for web usage)
-DROP POLICY IF EXISTS "Mobile tokens can access sessions" ON document_capture_sessions;
-CREATE POLICY "Mobile tokens can access sessions" ON document_capture_sessions FOR ALL USING (TRUE) WITH CHECK (TRUE);
-
 -- 24. AUDIT LOG
 CREATE TABLE IF NOT EXISTS audit_log (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -600,9 +581,3 @@ DROP TRIGGER IF EXISTS update_platform_settings_updated_at ON platform_settings;
 CREATE TRIGGER update_platform_settings_updated_at
   BEFORE UPDATE ON platform_settings
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-DROP TRIGGER IF EXISTS update_document_capture_sessions_updated_at ON document_capture_sessions;
-CREATE TRIGGER update_document_capture_sessions_updated_at
-  BEFORE UPDATE ON document_capture_sessions
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();

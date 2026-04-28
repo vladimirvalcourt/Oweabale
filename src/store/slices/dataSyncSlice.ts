@@ -421,7 +421,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
               id: pending.id as string,
               type: pending.type as AppState['pendingIngestions'][number]['type'],
               status: pending.status as string,
-              source: pending.source as 'desktop' | 'mobile' | undefined,
+              source: 'desktop',
               extractedData: (pending.extracted_data ?? {}) as AppState['pendingIngestions'][number]['extractedData'],
               originalFile: (pending.original_file ?? undefined) as AppState['pendingIngestions'][number]['originalFile'],
               storagePath: (pending.storage_path ?? undefined) as string | undefined,

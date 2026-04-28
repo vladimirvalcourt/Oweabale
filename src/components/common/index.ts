@@ -4,7 +4,6 @@
 
 // Default exports
 export { default as BankConnection } from './BankConnection';
-export { default as MobileSyncModal } from './MobileSyncModal';
 export { default as QuickAddModal } from './QuickAddModal';
 export { default as SessionWarningModal } from './SessionWarningModal';
 export { default as TrialBanner } from './TrialBanner';

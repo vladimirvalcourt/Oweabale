@@ -193,7 +193,7 @@ export interface PendingIngestion {
   };
   storagePath?: string;
   storageUrl?: string;
-  source?: 'desktop' | 'mobile';
+  source?: 'desktop';
 }
 
 export interface CreditFactor {

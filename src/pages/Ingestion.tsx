@@ -12,13 +12,11 @@ import {
   UploadCloud,
   CloudUpload,
   ExternalLink,
-  Smartphone,
   Camera
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useStore } from '../store';
 import { supabase } from '../lib/api/supabase';
-import { MobileSyncModal } from '../components/common';
 import { toast } from 'sonner';
 import { validateIngestionFile, sanitizeUrl } from '../lib/api/security';
 import { buildScanExtraction } from '../lib/api/services/ingestionExtraction';
@@ -47,7 +45,6 @@ export default function Ingestion() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  const [isSyncOpen, setIsSyncOpen] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const cameraInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -161,9 +158,8 @@ export default function Ingestion() {
     }
   };
 
-  // ── Auto-OCR and Signed URLs ──────────────────────────────────
+  // ── Signed URLs for persisted uploads ─────────────────────────
   React.useEffect(() => {
-    // 1. Generate Signed URLs for mobile syncs if missing
     pendingIngestions.forEach(async (pi) => {
       if (pi.storagePath && !pi.storageUrl) {
         const { data } = await supabase.storage
@@ -174,49 +170,6 @@ export default function Ingestion() {
         }
       }
     });
-
-    // 2. Trigger OCR for new mobile syncs
-    const pendingMobile = pendingIngestions.find(pi => pi.source === 'mobile' && pi.status === 'uploading');
-    if (pendingMobile && pendingMobile.storagePath) {
-       // Generate signed URL on-demand (don't rely on stored URL)
-       supabase.storage
-         .from('scans')
-         .createSignedUrl(pendingMobile.storagePath, 3600) // 1 hour expiry
-         .then(({ data, error }) => {
-           if (error || !data?.signedUrl) {
-             throw new Error(error?.message || 'Failed to generate signed URL');
-           }
-           return data.signedUrl;
-         })
-         .then((signedUrl) => {
-           // Derive the MIME type from the storage path extension so PDFs are handled correctly
-           const extMatch = pendingMobile.storagePath!.split('.').pop()?.toLowerCase() ?? 'jpg';
-           const mimeMap: Record<string, string> = {
-             pdf: 'application/pdf',
-             jpg: 'image/jpeg',
-             jpeg: 'image/jpeg',
-             png: 'image/png',
-             webp: 'image/webp',
-             gif: 'image/gif',
-           };
-           const mimeType = mimeMap[extMatch] ?? 'image/jpeg';
-           return fetch(signedUrl).then((res) => {
-             if (!res.ok) {
-               throw new Error(`Signed URL fetch failed: ${res.status}`);
-             }
-             return res.blob().then(blob => ({ blob, extMatch, mimeType }));
-           });
-         })
-         .then(({ blob, extMatch, mimeType }) => {
-           const file = new File([blob], `mobile_scan.${extMatch}`, { type: mimeType });
-           triggerManualScan(pendingMobile.id, file);
-         })
-         .catch((err) => {
-           console.warn('[Ingestion] Mobile scan fetch failed:', err);
-           updatePendingIngestion(pendingMobile.id, { status: 'error' });
-           toast.error('Failed to download mobile scan. Please retry from phone.');
-         });
-    }
   }, [pendingIngestions]);
 
   const triggerManualScan = async (id: string, file: File) => {
@@ -306,23 +259,9 @@ export default function Ingestion() {
           table: 'pending_ingestions'
         },
         (payload) => {
-          const row = payload.new as { id?: string; source?: string };
+          const row = payload.new as { id?: string };
           if (!row?.id) return;
           useStore.getState().fetchData(undefined, { background: true });
-          if (row.source === 'mobile') {
-            setRecentlyAddedId(row.id);
-            toast.success('Document received', {
-              description: 'Refreshing Documents.',
-              action: {
-                label: 'View',
-                onClick: () => {
-                  setSelectedId(row.id!);
-                  document.getElementById(`ingestion-${row.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                },
-              },
-            });
-            setTimeout(() => setRecentlyAddedId(null), 5000);
-          }
         }
       )
       .subscribe();
@@ -360,7 +299,7 @@ export default function Ingestion() {
             capture="environment"
             onChange={handleFileSelect}
           />
-          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
             <button 
               type="button"
               onClick={() => cameraInputRef.current?.click()}
@@ -368,14 +307,6 @@ export default function Ingestion() {
             >
               <Camera className="h-4 w-4 shrink-0" aria-hidden />
               <span className="text-center leading-tight">Camera</span>
-            </button>
-            <button 
-              type="button"
-              onClick={() => setIsSyncOpen(true)}
-              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-md border border-content-primary/20 bg-content-primary/[0.06] px-4 py-2.5 text-xs font-sans font-medium text-content-primary transition-colors hover:bg-content-primary/[0.1] btn-tactile"
-            >
-              <Smartphone className="h-4 w-4 shrink-0" aria-hidden />
-              <span className="text-center leading-tight">Scan via phone</span>
             </button>
             <button 
               type="button"
@@ -450,12 +381,6 @@ export default function Ingestion() {
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
                         <p className="text-xs font-mono font-medium text-content-primary truncate">{item.extractedData.biller || item.extractedData.name || item.originalFile?.name || 'Uploaded File'}</p>
-                        {item.source === 'mobile' && (
-                          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-content-primary/[0.06] border border-content-primary/15" title="Source: Mobile Capture">
-                             <Smartphone className="w-2.5 h-2.5 text-content-secondary" />
-                             <span className="text-[7px] font-mono font-medium text-content-secondary uppercase">Sync</span>
-                          </div>
-                        )}
                       </div>
                       <p className="text-[10px] font-mono text-content-muted uppercase tracking-widest mt-1">
                         {item.originalFile?.size ? (item.originalFile.size / 1024).toFixed(1) + ' KB' : 'SCANNED'}
@@ -967,16 +892,6 @@ export default function Ingestion() {
           </div>
         )}
       </div>
-      <MobileSyncModal 
-        isOpen={isSyncOpen} 
-        onClose={() => setIsSyncOpen(false)} 
-        onSuccess={() => {
-           // Mobile upload already inserted the record, 
-           // but we might need to refresh local state if store doesn't auto-poll
-           // In Oweable, fetchData() usually handles this.
-           useStore.getState().fetchData(undefined, { background: true });
-        }}
-      />
     </div>
   );
 }
