@@ -23,6 +23,163 @@ interface QuickAddModalProps {
 /** Quick Add → Bill/Debt: bill cadence or debt instrument (card vs loan). */
 type ObligationKind = 'bill-weekly' | 'bill-biweekly' | 'bill-monthly' | 'debt-card' | 'debt-loan';
 
+/** Reusable form input with label, error handling, and ARIA support */
+interface FormInputProps {
+  id: string;
+  label: string;
+  type?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
+  error?: string;
+  required?: boolean;
+  disabled?: boolean;
+  className?: string;
+  inputMode?: 'text' | 'numeric' | 'decimal';
+  step?: string;
+  min?: string;
+}
+
+function FormInput({
+  id,
+  label,
+  type = 'text',
+  value,
+  onChange,
+  placeholder,
+  error,
+  required,
+  disabled,
+  className = '',
+  inputMode,
+  step,
+  min,
+}: FormInputProps) {
+  const errorId = `${id}-error`;
+  const hasError = !!error;
+
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
+        {label}
+        {required && <span className="text-rose-500 ml-0.5">*</span>}
+      </label>
+      <input
+        id={id}
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        required={required}
+        disabled={disabled}
+        inputMode={inputMode}
+        step={step}
+        min={min}
+        aria-invalid={hasError}
+        aria-describedby={hasError ? errorId : undefined}
+        className={`w-full bg-surface-base border ${hasError ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border ${className}`}
+      />
+      {hasError && (
+        <p id={errorId} className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5" role="alert" aria-live="polite">
+          <AlertCircle className="w-3 h-3" aria-hidden />
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Reusable select field with label and ARIA support */
+interface FormSelectProps {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  children: React.ReactNode;
+  required?: boolean;
+  disabled?: boolean;
+  className?: string;
+}
+
+function FormSelect({
+  id,
+  label,
+  value,
+  onChange,
+  children,
+  required,
+  disabled,
+  className = '',
+}: FormSelectProps) {
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
+        {label}
+        {required && <span className="text-rose-500 ml-0.5">*</span>}
+      </label>
+      <select
+        id={id}
+        value={value}
+        onChange={onChange}
+        required={required}
+        disabled={disabled}
+        className={`w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer transition-colors hover:border-content-primary/15 disabled:opacity-40 ${className}`}
+      >
+        {children}
+      </select>
+    </div>
+  );
+}
+
+/** Reusable date input with label and ARIA support */
+interface FormDateProps {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
+  required?: boolean;
+  disabled?: boolean;
+}
+
+function FormDate({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+  required,
+  disabled,
+}: FormDateProps) {
+  const errorId = `${id}-error`;
+  const hasError = !!error;
+
+  return (
+    <div>
+      <label htmlFor={id} className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
+        {label}
+        {required && <span className="text-rose-500 ml-0.5">*</span>}
+      </label>
+      <input
+        id={id}
+        type="date"
+        value={value}
+        onChange={onChange}
+        required={required}
+        disabled={disabled}
+        aria-invalid={hasError}
+        aria-describedby={hasError ? errorId : undefined}
+        className={`input-date-dark w-full bg-surface-base border ${hasError ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
+      />
+      {hasError && (
+        <p id={errorId} className="text-xs text-red-400 mt-1.5" role="alert" aria-live="polite">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const NlpIcon = getCustomIcon('nlp');
   const UploadIcon = getCustomIcon('upload');
@@ -688,7 +845,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       placeholder={hasFullSuite ? "e.g. Rent 1200 on the 1st · Comcast bill 120 next Tuesday · Parking ticket 65 due Friday" : "e.g. Rent 1200 on the 1st · Internet bill 80 next Tuesday · Parking ticket 65 due Friday"}
                       value={nlpText}
                       onChange={handleNLPInput}
-                      className="w-full bg-surface-raised border border-surface-border rounded-lg focus-app-field text-sm font-sans text-content-primary placeholder:text-content-muted p-3 resize-none transition-colors"
+                      className="w-full bg-surface-raised border border-surface-border radius-input focus-app-field text-sm font-sans text-content-primary placeholder:text-content-muted p-3 resize-none transition-colors hover:border-content-primary/15"
                       rows={2}
                     />
                   </div>
@@ -781,28 +938,27 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     onSubmit={handleFormSubmit}
                     role="tabpanel"
                     aria-labelledby={`qa-tab-${activeTab}`}
+                    aria-live="polite"
                     className="p-6 space-y-5"
                   >
                     
                     {/* AMOUNT FIELD (ALWAYS PRESENT) */}
-                    <div>
-                      <label htmlFor="amount" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Amount</label>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-content-tertiary font-medium">$</span>
-                        <input
-                          id="amount"
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          value={amount}
-                          onChange={(e) => { setAmount(e.target.value); if(errors.amount) setErrors({...errors, amount: ''}); }}
-                          placeholder="0.00"
-                          className={`w-full bg-surface-base border ${errors.amount ? 'border-red-500/50' : 'border-surface-border'} rounded-lg focus-app-field pl-7 py-2.5 text-base font-sans font-semibold text-content-primary placeholder:text-content-muted transition-colors`}
-                        />
-                      </div>
-                      {errors.amount && (
-                        <p className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5"><AlertCircle className="w-3 h-3" /> {errors.amount}</p>
-                      )}
+                    <div className="relative">
+                      <FormInput
+                        id="amount"
+                        label="Amount"
+                        type="number"
+                        value={amount}
+                        onChange={(e) => { setAmount(e.target.value); if(errors.amount) setErrors({...errors, amount: ''}); }}
+                        placeholder="0.00"
+                        error={errors.amount}
+                        required
+                        inputMode="decimal"
+                        step="0.01"
+                        min="0"
+                        className="pl-7 text-base font-semibold"
+                      />
+                      <span className="absolute left-3 top-[calc(1.5rem+1.25rem)] -translate-y-1/2 text-content-tertiary font-medium pointer-events-none">$</span>
                     </div>
 
                     {/* TRANSACTION (expense or income/refund) */}
@@ -839,24 +995,22 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           <label htmlFor="description" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Description</label>
                           <div className="flex gap-3">
                             <div className="flex-1">
-                              <input
+                              <FormInput
                                 id="description"
-                                type="text"
+                                label=""
                                 value={description}
                                 onChange={(e) => { setDescription(e.target.value); if(errors.description) setErrors({...errors, description: ''}); }}
                                 placeholder="E.g., Whole Foods"
-                                className={`w-full bg-surface-base border ${errors.description ? 'border-red-500/50' : 'border-surface-border'} rounded-lg focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors`}
+                                error={errors.description}
+                                required
                               />
                             </div>
                             {description.length > 2 && (
-                              <div className="shrink-0 flex items-center justify-center bg-surface-base border border-surface-border rounded w-10">
+                              <div className="shrink-0 flex items-center justify-center bg-surface-base border border-surface-border radius-card w-10">
                                 <BrandLogo name={description} size="sm" />
                               </div>
                             )}
                           </div>
-                          {errors.description && (
-                            <p className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5"><AlertCircle className="w-3 h-3" /> {errors.description}</p>
-                          )}
                         </div>
 
                         <div className="rounded-lg border border-surface-border bg-surface-base p-3">
@@ -898,17 +1052,14 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label htmlFor="transaction-category" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
-                              {transactionLedgerKind === 'expense' ? 'Expense category' : 'Income category'}
-                            </label>
-                            {transactionLedgerKind === 'expense' ? (
-                              <select
-                                id="transaction-category"
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                                className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer"
-                              >
-                                {EXPENSE_CATEGORY_OPTGROUPS.map((g) => (
+                            <FormSelect
+                              id="transaction-category"
+                              label={transactionLedgerKind === 'expense' ? 'Expense category' : 'Income category'}
+                              value={transactionLedgerKind === 'expense' ? category : txIncomeCategory}
+                              onChange={(e) => transactionLedgerKind === 'expense' ? setCategory(e.target.value) : setTxIncomeCategory(e.target.value)}
+                            >
+                              {transactionLedgerKind === 'expense' ? (
+                                EXPENSE_CATEGORY_OPTGROUPS.map((g) => (
                                   <optgroup key={g.label} label={g.label}>
                                     {g.options.map((o) => (
                                       <option key={o.value} value={o.value}>
@@ -916,31 +1067,22 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                       </option>
                                     ))}
                                   </optgroup>
-                                ))}
-                              </select>
-                            ) : (
-                              <select
-                                id="transaction-category"
-                                value={txIncomeCategory}
-                                onChange={(e) => setTxIncomeCategory(e.target.value)}
-                                className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer"
-                              >
-                                {INCOME_CATEGORY_OPTIONS.map((o) => (
+                                ))
+                              ) : (
+                                INCOME_CATEGORY_OPTIONS.map((o) => (
                                   <option key={o.value} value={o.value}>
                                     {o.label}
                                   </option>
-                                ))}
-                              </select>
-                            )}
+                                ))
+                              )}
+                            </FormSelect>
                           </div>
                           <div>
-                            <label htmlFor="date" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Date</label>
-                            <input
+                            <FormDate
                               id="date"
-                              type="date"
+                              label="Date"
                               value={date}
                               onChange={(e) => setDate(e.target.value)}
-                              className="input-date-dark w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans"
                             />
                           </div>
                         </div>
@@ -955,8 +1097,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             onChange={(e) => setMemoNotes(e.target.value)}
                             placeholder="Split with roommate, business trip, etc."
                             rows={2}
-                            className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field text-sm font-sans text-content-primary placeholder:text-content-muted p-3 resize-none transition-colors"
+                            aria-describedby="memo-hint"
+                            className="w-full bg-surface-base border border-surface-border radius-input focus-app-field text-sm font-sans text-content-primary placeholder:text-content-muted p-3 resize-none transition-colors hover:border-content-primary/15"
                           />
+                          <p id="memo-hint" className="sr-only">Optional notes about this transaction</p>
                         </div>
                       </>
                     )}
@@ -966,15 +1110,15 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       <>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Type</label>
-                            <select 
+                            <FormSelect
+                              id="obligation-kind"
+                              label="Type"
                               value={obligationKind}
                               onChange={(e) => {
                                 const v = e.target.value as ObligationKind;
                                 setObligationKind(v);
                                 if (v.startsWith('bill-')) setDebtNoPaymentDue(false);
                               }}
-                              className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer"
                             >
                               <option value="bill-weekly">Weekly bill</option>
                               <option value="bill-biweekly">Bi-weekly bill</option>
@@ -985,26 +1129,22 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                   <option value="debt-loan">Loan</option>
                                 </>
                               )}
-                            </select>
-                            <p className="text-[10px] font-mono text-content-tertiary mt-1.5 leading-snug">
+                            </FormSelect>
+                            <p className="text-[10px] font-mono text-content-tertiary mt-1.5 leading-snug" id="obligation-kind-hint">
                               {obligationKind.startsWith('bill-')
                                 ? 'Amount is per bill cycle (weekly, bi-weekly, or monthly).'
                                 : 'Balance owed; APR and minimum payment are optional.'}
                             </p>
                           </div>
                           <div>
-                            <label htmlFor="dueDate" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">
-                              {obligationKind.startsWith('debt-') ? 'Payment due date' : 'Due Date'}
-                            </label>
-                            <input
+                            <FormDate
                               id="dueDate"
-                              type="date"
+                              label={obligationKind.startsWith('debt-') ? 'Payment due date' : 'Due Date'}
                               value={dueDate}
-                              disabled={obligationKind.startsWith('debt-') && debtNoPaymentDue}
                               onChange={(e) => { setDueDate(e.target.value); if(errors.dueDate) setErrors({...errors, dueDate: ''}); }}
-                              className={`input-date-dark w-full bg-surface-base border ${errors.dueDate ? 'border-red-500/50' : 'border-surface-border'} rounded-lg focus-app-field px-3 py-2 text-sm font-sans disabled:opacity-40`}
+                              error={errors.dueDate}
+                              disabled={obligationKind.startsWith('debt-') && debtNoPaymentDue}
                             />
-                            {errors.dueDate && <p className="text-xs text-red-400 mt-1.5">{errors.dueDate}</p>}
                             {obligationKind.startsWith('debt-') && (
                               <label className="mt-2 flex items-center gap-2 text-[11px] text-content-tertiary cursor-pointer">
                                 <input
@@ -1014,6 +1154,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                     setDebtNoPaymentDue(e.target.checked);
                                     if (e.target.checked && errors.dueDate) setErrors({ ...errors, dueDate: '' });
                                   }}
+                                  aria-describedby="dueDate-error"
                                   className="rounded border-surface-border focus-app"
                                 />
                                 No payment due date (closed card, charge-off, etc.)
@@ -1026,9 +1167,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             <label htmlFor="vendor" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Biller Name</label>
                             <div className="flex gap-3">
                               <div className="flex-1">
-                                <input
+                                <FormInput
                                   id="vendor"
-                                  type="text"
+                                  label=""
                                   value={vendor}
                                   onChange={(e) => { setVendor(e.target.value); if(errors.vendor) setErrors({...errors, vendor: ''}); }}
                                   placeholder={
@@ -1038,21 +1179,18 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                         ? 'E.g., Chase Sapphire'
                                         : 'E.g., SoFi Personal Loan'
                                   }
-                                  className={`w-full bg-surface-base border ${errors.vendor ? 'border-red-500/50' : 'border-surface-border'} rounded-lg focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors`}
+                                  error={errors.vendor}
+                                  required
                                 />
                               </div>
                             </div>
-                            {errors.vendor && (
-                              <p className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5"><AlertCircle className="w-3 h-3" /> {errors.vendor}</p>
-                            )}
                           </div>
                           <div>
-                            <label htmlFor="billCategory" className="block text-xs font-sans font-medium text-content-tertiary mb-1.5">Category</label>
-                            <select 
+                            <FormSelect
                               id="billCategory"
+                              label="Category"
                               value={category}
                               onChange={(e) => setCategory(e.target.value)}
-                              className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary cursor-pointer"
                             >
                               {EXPENSE_CATEGORY_OPTGROUPS.map((g) => (
                                 <optgroup key={g.label} label={g.label}>
@@ -1063,7 +1201,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                   ))}
                                 </optgroup>
                               ))}
-                            </select>
+                            </FormSelect>
                           </div>
                         </div>
                         {obligationKind.startsWith('debt-') && (
@@ -1077,7 +1215,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 value={apr}
                                 onChange={(e) => setApr(e.target.value)}
                                 placeholder="19.99"
-                                className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans text-content-primary"
+                                className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans text-content-primary transition-colors hover:border-content-primary/15"
                               />
                             </div>
                             <div>
@@ -1089,7 +1227,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 value={minPayment}
                                 onChange={(e) => setMinPayment(e.target.value)}
                                 placeholder="Auto"
-                                className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans text-content-primary"
+                                className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans text-content-primary transition-colors hover:border-content-primary/15"
                               />
                             </div>
                           </div>
@@ -1106,7 +1244,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             <select
                               value={citationType}
                               onChange={(e) => setCitationType(e.target.value)}
-                              className="w-full bg-surface-base border border-surface-border rounded focus-app-field-rose px-3 py-2 text-sm font-sans text-content-primary cursor-pointer"
+                              className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer transition-colors hover:border-content-primary/15"
                             >
                               <option value="Toll Violation">Toll Violation</option>
                               <option value="Traffic Citation">Traffic Citation</option>
@@ -1132,7 +1270,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                   setDaysLeft(String(days));
                                 }
                               }}
-                              className="input-date-dark w-full bg-surface-base border border-surface-border rounded focus-app-field-rose px-3 py-2 text-sm font-sans"
+                              className="input-date-dark w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15"
                             />
                           </div>
                         </div>
@@ -1145,7 +1283,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             value={jurisdiction}
                             onChange={(e) => { setJurisdiction(e.target.value); if (errors.jurisdiction) setErrors({ ...errors, jurisdiction: '' }); }}
                             placeholder="E.g., Dallas County, TX"
-                            className={`w-full bg-surface-base border ${errors.jurisdiction ? 'border-red-500/50' : 'border-surface-border'} rounded focus-app-field-rose px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors`}
+                            className={`w-full bg-surface-base border ${errors.jurisdiction ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15`}
                           />
                           {errors.jurisdiction && (
                             <p className="flex items-center gap-1.5 text-xs text-red-400 mt-1.5"><AlertCircle className="w-3 h-3" /> {errors.jurisdiction}</p>
@@ -1159,7 +1297,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               value={citationNumber}
                               onChange={(e) => setCitationNumber(e.target.value)}
                               placeholder="E.g., TN-20394857"
-                              className="w-full bg-surface-base border border-surface-border rounded focus-app-field-rose px-3 py-2.5 text-sm font-mono text-content-primary placeholder:text-content-muted transition-colors uppercase"
+                              className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2.5 text-sm font-mono text-content-primary placeholder:text-content-muted transition-colors uppercase hover:border-content-primary/15"
                             />
                           </div>
                           <div>
@@ -1171,7 +1309,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               value={penaltyFee}
                               onChange={(e) => setPenaltyFee(e.target.value)}
                               placeholder="0.00"
-                              className="w-full bg-surface-base border border-surface-border rounded focus-app-field-rose px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted"
+                              className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15"
                             />
                           </div>
                         </div>
@@ -1182,7 +1320,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             value={paymentUrl}
                             onChange={(e) => setPaymentUrl(e.target.value)}
                             placeholder="https://..."
-                            className="w-full bg-surface-base border border-surface-border rounded focus-app-field-rose px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors"
+                            className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15"
                           />
                         </div>
                         <div>
@@ -1191,7 +1329,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             type="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
-                            className="input-date-dark w-full bg-surface-base border border-surface-border rounded focus-app-field-rose px-3 py-2 text-sm font-sans"
+                            className="input-date-dark w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15"
                           />
                         </div>
                       </>
@@ -1208,7 +1346,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="E.g., Google Paycheck, Client Invoice"
-                            className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors"
+                            className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -1217,7 +1355,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             <select
                               value={incomeCategory}
                               onChange={(e) => setIncomeCategory(e.target.value)}
-                              className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer"
+                              className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer transition-colors hover:border-content-primary/15"
                             >
                               {INCOME_CATEGORY_OPTIONS.map((o) => (
                                 <option key={o.value} value={o.value}>{o.label}</option>
@@ -1229,7 +1367,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             <select
                               value={incomeFrequency}
                               onChange={(e) => setIncomeFrequency(e.target.value as IncomeSource['frequency'])}
-                              className="w-full bg-surface-base border border-surface-border rounded-lg focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer"
+                              className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2 text-sm font-sans text-content-primary cursor-pointer transition-colors hover:border-content-primary/15"
                             >
                               <option value="Weekly">Weekly</option>
                               <option value="Bi-weekly">Bi-weekly</option>
@@ -1245,7 +1383,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             type="date"
                             value={date}
                             onChange={(e) => { setDate(e.target.value); if(errors.date) setErrors({...errors, date: ''}); }}
-                            className={`input-date-dark w-full bg-surface-base border ${errors.date ? 'border-red-500/50' : 'border-surface-border'} rounded-lg focus-app-field px-3 py-2 text-sm font-sans`}
+                            className={`input-date-dark w-full bg-surface-base border ${errors.date ? 'border-red-500/50' : 'border-surface-border'} radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15`}
                           />
                           {errors.date && <p className="text-xs text-red-400 mt-1.5">{errors.date}</p>}
                         </div>
@@ -1278,21 +1416,21 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     type="button"
                     onClick={() => void submitEntry(true)}
                     disabled={isSubmitting}
-                    className="px-4 py-2 rounded-lg text-sm font-sans font-medium border border-surface-border text-content-secondary hover:text-content-primary hover:bg-surface-elevated transition-colors focus-app disabled:opacity-50"
+                    className="px-4 py-2 radius-button text-sm font-sans font-medium border border-surface-border text-content-secondary hover:text-content-primary hover:bg-surface-elevated transition-colors focus-app disabled:opacity-50"
                   >
-                    {isSubmitting ? 'Saving…' : 'Save & add another'}
+                    {isSubmitting ? 'Getting things ready...' : 'Save & add another'}
                   </button>
                   <button
                     type="button"
                     onClick={() => void submitEntry(false)}
                     disabled={isSubmitting}
-                    className={`px-5 py-2 rounded-lg text-sm font-sans font-medium transition-colors focus-app disabled:opacity-50 ${
+                    className={`px-5 py-2 radius-button text-sm font-sans font-medium transition-colors focus-app disabled:opacity-50 ${
                       activeTab === 'citation'
                         ? 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover border border-surface-border'
                         : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover'
                     }`}
                   >
-                    {isSubmitting ? 'Saving…' : 'Save entry'}
+                    {isSubmitting ? 'Getting things ready...' : 'Save entry'}
                   </button>
                 </div>
               </Dialog.Panel>
