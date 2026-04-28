@@ -4,6 +4,30 @@ This document tracks known technical debt items, future enhancements, and cosmet
 
 ---
 
+## ✅ Resolved Items
+
+### 1. Duplicate CSS Definition: `.noise-overlay` - RESOLVED ✅
+**Resolved:** April 26, 2026  
+**Commit:** b2dea40  
+**Action Taken:** Removed duplicate definition at lines 63-65, kept preferred version at line 328 with `background-size` property.
+
+### 2. Unused Theme Variants - RESOLVED ✅
+**Resolved:** April 26, 2026  
+**Commit:** b2dea40  
+**Action Taken:** Deleted all 6 unused theme variants (terminal, solar, nordic, crimson, ghost, neon) - removed 54 lines of dead CSS code.
+
+### 3. Transaction Pagination Limit - RESOLVED ✅
+**Resolved:** April 26, 2026  
+**Commit:** b2dea40  
+**Action Taken:** Implemented cursor-based pagination:
+- Changed from hard limit of 500 to paginated fetches of 100 transactions
+- Added `hasMoreTransactions` and `lastTransactionCursor` state fields
+- Created `loadMoreTransactions()` method for infinite scroll
+- Transactions now append when loading more pages
+- Users can access unlimited transaction history
+
+---
+
 ## Low-Priority Items (Deferred)
 
 ### 1. Duplicate CSS Definition: `.noise-overlay`
@@ -205,11 +229,13 @@ If >5% of active users exceed 500 transactions, escalate priority.
 
 ## Summary
 
-| Item | Severity | Effort | User Impact | Decision Needed |
-|------|----------|--------|-------------|-----------------|
-| Duplicate `.noise-overlay` | ⚪ Low | 5 min | None | No |
-| Unused theme variants | ⚪ Low | 10 min - 2 days | None | Yes (remove vs. implement) |
-| Transaction pagination | 🟢 Medium | 1-2 weeks | Scalability | No (implementation path clear) |
+| Item | Severity | Effort | User Impact | Status |
+|------|----------|--------|-------------|--------|
+| Duplicate `.noise-overlay` | ⚪ Low | 5 min | None | ✅ Resolved |
+| Unused theme variants | ⚪ Low | 10 min | None | ✅ Resolved |
+| Transaction pagination | 🟢 Medium | 1-2 weeks | Scalability | ✅ Resolved |
+
+**All items resolved in commit b2dea40 on April 26, 2026**
 
 ## Review Cadence
 
