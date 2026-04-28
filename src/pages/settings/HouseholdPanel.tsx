@@ -21,8 +21,8 @@ export function HouseholdPanel() {
   // Pro gating
   if (!hasFullSuite) {
     return (
-      <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-6">
-        <h3 className="text-sm font-medium text-amber-700 dark:text-amber-300 mb-2">Pro Feature</h3>
+      <div className="rounded-lg dark:border-amber-500/30 border-amber-500/40 dark:bg-amber-500/10 bg-amber-500/15 p-6">
+        <h3 className="text-sm font-medium dark:text-amber-300 text-amber-700 mb-2">Pro Feature</h3>
         <p className="text-xs text-content-secondary mb-4">
           Multi-user households are available with the Full Suite plan. Upgrade to invite partners and share your financial data.
         </p>
@@ -97,9 +97,9 @@ export function HouseholdPanel() {
   const getRoleBadgeColor = (role: UserRole) => {
     switch (role) {
       case 'owner':
-        return 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30';
+        return 'dark:bg-amber-500/15 dark:text-amber-300 bg-amber-500/20 text-amber-700 dark:border-amber-500/30 border-amber-500/40';
       case 'partner':
-        return 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30';
+        return 'dark:bg-emerald-500/15 dark:text-emerald-300 bg-emerald-500/20 text-emerald-700 dark:border-emerald-500/30 border-emerald-500/40';
       case 'viewer':
         return 'bg-slate-500/15 text-slate-700 dark:text-slate-300 border-slate-500/30';
     }
@@ -347,13 +347,13 @@ export function HouseholdPanel() {
             <h4 className="text-xs font-medium text-content-secondary mb-2">Permissions</h4>
             <ul className="space-y-2 text-xs text-content-tertiary">
               <li className="flex items-start gap-2">
-                <Crown className="w-3.5 h-3.5 text-amber-500 mt-0.5 shrink-0" />
+                <Crown className="w-3.5 h-3.5 dark:text-amber-500 text-amber-600 mt-0.5 shrink-0" />
                 <span>
                   <strong className="text-content-secondary">Owner:</strong> Full control — manage members, edit all data, billing
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <Users className="w-3.5 h-3.5 text-emerald-500 mt-0.5 shrink-0" />
+                <Users className="w-3.5 h-3.5 dark:text-emerald-500 text-emerald-600 mt-0.5 shrink-0" />
                 <span>
                   <strong className="text-content-secondary">Partner:</strong> Full access — add/edit bills, transactions, budgets, goals
                 </span>

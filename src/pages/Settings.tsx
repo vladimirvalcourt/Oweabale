@@ -25,7 +25,7 @@ const tabs = [
 const BUTTON_BASE_CLASS =
   'inline-flex min-h-10 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-app disabled:opacity-60 disabled:cursor-not-allowed';
 const BUTTON_SECONDARY_CLASS = `${BUTTON_BASE_CLASS} border border-surface-border bg-transparent text-content-secondary hover:bg-surface-elevated`;
-const BUTTON_WARNING_CLASS = `${BUTTON_BASE_CLASS} bg-amber-600 text-white hover:bg-amber-500`;
+const BUTTON_WARNING_CLASS = `${BUTTON_BASE_CLASS} dark:bg-amber-600 dark:text-white dark:hover:bg-amber-500 bg-amber-600 text-white hover:bg-amber-500`;
 const BUTTON_DESTRUCTIVE_CLASS = `${BUTTON_BASE_CLASS} bg-brand-expense text-white hover:bg-red-700`;
 
 const SettingsNav = memo(function SettingsNav({

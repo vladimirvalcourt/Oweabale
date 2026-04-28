@@ -257,9 +257,9 @@ function PayListRow({
           <div
             className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${
               isUrgent
-                ? 'border-rose-500/35 bg-rose-500/10 text-rose-300'
+                ? 'dark:border-rose-500/35 dark:bg-rose-500/10 dark:text-rose-300 border-rose-500/40 bg-rose-500/15 text-rose-700'
                 : item.status === 'week'
-                  ? 'border-amber-500/35 bg-amber-500/10 text-amber-300'
+                  ? 'dark:border-amber-500/35 dark:bg-amber-500/10 dark:text-amber-300 border-amber-500/40 bg-amber-500/15 text-amber-700'
                   : 'border-surface-border bg-surface-base text-content-secondary'
             }`}
           >
@@ -271,9 +271,9 @@ function PayListRow({
               <span
                 className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
                   isUrgent
-                    ? 'bg-rose-500/10 text-rose-300'
+                    ? 'dark:bg-rose-500/10 dark:text-rose-300 bg-rose-500/15 text-rose-700'
                     : item.status === 'week'
-                      ? 'bg-amber-500/10 text-amber-300'
+                      ? 'dark:bg-amber-500/10 dark:text-amber-300 bg-amber-500/15 text-amber-700'
                       : 'bg-content-primary/[0.06] text-content-secondary'
                 }`}
               >
@@ -719,8 +719,8 @@ export default function Dashboard() {
               </section>
 
               {unscheduledItems.length > 0 && (
-                <section className="border border-amber-500/25 p-4">
-                  <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-amber-300">
+                <section className="dark:border-amber-500/25 border-amber-500/40 p-4">
+                  <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest dark:text-amber-300 text-amber-700">
                     <CalendarDays className="h-4 w-4" aria-hidden />
                     Missing due dates
                   </p>
@@ -729,7 +729,7 @@ export default function Dashboard() {
                   </p>
                   <TransitionLink
                     to="/pro/bills?tab=debt"
-                    className="mt-4 inline-flex min-h-9 items-center justify-center border border-amber-500/25 px-3 py-1.5 text-xs font-medium text-amber-200 focus-app"
+                    className="mt-4 inline-flex min-h-9 items-center justify-center dark:border-amber-500/25 border-amber-500/40 px-3 py-1.5 text-xs font-medium dark:text-amber-300 text-amber-700 focus-app"
                   >
                     Add due dates
                   </TransitionLink>

@@ -413,24 +413,24 @@ export default function Obligations() {
             <DebtIcon className="w-3.5 h-3.5" />
             <span className="metric-label normal-case text-[11px]">Total debt</span>
           </div>
-          <p className="text-2xl font-mono text-amber-400 font-bold">${activePrincipal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+          <p className="text-2xl font-mono dark:text-amber-400 text-amber-600 font-bold">${activePrincipal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
-        <div className={`bg-surface-elevated border p-5 rounded-lg relative overflow-hidden ${urgentTotal > 0 ? 'border-rose-500/50' : 'border-surface-border'}`}>
-          {urgentTotal > 0 && <div className="absolute inset-0 bg-rose-500/3" />}
+        <div className={`bg-surface-elevated border p-5 rounded-lg relative overflow-hidden ${urgentTotal > 0 ? 'dark:border-rose-500/50 border-rose-500/60' : 'border-surface-border'}`}>
+          {urgentTotal > 0 && <div className="absolute inset-0 dark:bg-rose-500/3 bg-rose-500/5" />}
           <div className="flex items-center gap-2 text-content-tertiary mb-3 relative z-10">
-            <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+            <AlertTriangle className="w-3.5 h-3.5 dark:text-rose-400 text-rose-600" />
             <span className="metric-label normal-case text-[11px]">Urgent tickets</span>
-            {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold text-rose-400 border border-rose-500/50 px-1 rounded-lg ml-auto">{urgentCitations.length} DUE</span>}
+            {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold dark:text-rose-400 text-rose-600 dark:border-rose-500/50 border-rose-500/60 px-1 rounded-lg ml-auto">{urgentCitations.length} DUE</span>}
           </div>
-          <p className={`text-2xl font-mono font-bold relative z-10 ${urgentTotal > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+          <p className={`text-2xl font-mono font-bold relative z-10 ${urgentTotal > 0 ? 'dark:text-rose-400 text-rose-600' : 'dark:text-emerald-400 text-emerald-600'}`}>
             ${urgentTotal.toFixed(2)}
           </p>
         </div>
       </div>
 
       {isLowBalanceWeekRisk && (
-        <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-4">
-          <p className="text-sm font-medium text-rose-200">
+        <div className="rounded-lg dark:border-rose-500/30 border-rose-500/40 dark:bg-rose-500/10 bg-rose-500/15 p-4">
+          <p className="text-sm font-medium dark:text-rose-300 text-rose-700">
             Low-balance warning: ${liquidCash.toFixed(0)} cash vs ${weekAheadDueTotal.toFixed(0)} due in the next 7 days.
           </p>
           <div className="mt-2 flex flex-wrap gap-3 text-xs">
@@ -453,8 +453,8 @@ export default function Obligations() {
       )}
 
       {billAmountChanges.size > 0 && (
-        <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
-          <p className="text-sm font-medium text-amber-200">
+        <div className="rounded-lg dark:border-amber-500/30 border-amber-500/40 dark:bg-amber-500/10 bg-amber-500/15 p-4">
+          <p className="text-sm font-medium dark:text-amber-300 text-amber-700">
             {billAmountChanges.size} bill {billAmountChanges.size === 1 ? 'has' : 'have'} increased based on recent charges.
           </p>
           <p className="mt-1 text-xs text-content-secondary">
@@ -480,7 +480,7 @@ export default function Obligations() {
                     </p>
                     <p className="mt-1 text-xs text-content-tertiary">{suggestion.action}</p>
                   </div>
-                  <span className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-mono text-emerald-300">
+                  <span className="rounded-lg dark:border-emerald-500/30 border-emerald-500/40 dark:bg-emerald-500/10 bg-emerald-500/15 px-2 py-1 text-xs font-mono dark:text-emerald-300 text-emerald-700">
                     Est. save ${suggestion.estimatedMonthlySavings.toFixed(0)}/mo
                   </span>
                 </div>
@@ -544,8 +544,8 @@ export default function Obligations() {
           }
         >
           <div className="p-0">
-            <div className="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3">
-              <p className="text-sm font-medium text-emerald-200">
+            <div className="mb-4 rounded-lg dark:border-emerald-500/30 border-emerald-500/40 dark:bg-emerald-500/10 bg-emerald-500/15 p-3">
+              <p className="text-sm font-medium dark:text-emerald-300 text-emerald-700">
                 Debt progress milestone: {unlockedMilestone > 0 ? `${unlockedMilestone}% unlocked` : 'Starting strong'}.
               </p>
               <p className="mt-1 text-xs text-content-secondary">
@@ -609,9 +609,9 @@ export default function Obligations() {
                   </p>
                 )}
               </div>
-              <div className="bg-surface-elevated border border-emerald-500/20 rounded-lg p-4">
+              <div className="bg-surface-elevated border dark:border-emerald-500/20 border-emerald-500/30 rounded-lg p-4">
                 <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Saved</p>
-                <p className="text-lg font-mono font-bold text-emerald-400">${interestSaved.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                <p className="text-lg font-mono font-bold dark:text-emerald-400 text-emerald-600">${interestSaved.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                 <p className="text-[10px] font-mono text-content-muted">vs. minimum payments only</p>
               </div>
             </div>
@@ -782,8 +782,8 @@ export default function Obligations() {
                     key={ob.id} 
                     className={cn(
                       'hover:bg-surface-highlight transition-colors',
-                      overdueBand === 'warn' && 'bg-amber-500/[0.08] border-l-[3px] border-l-amber-500',
-                      overdueBand === 'critical' && 'bg-rose-500/[0.1] border-l-[3px] border-l-rose-500',
+                      overdueBand === 'warn' && 'dark:bg-amber-500/[0.08] dark:border-l-amber-500 bg-amber-500/[0.12] border-l-[3px] border-l-amber-500/60',
+                      overdueBand === 'critical' && 'dark:bg-rose-500/[0.1] dark:border-l-rose-500 bg-rose-500/[0.15] border-l-[3px] border-l-rose-500/60',
                     )}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">

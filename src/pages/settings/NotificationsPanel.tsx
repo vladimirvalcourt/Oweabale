@@ -132,7 +132,7 @@ function NotificationsPanelInner() {
           <p className="mb-4 text-xs font-medium text-content-muted">Your browser does not support web push.</p>
         )}
         {isWebPushSupported() && !vapidConfigured && (
-          <p className="mb-4 text-xs font-medium leading-relaxed text-amber-700 dark:text-amber-400/90">
+          <p className="mb-4 text-xs font-medium leading-relaxed dark:text-amber-400/90 text-amber-700">
             Web push is not configured yet (add{' '}
             <code className="rounded-md border border-surface-border bg-surface-raised px-1.5 py-0.5 font-mono text-[11px] text-content-primary">
               VITE_VAPID_PUBLIC_KEY
@@ -202,7 +202,7 @@ function NotificationsPanelInner() {
                       setWebPushReady(false);
                       toast.success('Browser push disabled on this device');
                     }}
-                    className="inline-flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-4 py-2 text-sm font-medium text-rose-700 transition-colors hover:bg-rose-500/20 disabled:opacity-60 dark:text-rose-300"
+                    className="inline-flex items-center gap-2 rounded-lg dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300 border-rose-500/40 bg-rose-500/15 text-rose-700 px-4 py-2 text-sm font-medium transition-colors hover:bg-rose-500/20 disabled:opacity-60"
                   >
                     Turn off
                   </button>
