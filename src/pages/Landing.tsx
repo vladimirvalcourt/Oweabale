@@ -1,7 +1,9 @@
+import { useEffect, useRef } from 'react';
 import { ArrowRight, Check, CircleDollarSign, Clock3, Layers3, ShieldCheck } from 'lucide-react';
 import { Footer, PublicHeader } from '../components/layout';
 import { TransitionLink } from '../components/common';
 import { useAuth, useSEO } from '../hooks';
+import gsap from 'gsap';
 
 const proofPoints = ['Bills', 'Debt', 'Subscriptions', 'Tolls', 'Tickets', 'Taxes'];
 
@@ -51,6 +53,38 @@ const activityRows = [
 ];
 
 function ProductPreview() {
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    // Create a timeline for the "ghost clicking" sequence
+    const tl = gsap.timeline({ repeat: -1, repeatDelay: 2 });
+
+    cardRefs.current.forEach((card, index) => {
+      if (!card) return;
+
+      // Animate the card/row being pressed (click down)
+      tl.to(card, {
+        scale: 0.98,
+        opacity: 0.85,
+        duration: 0.1,
+        ease: "power2.in",
+      })
+      .to(card, {
+        scale: 1,
+        opacity: 1,
+        duration: 0.35,
+        ease: "elastic.out(1, 0.5)",
+      }, "+=0.05")
+      
+      // Add a small pause between clicks for realism
+      .to({}, { duration: 0.8 });
+    });
+
+    return () => {
+      tl.kill();
+    };
+  }, []);
+
   return (
     <div className="relative mx-auto max-w-[1320px] overflow-hidden rounded-[10px] border border-surface-border bg-white/[0.018] shadow-[inset_0_1px_0_rgba(255,255,255,0.035),0_40px_160px_rgba(0,0,0,0.5)]">
       <div className="flex h-12 items-center justify-between border-b border-surface-border-subtle bg-surface-raised/70 px-5">
@@ -99,8 +133,12 @@ function ProductPreview() {
           </div>
 
           <div className="divide-y divide-white/[0.06] rounded-[8px] border border-surface-border-subtle bg-surface-base/50">
-            {payListRows.map((row) => (
-              <div key={row.label} className="grid grid-cols-[1fr_auto] gap-4 px-4 py-4 sm:grid-cols-[1fr_auto_auto_auto]">
+            {payListRows.map((row, index) => (
+              <div 
+                key={row.label} 
+                ref={(el) => { cardRefs.current[index] = el; }}
+                className="grid grid-cols-[1fr_auto] gap-4 px-4 py-4 sm:grid-cols-[1fr_auto_auto_auto] transition-all"
+              >
                 <div>
                   <p className="text-sm font-medium text-content-primary">{row.label}</p>
                   <p className="text-xs text-content-muted">Due {row.due}</p>
@@ -117,8 +155,12 @@ function ProductPreview() {
           <div className="mt-8">
             <p className="mb-3 text-sm font-medium text-content-primary">Activity</p>
             <div className="space-y-3">
-              {activityRows.map((row) => (
-                <div key={row.name} className="flex items-center gap-3 text-sm">
+              {activityRows.map((row, index) => (
+                <div 
+                  key={row.name} 
+                  ref={(el) => { cardRefs.current[payListRows.length + index] = el; }}
+                  className="flex items-center gap-3 text-sm transition-all"
+                >
                   <img
                     src={row.image}
                     alt={`${row.name} avatar`}
