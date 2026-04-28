@@ -26,7 +26,6 @@ export default function AdminApp() {
         <Route path="reports" element={<AdminPermissionGate permission="dashboard.view"><AdminReportsPage /></AdminPermissionGate>} />
         <Route path="compliance" element={<AdminPermissionGate permission="compliance.read"><AdminCompliancePage /></AdminPermissionGate>} />
         <Route path="telemetry" element={<AdminPermissionGate permission="telemetry.read"><AdminTelemetryPage /></AdminPermissionGate>} />
-        {/* ADD 7 + 6: New billing/marketing tools */}
         <Route path="email-blast" element={<AdminPermissionGate permission="moderation.manage"><AdminEmailBlastPage /></AdminPermissionGate>} />
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Route>

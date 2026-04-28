@@ -14,6 +14,8 @@ import { toast } from 'sonner';
 import { supabase } from '../../../lib/api/supabase';
 import { useAdminPermissions } from '../shared';
 import { useMemo } from 'react';
+import { AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminDangerButtonClass, adminInputClass } from '../shared/AdminUI';
+import { cn } from '../../../lib/utils';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -92,11 +94,11 @@ function StatusBadge({ status }: { status: string }) {
   const s = status.toLowerCase();
   const cls =
     s === 'active'
-      ? 'text-emerald-300 border-emerald-500/30'
+      ? 'text-emerald-700 border-emerald-500/30 dark:text-emerald-200'
       : s === 'trialing'
-        ? 'text-sky-300 border-sky-500/30'
+        ? 'text-sky-700 border-sky-500/30 dark:text-sky-200'
         : s === 'past_due'
-          ? 'text-amber-300 border-amber-500/30'
+          ? 'text-amber-700 border-amber-500/30 dark:text-amber-200'
           : 'text-content-muted border-surface-border';
   return (
     <span className={`inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium ${cls}`}>{status}</span>
@@ -113,7 +115,6 @@ export default function AdminCaseFilePage() {
 
   // UUID lookup
   const [lookupDraft, setLookupDraft] = useState('');
-  // ADD 4: Email lookup
   const [emailDraft, setEmailDraft] = useState('');
   const [emailSearchLoading, setEmailSearchLoading] = useState(false);
   const [emailSearchError, setEmailSearchError] = useState<string | null>(null);
@@ -221,7 +222,6 @@ export default function AdminCaseFilePage() {
     navigate(`/admin/user/${id}`);
   };
 
-  // ADD 4: Email search handler
   const handleEmailSearch = async () => {
     const email = emailDraft.trim().toLowerCase();
     if (!email) {
@@ -289,7 +289,6 @@ export default function AdminCaseFilePage() {
             Open case file
           </button>
 
-          {/* ADD 4: Email search */}
           <div className="mt-5 border-t border-surface-border pt-4">
             <p className="mb-2 text-[11px] font-medium text-content-tertiary uppercase tracking-wide">Or search by email</p>
             <div className="flex gap-2">
@@ -311,7 +310,7 @@ export default function AdminCaseFilePage() {
               </button>
             </div>
             {emailSearchError ? (
-              <p className="mt-1 text-xs text-rose-300">{emailSearchError}</p>
+              <p className="mt-1 text-xs text-rose-700 dark:text-rose-200">{emailSearchError}</p>
             ) : null}
           </div>
 
@@ -327,7 +326,7 @@ export default function AdminCaseFilePage() {
   if (!validUser) {
     return (
       <section className="mx-auto max-w-xl px-4 py-8 sm:px-6 lg:px-8">
-        <p className="text-sm text-rose-300">Invalid user id in URL.</p>
+        <p className="text-sm text-rose-700 dark:text-rose-200">Invalid user id in URL.</p>
         <Link to="/admin/user" className="mt-3 inline-block text-xs text-brand-cta hover:underline">
           ← Back to lookup
         </Link>
@@ -336,48 +335,52 @@ export default function AdminCaseFilePage() {
   }
 
   return (
-    <section className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+    <section className="mx-auto max-w-[92rem] space-y-5 px-4 py-5 sm:px-6 lg:px-8">
+      <AdminPageHeader
+        eyebrow="Users"
+        title="Operator case file"
+        description="Consolidated account investigation for support, security, billing, Plaid, and compliance. Controlled actions stay isolated and audited."
+        actions={
+          <>
           <Link
             to="/admin/user"
-            className="interactive-focus mb-2 inline-flex items-center gap-1 text-[11px] text-content-tertiary hover:text-content-secondary"
+            className={cn(adminButtonClass, 'py-1.5')}
           >
             <ArrowLeft className="h-3.5 w-3.5" /> User lookup
           </Link>
-          <h1 className="text-lg font-semibold text-content-primary">Operator case file</h1>
-          <p className="mt-1 max-w-2xl text-xs text-content-tertiary">
-            Consolidated view for support and incidents. Links below jump to other admin tools; impersonation opens a
-            one-time magic link (new tab) and is logged with your reason.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
           <Link
             to="/admin"
-            className="interactive-press interactive-focus inline-flex items-center gap-1 border border-surface-border px-3 py-1.5 text-[11px] text-content-secondary"
+            className={cn(adminButtonClass, 'py-1.5')}
           >
             <Shield className="h-3.5 w-3.5" /> Overview & controls
           </Link>
           <Link
             to="/admin/sessions"
-            className="interactive-press interactive-focus border border-surface-border px-3 py-1.5 text-[11px] text-content-secondary"
+            className={cn(adminButtonClass, 'py-1.5')}
           >
             Sessions
           </Link>
           <Link
             to="/admin/compliance"
-            className="interactive-press interactive-focus border border-surface-border px-3 py-1.5 text-[11px] text-content-secondary"
+            className={cn(adminButtonClass, 'py-1.5')}
           >
             Compliance
           </Link>
           <Link
             to="/admin/telemetry"
-            className="interactive-press interactive-focus border border-surface-border px-3 py-1.5 text-[11px] text-content-secondary"
+            className={cn(adminButtonClass, 'py-1.5')}
           >
             Telemetry
           </Link>
-        </div>
-      </div>
+          </>
+        }
+        metrics={[
+          { label: 'Status', value: detail?.profile?.is_banned ? 'Banned' : 'Active', tone: detail?.profile?.is_banned ? 'danger' : 'good' },
+          { label: 'Admin', value: detail?.profile?.is_admin ? 'Yes' : 'No', tone: detail?.profile?.is_admin ? 'warn' : 'default' },
+          { label: 'Entitlements', value: detail?.entitlements?.length ?? '—' },
+          { label: 'Risk', value: detail?.compliance?.risk_score ?? '—', tone: (detail?.compliance?.risk_score ?? 0) >= 75 ? 'danger' : 'default' },
+        ]}
+      />
 
       {detailQuery.isLoading || timelineQuery.isLoading ? (
         <div className="flex items-center gap-2 border border-surface-border p-8 text-xs text-content-muted">
@@ -393,19 +396,17 @@ export default function AdminCaseFilePage() {
 
       {!detailQuery.isLoading && detail?.profile ? (
         <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
-          <div className="space-y-1 border border-surface-border p-5">
+          <AdminPanel>
+            <div className="sticky top-0 z-10 -mx-0 border-b border-surface-border bg-surface-raised/95 p-5">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-base font-semibold text-content-primary">{detail.profile.email ?? '(no email)'}</span>
               {detail.profile.is_admin ? (
-                <span className="rounded border border-surface-border px-1.5 py-0.5 text-[10px] text-content-secondary">
-                  Admin
-                </span>
+                <AdminStatusBadge tone="warn">Admin</AdminStatusBadge>
               ) : null}
               {detail.profile.is_banned ? (
-                <span className="rounded border border-rose-500/40 px-1.5 py-0.5 text-[10px] text-rose-200">
-                  Banned
-                </span>
+                <AdminStatusBadge tone="danger">Banned</AdminStatusBadge>
               ) : null}
+              {detail.profile.has_completed_onboarding ? <AdminStatusBadge tone="good">Onboarded</AdminStatusBadge> : <AdminStatusBadge>Setup open</AdminStatusBadge>}
             </div>
             <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-content-muted">
               <span className="max-w-full truncate" title={detail.profile.id}>
@@ -423,6 +424,8 @@ export default function AdminCaseFilePage() {
               </button>
             </div>
             <p className="text-xs text-content-tertiary">Member since {fmtDate(detail.profile.created_at)}</p>
+            </div>
+            <div className="space-y-1 p-5">
 
             {isSuperAdmin ? (
               <div className="mt-4 border border-amber-500/35 p-3">
@@ -436,7 +439,7 @@ export default function AdminCaseFilePage() {
                   onChange={(e) => setImpersonationReason(e.target.value)}
                   rows={2}
                   placeholder="Reason (min. 8 characters, stored in audit log)"
-                  className="focus-app-field mt-2 w-full border border-surface-border p-2 text-xs text-content-secondary"
+                  className={cn(adminInputClass, 'mt-2 w-full text-content-secondary')}
                 />
                 <div className="mt-2 flex flex-wrap gap-2">
                   <button
@@ -450,7 +453,7 @@ export default function AdminCaseFilePage() {
                       if (!window.confirm('Open a magic link to sign in as this user in a new tab?')) return;
                       impersonateMutation.mutate();
                     }}
-                    className="interactive-press inline-flex items-center gap-1 border border-amber-500/50 px-3 py-1.5 text-[11px] font-semibold text-amber-100 disabled:opacity-40"
+                    className="interactive-press inline-flex items-center gap-1 border border-amber-500/50 bg-amber-500/10 px-3 py-1.5 text-[11px] font-semibold text-amber-700 disabled:opacity-40 dark:text-amber-100"
                   >
                     {impersonateMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
                     Impersonate (magic link)
@@ -462,7 +465,7 @@ export default function AdminCaseFilePage() {
                       if (!window.confirm('Revoke all Supabase sessions for this user globally?')) return;
                       revokeSessionsMutation.mutate();
                     }}
-                    className="danger-button border border-rose-500/50 px-3 py-1.5 text-[11px] font-semibold text-rose-100 disabled:opacity-40"
+                    className={cn(adminDangerButtonClass, 'py-1.5 text-[11px]')}
                   >
                     {revokeSessionsMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                     Revoke sessions
@@ -525,7 +528,7 @@ export default function AdminCaseFilePage() {
                   <li key={i} className="border border-surface-border p-2">
                     <span className="font-medium text-content-primary">{it.institution_name ?? 'Institution'}</span>
                     {it.item_login_required ? (
-                      <span className="ml-2 text-amber-300">Needs relink</span>
+                      <span className="ml-2 text-amber-700 dark:text-amber-200">Needs relink</span>
                     ) : null}
                     {it.last_sync_error ? (
                       <span className="mt-1 block text-rose-200/90">{String(it.last_sync_error)}</span>
@@ -576,9 +579,10 @@ export default function AdminCaseFilePage() {
                 ))}
               </ul>
             )}
-          </div>
+            </div>
+          </AdminPanel>
 
-          <aside className="space-y-3 border border-surface-border p-4 text-xs text-content-secondary">
+          <aside className="space-y-3 border border-surface-border bg-surface-raised/60 p-4 text-xs text-content-secondary">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Runbooks</p>
             <ul className="list-inside list-disc space-y-1 text-[11px] text-content-muted">
               <li>Plaid relink: confirm item_login_required, then user reconnects from app.</li>

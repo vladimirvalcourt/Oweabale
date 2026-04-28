@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronRight, Monitor, Smartphone } from 'lucide-react';
 import { supabase } from '../../../lib/api/supabase';
 import { useAdminPermissions } from '../shared';
+import { AdminPageHeader, AdminPanel, AdminStatusBadge, adminDangerButtonClass } from '../shared/AdminUI';
 
 type SessionUser = {
   id: string;
@@ -71,7 +72,6 @@ export default function AdminSessionsPage() {
     },
   });
 
-  // ADD 8: Load user_sessions table for IP/device info
   const { data: sessionRows = [] } = useQuery({
     queryKey: ['admin', 'sessions', 'device-info'],
     queryFn: async () => {
@@ -93,6 +93,8 @@ export default function AdminSessionsPage() {
   }, {});
 
   const canManageSessions = hasPermission('users.manage');
+  const activeSessionCount = sessionRows.filter((row) => !row.revoked_at).length;
+  const usersWithSessions = Object.keys(sessionsByUser).length;
 
   async function revokeSessions(userId: string) {
     if (!canManageSessions) return;
@@ -118,19 +120,22 @@ export default function AdminSessionsPage() {
   }
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold text-content-primary">Session Management</h1>
-          <p className="mt-1 text-xs text-content-tertiary">
-            Active user sessions with IP address, device, and browser context.
-          </p>
-        </div>
-      </div>
-      {!canManageSessions ? <p className="mb-4 text-xs text-amber-300">You do not have permission to revoke sessions.</p> : null}
-      <div className="border border-surface-border">
+    <section className="mx-auto max-w-[92rem] space-y-5 px-4 py-5 sm:px-6 lg:px-8">
+      <AdminPageHeader
+        eyebrow="Users"
+        title="Security sessions"
+        description="Inspect user sign-in context, device hints, and revoke sessions through the existing admin action."
+        metrics={[
+          { label: 'Users loaded', value: users.length },
+          { label: 'Active sessions', value: activeSessionCount },
+          { label: 'Users with devices', value: usersWithSessions },
+          { label: 'Permission', value: canManageSessions ? 'Can revoke' : 'Read only', tone: canManageSessions ? 'good' : 'warn' },
+        ]}
+      />
+      {!canManageSessions ? <p className="mb-4 text-xs text-amber-700 dark:text-amber-200">You do not have permission to revoke sessions.</p> : null}
+      <AdminPanel title="Session inventory" description="Device data comes from the app-tracked user_sessions table and may differ from provider-side auth sessions.">
         {isLoading ? <p className="p-4 text-xs text-content-muted">Loading sessions...</p> : null}
-        {error ? <p className="p-4 text-xs text-rose-300">Failed to load user sessions.</p> : null}
+        {error ? <p className="p-4 text-xs text-rose-700 dark:text-rose-200">Failed to load user sessions.</p> : null}
         {!isLoading && !error && users.length === 0 ? <p className="p-4 text-xs text-content-muted">No sessions found.</p> : null}
         {!isLoading && !error && users.length > 0 ? (
           <div className="max-h-[70vh] overflow-auto">
@@ -193,13 +198,15 @@ export default function AdminSessionsPage() {
                           {browser !== 'Unknown' ? browser : '—'} / {os !== 'Unknown' ? os : '—'}
                         </td>
                         <td className="px-3 py-2 text-content-secondary">{userSessions.length}</td>
-                        <td className="px-3 py-2 text-content-tertiary">{u.banned_until ? 'Banned' : 'Active'}</td>
+                        <td className="px-3 py-2 text-content-tertiary">
+                          <AdminStatusBadge tone={u.banned_until ? 'danger' : 'good'}>{u.banned_until ? 'Banned' : 'Active'}</AdminStatusBadge>
+                        </td>
                         <td className="px-3 py-2">
                           <button
                             type="button"
                             disabled={!canManageSessions || revokingUserId === u.id}
                             onClick={() => void revokeSessions(u.id)}
-                            className="border border-rose-500/40 px-2.5 py-1.5 text-[11px] text-rose-300 disabled:opacity-40"
+                            className={adminDangerButtonClass}
                           >
                             {revokingUserId === u.id ? 'Revoking...' : 'Revoke sessions'}
                           </button>
@@ -220,7 +227,7 @@ export default function AdminSessionsPage() {
                                     {sess.browser ?? parseBrowser(sess.user_agent)} / {sess.os ?? parseOS(sess.user_agent)}
                                   </span>
                                   {sess.revoked_at ? (
-                                    <span className="text-rose-300">Revoked</span>
+                                    <span className="text-rose-700 dark:text-rose-200">Revoked</span>
                                   ) : (
                                     <span className="text-emerald-400">Active</span>
                                   )}
@@ -237,7 +244,7 @@ export default function AdminSessionsPage() {
             </table>
           </div>
         ) : null}
-      </div>
+      </AdminPanel>
     </section>
   );
 }

@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../../../lib/api/supabase';
 import { useAdminPermissions } from '../shared';
+import { AdminPageHeader, AdminPanel, AdminStatusBadge, adminDangerButtonClass } from '../shared/AdminUI';
 
 type ComplianceStatusRow = {
   user_id: string;
@@ -73,52 +75,33 @@ export default function AdminCompliancePage() {
   };
 
   return (
-    <section className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
-      <header className="border border-surface-border p-4 sm:p-5">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <h1 className="text-lg font-semibold text-content-primary">Compliance Command Center</h1>
-            <p className="mt-1 text-xs text-content-tertiary">
-              Monitor KYC/AML risk and investigate flagged activity from one workflow.
-            </p>
-          </div>
+    <section className="mx-auto max-w-[92rem] space-y-5 px-4 py-5 sm:px-6 lg:px-8">
+      <AdminPageHeader
+        eyebrow="Governance"
+        title="Compliance command center"
+        description="Monitor KYC/AML risk, sanctions indicators, and flagged activity using the existing compliance overview action."
+        actions={
           <button
             type="button"
             disabled={!canManage || refreshingPlaid}
             onClick={() => void triggerPlaidRefresh()}
-            className="danger-button border border-amber-500/40 px-3 py-2 text-xs font-medium text-amber-200 disabled:opacity-40"
+            className={adminDangerButtonClass}
           >
-            {refreshingPlaid ? 'Refreshing Plaid…' : 'Force-refresh stale Plaid items'}
+            {refreshingPlaid ? 'Refreshing Plaid...' : 'Force-refresh stale Plaid items'}
           </button>
-        </div>
-      </header>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="border border-surface-border p-4">
-          <p className="text-[11px] uppercase tracking-wide text-content-tertiary">KYC manual review</p>
-          <p className="mt-1 text-2xl font-semibold text-content-primary">{summary.kycManual}</p>
-        </div>
-        <div className="border border-surface-border p-4">
-          <p className="text-[11px] uppercase tracking-wide text-content-tertiary">AML flagged users</p>
-          <p className="mt-1 text-2xl font-semibold text-content-primary">{summary.amlFlagged}</p>
-        </div>
-        <div className="border border-rose-500/30 p-4">
-          <p className="text-[11px] uppercase tracking-wide text-rose-200">Critical flags open</p>
-          <p className="mt-1 text-2xl font-semibold text-content-primary">{summary.criticalFlags}</p>
-        </div>
-        <div className="border border-surface-border p-4">
-          <p className="text-[11px] uppercase tracking-wide text-content-tertiary">High risk users (75+)</p>
-          <p className="mt-1 text-2xl font-semibold text-content-primary">{summary.highRisk}</p>
-        </div>
-      </div>
+        }
+        metrics={[
+          { label: 'KYC manual', value: summary.kycManual, tone: summary.kycManual ? 'warn' : 'default' },
+          { label: 'AML flagged', value: summary.amlFlagged, tone: summary.amlFlagged ? 'danger' : 'default' },
+          { label: 'Critical flags', value: summary.criticalFlags, tone: summary.criticalFlags ? 'danger' : 'default' },
+          { label: 'High risk', value: summary.highRisk, tone: summary.highRisk ? 'warn' : 'default' },
+        ]}
+      />
 
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1.5fr_1fr]">
-        <div className="border border-surface-border">
-          <div className="border-b border-surface-border px-3 py-2">
-            <h2 className="text-sm font-semibold text-content-primary">Compliance Status Matrix</h2>
-          </div>
+        <AdminPanel title="Compliance status matrix" description="Use the case file link before escalating account-level action.">
           {isLoading ? <p className="p-4 text-xs text-content-muted">Loading compliance data…</p> : null}
-          {error ? <p className="p-4 text-xs text-rose-300">Failed to load compliance overview.</p> : null}
+          {error ? <p className="p-4 text-xs text-rose-700 dark:text-rose-200">Failed to load compliance overview.</p> : null}
           {!isLoading && !error && statuses.length === 0 ? <p className="p-4 text-xs text-content-muted">No compliance statuses returned.</p> : null}
           {!isLoading && !error && statuses.length > 0 ? (
             <div className="max-h-[60vh] overflow-auto">
@@ -131,18 +114,24 @@ export default function AdminCompliancePage() {
                     <th className="px-3 py-2">PEP/Sanctions</th>
                     <th className="px-3 py-2">Risk</th>
                     <th className="px-3 py-2">Last Checked</th>
+                    <th className="px-3 py-2">Case</th>
                   </tr>
                 </thead>
                 <tbody>
                   {statuses.map((row) => (
                     <tr key={row.user_id} className="border-t border-surface-border/50">
-                      <td className="px-3 py-2 text-content-secondary">{row.user_id}</td>
-                      <td className="px-3 py-2 text-content-secondary">{row.kyc_status}</td>
-                      <td className="px-3 py-2 text-content-secondary">{row.aml_status}</td>
+                      <td className="px-3 py-2 font-mono text-[11px] text-content-secondary">{row.user_id}</td>
+                      <td className="px-3 py-2 text-content-secondary"><AdminStatusBadge tone={row.kyc_status === 'verified' ? 'good' : row.kyc_status === 'rejected' ? 'danger' : 'warn'}>{row.kyc_status}</AdminStatusBadge></td>
+                      <td className="px-3 py-2 text-content-secondary"><AdminStatusBadge tone={row.aml_status === 'clear' ? 'good' : row.aml_status === 'flagged' ? 'danger' : 'warn'}>{row.aml_status}</AdminStatusBadge></td>
                       <td className="px-3 py-2 text-content-secondary">{row.pep_sanctions_hit ? 'Yes' : 'No'}</td>
                       <td className="px-3 py-2 text-content-secondary">{row.risk_score}</td>
                       <td className="px-3 py-2 text-content-secondary">
                         {row.last_checked_at ? new Date(row.last_checked_at).toLocaleString() : '—'}
+                      </td>
+                      <td className="px-3 py-2">
+                        <Link to={`/admin/user/${row.user_id}`} className="text-[10px] font-semibold text-brand-cta hover:underline">
+                          Case file
+                        </Link>
                       </td>
                     </tr>
                   ))}
@@ -150,14 +139,11 @@ export default function AdminCompliancePage() {
               </table>
             </div>
           ) : null}
-        </div>
+        </AdminPanel>
 
-        <div className="border border-surface-border">
-          <div className="border-b border-surface-border px-3 py-2">
-            <h2 className="text-sm font-semibold text-content-primary">Flagged Activity Queue</h2>
-          </div>
+        <AdminPanel title="Flagged activity queue" description="Queue presentation only; backend workflow actions stay unchanged.">
           {isLoading ? <p className="p-4 text-xs text-content-muted">Loading flagged activity…</p> : null}
-          {error ? <p className="p-4 text-xs text-rose-300">Unable to load flagged activity.</p> : null}
+          {error ? <p className="p-4 text-xs text-rose-700 dark:text-rose-200">Unable to load flagged activity.</p> : null}
           {!isLoading && !error && flagged.length === 0 ? <p className="p-4 text-xs text-content-muted">No flagged items right now.</p> : null}
           {!isLoading && !error && flagged.length > 0 ? (
             <div className="max-h-[60vh] divide-y divide-surface-border overflow-auto">
@@ -182,11 +168,14 @@ export default function AdminCompliancePage() {
                     <span>Status: {item.status}</span>
                     <span>{new Date(item.created_at).toLocaleDateString()}</span>
                   </div>
+                  <Link to={`/admin/user/${item.user_id}`} className="inline-flex text-[10px] font-semibold text-brand-cta hover:underline">
+                    Open case file
+                  </Link>
                 </article>
               ))}
             </div>
           ) : null}
-        </div>
+        </AdminPanel>
       </div>
     </section>
   );

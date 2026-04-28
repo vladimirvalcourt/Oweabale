@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Download } from 'lucide-react';
+import { AlertTriangle, Download, ShieldCheck } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { getAdminActionErrorMessage } from '../../../lib/api/adminActions';
 import { supabase } from '../../../lib/api/supabase';
+import { AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminDangerButtonClass, adminInputClass } from '../shared/AdminUI';
+import { cn } from '../../../lib/utils';
 
 type EntityConfig = {
   key: string;
@@ -64,7 +66,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     editableColumns: ['title', 'content', 'type'],
     defaultOrder: 'created_at',
   },
-  // ADD 10: New financial data tables
   {
     key: 'Bills',
     table: 'bills',
@@ -134,6 +135,7 @@ export default function AdminDataTablesPage() {
   const [plaidFilter, setPlaidFilter] = useState<'any' | 'healthy' | 'error' | 'relink'>('any');
   const [editingRow, setEditingRow] = useState<Record<string, unknown> | null>(null);
   const [draftEdit, setDraftEdit] = useState<Record<string, unknown>>({});
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const qc = useQueryClient();
 
   const config = useMemo(() => ENTITY_CONFIGS.find((c) => c.key === activeKey) ?? ENTITY_CONFIGS[0], [activeKey]);
@@ -183,7 +185,6 @@ export default function AdminDataTablesPage() {
   const selectedOnPageCount = allPageRowIds.filter((id) => selectedIds.includes(id)).length;
   const allVisibleSelected = allPageRowIds.length > 0 && selectedOnPageCount === allPageRowIds.length;
   const profilesView = config.table === 'profiles';
-  // ADD 10: show case file link for any table with user_id column
   const hasUserIdColumn = config.columns.includes('user_id');
 
   const handleExportCsv = () => {
@@ -203,10 +204,18 @@ export default function AdminDataTablesPage() {
 
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) return;
+    if (deleteConfirmText !== config.table) {
+      toast.error(`Type ${config.table} in the danger zone before deleting rows.`);
+      return;
+    }
     if (!window.confirm(`Delete ${selectedIds.length} selected rows from ${config.table}?`)) return;
     const { error: deleteError } = await supabase.from(config.table as never).delete().in(config.primaryKey, selectedIds);
-    if (deleteError) return;
+    if (deleteError) {
+      toast.error(deleteError.message);
+      return;
+    }
     setSelectedIds([]);
+    setDeleteConfirmText('');
     await qc.invalidateQueries({ queryKey: ['admin', 'entity-table'] });
   };
 
@@ -256,44 +265,31 @@ export default function AdminDataTablesPage() {
       .from(config.table as never)
       .update(draftEdit as never)
       .eq(config.primaryKey, rowId);
-    if (updateError) return;
+    if (updateError) {
+      toast.error(updateError.message);
+      return;
+    }
+    toast.success('Row updated.');
     setEditingRow(null);
     setDraftEdit({});
     await qc.invalidateQueries({ queryKey: ['admin', 'entity-table'] });
   };
 
   return (
-    <section className="mx-auto max-w-7xl space-y-4 px-4 py-6 sm:px-6 lg:px-8">
-      <header className="border border-surface-border p-4 sm:p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <h1 className="text-lg font-semibold text-content-primary">Entity Data Tables</h1>
-            <p className="mt-1 text-xs text-content-tertiary">
-              Browse operational data, apply scoped filters, and run targeted row actions.
-            </p>
-          </div>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <div className="border border-surface-border px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Active table</p>
-              <p className="mt-1 text-sm font-semibold text-content-primary">{config.key}</p>
-            </div>
-            <div className="border border-surface-border px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Rows loaded</p>
-              <p className="mt-1 text-sm font-semibold text-content-primary">{rows.length}</p>
-            </div>
-            <div className="border border-surface-border px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Selected</p>
-              <p className="mt-1 text-sm font-semibold text-content-primary">{selectedIds.length}</p>
-            </div>
-            <div className="border border-surface-border px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wide text-content-tertiary">Page</p>
-              <p className="mt-1 text-sm font-semibold text-content-primary">{page + 1}</p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <section className="mx-auto max-w-[92rem] space-y-5 px-4 py-5 sm:px-6 lg:px-8">
+      <AdminPageHeader
+        eyebrow="Data"
+        title="Data explorer"
+        description="Read-first access to operational tables. Edits move through a side panel and destructive bulk actions stay in a danger zone."
+        metrics={[
+          { label: 'Active table', value: config.key },
+          { label: 'Rows loaded', value: rows.length },
+          { label: 'Selected', value: selectedIds.length, tone: selectedIds.length ? 'warn' : 'default' },
+          { label: 'Page', value: page + 1 },
+        ]}
+      />
 
-      <div className="border border-surface-border p-3">
+      <AdminPanel title="Tables" description="Switching tables clears selection to avoid accidental cross-table actions.">
         <div className="flex gap-2 overflow-x-auto pb-1">
           {ENTITY_CONFIGS.map((entity) => (
             <button
@@ -308,18 +304,19 @@ export default function AdminDataTablesPage() {
               }}
               className={`interactive-press interactive-focus shrink-0 border px-3 py-1.5 text-xs font-medium ${
                 activeKey === entity.key
-                  ? 'border-content-primary text-content-primary'
-                  : 'border-surface-border text-content-secondary hover:text-content-primary'
+                  ? 'border-content-primary bg-content-primary text-surface-base'
+                  : 'border-surface-border bg-surface-base text-content-secondary hover:text-content-primary'
               }`}
             >
               {entity.key}
             </button>
           ))}
         </div>
-      </div>
+      </AdminPanel>
 
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1fr_auto]">
-        <div className="border border-surface-border p-3 sm:p-4">
+        <AdminPanel title="Filters">
+          <div className="p-4">
           <p className="mb-3 text-[10px] uppercase tracking-wide text-content-tertiary">Filters</p>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {profilesView ? (
@@ -330,7 +327,7 @@ export default function AdminDataTablesPage() {
                     setPlanFilter(e.target.value as 'any' | 'free' | 'pro' | 'lifetime');
                     setPage(0);
                   }}
-                  className="focus-app-field border border-surface-border px-2 py-2 text-xs text-content-primary"
+                  className={adminInputClass}
                 >
                   <option value="any">Any plan</option>
                   <option value="free">Free</option>
@@ -343,7 +340,7 @@ export default function AdminDataTablesPage() {
                     setPlaidFilter(e.target.value as 'any' | 'healthy' | 'error' | 'relink');
                     setPage(0);
                   }}
-                  className="focus-app-field border border-surface-border px-2 py-2 text-xs text-content-primary"
+                  className={adminInputClass}
                 >
                   <option value="any">Any Plaid</option>
                   <option value="healthy">Healthy</option>
@@ -358,7 +355,7 @@ export default function AdminDataTablesPage() {
                 setPageSize(Number(e.target.value));
                 setPage(0);
               }}
-              className="focus-app-field border border-surface-border px-2 py-2 text-xs text-content-primary"
+              className={adminInputClass}
             >
               <option value={10}>10 rows / page</option>
               <option value={25}>25 rows / page</option>
@@ -368,18 +365,20 @@ export default function AdminDataTablesPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Filter current table..."
-              className="focus-app-field border border-surface-border px-3 py-2 text-xs text-content-primary sm:col-span-2 lg:col-span-1"
+              className={cn(adminInputClass, 'sm:col-span-2 lg:col-span-1')}
             />
           </div>
-        </div>
+          </div>
+        </AdminPanel>
 
-        <div className="border border-surface-border p-3 sm:p-4">
+        <AdminPanel title="Actions" description="Exports are safe. Bulk mutations are intentionally gated.">
+          <div className="p-4">
           <p className="mb-3 text-[10px] uppercase tracking-wide text-content-tertiary">Actions</p>
           <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleExportCsv}
-              className="interactive-press interactive-focus inline-flex items-center gap-1 border border-surface-border px-3 py-2 text-xs text-content-secondary hover:text-content-primary"
+              className={adminButtonClass}
             >
               <Download className="h-3.5 w-3.5" /> Export CSV
             </button>
@@ -388,29 +387,51 @@ export default function AdminDataTablesPage() {
                 <button
                   type="button"
                   onClick={() => void handleProfileBulkAction('ban')}
-                  className="danger-button border border-rose-500/40 px-3 py-2 text-xs text-rose-200"
+                  className={adminDangerButtonClass}
                 >
                   Ban selected
                 </button>
                 <button
                   type="button"
                   onClick={() => void handleProfileBulkAction('unban')}
-                  className="interactive-press interactive-focus border border-emerald-500/40 px-3 py-2 text-xs text-emerald-200"
+                  className="interactive-press interactive-focus border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-200"
                 >
                   Unban selected
                 </button>
               </>
             ) : null}
-            <button
-              type="button"
-              onClick={() => void handleBulkDelete()}
-              disabled={selectedIds.length === 0 || profilesView}
-              className="danger-button border border-rose-500/50 px-3 py-2 text-xs font-medium text-rose-100 disabled:opacity-40"
-            >
-              Delete selected
-            </button>
           </div>
-        </div>
+          {selectedIds.length > 0 && !profilesView ? (
+            <div className="mt-4 border border-rose-500/40 bg-rose-500/10 p-3">
+              <div className="flex items-start gap-2">
+                <AlertTriangle className="mt-0.5 h-4 w-4 text-rose-700 dark:text-rose-200" />
+                <div>
+                  <p className="text-xs font-semibold text-content-primary">Danger zone</p>
+                  <p className="mt-1 text-[11px] leading-5 text-content-secondary">
+                    Type <span className="font-mono text-content-primary">{config.table}</span> to unlock delete for {selectedIds.length} selected row(s).
+                  </p>
+                </div>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <input
+                  value={deleteConfirmText}
+                  onChange={(event) => setDeleteConfirmText(event.target.value)}
+                  className={cn(adminInputClass, 'min-w-48')}
+                  placeholder={config.table}
+                />
+                <button
+                  type="button"
+                  onClick={() => void handleBulkDelete()}
+                  disabled={deleteConfirmText !== config.table}
+                  className={adminDangerButtonClass}
+                >
+                  Delete selected
+                </button>
+              </div>
+            </div>
+          ) : null}
+          </div>
+        </AdminPanel>
       </div>
 
       <div className="border border-surface-border">
@@ -421,7 +442,7 @@ export default function AdminDataTablesPage() {
           <p>{selectedIds.length > 0 ? `${selectedIds.length} selected` : 'No rows selected'}</p>
         </div>
         {isLoading ? <p className="p-4 text-xs text-content-muted">Loading table...</p> : null}
-        {error ? <p className="p-4 text-xs text-rose-300">Failed to load {config.table}.</p> : null}
+        {error ? <p className="p-4 text-xs text-rose-700 dark:text-rose-200">Failed to load {config.table}.</p> : null}
         {!isLoading && !error && rows.length === 0 ? <p className="p-4 text-xs text-content-muted">No rows found for this query.</p> : null}
         {!isLoading && !error && rows.length > 0 ? (
           <div className="max-h-[70vh] overflow-auto">
@@ -501,8 +522,8 @@ export default function AdminDataTablesPage() {
                       <button
                         type="button"
                         onClick={() => openEdit(row)}
-                        className="interactive-press interactive-focus border border-surface-border px-2 py-1 text-[10px] text-content-tertiary"
-                      >
+                      className="interactive-press interactive-focus border border-surface-border bg-surface-base px-2 py-1 text-[10px] text-content-tertiary"
+                    >
                         Edit
                       </button>
                     </td>
@@ -540,9 +561,15 @@ export default function AdminDataTablesPage() {
       </div>
 
       {editingRow ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-xl rounded-xl border border-surface-border bg-surface-base p-4">
-            <h3 className="mb-3 text-sm font-semibold text-content-primary">Edit {config.key} Row</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 p-4">
+          <div className="h-full w-full max-w-xl overflow-auto border border-surface-border bg-surface-base p-4 shadow-2xl">
+            <div className="mb-4 flex items-start gap-3 border-b border-surface-border pb-4">
+              <ShieldCheck className="mt-0.5 h-4 w-4 text-content-tertiary" />
+              <div>
+                <h3 className="text-sm font-semibold text-content-primary">Edit {config.key} row</h3>
+                <p className="mt-1 text-xs leading-5 text-content-tertiary">Review the old and new values before saving. This writes directly to {config.table}.</p>
+              </div>
+            </div>
             <div className="space-y-2">
               {config.editableColumns.map((column) => (
                 <label key={column} className="block">
@@ -550,23 +577,34 @@ export default function AdminDataTablesPage() {
                   <input
                     value={String(draftEdit[column] ?? '')}
                     onChange={(e) => setDraftEdit((prev) => ({ ...prev, [column]: e.target.value }))}
-                    className="focus-app-field w-full border border-surface-border px-3 py-2 text-xs text-content-primary"
+                    className={cn(adminInputClass, 'w-full')}
                   />
+                  <span className="mt-1 block text-[10px] text-content-muted">Current: {String(editingRow[column] ?? '—')}</span>
                 </label>
               ))}
+            </div>
+            <div className="mt-4 border border-surface-border bg-surface-raised p-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-content-tertiary">Change summary</p>
+              <div className="mt-2 space-y-1 text-[11px] text-content-secondary">
+                {config.editableColumns.map((column) => (
+                  <p key={column}>
+                    <span className="font-mono text-content-tertiary">{column}</span>: {String(editingRow[column] ?? '—')} → {String(draftEdit[column] ?? '—')}
+                  </p>
+                ))}
+              </div>
             </div>
             <div className="mt-4 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={() => setEditingRow(null)}
-                className="interactive-press interactive-focus border border-surface-border px-3 py-2 text-xs text-content-secondary"
+                className={adminButtonClass}
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={() => void saveEdit()}
-                className="interactive-press interactive-focus border border-content-primary px-3 py-2 text-xs font-semibold text-content-primary"
+                className="interactive-press interactive-focus border border-content-primary bg-content-primary px-3 py-2 text-xs font-semibold text-surface-base"
               >
                 Save
               </button>

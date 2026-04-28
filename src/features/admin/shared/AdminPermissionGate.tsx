@@ -38,7 +38,7 @@ export function AdminPermissionGate({
     }
     return (
       <div className="mx-auto max-w-7xl px-4 py-6 space-y-3">
-        <p className="text-xs text-amber-300">
+        <p className="text-xs text-amber-700 dark:text-amber-200">
           Permission check timed out. Could not verify <code>{permission}</code>.
         </p>
         <button
@@ -54,7 +54,7 @@ export function AdminPermissionGate({
 
   if (!hasPermission(permission)) {
     return (
-      <p className="mx-auto max-w-7xl px-4 py-6 text-xs text-amber-300">
+      <p className="mx-auto max-w-7xl px-4 py-6 text-xs text-amber-700 dark:text-amber-200">
         You do not have permission for this section.
       </p>
     );

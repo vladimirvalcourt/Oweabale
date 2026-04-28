@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Download, FileText, TrendingUp, Users, Zap, BarChart3 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '../../../lib/api/supabase';
+import { AdminPageHeader, AdminPanel, adminButtonClass, adminInputClass } from '../shared/AdminUI';
 
 type ReportRow = {
   date: string;
@@ -23,9 +24,9 @@ type StatCardProps = { label: string; value: string | number; sub?: string; acce
 
 function StatCard({ label, value, sub, accent }: StatCardProps) {
   return (
-    <div className={`border p-3 ${accent ? 'border-content-primary' : 'border-surface-border'}`}>
-      <p className="text-[10px] uppercase tracking-wide text-content-tertiary">{label}</p>
-      <p className="mt-1 text-lg font-semibold text-content-primary">{value}</p>
+    <div className={`border bg-surface-base p-3 ${accent ? 'border-content-primary' : 'border-surface-border'}`}>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-content-tertiary">{label}</p>
+      <p className="mt-1 text-lg font-semibold tabular-nums text-content-primary">{value}</p>
       {sub ? <p className="mt-0.5 text-[11px] text-content-muted">{sub}</p> : null}
     </div>
   );
@@ -67,7 +68,6 @@ export default function AdminReportsPage() {
     },
   });
 
-  // ADD 11: Revenue metrics from payments table
   const { data: revenueMetrics } = useQuery({
     queryKey: ['admin', 'reports', 'revenue', fromDate, toDate],
     queryFn: async () => {
@@ -100,7 +100,6 @@ export default function AdminReportsPage() {
     },
   });
 
-  // ADD 11: Activation funnel
   const { data: funnelData } = useQuery({
     queryKey: ['admin', 'reports', 'funnel', fromDate, toDate],
     queryFn: async () => {
@@ -123,39 +122,22 @@ export default function AdminReportsPage() {
     },
   });
 
-  // ADD 11: Retention
   const { data: retentionData } = useQuery({
     queryKey: ['admin', 'reports', 'retention'],
     queryFn: async () => {
-      // Estimate from audit_log: ratio of users who had activity D+1, D+7, D+30 after signup
       const { data: recentSignups } = await supabase
         .from('profiles')
         .select('id, created_at')
         .order('created_at', { ascending: false })
         .limit(200);
 
-      if (!recentSignups?.length) return { d1: 0, d7: 0, d30: 0 };
-
-      const now = Date.now();
-      const eligible1 = recentSignups.filter((p) => now - new Date(p.created_at ?? 0).getTime() > 1 * 86400000);
-      const eligible7 = recentSignups.filter((p) => now - new Date(p.created_at ?? 0).getTime() > 7 * 86400000);
-      const eligible30 = recentSignups.filter((p) => now - new Date(p.created_at ?? 0).getTime() > 30 * 86400000);
-
-      // We approximate by checking if user has any bill/transaction after sign-up
-      // Actual D1/D7/D30 would require session logs but this is a reasonable proxy
-      const d1 = eligible1.length > 0 ? Math.round((eligible1.length * 0.62)) : 0;
-      const d7 = eligible7.length > 0 ? Math.round((eligible7.length * 0.38)) : 0;
-      const d30 = eligible30.length > 0 ? Math.round((eligible30.length * 0.22)) : 0;
-
       return {
-        d1: eligible1.length > 0 ? Math.round((d1 / eligible1.length) * 100) : 0,
-        d7: eligible7.length > 0 ? Math.round((d7 / eligible7.length) * 100) : 0,
-        d30: eligible30.length > 0 ? Math.round((d30 / eligible30.length) * 100) : 0,
+        sampleSize: recentSignups?.length ?? 0,
+        available: false,
       };
     },
   });
 
-  // ADD 11: Feature adoption
   const { data: adoptionData } = useQuery({
     queryKey: ['admin', 'reports', 'adoption', fromDate, toDate],
     queryFn: async () => {
@@ -248,24 +230,37 @@ export default function AdminReportsPage() {
     : [];
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-4">
-      {/* Date controls */}
-      <div className="flex flex-wrap items-end gap-3">
+    <section className="mx-auto max-w-[92rem] space-y-5 px-4 py-5 sm:px-6 lg:px-8">
+      <AdminPageHeader
+        eyebrow="Monitor"
+        title="Reports"
+        description="Operational reporting from current application tables. Estimated values are explicitly labeled and retention is not fabricated without cohort event data."
+        metrics={[
+          { label: 'Signups', value: totals.signups },
+          { label: 'Tickets', value: totals.tickets },
+          { label: 'Feedback', value: totals.feedback },
+          { label: 'Range', value: `${fromDate} to ${toDate}` },
+        ]}
+      />
+
+      <AdminPanel title="Report controls" description="Export the currently loaded operational rows. PDF export still uses the existing admin-reports function.">
+      <div className="flex flex-wrap items-end gap-3 p-4">
         <div>
           <label className="mb-1 block text-[10px] uppercase tracking-wider text-content-tertiary">From</label>
-          <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="focus-app-field border border-surface-border px-3 py-2 text-xs text-content-primary" />
+          <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className={adminInputClass} />
         </div>
         <div>
           <label className="mb-1 block text-[10px] uppercase tracking-wider text-content-tertiary">To</label>
-          <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="focus-app-field border border-surface-border px-3 py-2 text-xs text-content-primary" />
+          <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className={adminInputClass} />
         </div>
-        <button type="button" onClick={exportCsv} className="inline-flex items-center gap-1 border border-surface-border px-3 py-2 text-xs text-content-secondary">
+        <button type="button" onClick={exportCsv} className={adminButtonClass}>
           <Download className="h-3.5 w-3.5" /> CSV
         </button>
-        <button type="button" onClick={() => void exportPdf()} disabled={isExportingPdf} className="inline-flex items-center gap-1 border border-surface-border px-3 py-2 text-xs text-content-secondary disabled:opacity-40">
+        <button type="button" onClick={() => void exportPdf()} disabled={isExportingPdf} className={adminButtonClass}>
           <FileText className="h-3.5 w-3.5" /> {isExportingPdf ? 'PDF...' : 'PDF'}
         </button>
       </div>
+      </AdminPanel>
 
       {/* Section tabs */}
       <div className="flex gap-2 overflow-x-auto pb-1">
@@ -278,8 +273,8 @@ export default function AdminReportsPage() {
               onClick={() => setActiveSection(s.key)}
               className={`shrink-0 inline-flex items-center gap-1.5 border px-3 py-1.5 text-xs font-medium ${
                 activeSection === s.key
-                  ? 'border-content-primary text-content-primary'
-                  : 'border-surface-border text-content-secondary hover:text-content-primary'
+                  ? 'border-content-primary bg-content-primary text-surface-base'
+                  : 'border-surface-border bg-surface-base text-content-secondary hover:text-content-primary'
               }`}
             >
               <Icon className="h-3.5 w-3.5" />
@@ -300,7 +295,7 @@ export default function AdminReportsPage() {
 
           <div className="border border-surface-border">
             {isLoading ? <p className="p-4 text-xs text-content-muted">Loading report...</p> : null}
-            {error ? <p className="p-4 text-xs text-rose-300">Failed to load report data.</p> : null}
+            {error ? <p className="p-4 text-xs text-rose-700 dark:text-rose-200">Failed to load report data.</p> : null}
             {!isLoading && !error && rows.length === 0 ? <p className="p-4 text-xs text-content-muted">No data in selected range.</p> : null}
             {!isLoading && !error && rows.length > 0 ? (
               <div className="max-h-[60vh] overflow-auto">
@@ -330,7 +325,6 @@ export default function AdminReportsPage() {
         </>
       )}
 
-      {/* ADD 11 — Revenue section */}
       {activeSection === 'revenue' && (
         <div className="space-y-4">
           <h2 className="text-sm font-semibold text-content-primary">Revenue Metrics</h2>
@@ -346,13 +340,12 @@ export default function AdminReportsPage() {
           ) : (
             <p className="text-xs text-content-muted">Loading revenue data…</p>
           )}
-          <p className="text-[11px] text-content-muted">
-            MRR/ARR are estimates based on active subscription count × $17/mo average. Exact figures require Stripe API.
+          <p className="border border-amber-500/35 bg-amber-500/10 p-3 text-[11px] leading-5 text-content-secondary">
+            Estimated MRR/ARR are based on active subscription count x $17/mo average. Exact figures require Stripe source-of-truth amounts.
           </p>
         </div>
       )}
 
-      {/* ADD 11 — Activation Funnel section */}
       {activeSection === 'funnel' && (
         <div className="space-y-4">
           <h2 className="text-sm font-semibold text-content-primary">Activation Funnel</h2>
@@ -401,18 +394,17 @@ export default function AdminReportsPage() {
         </div>
       )}
 
-      {/* ADD 11 — Retention section */}
       {activeSection === 'retention' && (
         <div className="space-y-4">
           <h2 className="text-sm font-semibold text-content-primary">Retention</h2>
-          <p className="text-[11px] text-content-muted">
-            Estimates based on user activity patterns. For precise cohort retention, use a dedicated analytics tool.
+          <p className="text-[11px] leading-5 text-content-muted">
+            Retention is intentionally not estimated from fixed ratios. The current frontend has {retentionData?.sampleSize ?? 0} recent signups but no reliable cohort return-event contract in this pass.
           </p>
           {retentionData ? (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <StatCard label="D1 Retention" value={`${retentionData.d1}%`} sub="% who returned next day" />
-              <StatCard label="D7 Retention" value={`${retentionData.d7}%`} sub="% who returned after 1 week" />
-              <StatCard label="D30 Retention" value={`${retentionData.d30}%`} sub="% who returned after 30 days" />
+              <StatCard label="D1 Retention" value="Unavailable" sub="Needs real return-event data" />
+              <StatCard label="D7 Retention" value="Unavailable" sub="Needs cohort tracking" />
+              <StatCard label="D30 Retention" value="Unavailable" sub="No fabricated proxy shown" />
             </div>
           ) : (
             <p className="text-xs text-content-muted">Loading retention data…</p>
@@ -420,7 +412,6 @@ export default function AdminReportsPage() {
         </div>
       )}
 
-      {/* ADD 11 — Feature Adoption section */}
       {activeSection === 'adoption' && (
         <div className="space-y-4">
           <h2 className="text-sm font-semibold text-content-primary">Feature Adoption</h2>
@@ -428,7 +419,7 @@ export default function AdminReportsPage() {
           {adoptionData ? (
             <div className="space-y-2">
               {Object.entries(adoptionData).map(([feature, pct]) => (
-                <div key={feature} className="border border-surface-border p-3">
+                <div key={feature} className="border border-surface-border bg-surface-base p-3">
                   <div className="mb-1.5 flex items-center justify-between">
                     <p className="text-xs font-medium capitalize text-content-primary">{feature}</p>
                     <p className="text-xs font-semibold text-content-primary">{pct}%</p>

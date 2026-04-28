@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Mail, Send, Loader2, CheckCircle } from 'lucide-react';
+import { Mail, Send, Loader2, CheckCircle, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '../../../lib/api/supabase';
 import { useAdminPermissions } from '../shared';
+import { AdminMetric, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminDangerButtonClass, adminInputClass } from '../shared/AdminUI';
+import { cn } from '../../../lib/utils';
 
 type AudienceFilter = 'all' | 'free' | 'pro' | 'lifetime' | 'inactive_30d' | 'needs_relink';
 
@@ -35,6 +37,7 @@ export default function AdminEmailBlastPage() {
   const [audience, setAudience] = useState<AudienceFilter>('all');
   const [isSending, setIsSending] = useState(false);
   const [preview, setPreview] = useState(false);
+  const [reviewConfirmed, setReviewConfirmed] = useState(false);
 
   const { data: blasts = [], isLoading } = useQuery({
     queryKey: ['admin', 'email-blasts'],
@@ -53,7 +56,8 @@ export default function AdminEmailBlastPage() {
     if (!subject.trim()) { toast.error('Subject is required'); return; }
     if (!body.trim()) { toast.error('Body is required'); return; }
     if (body.trim().length < 30) { toast.error('Body must be at least 30 characters'); return; }
-    if (!window.confirm(`Send this email blast to ${AUDIENCE_OPTIONS.find((o) => o.value === audience)?.label}? This action cannot be undone.`)) return;
+    if (!reviewConfirmed) { toast.error('Confirm that the audience and preview were reviewed.'); return; }
+    if (!window.confirm(`Final send: deliver this blast to ${AUDIENCE_OPTIONS.find((o) => o.value === audience)?.label}? This action cannot be undone.`)) return;
 
     setIsSending(true);
     try {
@@ -68,6 +72,7 @@ export default function AdminEmailBlastPage() {
       setSubject('');
       setBody('');
       setAudience('all');
+      setReviewConfirmed(false);
       await qc.invalidateQueries({ queryKey: ['admin', 'email-blasts'] });
     } catch (err) {
       toast.error((err as Error)?.message ?? 'Failed to send');
@@ -77,29 +82,29 @@ export default function AdminEmailBlastPage() {
   };
 
   return (
-    <section className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:px-8">
-      <header className="border border-surface-border p-5">
-        <div className="flex items-center gap-2">
-          <Mail className="h-5 w-5 text-brand-cta" />
-          <h1 className="text-lg font-semibold text-content-primary">Email Blast Tool</h1>
-        </div>
-        <p className="mt-1 text-xs text-content-tertiary">
-          Send announcements, re-engagement campaigns, or critical notifications to user segments.
-        </p>
-      </header>
+    <section className="mx-auto max-w-[92rem] space-y-5 px-4 py-5 sm:px-6 lg:px-8">
+      <AdminPageHeader
+        eyebrow="Comms"
+        title="Campaign composer"
+        description="Send targeted operational or marketing broadcasts with preview, permission checks, and a deliberate final confirmation."
+        metrics={[
+          { label: 'History', value: blasts.length },
+          { label: 'Permission', value: canSend ? 'Can send' : 'Read only', tone: canSend ? 'good' : 'warn' },
+          { label: 'Preview', value: preview ? 'Open' : 'Edit' },
+          { label: 'Audience', value: AUDIENCE_OPTIONS.find((o) => o.value === audience)?.label ?? audience },
+        ]}
+      />
 
       <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
-        {/* Compose */}
-        <div className="border border-surface-border p-5 space-y-4">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Compose</p>
+        <AdminPanel title="Compose" description="Preview first. Broad sends are treated as controlled actions.">
+          <div className="space-y-4 p-5">
 
           {!canSend ? (
-            <div className="border border-amber-500/40 p-3 text-xs text-amber-200">
+            <div className="border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-200">
               You need super-admin or moderation.manage permission to send email blasts.
             </div>
           ) : null}
 
-          {/* Audience */}
           <div>
             <label className="mb-1.5 block text-[11px] font-medium text-content-secondary">Audience</label>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -108,10 +113,10 @@ export default function AdminEmailBlastPage() {
                   key={opt.value}
                   type="button"
                   onClick={() => setAudience(opt.value)}
-                  className={`border p-2 text-left ${
+                  className={`border bg-surface-base p-2 text-left transition-colors ${
                     audience === opt.value
                       ? 'border-content-primary text-content-primary'
-                      : 'border-surface-border text-content-secondary'
+                      : 'border-surface-border text-content-secondary hover:border-content-primary hover:text-content-primary'
                   }`}
                 >
                   <p className="text-[11px] font-semibold">{opt.label}</p>
@@ -121,7 +126,6 @@ export default function AdminEmailBlastPage() {
             </div>
           </div>
 
-          {/* Subject */}
           <div>
             <label className="mb-1 block text-[11px] font-medium text-content-secondary">
               Subject
@@ -129,8 +133,8 @@ export default function AdminEmailBlastPage() {
             <input
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              placeholder="e.g. New feature available for you!"
-              className="focus-app-field w-full border border-surface-border px-3 py-2 text-xs text-content-primary"
+              placeholder="Short, specific subject"
+              className={cn(adminInputClass, 'w-full')}
               maxLength={150}
             />
           </div>
@@ -142,7 +146,7 @@ export default function AdminEmailBlastPage() {
               <button
                 type="button"
                 onClick={() => setPreview((v) => !v)}
-                className="text-[10px] text-brand-cta hover:underline"
+                  className={cn(adminButtonClass, 'px-2 py-1 text-[10px]')}
               >
                 {preview ? 'Edit' : 'Preview'}
               </button>
@@ -152,16 +156,16 @@ export default function AdminEmailBlastPage() {
                 srcDoc={body}
                 sandbox=""
                 title="Email preview"
-                className="min-h-32 w-full border border-surface-border"
+                className="min-h-52 w-full border border-surface-border bg-white"
                 style={{ colorScheme: 'light' }}
               />
             ) : (
               <textarea
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
-                rows={8}
+                rows={10}
                 placeholder="Hello {{first_name}}, &#10;&#10;We wanted to let you know..."
-                className="focus-app-field w-full border border-surface-border px-3 py-2 text-xs text-content-secondary"
+                className={cn(adminInputClass, 'w-full text-content-secondary')}
               />
             )}
             <p className="mt-1 text-[10px] text-content-muted">
@@ -169,20 +173,42 @@ export default function AdminEmailBlastPage() {
             </p>
           </div>
 
-          <button
-            type="button"
-            disabled={!canSend || isSending}
-            onClick={() => void handleSend()}
-            className="interactive-press inline-flex w-full items-center justify-center gap-2 border border-content-primary px-4 py-2.5 text-sm font-semibold text-content-primary disabled:opacity-40"
-          >
-            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            {isSending ? 'Sending…' : 'Send blast'}
-          </button>
-        </div>
+            <label className="flex items-start gap-2 border border-surface-border bg-surface-base p-3 text-xs text-content-secondary">
+              <input
+                type="checkbox"
+                checked={reviewConfirmed}
+                onChange={(event) => setReviewConfirmed(event.target.checked)}
+                className="mt-0.5"
+              />
+              <span>I reviewed the audience, subject, preview, and compliance risk for this broadcast.</span>
+            </label>
 
-        {/* Blast history */}
-        <div className="border border-surface-border p-5">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-content-tertiary">Sent blasts</p>
+            <button
+              type="button"
+              disabled={!canSend || isSending || !reviewConfirmed}
+              onClick={() => void handleSend()}
+              className={cn(adminDangerButtonClass, 'w-full py-2.5 text-sm')}
+            >
+              {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {isSending ? 'Sending...' : 'Send controlled blast'}
+            </button>
+          </div>
+        </AdminPanel>
+
+        <AdminPanel title="Governance and history" description="Recipient counts come from the existing send record after the backend processes the campaign.">
+          <div className="grid grid-cols-2 gap-2 p-4">
+            <AdminMetric label="Draft state" value={subject || body ? 'Dirty' : 'Clean'} />
+            <AdminMetric label="Review gate" value={reviewConfirmed ? 'Confirmed' : 'Open'} tone={reviewConfirmed ? 'good' : 'warn'} />
+          </div>
+          <div className="border-y border-surface-border bg-surface-base p-4">
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="mt-0.5 h-4 w-4 text-content-tertiary" />
+              <p className="text-xs leading-5 text-content-secondary">
+                Suppression lists, unsubscribe enforcement, and rate limits must be enforced by the existing backend sender. This UI does not invent recipient estimates.
+              </p>
+            </div>
+          </div>
+          <div className="p-5">
           {isLoading ? <p className="text-xs text-content-muted">Loading history…</p> : null}
           {!isLoading && blasts.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-10 text-center">
@@ -196,13 +222,7 @@ export default function AdminEmailBlastPage() {
                 <div key={blast.id} className="border border-surface-border p-3">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-xs font-medium text-content-primary truncate">{blast.subject}</p>
-                    <span className={`shrink-0 border px-1.5 py-0.5 text-[10px] capitalize ${
-                      blast.status === 'sent'
-                        ? 'border-emerald-500/40 text-emerald-300'
-                        : blast.status === 'failed'
-                          ? 'border-rose-500/40 text-rose-300'
-                          : 'border-surface-border text-content-muted'
-                    }`}>{blast.status}</span>
+                    <AdminStatusBadge tone={blast.status === 'sent' ? 'good' : blast.status === 'failed' ? 'danger' : 'default'}>{blast.status}</AdminStatusBadge>
                   </div>
                   <div className="mt-1 flex items-center gap-3 text-[10px] text-content-tertiary">
                     <span>{blast.audience_filter}</span>
@@ -213,7 +233,8 @@ export default function AdminEmailBlastPage() {
               ))}
             </div>
           ) : null}
-        </div>
+          </div>
+        </AdminPanel>
       </div>
     </section>
   );
