@@ -410,7 +410,7 @@ export default function Layout() {
       <aside 
         aria-label="Primary navigation"
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col bg-black/55 backdrop-blur-xl transition-all duration-300 ease-in-out supports-[backdrop-filter]:bg-black/40",
+          "app-chrome fixed inset-y-0 left-0 z-50 flex flex-col backdrop-blur-xl transition-all duration-300 ease-in-out",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           sidebarCollapsed ? "w-20" : "w-[240px]",
           "border-r border-surface-border"
@@ -565,7 +565,7 @@ export default function Layout() {
                               )}
                             </TransitionLink>
                             {isDueSoonItem && showDueSoonPreview && !sidebarCollapsed && (
-                              <div className="absolute left-0 top-full z-50 mt-2 w-64 rounded-lg border border-surface-border bg-black/95 p-3 shadow-[0_20px_50px_rgba(0,0,0,0.55)] lg:left-full lg:top-1/2 lg:ml-2 lg:mt-0 lg:-translate-y-1/2">
+                              <div className="app-popover absolute left-0 top-full z-50 mt-2 w-64 rounded-lg border border-surface-border p-3 backdrop-blur-xl lg:left-full lg:top-1/2 lg:ml-2 lg:mt-0 lg:-translate-y-1/2">
                                 <p className="chrome-micro-label mb-2 text-content-tertiary">Due Soon Preview</p>
                                 <div className="space-y-1.5">
                                   {dueSoonPreview.length === 0 ? (
@@ -650,7 +650,7 @@ export default function Layout() {
         )}
       >
         {/* Top Bar */}
-        <header className="shrink-0 bg-black/55 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40 sticky top-0 z-30 h-[4.5rem] flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-surface-border">
+        <header className="app-chrome sticky top-0 z-30 flex h-[4.5rem] shrink-0 items-center justify-between border-b border-surface-border px-4 backdrop-blur-xl sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 flex-1">
             <button 
               type="button"
@@ -685,7 +685,7 @@ export default function Layout() {
               
               {/* Search Dropdown */}
               {isSearchOpen && searchQuery.trim() !== '' && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-surface-raised/95 backdrop-blur-md border border-surface-border rounded-lg shadow-[0_12px_40px_rgba(0,0,0,0.45)] overflow-hidden z-50 max-h-96 overflow-y-auto">
+                <div className="app-floating-panel absolute left-0 right-0 top-full z-50 mt-1 max-h-96 overflow-hidden overflow-y-auto rounded-lg border border-surface-border backdrop-blur-md">
                   {searchResults.length > 0 ? (
                     <ul className="py-1">
                       {searchResults.map((result, index) => (
@@ -786,7 +786,7 @@ export default function Layout() {
                 )}
               </button>
               {isNotifOpen && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-lg border border-surface-border bg-black/90 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+                <div className="app-popover absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-lg border border-surface-border backdrop-blur-xl">
                   <div className="flex items-center justify-between border-b border-content-primary/5 px-4 py-3">
                     <span className="chrome-micro-label text-content-secondary">Notifications</span>
                     <button
@@ -854,7 +854,7 @@ export default function Layout() {
                 leaveFrom="opacity-100 scale-100 translate-y-0"
                 leaveTo="opacity-0 scale-[0.96] -translate-y-1"
               >
-                <HeadlessMenu.Items className="absolute right-0 z-50 mt-3 w-64 origin-top-right overflow-hidden rounded-lg border border-surface-border bg-black/92 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl focus-app">
+                <HeadlessMenu.Items className="app-popover absolute right-0 z-50 mt-3 w-64 origin-top-right overflow-hidden rounded-lg border border-surface-border backdrop-blur-xl focus-app">
                   <div className="border-b border-content-primary/10 px-3 py-3">
                     <p className="text-[10px] font-mono uppercase tracking-wider text-content-muted">Signed in</p>
                     <p className="mt-1 truncate text-sm font-medium text-content-primary" title={accountDisplayName}>
@@ -1038,7 +1038,7 @@ export default function Layout() {
 
       {/* Mobile bottom app navigation */}
       <nav
-        className="fixed inset-x-0 bottom-0 z-40 border-t border-surface-border bg-black/88 px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 backdrop-blur-xl lg:hidden"
+        className="app-bottom-nav fixed inset-x-0 bottom-0 z-40 border-t border-surface-border px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2 backdrop-blur-xl lg:hidden"
         aria-label="Mobile app navigation"
       >
         <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
@@ -1090,7 +1090,7 @@ export default function Layout() {
 
       {/* Mobile Search Modal */}
       {isMobileSearchOpen && (
-        <div className="fixed inset-0 z-[60] bg-black/80 md:hidden flex flex-col">
+        <div className="fixed inset-0 z-[60] flex flex-col bg-surface-base md:hidden">
           <div className="p-4 bg-surface-raised border-b border-surface-border flex items-center gap-3">
             <label htmlFor="layout-mobile-search" className="sr-only">
               Search Pay List items, documents, subscriptions, and settings

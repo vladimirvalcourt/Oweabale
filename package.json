@@ -26,6 +26,7 @@
     "security:edge-cors": "node scripts/security/check-edge-cors-hardening.mjs",
     "security:migrations-rls": "node scripts/security/check-supabase-migration-rls.mjs",
     "security:readiness": "node scripts/security/check-security-readiness.mjs",
+    "launch:readiness": "node scripts/launch-readiness-gate.mjs",
     "secrets:scan": "gitleaks detect --source . --config .gitleaks.toml --redact --verbose",
     "test": "vitest run",
     "test:watch": "vitest",

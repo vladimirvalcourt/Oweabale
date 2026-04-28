@@ -220,7 +220,7 @@ function PayListIcon({ kind }: { kind: PayListKind }) {
 
 function EmptyPayList({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="border border-dashed border-surface-border p-8 text-center">
+    <div className="border border-dashed border-surface-border bg-surface-raised p-8 text-center">
       <ListChecks className="mx-auto h-8 w-8 text-content-tertiary" aria-hidden />
       <h2 className="mt-4 text-lg font-semibold text-content-primary">Nothing urgent is tracked yet</h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-content-secondary">
@@ -251,7 +251,7 @@ function PayListRow({
 }) {
   const isUrgent = item.status === 'overdue' || item.status === 'today';
   return (
-    <li className="border border-surface-border p-4">
+    <li className="app-panel p-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           <div
@@ -507,7 +507,7 @@ export default function Dashboard() {
           ].map((choice) => {
             const Icon = choice.icon;
             const inner = (
-              <div className="flex h-full min-h-[5.5rem] items-start gap-3 border border-surface-border p-4 text-left">
+              <div className="app-panel flex h-full min-h-[5.5rem] items-start gap-3 p-4 text-left transition-colors hover:bg-surface-elevated">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center border border-surface-border text-content-secondary">
                   <Icon className="h-4 w-4" aria-hidden />
                 </span>
@@ -533,7 +533,7 @@ export default function Dashboard() {
         </section>
 
         <section className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.55fr)]">
-          <div className="border border-surface-border p-5">
+          <div className="app-panel p-5">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
@@ -554,7 +554,7 @@ export default function Dashboard() {
                   </>
                 )}
               </div>
-              <div className="border border-surface-border p-4 lg:min-w-56">
+              <div className="border border-surface-border bg-surface-base p-4 lg:min-w-56">
                 <p className="text-xs font-mono uppercase tracking-widest text-content-tertiary">Due this week</p>
                 <p className="mt-2 text-3xl font-mono font-semibold tabular-nums text-content-primary">{formatMoney(totalDueThisWeek)}</p>
                 <p className="mt-1 text-xs text-content-secondary">
@@ -604,7 +604,7 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 xl:grid-cols-1">
             <TransitionLink to="/pro/bills" className="rounded-lg focus-app">
-              <div className="h-full border border-surface-border p-4">
+              <div className="app-panel h-full p-4 transition-colors hover:bg-surface-elevated">
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                   <Clock className="h-3.5 w-3.5" aria-hidden />
                   Overdue
@@ -613,7 +613,7 @@ export default function Dashboard() {
               </div>
             </TransitionLink>
             <TransitionLink to="/pro/dashboard#safe-spend" className="rounded-lg focus-app">
-              <div className="h-full border border-surface-border p-4">
+              <div className="app-panel h-full p-4 transition-colors hover:bg-surface-elevated">
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                   <Wallet className="h-3.5 w-3.5" aria-hidden />
                   Daily comfort
@@ -622,7 +622,7 @@ export default function Dashboard() {
               </div>
             </TransitionLink>
             <TransitionLink to="/pro/bills?tab=debt" className="rounded-lg focus-app">
-              <div className="h-full border border-surface-border p-4">
+              <div className="app-panel h-full p-4 transition-colors hover:bg-surface-elevated">
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                   <Landmark className="h-3.5 w-3.5" aria-hidden />
                   Debt mins
@@ -631,7 +631,7 @@ export default function Dashboard() {
               </div>
             </TransitionLink>
             <TransitionLink to="/pro/bills?tab=ambush" className="rounded-lg focus-app">
-              <div className="h-full border border-surface-border p-4">
+              <div className="app-panel h-full p-4 transition-colors hover:bg-surface-elevated">
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                   <ShieldAlert className="h-3.5 w-3.5" aria-hidden />
                   Tolls & fines
@@ -682,7 +682,7 @@ export default function Dashboard() {
             </div>
 
             <aside className="space-y-4">
-              <section id="safe-spend" className="border border-surface-border p-4">
+              <section id="safe-spend" className="app-panel p-4">
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                   <Wallet className="h-4 w-4" aria-hidden />
                   Spending comfort
@@ -696,7 +696,7 @@ export default function Dashboard() {
                 </p>
               </section>
 
-              <section className="border border-surface-border p-4">
+              <section className="app-panel p-4">
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                   <CreditCard className="h-4 w-4" aria-hidden />
                   Debt minimums first
@@ -720,7 +720,7 @@ export default function Dashboard() {
               </section>
 
               {unscheduledItems.length > 0 && (
-                <section className="border-[var(--color-status-amber-border)] p-4">
+                <section className="border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] p-4">
                   <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[var(--color-status-amber-text)]">
                     <CalendarDays className="h-4 w-4" aria-hidden />
                     Missing due dates

@@ -229,7 +229,7 @@ export default function FreeLayout() {
       <aside
         aria-label="Primary navigation"
         className={cn(
-          'fixed inset-y-0 left-0 z-50 flex flex-col bg-black/55 backdrop-blur-xl transition-all duration-300 ease-in-out supports-[backdrop-filter]:bg-black/40 border-r border-surface-border',
+          'app-chrome fixed inset-y-0 left-0 z-50 flex flex-col border-r border-surface-border backdrop-blur-xl transition-all duration-300 ease-in-out',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
           sidebarCollapsed ? 'w-20' : 'w-[240px]',
         )}
@@ -406,7 +406,7 @@ export default function FreeLayout() {
         sidebarCollapsed ? 'lg:pl-20' : 'lg:pl-[240px]',
       )}>
         {/* Topbar */}
-        <header className="shrink-0 bg-black/55 backdrop-blur-xl supports-[backdrop-filter]:bg-black/40 sticky top-0 z-30 h-[4.5rem] flex items-center justify-between px-4 sm:px-6 lg:px-8 border-b border-surface-border">
+        <header className="app-chrome sticky top-0 z-30 flex h-[4.5rem] shrink-0 items-center justify-between border-b border-surface-border px-4 backdrop-blur-xl sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 flex-1">
             <button
               type="button"
@@ -434,7 +434,7 @@ export default function FreeLayout() {
                   className="focus-app-field w-full min-h-10 rounded-lg border border-surface-border bg-surface-raised/80 py-2.5 pl-9 pr-4 font-sans text-sm text-content-primary transition-all placeholder:text-content-tertiary focus:border-content-primary/25 focus:bg-surface-elevated/90"
                 />
                 {isSearchOpen && searchQuery.trim() !== '' && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-surface-raised/95 backdrop-blur-md border border-surface-border rounded-lg shadow-[0_12px_40px_rgba(0,0,0,0.45)] overflow-hidden z-50 max-h-96 overflow-y-auto">
+                  <div className="app-floating-panel absolute left-0 right-0 top-full z-50 mt-1 max-h-96 overflow-hidden overflow-y-auto rounded-lg border border-surface-border backdrop-blur-md">
                     {searchResults.length > 0 ? (
                       <ul className="py-1">
                         {searchResults.map((r, i) => (
@@ -487,7 +487,7 @@ export default function FreeLayout() {
                 {unreadCount > 0 && <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden />}
               </button>
               {isNotifOpen && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-lg border border-surface-border bg-black/90 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl">
+                <div className="app-popover absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-lg border border-surface-border backdrop-blur-xl">
                   <div className="flex items-center justify-between border-b border-content-primary/5 px-4 py-3">
                     <span className="chrome-micro-label text-content-secondary">Notifications</span>
                     <button type="button" onClick={() => clearNotifications()}
@@ -530,7 +530,7 @@ export default function FreeLayout() {
               <Transition as={React.Fragment}
                 enter="transition-all duration-200 ease-out" enterFrom="opacity-0 scale-[0.96] -translate-y-1" enterTo="opacity-100 scale-100 translate-y-0"
                 leave="transition-all duration-150 ease-in"  leaveFrom="opacity-100 scale-100 translate-y-0" leaveTo="opacity-0 scale-[0.96] -translate-y-1">
-                <HeadlessMenu.Items className="absolute right-0 z-50 mt-3 w-64 origin-top-right overflow-hidden rounded-lg border border-surface-border bg-black/92 shadow-[0_20px_50px_rgba(0,0,0,0.55)] backdrop-blur-xl focus-app">
+                <HeadlessMenu.Items className="app-popover absolute right-0 z-50 mt-3 w-64 origin-top-right overflow-hidden rounded-lg border border-surface-border backdrop-blur-xl focus-app">
                   <div className="border-b border-content-primary/10 px-3 py-3">
                     <p className="text-[10px] font-mono uppercase tracking-wider text-content-muted">Signed in</p>
                     <p className="mt-1 truncate text-sm font-medium text-content-primary">{accountDisplayName || 'Account'}</p>
@@ -610,7 +610,7 @@ export default function FreeLayout() {
 
       {/* Mobile search */}
       {isMobileSearchOpen && (
-        <div className="fixed inset-0 z-[60] bg-black/80 md:hidden flex flex-col">
+        <div className="fixed inset-0 z-[60] flex flex-col bg-surface-base md:hidden">
           <div className="p-4 bg-surface-raised border-b border-surface-border flex items-center gap-3">
             <label htmlFor="free-mobile-search" className="sr-only">Search bills and subscriptions</label>
             <Search className="w-5 h-5 text-content-tertiary shrink-0" aria-hidden />
