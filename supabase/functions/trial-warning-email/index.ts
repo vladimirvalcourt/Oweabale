@@ -44,17 +44,17 @@ Deno.serve(async (req: Request) => {
             <h1 style="color: #1a1a1a; font-size: 24px; margin-bottom: 20px;">${daysRemaining} days left, ${escapeHtml(firstName)}</h1>
             
             <p style="color: #4a4a4a; font-size: 16px; line-height: 1.6;">
-              Your Full Suite trial ends in ${daysRemaining} days. After that, app access locks unless billing is active.
+              Your Full Suite trial ends in ${daysRemaining} days. Want to keep everything running? Add your payment details before then.
             </p>
 
             <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin: 24px 0;">
               <p style="color: #92400e; font-size: 14px; margin: 0;">
                 <strong>What happens next?</strong><br/>
-                Add billing before the trial ends to keep using your Pay List, documents, calendar, and settings without interruption.
+                Add your payment details before the trial ends so your Pay List, documents, calendar, and settings keep working without interruption.
               </p>
             </div>
 
-            <h2 style="color: #1a1a1a; font-size: 20px; margin-top: 30px; margin-bottom: 15px;">Upgrade now to keep everything:</h2>
+            <h2 style="color: #1a1a1a; font-size: 20px; margin-top: 30px; margin-bottom: 15px;">Pick a plan to keep going:</h2>
             
             <ul style="color: #4a4a4a; font-size: 16px; line-height: 1.8; padding-left: 20px;">
               <li><strong>$10.99/month</strong> — Cancel anytime</li>
@@ -64,12 +64,12 @@ Deno.serve(async (req: Request) => {
             <div style="margin: 30px 0; text-align: center;">
               <a href="https://www.oweable.com/pricing" 
                  style="display: inline-block; background-color: #f59e0b; color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
-                View Plans & Upgrade →
+                See Plans & Start →
               </a>
             </div>
 
             <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin-top: 30px;">
-              No surprise charges. You can add billing now, or subscribe later to unlock the app again.
+              No surprise charges. Add your payment details now, or pick a plan later to get back in.
             </p>
 
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;" />
@@ -79,7 +79,7 @@ Deno.serve(async (req: Request) => {
             </p>
           </div>
         `,
-        text: `${daysRemaining} days left on your Full Suite trial\n\nHi ${firstName},\n\nYour Full Suite trial ends in ${daysRemaining} days. After that, app access locks unless billing is active.\n\nUpgrade options:\n- $10.99/month (cancel anytime)\n- $92.32/year (save 30%, 2 months free)\n\nView plans: https://www.oweable.com/pricing\n\nNo surprise charges. You can add billing now, or subscribe later to unlock the app again.`,
+        text: `${daysRemaining} days left on your Full Suite trial\n\nHi ${firstName},\n\nYour Full Suite trial ends in ${daysRemaining} days. Want to keep everything running? Add your payment details before then.\n\nPlan options:\n- $10.99/month (cancel anytime)\n- $92.32/year (save 30%, 2 months free)\n\nSee plans: https://www.oweable.com/pricing\n\nNo surprise charges. Add your payment details now, or pick a plan later to get back in.`,
       }),
     });
 

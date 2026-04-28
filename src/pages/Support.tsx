@@ -38,15 +38,15 @@ const TURNSTILE_ENFORCED = Boolean(TURNSTILE_SITE_KEY);
 const QUICK_HELP = [
   {
     q: 'How does billing work for Full Suite?',
-    a: 'Full Suite renews on your billing cycle and can be managed from your settings. Pricing shows the current plan structure and trial details in plain English.',
+    a: 'Full Suite renews on your billing cycle and you can manage it from your settings. The Pricing page shows the current plan structure and trial details in plain English.',
   },
   {
     q: 'I cannot access my account. What should I do?',
-    a: 'Use the same sign-in method you originally used. If access still fails, send support the email tied to the account and a short description of what happened so we can help faster.',
+    a: 'Use the same sign-in method you originally used. If that still does not work, send support the email tied to your account and a quick note about what happened so we can help faster.',
   },
   {
     q: 'How do I cancel my subscription?',
-    a: 'You can cancel from billing settings. Access remains active through the end of the current paid period.',
+    a: 'You can pause or cancel from your billing settings. Your access stays active until the end of your current paid period.',
   },
   {
     q: 'Where can I read more about security and privacy?',

@@ -30,8 +30,8 @@ function BillingPanelInner() {
   const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
   const [searchParams, setSearchParams] = useSearchParams();
   const isLockedTrial = searchParams.get('locked') === 'trial';
-  const [tierLabel, setTierLabel] = useState('Access locked');
-  const [statusText, setStatusText] = useState('Subscribe to continue using Oweable.');
+  const [tierLabel, setTierLabel] = useState('Trial ended');
+  const [statusText, setStatusText] = useState('Add a plan to keep using Oweable.');
   const [hasPaidAccess, setHasPaidAccess] = useState(false);
   const [paymentHistory, setPaymentHistory] = useState<
     Array<{ id: string; amount_total: number; currency: string; status: string; created_at: string }>
@@ -111,7 +111,7 @@ function BillingPanelInner() {
       setTierLabel('Full Suite Trial');
       setStatusText(
         profile?.trial_ends_at
-          ? `Your 14-day Full Suite trial is active until ${new Date(profile.trial_ends_at).toLocaleDateString()}. Add a payment method before then if you want billing to continue without interruption.`
+          ? `You're all set until ${new Date(profile.trial_ends_at).toLocaleDateString()}. Want to keep things running smoothly? Add your payment details before then.`
           : 'Your 14-day Full Suite trial is active.',
       );
     } else if (paid) {
@@ -122,15 +122,15 @@ function BillingPanelInner() {
           : null;
         setStatusText(
           endDate
-            ? `Subscription ${sub.status}. Current period ends ${endDate}.`
-            : `Subscription ${sub.status}.`,
+            ? `All good — you're set through ${endDate}.`
+            : `You're all set with Full Suite.`,
         );
       } else {
         setStatusText('Full Suite access is active.');
       }
     } else {
-      setTierLabel('Access locked');
-      setStatusText('Your 14-day trial ended. Subscribe to continue using Oweable.');
+      setTierLabel('Paused');
+      setStatusText('Your trial wrapped up. Pick a plan to jump back in.');
     }
 
     setPaymentHistory(
@@ -316,7 +316,7 @@ function BillingPanelInner() {
           <div className="mb-5 rounded-md border border-amber-500/30 bg-amber-500/10 p-5">
             <h4 className="text-sm font-medium tracking-[-0.006em] text-content-primary">Your 14-day trial ended</h4>
             <p className="mt-1 max-w-2xl text-sm leading-6 tracking-[-0.006em] text-content-secondary">
-              Your account is locked until billing is active. Start a subscription to continue using your Pay List,
+              Your account is paused until you pick a plan. Start a subscription to get back to your Pay List,
               documents, calendar, and settings.
             </p>
           </div>
@@ -329,7 +329,7 @@ function BillingPanelInner() {
               </h4>
               <p className="mt-1 max-w-md text-sm tracking-[-0.006em] text-emerald-200/70">
                 {isProfileTrialOnly
-                  ? 'You already have Full Suite access during the trial. Start paid billing whenever you are ready so your card is on file before the trial ends.'
+                  ? 'You already have Full Suite access during the trial. Start paid billing whenever you are ready so everything keeps working after the trial ends.'
                   : 'Full Suite is active. Update your plan, payment method, or invoices anytime in the billing portal.'}
               </p>
               {subscriptionStatus === 'trialing' && currentPeriodEnd && (
@@ -345,12 +345,12 @@ function BillingPanelInner() {
                 disabled={isWorking}
                 className="shrink-0 rounded-md bg-emerald-600 px-5 py-2.5 text-sm font-medium tracking-[-0.006em] text-white shadow-none transition-[background-color,transform] hover:bg-emerald-500 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isWorking ? 'Working...' : isProfileTrialOnly ? 'Add payment method' : 'Manage billing'}
+                {isWorking ? 'Working...' : isProfileTrialOnly ? 'Add payment details' : 'Open billing portal'}
               </button>
               <p className="max-w-sm text-left text-[11px] tracking-[-0.006em] text-content-tertiary sm:text-right">
                 {isProfileTrialOnly
-                  ? 'Adding a payment method starts Stripe checkout so your subscription is ready before trial access ends.'
-                  : "Manage billing opens Stripe's customer portal to update payment methods and invoices."}
+                  ? 'Adding payment details starts checkout so your subscription is ready before trial access ends.'
+                  : "Open billing portal to update payment methods and view invoices."}
               </p>
               {!isProfileTrialOnly && (
                 <>
@@ -378,7 +378,7 @@ function BillingPanelInner() {
                     Cancel immediately
                   </button>
                   <p className="max-w-sm text-left text-[11px] tracking-[-0.006em] text-content-tertiary sm:text-right">
-                    Immediate cancel ends paid access today. Your data is retained for 30 days per policy.
+                    Immediate cancel ends paid access today. We'll keep your data safe for 30 days so you can come back if needed.
                   </p>
                 </>
               )}
@@ -388,11 +388,11 @@ function BillingPanelInner() {
           <div className="flex flex-col items-center justify-between gap-4 rounded-md border border-surface-border bg-white/[0.025] p-5 sm:flex-row">
             <div>
               <h4 className="flex items-center gap-2 text-sm font-medium tracking-[-0.006em] text-content-primary">
-                {isLockedTrial ? 'Subscribe to continue' : 'Upgrade to Full Suite'}
+                {isLockedTrial ? 'Pick a plan to continue' : 'Upgrade to Full Suite'}
               </h4>
               <p className="mt-1 max-w-md text-sm tracking-[-0.006em] text-content-secondary/70">
                 {isLockedTrial
-                  ? `Start Full Suite for $${monthlyPrice.toFixed(2)}/month to unlock your account again.`
+                  ? `Start Full Suite for $${monthlyPrice.toFixed(2)}/month to get back into your account.`
                   : `Unlock Full Suite: unlimited account sync, debt payoff planner, subscription alerts, and freelancer tax tools for $${monthlyPrice.toFixed(2)}/month.`}
               </p>
             </div>
@@ -440,14 +440,14 @@ function BillingPanelInner() {
         <div className="mb-4 flex flex-col items-center justify-center rounded-md border border-dashed border-surface-border bg-surface-base p-6 text-center">
           <CreditCardIcon className="mb-3 h-8 w-8 text-content-muted" />
           <p className="text-sm font-medium tracking-[-0.006em] text-content-secondary">
-            {hasPaidAccess ? 'Cards on file' : 'No payment method on file'}
+            {hasPaidAccess ? 'Payment methods' : 'No payment method yet'}
           </p>
           <p className="mt-1 text-xs font-medium tracking-[-0.006em] text-content-tertiary">
             {isProfileTrialOnly
-              ? 'You are in the trial period and do not have a payment method on file yet.'
+              ? 'You are in the trial period and do not need to add payment details yet.'
               : hasPaidAccess
-                ? 'Add, remove, or replace cards in the Stripe Customer Portal.'
-                : 'Add a payment method by starting Full Suite.'}
+                ? 'Update or change your card anytime in the billing portal.'
+                : 'Add your payment details when you start Full Suite.'}
           </p>
         </div>
         <button
@@ -456,7 +456,7 @@ function BillingPanelInner() {
           disabled={isWorking}
           className="focus-app rounded-md border border-surface-border bg-surface-elevated px-4 py-2 text-sm font-medium tracking-[-0.006em] text-content-primary transition-colors hover:text-content-secondary"
         >
-          {isProfileTrialOnly ? 'Add payment method' : 'Manage in Stripe Portal'}
+          {isProfileTrialOnly ? 'Add payment details' : 'Open billing portal'}
         </button>
       </CollapsibleModule>
 
@@ -500,7 +500,7 @@ function BillingPanelInner() {
               You keep Full Suite access until{' '}
               {currentPeriodEnd
                 ? new Date(currentPeriodEnd).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
-                : 'your period end date'}. After that, app access locks until billing is active again. Your data is retained.
+                : 'your period end date'}. After that, app access pauses until you pick a plan again. Your data stays safe.
             </Dialog.Description>
             <div className="mt-6 flex justify-end gap-3">
               <button

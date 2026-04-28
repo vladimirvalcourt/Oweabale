@@ -241,7 +241,7 @@ export default function FreeDashboard() {
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <Star className="w-4 h-4 text-amber-400" aria-hidden />
-              <p className="text-sm font-semibold text-amber-300">Unlock Full Suite</p>
+              <p className="text-sm font-semibold text-amber-300">Start Full Suite</p>
             </div>
             <p className="text-sm text-content-secondary leading-relaxed">
               Income tracking, debt payoff engine (Avalanche &amp; Snowball), taxes, budgets, analytics, net worth, and 15+ more tools — all in one dashboard.
@@ -255,7 +255,7 @@ export default function FreeDashboard() {
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 text-black hover:bg-amber-400 px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden /> : null}
-              {isUpgrading ? 'Loading...' : `Upgrade — $${monthlyPrice.toFixed(2)}/mo`}
+              {isUpgrading ? 'Getting things ready...' : `Start Full Suite — $${monthlyPrice.toFixed(2)}/mo`}
             </button>
             <TransitionLink to="/pricing" className="text-center text-xs text-content-tertiary hover:text-content-secondary transition-colors">
               See what's included →

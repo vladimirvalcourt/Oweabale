@@ -46,12 +46,12 @@ const PRICING_FAQ_STATIC = [
   {
     question: 'What happens when the trial ends?',
     answer:
-      'If you do nothing, your signed-in app locks after 14 days. You can add billing before the trial ends or subscribe later to continue using Oweable. No surprise charges.',
+      'If you do nothing, your signed-in app pauses after 14 days. You can add your payment details before the trial ends or pick a plan later to keep using Oweable. No surprise charges.',
   },
   {
     question: 'Can I cancel anytime?',
     answer:
-      'Yes. If you upgrade, you can manage or cancel your subscription from your account settings without needing to talk to anyone.',
+      'Yes. Once you start Full Suite, you can pause or cancel your subscription from your account settings — no need to talk to anyone.',
   },
   {
     question: 'Is this only for freelancers?',
@@ -332,7 +332,7 @@ export default function Pricing() {
                   disabled={isStartingCheckout}
                   className="mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-md bg-brand-indigo px-6 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {isStartingCheckout ? 'Starting checkout...' : 'Unlock Full Suite'}
+                  {isStartingCheckout ? 'Getting things ready...' : 'Start Full Suite'}
                 </button>
                 <p className="mt-4 text-sm text-content-tertiary">
                   Starts with a 14-day free trial. No credit card required to create your account first.
@@ -405,7 +405,7 @@ export default function Pricing() {
                 disabled={isStartingCheckout}
                 className="inline-flex min-h-12 items-center gap-3 rounded-md border border-surface-border bg-white/[0.02] px-7 text-sm font-medium text-content-primary transition-colors hover:bg-white/[0.05] disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Upgrade to Full Suite
+                Start Full Suite
               </button>
             </div>
           </div>

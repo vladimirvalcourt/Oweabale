@@ -397,11 +397,11 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
 
     if (trackerOnly) {
       if (!canUseQuickAddTab(activeTab, hasFullSuite)) {
-        toast.error('Tracker (free) includes bills and tickets here. Upgrade to Full Suite for ledger and income entries.');
+        toast.error('Tracker (free) includes bills and tickets here. Start Full Suite for ledger and income entries.');
         return;
       }
       if (trackerOnly && activeTab === 'obligation' && isTrackerObligationDebtBlocked(obligationKind, hasFullSuite)) {
-        toast.error('Adding loans and credit cards requires Full Suite.');
+        toast.error('Adding loans and credit cards needs Full Suite.');
         return;
       }
     }

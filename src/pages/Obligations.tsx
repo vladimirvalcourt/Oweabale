@@ -382,7 +382,7 @@ export default function Obligations() {
           type="button"
           onClick={() => {
             if (activeTab === 'debt' && !canUseDebt) {
-              toast.error('Loans and credit cards are a Full Suite feature. Upgrade to add debt.');
+              toast.error('Loans and credit cards need Full Suite. Start a plan to add debt.');
               return;
             }
             openQuickAdd(activeTab === 'ambush' ? 'citation' : 'obligation');
@@ -701,7 +701,7 @@ export default function Obligations() {
       {debts.length > 0 && !hasFullSuite && (
         <FullSuiteGateCard
           title="Debt Payoff Plan is available on Full Suite"
-          description="Unlock Avalanche/Snowball strategy modeling, debt-free projections, and interest-saved analytics."
+          description="Start Full Suite to get Avalanche/Snowball strategy modeling, debt-free projections, and interest-saved analytics."
           compact
         />
       )}

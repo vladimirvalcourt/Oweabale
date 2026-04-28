@@ -207,7 +207,7 @@ export default function Education() {
       <div className="min-h-[65vh] w-full flex items-center justify-center px-4">
         <FullSuiteGateCard
           title="Financial Academy is available on Full Suite"
-          description="Upgrade to unlock guided finance tracks, saved lesson progress, and deeper curriculum content."
+          description="Start Full Suite to get guided finance tracks, saved lesson progress, and deeper curriculum content."
         />
       </div>
     );
