@@ -378,7 +378,7 @@ export default function Obligations() {
             </p>
           )}
         </div>
-        <button 
+        <button
           type="button"
           onClick={() => {
             if (activeTab === 'debt' && !canUseDebt) {
@@ -389,11 +389,10 @@ export default function Obligations() {
           }}
           aria-disabled={activeTab === 'debt' && !canUseDebt}
           title={activeTab === 'debt' && !canUseDebt ? 'Full Suite required to add debt' : undefined}
-          className={`px-4 py-2.5 rounded-md text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile ${
-            activeTab === 'debt' && !canUseDebt
+          className={`px-4 py-2.5 rounded-md text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile ${activeTab === 'debt' && !canUseDebt
               ? 'bg-surface-elevated border border-surface-border text-content-tertiary'
               : 'bg-brand-cta hover:bg-brand-cta-hover text-surface-base'
-          }`}
+            }`}
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           {activeTab === 'ambush' ? 'Add toll or ticket' : activeTab === 'debt' ? (hasFullSuite ? 'Add debt payment' : 'Add debt (Full Suite)') : 'Add bill'}
@@ -534,8 +533,8 @@ export default function Obligations() {
 
       {/* Debt Payoff Engine Panel */}
       {debts.length > 0 && hasFullSuite && (
-        <CollapsibleModule 
-          title="Debt Payoff Plan" 
+        <CollapsibleModule
+          title="Debt Payoff Plan"
           icon={ChartIcon}
           extraHeader={
             <span className="text-xs font-sans text-content-tertiary bg-surface-base border border-surface-border px-2 py-0.5 rounded-full">
@@ -562,9 +561,8 @@ export default function Obligations() {
                   <button
                     key={s}
                     onClick={() => setStrategy(s)}
-                    className={`px-3 py-1.5 text-xs font-mono rounded-md transition-colors uppercase tracking-wider ${
-                      strategy === s ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-secondary'
-                    }`}
+                    className={`px-3 py-1.5 text-xs font-mono rounded-md transition-colors uppercase tracking-wider ${strategy === s ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-secondary'
+                      }`}
                   >
                     {s === 'avalanche' ? '⚡ Highest Interest First' : '❄️ Smallest Debt First'}
                   </button>
@@ -730,14 +728,12 @@ export default function Obligations() {
             <button
               key={tab.key}
               onClick={() => selectTab(tab.key)}
-              className={`pb-3 text-sm font-medium transition-colors relative flex items-center gap-1.5 ${
-                activeTab === tab.key ? 'text-content-primary' : 'text-content-tertiary hover:text-content-secondary'
-              }`}
+              className={`pb-3 text-sm font-medium transition-colors relative flex items-center gap-1.5 ${activeTab === tab.key ? 'text-content-primary' : 'text-content-tertiary hover:text-content-secondary'
+                }`}
             >
               {tab.label}
-              <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-lg ${
-                activeTab === tab.key ? 'bg-content-primary/10 text-content-primary' : 'bg-surface-elevated text-content-muted'
-              }`}>{tab.count}</span>
+              <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-lg ${activeTab === tab.key ? 'bg-content-primary/10 text-content-primary' : 'bg-surface-elevated text-content-muted'
+                }`}>{tab.count}</span>
               {activeTab === tab.key && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-cta" />}
             </button>
           ))}
@@ -745,237 +741,235 @@ export default function Obligations() {
       </div>
 
       <div id="due-soon" className="scroll-mt-24">
-      <CollapsibleModule title="Scheduled Payments" icon={PaymentsIcon}>
-        <div className="overflow-x-auto -mx-6 -my-6">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-surface-border bg-surface-raised">
-                <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Description</th>
-                <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Category</th>
-                <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Due Date</th>
-                <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider text-right">Amount</th>
-                <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-surface-border">
-              {filteredObligations.map(ob => {
-                const Icon = ob.icon;
-                const isDebtNoDue = ob.type === 'debt' && ob.dueLabel === 'No due date';
-                const dueNorm = new Date(ob.dueDate.includes('T') ? ob.dueDate : `${ob.dueDate}T12:00:00`);
-                const todayNorm = new Date(today);
-                todayNorm.setHours(0, 0, 0, 0);
-                dueNorm.setHours(0, 0, 0, 0);
-                const isPastDue = !isDebtNoDue && !Number.isNaN(dueNorm.getTime()) && dueNorm < todayNorm;
-                const overdueDays = isPastDue
-                  ? Math.max(1, Math.floor((todayNorm.getTime() - dueNorm.getTime()) / 86400000))
-                  : 0;
-                const overdueBand: 'none' | 'warn' | 'critical' = !isPastDue
-                  ? 'none'
-                  : overdueDays <= 7
-                    ? 'warn'
-                    : 'critical';
-                const tollHint =
-                  ob.type === 'ambush' &&
-                  /toll|violation|ez-?pass|fastrak|sunpass/i.test(`${ob.name} ${ob.subType}`);
-                return (
-                  <tr 
-                    key={ob.id} 
-                    className={cn(
-                      'hover:bg-surface-raised transition-colors',
-                      overdueBand === 'warn' && 'bg-[var(--color-status-amber-bg)] border border-[var(--color-status-amber-border)]',
-                      overdueBand === 'critical' && 'bg-[var(--color-status-rose-bg)] border border-[var(--color-status-rose-border)]',
-                    )}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        <BrandLogo name={ob.name} fallbackIcon={<Icon className="w-3.5 h-3.5 text-content-tertiary" />} />
-                        <span className="text-sm font-medium text-content-primary">{ob.name}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${
-                        ob.type === 'debt' ? 'border-surface-border text-content-primary bg-content-primary/[0.05]' :
-                        ob.type === 'ambush' ? 'border-rose-500/30 text-rose-400 bg-rose-500/10' :
-                        'border-surface-border text-content-tertiary bg-surface-elevated'
-                      }`}>{ob.subType}</span>
-                      {ob.type === 'recurring' && billAmountChanges.get(ob.id) && (
-                        <span className="ml-2 inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-mono text-amber-300">
-                          +{billAmountChanges.get(ob.id)?.pct.toFixed(0)}%
+        <CollapsibleModule title="Scheduled Payments" icon={PaymentsIcon}>
+          <div className="overflow-x-auto -mx-6 -my-6">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-surface-border bg-surface-raised">
+                  <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Description</th>
+                  <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Due Date</th>
+                  <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider text-right">Amount</th>
+                  <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-surface-border">
+                {filteredObligations.map(ob => {
+                  const Icon = ob.icon;
+                  const isDebtNoDue = ob.type === 'debt' && ob.dueLabel === 'No due date';
+                  const dueNorm = new Date(ob.dueDate.includes('T') ? ob.dueDate : `${ob.dueDate}T12:00:00`);
+                  const todayNorm = new Date(today);
+                  todayNorm.setHours(0, 0, 0, 0);
+                  dueNorm.setHours(0, 0, 0, 0);
+                  const isPastDue = !isDebtNoDue && !Number.isNaN(dueNorm.getTime()) && dueNorm < todayNorm;
+                  const overdueDays = isPastDue
+                    ? Math.max(1, Math.floor((todayNorm.getTime() - dueNorm.getTime()) / 86400000))
+                    : 0;
+                  const overdueBand: 'none' | 'warn' | 'critical' = !isPastDue
+                    ? 'none'
+                    : overdueDays <= 7
+                      ? 'warn'
+                      : 'critical';
+                  const tollHint =
+                    ob.type === 'ambush' &&
+                    /toll|violation|ez-?pass|fastrak|sunpass/i.test(`${ob.name} ${ob.subType}`);
+                  return (
+                    <tr
+                      key={ob.id}
+                      className={cn(
+                        'hover:bg-surface-raised transition-colors',
+                        overdueBand === 'warn' && 'bg-[var(--color-status-amber-bg)] border border-[var(--color-status-amber-border)]',
+                        overdueBand === 'critical' && 'bg-[var(--color-status-rose-bg)] border border-[var(--color-status-rose-border)]',
+                      )}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                          <BrandLogo name={ob.name} fallbackIcon={<Icon className="w-3.5 h-3.5 text-content-tertiary" />} />
+                          <span className="text-sm font-medium text-content-primary">{ob.name}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${ob.type === 'debt' ? 'border-surface-border text-content-primary bg-content-primary/[0.05]' :
+                            ob.type === 'ambush' ? 'border-rose-500/30 text-rose-400 bg-rose-500/10' :
+                              'border-surface-border text-content-tertiary bg-surface-elevated'
+                          }`}>{ob.subType}</span>
+                        {ob.type === 'recurring' && billAmountChanges.get(ob.id) && (
+                          <span className="ml-2 inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-mono text-amber-300">
+                            +{billAmountChanges.get(ob.id)?.pct.toFixed(0)}%
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex flex-col gap-1">
+                          <span
+                            className={`text-sm font-mono ${overdueBand === 'critical'
+                                ? 'text-rose-400'
+                                : overdueBand === 'warn'
+                                  ? 'text-amber-400'
+                                  : isDebtNoDue
+                                    ? 'text-content-muted'
+                                    : 'text-content-secondary'
+                              }`}
+                          >
+                            {ob.dueLabel}
+                            {overdueBand === 'warn' && (
+                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
+                                ⚠️ OVERDUE {overdueDays} {overdueDays === 1 ? 'day' : 'days'}
+                              </span>
+                            )}
+                            {overdueBand === 'critical' && (
+                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-rose-500/40 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-bold text-rose-300">
+                                ⚠️ OVERDUE {overdueDays} days
+                              </span>
+                            )}
+                          </span>
+                          {tollHint && overdueBand !== 'none' && (
+                            <p className="max-w-xs text-[11px] text-content-tertiary leading-snug">
+                              Toll violations may accrue penalties after 30 days.
+                            </p>
+                          )}
+                          {overdueBand === 'critical' && !tollHint && ob.type === 'ambush' && (
+                            <p className="max-w-xs text-[11px] text-rose-300/90 leading-snug">
+                              Unpaid fines can add late fees and collection risk. Resolve as soon as you can.
+                            </p>
+                          )}
+                          {isDebtNoDue && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (!canUseDebt) {
+                                  toast.error('Editing debt requires Full Suite.');
+                                  return;
+                                }
+                                const d = debts.find((x) => x.id === ob.id);
+                                if (d) setEditDebtRow(d);
+                              }}
+                              className="inline-flex items-center gap-1 self-start text-[11px] font-medium text-[var(--color-status-amber-text)] hover:underline"
+                            >
+                              <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                              Add due date
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <span className="text-sm font-mono text-content-primary">
+                          ${ob.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="inline-flex flex-col items-end gap-2">
+                          {ob.type === 'recurring' && isPastDue && (
+                            <button
+                              type="button"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                const b = bills.find((x) => x.id === ob.id);
+                                if (!b) return;
+                                await markBillPaid(b.id);
+                                toast.success(`✓ ${b.biller} marked as paid`);
+                              }}
+                              className={cn(
+                                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition-colors',
+                                overdueBand === 'critical'
+                                  ? 'bg-rose-600 text-white hover:bg-rose-500'
+                                  : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover',
+                              )}
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" aria-hidden />
+                              Resolve Now →
+                            </button>
+                          )}
+                          {ob.type === 'debt' && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (!canUseDebt) {
+                                  toast.error('Editing debt requires Full Suite.');
+                                  return;
+                                }
+                                const d = debts.find((x) => x.id === ob.id);
+                                if (d) setEditDebtRow(d);
+                              }}
+                              className="inline-flex items-center gap-1.5 px-2 py-1 text-content-tertiary hover:text-content-secondary text-[11px] font-mono underline-offset-2 hover:underline"
+                            >
+                              <Pencil className="w-3 h-3" aria-hidden />
+                              Edit
+                            </button>
+                          )}
+                          {ob.type === 'recurring' && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const b = bills.find((x) => x.id === ob.id);
+                                if (b) setEditBillRow(b);
+                              }}
+                              className="inline-flex items-center gap-1.5 px-2 py-1 text-content-tertiary hover:text-content-secondary text-[11px] font-mono underline-offset-2 hover:underline"
+                            >
+                              <Pencil className="w-3 h-3" aria-hidden />
+                              Edit
+                            </button>
+                          )}
+                          {ob.type === 'ambush' && (
+                            <button
+                              type="button"
+                              onClick={async () => {
+                                const cit = citations.find((c) => c.id === ob.id);
+                                if (cit) {
+                                  const ok = await resolveCitation(cit.id);
+                                  if (ok) toast.success(`${ob.name} resolved`);
+                                } else toast.error('Citation not found');
+                              }}
+                              className={cn(
+                                'px-3 py-1.5 text-xs font-mono font-bold rounded-md transition-colors active:scale-[0.98]',
+                                isPastDue
+                                  ? 'border border-rose-500 bg-rose-600 text-white hover:bg-rose-500'
+                                  : 'border border-rose-500/50 hover:bg-rose-500/10 text-rose-400',
+                              )}
+                            >
+                              {isPastDue ? 'Resolve Now →' : 'PAY'}
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {filteredObligations.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-14 text-center">
+                      {activeTab === 'ambush' ? (
+                        /* PAGE-04: Tickets & Fines empty state with context */
+                        <div className="flex flex-col items-center justify-center gap-3">
+                          <TicketIcon className="w-10 h-10 text-content-muted" />
+                          <p className="text-base font-semibold text-content-primary">Track unexpected charges</p>
+                          <p className="max-w-xs text-sm text-content-tertiary leading-relaxed">
+                            Log parking tickets, court fines, late fees, or any one-time charge. We&apos;ll add them to your bill calendar.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => openQuickAdd('citation')}
+                            className="mt-2 inline-flex items-center gap-2 rounded-md bg-brand-cta px-4 py-2.5 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
+                          >
+                            <Plus className="w-4 h-4 shrink-0" aria-hidden />
+                            Add a fine or ticket
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center text-content-tertiary">
+                          <CheckCircle2 className="w-8 h-8 mb-3 text-emerald-500/50" />
+                          <p className="text-sm font-mono">No obligations in this category.</p>
+                        </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex flex-col gap-1">
-                        <span
-                          className={`text-sm font-mono ${
-                            overdueBand === 'critical'
-                              ? 'text-rose-400'
-                              : overdueBand === 'warn'
-                                ? 'text-amber-400'
-                                : isDebtNoDue
-                                  ? 'text-content-muted'
-                                  : 'text-content-secondary'
-                          }`}
-                        >
-                          {ob.dueLabel}
-                          {overdueBand === 'warn' && (
-                            <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
-                              ⚠️ OVERDUE {overdueDays} {overdueDays === 1 ? 'day' : 'days'}
-                            </span>
-                          )}
-                          {overdueBand === 'critical' && (
-                            <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-rose-500/40 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-bold text-rose-300">
-                              ⚠️ OVERDUE {overdueDays} days
-                            </span>
-                          )}
-                        </span>
-                        {tollHint && overdueBand !== 'none' && (
-                          <p className="max-w-xs text-[11px] text-content-tertiary leading-snug">
-                            Toll violations may accrue penalties after 30 days.
-                          </p>
-                        )}
-                        {overdueBand === 'critical' && !tollHint && ob.type === 'ambush' && (
-                          <p className="max-w-xs text-[11px] text-rose-300/90 leading-snug">
-                            Unpaid fines can add late fees and collection risk. Resolve as soon as you can.
-                          </p>
-                        )}
-                        {isDebtNoDue && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (!canUseDebt) {
-                                toast.error('Editing debt requires Full Suite.');
-                                return;
-                              }
-                              const d = debts.find((x) => x.id === ob.id);
-                              if (d) setEditDebtRow(d);
-                            }}
-                            className="inline-flex items-center gap-1 self-start text-[11px] font-medium text-[var(--color-status-amber-text)] hover:underline"
-                          >
-                            <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden />
-                            Add due date
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <span className="text-sm font-mono text-content-primary">
-                        ${ob.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <div className="inline-flex flex-col items-end gap-2">
-                        {ob.type === 'recurring' && isPastDue && (
-                          <button
-                            type="button"
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              const b = bills.find((x) => x.id === ob.id);
-                              if (!b) return;
-                              await markBillPaid(b.id);
-                              toast.success(`✓ ${b.biller} marked as paid`);
-                            }}
-                            className={cn(
-                              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition-colors',
-                              overdueBand === 'critical'
-                                ? 'bg-rose-600 text-white hover:bg-rose-500'
-                                : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover',
-                            )}
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5" aria-hidden />
-                            Resolve Now →
-                          </button>
-                        )}
-                        {ob.type === 'debt' && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (!canUseDebt) {
-                                toast.error('Editing debt requires Full Suite.');
-                                return;
-                              }
-                              const d = debts.find((x) => x.id === ob.id);
-                              if (d) setEditDebtRow(d);
-                            }}
-                            className="inline-flex items-center gap-1.5 px-2 py-1 text-content-tertiary hover:text-content-secondary text-[11px] font-mono underline-offset-2 hover:underline"
-                          >
-                            <Pencil className="w-3 h-3" aria-hidden />
-                            Edit
-                          </button>
-                        )}
-                        {ob.type === 'recurring' && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const b = bills.find((x) => x.id === ob.id);
-                              if (b) setEditBillRow(b);
-                            }}
-                            className="inline-flex items-center gap-1.5 px-2 py-1 text-content-tertiary hover:text-content-secondary text-[11px] font-mono underline-offset-2 hover:underline"
-                          >
-                            <Pencil className="w-3 h-3" aria-hidden />
-                            Edit
-                          </button>
-                        )}
-                        {ob.type === 'ambush' && (
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              const cit = citations.find((c) => c.id === ob.id);
-                              if (cit) {
-                                const ok = await resolveCitation(cit.id);
-                                if (ok) toast.success(`${ob.name} resolved`);
-                              } else toast.error('Citation not found');
-                            }}
-                            className={cn(
-                              'px-3 py-1.5 text-xs font-mono font-bold rounded-md transition-colors active:scale-[0.98]',
-                              isPastDue
-                                ? 'border border-rose-500 bg-rose-600 text-white hover:bg-rose-500'
-                                : 'border border-rose-500/50 hover:bg-rose-500/10 text-rose-400',
-                            )}
-                          >
-                            {isPastDue ? 'Resolve Now →' : 'PAY'}
-                          </button>
-                        )}
-                      </div>
-                    </td>
                   </tr>
-                );
-              })}
-              {filteredObligations.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-6 py-14 text-center">
-                    {activeTab === 'ambush' ? (
-                      /* PAGE-04: Tickets & Fines empty state with context */
-                      <div className="flex flex-col items-center justify-center gap-3">
-                        <TicketIcon className="w-10 h-10 text-content-muted" />
-                        <p className="text-base font-semibold text-content-primary">Track unexpected charges</p>
-                        <p className="max-w-xs text-sm text-content-tertiary leading-relaxed">
-                          Log parking tickets, court fines, late fees, or any one-time charge. We&apos;ll add them to your bill calendar.
-                        </p>
-                        <button
-                          type="button"
-                          onClick={() => openQuickAdd('citation')}
-                          className="mt-2 inline-flex items-center gap-2 rounded-md bg-brand-cta px-4 py-2.5 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
-                        >
-                          <Plus className="w-4 h-4 shrink-0" aria-hidden />
-                          Add a fine or ticket
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center text-content-tertiary">
-                        <CheckCircle2 className="w-8 h-8 mb-3 text-emerald-500/50" />
-                        <p className="text-sm font-mono">No obligations in this category.</p>
-                      </div>
-                    )}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </CollapsibleModule>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </CollapsibleModule>
       </div>
 
       <CollapsibleModule title="Payment History Log" icon={PaymentsIcon} defaultOpen={false}>

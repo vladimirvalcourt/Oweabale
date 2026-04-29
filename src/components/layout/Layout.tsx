@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo, startTransition, useDeferredValue, memo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { TransitionLink } from '../common/TransitionLink';
-import { 
+import {
   Bell, Search, Settings, Plus, X,
   Command, Home, Activity, AlertTriangle, MoreHorizontal,
   LayoutDashboard, CalendarDays, Inbox
@@ -82,7 +82,7 @@ const SidebarHeader = memo(function SidebarHeader({
       <div className="flex items-center gap-1">
         {/* Theme Toggle - only shown in mobile sidebar */}
         <ThemeToggle className="lg:hidden" />
-        <button 
+        <button
           type="button"
           aria-label="Close navigation menu"
           className="shrink-0 p-2 text-content-tertiary transition-colors hover:text-content-secondary focus-app rounded-lg lg:hidden"
@@ -102,7 +102,7 @@ export default function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarInteracting, setSidebarInteracting] = useState(false);
   const sidebarCollapsed = !sidebarOpen && !sidebarInteracting;
-  
+
   // Initialize theme system
   const { theme } = useTheme();
 
@@ -420,11 +420,11 @@ export default function Layout() {
     () =>
       lockedToBilling
         ? navGroups
-            .map((group) => ({
-              ...group,
-              items: group.items.filter((item) => item.path === '/pro/settings'),
-            }))
-            .filter((group) => group.items.length > 0)
+          .map((group) => ({
+            ...group,
+            items: group.items.filter((item) => item.path === '/pro/settings'),
+          }))
+          .filter((group) => group.items.length > 0)
         : navGroups,
     [lockedToBilling, navGroups],
   );
@@ -459,7 +459,7 @@ export default function Layout() {
       )}
 
       {/* Sidebar */}
-      <aside 
+      <aside
         aria-label="Primary navigation"
         onMouseEnter={() => setSidebarInteracting(true)}
         onMouseLeave={() => setSidebarInteracting(false)}
@@ -483,7 +483,7 @@ export default function Layout() {
           closeSidebarMobile={closeSidebarMobile}
         />
 
-          {/* Sidebar free-plan upgrade banner removed — Layout only renders for Pro users */}
+        {/* Sidebar free-plan upgrade banner removed — Layout only renders for Pro users */}
 
         <nav className={cn('min-h-0 flex-1 overflow-y-auto scrollbar-hide', sidebarCollapsed ? 'space-y-3 px-2 py-4' : 'space-y-5 px-3 py-5')} aria-label="App sections">
           {processedSidebarNav.map((group, groupIndex) => {
@@ -500,109 +500,109 @@ export default function Layout() {
 
                 <div className="space-y-1">
                   {group.items.map((item) => {
-                        const Icon = item.icon;
-                        const isActive = item.isActive;
-                        const navCount = (item as { count?: number }).count;
-                        const isDueSoonItem = item.name === 'Due soon' && (navCount ?? 0) > 0;
-                        return (
-                          <div
-                            key={item.name}
-                            className="relative mx-1"
-                            onMouseEnter={() => {
-                              if (isDueSoonItem) setShowDueSoonPreview(true);
-                              // Fix 4: Hover-prefetch — load the route chunk before the click
-                              const lazyItem = item as typeof item & { lazyImport?: () => Promise<unknown> };
-                              if (lazyItem.lazyImport && !prefetchedPaths.current.has(item.path)) {
-                                prefetchedPaths.current.add(item.path);
-                                lazyItem.lazyImport().catch(() => {/* silent — prefetch is best-effort */});
-                              }
-                            }}
-                            onMouseLeave={() => { if (isDueSoonItem) setShowDueSoonPreview(false); }}
-                          >
-                            <TransitionLink
-                              to={item.linkTo}
-                              className={cn(
-                                'focus-app group relative flex min-h-10 items-center gap-3 rounded-md border border-transparent py-2.5 transition-colors duration-200',
-                                sidebarCollapsed ? 'justify-center px-2' : 'px-4',
-                                isActive
-                                  ? 'border border-surface-border/50 bg-content-primary/[0.07] text-content-primary'
-                                  : 'text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary',
-                              )}
-                              title={sidebarCollapsed ? item.name : undefined}
-                              aria-current={isActive ? 'page' : undefined}
-                              onClick={(e) => {
-                                if (!isDueSoonItem) return;
-                                const isMobile = window.matchMedia('(max-width: 1023px)').matches;
-                                if (isMobile) {
-                                  e.preventDefault();
-                                  setShowDueSoonPreview((v) => !v);
-                                  return;
-                                }
-                                setShowDueSoonPreview(false);
-                              }}
-                            >
-                              {isActive && !sidebarCollapsed && (
-                                <span
-                                  className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-r-sm bg-content-primary"
-                                  aria-hidden
-                                />
-                              )}
-                              {isActive && sidebarCollapsed && (
-                                <span
-                                  className="pointer-events-none absolute inset-x-1.5 bottom-1 h-0.5 rounded-full bg-brand-cta"
-                                  aria-hidden
-                                />
-                              )}
-                              <TactileIcon
-                                icon={Icon}
-                                size={16}
-                                active={isActive}
-                                variant="static"
-                                className={cn(
-                                  'relative z-[1] shrink-0',
-                                  !isActive && !sidebarCollapsed && 'group-hover:translate-x-0.5'
-                                )}
-                              />
-                              {!sidebarCollapsed && (
-                                <>
-                                  <span className="chrome-nav-row pointer-events-none flex-1">
-                                    {item.name}
-                                  </span>
-                                  {navCount !== undefined && navCount > 0 && (
-                                    <span className="relative flex items-center gap-1.5 shrink-0 px-1">
-                                      <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
-                                      <span className="text-[10px] font-mono text-content-secondary tabular-nums">
-                                        {navCount}
-                                      </span>
-                                    </span>
-                                  )}
-                                </>
-                              )}
-                            </TransitionLink>
-                            {isDueSoonItem && showDueSoonPreview && !sidebarCollapsed && (
-                              <div className="app-popover absolute left-0 top-full z-50 mt-2 w-64 rounded-lg border border-surface-border p-3 backdrop-blur-xl lg:left-full lg:top-1/2 lg:ml-2 lg:mt-0 lg:-translate-y-1/2">
-                                <p className="chrome-micro-label mb-2 text-content-tertiary">Due Soon Preview</p>
-                                <div className="space-y-1.5">
-                                  {dueSoonPreview.length === 0 ? (
-                                    <p className="text-xs text-content-tertiary">No upcoming bills in next 7 days.</p>
-                                  ) : (
-                                    dueSoonPreview.map((entry) => (
-                                      <p key={entry.label} className="text-xs text-content-secondary">{entry.label}</p>
-                                    ))
-                                  )}
-                                </div>
-                                <TransitionLink
-                                  to="/pro/bills#due-soon"
-                                  className="mt-3 inline-flex text-xs text-content-primary hover:text-content-secondary"
-                                  onClick={() => setShowDueSoonPreview(false)}
-                                >
-                                  View All →
-                                </TransitionLink>
-                              </div>
+                    const Icon = item.icon;
+                    const isActive = item.isActive;
+                    const navCount = (item as { count?: number }).count;
+                    const isDueSoonItem = item.name === 'Due soon' && (navCount ?? 0) > 0;
+                    return (
+                      <div
+                        key={item.name}
+                        className="relative mx-1"
+                        onMouseEnter={() => {
+                          if (isDueSoonItem) setShowDueSoonPreview(true);
+                          // Fix 4: Hover-prefetch — load the route chunk before the click
+                          const lazyItem = item as typeof item & { lazyImport?: () => Promise<unknown> };
+                          if (lazyItem.lazyImport && !prefetchedPaths.current.has(item.path)) {
+                            prefetchedPaths.current.add(item.path);
+                            lazyItem.lazyImport().catch(() => {/* silent — prefetch is best-effort */ });
+                          }
+                        }}
+                        onMouseLeave={() => { if (isDueSoonItem) setShowDueSoonPreview(false); }}
+                      >
+                        <TransitionLink
+                          to={item.linkTo}
+                          className={cn(
+                            'focus-app group relative flex min-h-10 items-center gap-3 rounded-md border border-transparent py-2.5 transition-colors duration-200',
+                            sidebarCollapsed ? 'justify-center px-2' : 'px-4',
+                            isActive
+                              ? 'border border-surface-border/50 bg-content-primary/[0.07] text-content-primary'
+                              : 'text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary',
+                          )}
+                          title={sidebarCollapsed ? item.name : undefined}
+                          aria-current={isActive ? 'page' : undefined}
+                          onClick={(e) => {
+                            if (!isDueSoonItem) return;
+                            const isMobile = window.matchMedia('(max-width: 1023px)').matches;
+                            if (isMobile) {
+                              e.preventDefault();
+                              setShowDueSoonPreview((v) => !v);
+                              return;
+                            }
+                            setShowDueSoonPreview(false);
+                          }}
+                        >
+                          {isActive && !sidebarCollapsed && (
+                            <span
+                              className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-r-sm bg-content-primary"
+                              aria-hidden
+                            />
+                          )}
+                          {isActive && sidebarCollapsed && (
+                            <span
+                              className="pointer-events-none absolute inset-x-1.5 bottom-1 h-0.5 rounded-full bg-brand-cta"
+                              aria-hidden
+                            />
+                          )}
+                          <TactileIcon
+                            icon={Icon}
+                            size={16}
+                            active={isActive}
+                            variant="static"
+                            className={cn(
+                              'relative z-[1] shrink-0',
+                              !isActive && !sidebarCollapsed && 'group-hover:translate-x-0.5'
                             )}
+                          />
+                          {!sidebarCollapsed && (
+                            <>
+                              <span className="chrome-nav-row pointer-events-none flex-1">
+                                {item.name}
+                              </span>
+                              {navCount !== undefined && navCount > 0 && (
+                                <span className="relative flex items-center gap-1.5 shrink-0 px-1">
+                                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
+                                  <span className="text-[10px] font-mono text-content-secondary tabular-nums">
+                                    {navCount}
+                                  </span>
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </TransitionLink>
+                        {isDueSoonItem && showDueSoonPreview && !sidebarCollapsed && (
+                          <div className="app-popover absolute left-0 top-full z-50 mt-2 w-64 rounded-lg border border-surface-border p-3 backdrop-blur-xl lg:left-full lg:top-1/2 lg:ml-2 lg:mt-0 lg:-translate-y-1/2">
+                            <p className="chrome-micro-label mb-2 text-content-tertiary">Due Soon Preview</p>
+                            <div className="space-y-1.5">
+                              {dueSoonPreview.length === 0 ? (
+                                <p className="text-xs text-content-tertiary">No upcoming bills in next 7 days.</p>
+                              ) : (
+                                dueSoonPreview.map((entry) => (
+                                  <p key={entry.label} className="text-xs text-content-secondary">{entry.label}</p>
+                                ))
+                              )}
+                            </div>
+                            <TransitionLink
+                              to="/pro/bills#due-soon"
+                              className="mt-3 inline-flex text-xs text-content-primary hover:text-content-secondary"
+                              onClick={() => setShowDueSoonPreview(false)}
+                            >
+                              View All →
+                            </TransitionLink>
                           </div>
-                        );
-                      })}
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -638,7 +638,7 @@ export default function Layout() {
       </aside>
 
       {/* Main Content Wrapper */}
-      <div 
+      <div
         className={cn(
           /* scroll-padding: sticky app header (h-[4.5rem]) — keyboard focus stays clear of chrome (WCAG 2.4.11) */
           "flex h-[100dvh] flex-1 flex-col overflow-y-auto scroll-pt-[4.5rem] scrollbar-hide transition-all duration-300 ease-in-out",
@@ -648,7 +648,7 @@ export default function Layout() {
         {/* Top Bar */}
         <header className="app-chrome sticky top-0 z-30 flex h-[4.5rem] shrink-0 items-center justify-between border-b border-surface-border px-4 backdrop-blur-xl sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 flex-1">
-            <button 
+            <button
               type="button"
               aria-label="Open navigation menu"
               className="lg:hidden flex min-h-11 min-w-11 items-center justify-center rounded-lg text-content-tertiary transition-colors hover:text-content-secondary focus-app"
@@ -656,57 +656,57 @@ export default function Layout() {
             >
               <MorphingMenuIcon isOpen={sidebarOpen} className="scale-110" />
             </button>
-            
+
             {/* Global Search (Desktop) */}
             <div className="hidden md:flex flex-col max-w-md w-full" ref={searchRef}>
               <label htmlFor="layout-global-search" className="sr-only">
                 Search Pay List items, documents, subscriptions, and settings
               </label>
               <div className="relative w-full">
-              <Search className="w-4 h-4 text-content-tertiary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden />
-              <input 
-                id="layout-global-search"
-                ref={searchInputRef}
-                type="text" 
-                placeholder={searchModKey === '⌘' ? 'Search (⌘K)' : 'Search (Ctrl+K)'}
-                autoComplete="off"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setIsSearchOpen(true);
-                }}
-                onFocus={() => setIsSearchOpen(true)}
-                className="focus-app-field min-h-10 w-full rounded-md border border-surface-border bg-surface-base py-2.5 pl-9 pr-4 font-sans text-sm text-content-primary transition-all placeholder:text-content-tertiary focus:border-content-primary/25 focus:bg-surface-elevated/90"
-              />
-              
-              {/* Search Dropdown */}
-              {isSearchOpen && searchQuery.trim() !== '' && (
-                <div className="app-floating-panel absolute left-0 right-0 top-full z-50 mt-1 max-h-96 overflow-hidden overflow-y-auto rounded-lg border border-surface-border backdrop-blur-md">
-                  {searchResults.length > 0 ? (
-                    <ul className="py-1">
-                      {searchResults.map((result, index) => (
-                        <li key={index}>
-                          <button
-                            type="button"
-                            onClick={() => handleSearchSelect(result.path)}
-                            className="focus-app flex w-full flex-col px-4 py-2.5 text-left transition-colors hover:bg-content-primary/[0.04]"
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="text-sm font-medium text-content-primary">{result.name}</span>
-                              <span className="text-xs text-content-tertiary bg-surface-elevated px-1.5 py-0.5 rounded">{result.type}</span>
-                            </div>
-                            <span className="text-xs text-content-tertiary mt-0.5">{result.detail}</span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className="px-4 py-3 text-sm text-content-tertiary text-center">
-                      {`No results found for "${searchQuery}"`}
-                    </div>
-                  )}
-                </div>
-              )}
+                <Search className="w-4 h-4 text-content-tertiary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden />
+                <input
+                  id="layout-global-search"
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder={searchModKey === '⌘' ? 'Search (⌘K)' : 'Search (Ctrl+K)'}
+                  autoComplete="off"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setIsSearchOpen(true);
+                  }}
+                  onFocus={() => setIsSearchOpen(true)}
+                  className="focus-app-field min-h-10 w-full rounded-md border border-surface-border bg-surface-base py-2.5 pl-9 pr-4 font-sans text-sm text-content-primary transition-all placeholder:text-content-tertiary focus:border-content-primary/25 focus:bg-surface-elevated/90"
+                />
+
+                {/* Search Dropdown */}
+                {isSearchOpen && searchQuery.trim() !== '' && (
+                  <div className="app-floating-panel absolute left-0 right-0 top-full z-50 mt-1 max-h-96 overflow-hidden overflow-y-auto rounded-lg border border-surface-border backdrop-blur-md">
+                    {searchResults.length > 0 ? (
+                      <ul className="py-1">
+                        {searchResults.map((result, index) => (
+                          <li key={index}>
+                            <button
+                              type="button"
+                              onClick={() => handleSearchSelect(result.path)}
+                              className="focus-app flex w-full flex-col px-4 py-2.5 text-left transition-colors hover:bg-content-primary/[0.04]"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium text-content-primary">{result.name}</span>
+                                <span className="text-xs text-content-tertiary bg-surface-elevated px-1.5 py-0.5 rounded">{result.type}</span>
+                              </div>
+                              <span className="text-xs text-content-tertiary mt-0.5">{result.detail}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <div className="px-4 py-3 text-sm text-content-tertiary text-center">
+                        {`No results found for "${searchQuery}"`}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               <p className="mt-1.5 pl-1 text-xs font-sans text-content-muted leading-none hidden lg:block">
                 <kbd className="rounded border border-surface-border bg-surface-elevated px-1 py-0.5 font-mono text-[10px]">
@@ -730,10 +730,10 @@ export default function Layout() {
 
           <div className="flex items-center gap-2 sm:gap-4">
             {/* Search Icon (Mobile) */}
-            <button 
+            <button
               type="button"
               aria-label="Open search"
-              onClick={() => setIsMobileSearchOpen(true)} 
+              onClick={() => setIsMobileSearchOpen(true)}
               className="md:hidden text-content-tertiary hover:text-content-secondary transition-colors p-1 focus-app rounded-lg min-w-11 min-h-11 flex items-center justify-center"
             >
               <Search className="w-4 h-4" />
@@ -1041,10 +1041,10 @@ export default function Layout() {
           {(lockedToBilling
             ? [{ name: 'Plan', to: '/pro/settings?tab=billing', icon: Settings }]
             : [
-                { name: 'Pay List', to: '/pro/dashboard', icon: LayoutDashboard },
-                { name: 'Calendar', to: '/pro/calendar', icon: CalendarDays },
-                { name: 'Documents', to: '/pro/documents', icon: Inbox },
-              ]
+              { name: 'Pay List', to: '/pro/dashboard', icon: LayoutDashboard },
+              { name: 'Calendar', to: '/pro/calendar', icon: CalendarDays },
+              { name: 'Documents', to: '/pro/documents', icon: Inbox },
+            ]
           ).map((item) => {
             const Icon = item.icon;
             const active = `${location.pathname}${location.search}` === item.to || location.pathname === item.to;
@@ -1102,7 +1102,7 @@ export default function Layout() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="focus-app flex-1 rounded-lg border border-transparent bg-transparent px-1 text-base text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-surface-border focus:bg-surface-base/35"
             />
-            <button 
+            <button
               type="button"
               aria-label="Close search"
               onClick={() => {
@@ -1116,7 +1116,7 @@ export default function Layout() {
               <X className="w-5 h-5" />
             </button>
           </div>
-          
+
           <div className="flex-1 overflow-y-auto scrollbar-hide bg-surface-base">
             {searchQuery.trim() !== '' ? (
               searchResults.length > 0 ? (
