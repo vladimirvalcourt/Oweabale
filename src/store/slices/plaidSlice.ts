@@ -38,6 +38,8 @@ export const createPlaidSlice: StoreSlice<
     // before we consider the sync complete. Prevents race conditions where
     // fetchData() reads stale data immediately after sync completes.
     const previousTransactionCount = get().transactions.length;
+    const previousLastSyncAt = get().plaidLastSyncAt;
+    const previousRelinkState = get().plaidNeedsRelink;
     let attempts = 0;
     const maxAttempts = 5;
     
@@ -47,7 +49,10 @@ export const createPlaidSlice: StoreSlice<
       await get().fetchData();
       
       const newTransactionCount = get().transactions.length;
-      if (newTransactionCount !== previousTransactionCount) {
+      const syncStateChanged =
+        get().plaidLastSyncAt !== previousLastSyncAt ||
+        get().plaidNeedsRelink !== previousRelinkState;
+      if (newTransactionCount !== previousTransactionCount || syncStateChanged) {
         console.log('[Plaid Sync] Data updated successfully');
         break;
       }

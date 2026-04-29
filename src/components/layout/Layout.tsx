@@ -46,6 +46,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const prefetchedPaths = usePrefetchedSet(); // Fix 4
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sidebarCollapsed = false;
   
   // Initialize theme system
   const { theme } = useTheme();
