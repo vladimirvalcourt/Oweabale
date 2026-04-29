@@ -148,7 +148,6 @@ export function buildNavGroups({
     { name: 'Pay List', path: '/pro/dashboard', icon: LayoutDashboard, count: dueSoonCount, lazyImport: () => import('../../pages/Dashboard') },
     { name: 'Calendar', path: '/pro/calendar', icon: CalendarIcon, lazyImport: () => import('../../pages/Calendar') },
     { name: 'Documents', path: '/pro/documents', icon: Inbox, count: pendingIngestionsCount, lazyImport: () => import('../../pages/Ingestion') },
-    { name: 'Settings', path: '/pro/settings', icon: Settings, lazyImport: () => import('../../pages/Settings') },
   ];
 
   const advancedNavItems: NavItem[] = [
