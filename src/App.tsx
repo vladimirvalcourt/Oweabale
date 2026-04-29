@@ -8,7 +8,7 @@ import type { User } from '@supabase/supabase-js';
 import { lazy, Suspense } from 'react';
 import { Layout, DeviceGuard, ErrorBoundary, AuthGuard, AdminGuard, MaintenanceGuard, ProPlanGuard, DashboardSkeleton, ListSkeleton, AppLoader, SessionWarningModal, PWAInstallBanner } from './components';
 import { useStore } from './store';
-import { useAuth, usePWAUpdateNotification, usePWAStandaloneMode, usePostHogIdentity } from './hooks';
+import { useAuth, usePWAUpdateNotification, usePWAStandaloneMode, usePostHogIdentity, useTheme } from './hooks';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // Fix 1: Dashboard is now lazy — this keeps recharts + motion/react OUT of the initial
@@ -120,13 +120,6 @@ function AppRoutes() {
       <Route path="/auth" element={<SignInRoute authUser={authUser} />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/plaid/callback" element={<PlaidCallback />} />
-
-      {/* Old free namespace is kept only as redirects so existing links do not break. */}
-      <Route path="free/dashboard" element={<AppRedirect to="/pro/dashboard" />} />
-      <Route path="free/bills" element={<AppRedirect to="/pro/bills" />} />
-      <Route path="free/subscriptions" element={<AppRedirect to="/pro/subscriptions" />} />
-      <Route path="free/calendar" element={<AppRedirect to="/pro/calendar" />} />
-      <Route path="free/settings" element={<AppRedirect to="/pro/settings" />} />
 
       {/* ────────────────────────────────────────────────────────────────
            PRO NAMESPACE  /pro/*
@@ -240,6 +233,7 @@ function AppShell() {
   const { user: authUser } = useAuth();
   const location = useLocation();
   const isProRoute = location.pathname.startsWith('/pro');
+  useTheme();
   
   // Track user identity in PostHog
   usePostHogIdentity();

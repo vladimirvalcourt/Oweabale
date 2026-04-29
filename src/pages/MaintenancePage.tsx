@@ -9,7 +9,7 @@ export default function MaintenancePage() {
 
   return (
     <div className="min-h-screen bg-surface-base flex flex-col items-center justify-center px-6 py-16">
-      <p className="text-xs font-medium uppercase tracking-widest text-success mb-6">Maintenance</p>
+      <p className="ui-pill ui-pill-good mb-6">Maintenance</p>
       <h1 className="mb-2 text-center text-3xl font-semibold tracking-tight text-content-primary sm:text-4xl">
         We&apos;re upgrading Oweable
       </h1>
@@ -21,13 +21,13 @@ export default function MaintenancePage() {
         <button
           type="button"
           onClick={() => void signOut()}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-surface-border bg-surface-raised text-sm font-medium text-content-primary hover:bg-surface-elevated transition-colors rounded-lg"
+          className="ui-button ui-button-md ui-button-secondary"
         >
           Sign out
         </button>
         <TransitionLink
           to="/"
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover"
+          className="ui-button ui-button-md ui-button-primary"
         >
           Home
         </TransitionLink>

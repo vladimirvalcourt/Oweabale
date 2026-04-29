@@ -8,7 +8,7 @@ const sections = [
   {
     title: 'Acceptance of terms',
     copy:
-      'By using Oweable, you agree to these Terms of Service and any additional policies referenced by them. These terms govern access to the platform and its paid and free plans.',
+      'By using Oweable, you agree to these Terms of Service and any additional policies referenced by them. These terms govern access to the platform, trial access, and paid plans.',
   },
   {
     title: 'Platform use',
@@ -59,7 +59,7 @@ export default function Terms() {
           { href: '/support', label: 'Support' },
         ]}
       />
-      <div className="min-h-screen bg-surface-base text-content-primary selection:bg-brand-violet/25">
+      <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
         <main className="premium-container pb-24 pt-36">
           <section className="grid gap-12 py-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
             <div>
@@ -84,15 +84,15 @@ export default function Terms() {
               <div className="p-5">
               <p className="text-sm leading-6 text-content-tertiary">
                 For billing and plan details, visit{' '}
-                <TransitionLink to="/pricing" className="font-medium text-content-primary underline underline-offset-4 hover:text-brand-violet">
+                <TransitionLink to="/pricing" className="font-medium text-content-primary underline underline-offset-4 hover:text-content-secondary">
                   Pricing
                 </TransitionLink>
                 . For data handling, use{' '}
-                <TransitionLink to="/privacy" className="font-medium text-content-primary underline underline-offset-4 hover:text-brand-violet">
+                <TransitionLink to="/privacy" className="font-medium text-content-primary underline underline-offset-4 hover:text-content-secondary">
                   Privacy
                 </TransitionLink>
                 . If something is unclear, contact{' '}
-                <TransitionLink to="/support" className="font-medium text-content-primary underline underline-offset-4 hover:text-brand-violet">
+                <TransitionLink to="/support" className="font-medium text-content-primary underline underline-offset-4 hover:text-content-secondary">
                   Support
                 </TransitionLink>
                 .

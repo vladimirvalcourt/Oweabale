@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { TransitionLink } from '../components/common';
 import { useSEO, trackEvent } from '../hooks';
 import { runAfterPaint } from '../lib/utils';
-import { BrandWordmark } from '../components/common';
+import { BrandWordmark, ThemeToggle } from '../components/common';
 import { CheckCircle2, LockKeyhole, ReceiptText, WalletCards } from 'lucide-react';
 
 type AuthPageProps = {
@@ -19,9 +19,9 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
   const location = useLocation();
 
   useSEO({
-    title: isSignupMode ? 'Create your free account — Oweable' : 'Sign in — Oweable',
+    title: isSignupMode ? 'Create your trial account — Oweable' : 'Sign in — Oweable',
     description: isSignupMode
-      ? 'Create your free Oweable account to start organizing bills, debt, due dates, and what needs attention next.'
+      ? 'Create your Oweable account to start 14 days of Full Suite access for bills, debt, due dates, and what needs attention next.'
       : 'Sign in to Oweable with Google for secure access to your Pay List, debt plan, subscriptions, and cash-flow tools.',
     canonical: isSignupMode ? 'https://www.oweable.com/onboarding' : 'https://www.oweable.com/auth',
     ogImage: 'https://www.oweable.com/og-image.svg',
@@ -61,7 +61,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-brand-violet/25">
+    <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-content-primary/15">
       <header className="fixed inset-x-0 top-0 z-50 border-b border-surface-border-subtle bg-surface-base/90 backdrop-blur-xl">
         <div className="premium-container flex h-[72px] items-center justify-between">
           <TransitionLink to="/" className="group flex items-center gap-2 text-content-primary">
@@ -70,17 +70,20 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
               textClassName="text-xl font-medium normal-case tracking-[-0.035em] text-content-primary"
             />
           </TransitionLink>
-          <TransitionLink to="/pricing" className="text-sm text-content-secondary/72 transition-colors hover:text-content-primary">
-            Pricing
-          </TransitionLink>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <TransitionLink to="/pricing" className="ui-button ui-button-sm ui-button-ghost">
+              Pricing
+            </TransitionLink>
+          </div>
         </div>
       </header>
 
       <main className="premium-container grid min-h-screen gap-12 pb-16 pt-36 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
         <section className="max-w-md">
-          <p className="inline-flex items-center gap-2 rounded-full border border-surface-border-subtle bg-surface-raised px-3 py-1 text-xs text-content-secondary">
+          <p className="ui-pill ui-pill-lg">
             <span className="h-1.5 w-1.5 rounded-full bg-content-primary" aria-hidden />
-            Free to start · Google sign-in
+            14 days first · Google sign-in
           </p>
 
           <h1 className="premium-display mt-7">

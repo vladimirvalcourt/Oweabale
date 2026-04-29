@@ -51,10 +51,10 @@ export function FullSuiteGateCard({ title, description, compact = false }: FullS
             className="mt-5 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-sans font-semibold text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isUpgrading ? <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden /> : null}
-            {isUpgrading ? 'Getting things ready...' : `Start Full Suite — $${monthlyPrice.toFixed(2)}/mo`}
+            {isUpgrading ? 'Getting things ready...' : `Add billing - $${monthlyPrice.toFixed(2)}/mo`}
           </button>
           <p className="mt-2 text-xs text-content-tertiary">
-            No pressure: you can keep using the Pay List and core workflows.
+            New accounts get 14 days first. Billing only starts when you choose a paid plan.
           </p>
           <TransitionLink
             to="/pro/dashboard"

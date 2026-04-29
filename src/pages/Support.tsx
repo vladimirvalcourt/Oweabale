@@ -247,7 +247,7 @@ export default function Support() {
                   <p className="premium-eyebrow">Contact support</p>
                   {EMAIL_CONFIG.support.createContactLink(
                     'Get Help',
-                    'mt-3 inline-flex h-11 min-w-[140px] items-center justify-center rounded-md bg-content-primary px-5 text-sm font-medium text-surface-base transition-colors hover:bg-content-secondary',
+                    'ui-button ui-button-md ui-button-primary mt-3 min-w-[140px]',
                     true
                   )}
                 </div>
@@ -268,14 +268,14 @@ export default function Support() {
                 </p>
 
                 {submitted ? (
-                  <div className="mt-8 rounded-lg border border-surface-border-subtle bg-surface-base/60 p-8 text-center">
+                  <div className="ui-card-compact mt-8 p-8 text-center">
                     <h3 className="text-lg font-medium text-content-primary mb-3">Message sent</h3>
                     <p className="text-sm leading-relaxed text-content-tertiary">
                       We got your note and will usually reply within one business day.
                     </p>
                     <button
                       onClick={() => setSubmitted(false)}
-                      className="mt-6 inline-flex h-11 min-w-[160px] items-center justify-center rounded-md bg-content-primary px-6 text-sm font-medium text-surface-base transition-colors hover:bg-content-secondary"
+                      className="ui-button ui-button-md ui-button-primary mt-6 min-w-[160px]"
                     >
                       Send another message
                     </button>
@@ -289,7 +289,7 @@ export default function Support() {
                           type="text"
                           value={formData.name}
                           onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                          className="mt-2 w-full rounded-md border border-surface-border bg-surface-base px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-content-primary/30 focus-app-field"
+                          className="ui-field mt-2"
                           placeholder="Your name"
                           required
                         />
@@ -300,7 +300,7 @@ export default function Support() {
                           type="email"
                           value={formData.email}
                           onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                          className="mt-2 w-full rounded-md border border-surface-border bg-surface-base px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-content-primary/30 focus-app-field"
+                          className="ui-field mt-2"
                           placeholder="you@example.com"
                           required
                         />
@@ -313,7 +313,7 @@ export default function Support() {
                         type="text"
                         value={formData.subject}
                         onChange={(e) => setFormData((prev) => ({ ...prev, subject: e.target.value }))}
-                        className="mt-2 w-full rounded-md border border-surface-border bg-surface-base px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-content-primary/30 focus-app-field"
+                        className="ui-field mt-2"
                         placeholder="Billing, login issue, bug report..."
                       />
                     </label>
@@ -323,7 +323,7 @@ export default function Support() {
                       <textarea
                         value={formData.message}
                         onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
-                        className="mt-2 min-h-[160px] w-full rounded-md border border-surface-border bg-surface-base px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-content-primary/30 focus-app-field"
+                        className="ui-field mt-2 min-h-[160px] py-3"
                         placeholder="Tell us what happened, what you expected, and anything that would help us reproduce or understand the issue."
                         
                         required
@@ -352,7 +352,7 @@ export default function Support() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="mt-6 inline-flex h-11 items-center gap-3 rounded-md bg-content-primary px-6 text-sm font-semibold text-surface-base transition-colors hover:bg-content-secondary disabled:cursor-not-allowed disabled:opacity-70"
+                      className="ui-button ui-button-md ui-button-primary mt-6 disabled:opacity-70"
                     >
                       {isSubmitting ? 'Sending...' : 'Send message'}
                       <ArrowRight className="h-4 w-4" />
@@ -381,20 +381,20 @@ export default function Support() {
                   <motion.div variants={springButton} whileHover="hover" whileTap="tap">
                     <TransitionLink
                       to="/pricing"
-                      className="inline-flex items-center gap-2 rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-raised"
+                      className="ui-button ui-button-md ui-button-secondary"
                     >
                       Pricing
                     </TransitionLink>
                   </motion.div>
                   <TransitionLink
                     to="/security"
-                    className="inline-flex items-center gap-2 rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-raised"
+                    className="ui-button ui-button-md ui-button-secondary"
                   >
                     Security
                   </TransitionLink>
                   <TransitionLink
                     to="/privacy"
-                    className="inline-flex items-center gap-2 rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-raised"
+                    className="ui-button ui-button-md ui-button-secondary"
                   >
                     Privacy
                   </TransitionLink>

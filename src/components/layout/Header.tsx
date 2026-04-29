@@ -52,14 +52,14 @@ export default function Header() {
                 useStore.getState().signOut();
                 toast.success('Session terminated');
               }}
-              className="hidden min-h-[48px] rounded-full border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:border-surface-border-subtle hover:text-content-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base sm:block"
+              className="hidden min-h-[48px] rounded-full border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:border-surface-border-subtle hover:text-content-primary focus-app sm:block"
             >
               Sign out
             </button>
           )}
           <TransitionLink
             to={authUser?.id ? '/dashboard' : '/auth'}
-            className="inline-flex min-h-[48px] items-center gap-2 rounded-full bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+            className="inline-flex min-h-[48px] items-center gap-2 rounded-full bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-cta-hover focus-app"
           >
             {authUser?.id ? 'Open Pay List' : 'Start free'}
           </TransitionLink>

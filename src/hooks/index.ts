@@ -8,7 +8,6 @@ export { useDataSync } from './useDataSync';
 export { useFullSuiteAccess } from './useFullSuiteAccess';
 export { useJsonLd } from './useJsonLd';
 export { usePlaidFlow } from './usePlaidFlow';
-export { usePlanRedirect } from './usePlanRedirect';
 export { usePrefersReducedMotion } from './usePrefersReducedMotion';
 export { usePWAStandaloneMode } from './usePWAStandaloneMode';
 export { usePWAUpdateNotification } from './usePWAUpdateNotification';

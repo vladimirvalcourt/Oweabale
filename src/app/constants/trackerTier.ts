@@ -1,7 +1,7 @@
 import type { TabType } from '../../store';
 
 /**
- * Tracker (free) tier — centralized policy contract.
+ * Limited-access policy contract used while Full Suite access is unavailable.
  */
 
 export const TRACKER_ALLOWED_APP_PATHS = new Set(['/bills', '/settings']);
@@ -30,7 +30,7 @@ export function isTrackerObligationDebtBlocked(obligationKind: string, hasFullSu
 }
 
 /**
- * Copy contract surfaced in free-tier UI callouts.
+ * Copy contract surfaced in limited-access UI callouts.
  */
 export const TRACKER_FREE_TIER_SUMMARY =
-  'Tracker (free): recurring bills and tickets/fines on Bills. Full Suite unlocks debt actions, ledger, income, and bank sync.';
+  'Full Suite access is needed for debt actions, ledger entries, income, and bank sync.';

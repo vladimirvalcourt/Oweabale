@@ -124,7 +124,7 @@ function ProductPreview() {
   }, []);
 
   return (
-    <div className="relative mx-auto max-w-[1320px] overflow-hidden rounded-[22px] border border-surface-border bg-surface-raised shadow-panel">
+      <div className="ui-card relative mx-auto max-w-[1320px] overflow-hidden shadow-panel">
       <div className="public-grid-bg pointer-events-none absolute inset-0 opacity-35" />
       <div className="relative flex h-12 items-center justify-between border-b border-surface-border-subtle bg-surface-raised/82 px-5">
         <div className="flex items-center gap-2">
@@ -166,12 +166,12 @@ function ProductPreview() {
                 Sort upcoming bills by cash impact, due date, and whether a payment can safely move today.
               </p>
             </div>
-            <span className="hidden rounded-md border border-surface-border-subtle px-3 py-1 text-xs text-content-tertiary sm:inline-flex">
+            <span className="ui-pill ui-pill-muted hidden sm:inline-flex">
               In Progress
             </span>
           </div>
 
-          <div className="divide-y divide-white/[0.06] rounded-lg border border-surface-border-subtle bg-surface-base/50">
+          <div className="ui-card-compact divide-y divide-surface-border-subtle overflow-hidden">
             {payListRows.map((row, index) => (
               <div 
                 key={row.label} 
@@ -182,11 +182,11 @@ function ProductPreview() {
                   <p className="text-sm font-medium text-content-primary">{row.label}</p>
                   <p className="text-xs text-content-muted">Due {row.due}</p>
                 </div>
-                <span className="hidden self-center rounded-md border border-surface-border-subtle px-2 py-1 text-xs text-content-tertiary sm:inline-flex">
+                <span className="ui-pill ui-pill-muted hidden self-center sm:inline-flex">
                   {row.state}
                 </span>
                 <span className="self-center font-mono text-sm text-content-secondary">{row.amount}</span>
-                <Check className="hidden h-4 w-4 self-center text-brand-violet sm:block" />
+                <Check className="hidden h-4 w-4 self-center text-content-secondary sm:block" />
               </div>
             ))}
           </div>
@@ -217,8 +217,8 @@ function ProductPreview() {
               ))}
             </div>
             </div>
-            <div className="rounded-lg border border-surface-border-subtle bg-surface-base/44 p-4">
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-content-muted">This week</p>
+            <div className="ui-card-compact p-4">
+              <p className="ui-label">This week</p>
               <div className="mt-4 space-y-3">
                 <div className="h-1.5 overflow-hidden rounded-full bg-surface-elevated">
                   <div className="h-full w-[68%] rounded-full bg-content-primary" />
@@ -230,11 +230,11 @@ function ProductPreview() {
         </div>
 
         <aside className="hidden border-l border-surface-border-subtle bg-surface-raised/24 p-7 lg:block">
-          <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Cash ready</p>
+          <p className="ui-label">Cash ready</p>
           <div className="mt-5 font-mono text-3xl tracking-[-0.04em] text-content-primary">$2,417</div>
           <div className="mt-7 grid gap-2">
             {heroMetrics.map((metric) => (
-              <div key={metric.label} className="rounded-md border border-surface-border-subtle bg-surface-base/44 px-3 py-3">
+              <div key={metric.label} className="ui-card-compact px-3 py-3">
                 <p className="text-xs text-content-muted">{metric.label}</p>
                 <p className="mt-1 font-mono text-sm text-content-secondary">{metric.value}</p>
               </div>
@@ -289,7 +289,7 @@ export default function Landing() {
   });
 
   return (
-    <div className="min-h-screen overflow-hidden bg-surface-base text-content-primary selection:bg-brand-violet/25">
+    <div className="min-h-screen overflow-hidden bg-surface-base text-content-primary selection:bg-content-primary/15">
       <PublicHeader
         links={[
           { href: '#why', label: 'Why', id: 'why' },
@@ -353,10 +353,10 @@ export default function Landing() {
                 </div>
               </div>
               <div className="public-fade-up public-delay-1 hidden lg:block">
-                <div className="rounded-[22px] border border-surface-border-subtle bg-surface-raised/72 p-5 shadow-card">
+                <div className="ui-card-soft p-5">
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-content-muted">Live week</p>
-                    <span className="rounded-md border border-surface-border-subtle px-2 py-1 font-mono text-[11px] text-content-tertiary">APR 29</span>
+                    <p className="ui-label">Live week</p>
+                    <span className="ui-pill ui-pill-muted font-mono">APR 29</span>
                   </div>
                   <div className="mt-7 space-y-5">
                     {heroMetrics.map((metric) => (
@@ -371,8 +371,8 @@ export default function Landing() {
                     className="mt-7 inline-flex items-center gap-3 text-sm text-content-secondary transition-colors hover:text-content-primary"
                   >
                     <span className="relative flex h-2.5 w-2.5">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-violet opacity-20" />
-                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brand-indigo" />
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-content-muted opacity-20" />
+                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-content-primary" />
                     </span>
                     <span>Stay ahead of bills</span>
                     <ArrowRight className="h-4 w-4 text-content-muted" />
@@ -408,7 +408,7 @@ export default function Landing() {
                       className="public-feature-card h-full p-5"
                     >
                       <span className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-surface-border-subtle bg-surface-base/54">
-                        <Icon className="h-5 w-5 text-brand-violet" />
+                        <Icon className="h-5 w-5 text-content-secondary" />
                       </span>
                       <h3 className="mt-5 text-xl font-medium tracking-[-0.024em] text-content-primary">{feature.title}</h3>
                       <p className="mt-3 text-sm leading-6 text-content-tertiary">{feature.body}</p>
@@ -443,7 +443,7 @@ export default function Landing() {
               {proofPoints.map((item, index) => (
                 <div
                   key={item}
-                  className="flex items-center justify-between rounded-md border border-surface-border-subtle bg-surface-raised px-4 py-4 shadow-card"
+                  className="ui-card-soft flex items-center justify-between px-4 py-4"
                 >
                   <span className="text-sm text-content-secondary">{item}</span>
                   <span className="font-mono text-xs text-content-muted">0{index + 1}</span>

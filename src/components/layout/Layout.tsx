@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback, useMemo, startTransiti
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { TransitionLink } from '../common/TransitionLink';
 import { 
-  Bell, Search, Settings, Plus, X, ChevronDown,
+  Bell, Search, Settings, Plus, X,
   Command, Home, Activity, AlertTriangle, MoreHorizontal,
   LayoutDashboard, CalendarDays, Inbox
 } from 'lucide-react';
@@ -46,7 +46,8 @@ export default function Layout() {
   const navigate = useNavigate();
   const prefetchedPaths = usePrefetchedSet(); // Fix 4
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const sidebarCollapsed = false;
+  const [sidebarInteracting, setSidebarInteracting] = useState(false);
+  const sidebarCollapsed = !sidebarOpen && !sidebarInteracting;
   
   // Initialize theme system
   const { theme } = useTheme();
@@ -59,20 +60,6 @@ export default function Layout() {
   useEffect(() => {
     startTransition(() => setSidebarOpen(false));
   }, [location.pathname, location.search, location.hash]);
-
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
-    'Overview': true,
-    'More': false,
-  });
-
-  const toggleGroup = useCallback((label: string) => {
-    startTransition(() => {
-      setExpandedGroups((prev) => ({
-        ...prev,
-        [label]: !prev[label],
-      }));
-    });
-  }, []);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -409,10 +396,20 @@ export default function Layout() {
       {/* Sidebar */}
       <aside 
         aria-label="Primary navigation"
+        onMouseEnter={() => setSidebarInteracting(true)}
+        onMouseLeave={() => setSidebarInteracting(false)}
+        onFocusCapture={() => setSidebarInteracting(true)}
+        onBlurCapture={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+            setSidebarInteracting(false);
+          }
+        }}
         className={cn(
-          "app-chrome fixed inset-y-0 left-0 z-50 flex flex-col backdrop-blur-xl transition-all duration-300 ease-in-out",
+          "app-chrome fixed inset-y-0 left-0 z-50 flex flex-col overflow-hidden backdrop-blur-xl transition-[width,transform,box-shadow] duration-300 ease-out",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-          "w-[240px] border-r border-surface-border"
+          sidebarCollapsed ? "w-[72px]" : "w-[280px]",
+          "border-r border-surface-border",
+          !sidebarCollapsed && "shadow-[20px_0_80px_rgba(0,0,0,0.28)]"
         )}
       >
         <div className="flex h-[4.5rem] shrink-0 items-center justify-between gap-2 border-b border-surface-border/90 px-3 sm:px-4">
@@ -455,35 +452,21 @@ export default function Layout() {
 
           {/* Sidebar free-plan upgrade banner removed — Layout only renders for Pro users */}
 
-        <nav className={cn('min-h-0 flex-1 overflow-y-auto scrollbar-hide', sidebarCollapsed ? 'space-y-3 px-1.5 py-4' : 'space-y-4 px-3 py-5')} aria-label="App sections">
+        <nav className={cn('min-h-0 flex-1 overflow-y-auto scrollbar-hide', sidebarCollapsed ? 'space-y-3 px-2 py-4' : 'space-y-5 px-3 py-5')} aria-label="App sections">
           {processedSidebarNav.map((group, groupIndex) => {
-            const isExpanded = expandedGroups[group.label];
             return (
-              <div key={group.label} className="space-y-1">
-                {!sidebarCollapsed && (
-                  <button 
-                    type="button"
-                    onClick={() => toggleGroup(group.label)}
-                    aria-expanded={isExpanded}
-                    className="chrome-nav-group-trigger group/header flex w-full items-center justify-between px-4 py-2 transition-colors focus-app"
-                  >
-                    <span>{group.label}</span>
-                    <ChevronDown className={cn("w-3 h-3 transition-transform duration-300", isExpanded ? "rotate-0" : "-rotate-90 text-content-tertiary")} />
-                  </button>
+              <div key={group.label} className="space-y-1.5">
+                {!sidebarCollapsed && group.label && (
+                  <p className="chrome-nav-section-label px-4 py-1">
+                    {group.label}
+                  </p>
                 )}
                 {sidebarCollapsed && groupIndex > 0 && (
-                  <div className="mx-1 mb-2 h-px bg-surface-border opacity-50" role="separator" aria-hidden="true" />
+                  <div className="mx-2 mb-2 h-px bg-surface-border opacity-60" role="separator" aria-hidden="true" />
                 )}
 
-                <div
-                  className={cn(
-                    'grid transition-[grid-template-rows] duration-300 ease-out',
-                    isExpanded || sidebarCollapsed ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-                  )}
-                >
-                  <div className="min-h-0 overflow-hidden">
-                    <div className="space-y-1">
-                      {group.items.map((item) => {
+                <div className="space-y-1">
+                  {group.items.map((item) => {
                         const Icon = item.icon;
                         const isActive = item.isActive;
                         const navCount = (item as { count?: number }).count;
@@ -506,8 +489,8 @@ export default function Layout() {
                             <TransitionLink
                               to={item.linkTo}
                               className={cn(
-                                'focus-app group relative flex min-h-10 items-center gap-3 rounded-lg border border-transparent px-4 py-2.5 transition-colors duration-200',
-                                sidebarCollapsed && 'justify-center border-transparent px-1.5',
+                                'focus-app group relative flex min-h-10 items-center gap-3 rounded-md border border-transparent py-2.5 transition-colors duration-200',
+                                sidebarCollapsed ? 'justify-center px-2' : 'px-4',
                                 isActive
                                   ? 'border border-surface-border/50 bg-content-primary/[0.07] text-content-primary'
                                   : 'text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary',
@@ -587,8 +570,6 @@ export default function Layout() {
                           </div>
                         );
                       })}
-                    </div>
-                  </div>
                 </div>
               </div>
             );
@@ -604,10 +585,11 @@ export default function Layout() {
             <TransitionLink
               to="/pro/settings"
               onClick={closeSidebarMobile}
+              title={sidebarCollapsed ? 'Account settings' : undefined}
               aria-current={isSettingsRoute ? 'page' : undefined}
               className={cn(
                 'focus-app group flex min-h-10 w-full items-center rounded-lg border py-2.5 text-[12px] font-sans font-medium transition-all',
-                'justify-start gap-3 px-3',
+                sidebarCollapsed ? 'justify-center px-2' : 'justify-start gap-3 px-3',
                 isSettingsRoute
                   ? 'border-content-primary/30 bg-content-primary/[0.1] text-content-primary shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]'
                   : 'border-surface-border bg-surface-base/60 text-content-secondary hover:bg-content-primary/[0.06] hover:text-content-primary',
@@ -616,7 +598,7 @@ export default function Layout() {
               <div className="flex h-5 w-5 shrink-0 items-center justify-center">
                 <Settings className="h-4 w-4 shrink-0 text-content-tertiary transition-colors group-hover:text-content-primary" aria-hidden />
               </div>
-              <span>Account settings</span>
+              {!sidebarCollapsed && <span>Account settings</span>}
             </TransitionLink>
           </div>
         </div>
@@ -627,7 +609,7 @@ export default function Layout() {
         className={cn(
           /* scroll-padding: sticky app header (h-[4.5rem]) — keyboard focus stays clear of chrome (WCAG 2.4.11) */
           "flex h-[100dvh] flex-1 flex-col overflow-y-auto scroll-pt-[4.5rem] scrollbar-hide transition-all duration-300 ease-in-out",
-          "lg:pl-[240px]"
+          "lg:pl-[72px]"
         )}
       >
         {/* Top Bar */}

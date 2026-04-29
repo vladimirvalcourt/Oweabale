@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrandWordmark } from '../common/BrandWordmark';
+import { ThemeToggle } from '../common/ThemeToggle';
 import { TransitionLink } from '../common/TransitionLink';
 import { useAuth } from '../../hooks';
 
@@ -15,8 +16,8 @@ function NavLink({
   return (
     <TransitionLink
       to={href}
-      className={`rounded px-2 py-1 text-sm transition-colors ${
-        isActive ? 'bg-surface-elevated text-content-primary' : 'text-content-secondary/72 hover:text-content-primary'
+      className={`ui-button ui-button-sm ${
+        isActive ? 'ui-button-secondary text-content-primary' : 'ui-button-ghost'
       }`}
     >
       <span className="relative z-10">{children}</span>
@@ -71,7 +72,7 @@ export default function PublicHeader({ links = [] }: PublicHeaderProps) {
         </TransitionLink>
 
         {links.length > 0 && (
-          <div className="hidden items-center gap-1 rounded-md border border-surface-border-subtle bg-surface-raised/76 p-1 shadow-card md:flex">
+          <div className="hidden items-center gap-1 rounded-lg border border-surface-border-subtle bg-surface-raised/76 p-1 shadow-card md:flex">
             {links.map((link) => (
               <NavLink key={link.href} href={link.href} isActive={activeSection === link.id}>
                 {link.label}
@@ -81,15 +82,16 @@ export default function PublicHeader({ links = [] }: PublicHeaderProps) {
         )}
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <TransitionLink
             to="/auth"
-            className="hidden rounded-md px-3 py-2 text-sm font-medium text-content-secondary/80 transition-colors hover:bg-surface-elevated hover:text-content-primary sm:inline-flex"
+            className="ui-button ui-button-sm ui-button-ghost hidden sm:inline-flex"
           >
             Log in
           </TransitionLink>
           <TransitionLink
             to={primaryHref}
-            className="inline-flex h-10 items-center justify-center rounded-md bg-content-primary px-4 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px"
+            className="ui-button ui-button-md ui-button-primary"
           >
             <span className="relative z-10">{authUser?.id ? 'Open app' : 'Sign up'}</span>
           </TransitionLink>

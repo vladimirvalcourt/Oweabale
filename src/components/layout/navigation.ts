@@ -3,15 +3,21 @@ import {
   ArrowRightLeft,
   BarChart3,
   Banknote,
+  BookOpen,
+  BriefcaseBusiness,
   Calendar as CalendarIcon,
   Clock,
+  GraduationCap,
   Inbox,
   Landmark,
   LayoutDashboard,
   MoreHorizontal,
   PieChart,
   Repeat,
+  ShieldCheck,
   Settings,
+  Target,
+  TrendingUp,
   Wallet,
 } from 'lucide-react';
 import type { Citation, Bill, Subscription } from '../../store';
@@ -146,24 +152,47 @@ export function buildNavGroups({
 }): NavGroup[] {
   const coreNavItems: NavItem[] = [
     { name: 'Pay List', path: '/pro/dashboard', icon: LayoutDashboard, count: dueSoonCount, lazyImport: () => import('../../pages/Dashboard') },
-    { name: 'Calendar', path: '/pro/calendar', icon: CalendarIcon, lazyImport: () => import('../../pages/Calendar') },
-    { name: 'Documents', path: '/pro/documents', icon: Inbox, count: pendingIngestionsCount, lazyImport: () => import('../../pages/Ingestion') },
-  ];
-
-  const advancedNavItems: NavItem[] = [
-    { name: 'Spending comfort', path: '/pro/dashboard', icon: Wallet, hash: 'safe-spend' },
     { name: 'Pay List details', path: '/pro/bills', icon: BarChart3, lazyImport: () => import('../../pages/Obligations') },
     { name: 'Due soon', path: '/pro/bills', icon: Clock, hash: 'due-soon', count: dueSoonCount },
     { name: 'Debt minimums', path: '/pro/bills?tab=debt', icon: Landmark },
     { name: 'Tolls, tickets & fines', path: '/pro/bills?tab=ambush', icon: AlertCircle },
-    { name: 'Subscriptions', path: '/pro/subscriptions', icon: Repeat, lazyImport: () => import('../../pages/Subscriptions') },
+    { name: 'Calendar', path: '/pro/calendar', icon: CalendarIcon, lazyImport: () => import('../../pages/Calendar') },
+    { name: 'Documents', path: '/pro/documents', icon: Inbox, count: pendingIngestionsCount, lazyImport: () => import('../../pages/Ingestion') },
+  ];
+
+  const moneyNavItems: NavItem[] = [
+    { name: 'Spending comfort', path: '/pro/dashboard', icon: Wallet, hash: 'safe-spend' },
     { name: 'Transactions', path: '/pro/transactions', icon: ArrowRightLeft, lazyImport: () => import('../../pages/Transactions') },
+    { name: 'Subscriptions', path: '/pro/subscriptions', icon: Repeat, lazyImport: () => import('../../pages/Subscriptions') },
     { name: 'Budgets', path: '/pro/budgets', icon: PieChart, lazyImport: () => import('../../pages/Budgets') },
     { name: 'Income', path: '/pro/income', icon: Banknote, lazyImport: () => import('../../pages/Income') },
+    { name: 'Freelance', path: '/pro/freelance', icon: BriefcaseBusiness, lazyImport: () => import('../../pages/Freelance') },
+    { name: 'Taxes', path: '/pro/taxes', icon: ShieldCheck, lazyImport: () => import('../../pages/Taxes') },
+  ];
+
+  const planningNavItems: NavItem[] = [
+    { name: 'Goals', path: '/pro/goals', icon: Target, lazyImport: () => import('../../pages/Goals') },
+    { name: 'Savings', path: '/pro/savings', icon: Wallet, lazyImport: () => import('../../pages/Savings') },
+    { name: 'Net worth', path: '/pro/net-worth', icon: TrendingUp, lazyImport: () => import('../../pages/NetWorth') },
+    { name: 'Investments', path: '/pro/investments', icon: BarChart3, lazyImport: () => import('../../pages/Investments') },
+    { name: 'Insurance', path: '/pro/insurance', icon: ShieldCheck, lazyImport: () => import('../../pages/Insurance') },
+    { name: 'Credit center', path: '/pro/credit', icon: Landmark, lazyImport: () => import('../../pages/CreditCenter') },
+  ];
+
+  const insightNavItems: NavItem[] = [
+    { name: 'Reports', path: '/pro/reports', icon: BookOpen, lazyImport: () => import('../../pages/Reports') },
+    { name: 'Analytics', path: '/pro/analytics', icon: BarChart3, lazyImport: () => import('../../pages/Analytics') },
+    { name: 'Education', path: '/pro/education', icon: GraduationCap, lazyImport: () => import('../../pages/Education') },
+    { name: 'Categories', path: '/pro/categories', icon: PieChart, lazyImport: () => import('../../pages/Categories') },
+    { name: 'Support', path: '/pro/app/support', icon: AlertCircle, lazyImport: () => import('../../pages/HelpDesk') },
+    { name: 'Changelog', path: '/pro/changelog', icon: Clock, lazyImport: () => import('../../pages/Changelog') },
   ];
 
   return [
-    { label: '', items: [...coreNavItems, ...advancedNavItems] },
+    { label: 'Core', items: coreNavItems },
+    { label: 'Money', items: moneyNavItems },
+    { label: 'Planning', items: planningNavItems },
+    { label: 'Insights', items: insightNavItems },
   ];
 }
 

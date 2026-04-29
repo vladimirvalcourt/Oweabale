@@ -13,7 +13,7 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
   if (!mounted) {
     return (
       <button
-        className={`inline-flex min-h-11 min-w-11 items-center justify-center p-2 text-content-secondary transition-colors hover:text-content-primary ${className}`}
+        className={`ui-icon-button ${className}`}
         disabled
         aria-label="Toggle theme"
       >
@@ -25,7 +25,7 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
   return (
     <button
       onClick={toggleTheme}
-      className={`group relative inline-flex min-h-11 min-w-11 items-center justify-center p-2 text-content-secondary transition-all hover:text-content-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base ${className}`}
+      className={`ui-icon-button group relative ${className}`}
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
       title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >

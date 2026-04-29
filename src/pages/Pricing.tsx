@@ -1,25 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Minus, Plus } from 'lucide-react';
-import { toast } from 'sonner';
 import { Footer } from '../components/layout';
 import { PublicHeader } from '../components/layout';
-import { TransitionLink } from '../components/common';
-import { useJsonLd } from '../hooks';
-import { useSEO } from '../hooks';
-import { createStripeCheckoutSession, type StripeCheckoutPlanKey } from '../lib/api/stripe';
+import { useAuth, useJsonLd, useSEO } from '../hooks';
 
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="rounded-xl border border-surface-border bg-surface-raised px-8 py-6">
+    <div className="ui-card-soft px-5 py-5 sm:px-6">
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex w-full items-start justify-between gap-4 text-left"
+        className="flex w-full items-start justify-between gap-4 text-left focus-app"
       >
-        <span className="text-lg font-medium tracking-[-0.024em] leading-tight text-content-primary">{question}</span>
+        <span className="text-base font-semibold leading-snug text-content-primary sm:text-lg">{question}</span>
         {isOpen ? (
           <Minus className="h-5 w-5 shrink-0 text-content-secondary" />
         ) : (
@@ -31,7 +27,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
           isOpen ? 'mt-4 max-h-72 opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <p className="max-w-3xl text-base leading-7 text-content-secondary">{answer}</p>
+        <p className="max-w-3xl text-sm leading-6 text-content-secondary sm:text-base sm:leading-7">{answer}</p>
       </div>
     </div>
   );
@@ -168,6 +164,7 @@ const comparisonRows = [
 
 export default function Pricing() {
   const navigate = useNavigate();
+  const { user: authUser } = useAuth();
   const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
   const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;
   const configuredYearly = Number(import.meta.env.VITE_PRICING_YEARLY_DISPLAY);
@@ -199,27 +196,18 @@ export default function Pricing() {
     [monthlyPrice, hasYearlyPricing, yearlyTotal, yearlySavingsPct]
   );
 
-  const [isStartingCheckout, setIsStartingCheckout] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly');
 
-  const startCheckout = async (planKey: StripeCheckoutPlanKey) => {
-    if (isStartingCheckout) return;
-    setIsStartingCheckout(true);
-    const response = await createStripeCheckoutSession(planKey);
-    if ('error' in response) {
-      if (response.error === 'Please sign in to start checkout.') {
-        navigate(`/onboarding?redirect=${encodeURIComponent('/pro/settings?tab=billing')}`);
-        return;
-      }
-      toast.error(response.error);
-      setIsStartingCheckout(false);
-      return;
-    }
-    window.location.href = response.checkoutUrl;
+  const startTrial = () => {
+    navigate(authUser ? '/pro/dashboard' : `/onboarding?redirect=${encodeURIComponent('/pro/dashboard')}`);
+  };
+
+  const openBilling = () => {
+    navigate(authUser ? '/pro/settings?tab=billing' : `/auth?redirect=${encodeURIComponent('/pro/settings?tab=billing')}`);
   };
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-brand-violet/25">
+    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
       <PublicHeader
         links={[
           { href: '/', label: 'Home' },
@@ -232,18 +220,18 @@ export default function Pricing() {
         <section className="relative overflow-hidden pb-20 pt-32 lg:pt-40">
           <div className="public-grid-bg pointer-events-none absolute inset-x-0 top-0 h-[620px] opacity-55" />
           <div className="premium-container relative">
-            <p className="premium-eyebrow">Pricing without another surprise</p>
+            <p className="premium-eyebrow">14 days first. Billing later.</p>
             <h1 className="premium-display mt-5 max-w-5xl public-fade-up">
-              Start where the pressure is. Pay when you need the deeper plan.
+              Try the complete money command center before you pay.
             </h1>
             <p className="premium-lede mt-7 max-w-3xl public-fade-up public-delay-1">
-              Oweable starts with a focused Pay List for bills, debt, subscriptions, tolls, tickets, and the obligations that keep slipping into the back of your mind.{' '}
-              Full Suite is there when you want help turning the whole picture into a plan you can keep coming back to.
+              Every new account starts with 14 days of Full Suite access for bills, debt, subscriptions,
+              transactions, documents, budgets, and cash-flow planning. No card is required to start the trial.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3 text-sm text-content-secondary public-fade-up public-delay-2">
-              <span className="rounded-md border border-surface-border-subtle bg-surface-raised px-4 py-2">14-day Full Suite trial</span>
-              <span className="rounded-md border border-surface-border-subtle bg-surface-raised px-4 py-2">No credit card required</span>
-              <span className="rounded-md border border-surface-border-subtle bg-surface-raised px-4 py-2">Cancel anytime</span>
+            <div className="mt-8 flex flex-wrap gap-2 public-fade-up public-delay-2">
+              <span className="ui-pill ui-pill-lg">14-day Full Suite trial</span>
+              <span className="ui-pill ui-pill-lg">No credit card required</span>
+              <span className="ui-pill ui-pill-lg">Cancel anytime</span>
             </div>
           </div>
         </section>
@@ -252,17 +240,17 @@ export default function Pricing() {
           <div className="premium-container">
             <div className="grid gap-5 lg:grid-cols-[0.72fr_1.28fr] lg:items-stretch">
               <aside className="premium-panel p-7 sm:p-8">
-                <p className="premium-eyebrow">What stays free</p>
+                <p className="premium-eyebrow">Before billing</p>
                 <h2 className="mt-5 text-3xl font-medium leading-tight tracking-[-0.04em] text-content-primary">
-                  Get oriented before money leaves your account.
+                  Get the full workspace before money leaves your account.
                 </h2>
                 <p className="mt-5 text-sm leading-6 text-content-tertiary">
-                  You can sign up, map the immediate Pay List, and decide whether the deeper planning tools are worth keeping.
+                  Create an account, use the complete Full Suite trial, and decide whether the system is worth keeping.
                 </p>
                 <div className="mt-8 space-y-3 text-sm text-content-secondary">
-                  {['Create the first Pay List', 'Review due dates and pressure', 'Upgrade only when the system is useful'].map((item) => (
+                  {['14 days of Full Suite access', 'No card required at signup', 'Pay only if you keep using it'].map((item) => (
                     <div key={item} className="flex items-center gap-3 border-b border-surface-border-subtle pb-3 last:border-b-0 last:pb-0">
-                      <span className="h-1.5 w-1.5 rounded-full bg-brand-violet" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-content-primary" />
                       <span>{item}</span>
                     </div>
                   ))}
@@ -271,19 +259,19 @@ export default function Pricing() {
 
               <div className="premium-panel p-7 text-content-primary shadow-panel sm:p-8">
                 <div className="flex items-center justify-between gap-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">Full Suite</p>
-                  <span className="text-xs font-medium uppercase tracking-[0.14em] text-content-tertiary">
+                  <p className="ui-label">Full Suite</p>
+                  <span className="ui-pill ui-pill-muted">
                     Deeper support
                   </span>
                 </div>
 
                 {hasYearlyPricing ? (
-                  <div className="mt-5 inline-flex items-center rounded-md border border-surface-border-subtle bg-surface-raised p-0.5">
+                  <div className="mt-5 inline-flex items-center gap-1 rounded-lg border border-surface-border-subtle bg-surface-raised p-1">
                     <button
                       type="button"
                       onClick={() => setBillingPeriod('monthly')}
                       aria-pressed={billingPeriod === 'monthly'}
-                    className={`rounded px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
+                    className={`ui-button ui-button-sm ${
                         billingPeriod === 'monthly'
                           ? 'bg-content-primary text-surface-base'
                           : 'text-content-tertiary hover:text-content-primary'
@@ -295,7 +283,7 @@ export default function Pricing() {
                       type="button"
                       onClick={() => setBillingPeriod('yearly')}
                       aria-pressed={billingPeriod === 'yearly'}
-                    className={`rounded px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
+                    className={`ui-button ui-button-sm ${
                         billingPeriod === 'yearly'
                           ? 'bg-content-primary text-surface-base'
                           : 'text-content-tertiary hover:text-content-primary'
@@ -349,14 +337,13 @@ export default function Pricing() {
                 </ul>
                 <button
                   type="button"
-                  onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
-                  disabled={isStartingCheckout}
-                  className="premium-button-primary mt-8 w-full disabled:cursor-not-allowed disabled:opacity-70"
+                  onClick={startTrial}
+                  className="premium-button-primary mt-8 w-full"
                 >
-                  {isStartingCheckout ? 'Getting things ready...' : 'Start Full Suite'}
+                  Start 14-day trial
                 </button>
                 <p className="mt-4 text-sm text-content-tertiary">
-                  Starts with a 14-day free trial. No credit card required to create your account first.
+                  Payment details live in account billing settings after your trial starts.
                 </p>
               </div>
             </div>
@@ -375,15 +362,15 @@ export default function Pricing() {
                   The plan is intentionally narrow at the start and deeper where ongoing money stress usually hides.
                 </p>
               </div>
-              <div className="premium-panel overflow-x-auto">
-                <div className="grid grid-cols-2 border-b border-surface-border-subtle bg-surface-elevated text-sm font-medium text-content-primary">
+                <div className="premium-panel overflow-x-auto">
+                <div className="grid grid-cols-2 border-b border-surface-border-subtle bg-surface-elevated text-sm font-semibold text-content-primary">
                   <div className="min-w-[180px] px-4 py-4">Feature</div>
                   <div className="min-w-[160px] border-l border-surface-border px-4 py-4">Oweable</div>
                 </div>
                 {comparisonRows.map(([feature, , suite]) => (
                   <div key={feature} className="grid grid-cols-2 border-b border-surface-border text-sm last:border-b-0">
-                    <div className="min-w-[180px] px-4 py-4 text-content-tertiary">{feature}</div>
-                    <div className="min-w-[160px] border-l border-surface-border-subtle px-4 py-4 text-content-secondary">{suite}</div>
+                    <div className="min-w-[180px] px-4 py-4 leading-6 text-content-tertiary">{feature}</div>
+                    <div className="min-w-[160px] border-l border-surface-border-subtle px-4 py-4 leading-6 text-content-secondary">{suite}</div>
                   </div>
                 ))}
               </div>
@@ -417,20 +404,20 @@ export default function Pricing() {
               The first path is the Pay List. The advanced tools are there when they reduce pressure, not when they distract.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <TransitionLink
-                to="/onboarding?redirect=/pro/dashboard"
-                className="premium-button-primary"
-              >
-                Try Full Suite
-                <ArrowRight className="h-4 w-4" />
-              </TransitionLink>
               <button
                 type="button"
-                onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
-                disabled={isStartingCheckout}
-                className="premium-button-secondary disabled:cursor-not-allowed disabled:opacity-70"
+                onClick={startTrial}
+                className="premium-button-primary"
               >
-                Start Full Suite
+                Start 14-day trial
+                <ArrowRight className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={openBilling}
+                className="premium-button-secondary"
+              >
+                Add billing details
               </button>
             </div>
           </div>

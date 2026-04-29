@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { useStore } from '../store';
 import { cn } from '../lib/utils';
 import { yieldForPaint } from '../lib/utils';
-import { BrandWordmark } from '../components/common';
+import { BrandWordmark, ThemeToggle } from '../components/common';
 
 type Step = {
   id: string;
@@ -213,13 +213,16 @@ export default function Onboarding() {
               textClassName="text-xl font-medium normal-case tracking-[-0.035em] text-content-primary"
               logoClassName="h-5 w-5 rounded"
             />
-            <button
-              type="button"
-              onClick={() => void skipSetup()}
-              className="min-h-10 rounded-md border border-surface-border px-4 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-raised hover:text-content-primary focus-app"
-            >
-              Skip setup
-            </button>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <button
+                type="button"
+                onClick={() => void skipSetup()}
+                className="ui-button ui-button-sm ui-button-secondary"
+              >
+                Skip setup
+              </button>
+            </div>
           </header>
 
           <main className="relative z-10 flex flex-1 flex-col items-center overflow-y-auto px-4 py-10 sm:px-6 sm:py-14">
@@ -318,10 +321,11 @@ export default function Onboarding() {
             <span className="hidden text-xs tabular-nums text-content-tertiary sm:inline">
               {currentStepIndex + 1} / {STEPS.length}
             </span>
+            <ThemeToggle />
             <button
               type="button"
               onClick={() => void skipSetup()}
-              className="min-h-10 whitespace-nowrap rounded-md border border-surface-border px-3 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-raised hover:text-content-primary focus-app sm:px-4"
+              className="ui-button ui-button-sm ui-button-secondary whitespace-nowrap"
             >
               Skip
             </button>

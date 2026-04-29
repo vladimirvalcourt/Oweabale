@@ -52,22 +52,22 @@ function FaqCard({ question, answer }: { question: string; answer: string }) {
   const panelId = `faq-panel-${question.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`;
 
   return (
-    <article className="border-b border-surface-border-subtle py-6 last:border-b-0">
+    <article className="border-b border-surface-border-subtle py-5 last:border-b-0">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         aria-expanded={open}
         aria-controls={panelId}
-        className="flex w-full items-start justify-between gap-4 text-left"
+        className="flex w-full items-start justify-between gap-4 text-left focus-app"
       >
-        <h3 className="text-lg font-medium leading-tight tracking-[-0.024em] text-content-primary">{question}</h3>
+        <h3 className="text-base font-semibold leading-snug text-content-primary sm:text-lg">{question}</h3>
         {open ? <Minus className="h-5 w-5 shrink-0 text-content-tertiary" /> : <Plus className="h-5 w-5 shrink-0 text-content-tertiary" />}
       </button>
       <div
         id={panelId}
         className={`overflow-hidden transition-all duration-300 ease-out ${open ? 'mt-4 max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}
       >
-        <p className="text-base leading-relaxed text-content-tertiary">{answer}</p>
+        <p className="text-sm leading-6 text-content-tertiary sm:text-base sm:leading-7">{answer}</p>
       </div>
     </article>
   );
@@ -77,7 +77,7 @@ export default function FAQ() {
   useSEO({
     title: 'Frequently Asked Questions — Oweable',
     description:
-      'Plain-English answers about how Oweable helps with bills, debt payoff, subscriptions, free plans, security, and uneven income.',
+      'Plain-English answers about how Oweable helps with bills, debt payoff, subscriptions, the 14-day trial, security, and uneven income.',
     canonical: 'https://www.oweable.com/faq',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -96,7 +96,7 @@ export default function FAQ() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-brand-violet/25">
+    <div className="min-h-screen bg-surface-base text-content-primary selection:bg-content-primary/15">
       <PublicHeader
         links={[
           { href: '/pricing', label: 'Plans' },
@@ -121,7 +121,7 @@ export default function FAQ() {
               </p>
               </div>
               <aside className="premium-panel p-5">
-                <p className="text-xs font-medium uppercase tracking-[0.14em] text-content-muted">Fast answer</p>
+                <p className="ui-label">Fast answer</p>
                 <p className="mt-4 text-sm leading-6 text-content-secondary">
                   You can start manually, try the deeper suite for 14 days, and connect accounts only if it reduces effort.
                 </p>
