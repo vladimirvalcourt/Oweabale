@@ -269,7 +269,7 @@ function PayListRow({
             <div className="flex flex-wrap items-center gap-2">
               <p className="truncate text-sm font-semibold text-content-primary">{item.title}</p>
               <span
-                className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                   isUrgent
                     ? 'bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]'
                     : item.status === 'week'
@@ -292,7 +292,7 @@ function PayListRow({
               <button
                 type="button"
                 onClick={() => onMarkPaid(item.sourceId)}
-                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md bg-content-primary px-3 py-1.5 text-xs font-semibold text-surface-base transition-colors hover:bg-content-secondary focus-app"
+                className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-md bg-content-primary px-3 py-2 text-xs font-semibold text-surface-base transition-colors hover:bg-content-secondary focus-app"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
                 Mark paid
@@ -302,7 +302,7 @@ function PayListRow({
               <button
                 type="button"
                 onClick={() => onResolve(item.sourceId)}
-                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md bg-content-primary px-3 py-1.5 text-xs font-semibold text-surface-base transition-colors hover:bg-content-secondary focus-app"
+                className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-md bg-content-primary px-3 py-2 text-xs font-semibold text-surface-base transition-colors hover:bg-content-secondary focus-app"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
                 Resolve
@@ -310,14 +310,14 @@ function PayListRow({
             )}
             <TransitionLink
               to={item.route}
-              className="inline-flex min-h-9 items-center justify-center rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
+              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-surface-border px-3 py-2 text-xs font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
             >
               Details
             </TransitionLink>
             <button
               type="button"
               onClick={() => onSnooze(item.id)}
-              className="inline-flex min-h-9 items-center justify-center rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
+              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-surface-border px-3 py-2 text-xs font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
             >
               Snooze
             </button>

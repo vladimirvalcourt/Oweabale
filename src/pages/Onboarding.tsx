@@ -229,7 +229,7 @@ export default function Onboarding() {
               transition={{ duration: 0.45, ease: [0.19, 1, 0.22, 1] }}
               className="w-full max-w-lg"
             >
-              <p className="mb-4 text-[11px] font-mono font-medium uppercase tracking-[0.14em] text-content-muted">
+              <p className="mb-4 text-xs font-mono font-medium uppercase tracking-wide text-content-muted">
                 Takes about 2 minutes
               </p>
 

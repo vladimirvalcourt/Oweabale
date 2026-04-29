@@ -359,11 +359,11 @@ export default function Ingestion() {
           <div className="grid grid-cols-1 gap-px bg-surface-border border border-surface-border rounded-lg overflow-hidden shadow-none">
             {/* Table Header */}
             <div className="hidden md:grid grid-cols-12 bg-surface-elevated px-6 py-3 border-b border-surface-border">
-              <div className="col-span-4 section-label normal-case text-[10px]">Document</div>
-              <div className="col-span-2 section-label normal-case text-[10px]">Status</div>
-              <div className="col-span-2 section-label normal-case text-[10px]">Amount</div>
-              <div className="col-span-2 section-label normal-case text-[10px]">Type</div>
-              <div className="col-span-2 text-right section-label normal-case text-[10px]">Action</div>
+              <div className="col-span-4 section-label normal-case text-xs">Document</div>
+              <div className="col-span-2 section-label normal-case text-xs">Status</div>
+              <div className="col-span-2 section-label normal-case text-xs">Amount</div>
+              <div className="col-span-2 section-label normal-case text-xs">Type</div>
+              <div className="col-span-2 text-right section-label normal-case text-xs">Action</div>
             </div>
 
             {pendingIngestions.map((item) => {
@@ -387,7 +387,7 @@ export default function Ingestion() {
                       <div className="flex items-center gap-1.5">
                         <p className="text-xs font-mono font-medium text-content-primary truncate">{item.extractedData.biller || item.extractedData.name || item.originalFile?.name || 'Uploaded File'}</p>
                       </div>
-                      <p className="text-[10px] font-mono text-content-muted uppercase tracking-widest mt-1">
+                      <p className="text-xs font-mono text-content-muted uppercase tracking-widest mt-1">
                         {item.originalFile?.size ? (item.originalFile.size / 1024).toFixed(1) + ' KB' : 'SCANNED'}
                       </p>
                       <div className="mt-2 md:hidden">
@@ -400,7 +400,7 @@ export default function Ingestion() {
                             })
                           }
                           onClick={(e) => e.stopPropagation()}
-                          className="w-full max-w-[200px] bg-surface-raised border border-surface-border text-[9px] font-mono font-medium uppercase tracking-widest text-content-tertiary rounded-md px-2 py-1 focus-app-field"
+                          className="w-full max-w-[200px] bg-surface-raised border border-surface-border text-xs font-mono font-medium uppercase tracking-widest text-content-tertiary rounded-md px-2 py-1 focus-app-field"
                         >
                           <option value="transaction">Transaction</option>
                           <option value="bill">Bill</option>
@@ -418,29 +418,29 @@ export default function Ingestion() {
                         {item.status === 'uploading' ? (
                           <>
                             <CloudUpload className="w-3 h-3 text-sky-400 animate-pulse" />
-                            <span className="text-[9px] font-mono font-black text-sky-400 uppercase tracking-widest leading-none">Uploading...</span>
+                            <span className="text-xs font-mono font-black text-sky-400 uppercase tracking-widest leading-none">Uploading...</span>
                           </>
                         ) : item.status.includes('scanning') ? (
                           <>
                             <Loader2 className="w-3 h-3 text-content-secondary animate-spin" />
-                            <span className="text-[9px] font-mono font-black text-content-secondary uppercase tracking-widest leading-none">
+                            <span className="text-xs font-mono font-black text-content-secondary uppercase tracking-widest leading-none">
                               {item.status.replace('scanning', '').trim() || 'Reading...'}
                             </span>
                           </>
                         ) : item.status === 'ready' ? (
                           <>
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-glow-emerald" />
-                            <span className="text-[9px] font-mono font-black text-emerald-500 uppercase tracking-widest">Verified</span>
+                            <span className="text-xs font-mono font-black text-emerald-500 uppercase tracking-widest">Verified</span>
                           </>
                         ) : (
                           <>
                             <AlertCircle className="w-3 h-3 text-rose-500" />
-                            <span className="text-[9px] font-mono font-black text-rose-500 uppercase tracking-widest">Needs Review</span>
+                            <span className="text-xs font-mono font-black text-rose-500 uppercase tracking-widest">Needs Review</span>
                           </>
                         )}
                       </div>
                       {item.storagePath && (
-                        <span className="text-[8px] font-mono text-sky-600 uppercase tracking-widest flex items-center gap-1">
+                        <span className="text-xs font-mono text-sky-600 uppercase tracking-widest flex items-center gap-1">
                           <CloudUpload className="w-2.5 h-2.5" /> Backed Up
                         </span>
                       )}
@@ -461,7 +461,7 @@ export default function Ingestion() {
                           type: e.target.value as PendingIngestion['type'],
                         })
                       }
-                      className="bg-surface-raised border border-surface-border text-[9px] font-mono font-bold uppercase tracking-widest text-content-tertiary rounded-lg px-2 py-1 focus-app-field transition-colors"
+                      className="bg-surface-raised border border-surface-border text-xs font-mono font-bold uppercase tracking-widest text-content-tertiary rounded-lg px-2 py-1 focus-app-field transition-colors"
                     >
                       <option value="transaction">Transaction</option>
                       <option value="bill">Bill</option>
@@ -507,10 +507,10 @@ export default function Ingestion() {
                         {/* Digital Asset Preview */}
                         <div className="bg-surface-raised border border-surface-border flex flex-col min-h-[400px]">
                           <div className="px-4 py-2 border-b border-surface-border flex justify-between items-center bg-surface-elevated/50">
-                            <span className="text-[9px] font-mono text-content-tertiary uppercase tracking-widest font-bold flex items-center gap-2">
+                            <span className="text-xs font-mono text-content-tertiary uppercase tracking-widest font-bold flex items-center gap-2">
                               <FileText className="w-3 h-3" /> Document Preview
                               {item.storagePath && (
-                                <span className="text-[8px] text-sky-500 flex items-center gap-1">
+                                <span className="text-xs text-sky-500 flex items-center gap-1">
                                 <CloudUpload className="w-2.5 h-2.5" /> Saved
                               </span>
                               )}

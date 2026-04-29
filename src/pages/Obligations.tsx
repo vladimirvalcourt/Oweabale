@@ -404,7 +404,7 @@ export default function Obligations() {
         <div className="bg-surface-elevated border border-surface-border p-5 rounded-lg">
           <div className="flex items-center gap-2 text-content-tertiary mb-3">
             <RecurringIcon className="w-3.5 h-3.5" />
-            <span className="metric-label normal-case text-[11px]">Monthly payments</span>
+            <span className="metric-label normal-case text-xs">Monthly payments</span>
           </div>
           <p className="text-2xl font-mono text-red-400 font-bold">${totalMonthlyBurn.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>

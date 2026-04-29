@@ -315,7 +315,7 @@ export default function Analytics() {
             {netWorthDelta !== null ? (isPositiveDelta ? 'Growing' : 'Declining') : 'Need 2+ data points'}
           </p>
           {netWorthDelta !== null && netWorthDelta < 0 && (
-            <p className="mt-2 text-[11px] text-content-secondary leading-relaxed">
+            <p className="mt-2 text-xs text-content-secondary leading-relaxed">
               Snapshots lag real-time — tighten spending or add assets to bend the curve.{' '}
               <TransitionLink to="/net-worth" className="text-content-primary underline underline-offset-2">
                 Open projection
@@ -331,7 +331,7 @@ export default function Analytics() {
           </p>
           <p className="text-xs text-content-tertiary mt-1">Income {fmt(ytdMetrics.income)} · Spend {fmt(ytdMetrics.expenses)}</p>
           {ytdMetrics.saved < 0 && (
-            <p className="mt-2 text-[11px] text-content-secondary leading-relaxed">
+            <p className="mt-2 text-xs text-content-secondary leading-relaxed">
               <TransitionLink to="/budgets" className="text-content-primary underline underline-offset-2">
                 Review budgets
               </TransitionLink>{' '}
@@ -353,7 +353,7 @@ export default function Analytics() {
             Goal: {savingsGoalPct}% · You&apos;re at {ytdMetrics.rate.toFixed(1)}%
           </p>
           {ytdMetrics.rate < savingsGoalPct && (
-            <p className="mt-2 text-[11px] text-content-secondary leading-relaxed">
+            <p className="mt-2 text-xs text-content-secondary leading-relaxed">
               Automate a transfer on payday and trim one recurring bill to move toward {savingsGoalPct}%.{' '}
               <TransitionLink to="/subscriptions" className="text-content-primary underline underline-offset-2">
                 Audit subscriptions
@@ -444,7 +444,7 @@ export default function Analytics() {
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="rounded-lg border border-surface-border bg-surface-base p-4">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-content-muted mb-1">
+                <p className="text-xs font-mono uppercase tracking-widest text-content-muted mb-1">
                   {spendingBenchmark.priorLabel}
                 </p>
                 <p className="text-xl font-mono font-bold tabular-nums text-content-primary">
@@ -453,7 +453,7 @@ export default function Analytics() {
                 <p className="text-xs text-content-tertiary mt-1">Total spend</p>
               </div>
               <div className="rounded-lg border border-surface-border bg-surface-base p-4">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-content-muted mb-1">
+                <p className="text-xs font-mono uppercase tracking-widest text-content-muted mb-1">
                   {spendingBenchmark.lastLabel}
                 </p>
                 <p className="text-xl font-mono font-bold tabular-nums text-content-primary">
@@ -462,7 +462,7 @@ export default function Analytics() {
                 <p className="text-xs text-content-tertiary mt-1">Total spend</p>
               </div>
               <div className="rounded-lg border border-surface-border bg-surface-base p-4">
-                <p className="text-[10px] font-mono uppercase tracking-widest text-content-muted mb-1">Change</p>
+                <p className="text-xs font-mono uppercase tracking-widest text-content-muted mb-1">Change</p>
                 <p
                   className={`text-xl font-mono font-bold tabular-nums ${
                     spendingBenchmark.totalDelta <= 0 ? 'text-[var(--color-status-emerald-text)]' : 'text-[var(--color-status-amber-text)]'

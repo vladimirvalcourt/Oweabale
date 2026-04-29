@@ -20,7 +20,7 @@ import { cn } from '../lib/utils';
 function SummaryCard({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent?: string }) {
   return (
     <div className="rounded-xl border border-surface-border bg-surface-raised p-5">
-      <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-content-tertiary">{label}</p>
+      <p className="text-xs font-mono uppercase tracking-wide text-content-tertiary">{label}</p>
       <p className={cn('mt-2 text-2xl font-semibold tracking-tight', accent ?? 'text-content-primary')}>{value}</p>
       {sub && <p className="mt-1 text-xs text-content-secondary">{sub}</p>}
     </div>
