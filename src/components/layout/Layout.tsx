@@ -416,6 +416,7 @@ export default function Layout() {
       >
         <div className="flex h-[4.5rem] shrink-0 items-center justify-between gap-2 border-b border-surface-border/90 px-3 sm:px-4">
           <div className="flex min-w-0 flex-1 items-center overflow-hidden">
+            {!sidebarCollapsed ? (
               <TransitionLink to="/pro/dashboard" className="min-w-0 shrink focus-app rounded-lg">
                 <BrandWordmark textClassName="brand-header-text" />
               </TransitionLink>
@@ -453,10 +454,12 @@ export default function Layout() {
 
           {/* Sidebar free-plan upgrade banner removed — Layout only renders for Pro users */}
 
+        <nav className={cn('min-h-0 flex-1 overflow-y-auto scrollbar-hide', sidebarCollapsed ? 'space-y-3 px-1.5 py-4' : 'space-y-4 px-3 py-5')} aria-label="App sections">
           {processedSidebarNav.map((group, groupIndex) => {
             const isExpanded = expandedGroups[group.label];
             return (
               <div key={group.label} className="space-y-1">
+                {!sidebarCollapsed && (
                   <button 
                     type="button"
                     onClick={() => toggleGroup(group.label)}
@@ -467,12 +470,14 @@ export default function Layout() {
                     <ChevronDown className={cn("w-3 h-3 transition-transform duration-300", isExpanded ? "rotate-0" : "-rotate-90 text-content-tertiary")} />
                   </button>
                 )}
+                {sidebarCollapsed && groupIndex > 0 && (
                   <div className="mx-1 mb-2 h-px bg-surface-border opacity-50" role="separator" aria-hidden="true" />
                 )}
 
                 <div
                   className={cn(
                     'grid transition-[grid-template-rows] duration-300 ease-out',
+                    isExpanded || sidebarCollapsed ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
                   )}
                 >
                   <div className="min-h-0 overflow-hidden">
@@ -501,10 +506,12 @@ export default function Layout() {
                               to={item.linkTo}
                               className={cn(
                                 'focus-app group relative flex min-h-10 items-center gap-3 rounded-lg border border-transparent px-4 py-2.5 transition-colors duration-200',
+                                sidebarCollapsed && 'justify-center border-transparent px-1.5',
                                 isActive
                                   ? 'border border-surface-border/50 bg-content-primary/[0.07] text-content-primary'
                                   : 'text-content-secondary hover:bg-content-primary/[0.04] hover:text-content-primary',
                               )}
+                              title={sidebarCollapsed ? item.name : undefined}
                               aria-current={isActive ? 'page' : undefined}
                               onClick={(e) => {
                                 if (!isDueSoonItem) return;
@@ -517,11 +524,13 @@ export default function Layout() {
                                 setShowDueSoonPreview(false);
                               }}
                             >
+                              {isActive && !sidebarCollapsed && (
                                 <span
                                   className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-r-sm bg-content-primary"
                                   aria-hidden
                                 />
                               )}
+                              {isActive && sidebarCollapsed && (
                                 <span
                                   className="pointer-events-none absolute inset-x-1.5 bottom-1 h-0.5 rounded-full bg-brand-cta"
                                   aria-hidden
@@ -534,8 +543,10 @@ export default function Layout() {
                                 variant="static"
                                 className={cn(
                                   'relative z-[1] shrink-0',
+                                  !isActive && !sidebarCollapsed && 'group-hover:translate-x-0.5'
                                 )}
                               />
+                              {!sidebarCollapsed && (
                                 <>
                                   <span className="chrome-nav-row pointer-events-none flex-1">
                                     {item.name}
@@ -551,6 +562,7 @@ export default function Layout() {
                                 </>
                               )}
                             </TransitionLink>
+                            {isDueSoonItem && showDueSoonPreview && !sidebarCollapsed && (
                               <div className="app-popover absolute left-0 top-full z-50 mt-2 w-64 rounded-lg border border-surface-border p-3 backdrop-blur-xl lg:left-full lg:top-1/2 lg:ml-2 lg:mt-0 lg:-translate-y-1/2">
                                 <p className="chrome-micro-label mb-2 text-content-tertiary">Due Soon Preview</p>
                                 <div className="space-y-1.5">
@@ -584,14 +596,17 @@ export default function Layout() {
 
         {/* Account strip: always visible above the fold — Settings + collapse (sign out is profile menu only) */}
         <div className="mt-auto shrink-0 border-t border-surface-border bg-surface-raised/50 backdrop-blur-sm">
+          {!sidebarCollapsed && (
             <p className="chrome-micro-label px-4 pt-3 text-content-tertiary">Account</p>
           )}
+          <div className={cn('flex flex-col gap-2 p-3 sm:p-4', sidebarCollapsed ? 'pt-3' : '')}>
             <TransitionLink
               to="/pro/settings"
               onClick={closeSidebarMobile}
               aria-current={isSettingsRoute ? 'page' : undefined}
               className={cn(
-                'focus-app group flex min-h-10 w-full items-center rounded-lg border py-2.5 text-[12px] font-sans font-medium transition-all justify-start gap-3 px-3',
+                'focus-app group flex min-h-10 w-full items-center rounded-lg border py-2.5 text-[12px] font-sans font-medium transition-all',
+                'justify-start gap-3 px-3',
                 isSettingsRoute
                   ? 'border-content-primary/30 bg-content-primary/[0.1] text-content-primary shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]'
                   : 'border-surface-border bg-surface-base/60 text-content-secondary hover:bg-content-primary/[0.06] hover:text-content-primary',
