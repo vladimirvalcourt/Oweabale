@@ -163,8 +163,7 @@ export function buildNavGroups({
   ];
 
   return [
-    { label: 'Overview', items: coreNavItems },
-    { label: 'More', items: advancedNavItems },
+    { label: '', items: [...coreNavItems, ...advancedNavItems] },
   ];
 }
 
