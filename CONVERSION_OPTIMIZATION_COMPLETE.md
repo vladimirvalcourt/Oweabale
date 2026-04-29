@@ -21,7 +21,7 @@
 3. Add to `.env`:
    ```
    VITE_POSTHOG_KEY=your_posthog_project_api_key
-   VITE_POSTHOG_HOST=https://app.posthog.com
+   VITE_POSTHOG_HOST=https://us.i.posthog.com
    ```
 
 **Events being tracked:**
@@ -169,7 +169,7 @@ Currently just tracks the event. To actually send emails:
    
    # 4. Add to .env file:
    echo "VITE_POSTHOG_KEY=phc_xxxxxxxxxxxxxxxx" >> .env
-   echo "VITE_POSTHOG_HOST=https://app.posthog.com" >> .env
+   echo "VITE_POSTHOG_HOST=https://us.i.posthog.com" >> .env
    
    # 5. Redeploy
    git push origin main

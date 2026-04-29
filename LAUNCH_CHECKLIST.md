@@ -47,7 +47,7 @@
 
 # Add these variables (mark as Production + Preview):
 VITE_POSTHOG_KEY=phc_your_actual_key_here
-VITE_POSTHOG_HOST=https://app.posthog.com
+VITE_POSTHOG_HOST=https://us.i.posthog.com
 
 # Step 5: Redeploy (or wait for next push)
 git commit --allow-empty -m "trigger redeploy with PostHog config" && git push
@@ -228,7 +228,7 @@ echo $VITE_POSTHOG_KEY
 # Verify in browser console
 window.process.env.VITE_POSTHOG_KEY
 
-# Check network tab for requests to app.posthog.com
+# Check network tab for requests to us.i.posthog.com
 ```
 
 ### Crisp Widget Not Showing

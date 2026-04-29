@@ -5,7 +5,7 @@ import { useAuth } from './useAuth';
 
 // PostHog API key from environment
 const POSTHOG_KEY = import.meta.env.VITE_POSTHOG_KEY || '';
-const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST || 'https://app.posthog.com';
+const POSTHOG_HOST = import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com';
 
 /**
  * PostHog Analytics Provider
@@ -17,6 +17,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
 
     posthog.init(POSTHOG_KEY, {
       api_host: POSTHOG_HOST,
+      defaults: '2026-01-30', // Use latest PostHog defaults
       person_profiles: 'identified_only', // Don't create profiles for anonymous users
       capture_pageview: true, // Capture pageviews automatically
       capture_pageleave: true, // Capture page leave events
