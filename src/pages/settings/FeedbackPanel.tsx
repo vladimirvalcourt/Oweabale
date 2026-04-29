@@ -124,7 +124,7 @@ function FeedbackPanelInner() {
                       </button>
                     ))}
                   </div>
-                  <div className="flex justify-between text-[10px] font-medium text-content-muted px-0.5">
+                  <div className="flex justify-between text-xs font-medium text-content-muted px-0.5">
                     <span>1 = Poor</span>
                     <span>5 = Excellent</span>
                   </div>

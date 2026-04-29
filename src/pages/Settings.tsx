@@ -186,7 +186,7 @@ export default function Settings() {
       <Dialog open={isResetDialogOpen} onClose={() => setIsResetDialogOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-sm rounded-lg bg-surface-raised border border-surface-border p-6 shadow-xl">
+          <Dialog.Panel className="mx-auto max-w-sm rounded-xl bg-surface-raised border border-surface-border p-6 shadow-xl">
             <div className="flex items-center gap-4 mb-4">
               <div className="flex-shrink-0 w-10 h-10 rounded-full border border-amber-500/50 flex items-center justify-center">
                 <AlertTriangle className="w-5 h-5 text-amber-500" />
@@ -205,7 +205,7 @@ export default function Settings() {
               value={resetConfirmText}
               onChange={(e) => setResetConfirmText(e.target.value)}
               autoComplete="off"
-              className="mb-6 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+              className="mb-6 w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
               placeholder="RESET"
             />
 
@@ -237,7 +237,7 @@ export default function Settings() {
       <Dialog open={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} className="relative z-50">
         <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-sm rounded-lg bg-surface-raised border border-surface-border p-6 shadow-xl">
+          <Dialog.Panel className="mx-auto max-w-sm rounded-xl bg-surface-raised border border-surface-border p-6 shadow-xl">
             <div className="flex items-center gap-4 mb-4">
               <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)]">
                 <AlertTriangle className="w-5 h-5 text-brand-expense" />
@@ -249,7 +249,7 @@ export default function Settings() {
                 <Dialog.Description className="text-sm text-content-tertiary mb-3">
                   Your account and data have been deleted. Keep this receipt as proof of deletion.
                 </Dialog.Description>
-                <div className="mb-5 rounded-lg border border-surface-border bg-surface-base p-3 text-xs text-content-secondary space-y-1">
+                <div className="mb-5 rounded-xl border border-surface-border bg-surface-base p-3 text-xs text-content-secondary space-y-1">
                   <p>Receipt ID: {deletionReceipt.id}</p>
                   <p>Deleted at: {new Date(deletionReceipt.deletedAt).toLocaleString()}</p>
                 </div>
@@ -284,7 +284,7 @@ export default function Settings() {
                   value={deleteConfirmText}
                   onChange={(e) => setDeleteConfirmText(e.target.value)}
                   autoComplete="off"
-                  className="mb-6 w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+                  className="mb-6 w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
                   placeholder="DELETE"
                 />
                 <div className="flex justify-end gap-3">

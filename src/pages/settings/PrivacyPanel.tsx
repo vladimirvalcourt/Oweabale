@@ -190,7 +190,7 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
       <CollapsibleModule title="Data Management" icon={BillingIcon} defaultOpen>
         <p className="text-sm text-content-tertiary mb-6">Manage your inputs and export your financial history.</p>
         <div className="space-y-6">
-          <div className="border border-surface-border rounded-lg p-4 bg-surface-elevated/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="border border-surface-border rounded-xl p-4 bg-surface-elevated/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h4 className="text-sm font-medium text-content-primary">Export your data</h4>
               <p className="text-xs text-content-tertiary mt-1">
@@ -215,7 +215,7 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
             </div>
           </div>
 
-          <div className="rounded-lg border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="rounded-full border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h4 className="text-sm font-medium text-[var(--color-status-rose-text)]">Reset Account Data</h4>
               <p className="text-xs text-content-tertiary mt-1">Wipe bills, debts, assets, and transactions — account stays open.</p>
@@ -223,7 +223,7 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
             <button
               type="button"
               onClick={onOpenResetDialog}
-              className="shrink-0 rounded-lg border border-[var(--color-status-rose-border)] bg-surface-base px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:bg-[var(--color-status-rose-bg)] focus-app"
+              className="shrink-0 rounded-full border border-[var(--color-status-rose-border)] bg-surface-base px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:bg-[var(--color-status-rose-bg)] focus-app"
             >
               Reset data
             </button>

@@ -14,7 +14,7 @@ function IntegrationsPanelInner() {
       <Suspense
         fallback={
           <div
-            className="flex min-h-[10rem] items-center justify-center rounded-lg border border-surface-border bg-surface-raised p-8"
+            className="flex min-h-[10rem] items-center justify-center rounded-md border border-surface-border bg-surface-raised p-8"
             aria-busy="true"
             aria-label="Loading integrations"
           >

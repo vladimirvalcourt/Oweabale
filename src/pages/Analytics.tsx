@@ -271,12 +271,12 @@ export default function Analytics() {
           <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Trends</h1>
           <p className="text-sm text-content-tertiary mt-1">Historical performance and spending patterns.</p>
         </div>
-        <div className="flex bg-surface-raised border border-surface-border rounded-lg p-1">
+        <div className="flex bg-surface-raised border border-surface-border rounded-xl p-1">
           {(['1M', '3M', '6M', '1Y', 'ALL'] as Period[]).map(p => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
-              className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-md transition-colors ${
                 period === p ? 'bg-surface-elevated text-content-primary border border-surface-border' : 'text-content-tertiary hover:text-content-secondary'
               }`}
             >
@@ -288,7 +288,7 @@ export default function Analytics() {
 
       {/* Metric Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-surface-elevated border border-surface-border rounded-lg p-5">
+        <div className="bg-surface-elevated border border-surface-border rounded-xl p-5">
           <p className="metric-label normal-case text-content-tertiary mb-2">Current Net Worth</p>
           <p
             className={`text-2xl font-mono font-bold tabular-nums data-numeric ${
@@ -302,7 +302,7 @@ export default function Analytics() {
           </p>
         </div>
 
-        <div className="bg-surface-elevated border border-surface-border rounded-lg p-5">
+        <div className="bg-surface-elevated border border-surface-border rounded-xl p-5">
           <p className="metric-label normal-case text-content-tertiary mb-2">Net Worth Δ ({period})</p>
           <p
             className={`text-2xl font-mono font-bold tabular-nums data-numeric ${
@@ -324,7 +324,7 @@ export default function Analytics() {
           )}
         </div>
 
-        <div className="bg-surface-elevated border border-surface-border rounded-lg p-5">
+        <div className="bg-surface-elevated border border-surface-border rounded-xl p-5">
           <p className="metric-label normal-case text-content-tertiary mb-2">YTD Saved</p>
           <p className={`text-2xl font-mono font-bold tabular-nums data-numeric ${ytdMetrics.saved >= 0 ? 'text-content-primary' : 'text-[var(--color-status-rose-text)]'}`}>
             {fmt(ytdMetrics.saved)}
@@ -340,7 +340,7 @@ export default function Analytics() {
           )}
         </div>
 
-        <div className="bg-surface-elevated border border-surface-border rounded-lg p-5">
+        <div className="bg-surface-elevated border border-surface-border rounded-xl p-5">
           <p className="metric-label normal-case text-content-tertiary mb-2">Avg Savings Rate</p>
           <p
             className={`text-2xl font-mono font-bold tabular-nums data-numeric ${
@@ -443,7 +443,7 @@ export default function Analytics() {
         ) : (
           <div className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="rounded-lg border border-surface-border bg-surface-base p-4">
+              <div className="rounded-xl border border-surface-border bg-surface-base p-4">
                 <p className="text-xs font-mono uppercase tracking-widest text-content-muted mb-1">
                   {spendingBenchmark.priorLabel}
                 </p>
@@ -452,7 +452,7 @@ export default function Analytics() {
                 </p>
                 <p className="text-xs text-content-tertiary mt-1">Total spend</p>
               </div>
-              <div className="rounded-lg border border-surface-border bg-surface-base p-4">
+              <div className="rounded-xl border border-surface-border bg-surface-base p-4">
                 <p className="text-xs font-mono uppercase tracking-widest text-content-muted mb-1">
                   {spendingBenchmark.lastLabel}
                 </p>
@@ -461,7 +461,7 @@ export default function Analytics() {
                 </p>
                 <p className="text-xs text-content-tertiary mt-1">Total spend</p>
               </div>
-              <div className="rounded-lg border border-surface-border bg-surface-base p-4">
+              <div className="rounded-xl border border-surface-border bg-surface-base p-4">
                 <p className="text-xs font-mono uppercase tracking-widest text-content-muted mb-1">Change</p>
                 <p
                   className={`text-xl font-mono font-bold tabular-nums ${
@@ -485,7 +485,7 @@ export default function Analytics() {
                 {spendingBenchmark.topDeltas.map((row) => (
                   <li
                     key={row.cat}
-                    className="flex items-center justify-between gap-4 rounded-lg border border-surface-border bg-surface-base px-3 py-2"
+                    className="flex items-center justify-between gap-4 rounded-md border border-surface-border bg-surface-base px-3 py-2"
                   >
                     <span className="text-sm text-content-primary">{formatCategoryLabel(row.cat)}</span>
                     <span

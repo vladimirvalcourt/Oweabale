@@ -48,7 +48,7 @@ function FinancialPanelInner() {
                 const r = STATE_TAX_MAP[code];
                 if (r) setLocalTaxRate(String(r.rate));
               }}
-              className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
+              className="focus-app-field block w-full rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
             >
               {Object.entries(STATE_TAX_MAP).map(([code, { name }]) => (
                 <option key={code} value={code}>
@@ -67,7 +67,7 @@ function FinancialPanelInner() {
               step="0.01"
               value={localTaxRate}
               onChange={(e) => setLocalTaxRate(e.target.value)}
-              className="focus-app-field block w-full rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
+              className="focus-app-field block w-full rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
             />
           </div>
           <button
@@ -81,7 +81,7 @@ function FinancialPanelInner() {
               await setTaxSettings(localTaxState || 'NY', rate);
               toast.success('Tax settings saved');
             }}
-            className="rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base hover:bg-brand-cta-hover"
+            className="rounded-md bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base hover:bg-brand-cta-hover"
           >
             Save tax settings
           </button>

@@ -164,7 +164,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
                 <p className="mt-3 max-w-lg text-sm leading-6 text-content-tertiary">
                   Connect the basics first. Oweable keeps the onboarding path short, then lets the dashboard handle the deeper setup.
                 </p>
-                <div className="mt-10 divide-y divide-white/[0.06] rounded-lg border border-surface-border-subtle bg-surface-base/50">
+                <div className="mt-10 divide-y divide-white/[0.06] rounded-xl border border-surface-border-subtle bg-surface-base/50">
                   {['Google OAuth redirect', 'Trial profile activation', 'Dashboard routing'].map((item, index) => (
                     <div key={item} className="flex items-center justify-between px-4 py-4">
                       <span className="text-sm text-content-secondary">{item}</span>

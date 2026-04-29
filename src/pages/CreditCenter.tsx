@@ -145,18 +145,18 @@ ${user.firstName} ${user.lastName}
           <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-surface-raised border border-surface-border p-8 rounded-lg shrink-0 w-full md:w-64 text-center relative overflow-hidden shadow-none"
+            className="bg-surface-raised border border-surface-border p-8 rounded-xl shrink-0 w-full md:w-64 text-center relative overflow-hidden shadow-none"
           >
             <div className="absolute top-0 left-0 w-full h-px bg-surface-border" />
-            <p className="text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">Estimated Score</p>
+            <p className="text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest mb-2">Estimated Score</p>
             <p className="text-6xl font-mono font-bold text-content-primary tracking-tighter mb-2">{creditScore || '—'}</p>
             {credit?.lastUpdated ? (
-              <div className="flex items-center justify-center gap-2 text-[11px] font-mono uppercase tracking-widest text-content-tertiary">
+              <div className="flex items-center justify-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
                 <Calendar className="w-3 h-3" />
                 <span>Updated {new Date(credit.lastUpdated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
               </div>
             ) : (
-              <p className="text-[11px] font-mono uppercase tracking-widest text-content-muted">No score recorded yet</p>
+              <p className="text-xs font-mono uppercase tracking-widest text-content-muted">No score recorded yet</p>
             )}
           </motion.div>
         </div>
@@ -167,12 +167,12 @@ ${user.firstName} ${user.lastName}
           <div className="lg:col-span-2 space-y-8">
             
             {/* Main Factors */}
-            <section className="bg-surface-raised border border-surface-border rounded-lg overflow-hidden shadow-none">
+            <section className="bg-surface-raised border border-surface-border rounded-xl overflow-hidden shadow-none">
               <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-raised/80">
                 <h2 className="text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest">Score Breakdown</h2>
                 <TransitionLink
                   to="/education"
-                  className="focus-app rounded text-[10px] font-mono uppercase tracking-widest text-content-primary flex items-center gap-1 hover:text-content-secondary"
+                  className="focus-app rounded text-xs font-mono uppercase tracking-widest text-content-primary flex items-center gap-1 hover:text-content-secondary"
                 >
                   Education <HelpCircle className="w-3 h-3 shrink-0" aria-hidden />
                 </TransitionLink>
@@ -183,7 +183,7 @@ ${user.firstName} ${user.lastName}
                     <div className="flex-1 space-y-1 text-left w-full">
                       <div className="flex items-center justify-between md:justify-start gap-3">
                         <span className="text-sm font-sans font-bold text-content-primary">{factor.name}</span>
-                        <span className={`px-1.5 py-0.5 rounded-lg text-[9px] font-mono font-bold uppercase border ${getImpactColor(factor.impact)}`}>
+                        <span className={`px-1.5 py-0.5 rounded-xl text-xs font-mono font-bold uppercase border ${getImpactColor(factor.impact)}`}>
                           {factor.impact} Impact
                         </span>
                       </div>
@@ -198,7 +198,7 @@ ${user.firstName} ${user.lastName}
             </section>
 
             {/* Quick Boost Section */}
-            <section className="bg-content-primary/[0.03] border border-surface-border rounded-lg p-8 relative overflow-hidden group">
+            <section className="bg-content-primary/[0.03] border border-surface-border rounded-xl p-8 relative overflow-hidden group">
               <div className="absolute -top-4 -right-4 text-content-secondary/10 group-hover:text-content-secondary/20 transition-all duration-700">
                 <TrendingUp className="w-32 h-32 rotate-12" />
               </div>
@@ -215,7 +215,7 @@ ${user.firstName} ${user.lastName}
                     <p className="text-sm text-content-tertiary mb-6 max-w-lg leading-relaxed">
                       Your current utilization on this account is suppressing your score. Pay <span className="text-content-primary font-mono">${boostTip.amountToPay.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span> to trigger a recalculation.
                     </p>
-                    <div className="inline-flex items-center bg-black/30 border border-surface-border px-4 py-2 rounded-lg text-xs font-mono">
+                    <div className="inline-flex items-center bg-black/30 border border-surface-border px-4 py-2 rounded-md text-xs font-mono">
                       <span className="text-content-tertiary uppercase tracking-widest mr-2">Est. Boost</span>
                       <span className="text-content-primary font-bold">~{boostTip.pointPotential} Points</span>
                     </div>
@@ -271,7 +271,7 @@ ${user.firstName} ${user.lastName}
                   const { label, tips } = tipsByBracket[bracket];
                   return (
                     <div className="mt-8 border-t border-surface-border pt-6">
-                      <p className="text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-3">
+                      <p className="text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest mb-3">
                         Tips for your score range · {label}
                       </p>
                       <ul className="space-y-2">
@@ -293,7 +293,7 @@ ${user.firstName} ${user.lastName}
           <div className="space-y-8">
             
             {/* Fix-it List */}
-            <section className="bg-surface-raised border border-surface-border rounded-lg flex flex-col h-full shadow-none">
+            <section className="bg-surface-raised border border-surface-border rounded-xl flex flex-col h-full shadow-none">
               <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-raised/80">
                 <h2 className="text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-500" /> Dispute Hub
@@ -301,7 +301,7 @@ ${user.firstName} ${user.lastName}
                 <button 
                   type="button"
                   onClick={() => setIsFixModalOpen(true)}
-                  className="focus-app rounded border border-surface-border bg-surface-elevated p-1 px-3 text-[10px] font-mono font-bold uppercase text-content-primary transition-all hover:bg-surface-raised"
+                  className="focus-app rounded border border-surface-border bg-surface-elevated p-1 px-3 text-xs font-mono font-bold uppercase text-content-primary transition-all hover:bg-surface-raised"
                 >
                   New Case
                 </button>
@@ -315,7 +315,7 @@ ${user.firstName} ${user.lastName}
                     </div>
                     <div>
                       <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">Clear Record</p>
-                      <p className="text-[10px] text-content-muted mt-1 uppercase tracking-tight max-w-xs mx-auto leading-relaxed">
+                      <p className="text-xs text-content-muted mt-1 uppercase tracking-tight max-w-xs mx-auto leading-relaxed">
                       Add a dispute case to track letters and status. Annual review helps catch reporting errors early.
                     </p>
                     </div>
@@ -326,9 +326,9 @@ ${user.firstName} ${user.lastName}
                       <div className="flex items-start justify-between">
                         <div>
                           <h3 className="text-sm font-sans font-bold text-content-primary">{fix.item}</h3>
-                          <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{fix.bureau}</p>
+                          <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">{fix.bureau}</p>
                         </div>
-                        <span className={`text-[10px] font-mono px-2 py-0.5 rounded-lg border ${
+                        <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${
                           fix.status === 'resolved' ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/5' : 
                           fix.status === 'sent' ? 'border-surface-border text-content-primary bg-content-primary/[0.03]' : 
                           'border-content-primary/10 text-content-tertiary'
@@ -348,14 +348,14 @@ ${user.firstName} ${user.lastName}
                             setSelectedFixId(fix.id);
                             setIsLetterModalOpen(true);
                           }}
-                          className="focus-app flex flex-1 items-center justify-center gap-2 rounded-lg border border-surface-border bg-content-primary/[0.06] py-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-content-primary transition-all hover:bg-content-primary/[0.08]"
+                          className="focus-app flex flex-1 items-center justify-center gap-2 rounded-md border border-surface-border bg-content-primary/[0.06] py-1.5 text-xs font-mono font-bold uppercase tracking-widest text-content-primary transition-all hover:bg-content-primary/[0.08]"
                         >
                           <FileText className="w-3 h-3" aria-hidden /> Letter
                         </button>
                         <button 
                           type="button"
                           onClick={() => updateCreditFix(fix.id, { status: fix.status === 'resolved' ? 'todo' : 'resolved' })}
-                          className="focus-app flex-1 rounded-lg border border-content-primary/5 bg-surface-elevated py-1.5 text-[10px] font-mono font-bold uppercase tracking-widest text-content-secondary transition-all hover:bg-surface-border"
+                          className="focus-app flex-1 rounded-md border border-content-primary/5 bg-surface-elevated py-1.5 text-xs font-mono font-bold uppercase tracking-widest text-content-secondary transition-all hover:bg-surface-border"
                         >
                           {fix.status === 'resolved' ? 'Undo' : 'Resolve'}
                         </button>
@@ -374,14 +374,14 @@ ${user.firstName} ${user.lastName}
               </div>
 
               <div className="p-6 bg-surface-base border-t border-surface-border space-y-4">
-                <div className="flex items-center gap-2 text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest">
+                <div className="flex items-center gap-2 text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest">
                   <ShieldAlert className="w-3.5 h-3.5 text-content-secondary" /> Protection Shield
                 </div>
                 <div className="space-y-2">
-                  <a href="https://www.annualcreditreport.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2.5 text-[11px] text-content-tertiary hover:text-content-primary bg-surface-elevated border border-surface-border rounded-lg transition-all group">
+                  <a href="https://www.annualcreditreport.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2.5 text-xs text-content-tertiary hover:text-content-primary bg-surface-elevated border border-surface-border rounded-xl transition-all group">
                     Full Credit Report <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100" />
                   </a>
-                  <a href="https://www.experian.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2.5 text-[11px] text-content-tertiary hover:text-content-primary bg-surface-elevated border border-surface-border rounded-lg transition-all group">
+                  <a href="https://www.experian.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2.5 text-xs text-content-tertiary hover:text-content-primary bg-surface-elevated border border-surface-border rounded-xl transition-all group">
                     Freeze Credit <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100" />
                   </a>
                 </div>
@@ -408,39 +408,39 @@ ${user.firstName} ${user.lastName}
                   exit={{ opacity: 0, scale: 0.95, y: 10 }}
                   className="w-full max-w-md"
                 >
-                  <Dialog.Panel className="bg-surface-elevated border border-surface-border rounded-lg shadow-none p-8">
+                  <Dialog.Panel className="bg-surface-elevated border border-surface-border rounded-xl shadow-none p-8">
                     <Dialog.Title className="text-sm font-mono font-bold text-content-primary uppercase tracking-widest mb-6 border-b border-surface-border pb-4">
                       Report Error
                     </Dialog.Title>
                     <form onSubmit={handleAddFix} className="space-y-4">
                       <div>
-                        <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Description</label>
+                        <label className="block text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Description</label>
                         <input 
                           autoFocus
                           type="text" 
                           value={fixItem}
                           onChange={e => setFixItem(e.target.value)}
                           placeholder="e.g., Inaccurate Medical Collection"
-                          className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-content-primary focus-app-field placeholder:text-content-muted"
+                          className="w-full bg-surface-base border border-surface-border rounded-md px-3 py-3 text-sm text-content-primary focus-app-field placeholder:text-content-muted"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Amount ($)</label>
+                          <label className="block text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Amount ($)</label>
                           <input 
                             type="number" 
                             value={fixAmount}
                             onChange={e => setFixAmount(e.target.value)}
                             placeholder="0.00"
-                            className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-content-primary focus-app-field"
+                            className="w-full bg-surface-base border border-surface-border rounded-md px-3 py-3 text-sm text-content-primary focus-app-field"
                           />
                         </div>
                         <div>
-                          <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Bureau</label>
+                          <label className="block text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Bureau</label>
                           <select 
                             value={fixBureau}
                             onChange={e => setFixBureau(e.target.value)}
-                            className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-content-primary focus-app-field h-[46px]"
+                            className="w-full bg-surface-base border border-surface-border rounded-md px-3 py-3 text-sm text-content-primary focus-app-field h-[46px]"
                           >
                             <option>Experian</option>
                             <option>Equifax</option>
@@ -450,12 +450,12 @@ ${user.firstName} ${user.lastName}
                         </div>
                       </div>
                       <div>
-                        <label className="block text-[10px] font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Evidence / Notes</label>
+                        <label className="block text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Evidence / Notes</label>
                         <textarea 
                           value={fixNotes}
                           onChange={e => setFixNotes(e.target.value)}
                           placeholder="Explain why this is incorrect..."
-                          className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-3 text-sm text-content-primary focus-app-field h-24 resize-none placeholder:text-content-muted"
+                          className="w-full bg-surface-base border border-surface-border rounded-md px-3 py-3 text-sm text-content-primary focus-app-field h-24 resize-none placeholder:text-content-muted"
                         />
                       </div>
                       <div className="flex gap-3 pt-4">
@@ -468,7 +468,7 @@ ${user.firstName} ${user.lastName}
                         </button>
                         <button 
                           type="submit"
-                          className="flex-1 py-3 bg-brand-cta text-surface-base hover:bg-brand-cta-hover rounded-lg text-xs font-mono font-bold uppercase tracking-widest transition-all shadow-none"
+                          className="flex-1 py-3 bg-brand-cta text-surface-base hover:bg-brand-cta-hover rounded-md text-xs font-mono font-bold uppercase tracking-widest transition-all shadow-none"
                         >
                           Add Case
                         </button>
@@ -503,7 +503,7 @@ ${user.firstName} ${user.lastName}
                   exit={{ opacity: 0, scale: 0.9, rotateX: 10 }}
                   className="w-full max-w-2xl"
                 >
-                  <Dialog.Panel className="bg-brand-cta text-surface-base rounded-lg shadow-2xl p-10 font-serif border border-surface-base/15">
+                  <Dialog.Panel className="bg-brand-cta text-surface-base rounded-xl shadow-2xl p-10 font-serif border border-surface-base/15">
                 <div className="flex justify-between items-start mb-8 border-b border-surface-base/15 pb-4 no-print">
                   <div className="space-y-1">
                     <Dialog.Title className="text-xl font-sans font-black uppercase italic tracking-tighter text-surface-base">
@@ -546,7 +546,7 @@ ${user.firstName} ${user.lastName}
                 </div>
 
                 <div className="mt-8 pt-8 border-t border-surface-base/10 flex items-center justify-between no-print">
-                  <p className="text-[10px] font-sans text-content-tertiary italic">
+                  <p className="text-xs font-sans text-content-tertiary italic">
                     Certified Mail is recommended for all legal disputes.
                   </p>
                   <button 
@@ -555,7 +555,7 @@ ${user.firstName} ${user.lastName}
                       setIsLetterModalOpen(false);
                       toast.success('Status updated to SENT');
                     }}
-                    className="px-6 py-2 bg-surface-base text-content-primary font-sans font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-brand-cta hover:text-surface-base transition-colors"
+                    className="px-6 py-2 bg-surface-base text-content-primary font-sans font-bold text-xs uppercase tracking-widest rounded-md hover:bg-brand-cta hover:text-surface-base transition-colors"
                     type="button"
                   >
                     Mark as Sent

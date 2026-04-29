@@ -47,14 +47,14 @@ function SecurityPanelInner() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-secondary">
+      <div className="flex items-center gap-2 rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-secondary">
         <ShieldCheck className="w-3.5 h-3.5 shrink-0 text-content-tertiary" aria-hidden />
         <span>Secure connection — your session is encrypted in transit (HTTPS).</span>
       </div>
 
       {/* E-02: Show trust badge for SSO users instead of a misleading 0/2 score */}
       {isSsoOnly ? (
-        <div className="flex items-start gap-3 rounded-lg border border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-4 py-3">
+        <div className="flex items-start gap-3 rounded-full border border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-4 py-3">
           <ShieldCheck className="w-5 h-5 shrink-0 text-[var(--color-status-emerald-text)] mt-0.5" aria-hidden />
           <div>
             <p className="text-sm font-medium text-[var(--color-status-emerald-text)]">
@@ -76,7 +76,7 @@ function SecurityPanelInner() {
           </div>
         </div>
       ) : (
-        <div className="rounded-lg border border-surface-border bg-surface-elevated/50 px-4 py-3">
+        <div className="rounded-md border border-surface-border bg-surface-elevated/50 px-4 py-3">
           <p className="text-sm font-medium text-content-primary">
             Security score: {hasEmailPassword === null || mfaEnabled === null ? '…' : `${securityScore}/${securityScoreMax}`}
           </p>
@@ -146,7 +146,7 @@ function SecurityPanelInner() {
                   type="password"
                   required
                   autoComplete="current-password"
-                  className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+                  className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-md px-3 py-2 border transition-colors"
                 />
               </div>
               <div>
@@ -157,7 +157,7 @@ function SecurityPanelInner() {
                   required
                   minLength={8}
                   autoComplete="new-password"
-                  className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+                  className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-md px-3 py-2 border transition-colors"
                 />
               </div>
               <div>
@@ -167,14 +167,14 @@ function SecurityPanelInner() {
                   type="password"
                   required
                   autoComplete="new-password"
-                  className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-lg px-3 py-2 border transition-colors"
+                  className="mt-1 focus-app-field block w-full sm:text-sm border-surface-border bg-surface-base text-content-primary rounded-md px-3 py-2 border transition-colors"
                 />
               </div>
               <div className="pt-2">
                 <button
                   type="submit"
                   disabled={isUpdatingPassword}
-                  className="flex items-center gap-2 px-4 py-2 bg-brand-cta text-surface-base hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed rounded-lg text-sm font-medium transition-colors focus-app"
+                  className="flex items-center gap-2 px-4 py-2 bg-brand-cta text-surface-base hover:bg-brand-cta-hover disabled:opacity-60 disabled:cursor-not-allowed rounded-md text-sm font-medium transition-colors focus-app"
                 >
                   {isUpdatingPassword && <Loader2 className="w-3 h-3 animate-spin" />}
                   {isUpdatingPassword ? 'Updating...' : 'Update Password'}
@@ -199,7 +199,7 @@ function SecurityPanelInner() {
         }
       >
         {mfaEnabled ? (
-          <div className="flex items-start gap-3 border border-surface-border rounded-lg p-4 bg-surface-elevated/50">
+          <div className="flex items-start gap-3 border border-surface-border rounded-xl p-4 bg-surface-elevated/50">
             <div className="w-10 h-10 shrink-0 border rounded-full flex items-center justify-center border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)]">
               <CheckCircle2 className="w-5 h-5 text-[var(--color-status-emerald-text)]" />
             </div>
@@ -209,7 +209,7 @@ function SecurityPanelInner() {
             </div>
           </div>
         ) : (
-          <div className="flex items-start gap-3 border border-surface-border rounded-lg p-4 bg-surface-elevated/50">
+          <div className="flex items-start gap-3 border border-surface-border rounded-xl p-4 bg-surface-elevated/50">
             <div className="w-10 h-10 shrink-0 border border-surface-border bg-surface-raised rounded-full flex items-center justify-center">
               <Shield className="w-5 h-5 text-content-tertiary" />
             </div>

@@ -260,7 +260,7 @@ export default function Budgets() {
         <button 
           onClick={openAddModal}
           type="button"
-          className="px-4 py-2.5 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus-app"
+          className="px-4 py-2.5 rounded-md bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2 self-start sm:self-auto focus-app"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           Create budget
@@ -268,8 +268,8 @@ export default function Budgets() {
       </div>
 
       {budgets.length === 0 ? (
-        <div className="bg-surface-raised border border-surface-border rounded-lg p-12 text-center">
-          <div className="w-16 h-16 bg-surface-elevated rounded-lg flex items-center justify-center mx-auto mb-4 border border-surface-border">
+        <div className="bg-surface-raised border border-surface-border rounded-xl p-12 text-center">
+          <div className="w-16 h-16 bg-surface-elevated rounded-xl flex items-center justify-center mx-auto mb-4 border border-surface-border">
             <BudgetIcon className="w-8 h-8 text-content-muted" />
           </div>
           <h3 className="text-lg font-semibold text-content-primary mb-2">No budgets yet</h3>
@@ -277,7 +277,7 @@ export default function Budgets() {
           <button 
             type="button"
             onClick={openAddModal}
-            className="px-6 py-3 rounded-lg bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-surface-base text-sm font-sans font-semibold transition-colors inline-flex items-center gap-2 shadow-sm"
+            className="px-6 py-3 rounded-md bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-surface-base text-sm font-sans font-semibold transition-colors inline-flex items-center gap-2 shadow-sm"
           >
             <Plus className="w-4 h-4 shrink-0" aria-hidden />
             Create your first budget
@@ -287,7 +287,7 @@ export default function Budgets() {
         <>
           <CollapsibleModule title="Savings Target" icon={PlanningIcon}>
             <div className="space-y-4">
-              <div className="rounded-lg border border-surface-border bg-surface-elevated p-4">
+              <div className="rounded-xl border border-surface-border bg-surface-elevated p-4">
                 <label className="block text-xs font-medium text-content-tertiary mb-2">Monthly savings target</label>
                 <div className="flex items-center gap-3">
                   <div className="relative w-full max-w-xs">
@@ -298,22 +298,22 @@ export default function Budgets() {
                       step="1"
                       value={monthlySavingsTarget}
                       onChange={(e) => saveMonthlySavingsTarget(Math.max(0, Number(e.target.value) || 0))}
-                      className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field"
+                      className="w-full bg-surface-base border border-surface-border rounded-md pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field"
                     />
                   </div>
                   <span className="text-xs text-content-tertiary">per month</span>
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                <div className="rounded-lg border border-surface-border bg-surface-elevated p-3">
+                <div className="rounded-xl border border-surface-border bg-surface-elevated p-3">
                   <p className="text-xs text-content-tertiary">Saved so far</p>
                   <p className="mt-1 font-mono text-content-primary">${monthlySavingsSnapshot.netSavedSoFar.toFixed(0)}</p>
                 </div>
-                <div className="rounded-lg border border-surface-border bg-surface-elevated p-3">
+                <div className="rounded-xl border border-surface-border bg-surface-elevated p-3">
                   <p className="text-xs text-content-tertiary">Projected end-of-month</p>
                   <p className="mt-1 font-mono text-content-primary">${monthlySavingsSnapshot.projectedEndOfMonthSavings.toFixed(0)}</p>
                 </div>
-                <div className="rounded-lg border border-surface-border bg-surface-elevated p-3">
+                <div className="rounded-xl border border-surface-border bg-surface-elevated p-3">
                   <p className="text-xs text-content-tertiary">Status</p>
                   <p
                     className={`mt-1 font-medium ${
@@ -339,14 +339,14 @@ export default function Budgets() {
             <CollapsibleModule title="Personalized Savings Suggestions" icon={PlanningIcon} defaultOpen={false}>
               <div className="space-y-3">
                 {personalizedSavingsSuggestions.map((suggestion) => (
-                  <div key={suggestion.id} className="rounded-lg border border-surface-border bg-surface-elevated p-4">
+                  <div key={suggestion.id} className="rounded-xl border border-surface-border bg-surface-elevated p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="text-sm font-semibold text-content-primary">{suggestion.headline}</p>
                         <p className="mt-1 text-xs text-content-secondary">{suggestion.rationale}</p>
                         <p className="mt-1 text-xs text-content-tertiary">{suggestion.action}</p>
                       </div>
-                      <span className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-mono text-emerald-300">
+                      <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-mono text-emerald-300">
                         Save ~${suggestion.estimatedMonthlySavings.toFixed(0)}/mo
                       </span>
                     </div>
@@ -357,7 +357,7 @@ export default function Budgets() {
           )}
 
           {projectedRiskBudgets.length > 0 && (
-            <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4">
+            <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
               <p className="text-sm font-medium text-amber-300">
                 Heads up: {projectedRiskBudgets.length} {projectedRiskBudgets.length === 1 ? 'category is' : 'categories are'} on pace to overspend.
               </p>
@@ -393,26 +393,26 @@ export default function Budgets() {
               return (
                 <div 
                   key={budget.id} 
-                  className="bg-surface-elevated rounded-lg border border-surface-border p-5 flex flex-col relative group hover:border-content-primary/15 transition-colors"
+                  className="bg-surface-elevated rounded-xl border border-surface-border p-5 flex flex-col relative group hover:border-content-primary/15 transition-colors"
                 >
                   <div className="flex justify-between items-start mb-6">
                     <div>
                       <h3 className="text-sm font-semibold text-content-primary flex items-center gap-1.5">
                         {formatCategoryLabel(budget.category)}
                         {anomalyMap[budget.category] && (
-                          <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400">
+                          <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-1.5 py-0.5 text-xs font-semibold text-amber-400">
                             ↑{anomalyMap[budget.category].overagePercent.toFixed(0)}%
                           </span>
                         )}
                       </h3>
                       <p className="metric-label mt-1.5 normal-case">{budget.period} limit</p>
                       {(budget.lockMode ?? 'none') !== 'none' && (
-                        <p className="mt-1 text-[11px] font-medium text-amber-400 uppercase tracking-wide">
+                        <p className="mt-1 text-xs font-medium text-amber-400 uppercase tracking-wide">
                           {(budget.lockMode ?? 'none') === 'hard' ? 'Hard lock' : 'Soft lock'}
                         </p>
                       )}
                       {budget.rolloverEnabled && rolloverCredit > 0 && (
-                        <p className="mt-1 text-[11px] font-medium text-emerald-400">
+                        <p className="mt-1 text-xs font-medium text-emerald-400">
                           Rollover +${rolloverCredit.toFixed(0)}
                         </p>
                       )}
@@ -474,7 +474,7 @@ export default function Budgets() {
                     </p>
                   </div>
 
-                  <div className="w-full bg-surface-raised border border-surface-border rounded-lg h-1.5 mb-2 overflow-hidden">
+                  <div className="w-full bg-surface-raised border border-surface-border rounded-xl h-1.5 mb-2 overflow-hidden">
                     <div className={`${progressColor} h-full transition-all duration-700 ease-out`} style={{ width: `${percentage}%` }}></div>
                   </div>
 
@@ -504,7 +504,7 @@ export default function Budgets() {
       <Dialog open={isAddModalOpen || isEditModalOpen} onClose={() => { setIsAddModalOpen(false); setIsEditModalOpen(false); }} className="relative z-50">
         <div className="fixed inset-0 bg-black/80" aria-hidden="true" />
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto max-w-sm w-full rounded-lg bg-surface-raised border border-surface-border shadow-2xl">
+          <Dialog.Panel className="mx-auto max-w-sm w-full rounded-xl bg-surface-raised border border-surface-border shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-surface-border">
               <Dialog.Title className="text-base font-sans font-semibold text-content-primary">
                 {isEditModalOpen ? 'Edit budget' : 'New budget'}
@@ -521,7 +521,7 @@ export default function Budgets() {
                   required
                   value={formData.category}
                   onChange={(e) => setFormData({...formData, category: e.target.value})}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-md px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                 >
                   <option value="" disabled>Select category</option>
                   {expenseCategories.map(c => (
@@ -544,13 +544,13 @@ export default function Budgets() {
                     min="0"
                     value={formData.amount}
                     onChange={(e) => setFormData({...formData, amount: e.target.value})}
-                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-md pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field transition-colors"
                     placeholder="0.00"
                   />
                 </div>
                 {selectedSinkingFundSuggestion !== null && (
-                  <div className="mt-2 flex items-center justify-between rounded-lg border border-surface-border bg-surface-elevated px-3 py-2">
-                    <p className="text-[11px] text-content-secondary">
+                  <div className="mt-2 flex items-center justify-between rounded-md border border-surface-border bg-surface-elevated px-3 py-2">
+                    <p className="text-xs text-content-secondary">
                       Suggested sinking-fund target for this category:
                       <span className="ml-1 font-mono text-content-primary">
                         ${selectedSinkingFundSuggestion.toFixed(2)}/mo
@@ -559,7 +559,7 @@ export default function Budgets() {
                     <button
                       type="button"
                       onClick={() => setFormData({ ...formData, amount: selectedSinkingFundSuggestion.toFixed(2) })}
-                      className="text-[11px] font-medium text-content-primary hover:text-content-secondary focus-app rounded-lg px-2 py-1"
+                      className="text-xs font-medium text-content-primary hover:text-content-secondary focus-app rounded-full px-2 py-1"
                     >
                       Use target
                     </button>
@@ -572,7 +572,7 @@ export default function Budgets() {
                 <select 
                   value={formData.period}
                   onChange={(e) => setFormData({...formData, period: e.target.value as Budget['period']})}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-md px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                 >
                   {BUDGET_PERIODS.map((period) => (
                     <option key={period} value={period}>{period}</option>
@@ -580,7 +580,7 @@ export default function Budgets() {
                 </select>
               </div>
 
-              <div className="rounded-lg border border-surface-border bg-surface-base p-3">
+              <div className="rounded-xl border border-surface-border bg-surface-base p-3">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
@@ -602,7 +602,7 @@ export default function Budgets() {
                 <select
                   value={formData.lockMode}
                   onChange={(e) => setFormData({ ...formData, lockMode: e.target.value as NonNullable<Budget['lockMode']> })}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-md px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                 >
                   <option value="none">No lock</option>
                   <option value="soft">Soft lock (warn + allow override)</option>
@@ -620,7 +620,7 @@ export default function Budgets() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold transition-colors shadow-sm"
+                  className="px-6 py-2 rounded-md bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold transition-colors shadow-sm"
                 >
                   {isEditModalOpen ? 'Save changes' : 'Save budget'}
                 </button>

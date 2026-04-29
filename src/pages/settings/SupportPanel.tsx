@@ -135,13 +135,13 @@ function SupportPanelInner() {
     <div className="space-y-6">
       <CollapsibleModule title="Service Status" icon={SupportIcon} defaultOpen={false}>
         <div className="space-y-3">
-          <div className="rounded-lg border border-surface-border bg-surface-base p-3 text-sm">
+          <div className="rounded-xl border border-surface-border bg-surface-base p-3 text-sm">
             <p className="font-medium text-content-primary">App connectivity: {isOnline ? 'Online' : 'Offline'}</p>
             <p className="mt-1 text-xs text-content-tertiary">
               {isOnline ? 'Network looks healthy from this browser.' : 'You appear offline. Sync and support actions may fail.'}
             </p>
           </div>
-          <div className="rounded-lg border border-surface-border bg-surface-base p-3 text-sm">
+          <div className="rounded-xl border border-surface-border bg-surface-base p-3 text-sm">
             <p className="font-medium text-content-primary">
               Bank sync status:{' '}
               {syncState === 'healthy'
@@ -233,7 +233,7 @@ function SupportPanelInner() {
                 {isSubmittingTicket ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                 {isSubmittingTicket ? 'Sending...' : 'Submit Request'}
               </button>
-              <p className="max-w-md text-right text-[11px] text-content-tertiary leading-relaxed">
+              <p className="max-w-md text-right text-xs text-content-tertiary leading-relaxed">
                 We typically respond within 24 hours.
                 {userEmail
                   ? ` You'll receive a confirmation at ${userEmail}.`
@@ -270,7 +270,7 @@ function SupportPanelInner() {
                 <div key={ticket.id} className="p-5 hover:bg-surface-elevated transition-colors flex items-center justify-between">
                   <div className="flex items-center gap-4 min-w-0">
                     <div
-                      className={`p-1.5 border rounded-lg shrink-0 ${
+                      className={`p-1.5 border rounded-xl shrink-0 ${
                         ticket.status === 'Resolved'
                           ? 'bg-[var(--color-status-emerald-bg)] border-[var(--color-status-emerald-border)] text-[var(--color-status-emerald-text)]'
                           : ticket.status === 'In Progress'
@@ -290,7 +290,7 @@ function SupportPanelInner() {
                       <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                         <span className="font-mono text-xs text-content-tertiary">{ticket.id}</span>
                         <span
-                          className={`rounded-lg border px-1.5 py-0.5 text-xs font-medium ${
+                          className={`rounded-md border px-1.5 py-0.5 text-xs font-medium ${
                             ticket.priority === 'Urgent'
                               ? 'border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]'
                               : 'border-surface-border bg-surface-elevated text-content-secondary'

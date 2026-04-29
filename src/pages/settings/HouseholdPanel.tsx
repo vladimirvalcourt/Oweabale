@@ -21,7 +21,7 @@ export function HouseholdPanel() {
   // Pro gating
   if (!hasFullSuite) {
     return (
-      <div className="rounded-lg border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] p-6">
+      <div className="rounded-full border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] p-6">
         <h3 className="text-sm font-medium text-[var(--color-status-amber-text)] mb-2">Pro Feature</h3>
         <p className="text-xs text-content-secondary mb-4">
           Multi-user households are available with the Full Suite plan. Upgrade to invite partners and share your financial data.
@@ -136,10 +136,10 @@ export function HouseholdPanel() {
                 type="text"
                 value={currentHousehold?.name || ''}
                 disabled
-                className="flex-1 rounded-lg border border-surface-border bg-surface-base px-4 py-2.5 text-sm text-content-primary cursor-not-allowed opacity-60"
+                className="flex-1 rounded-md border border-surface-border bg-surface-base px-4 py-2.5 text-sm text-content-primary cursor-not-allowed opacity-60"
               />
               {isOwner && (
-                <span className="text-[10px] font-mono text-content-muted uppercase tracking-widest">
+                <span className="text-xs font-mono text-content-muted uppercase tracking-widest">
                   Owner only
                 </span>
               )}
@@ -151,7 +151,7 @@ export function HouseholdPanel() {
 
           {/* Invite Form */}
           {canManageMembers && (
-            <div className="rounded-lg border border-surface-border bg-surface-elevated/50 p-4">
+            <div className="rounded-xl border border-surface-border bg-surface-elevated/50 p-4">
               <h4 className="text-sm font-medium text-content-primary mb-3 flex items-center gap-2">
                 <UserPlus className="w-4 h-4 text-content-tertiary" />
                 Invite Member
@@ -168,7 +168,7 @@ export function HouseholdPanel() {
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
                       placeholder="partner@example.com"
-                      className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+                      className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
                       required
                     />
                   </div>
@@ -180,7 +180,7 @@ export function HouseholdPanel() {
                       id="invite-role"
                       value={inviteRole}
                       onChange={(e) => setInviteRole(e.target.value as 'partner' | 'viewer')}
-                      className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-secondary focus-app-field"
+                      className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-secondary focus-app-field"
                     >
                       <option value="partner">Partner</option>
                       <option value="viewer">Viewer</option>
@@ -194,7 +194,7 @@ export function HouseholdPanel() {
                   <button
                     type="submit"
                     disabled={isInviting}
-                    className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-xs font-medium text-surface-base hover:bg-brand-cta-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 rounded-md bg-brand-cta px-4 py-2 text-xs font-medium text-surface-base hover:bg-brand-cta-hover transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isInviting ? (
                       <>
@@ -224,7 +224,7 @@ export function HouseholdPanel() {
                 {pendingInvites.map((member) => (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between rounded-lg border border-surface-border bg-surface-base px-4 py-3"
+                    className="flex items-center justify-between rounded-md border border-surface-border bg-surface-base px-4 py-3"
                   >
                     <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="w-8 h-8 rounded-full bg-surface-elevated border border-surface-border flex items-center justify-center shrink-0">
@@ -241,7 +241,7 @@ export function HouseholdPanel() {
                       <button
                         type="button"
                         onClick={() => handleRemoveMember(member.id, member.invited_email || undefined)}
-                        className="ml-3 p-2 text-content-tertiary hover:text-[var(--color-status-rose-text)] hover:bg-[var(--color-status-rose-bg)] rounded-lg transition-colors"
+                        className="ml-3 p-2 text-content-tertiary hover:text-[var(--color-status-rose-text)] hover:bg-[var(--color-status-rose-bg)] rounded-full transition-colors"
                         title="Revoke invite"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -260,7 +260,7 @@ export function HouseholdPanel() {
               Members ({acceptedMembers.length})
             </h4>
             {acceptedMembers.length === 0 ? (
-              <div className="text-center py-8 rounded-lg border border-dashed border-surface-border bg-surface-raised">
+              <div className="text-center py-8 rounded-xl border border-dashed border-surface-border bg-surface-raised">
                 <Users className="w-8 h-8 text-content-muted mx-auto mb-2" />
                 <p className="text-sm text-content-secondary">No members yet</p>
                 <p className="text-xs text-content-tertiary mt-1">
@@ -277,7 +277,7 @@ export function HouseholdPanel() {
                   return (
                     <div
                       key={member.id}
-                      className="flex items-center justify-between rounded-lg border border-surface-border bg-surface-base px-4 py-3 group"
+                      className="flex items-center justify-between rounded-md border border-surface-border bg-surface-base px-4 py-3 group"
                     >
                       <div className="flex items-center gap-3 min-w-0 flex-1">
                         <div className="w-8 h-8 rounded-full bg-content-primary/[0.08] border border-content-primary/15 flex items-center justify-center shrink-0">
@@ -302,7 +302,7 @@ export function HouseholdPanel() {
                               )}
                             </p>
                             <span
-                              className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-medium ${getRoleBadgeColor(member.role)}`}
+                              className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-xs font-medium ${getRoleBadgeColor(member.role)}`}
                             >
                               <RoleIcon className="w-3 h-3" />
                               {member.role}
@@ -327,7 +327,7 @@ export function HouseholdPanel() {
                             <button
                               type="button"
                               onClick={() => handleRemoveMember(member.id, displayName)}
-                              className="p-2 text-content-tertiary hover:text-[var(--color-status-rose-text)] hover:bg-[var(--color-status-rose-bg)] rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                              className="p-2 text-content-tertiary hover:text-[var(--color-status-rose-text)] hover:bg-[var(--color-status-rose-bg)] rounded-full transition-colors opacity-0 group-hover:opacity-100"
                               title="Remove member"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -343,7 +343,7 @@ export function HouseholdPanel() {
           </div>
 
           {/* Permissions Info */}
-          <div className="rounded-lg border border-surface-border bg-surface-elevated/50 p-4">
+          <div className="rounded-xl border border-surface-border bg-surface-elevated/50 p-4">
             <h4 className="text-xs font-medium text-content-secondary mb-2">Permissions</h4>
             <ul className="space-y-2 text-xs text-content-tertiary">
               <li className="flex items-start gap-2">

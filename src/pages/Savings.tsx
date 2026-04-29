@@ -103,7 +103,7 @@ export default function Savings() {
             type="button"
             onClick={() => void onSync()}
             disabled={syncing}
-            className="inline-flex items-center gap-2 rounded-lg border border-surface-border px-4 py-2.5 text-sm font-medium text-content-secondary hover:bg-surface-elevated disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-md border border-surface-border px-4 py-2.5 text-sm font-medium text-content-secondary hover:bg-surface-elevated disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} aria-hidden />
             Sync now
@@ -112,7 +112,7 @@ export default function Savings() {
       </div>
 
       {!bankConnected && (
-        <div className="rounded-lg border border-dashed border-surface-border bg-surface-raised p-8 text-center">
+        <div className="rounded-xl border border-dashed border-surface-border bg-surface-raised p-8 text-center">
           <Landmark className="w-10 h-10 mx-auto text-content-muted mb-3" aria-hidden />
           <p className="text-content-primary font-medium">Connect a bank to see savings activity</p>
           <p className="text-sm text-content-tertiary mt-2 max-w-md mx-auto">
@@ -120,7 +120,7 @@ export default function Savings() {
           </p>
           <TransitionLink
             to="/pro/settings?tab=integrations"
-            className="mt-4 inline-flex items-center justify-center rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover"
+            className="mt-4 inline-flex items-center justify-center rounded-md bg-brand-cta px-5 py-2.5 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover"
           >
             Go to Integrations
           </TransitionLink>
@@ -128,7 +128,7 @@ export default function Savings() {
       )}
 
       {bankConnected && plaidAccounts.length === 0 && (
-        <div className="rounded-lg border border-surface-border bg-surface-raised p-6">
+        <div className="rounded-xl border border-surface-border bg-surface-raised p-6">
           <p className="text-content-primary text-sm">
             Accounts from your bank will show here after the next successful sync
             {plaidLastSyncAt ? ` (last sync ${new Date(plaidLastSyncAt).toLocaleString()}).` : '.'}
@@ -154,7 +154,7 @@ export default function Savings() {
                   <p className="text-xs text-content-tertiary mt-0.5">
                     {[acc.accountSubtype, acc.mask ? `···${acc.mask}` : null].filter(Boolean).join(' · ') || acc.accountType}
                     {acc.subtypeSuggestedSavings && (
-                      <span className="ml-2 rounded border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-medium text-emerald-400">
+                      <span className="ml-2 rounded border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-xs font-medium text-emerald-400">
                         Suggested
                       </span>
                     )}
@@ -179,19 +179,19 @@ export default function Savings() {
       {bankConnected && trackedPlaidIds.size > 0 && (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="rounded-lg border border-surface-border bg-surface-raised p-5">
+            <div className="rounded-xl border border-surface-border bg-surface-raised p-5">
               <p className="text-xs text-content-tertiary uppercase tracking-wide">In (90 days)</p>
               <p className="mt-2 text-2xl font-mono tabular-nums text-emerald-400 data-numeric">
                 ${totals90.inflow.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </p>
             </div>
-            <div className="rounded-lg border border-surface-border bg-surface-raised p-5">
+            <div className="rounded-xl border border-surface-border bg-surface-raised p-5">
               <p className="text-xs text-content-tertiary uppercase tracking-wide">Out (90 days)</p>
               <p className="mt-2 text-2xl font-mono tabular-nums text-rose-400 data-numeric">
                 ${totals90.outflow.toLocaleString(undefined, { maximumFractionDigits: 0 })}
               </p>
             </div>
-            <div className="rounded-lg border border-surface-border bg-surface-raised p-5">
+            <div className="rounded-xl border border-surface-border bg-surface-raised p-5">
               <p className="text-xs text-content-tertiary uppercase tracking-wide">Net</p>
               <p className="mt-2 text-2xl font-mono tabular-nums text-content-primary data-numeric">
                 ${totals90.net.toLocaleString(undefined, { maximumFractionDigits: 0 })}
@@ -238,7 +238,7 @@ export default function Savings() {
       )}
 
       {bankConnected && plaidAccounts.length > 0 && trackedPlaidIds.size === 0 && (
-        <p className="text-sm text-content-tertiary text-center py-8 rounded-lg border border-dashed border-surface-border">
+        <p className="text-sm text-content-tertiary text-center py-8 rounded-md border border-dashed border-surface-border">
           Turn on &quot;Track on Savings page&quot; for at least one account to see totals and activity.
         </p>
       )}

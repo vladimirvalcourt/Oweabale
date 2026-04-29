@@ -94,7 +94,7 @@ function InvestmentsPageSkeleton() {
               key={i}
               className="rounded-xl border border-surface-border bg-surface-raised p-4 sm:p-5 flex gap-4"
             >
-              <div className="skeleton-shimmer rounded-lg w-10 h-10 shrink-0" />
+              <div className="skeleton-shimmer rounded-xl w-10 h-10 shrink-0" />
               <div className="flex-1 space-y-2">
                 {bar('h-3 w-48')}
                 {bar('h-3 w-20')}
@@ -152,11 +152,11 @@ function PortfolioVsDebtWidget({
             }}
           />
           <div className="absolute inset-[16%] flex flex-col items-center justify-center rounded-full border border-surface-border bg-surface-base text-center px-2">
-            <span className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary">Mix</span>
+            <span className="text-xs font-mono uppercase tracking-wider text-content-tertiary">Mix</span>
             <span className="text-sm font-mono font-semibold tabular-nums text-content-primary">
               {total > 0 ? `${Math.round(invPct)}%` : '—'}
             </span>
-            <span className="text-[10px] text-content-tertiary">invested</span>
+            <span className="text-xs text-content-tertiary">invested</span>
           </div>
         </div>
 
@@ -210,7 +210,7 @@ function AccountTypeIconCluster() {
       )}
     >
       <Icon className="w-5 h-5 text-content-secondary" aria-hidden />
-      <span className="text-[10px] font-mono font-medium uppercase tracking-[0.12em] text-content-tertiary">{label}</span>
+      <span className="text-xs font-mono font-medium uppercase tracking-[0.12em] text-content-tertiary">{label}</span>
     </div>
   );
   return (
@@ -357,7 +357,7 @@ export default function Investments() {
             <button
               type="button"
               onClick={openAdd}
-              className="inline-flex items-center gap-2 rounded-lg bg-content-primary px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app shrink-0 self-end sm:self-start btn-tactile"
+              className="inline-flex items-center gap-2 rounded-md bg-content-primary px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app shrink-0 self-end sm:self-start btn-tactile"
             >
               <Plus className="w-4 h-4 shrink-0" aria-hidden />
               + Add Account
@@ -382,7 +382,7 @@ export default function Investments() {
                 <button
                   type="button"
                   onClick={openAdd}
-                  className="mt-8 inline-flex items-center gap-2 rounded-lg bg-content-primary px-8 py-3 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app btn-tactile"
+                  className="mt-8 inline-flex items-center gap-2 rounded-md bg-content-primary px-8 py-3 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app btn-tactile"
                 >
                   <Plus className="w-4 h-4 shrink-0" aria-hidden />
                   Add Investment Account
@@ -449,14 +449,14 @@ export default function Investments() {
                             className="rounded-xl border border-surface-border bg-surface-raised p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                           >
                             <div className="flex items-start gap-4 min-w-0">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-surface-border bg-surface-base">
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-surface-border bg-surface-base">
                                 <TrendingUp className="w-4 h-4 text-content-muted" aria-hidden />
                               </div>
                               <div className="min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <h4 className="text-sm font-semibold text-content-primary">{account.name}</h4>
                                   <span
-                                    className={`inline-flex items-center rounded-md border px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wide ${TYPE_BADGE[account.type]}`}
+                                    className={`inline-flex items-center rounded-md border px-1.5 py-0.5 font-mono text-xs font-semibold uppercase tracking-wide ${TYPE_BADGE[account.type]}`}
                                   >
                                     {TYPE_LABELS[account.type]}
                                   </span>
@@ -470,7 +470,7 @@ export default function Investments() {
                                 {account.notes && (
                                   <p className="text-xs text-content-tertiary mt-0.5 truncate max-w-md">{account.notes}</p>
                                 )}
-                                <p className="text-[11px] text-content-tertiary mt-2">
+                                <p className="text-xs text-content-tertiary mt-2">
                                   Last updated {formatRelativeTime(account.lastUpdated)}
                                 </p>
                               </div>
@@ -564,7 +564,7 @@ export default function Investments() {
                     required
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary transition-colors"
+                    className="focus-app-field w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary transition-colors"
                     placeholder="e.g., Fidelity 401(k)"
                   />
                 </div>
@@ -574,7 +574,7 @@ export default function Investments() {
                   <select
                     value={form.type}
                     onChange={(e) => setForm({ ...form, type: e.target.value as InvestmentAccount['type'] })}
-                    className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary transition-colors"
+                    className="focus-app-field w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary transition-colors"
                   >
                     <option value="brokerage">Brokerage</option>
                     <option value="ira">Traditional IRA</option>
@@ -592,7 +592,7 @@ export default function Investments() {
                     type="text"
                     value={form.institution}
                     onChange={(e) => setForm({ ...form, institution: e.target.value })}
-                    className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary transition-colors"
+                    className="focus-app-field w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary transition-colors"
                     placeholder="e.g., Fidelity"
                   />
                 </div>
@@ -610,7 +610,7 @@ export default function Investments() {
                       step="0.01"
                       value={form.balance}
                       onChange={(e) => setForm({ ...form, balance: e.target.value })}
-                      className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base py-2 pl-7 pr-3 font-mono text-sm text-content-primary transition-colors"
+                      className="focus-app-field w-full rounded-md border border-surface-border bg-surface-base py-2 pl-7 pr-3 font-mono text-sm text-content-primary transition-colors"
                       placeholder="0.00"
                     />
                   </div>
@@ -622,7 +622,7 @@ export default function Investments() {
                     rows={2}
                     value={form.notes}
                     onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                    className="focus-app-field w-full resize-none rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary transition-colors"
+                    className="focus-app-field w-full resize-none rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary transition-colors"
                     placeholder="Optional notes…"
                   />
                 </div>
@@ -632,13 +632,13 @@ export default function Investments() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-transparent px-3 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
+                  className="inline-flex items-center gap-2 rounded-md border border-surface-border bg-transparent px-3 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
+                  className="inline-flex items-center gap-2 rounded-md bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
                 >
                   {editingId ? 'Save changes' : 'Add account'}
                 </button>

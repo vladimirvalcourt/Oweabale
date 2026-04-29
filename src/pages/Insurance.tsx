@@ -144,7 +144,7 @@ export default function Insurance() {
           <button
             type="button"
             onClick={openAdd}
-            className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
+            className="inline-flex items-center gap-2 rounded-md bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
           >
             <Plus className="h-4 w-4 shrink-0" aria-hidden />
             Add Policy
@@ -153,7 +153,7 @@ export default function Insurance() {
 
         {/* PAGE-06: First-visit explainer banner — dismissable */}
         {!bannerDismissed && (
-          <div className="flex items-start gap-3 rounded-lg border border-surface-border bg-surface-raised p-4">
+          <div className="flex items-start gap-3 rounded-xl border border-surface-border bg-surface-raised p-4">
             <Shield className="h-5 w-5 shrink-0 text-content-secondary mt-0.5" aria-hidden />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-content-primary">Why track insurance here?</p>
@@ -164,7 +164,7 @@ export default function Insurance() {
             <button
               type="button"
               onClick={dismissBanner}
-              className="shrink-0 rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-elevated"
+              className="shrink-0 rounded-md border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary transition-colors hover:bg-surface-elevated"
             >
               Got it
             </button>
@@ -181,7 +181,7 @@ export default function Insurance() {
               return (
                 <div
                   key={key}
-                  className={`flex items-start gap-3 rounded-lg border p-3 ${
+                  className={`flex items-start gap-3 rounded-xl border p-3 ${
                     covered
                       ? 'border-emerald-500/20 bg-emerald-500/5'
                       : 'border-amber-500/20 bg-amber-500/5'
@@ -194,7 +194,7 @@ export default function Insurance() {
                   <div>
                     <p className="text-sm font-medium text-content-primary flex items-center gap-2">
                       {label}
-                      <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                      <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${
                         covered ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'
                       }`}>
                         {covered ? 'Covered' : 'Gap'}
@@ -210,7 +210,7 @@ export default function Insurance() {
 
         {/* Summary */}
         {activePolicies.length > 0 && (
-          <div className="flex items-center justify-between rounded-lg border border-surface-border bg-surface-elevated px-4 py-3">
+          <div className="flex items-center justify-between rounded-md border border-surface-border bg-surface-elevated px-4 py-3">
             <p className="text-sm text-content-secondary">{activePolicies.length} active {activePolicies.length === 1 ? 'policy' : 'policies'}</p>
             <p className="text-sm font-semibold text-content-primary">
               ${monthlyPremiumTotal.toFixed(2)}<span className="text-xs font-normal text-content-tertiary">/mo total</span>
@@ -220,8 +220,8 @@ export default function Insurance() {
 
         {/* Policy List */}
         {insurancePolicies.length === 0 ? (
-          <div className="rounded-lg border border-surface-border bg-surface-elevated p-12 text-center">
-            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-lg border border-surface-border bg-surface-base">
+          <div className="rounded-xl border border-surface-border bg-surface-elevated p-12 text-center">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-surface-border bg-surface-base">
               <Shield className="w-7 h-7 text-content-muted" />
             </div>
             <h3 className="mb-2 text-base font-medium text-content-primary">No policies yet</h3>
@@ -231,7 +231,7 @@ export default function Insurance() {
             <button
               type="button"
               onClick={openAdd}
-              className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
+              className="inline-flex items-center gap-2 rounded-md bg-brand-cta px-4 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
             >
               <Plus className="h-4 w-4 shrink-0" aria-hidden />
               Add your first policy
@@ -243,21 +243,21 @@ export default function Insurance() {
               {insurancePolicies.map(policy => (
                 <div
                   key={policy.id}
-                  className="flex items-start justify-between gap-4 rounded-lg border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary/15"
+                  className="flex items-start justify-between gap-4 rounded-xl border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary/15"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-semibold text-content-primary">{policy.provider}</span>
-                      <span className="rounded-full border border-surface-border bg-content-primary/[0.04] px-1.5 py-0.5 text-[11px] font-semibold text-content-secondary">
+                      <span className="rounded-full border border-surface-border bg-content-primary/[0.04] px-1.5 py-0.5 text-xs font-semibold text-content-secondary">
                         {TYPE_LABELS[policy.type]}
                       </span>
                       {policy.status !== 'active' && (
-                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20">
+                        <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-rose-500/10 text-rose-300 border border-rose-500/20">
                           {policy.status}
                         </span>
                       )}
                       {isExpiringSoon(policy.expirationDate) && (
-                        <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                        <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20">
                           Expires soon
                         </span>
                       )}
@@ -303,7 +303,7 @@ export default function Insurance() {
         <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} className="relative z-50">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
           <div className="fixed inset-0 flex items-center justify-center p-4">
-            <Dialog.Panel className="w-full max-w-lg rounded-lg border border-surface-border bg-surface-elevated shadow-xl">
+            <Dialog.Panel className="w-full max-w-lg rounded-xl border border-surface-border bg-surface-elevated shadow-xl">
               <div className="flex items-center justify-between p-5 border-b border-surface-border">
                 <Dialog.Title className="text-base font-semibold text-content-primary">
                   {editingId ? 'Edit Policy' : 'Add Policy'}
@@ -323,7 +323,7 @@ export default function Insurance() {
                     <select
                       value={form.type}
                       onChange={e => setForm(f => ({ ...f, type: e.target.value as InsurancePolicy['type'] }))}
-                      className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
+                      className="focus-app-field w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
                     >
                       {(Object.keys(TYPE_LABELS) as InsurancePolicy['type'][]).map(t => (
                         <option key={t} value={t}>{TYPE_LABELS[t]}</option>
@@ -335,7 +335,7 @@ export default function Insurance() {
                     <select
                       value={form.status}
                       onChange={e => setForm(f => ({ ...f, status: e.target.value as InsurancePolicy['status'] }))}
-                      className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
+                      className="focus-app-field w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
                     >
                       <option value="active">Active</option>
                       <option value="expired">Expired</option>
@@ -350,7 +350,7 @@ export default function Insurance() {
                       value={form.provider}
                       onChange={e => setForm(f => ({ ...f, provider: e.target.value }))}
                       placeholder="e.g. Blue Cross, Geico, State Farm"
-                      className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
+                      className="focus-app-field w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
                     />
                   </div>
                   <div>
@@ -363,7 +363,7 @@ export default function Insurance() {
                       value={form.premium}
                       onChange={e => setForm(f => ({ ...f, premium: e.target.value }))}
                       placeholder="0.00"
-                      className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
+                      className="focus-app-field w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
                     />
                   </div>
                   <div>
@@ -371,7 +371,7 @@ export default function Insurance() {
                     <select
                       value={form.frequency}
                       onChange={e => setForm(f => ({ ...f, frequency: e.target.value }))}
-                      className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
+                      className="focus-app-field w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
                     >
                       {['Monthly', 'Yearly', 'Bi-weekly', 'Weekly'].map(fr => (
                         <option key={fr} value={fr}>{fr}</option>
@@ -387,7 +387,7 @@ export default function Insurance() {
                       value={form.coverageAmount}
                       onChange={e => setForm(f => ({ ...f, coverageAmount: e.target.value }))}
                       placeholder="Optional"
-                      className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
+                      className="focus-app-field w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
                     />
                   </div>
                   <div>
@@ -399,7 +399,7 @@ export default function Insurance() {
                       value={form.deductible}
                       onChange={e => setForm(f => ({ ...f, deductible: e.target.value }))}
                       placeholder="Optional"
-                      className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
+                      className="focus-app-field w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
                     />
                   </div>
                   <div className="col-span-2">
@@ -408,7 +408,7 @@ export default function Insurance() {
                       type="date"
                       value={form.expirationDate}
                       onChange={e => setForm(f => ({ ...f, expirationDate: e.target.value }))}
-                      className="focus-app-field w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
+                      className="focus-app-field w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
                     />
                   </div>
                   <div className="col-span-2">
@@ -418,7 +418,7 @@ export default function Insurance() {
                       onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
                       rows={2}
                       placeholder="Policy number, agent contact, etc."
-                      className="focus-app-field w-full resize-none rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
+                      className="focus-app-field w-full resize-none rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
                     />
                   </div>
                 </div>
@@ -426,13 +426,13 @@ export default function Insurance() {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-transparent px-3 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
+                    className="inline-flex items-center gap-2 rounded-md border border-surface-border bg-transparent px-3 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
+                    className="inline-flex items-center gap-2 rounded-md bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
                   >
                     {editingId ? 'Save Changes' : 'Add Policy'}
                   </button>

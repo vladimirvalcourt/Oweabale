@@ -419,7 +419,7 @@ export default function Obligations() {
           <div className="flex items-center gap-2 text-content-tertiary mb-3 relative z-10">
             <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-status-rose-text)]" />
             <span className="metric-label normal-case text-xs">Urgent tickets</span>
-            {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold text-[var(--color-status-rose-text)] border-[var(--color-status-rose-border)] px-1 rounded-full ml-auto">{urgentCitations.length} DUE</span>}
+            {urgentCitations.length > 0 && <span className="text-xs font-mono font-bold text-[var(--color-status-rose-text)] border-[var(--color-status-rose-border)] px-1 rounded-full ml-auto">{urgentCitations.length} DUE</span>}
           </div>
           <p className={`text-2xl font-mono font-bold relative z-10 ${urgentTotal > 0 ? 'text-[var(--color-status-rose-text)]' : 'text-[var(--color-status-emerald-text)]'}`}>
             ${urgentTotal.toFixed(2)}
@@ -568,7 +568,7 @@ export default function Obligations() {
                   </button>
                 ))}
               </div>
-              <div className="flex items-center gap-3 bg-surface-base border border-surface-border rounded-lg px-3 py-1.5">
+              <div className="flex items-center gap-3 bg-surface-base border border-surface-border rounded-md px-3 py-1.5">
                 <Calculator className="w-3.5 h-3.5 text-content-tertiary" />
                 <span className="text-xs font-mono text-content-tertiary uppercase tracking-wider">Extra per month:</span>
                 <button type="button" aria-label="Decrease extra monthly payment by 100" onClick={() => setExtraPayment(e => Math.max(0, e - 100))} className="focus-app rounded text-content-tertiary hover:text-content-primary"><Minus className="w-3 h-3" aria-hidden /></button>
@@ -616,7 +616,7 @@ export default function Obligations() {
 
             {/* Per-debt timeline bars */}
             <div className="space-y-4">
-              <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Payoff Order — {strategy === 'avalanche' ? 'Highest Interest First' : 'Smallest Balance First'}</p>
+              <p className="text-xs font-mono text-content-tertiary uppercase tracking-wider">Payoff Order — {strategy === 'avalanche' ? 'Highest Interest First' : 'Smallest Balance First'}</p>
               {[...debts]
                 .sort((a, b) => strategy === 'avalanche' ? b.apr - a.apr : a.remaining - b.remaining)
                 .map((d, i) => {
@@ -629,23 +629,23 @@ export default function Obligations() {
                     <div key={d.id}>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 bg-content-primary/[0.08] border border-surface-border text-content-primary text-[10px] font-mono font-bold flex items-center justify-center rounded-full">{i + 1}</span>
+                          <span className="w-5 h-5 bg-content-primary/[0.08] border border-surface-border text-content-primary text-xs font-mono font-bold flex items-center justify-center rounded-full">{i + 1}</span>
                           <span className="text-sm text-content-primary">{d.name}</span>
-                          <span className="text-[10px] font-mono text-content-muted border border-surface-border px-1.5 py-0.5 rounded-full">{d.apr}% interest rate</span>
+                          <span className="text-xs font-mono text-content-muted border border-surface-border px-1.5 py-0.5 rounded-full">{d.apr}% interest rate</span>
                         </div>
                         <span className="text-xs font-mono text-content-tertiary">${d.remaining.toLocaleString()} left</span>
                       </div>
                       <div className="w-full h-1.5 bg-surface-border rounded-none overflow-hidden">
                         <div className="h-full bg-brand-cta transition-all duration-700" style={{ width: `${pct}%` }} />
                       </div>
-                      <div className="flex justify-between text-[10px] font-mono text-content-muted mt-0.5">
+                      <div className="flex justify-between text-xs font-mono text-content-muted mt-0.5">
                         <span>{pct}% paid</span>
                         <span>Min: ${d.minPayment}/mo</span>
                       </div>
                       <div className="mt-1">
                         <button
                           onClick={() => setExpandedDebtId(isExpanded ? null : d.id)}
-                          className="text-[10px] font-mono text-content-muted hover:text-content-primary transition-colors uppercase tracking-widest flex items-center gap-1"
+                          className="text-xs font-mono text-content-muted hover:text-content-primary transition-colors uppercase tracking-widest flex items-center gap-1"
                         >
                           {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                           {isExpanded ? 'Hide Schedule' : 'Show 12-Month Schedule'}
@@ -661,7 +661,7 @@ export default function Obligations() {
                         const totalInterest12 = schedule.reduce((s, r) => s + r.interest, 0);
                         return (
                           <div className="mt-3 border-t border-surface-border pt-3">
-                            <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest mb-2">
+                            <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest mb-2">
                               Principal vs. Interest — First 12 Months
                             </p>
                             <div className="h-[120px] w-full min-h-0 overflow-visible relative isolate">
@@ -680,9 +680,9 @@ export default function Obligations() {
                               </SafeResponsiveContainer>
                             </div>
                             <div className="flex gap-4 mt-2">
-                              <span className="text-[10px] font-mono text-content-primary">■ Principal</span>
-                              <span className="text-[10px] font-mono text-red-400">■ Interest</span>
-                              <span className="text-[10px] font-mono text-content-muted ml-auto">
+                              <span className="text-xs font-mono text-content-primary">■ Principal</span>
+                              <span className="text-xs font-mono text-red-400">■ Interest</span>
+                              <span className="text-xs font-mono text-content-muted ml-auto">
                                 12-mo interest: ${totalInterest12.toFixed(2)}
                               </span>
                             </div>
@@ -732,7 +732,7 @@ export default function Obligations() {
                 }`}
             >
               {tab.label}
-              <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-lg ${activeTab === tab.key ? 'bg-content-primary/10 text-content-primary' : 'bg-surface-elevated text-content-muted'
+              <span className={`text-xs font-mono px-1.5 py-0.5 rounded-full ${activeTab === tab.key ? 'bg-content-primary/10 text-content-primary' : 'bg-surface-elevated text-content-muted'
                 }`}>{tab.count}</span>
               {activeTab === tab.key && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-cta" />}
             </button>
@@ -746,11 +746,11 @@ export default function Obligations() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-surface-border bg-surface-raised">
-                  <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Description</th>
-                  <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Due Date</th>
-                  <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider text-right">Amount</th>
-                  <th className="px-6 py-3 text-[10px] font-mono text-content-tertiary uppercase tracking-wider text-right">Action</th>
+                  <th className="px-6 py-3 text-xs font-mono text-content-tertiary uppercase tracking-wider">Description</th>
+                  <th className="px-6 py-3 text-xs font-mono text-content-tertiary uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-3 text-xs font-mono text-content-tertiary uppercase tracking-wider">Due Date</th>
+                  <th className="px-6 py-3 text-xs font-mono text-content-tertiary uppercase tracking-wider text-right">Amount</th>
+                  <th className="px-6 py-3 text-xs font-mono text-content-tertiary uppercase tracking-wider text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-surface-border">
@@ -794,7 +794,7 @@ export default function Obligations() {
                               'border-surface-border text-content-tertiary bg-surface-elevated'
                           }`}>{ob.subType}</span>
                         {ob.type === 'recurring' && billAmountChanges.get(ob.id) && (
-                          <span className="ml-2 inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-mono text-amber-300">
+                          <span className="ml-2 inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-mono text-amber-300">
                             +{billAmountChanges.get(ob.id)?.pct.toFixed(0)}%
                           </span>
                         )}
@@ -813,23 +813,23 @@ export default function Obligations() {
                           >
                             {ob.dueLabel}
                             {overdueBand === 'warn' && (
-                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
+                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-xs font-bold text-amber-300">
                                 ⚠️ OVERDUE {overdueDays} {overdueDays === 1 ? 'day' : 'days'}
                               </span>
                             )}
                             {overdueBand === 'critical' && (
-                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-rose-500/40 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-bold text-rose-300">
+                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-rose-500/40 bg-rose-500/10 px-1.5 py-0.5 text-xs font-bold text-rose-300">
                                 ⚠️ OVERDUE {overdueDays} days
                               </span>
                             )}
                           </span>
                           {tollHint && overdueBand !== 'none' && (
-                            <p className="max-w-xs text-[11px] text-content-tertiary leading-snug">
+                            <p className="max-w-xs text-xs text-content-tertiary leading-snug">
                               Toll violations may accrue penalties after 30 days.
                             </p>
                           )}
                           {overdueBand === 'critical' && !tollHint && ob.type === 'ambush' && (
-                            <p className="max-w-xs text-[11px] text-rose-300/90 leading-snug">
+                            <p className="max-w-xs text-xs text-rose-300/90 leading-snug">
                               Unpaid fines can add late fees and collection risk. Resolve as soon as you can.
                             </p>
                           )}
@@ -844,7 +844,7 @@ export default function Obligations() {
                                 const d = debts.find((x) => x.id === ob.id);
                                 if (d) setEditDebtRow(d);
                               }}
-                              className="inline-flex items-center gap-1 self-start text-[11px] font-medium text-[var(--color-status-amber-text)] hover:underline"
+                              className="inline-flex items-center gap-1 self-start text-xs font-medium text-[var(--color-status-amber-text)] hover:underline"
                             >
                               <AlertCircle className="h-3.5 w-3.5 shrink-0" aria-hidden />
                               Add due date
@@ -892,7 +892,7 @@ export default function Obligations() {
                                 const d = debts.find((x) => x.id === ob.id);
                                 if (d) setEditDebtRow(d);
                               }}
-                              className="inline-flex items-center gap-1.5 px-2 py-1 text-content-tertiary hover:text-content-secondary text-[11px] font-mono underline-offset-2 hover:underline"
+                              className="inline-flex items-center gap-1.5 px-2 py-1 text-content-tertiary hover:text-content-secondary text-xs font-mono underline-offset-2 hover:underline"
                             >
                               <Pencil className="w-3 h-3" aria-hidden />
                               Edit
@@ -906,7 +906,7 @@ export default function Obligations() {
                                 const b = bills.find((x) => x.id === ob.id);
                                 if (b) setEditBillRow(b);
                               }}
-                              className="inline-flex items-center gap-1.5 px-2 py-1 text-content-tertiary hover:text-content-secondary text-[11px] font-mono underline-offset-2 hover:underline"
+                              className="inline-flex items-center gap-1.5 px-2 py-1 text-content-tertiary hover:text-content-secondary text-xs font-mono underline-offset-2 hover:underline"
                             >
                               <Pencil className="w-3 h-3" aria-hidden />
                               Edit
@@ -980,10 +980,10 @@ export default function Obligations() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-surface-border">
-                  <th className="px-2 py-2 text-[10px] font-mono uppercase tracking-wider text-content-tertiary">Date</th>
-                  <th className="px-2 py-2 text-[10px] font-mono uppercase tracking-wider text-content-tertiary">Description</th>
-                  <th className="px-2 py-2 text-[10px] font-mono uppercase tracking-wider text-content-tertiary">Category</th>
-                  <th className="px-2 py-2 text-[10px] font-mono uppercase tracking-wider text-content-tertiary text-right">Amount</th>
+                  <th className="px-2 py-2 text-xs font-mono uppercase tracking-wider text-content-tertiary">Date</th>
+                  <th className="px-2 py-2 text-xs font-mono uppercase tracking-wider text-content-tertiary">Description</th>
+                  <th className="px-2 py-2 text-xs font-mono uppercase tracking-wider text-content-tertiary">Category</th>
+                  <th className="px-2 py-2 text-xs font-mono uppercase tracking-wider text-content-tertiary text-right">Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -1054,14 +1054,14 @@ function EditBillDialog({
     <Dialog open className="relative z-[100]" onClose={onClose}>
       <div className="fixed inset-0 bg-black/70" aria-hidden />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-md rounded-lg border border-surface-border bg-surface-elevated p-6 shadow-2xl">
+        <Dialog.Panel className="w-full max-w-md rounded-xl border border-surface-border bg-surface-elevated p-6 shadow-2xl">
           <Dialog.Title className="text-lg font-semibold text-content-primary mb-4">Edit bill</Dialog.Title>
           <div className="space-y-3">
             <label className="block text-xs text-content-tertiary">Payee</label>
             <input
               value={biller}
               onChange={(e) => setBiller(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">Amount ($)</label>
             <input
@@ -1069,26 +1069,26 @@ function EditBillDialog({
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">Category</label>
             <input
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">Due date</label>
             <input
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="input-date-dark w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm"
+              className="input-date-dark w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm"
             />
             <label className="block text-xs text-content-tertiary">Frequency</label>
             <select
               value={frequency}
               onChange={(e) => setFrequency(e.target.value as Bill['frequency'])}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
+              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
             >
               <option value="Weekly">Weekly</option>
               <option value="Bi-weekly">Bi-weekly</option>
@@ -1165,7 +1165,7 @@ function EditDebtDialog({
     <Dialog open className="relative z-[100]" onClose={onClose}>
       <div className="fixed inset-0 bg-black/70" aria-hidden />
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-md rounded-lg border border-surface-border bg-surface-elevated p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <Dialog.Panel className="w-full max-w-md rounded-xl border border-surface-border bg-surface-elevated p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
           <Dialog.Title className="text-lg font-semibold text-content-primary mb-1">Edit debt</Dialog.Title>
           <p className="text-xs text-content-tertiary mb-4">Update balance, APR, minimum payment, or payment due date.</p>
           <div className="space-y-3">
@@ -1173,14 +1173,14 @@ function EditDebtDialog({
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">Type</label>
             <input
               value={type}
               onChange={(e) => setType(e.target.value)}
               placeholder="Credit Card, Loan, …"
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">Balance owed ($)</label>
             <input
@@ -1188,7 +1188,7 @@ function EditDebtDialog({
               step="0.01"
               value={remaining}
               onChange={(e) => setRemaining(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">APR (%)</label>
             <input
@@ -1196,7 +1196,7 @@ function EditDebtDialog({
               step="0.01"
               value={apr}
               onChange={(e) => setApr(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="block text-xs text-content-tertiary">Minimum payment ($/mo)</label>
             <input
@@ -1204,7 +1204,7 @@ function EditDebtDialog({
               step="0.01"
               value={minPayment}
               onChange={(e) => setMinPayment(e.target.value)}
-              className="w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <label className="flex items-center gap-2 text-sm text-content-secondary cursor-pointer">
               <input
@@ -1222,7 +1222,7 @@ function EditDebtDialog({
                   type="date"
                   value={paymentDue}
                   onChange={(e) => setPaymentDue(e.target.value)}
-                  className="input-date-dark w-full rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm"
+                  className="input-date-dark w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm"
                 />
               </>
             )}

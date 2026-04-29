@@ -194,7 +194,7 @@ function RulesPanelInner() {
                                 : 'No transactions needed updating.',
                             );
                           }}
-                          className="flex items-center gap-1.5 rounded-lg bg-brand-cta px-3 py-1.5 text-xs font-medium text-surface-base hover:bg-brand-cta-hover disabled:opacity-50"
+                          className="flex items-center gap-1.5 rounded-md bg-brand-cta px-3 py-1.5 text-xs font-medium text-surface-base hover:bg-brand-cta-hover disabled:opacity-50"
                         >
                           {isBulkAccepting ? (
                             <Loader2 className="w-3 h-3 animate-spin" />
@@ -210,7 +210,7 @@ function RulesPanelInner() {
                     {clearSuggestions.map((s) => (
                       <li
                         key={s.from}
-                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-surface-border bg-surface-raised px-3 py-2"
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-surface-border bg-surface-raised px-3 py-2"
                       >
                         {/* E-06: per-row checkbox */}
                         <label className="flex items-center gap-2 cursor-pointer flex-1 min-w-0">
@@ -241,7 +241,7 @@ function RulesPanelInner() {
                               if (n === 0) toast.info('No transactions needed updating.');
                               else toast.success(`Renamed ${n} transaction${n === 1 ? '' : 's'}`);
                             }}
-                            className="rounded-lg bg-brand-cta px-3 py-1.5 text-xs font-medium text-surface-base hover:bg-brand-cta-hover"
+                            className="rounded-md bg-brand-cta px-3 py-1.5 text-xs font-medium text-surface-base hover:bg-brand-cta-hover"
                           >
                             Accept
                           </button>
@@ -255,7 +255,7 @@ function RulesPanelInner() {
                                 category: s.to,
                               }))
                             }
-                            className="rounded-lg border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary hover:bg-surface-elevated"
+                            className="rounded-md border border-surface-border px-3 py-1.5 text-xs font-medium text-content-secondary hover:bg-surface-elevated"
                           >
                             Edit
                           </button>
@@ -280,7 +280,7 @@ function RulesPanelInner() {
                     {reviewSuggestions.map((s) => (
                       <li
                         key={s.from}
-                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] px-3 py-2"
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-full border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] px-3 py-2"
                       >
                         <span className="text-xs text-content-secondary">
                           <span className="font-medium text-content-primary">{s.to}</span>
@@ -297,7 +297,7 @@ function RulesPanelInner() {
                               if (n === 0) toast.info('No transactions needed updating.');
                               else toast.success(`Renamed ${n} transaction${n === 1 ? '' : 's'}`);
                             }}
-                            className="rounded-lg border border-surface-border bg-surface-raised px-3 py-1.5 text-xs font-medium text-content-secondary hover:bg-surface-elevated"
+                            className="rounded-md border border-surface-border bg-surface-raised px-3 py-1.5 text-xs font-medium text-content-secondary hover:bg-surface-elevated"
                           >
                             Accept anyway
                           </button>
@@ -311,7 +311,7 @@ function RulesPanelInner() {
                                 category: s.to,
                               }))
                             }
-                            className="rounded-lg bg-brand-cta px-3 py-1.5 text-xs font-medium text-surface-base hover:bg-brand-cta-hover"
+                            className="rounded-md bg-brand-cta px-3 py-1.5 text-xs font-medium text-surface-base hover:bg-brand-cta-hover"
                           >
                             Edit
                           </button>
@@ -333,7 +333,7 @@ function RulesPanelInner() {
                 onChange={(e) =>
                   setRuleForm((f) => ({ ...f, scope: e.target.value as RuleScope }))
                 }
-                className="w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-primary focus-app-field sm:w-36"
+                className="w-full appearance-none rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-primary focus-app-field sm:w-36"
               >
                 <option value="one">One exact name</option>
                 <option value="merchant">Merchant family</option>
@@ -344,12 +344,12 @@ function RulesPanelInner() {
                 placeholder="e.g. STARBUCKS"
                 value={ruleForm.match_value}
                 onChange={(e) => setRuleForm((f) => ({ ...f, match_value: e.target.value }))}
-                className="flex-1 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-primary placeholder:text-content-muted focus-app-field"
+                className="flex-1 rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-primary placeholder:text-content-muted focus-app-field"
               />
               <select
                 value={ruleForm.category}
                 onChange={(e) => setRuleForm((f) => ({ ...f, category: e.target.value }))}
-                className="w-full appearance-none rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-primary focus-app-field sm:w-44"
+                className="w-full appearance-none rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-xs font-medium text-content-primary focus-app-field sm:w-44"
               >
                 <option value="">— Select category —</option>
                 {categories.map((c) => (
@@ -373,7 +373,7 @@ function RulesPanelInner() {
                   });
                   setRuleForm((f) => ({ ...f, match_value: '' }));
                 }}
-                className="flex shrink-0 items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover"
+                className="flex shrink-0 items-center gap-2 rounded-md bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover"
               >
                 <Plus className="w-3 h-3" />
                 Add
@@ -384,8 +384,8 @@ function RulesPanelInner() {
               existing transaction{previewCount !== 1 ? 's' : ''}.
             </p>
             {previewExamples.length > 0 && (
-              <div className="mt-3 rounded-lg border border-surface-border bg-surface-raised p-3">
-                <p className="text-[11px] font-medium text-content-secondary mb-2">Examples</p>
+              <div className="mt-3 rounded-xl border border-surface-border bg-surface-raised p-3">
+                <p className="text-xs font-medium text-content-secondary mb-2">Examples</p>
                 <ul className="space-y-1">
                   {previewExamples.map((tx) => (
                     <li key={tx.id} className="text-xs text-content-tertiary">
@@ -412,7 +412,7 @@ function RulesPanelInner() {
                   className="flex items-center justify-between px-6 py-3 hover:bg-surface-elevated transition-colors group"
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <span className="shrink-0 rounded-lg border border-surface-border bg-content-primary/[0.05] px-2 py-0.5 text-[11px] font-medium capitalize text-content-primary">
+                    <span className="shrink-0 rounded-xl border border-surface-border bg-content-primary/[0.05] px-2 py-0.5 text-xs font-medium capitalize text-content-primary">
                       {rule.match_type.replace('_', ' ')}
                     </span>
                     <span className="truncate text-sm font-medium text-content-primary">{rule.match_value}</span>
@@ -439,7 +439,7 @@ function RulesPanelInner() {
       <CollapsibleModule title="Re-apply Smart Categories" icon={RulesIcon} defaultOpen={false}>
         <div className="space-y-4">
           {lastAutoCategorization && (
-            <div className="rounded-lg border border-surface-border bg-surface-base p-4 flex items-center justify-between gap-3">
+            <div className="rounded-xl border border-surface-border bg-surface-base p-4 flex items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-content-primary">
                   Auto-categorized “{lastAutoCategorization.name}” to {formatCategoryLabel(lastAutoCategorization.to)}
@@ -451,7 +451,7 @@ function RulesPanelInner() {
               <button
                 type="button"
                 onClick={() => void undoLastAutoCategorization()}
-                className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-xs font-medium text-content-secondary hover:bg-surface-raised"
+                className="inline-flex items-center gap-2 rounded-md border border-surface-border bg-surface-elevated px-3 py-2 text-xs font-medium text-content-secondary hover:bg-surface-raised"
               >
                 <Undo2 className="w-3.5 h-3.5" />
                 Undo
@@ -459,7 +459,7 @@ function RulesPanelInner() {
             </div>
           )}
           {lastRuleApplication && (
-            <div className="rounded-lg border border-surface-border bg-surface-base p-4 flex items-center justify-between gap-3">
+            <div className="rounded-xl border border-surface-border bg-surface-base p-4 flex items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-medium text-content-primary">
                   Last bulk apply changed {lastRuleApplication.changes.length} transaction{lastRuleApplication.changes.length !== 1 ? 's' : ''}
@@ -469,7 +469,7 @@ function RulesPanelInner() {
               <button
                 type="button"
                 onClick={() => void undoLastRuleApplication()}
-                className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-xs font-medium text-content-secondary hover:bg-surface-raised"
+                className="inline-flex items-center gap-2 rounded-md border border-surface-border bg-surface-elevated px-3 py-2 text-xs font-medium text-content-secondary hover:bg-surface-raised"
               >
                 <Undo2 className="w-3.5 h-3.5" />
                 Undo bulk apply
@@ -488,7 +488,7 @@ function RulesPanelInner() {
               type="button"
               onClick={runSimulation}
               disabled={isSimulating}
-              className="flex shrink-0 items-center gap-2 rounded-lg border border-surface-border bg-surface-elevated px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-raised disabled:opacity-50"
+              className="flex shrink-0 items-center gap-2 rounded-md border border-surface-border bg-surface-elevated px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-raised disabled:opacity-50"
             >
               {isSimulating ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
               Simulate & Review
@@ -504,7 +504,7 @@ function RulesPanelInner() {
                 setSimulatedChanges([]);
               }}
               disabled={isApplying || simulatedChanges.length === 0}
-              className="flex shrink-0 items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover disabled:opacity-50"
+              className="flex shrink-0 items-center gap-2 rounded-md bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base transition-colors hover:bg-brand-cta-hover disabled:opacity-50"
             >
               {isApplying ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
               Confirm Apply
@@ -512,7 +512,7 @@ function RulesPanelInner() {
           </div>
           </div>
           {simulatedChanges.length > 0 && (
-            <div className="rounded-lg border border-surface-border bg-surface-base p-4">
+            <div className="rounded-xl border border-surface-border bg-surface-base p-4">
               <p className="text-sm font-medium text-content-primary mb-2">
                 Simulation found {simulatedChanges.length} change{simulatedChanges.length !== 1 ? 's' : ''}
               </p>
@@ -523,7 +523,7 @@ function RulesPanelInner() {
                 {simulatedChanges.slice(0, 20).map((change) => (
                   <div key={change.id} className="rounded border border-surface-border bg-surface-raised px-3 py-2">
                     <p className="text-xs text-content-primary font-medium">{change.name}</p>
-                    <p className="text-[11px] text-content-tertiary mt-0.5">
+                    <p className="text-xs text-content-tertiary mt-0.5">
                       {change.date} · {formatCategoryLabel(change.from)} → {formatCategoryLabel(change.to)}
                     </p>
                   </div>
@@ -554,7 +554,7 @@ function RulesPanelInner() {
                 <button
                   type="button"
                   onClick={() => void deleteCategorizationExclusion(e.id)}
-                  className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-xs font-medium text-content-secondary hover:bg-surface-raised"
+                  className="inline-flex items-center gap-2 rounded-md border border-surface-border bg-surface-elevated px-3 py-2 text-xs font-medium text-content-secondary hover:bg-surface-raised"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   Remove

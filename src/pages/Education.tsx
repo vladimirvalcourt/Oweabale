@@ -250,13 +250,13 @@ export default function Education() {
                     <button
                       key={mod.id}
                       onClick={() => setSelectedModule(mod.id)}
-                      className={`w-full flex items-start gap-4 p-4 rounded-lg border text-left transition-all ${
+                      className={`w-full flex items-start gap-4 p-4 rounded-xl border text-left transition-all ${
                         isSelected
                           ? 'border-surface-border bg-content-primary/[0.03] bg-surface-base'
                           : 'border-surface-border bg-surface-elevated hover:bg-surface-base'
                       }`}
                     >
-                      <div className={`p-2 rounded-lg shrink-0 ${isSelected ? 'bg-content-primary/[0.05] text-content-primary' : 'bg-surface-base border border-surface-border text-content-tertiary'}`}>
+                      <div className={`p-2 rounded-md shrink-0 ${isSelected ? 'bg-content-primary/[0.05] text-content-primary' : 'bg-surface-base border border-surface-border text-content-tertiary'}`}>
                         <Icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -312,7 +312,7 @@ export default function Education() {
               <CollapsibleModule
                 title={activeModule.title}
                 icon={EducationIcon}
-                extraHeader={<span className="text-xs font-sans font-medium text-content-tertiary px-2 py-0.5 border border-surface-border rounded-lg">{activeModule.category}</span>}
+                extraHeader={<span className="text-xs font-sans font-medium text-content-tertiary px-2 py-0.5 border border-surface-border rounded-md">{activeModule.category}</span>}
               >
                 <div className="p-6">
                   <div className="space-y-4">
@@ -324,10 +324,10 @@ export default function Education() {
                           <div
                             key={lesson.id}
                             onClick={() => openLesson(lesson)}
-                            className="group flex items-center justify-between p-4 bg-surface-base border border-surface-border rounded-lg hover:border-content-muted transition-colors cursor-pointer"
+                            className="group flex items-center justify-between p-4 bg-surface-base border border-surface-border rounded-xl hover:border-content-muted transition-colors cursor-pointer"
                           >
                             <div className="flex items-center gap-4">
-                              <div className={`p-1.5 rounded-lg ${isDone ? 'text-emerald-500' : 'text-content-tertiary group-hover:text-content-primary transition-colors'}`}>
+                              <div className={`p-1.5 rounded-xl ${isDone ? 'text-emerald-500' : 'text-content-tertiary group-hover:text-content-primary transition-colors'}`}>
                                 {isDone ? <CheckCircle2 className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
                               </div>
                               <div>
@@ -350,7 +350,7 @@ export default function Education() {
                       <button
                         type="button"
                         onClick={() => openLesson(activeModule.lessons[0])}
-                        className="px-6 py-2.5 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2"
+                        className="px-6 py-2.5 rounded-md bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold shadow-sm transition-colors flex items-center gap-2"
                       >
                         <PlayCircle className="w-4 h-4 shrink-0" aria-hidden />
                         {progress === 0 ? 'Start course' : progress === 100 ? 'Review course' : 'Resume course'}
@@ -390,7 +390,7 @@ export default function Education() {
                 leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                 leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
               >
-                <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-surface-base border border-surface-border text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
+                <Dialog.Panel className="relative transform overflow-hidden rounded-md bg-surface-base border border-surface-border text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
                   {activeLesson && (
                     <>
                       <div className="bg-surface-elevated px-4 py-3 border-b border-surface-border flex items-center justify-between">
@@ -417,7 +417,7 @@ export default function Education() {
                       <div className="bg-surface-elevated border-t border-surface-border px-4 py-4 sm:px-6 flex justify-end">
                         <button
                           type="button"
-                          className="inline-flex items-center gap-2 justify-center rounded-lg bg-brand-cta px-6 py-2.5 text-xs font-mono font-bold uppercase tracking-widest text-surface-base hover:bg-brand-cta-hover focus-app transition-colors"
+                          className="inline-flex items-center gap-2 justify-center rounded-md bg-brand-cta px-6 py-2.5 text-xs font-mono font-bold uppercase tracking-widest text-surface-base hover:bg-brand-cta-hover focus-app transition-colors"
                           onClick={markComplete}
                         >
                           <CheckCircle2 className="w-4 h-4" />

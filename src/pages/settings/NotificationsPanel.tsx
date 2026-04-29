@@ -134,7 +134,7 @@ function NotificationsPanelInner() {
         {isWebPushSupported() && !vapidConfigured && (
           <p className="mb-4 text-xs font-medium leading-relaxed text-[var(--color-status-amber-text)]">
             Web push is not configured yet (add{' '}
-            <code className="rounded-md border border-surface-border bg-surface-raised px-1.5 py-0.5 font-mono text-[11px] text-content-primary">
+            <code className="rounded-md border border-surface-border bg-surface-raised px-1.5 py-0.5 font-mono text-xs text-content-primary">
               VITE_VAPID_PUBLIC_KEY
             </code>
             ).
@@ -142,7 +142,7 @@ function NotificationsPanelInner() {
         )}
 
         {isWebPushSupported() && vapidConfigured && (
-          <div className="mb-6 rounded-lg border border-surface-border bg-surface-base p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="mb-6 rounded-xl border border-surface-border bg-surface-base p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-content-primary">This browser</p>
               <p className="mt-0.5 text-xs font-medium text-content-muted">
@@ -165,7 +165,7 @@ function NotificationsPanelInner() {
                     setWebPushReady(true);
                     toast.success('Browser notifications enabled');
                   }}
-                  className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:opacity-60"
+                  className="inline-flex items-center gap-2 rounded-md bg-brand-cta px-4 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover disabled:opacity-60"
                 >
                   {webPushBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                   Enable web push
@@ -183,7 +183,7 @@ function NotificationsPanelInner() {
                       if ('error' in r) toast.error(r.error);
                       else toast.success('Test push sent');
                     }}
-                    className="inline-flex items-center gap-2 rounded-lg border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:border-content-muted hover:text-content-primary disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-md border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:border-content-muted hover:text-content-primary disabled:opacity-60"
                   >
                     {webPushBusy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                     Send test
@@ -202,7 +202,7 @@ function NotificationsPanelInner() {
                       setWebPushReady(false);
                       toast.success('Browser push disabled on this device');
                     }}
-                    className="inline-flex items-center gap-2 rounded-lg border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:brightness-95 disabled:opacity-60"
+                    className="inline-flex items-center gap-2 rounded-full border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:brightness-95 disabled:opacity-60"
                   >
                     Turn off
                   </button>

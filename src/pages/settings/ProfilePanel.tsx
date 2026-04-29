@@ -381,7 +381,7 @@ function ProfilePanelInner() {
               <div className="space-y-2 min-w-0">
                 <p className="text-xs text-content-tertiary">JPG or PNG, max 2 MB. Crop after you choose a photo.</p>
                 {/* SET-01: Support ID with label and helper text */}
-                <p className="text-[11px] font-medium text-content-tertiary">Your Support ID</p>
+                <p className="text-xs font-medium text-content-tertiary">Your Support ID</p>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-mono text-sm text-content-secondary">{displayUserId}</span>
                   <button
@@ -393,7 +393,7 @@ function ProfilePanelInner() {
                     <Copy className="h-3.5 w-3.5" />
                   </button>
                 </div>
-                <p className="text-[11px] text-content-muted">Share this with our team if you need help.</p>
+                <p className="text-xs text-content-muted">Share this with our team if you need help.</p>
               </div>
             </div>
 
@@ -432,7 +432,7 @@ function ProfilePanelInner() {
                   {/* SET-02: tooltip explaining read-only email */}
                   <span className="relative ml-0.5 inline-flex cursor-default items-center group">
                     <Info className="h-3 w-3 text-content-muted" aria-hidden />
-                    <span className="pointer-events-none absolute left-full top-1/2 z-20 ml-2 w-56 -translate-y-1/2 rounded-md border border-surface-border bg-surface-raised px-2.5 py-1.5 text-[11px] font-normal leading-snug text-content-secondary opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+                    <span className="pointer-events-none absolute left-full top-1/2 z-20 ml-2 w-56 -translate-y-1/2 rounded-md border border-surface-border bg-surface-raised px-2.5 py-1.5 text-xs font-normal leading-snug text-content-secondary opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
                       This email comes from your Google sign-in. To change it, update your Google account.
                     </span>
                   </span>

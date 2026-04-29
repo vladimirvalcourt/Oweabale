@@ -326,7 +326,7 @@ function BillingPanelInner() {
 
   return (
     <div className="space-y-5">
-      <section className="overflow-hidden rounded-lg border border-surface-border bg-surface-raised shadow-card">
+      <section className="overflow-hidden rounded-xl border border-surface-border bg-surface-raised shadow-card">
         <div className="grid gap-0 lg:grid-cols-[1fr_260px]">
           <div className="p-6 sm:p-7">
             <div className="flex flex-wrap items-center gap-3">
@@ -408,7 +408,7 @@ function BillingPanelInner() {
       </section>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-lg border border-surface-border bg-surface-raised p-5">
+        <section className="rounded-xl border border-surface-border bg-surface-raised p-5">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-surface-border-subtle bg-surface-base">
               <CreditCardIcon className="h-4 w-4 text-content-tertiary" aria-hidden />
@@ -434,7 +434,7 @@ function BillingPanelInner() {
           </button>
         </section>
 
-        <section className="rounded-lg border border-surface-border bg-surface-raised p-5">
+        <section className="rounded-xl border border-surface-border bg-surface-raised p-5">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-surface-border-subtle bg-surface-base">
               <Download className="h-4 w-4 text-content-tertiary" aria-hidden />
@@ -471,7 +471,7 @@ function BillingPanelInner() {
         </section>
       </div>
 
-      <section className="rounded-lg border border-surface-border bg-surface-raised p-5">
+      <section className="rounded-xl border border-surface-border bg-surface-raised p-5">
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="flex gap-3">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-content-tertiary" aria-hidden />
@@ -489,7 +489,7 @@ function BillingPanelInner() {
       </section>
 
       {hasPaidAccess && !isProfileTrialOnly && (
-        <section className="rounded-lg border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] p-5">
+        <section className="rounded-full border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] p-5">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--color-status-rose-text)]">Danger zone</p>

@@ -250,7 +250,7 @@ export default function Taxes() {
               ? 'Estimates and quarterly reminders based on your ledger.'
               : 'Manual mileage log for planning — consult a tax pro before filing.'}
           </p>
-          <div className="mt-3 inline-flex rounded-lg border border-surface-border bg-surface-raised p-1">
+          <div className="mt-3 inline-flex rounded-xl border border-surface-border bg-surface-raised p-1">
             <button
               type="button"
               onClick={() => applyTaxTab('overview')}
@@ -283,20 +283,20 @@ export default function Taxes() {
           <select 
             value={taxState} 
             onChange={(e) => setTaxSettings(e.target.value, STATE_TAX_MAP[e.target.value].rate)}
-            className="bg-surface-raised border border-surface-border text-sm font-sans text-content-primary px-3 py-1.5 focus-app-field rounded-lg"
+            className="bg-surface-raised border border-surface-border text-sm font-sans text-content-primary px-3 py-1.5 focus-app-field rounded-md"
           >
             {Object.keys(STATE_TAX_MAP).map(k => (
               <option key={k} value={k}>{STATE_TAX_MAP[k].name} ({STATE_TAX_MAP[k].rate}%)</option>
             ))}
           </select>
-          <div className="flex bg-surface-raised border border-surface-border rounded-lg p-1">
+          <div className="flex bg-surface-raised border border-surface-border rounded-xl p-1">
             <button
               onClick={() => setFilingStatus('single')}
-              className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${filingStatus === 'single' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-secondary'}`}
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-full transition-colors ${filingStatus === 'single' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-secondary'}`}
             >Single</button>
             <button
               onClick={() => setFilingStatus('married')}
-              className={`px-3 py-1 text-xs font-sans font-medium rounded-lg transition-colors ${filingStatus === 'married' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-secondary'}`}
+              className={`px-3 py-1 text-xs font-sans font-medium rounded-full transition-colors ${filingStatus === 'married' ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-secondary'}`}
             >Married</button>
           </div>
         </div>
@@ -304,7 +304,7 @@ export default function Taxes() {
 
       {taxTab === 'mileage' ? (
         <div className="space-y-6">
-          <div className="bg-surface-raised border border-surface-border rounded-lg p-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+          <div className="bg-surface-raised border border-surface-border rounded-xl p-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div>
               <p className="text-sm font-sans font-semibold text-content-primary">Mileage deduction planning</p>
               <p className="text-xs text-content-tertiary mt-1 max-w-xl leading-relaxed">
@@ -314,7 +314,7 @@ export default function Taxes() {
             <button
               type="button"
               onClick={exportMileageCsv}
-              className="inline-flex items-center justify-center gap-2 rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-xs font-sans font-semibold text-content-primary hover:bg-surface-elevated/80 transition-colors shrink-0"
+              className="inline-flex items-center justify-center gap-2 rounded-md border border-surface-border bg-surface-elevated px-3 py-2 text-xs font-sans font-semibold text-content-primary hover:bg-surface-elevated/80 transition-colors shrink-0"
             >
               <Download className="h-4 w-4" aria-hidden />
               Export CSV
@@ -327,7 +327,7 @@ export default function Taxes() {
               return (
                 <div
                   key={key}
-                  className="rounded-lg border border-surface-border bg-surface-elevated p-4"
+                  className="rounded-xl border border-surface-border bg-surface-elevated p-4"
                 >
                   <p className="text-xs font-sans font-semibold text-content-tertiary">{label} {currentYear}</p>
                   <p className="mt-2 text-lg font-mono tabular-nums text-content-primary data-numeric">
@@ -341,7 +341,7 @@ export default function Taxes() {
             })}
           </div>
 
-          <div className="rounded-lg border border-surface-border bg-surface-elevated/50 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="rounded-xl border border-surface-border bg-surface-elevated/50 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <p className="text-xs font-sans font-semibold text-content-tertiary">Year-to-date mileage deduction (logged)</p>
               <p className="text-2xl font-mono font-bold tabular-nums text-content-primary data-numeric mt-1">
@@ -368,7 +368,7 @@ export default function Taxes() {
                   type="date"
                   value={mileageForm.tripDate}
                   onChange={(e) => setMileageForm((f) => ({ ...f, tripDate: e.target.value }))}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-content-primary focus-app-field"
+                  className="w-full bg-surface-base border border-surface-border rounded-md h-10 px-3 text-sm text-content-primary focus-app-field"
                 />
               </div>
               <div>
@@ -383,7 +383,7 @@ export default function Taxes() {
                       irsRatePerMile: String(defaultIrsRateForPurpose(purpose)),
                     }));
                   }}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-content-primary focus-app-field"
+                  className="w-full bg-surface-base border border-surface-border rounded-md h-10 px-3 text-sm text-content-primary focus-app-field"
                 >
                   <option value="business">Business</option>
                   <option value="medical">Medical</option>
@@ -399,7 +399,7 @@ export default function Taxes() {
                   placeholder="0"
                   value={mileageForm.miles}
                   onChange={(e) => setMileageForm((f) => ({ ...f, miles: e.target.value }))}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm font-mono tabular-nums text-content-primary focus-app-field"
+                  className="w-full bg-surface-base border border-surface-border rounded-md h-10 px-3 text-sm font-mono tabular-nums text-content-primary focus-app-field"
                 />
               </div>
               <div className="md:col-span-2">
@@ -410,14 +410,14 @@ export default function Taxes() {
                     placeholder="Start"
                     value={mileageForm.startLocation}
                     onChange={(e) => setMileageForm((f) => ({ ...f, startLocation: e.target.value }))}
-                    className="flex-1 bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-content-primary focus-app-field"
+                    className="flex-1 bg-surface-base border border-surface-border rounded-md h-10 px-3 text-sm text-content-primary focus-app-field"
                   />
                   <input
                     type="text"
                     placeholder="End"
                     value={mileageForm.endLocation}
                     onChange={(e) => setMileageForm((f) => ({ ...f, endLocation: e.target.value }))}
-                    className="flex-1 bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-content-primary focus-app-field"
+                    className="flex-1 bg-surface-base border border-surface-border rounded-md h-10 px-3 text-sm text-content-primary focus-app-field"
                   />
                 </div>
               </div>
@@ -428,7 +428,7 @@ export default function Taxes() {
                   placeholder="e.g. DoorDash"
                   value={mileageForm.platform}
                   onChange={(e) => setMileageForm((f) => ({ ...f, platform: e.target.value }))}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-content-primary focus-app-field"
+                  className="w-full bg-surface-base border border-surface-border rounded-md h-10 px-3 text-sm text-content-primary focus-app-field"
                 />
               </div>
               <div>
@@ -439,7 +439,7 @@ export default function Taxes() {
                   step={0.01}
                   value={mileageForm.irsRatePerMile}
                   onChange={(e) => setMileageForm((f) => ({ ...f, irsRatePerMile: e.target.value }))}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm font-mono tabular-nums text-content-primary focus-app-field"
+                  className="w-full bg-surface-base border border-surface-border rounded-md h-10 px-3 text-sm font-mono tabular-nums text-content-primary focus-app-field"
                 />
               </div>
               <div className="md:col-span-2 lg:col-span-3 flex justify-end">
@@ -479,7 +479,7 @@ export default function Taxes() {
                       platform: '',
                     }));
                   }}
-                  className="bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold px-4 py-2 rounded-lg transition-colors"
+                  className="bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold px-4 py-2 rounded-md transition-colors"
                 >
                   Save trip
                 </button>
@@ -536,7 +536,7 @@ export default function Taxes() {
       ) : (
         <>
       {/* Gig Worker Education Banner */}
-      <div className="bg-amber-500/10 border border-amber-500/40 rounded-lg p-4 flex items-start gap-3 shadow-[0_0_20px_rgba(245,158,11,0.05)]">
+      <div className="bg-amber-500/10 border border-amber-500/40 rounded-xl p-4 flex items-start gap-3 shadow-[0_0_20px_rgba(245,158,11,0.05)]">
         <Zap className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
         <div>
           <p className="text-sm font-sans font-semibold text-amber-400 mb-1">Freelancer tip: the savings rule</p>
@@ -546,7 +546,7 @@ export default function Taxes() {
             {/* COPY-03: self-employment tax label + tooltip */}
             (<span className="relative inline-flex cursor-default items-center group">
               <span className="underline underline-offset-2 decoration-dotted text-content-secondary">self-employment tax</span>
-              <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-72 -translate-x-1/2 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-[11px] font-normal leading-snug text-content-secondary opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+              <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-72 -translate-x-1/2 rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-xs font-normal leading-snug text-content-secondary opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
                 As a freelancer, you pay both the employee AND employer share of Social Security and Medicare.
               </span>
             </span>){' '}
@@ -670,17 +670,17 @@ export default function Taxes() {
             <div className="p-0">
                <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-elevated/50">
                   <p className="text-sm font-sans font-medium text-content-secondary">Write-offs from your ledger</p>
-                  <button type="button" onClick={() => setShowAddForm(!showAddForm)} className="bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-xs font-sans font-semibold px-3 py-1.5 rounded-lg transition-all">Add deduction</button>
+                  <button type="button" onClick={() => setShowAddForm(!showAddForm)} className="bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-xs font-sans font-semibold px-3 py-1.5 rounded-md transition-all">Add deduction</button>
                </div>
                {showAddForm && (
                  <div className="p-6 bg-surface-elevated border-b border-surface-border flex gap-3 items-end">
                     <div className="flex-1">
                       <p className="text-xs text-content-tertiary mb-1">Expense label</p>
-                      <input type="text" placeholder="e.g. Adobe Suite" value={newDeduction.name} onChange={e => setNewDeduction({...newDeduction, name: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm text-content-primary focus-app-field transition-colors" />
+                      <input type="text" placeholder="e.g. Adobe Suite" value={newDeduction.name} onChange={e => setNewDeduction({...newDeduction, name: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-md h-10 px-3 text-sm text-content-primary focus-app-field transition-colors" />
                     </div>
                     <div className="w-24">
                       <p className="text-xs text-content-tertiary mb-1">Amount</p>
-                      <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-lg h-10 px-3 text-sm font-mono tabular-nums text-content-primary focus-app-field transition-colors" />
+                      <input type="number" placeholder="0.00" value={newDeduction.amount} onChange={e => setNewDeduction({...newDeduction, amount: e.target.value})} className="w-full bg-surface-base border border-surface-border rounded-md h-10 px-3 text-sm font-mono tabular-nums text-content-primary focus-app-field transition-colors" />
                     </div>
                     <button type="button" onClick={async () => {
                       if (!newDeduction.name.trim()) { toast.error('Enter an expense label'); return; }
@@ -690,7 +690,7 @@ export default function Taxes() {
                       if (!ok) return;
                       toast.success('Deduction added');
                       setNewDeduction({name: '', amount: '', category: ''}); setShowAddForm(false);
-                    }} className="bg-emerald-500 text-surface-base h-10 px-4 text-sm font-sans font-semibold rounded-lg hover:bg-emerald-400 transition-colors">Add</button>
+                    }} className="bg-emerald-500 text-surface-base h-10 px-4 text-sm font-sans font-semibold rounded-md hover:bg-emerald-400 transition-colors">Add</button>
                  </div>
                )}
                <div className="divide-y divide-surface-border">
@@ -715,10 +715,10 @@ export default function Taxes() {
           <CollapsibleModule title="Quarterly Tax Deadlines" icon={CalendarIcon}>
             <div className="space-y-4">
               {quarterlyDates.map(q => (
-                <div key={q.label} className={`p-4 rounded-lg border ${q.overdue ? 'bg-surface-raised border-surface-border opacity-50' : q.daysLeft < 15 ? 'bg-rose-500/5 border-rose-500/30 shadow-[inset_0_0_15px_rgba(244,63,94,0.05)]' : 'bg-surface-elevated border-surface-border'}`}>
+                <div key={q.label} className={`p-4 rounded-xl border ${q.overdue ? 'bg-surface-raised border-surface-border opacity-50' : q.daysLeft < 15 ? 'bg-rose-500/5 border-rose-500/30 shadow-[inset_0_0_15px_rgba(244,63,94,0.05)]' : 'bg-surface-elevated border-surface-border'}`}>
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-xs font-sans font-semibold text-content-tertiary">{q.label} estimated payment</span>
-                    {q.overdue ? <span className="bg-surface-elevated text-content-tertiary text-xs px-2 py-0.5 rounded-lg">Completed</span> : <span className="text-emerald-400 text-xs font-sans font-medium">{q.daysLeft}d left</span>}
+                    {q.overdue ? <span className="bg-surface-elevated text-content-tertiary text-xs px-2 py-0.5 rounded-full">Completed</span> : <span className="text-emerald-400 text-xs font-sans font-medium">{q.daysLeft}d left</span>}
                   </div>
                   <div className="flex items-center justify-between gap-4">
                     <span className="flex items-center gap-1.5 text-xs text-content-tertiary">
@@ -726,7 +726,7 @@ export default function Taxes() {
                       {/* COPY-02: penalty tooltip on each quarterly deadline */}
                       <span className="relative inline-flex cursor-default items-center group">
                         <Info className="h-3 w-3 text-content-muted" aria-hidden />
-                        <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-64 -translate-x-1/2 rounded-lg border border-surface-border bg-surface-raised px-3 py-2 text-[11px] font-normal leading-snug text-content-secondary opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+                        <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-64 -translate-x-1/2 rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-xs font-normal leading-snug text-content-secondary opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
                           Missing this deadline may result in an IRS underpayment penalty. Consult your CPA for your specific situation.
                         </span>
                       </span>
@@ -742,7 +742,7 @@ export default function Taxes() {
             </div>
           </CollapsibleModule>
 
-          <div className="bg-surface-raised border border-surface-border p-6 rounded-lg space-y-6">
+          <div className="bg-surface-raised border border-surface-border p-6 rounded-xl space-y-6">
              <div>
                <h3 className="text-sm font-sans font-semibold text-content-primary mb-4">Smart freelance tips</h3>
                <div className="space-y-4">

@@ -207,7 +207,7 @@ export default function Calendar() {
             return (
               <div key={type} className="flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-none ${cfg.color}`} />
-                <span className="text-[11px] font-mono text-content-tertiary capitalize">{type}</span>
+                <span className="text-xs font-mono text-content-tertiary capitalize">{type}</span>
               </div>
             );
           })}
@@ -216,15 +216,15 @@ export default function Calendar() {
       <CollapsibleModule 
         title="Financial Calendar"
         icon={CalendarIcon}
-        extraHeader={<span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{Array.from(eventsByDay.values()).flat().length} Events Detected</span>}
+        extraHeader={<span className="text-xs font-mono text-content-tertiary uppercase tracking-widest">{Array.from(eventsByDay.values()).flat().length} Events Detected</span>}
       >
-        <div className="bg-surface-raised border border-surface-border rounded-lg overflow-hidden -mx-6 -my-6">
+        <div className="bg-surface-raised border border-surface-border rounded-xl overflow-hidden -mx-6 -my-6">
           {billIncreaseAlerts.length > 0 && (
             <div className="px-6 py-3 border-b border-amber-500/30 bg-amber-500/10">
               <p className="text-xs text-amber-200 font-medium">
                 Bill amount changes detected: {billIncreaseAlerts.length} {billIncreaseAlerts.length === 1 ? 'service' : 'services'} increased recently.
               </p>
-              <p className="mt-1 text-[11px] text-content-secondary">
+              <p className="mt-1 text-xs text-content-secondary">
                 {billIncreaseAlerts
                   .slice(0, 2)
                   .map((a) => `${a.biller} +${a.pct.toFixed(0)}%`)
@@ -253,7 +253,7 @@ export default function Calendar() {
           <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border bg-surface-elevated">
             <button
               onClick={prevMonth}
-              className="p-1.5 text-content-tertiary hover:text-content-primary hover:bg-surface-border rounded-lg transition-colors"
+              className="p-1.5 text-content-tertiary hover:text-content-primary hover:bg-surface-border rounded-md transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -264,7 +264,7 @@ export default function Calendar() {
             </div>
             <button
               onClick={nextMonth}
-              className="p-1.5 text-content-tertiary hover:text-content-primary hover:bg-surface-border rounded-lg transition-colors"
+              className="p-1.5 text-content-tertiary hover:text-content-primary hover:bg-surface-border rounded-md transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -273,7 +273,7 @@ export default function Calendar() {
           {/* Day Labels */}
           <div className="grid grid-cols-7 border-b border-surface-border bg-surface-base">
             {DAYS.map(d => (
-              <div key={d} className="py-2 text-center text-[10px] font-mono text-content-secondary uppercase tracking-wider">
+              <div key={d} className="py-2 text-center text-xs font-mono text-content-secondary uppercase tracking-wider">
                 {d}
               </div>
             ))}
@@ -303,7 +303,7 @@ export default function Calendar() {
                 >
                   {isCurrentMonth && (
                     <>
-                      <div className={`w-6 h-6 flex items-center justify-center text-xs font-mono mb-1 rounded-lg
+                      <div className={`w-6 h-6 flex items-center justify-center text-xs font-mono mb-1 rounded-md
                         ${isToday ? 'bg-brand-cta text-surface-base font-bold' : 'text-content-primary'}
                       `}>
                         {dayNum}
@@ -314,15 +314,15 @@ export default function Calendar() {
                           return (
                             <div
                               key={ev.id}
-                              className={`flex items-center gap-1 px-1 py-0.5 rounded-lg bg-surface-elevated border border-surface-border`}
+                              className={`flex items-center gap-1 px-1 py-0.5 rounded-xl bg-surface-elevated border border-surface-border`}
                             >
                               <span className={`w-1.5 h-1.5 rounded-none shrink-0 ${cfg.color}`} />
-                              <span className="text-[9px] font-mono text-content-primary truncate">{ev.label}</span>
+                              <span className="text-xs font-mono text-content-primary truncate">{ev.label}</span>
                             </div>
                           );
                         })}
                         {events.length > 3 && (
-                          <div className="text-[9px] font-mono text-content-muted pl-1">+{events.length - 3} more</div>
+                          <div className="text-xs font-mono text-content-muted pl-1">+{events.length - 3} more</div>
                         )}
                       </div>
                     </>
@@ -337,7 +337,7 @@ export default function Calendar() {
       {/* Popover */}
       {popover && (
         <div
-          className="fixed z-50 bg-surface-raised border border-surface-border rounded-lg shadow-2xl p-4 min-w-[220px] max-w-xs"
+          className="fixed z-50 bg-surface-raised border border-surface-border rounded-xl shadow-2xl p-4 min-w-[220px] max-w-xs"
           style={{ top: popover.y, left: Math.min(popover.x, window.innerWidth - 240) }}
           onClick={e => e.stopPropagation()}
         >
@@ -381,12 +381,12 @@ export default function Calendar() {
               const cfg = EVENT_CONFIG[ev.type];
               const Icon = cfg.icon;
               return (
-                <div key={ev.id} className="flex items-center justify-between py-2 border-b border-surface-raised last:border-0 hover:bg-surface-elevated transition-colors rounded-lg px-2">
+                <div key={ev.id} className="flex items-center justify-between py-2 border-b border-surface-raised last:border-0 hover:bg-surface-elevated transition-colors rounded-md px-2">
                   <div className="flex items-center gap-3">
-                    <div className={`text-[10px] font-mono text-content-tertiary w-8 text-center uppercase tracking-widest`}>{ev.day}</div>
+                    <div className={`text-xs font-mono text-content-tertiary w-8 text-center uppercase tracking-widest`}>{ev.day}</div>
                     <Icon className={`w-3.5 h-3.5 ${cfg.text}`} />
                     <span className="text-sm font-mono text-content-secondary uppercase tracking-widest">{ev.label}</span>
-                    <span className={`text-[9px] font-mono ${cfg.text} uppercase tracking-widest border border-surface-border px-1.5 rounded-lg bg-surface-base`}>{ev.type}</span>
+                    <span className={`text-xs font-mono ${cfg.text} uppercase tracking-widest border border-surface-border px-1.5 rounded-full bg-surface-base`}>{ev.type}</span>
                   </div>
                   {ev.amount !== undefined && (
                     <span className={`text-sm font-mono font-bold tabular-nums ${ev.type === 'income' ? 'text-emerald-500' : 'text-red-400'}`}>

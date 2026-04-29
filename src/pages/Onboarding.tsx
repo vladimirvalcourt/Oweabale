@@ -468,7 +468,7 @@ export default function Onboarding() {
                           className="focus-app-field w-full rounded-md border border-surface-border bg-surface-raised px-3 py-2 pl-8 font-mono text-sm text-content-primary placeholder:text-content-muted tnum transition-colors hover:border-content-primary/15 focus:border-content-primary/25 sm:text-base"
                         />
                       </div>
-                      <div className="rounded-lg border border-surface-border bg-surface-base/80 p-4">
+                      <div className="rounded-xl border border-surface-border bg-surface-base/80 p-4">
                         <p className="text-xs font-medium text-amber-400/95">How we use this</p>
                         <p className="mt-2 text-xs leading-relaxed text-content-secondary">
                           We add a monthly <span className="text-content-primary">Flexible spending</span> budget (~30× this number). Adjust it anytime as real spending shows up.

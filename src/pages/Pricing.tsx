@@ -266,7 +266,7 @@ export default function Pricing() {
                 </div>
 
                 {hasYearlyPricing ? (
-                  <div className="mt-5 inline-flex items-center gap-1 rounded-lg border border-surface-border-subtle bg-surface-raised p-1">
+                  <div className="mt-5 inline-flex items-center gap-1 rounded-xl border border-surface-border-subtle bg-surface-raised p-1">
                     <button
                       type="button"
                       onClick={() => setBillingPeriod('monthly')}

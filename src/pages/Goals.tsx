@@ -148,7 +148,7 @@ export default function Goals() {
               value={checkInText}
               onChange={(e) => setCheckInText(e.target.value)}
               placeholder="What is your next money move this week?"
-              className="flex-1 rounded-lg border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
+              className="flex-1 rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
             />
             <button
               type="button"
@@ -163,7 +163,7 @@ export default function Goals() {
                 setCheckInText('');
                 toast.success('Check-in saved. Keep going.');
               }}
-              className="rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover"
+              className="rounded-md bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover"
             >
               Save check-in
             </button>
@@ -171,7 +171,7 @@ export default function Goals() {
           {checkIns.length > 0 && (
             <ul className="space-y-2">
               {checkIns.slice(0, 5).map((entry, idx) => (
-                <li key={`${entry.at}-${idx}`} className="rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-xs">
+                <li key={`${entry.at}-${idx}`} className="rounded-md border border-surface-border bg-surface-elevated px-3 py-2 text-xs">
                   <p className="text-content-primary">{entry.note}</p>
                   <p className="mt-1 text-content-tertiary">{new Date(entry.at).toLocaleString()}</p>
                 </li>
@@ -189,7 +189,7 @@ export default function Goals() {
         <button
           type="button"
           onClick={() => setIsAddingGoal(true)}
-          className="flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
+          className="flex items-center gap-2 rounded-md bg-brand-cta px-4 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
           Add goal
@@ -197,7 +197,7 @@ export default function Goals() {
       </div>
 
       {isAddingGoal && (
-        <div className="bg-surface-raised rounded-lg border border-surface-border p-6 mb-6">
+        <div className="bg-surface-raised rounded-xl border border-surface-border p-6 mb-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-base font-sans font-semibold text-content-primary">New goal</h3>
             <button type="button" onClick={() => setIsAddingGoal(false)} className="focus-app rounded text-content-tertiary hover:text-content-secondary transition-colors">
@@ -213,7 +213,7 @@ export default function Goals() {
                   required
                   value={newGoal.name}
                   onChange={(e) => setNewGoal({ ...newGoal, name: e.target.value })}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-md px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                   placeholder="e.g., EMERGENCY FUND"
                 />
               </div>
@@ -222,7 +222,7 @@ export default function Goals() {
                 <select
                   value={newGoal.type}
                   onChange={(e) => setNewGoal({ ...newGoal, type: e.target.value as Goal['type'] })}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-md px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                 >
                   <option value="savings">Savings</option>
                   <option value="debt">Debt payoff</option>
@@ -240,7 +240,7 @@ export default function Goals() {
                     step="0.01"
                     value={newGoal.targetAmount}
                     onChange={(e) => setNewGoal({ ...newGoal, targetAmount: e.target.value })}
-                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-md pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field transition-colors"
                   />
                 </div>
               </div>
@@ -254,7 +254,7 @@ export default function Goals() {
                     step="0.01"
                     value={newGoal.currentAmount}
                     onChange={(e) => setNewGoal({ ...newGoal, currentAmount: e.target.value })}
-                    className="w-full bg-surface-base border border-surface-border rounded-lg pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field transition-colors"
+                    className="w-full bg-surface-base border border-surface-border rounded-md pl-7 pr-3 py-2 text-sm font-mono text-content-primary focus-app-field transition-colors"
                   />
                 </div>
               </div>
@@ -265,7 +265,7 @@ export default function Goals() {
                   required
                   value={newGoal.deadline}
                   onChange={(e) => setNewGoal({ ...newGoal, deadline: e.target.value })}
-                  className="w-full bg-surface-base border border-surface-border rounded-lg px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
+                  className="w-full bg-surface-base border border-surface-border rounded-md px-3 py-2 text-sm text-content-primary focus-app-field transition-colors"
                 />
               </div>
             </div>
@@ -279,7 +279,7 @@ export default function Goals() {
               </button>
               <button
                 type="submit"
-                className="px-6 py-2 rounded-lg bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold transition-colors shadow-sm"
+                className="px-6 py-2 rounded-md bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold transition-colors shadow-sm"
               >
                 Save goal
               </button>
@@ -291,8 +291,8 @@ export default function Goals() {
       {goals.length === 0 && !isAddingGoal ? (
         <div className="space-y-4">
           {/* PAGE-05: Ghost example goal card — sets expectations before first goal is created */}
-          <div className="relative rounded-lg border border-surface-border border-dashed bg-surface-raised/50 p-5 opacity-60 select-none pointer-events-none">
-            <div className="absolute -top-2.5 left-4 rounded-full border border-surface-border bg-surface-elevated px-2.5 py-0.5 text-[10px] font-medium text-content-muted tracking-wide">
+          <div className="relative rounded-md border border-surface-border border-dashed bg-surface-raised/50 p-5 opacity-60 select-none pointer-events-none">
+            <div className="absolute -top-2.5 left-4 rounded-full border border-surface-border bg-surface-elevated px-2.5 py-0.5 text-xs font-medium text-content-muted tracking-wide">
               Example
             </div>
             <div className="flex items-start justify-between gap-4 mb-4">
@@ -305,11 +305,11 @@ export default function Goals() {
             <div className="w-full rounded-full bg-surface-elevated h-2 overflow-hidden">
               <div className="h-2 rounded-full bg-content-muted/40" style={{ width: '53%' }} />
             </div>
-            <p className="mt-2 text-right text-[11px] text-content-muted">53% complete</p>
+            <p className="mt-2 text-right text-xs text-content-muted">53% complete</p>
           </div>
 
-          <div className="bg-surface-raised rounded-lg border border-surface-border border-dashed p-12 text-center">
-            <div className="w-16 h-16 border border-surface-border rounded-lg flex items-center justify-center mx-auto mb-4 bg-surface-elevated">
+          <div className="bg-surface-raised rounded-xl border border-surface-border border-dashed p-12 text-center">
+            <div className="w-16 h-16 border border-surface-border rounded-xl flex items-center justify-center mx-auto mb-4 bg-surface-elevated">
               <Target className="w-8 h-8 text-content-muted" />
             </div>
             <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-2">No goals yet</h3>
@@ -317,7 +317,7 @@ export default function Goals() {
             <button
               type="button"
               onClick={() => setIsAddingGoal(true)}
-              className="px-8 py-3 rounded-lg bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-surface-base text-sm font-sans font-semibold transition-colors flex items-center gap-2 mx-auto shadow-sm"
+              className="px-8 py-3 rounded-md bg-brand-cta hover:bg-brand-cta-hover active:scale-[0.98] text-surface-base text-sm font-sans font-semibold transition-colors flex items-center gap-2 mx-auto shadow-sm"
             >
               <Plus className="w-4 h-4 shrink-0" aria-hidden />
               Create your first goal
@@ -339,12 +339,12 @@ export default function Goals() {
               return (
                 <div 
                   key={goal.id} 
-                  className="bg-surface-elevated rounded-lg border border-surface-border overflow-hidden group hover:border-content-primary/15 transition-colors"
+                  className="bg-surface-elevated rounded-xl border border-surface-border overflow-hidden group hover:border-content-primary/15 transition-colors"
                 >
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-6">
                       <div className="flex items-center gap-4">
-                        <div className={`w-10 h-10 rounded-lg border border-surface-border flex items-center justify-center bg-surface-base transition-colors`}>
+                        <div className={`w-10 h-10 rounded-xl border border-surface-border flex items-center justify-center bg-surface-base transition-colors`}>
                           {isSavings ? <TrendingUp className="w-5 h-5 text-emerald-500" /> : <TrendingDown className="w-5 h-5 text-content-secondary" />}
                         </div>
                         <div>
@@ -353,7 +353,7 @@ export default function Goals() {
                         </div>
                       </div>
                       {isCompleted && (
-                        <span className="inline-flex items-center text-[9px] font-mono font-bold uppercase tracking-widest text-emerald-500">
+                        <span className="inline-flex items-center text-xs font-mono font-bold uppercase tracking-widest text-emerald-500">
                           <CheckCircle2 className="w-3 h-3 mr-1.5" /> FULFILLED
                         </span>
                       )}
@@ -379,8 +379,8 @@ export default function Goals() {
                       const monthsLeft = Math.max(1, Math.ceil((new Date(goal.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24 * 30)));
                       const needed = (goal.targetAmount - goal.currentAmount) / monthsLeft;
                       return (
-                        <div className="flex items-center justify-between bg-surface-base border border-surface-border rounded-lg px-3 py-2 mb-4">
-                          <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Needed / month</span>
+                        <div className="flex items-center justify-between bg-surface-base border border-surface-border rounded-md px-3 py-2 mb-4">
+                          <span className="text-xs font-mono text-content-tertiary uppercase tracking-wider">Needed / month</span>
                           <span className="text-sm font-mono font-bold text-content-primary">${needed.toFixed(0)}/mo</span>
                         </div>
                       );
@@ -395,9 +395,9 @@ export default function Goals() {
                           value={progressInput.value}
                           onChange={(e) => setProgressInput({ id: goal.id, value: e.target.value })}
                           placeholder="Amount (+/-)"
-                          className="flex-1 bg-surface-base border border-surface-border rounded-lg px-3 py-1.5 text-sm font-mono text-content-primary focus-app-field transition-colors"
+                          className="flex-1 bg-surface-base border border-surface-border rounded-md px-3 py-1.5 text-sm font-mono text-content-primary focus-app-field transition-colors"
                         />
-                        <button type="submit" className="px-3 py-1.5 bg-brand-cta text-surface-base hover:bg-brand-cta-hover rounded-lg text-xs font-bold transition-colors">
+                        <button type="submit" className="px-3 py-1.5 bg-brand-cta text-surface-base hover:bg-brand-cta-hover rounded-md text-xs font-bold transition-colors">
                           Save
                         </button>
                         <button type="button" onClick={() => setProgressInput(null)} className="px-3 py-1.5 text-content-tertiary hover:text-content-primary transition-colors text-xs">

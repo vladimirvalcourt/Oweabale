@@ -9,7 +9,7 @@ import { getCustomIcon } from '../lib/utils';
 import { toast } from 'sonner';
 
 const BUTTON_BASE_CLASS =
-  'inline-flex min-h-10 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-app disabled:opacity-50 disabled:cursor-not-allowed';
+  'inline-flex min-h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus-app disabled:opacity-50 disabled:cursor-not-allowed';
 const BUTTON_SECONDARY_CLASS = `${BUTTON_BASE_CLASS} border border-surface-border bg-transparent text-content-secondary hover:bg-surface-elevated hover:text-content-primary`;
 const BUTTON_PRIMARY_CLASS = `${BUTTON_BASE_CLASS} bg-brand-cta text-surface-base hover:bg-brand-cta-hover`;
 const TransactionsIcon = getCustomIcon('transactions');
@@ -177,7 +177,7 @@ export default function Transactions() {
       <CollapsibleModule 
         title="Filter Transactions"
         icon={FiltersIcon}
-        extraHeader={<span className="text-[10px] font-mono text-content-tertiary uppercase tracking-widest">{filteredTransactions.length} Records Detected</span>}
+        extraHeader={<span className="text-xs font-mono text-content-tertiary uppercase tracking-widest">{filteredTransactions.length} Records Detected</span>}
       >
         <div className="-mx-6 -my-6 p-6 space-y-4">
           <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
@@ -190,7 +190,7 @@ export default function Transactions() {
                 placeholder="Search transactions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-surface-border rounded-lg leading-5 bg-surface-base text-xs font-mono uppercase tracking-widest text-content-primary placeholder:text-content-muted focus-app-field transition-all"
+                className="block w-full pl-10 pr-3 py-2 border border-surface-border rounded-md leading-5 bg-surface-base text-xs font-mono uppercase tracking-widest text-content-primary placeholder:text-content-muted focus-app-field transition-all"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -223,13 +223,13 @@ export default function Transactions() {
           {showAdvancedFilters && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 pt-6 border-t border-surface-border">
               <div>
-                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
+                <label className="block text-xs font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
                   <Activity className="w-3 h-3" /> Type
                 </label>
                 <select
                   value={filterType}
                   onChange={(e) => setFilterType(e.target.value as 'all' | 'income' | 'expense')}
-                  className="block w-full px-3 py-2 border border-surface-border rounded-lg bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus-app-field transition-colors"
+                  className="block w-full px-3 py-2 border border-surface-border rounded-md bg-surface-base text-xs font-mono uppercase tracking-widest text-content-primary focus-app-field transition-colors"
                 >
                   <option value="all">All Types</option>
                   <option value="income">Income</option>
@@ -238,13 +238,13 @@ export default function Transactions() {
               </div>
 
               <div>
-                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
+                <label className="block text-xs font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
                   <Tag className="w-3 h-3" /> Category
                 </label>
                 <select
                   value={filterCategory}
                   onChange={(e) => setFilterCategory(e.target.value)}
-                  className="block w-full px-3 py-2 border border-surface-border rounded-lg bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus-app-field transition-colors"
+                  className="block w-full px-3 py-2 border border-surface-border rounded-md bg-surface-base text-xs font-mono uppercase tracking-widest text-content-primary focus-app-field transition-colors"
                 >
                   <option value="all">All Categories</option>
                   {uniqueCategories.map(cat => (
@@ -254,7 +254,7 @@ export default function Transactions() {
               </div>
 
               <div>
-                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
+                <label className="block text-xs font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
                   <ShoppingBag className="w-3 h-3" /> Platform
                 </label>
                 <select
@@ -263,7 +263,7 @@ export default function Transactions() {
                     setFilterPlatform(e.target.value);
                     setPage(1);
                   }}
-                  className="block w-full px-3 py-2 border border-surface-border rounded-lg bg-surface-base text-[10px] font-mono uppercase tracking-widest text-content-primary focus-app-field transition-colors"
+                  className="block w-full px-3 py-2 border border-surface-border rounded-md bg-surface-base text-xs font-mono uppercase tracking-widest text-content-primary focus-app-field transition-colors"
                 >
                   <option value="all">All platforms</option>
                   <option value="__untagged">Untagged</option>
@@ -274,7 +274,7 @@ export default function Transactions() {
               </div>
 
               <div>
-                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
+                <label className="block text-xs font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
                   <Calendar className="w-3 h-3" /> Date Range
                 </label>
                 <div className="flex items-center gap-2">
@@ -282,20 +282,20 @@ export default function Transactions() {
                     type="date"
                     value={dateRange.start}
                     onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
-                    className="block w-full px-2 py-2 border border-surface-border rounded-lg bg-surface-base text-[10px] font-mono text-content-primary focus-app-field transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-md bg-surface-base text-xs font-mono text-content-primary focus-app-field transition-colors"
                   />
                   <span className="text-surface-border">::</span>
                   <input
                     type="date"
                     value={dateRange.end}
                     onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
-                    className="block w-full px-2 py-2 border border-surface-border rounded-lg bg-surface-base text-[10px] font-mono text-content-primary focus-app-field transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-md bg-surface-base text-xs font-mono text-content-primary focus-app-field transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[9px] font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
+                <label className="block text-xs font-mono uppercase tracking-[0.2em] text-content-muted mb-2 flex items-center gap-1.5">
                   <Hash className="w-3 h-3" /> Amount Range
                 </label>
                 <div className="flex items-center gap-2">
@@ -304,7 +304,7 @@ export default function Transactions() {
                     placeholder="MIN"
                     value={amountRange.min}
                     onChange={(e) => setAmountRange({...amountRange, min: e.target.value})}
-                    className="block w-full px-2 py-2 border border-surface-border rounded-lg bg-surface-base text-[10px] font-mono text-content-primary placeholder:text-content-muted focus-app-field transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-md bg-surface-base text-xs font-mono text-content-primary placeholder:text-content-muted focus-app-field transition-colors"
                   />
                   <span className="text-surface-border">::</span>
                   <input
@@ -312,7 +312,7 @@ export default function Transactions() {
                     placeholder="MAX"
                     value={amountRange.max}
                     onChange={(e) => setAmountRange({...amountRange, max: e.target.value})}
-                    className="block w-full px-2 py-2 border border-surface-border rounded-lg bg-surface-base text-[10px] font-mono text-content-primary placeholder:text-content-muted focus-app-field transition-colors"
+                    className="block w-full px-2 py-2 border border-surface-border rounded-md bg-surface-base text-xs font-mono text-content-primary placeholder:text-content-muted focus-app-field transition-colors"
                   />
                 </div>
               </div>
@@ -373,19 +373,19 @@ export default function Transactions() {
             <table className="min-w-full divide-y divide-surface-highlight">
               <thead className="bg-surface-base">
                 <tr>
-                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
                     Description
                   </th>
-                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
                     Timestamp
                   </th>
-                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
                     Category
                   </th>
-                  <th scope="col" className="px-6 py-4 text-left text-[10px] font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
+                  <th scope="col" className="px-6 py-4 text-left text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
                     Platform
                   </th>
-                  <th scope="col" className="px-6 py-4 text-right text-[10px] font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
+                  <th scope="col" className="px-6 py-4 text-right text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
                     Amount
                   </th>
                 </tr>
@@ -433,7 +433,7 @@ export default function Transactions() {
                                   <button
                                     type="button"
                                     onClick={() => void deleteCategorizationExclusion(txExclusionId)}
-                                    className="inline-flex items-center gap-1 rounded border border-surface-border bg-surface-base px-2 py-0.5 text-[10px] font-medium text-content-secondary hover:text-content-primary"
+                                    className="inline-flex items-center gap-1 rounded border border-surface-border bg-surface-base px-2 py-0.5 text-xs font-medium text-content-secondary hover:text-content-primary"
                                   >
                                     <Ban className="w-3 h-3" />
                                     Re-enable this tx
@@ -448,7 +448,7 @@ export default function Transactions() {
                                         merchant_name: null,
                                       })
                                     }
-                                    className="inline-flex items-center gap-1 rounded border border-surface-border bg-surface-base px-2 py-0.5 text-[10px] font-medium text-content-secondary hover:text-content-primary"
+                                    className="inline-flex items-center gap-1 rounded border border-surface-border bg-surface-base px-2 py-0.5 text-xs font-medium text-content-secondary hover:text-content-primary"
                                   >
                                     <Ban className="w-3 h-3" />
                                     Exclude this tx
@@ -458,7 +458,7 @@ export default function Transactions() {
                                   <button
                                     type="button"
                                     onClick={() => void deleteCategorizationExclusion(merchantExclusionId)}
-                                    className="inline-flex items-center gap-1 rounded border border-surface-border bg-surface-base px-2 py-0.5 text-[10px] font-medium text-content-secondary hover:text-content-primary"
+                                    className="inline-flex items-center gap-1 rounded border border-surface-border bg-surface-base px-2 py-0.5 text-xs font-medium text-content-secondary hover:text-content-primary"
                                   >
                                     <Ban className="w-3 h-3" />
                                     Re-enable merchant
@@ -473,7 +473,7 @@ export default function Transactions() {
                                         merchant_name: transaction.name,
                                       })
                                     }
-                                    className="inline-flex items-center gap-1 rounded border border-surface-border bg-surface-base px-2 py-0.5 text-[10px] font-medium text-content-secondary hover:text-content-primary"
+                                    className="inline-flex items-center gap-1 rounded border border-surface-border bg-surface-base px-2 py-0.5 text-xs font-medium text-content-secondary hover:text-content-primary"
                                   >
                                     <Ban className="w-3 h-3" />
                                     Exclude merchant
@@ -483,7 +483,7 @@ export default function Transactions() {
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-[10px] font-mono text-content-tertiary uppercase tracking-widest">
+                        <td className="px-6 py-4 whitespace-nowrap text-xs font-mono text-content-tertiary uppercase tracking-widest">
                           {transaction.date}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -493,7 +493,7 @@ export default function Transactions() {
                               <select
                                 autoFocus
                                 value={transaction.category}
-                                className="rounded-lg border border-surface-border bg-surface-base px-2 py-0.5 text-[9px] font-mono font-bold uppercase tracking-widest text-content-primary focus-app-field"
+                                className="rounded-xl border border-surface-border bg-surface-base px-2 py-0.5 text-xs font-mono font-bold uppercase tracking-widest text-content-primary focus-app-field"
                                 onChange={async (e) => {
                                   const newCat = e.target.value;
                                   const oldCat = transaction.category;
@@ -533,7 +533,7 @@ export default function Transactions() {
                                 type="button"
                                 title={exclusionReason ?? 'Click to change category'}
                                 onClick={() => setEditingCategory(transaction.id)}
-                                className="inline-flex items-center px-2 py-0.5 rounded-lg text-[9px] font-mono font-bold uppercase tracking-widest bg-surface-base border border-surface-border text-content-tertiary group-hover:text-content-secondary hover:border-content-muted transition-colors cursor-pointer"
+                                className="inline-flex items-center px-2 py-0.5 rounded-xl text-xs font-mono font-bold uppercase tracking-widest bg-surface-base border border-surface-border text-content-tertiary group-hover:text-content-secondary hover:border-content-muted transition-colors cursor-pointer"
                               >
                                 {formatCategoryLabel(transaction.category)}
                               </button>
@@ -541,7 +541,7 @@ export default function Transactions() {
                             {exclusionReason && (
                               <span
                                 title={exclusionReason}
-                                className="inline-flex items-center w-fit rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[9px] font-medium text-amber-300"
+                                className="inline-flex items-center w-fit rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-xs font-medium text-amber-300"
                               >
                                 Excluded from auto-rules
                               </span>
@@ -572,11 +572,11 @@ export default function Transactions() {
                                 onKeyDown={(e) => {
                                   if (e.key === 'Escape') setEditingPlatform(null);
                                 }}
-                                className="w-full rounded border border-surface-border bg-surface-base px-2 py-1 text-[10px] font-mono text-content-primary focus-app-field"
+                                className="w-full rounded border border-surface-border bg-surface-base px-2 py-1 text-xs font-mono text-content-primary focus-app-field"
                                 placeholder="Uber, DoorDash…"
                                 autoFocus
                               />
-                              <span className="text-[9px] text-content-muted">Enter to save · Esc cancel</span>
+                              <span className="text-xs text-content-muted">Enter to save · Esc cancel</span>
                             </form>
                           ) : (
                             <button
@@ -588,7 +588,7 @@ export default function Transactions() {
                                   value: transaction.platformTag || '',
                                 })
                               }
-                              className="inline-flex max-w-[10rem] truncate text-left text-[10px] font-mono uppercase tracking-widest text-content-tertiary hover:text-content-secondary border border-transparent hover:border-surface-border rounded-lg px-2 py-1 transition-colors"
+                              className="inline-flex max-w-[10rem] truncate text-left text-xs font-mono uppercase tracking-widest text-content-tertiary hover:text-content-secondary border border-transparent hover:border-surface-border rounded-full px-2 py-1 transition-colors"
                             >
                               {(transaction.platformTag || '').trim() || '—'}
                             </button>
@@ -610,7 +610,7 @@ export default function Transactions() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between pt-2 px-1">
-            <span className="text-[10px] font-mono text-content-muted uppercase tracking-widest">
+            <span className="text-xs font-mono text-content-muted uppercase tracking-widest">
               Page {currentPage} of {totalPages} — {filteredTransactions.length} records
             </span>
             <div className="flex items-center gap-2">
