@@ -4,11 +4,22 @@ import { browserSupportsModernWebCrypto } from '../../lib/utils';
 
 /**
  * Shown when the runtime cannot use PKCE / Web Crypto (legacy browsers, some embedded WebViews).
+ * Hidden when running as an installed PWA since authentication already succeeded.
  */
 export function UnsupportedBrowserBanner() {
   const [unsupported, setUnsupported] = useState(false);
 
   useEffect(() => {
+    // Don't show warning if running as installed PWA (user already authenticated successfully)
+    const isStandalone =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as { standalone?: boolean }).standalone === true;
+    
+    if (isStandalone) {
+      setUnsupported(false);
+      return;
+    }
+    
     setUnsupported(!browserSupportsModernWebCrypto());
   }, []);
 
