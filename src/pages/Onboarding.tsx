@@ -237,7 +237,7 @@ export default function Onboarding() {
                 Welcome, {firstName}
               </h1>
               <p className="mb-8 max-w-md text-pretty text-sm leading-6 text-content-tertiary">
-                We'll ask about what cash you can use, bills coming up, and a daily spending amount that feels comfortable. Leave anything blank — you can fill it in later.
+                We'll ask about what cash you can use, bills coming up, and a daily spending amount that feels comfortable. Leave anything blank. You can fill it in later.
               </p>
 
               <div className="mb-10 grid gap-3 sm:grid-cols-2">
@@ -397,7 +397,7 @@ export default function Onboarding() {
                 <p className="mb-6 text-xs leading-relaxed text-content-tertiary sm:text-sm sm:text-content-tertiary">
                   {currentStep.description}
                   {currentStepIndex <= 2 ? (
-                    <span className="mt-2 block text-content-tertiary">Optional — leave blank and continue.</span>
+                    <span className="mt-2 block text-content-tertiary">Optional. Leave blank and continue.</span>
                   ) : null}
                 </p>
 
@@ -442,7 +442,7 @@ export default function Onboarding() {
                           className="focus-app-field w-full rounded-md border border-surface-border bg-surface-raised px-3 py-2 pl-8 font-mono text-sm text-content-primary placeholder:text-content-muted tnum transition-colors hover:border-content-primary/15 focus:border-content-primary/25 sm:text-base"
                         />
                       </div>
-                      <p className="text-xs text-content-tertiary">Rent, utilities, subscriptions, loan minimums — one monthly total is fine.</p>
+                      <p className="text-xs text-content-tertiary">Rent, utilities, subscriptions, loan minimums. One monthly total is fine.</p>
                     </div>
                   )}
 

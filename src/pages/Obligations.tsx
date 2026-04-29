@@ -505,7 +505,7 @@ export default function Obligations() {
       >
         <div className="p-0 space-y-4">
           <p className="text-xs text-content-tertiary leading-relaxed">
-            Totals include unpaid bills, active subscriptions, minimum debt payments with a due date, and open fines — same buckets as
+            Totals include unpaid bills, active subscriptions, minimum debt payments with a due date, and open fines. Same buckets as
             the list below, grouped by days from today. The{' '}
             <TransitionLink to={calendarHref} className="text-content-primary hover:underline">
               Calendar
@@ -589,7 +589,7 @@ export default function Obligations() {
                   <p className="mt-2 text-xs text-content-secondary leading-relaxed">
                     Add $50/month extra to cut{' '}
                     <span className="font-mono font-medium text-content-primary">{monthsSavedBy50}</span> months off your payoff
-                    timeline — adjust &quot;Extra per month&quot; above to model it.{' '}
+                    timeline. Adjust &quot;Extra per month&quot; above to model it.{' '}
                     <TransitionLink to={cashFlowHref} className="text-content-primary underline underline-offset-2">
                       Tighten cash flow
                     </TransitionLink>
@@ -601,7 +601,7 @@ export default function Obligations() {
                 <p className="text-lg font-mono font-bold text-red-400">${payoffResult.totalInterest.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                 {payoffResult.totalInterest > 10_000 && (
                   <p className="mt-2 text-xs text-content-secondary leading-relaxed">
-                    Interest is sensitive to APR and payoff order — even small extra payments compound. Use the slider above or{' '}
+                    Interest is sensitive to APR and payoff order. Even small extra payments compound. Use the slider above or{' '}
                     <TransitionLink to={analyticsHref} className="text-content-primary underline underline-offset-2">
                       review spending trends
                     </TransitionLink>
@@ -782,8 +782,8 @@ export default function Obligations() {
                     key={ob.id} 
                     className={cn(
                       'hover:bg-surface-highlight transition-colors',
-                      overdueBand === 'warn' && 'bg-[var(--color-status-amber-bg)] border-l-[3px] border-l-[var(--color-status-amber-border)]',
-                      overdueBand === 'critical' && 'bg-[var(--color-status-rose-bg)] border-l-[3px] border-l-[var(--color-status-rose-border)]',
+                      overdueBand === 'warn' && 'bg-[var(--color-status-amber-bg)] border border-[var(--color-status-amber-border)]',
+                      overdueBand === 'critical' && 'bg-[var(--color-status-rose-bg)] border border-[var(--color-status-rose-border)]',
                     )}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -836,7 +836,7 @@ export default function Obligations() {
                         )}
                         {overdueBand === 'critical' && !tollHint && ob.type === 'ambush' && (
                           <p className="max-w-xs text-[11px] text-rose-300/90 leading-snug">
-                            Unpaid fines can add late fees and collection risk — resolve as soon as you can.
+                            Unpaid fines can add late fees and collection risk. Resolve as soon as you can.
                           </p>
                         )}
                         {isDebtNoDue && (

@@ -2,7 +2,7 @@
  * FreeDashboard
  *
  * Simplified dashboard for Free (Tracker) plan users.
- * Shows only the billing/debt-oriented widgets — no income, taxes,
+ * Shows only the billing/debt-oriented widgets. No income, taxes,
  * net worth, cash flow, or spending charts (those are Pro-only).
  *
  * Includes a persistent Upgrade banner at the bottom.
@@ -255,7 +255,7 @@ export default function FreeDashboard() {
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 text-black hover:bg-amber-400 px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isUpgrading ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden /> : null}
-              {isUpgrading ? 'Getting things ready...' : `Start Full Suite — $${monthlyPrice.toFixed(2)}/mo`}
+              {isUpgrading ? 'Getting things ready...' : `Start Full Suite. $${monthlyPrice.toFixed(2)}/mo`}
             </button>
             <TransitionLink to="/pricing" className="text-center text-xs text-content-tertiary hover:text-content-secondary transition-colors">
               See what's included →

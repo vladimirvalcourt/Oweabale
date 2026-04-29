@@ -130,7 +130,7 @@ export default function Ingestion() {
 
       if (trimmed.length < 35 && noAmount) {
         toast.warning(
-          'Could not read amounts or text from this file. It may be a scanned PDF, very dark, or low resolution — enter details manually, or retake as a brighter photo.',
+          'Could not read amounts or text from this file. It may be a scanned PDF, very dark, or low resolution. Enter details manually, or retake as a brighter photo.',
           { duration: 8000 }
         );
       } else if (usedRasterPdfOcr) {
@@ -151,7 +151,7 @@ export default function Ingestion() {
           toast.success(`${uploadedFile.name.substring(0, 20)}... scanned`);
         }
         if (useStore.getState().pendingIngestions.some((p) => p.id === ingestionId)) {
-          toast.info('Confirm amount and details, then save — or delete the row.');
+          toast.info('Confirm amount and details, then save. Or delete the row.');
         }
       }
     } catch (error) {
@@ -193,15 +193,15 @@ export default function Ingestion() {
        });
        if (trimmed.length < 35 && noAmount) {
          toast.warning(
-           'Could not read much from this document — you may need to enter details manually.',
+           'Could not read much from this document. You may need to enter details manually.',
            { duration: 7000 }
          );
        } else if (usedRasterPdfOcr) {
-         toast.info('PDF read from page images — confirm amounts before saving.', { duration: 4000 });
+         toast.info('PDF read from page images. Confirm amounts before saving.', { duration: 4000 });
        }
        const committed = await useStore.getState().commitIngestion(id);
        if (!committed && useStore.getState().pendingIngestions.some((p) => p.id === id)) {
-         toast.info('Confirm amount and details, then save — or delete the row.');
+         toast.info('Confirm amount and details, then save. Or delete the row.');
        }
      } catch (err) {
        updatePendingIngestion(id, { status: 'error' });
@@ -247,7 +247,7 @@ export default function Ingestion() {
       if (await useStore.getState().commitIngestion(item.id)) n++;
     }
     if (n > 0) toast.success(`Saved ${n} item${n === 1 ? '' : 's'} to history`);
-    else if (readyItems.length > 0) toast.error('Nothing saved — check amounts and fields.');
+    else if (readyItems.length > 0) toast.error('Nothing saved. Check amounts and fields.');
   };
 
   const [recentlyAddedId, setRecentlyAddedId] = React.useState<string | null>(null);

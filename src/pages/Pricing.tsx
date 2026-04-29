@@ -51,7 +51,7 @@ const PRICING_FAQ_STATIC = [
   {
     question: 'Can I cancel anytime?',
     answer:
-      'Yes. Once you start Full Suite, you can pause or cancel your subscription from your account settings — no need to talk to anyone.',
+      'Yes. Once you start Full Suite, you can pause or cancel your subscription from your account settings. No need to talk to anyone.',
   },
   {
     question: 'Is this only for freelancers?',
