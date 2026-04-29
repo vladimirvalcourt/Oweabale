@@ -120,7 +120,7 @@ async function syncPlaidAccountsForItem(
   }
 }
 
-function mapPlaidRow(tx: PlaidTx, userId: string, rules: RuleRow[]) {
+function mapPlaidRow(tx: PlaidTx, userId: string, rules: RuleRow[], householdId: string | null) {
   const nameRaw = (tx.merchant_name || tx.name || 'Transaction').trim();
   const name = nameRaw.slice(0, 500);
   const date = (tx.date || tx.authorized_date || new Date().toISOString().slice(0, 10)).slice(0, 10);
@@ -135,6 +135,7 @@ function mapPlaidRow(tx: PlaidTx, userId: string, rules: RuleRow[]) {
 
   return {
     user_id: userId,
+    household_id: householdId,
     name,
     category,
     date,
@@ -156,6 +157,24 @@ async function loadRules(supabase: SupabaseClient, userId: string): Promise<Rule
     .order('created_at', { ascending: false });
   if (error) throw error;
   return (data ?? []) as RuleRow[];
+}
+
+/** Get the user's household_id if they belong to one */
+async function getUserHouseholdId(
+  supabase: SupabaseClient,
+  userId: string,
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('household_members')
+    .select('household_id')
+    .eq('user_id', userId)
+    .eq('status', 'accepted')
+    .maybeSingle();
+  if (error) {
+    console.warn('[plaid sync] Failed to fetch household_id:', error);
+    return null;
+  }
+  return data?.household_id ?? null;
 }
 
 async function markItemError(
@@ -195,6 +214,7 @@ export async function runSyncForPlaidItem(
   },
 ): Promise<{ ok: boolean; product_not_ready?: boolean; error?: string }> {
   const rules = await loadRules(supabase, item.user_id);
+  const householdId = await getUserHouseholdId(supabase, item.user_id);
   let cursor: string | null | undefined = item.transactions_cursor;
   let lastNextCursor = cursor;
 
@@ -212,7 +232,7 @@ export async function runSyncForPlaidItem(
       const modified = res.modified ?? [];
       const removed = res.removed ?? [];
 
-      const upsertRows = [...added, ...modified].map((tx) => mapPlaidRow(tx, item.user_id, rules));
+      const upsertRows = [...added, ...modified].map((tx) => mapPlaidRow(tx, item.user_id, rules, householdId));
       if (upsertRows.length > 0) {
         const { error: upErr } = await supabase.from('transactions').upsert(upsertRows, {
           onConflict: 'user_id,plaid_transaction_id',
