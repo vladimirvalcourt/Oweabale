@@ -94,6 +94,13 @@ export default defineConfig(({ mode }) => {
                   ? { deploy: { env: process.env.VERCEL_ENV.trim() } }
                   : {}),
               },
+              sourcemaps: {
+                // Only upload Vite application bundles. The root PWA/workbox files are generated
+                // service-worker artifacts and can trigger noisy source-map-reference warnings.
+                assets: ['./dist/assets/**/*.{js,map}'],
+                ignore: ['./dist/sw.js', './dist/sw.js.map', './dist/workbox-*.js', './dist/workbox-*.js.map'],
+                filesToDeleteAfterUpload: ['./dist/assets/**/*.map'],
+              },
             }),
           ]
         : []),
@@ -178,7 +185,9 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      chunkSizeWarningLimit: 500,
+      // We intentionally split PDF/chart/runtime vendors into lazy chunks; the PDF worker alone
+      // is >1 MB uncompressed, so the default budget creates Vercel noise without indicating a regression.
+      chunkSizeWarningLimit: 1400,
       minify: 'esbuild',
       sourcemap: isProd ? 'hidden' : false,
       rollupOptions: {
