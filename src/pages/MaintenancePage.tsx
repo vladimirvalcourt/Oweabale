@@ -21,13 +21,13 @@ export default function MaintenancePage() {
         <button
           type="button"
           onClick={() => void signOut()}
-          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-surface-border bg-surface-raised text-sm font-medium text-content-primary hover:bg-surface-elevated transition-colors rounded-[10px]"
+          className="inline-flex items-center justify-center gap-2 px-5 py-2.5 border border-surface-border bg-surface-raised text-sm font-medium text-content-primary hover:bg-surface-elevated transition-colors rounded-lg"
         >
           Sign out
         </button>
         <TransitionLink
           to="/"
-          className="inline-flex items-center justify-center gap-2 rounded-[10px] bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-cta px-5 py-2.5 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover"
         >
           Home
         </TransitionLink>

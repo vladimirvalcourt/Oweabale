@@ -144,7 +144,7 @@ const Hero = React.memo(() => {
 
   return (
     <section className="min-h-[100dvh] w-full p-3">
-      <div className="relative min-h-[calc(100dvh-1.5rem)] w-full overflow-hidden rounded-[22px] border border-surface-border-subtle bg-surface-base">
+      <div className="relative min-h-[calc(100dvh-1.5rem)] w-full overflow-hidden rounded-3xl border border-surface-border-subtle bg-surface-base">
         
         {/* Background video */}
         <video

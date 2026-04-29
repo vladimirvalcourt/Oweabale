@@ -520,7 +520,7 @@ export default function Ingestion() {
                                 href={safeStorage}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-[9px] font-mono text-content-muted hover:text-content-primary uppercase tracking-widest flex items-center gap-1 transition-colors"
+                                className="text-xs font-mono text-content-muted hover:text-content-primary uppercase tracking-widest flex items-center gap-1 transition-colors"
                               >
                                 <ExternalLink className="w-3 h-3" /> Open
                               </a>
@@ -544,7 +544,7 @@ export default function Ingestion() {
                               <div className="text-center p-12">
                                 <FileText className="w-16 h-16 text-content-muted mx-auto mb-4" />
                                 <p className="text-[10px] font-mono text-content-muted uppercase tracking-widest">No Preview Available</p>
-                                <p className="text-[9px] font-mono text-content-muted mt-2 select-none uppercase">ID: {item.id}</p>
+                                <p className="text-xs font-mono text-content-muted mt-2 select-none uppercase">ID: {item.id}</p>
                               </div>
                             )}
                           </div>
@@ -560,7 +560,7 @@ export default function Ingestion() {
                               <>
                                 <div className="grid grid-cols-2 gap-8">
                                   <div>
-                                    <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Ticket type</label>
+                                    <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Ticket type</label>
                                     <select
                                       value={item.extractedData.citationType || 'Toll Violation'}
                                       onChange={(e) =>
@@ -580,7 +580,7 @@ export default function Ingestion() {
                                     </select>
                                   </div>
                                   <div>
-                                    <label className="text-[9px] font-mono text-rose-400/90 uppercase tracking-[0.2em] block mb-3 font-black">
+                                    <label className="text-xs font-mono text-rose-400/90 uppercase tracking-[0.2em] block mb-3 font-black">
                                       Issuing jurisdiction *
                                     </label>
                                     <input
@@ -601,7 +601,7 @@ export default function Ingestion() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-8">
                                   <div>
-                                    <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Citation / notice #</label>
+                                    <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Citation / notice #</label>
                                     <input
                                       value={item.extractedData.citationNumber || ''}
                                       onChange={(e) =>
@@ -613,7 +613,7 @@ export default function Ingestion() {
                                     />
                                   </div>
                                   <div>
-                                    <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Penalty / late fee ($)</label>
+                                    <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Penalty / late fee ($)</label>
                                     <input
                                       type="number"
                                       step="0.01"
@@ -632,7 +632,7 @@ export default function Ingestion() {
                                   </div>
                                 </div>
                                 <div>
-                                  <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Payment URL (optional)</label>
+                                  <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Payment URL (optional)</label>
                                   <input
                                     type="url"
                                     value={item.extractedData.paymentUrl || ''}
@@ -647,7 +647,7 @@ export default function Ingestion() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-8">
                                   <div>
-                                    <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Incident date</label>
+                                    <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Incident date</label>
                                     <input
                                       type="date"
                                       value={item.extractedData.date || ''}
@@ -660,7 +660,7 @@ export default function Ingestion() {
                                     />
                                   </div>
                                   <div>
-                                    <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Days until due</label>
+                                    <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Days until due</label>
                                     <input
                                       type="number"
                                       min="0"
@@ -681,7 +681,7 @@ export default function Ingestion() {
                             ) : item.type === 'transaction' ? (
                               <div className="grid grid-cols-2 gap-8">
                                 <div>
-                                  <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Description</label>
+                                  <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Description</label>
                                   <input
                                     value={item.extractedData.biller || item.extractedData.name || ''}
                                     onChange={(e) =>
@@ -693,7 +693,7 @@ export default function Ingestion() {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Category</label>
+                                  <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Category</label>
                                   <select
                                     value={item.extractedData.category || 'other'}
                                     onChange={(e) =>
@@ -716,7 +716,7 @@ export default function Ingestion() {
                             ) : item.type === 'income' ? (
                               <div className="grid grid-cols-2 gap-8">
                                 <div>
-                                  <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Income source / label</label>
+                                  <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Income source / label</label>
                                   <input
                                     value={item.extractedData.source || item.extractedData.biller || ''}
                                     onChange={(e) =>
@@ -733,7 +733,7 @@ export default function Ingestion() {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Category</label>
+                                  <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Category</label>
                                   <select
                                     value={item.extractedData.category || 'Salary'}
                                     onChange={(e) =>
@@ -752,7 +752,7 @@ export default function Ingestion() {
                             ) : item.type === 'debt' ? (
                               <div className="grid grid-cols-2 gap-8">
                                 <div>
-                                  <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Lender / account</label>
+                                  <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Lender / account</label>
                                   <input
                                     value={item.extractedData.biller || ''}
                                     onChange={(e) =>
@@ -764,7 +764,7 @@ export default function Ingestion() {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">APR (%)</label>
+                                  <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">APR (%)</label>
                                   <input
                                     type="number"
                                     step="0.01"
@@ -781,7 +781,7 @@ export default function Ingestion() {
                                   />
                                 </div>
                                 <div className="col-span-2">
-                                  <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Minimum payment ($)</label>
+                                  <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Minimum payment ($)</label>
                                   <input
                                     type="number"
                                     step="0.01"
@@ -802,7 +802,7 @@ export default function Ingestion() {
                             ) : (
                               <div className="grid grid-cols-2 gap-8">
                                 <div>
-                                  <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Merchant / Payee</label>
+                                  <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Merchant / Payee</label>
                                   <input 
                                     value={item.extractedData.biller || ''} 
                                     onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, biller: e.target.value, name: e.target.value } })}
@@ -810,7 +810,7 @@ export default function Ingestion() {
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Category</label>
+                                  <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Category</label>
                                   <select 
                                     value={item.extractedData.category || 'utilities'}
                                     onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, category: e.target.value } })}
@@ -830,7 +830,7 @@ export default function Ingestion() {
 
                             <div className="grid grid-cols-2 gap-8">
                               <div>
-                                <label className="text-[9px] font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Amount ($)</label>
+                                <label className="text-xs font-mono text-content-tertiary uppercase tracking-[0.2em] block mb-3 font-black">Amount ($)</label>
                                 <input 
                                   type="number"
                                   value={item.extractedData.amount ?? ''} 

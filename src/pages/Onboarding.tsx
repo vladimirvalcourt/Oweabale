@@ -211,7 +211,7 @@ export default function Onboarding() {
           <header className="relative z-20 flex h-[72px] shrink-0 items-center justify-between border-b border-surface-border-subtle bg-surface-base/90 px-5 backdrop-blur-xl sm:px-8">
             <BrandWordmark
               textClassName="text-xl font-medium normal-case tracking-[-0.035em] text-content-primary"
-              logoClassName="h-5 w-5 rounded-[4px]"
+              logoClassName="h-5 w-5 rounded"
             />
             <button
               type="button"

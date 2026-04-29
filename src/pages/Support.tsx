@@ -268,7 +268,7 @@ export default function Support() {
                 </p>
 
                 {submitted ? (
-                  <div className="mt-8 rounded-[8px] border border-surface-border-subtle bg-surface-base/60 p-8 text-center">
+                  <div className="mt-8 rounded-lg border border-surface-border-subtle bg-surface-base/60 p-8 text-center">
                     <h3 className="text-lg font-medium text-content-primary mb-3">Message sent</h3>
                     <p className="text-sm leading-relaxed text-content-tertiary">
                       We got your note and will usually reply within one business day.

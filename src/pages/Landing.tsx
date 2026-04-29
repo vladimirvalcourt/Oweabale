@@ -116,10 +116,10 @@ function ProductPreview() {
   }, []);
 
   return (
-    <div className="relative mx-auto max-w-[1320px] overflow-hidden rounded-[10px] border border-surface-border bg-surface-raised shadow-panel">
+    <div className="relative mx-auto max-w-[1320px] overflow-hidden rounded-xl border border-surface-border bg-surface-raised shadow-panel">
       <div className="flex h-12 items-center justify-between border-b border-surface-border-subtle bg-surface-raised/70 px-5">
         <div className="flex items-center gap-2">
-          <span className="h-4 w-4 rounded-[4px] border border-surface-border bg-surface-elevated" />
+          <span className="h-4 w-4 rounded border border-surface-border bg-surface-elevated" />
           <span className="text-sm font-medium text-content-primary">Oweable</span>
           <span className="text-content-muted">/</span>
           <span className="hidden text-sm text-content-tertiary sm:inline">Pay List</span>
@@ -162,7 +162,7 @@ function ProductPreview() {
             </span>
           </div>
 
-          <div className="divide-y divide-white/[0.06] rounded-[8px] border border-surface-border-subtle bg-surface-base/50">
+          <div className="divide-y divide-white/[0.06] rounded-lg border border-surface-border-subtle bg-surface-base/50">
             {payListRows.map((row, index) => (
               <div 
                 key={row.label} 

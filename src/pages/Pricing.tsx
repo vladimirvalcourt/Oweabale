@@ -13,7 +13,7 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="rounded-[12px] border border-surface-border bg-surface-raised px-8 py-6">
+    <div className="rounded-xl border border-surface-border bg-surface-raised px-8 py-6">
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
@@ -262,7 +262,7 @@ export default function Pricing() {
                       type="button"
                       onClick={() => setBillingPeriod('monthly')}
                       aria-pressed={billingPeriod === 'monthly'}
-                    className={`rounded-[6px] px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
+                    className={`rounded px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
                         billingPeriod === 'monthly'
                           ? 'bg-content-primary text-surface-base'
                           : 'text-content-tertiary hover:text-content-primary'
@@ -274,7 +274,7 @@ export default function Pricing() {
                       type="button"
                       onClick={() => setBillingPeriod('yearly')}
                       aria-pressed={billingPeriod === 'yearly'}
-                    className={`rounded-[6px] px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
+                    className={`rounded px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
                         billingPeriod === 'yearly'
                           ? 'bg-content-primary text-surface-base'
                           : 'text-content-tertiary hover:text-content-primary'

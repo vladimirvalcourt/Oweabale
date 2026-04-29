@@ -65,7 +65,7 @@ export default function PublicHeader({ links = [] }: PublicHeaderProps) {
       <div className="premium-container flex h-[72px] items-center justify-between">
         <TransitionLink to="/" className="group flex items-center gap-2 text-content-primary">
           <BrandWordmark
-            logoClassName="h-5 w-5 rounded-[4px]"
+            logoClassName="h-5 w-5 rounded"
             textClassName="text-xl font-medium normal-case tracking-[-0.035em] text-content-primary"
           />
         </TransitionLink>

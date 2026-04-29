@@ -411,7 +411,7 @@ export default function Obligations() {
         <div className="bg-surface-elevated border border-surface-border p-5 rounded-lg">
           <div className="flex items-center gap-2 text-content-tertiary mb-3">
             <DebtIcon className="w-3.5 h-3.5" />
-            <span className="metric-label normal-case text-[11px]">Total debt</span>
+            <span className="metric-label normal-case text-xs">Total debt</span>
           </div>
           <p className="text-2xl font-mono text-[var(--color-status-amber-text)] font-bold">${activePrincipal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
@@ -419,7 +419,7 @@ export default function Obligations() {
           {urgentTotal > 0 && <div className="absolute inset-0 bg-[var(--color-status-rose-bg)]" />}
           <div className="flex items-center gap-2 text-content-tertiary mb-3 relative z-10">
             <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-status-rose-text)]" />
-            <span className="metric-label normal-case text-[11px]">Urgent tickets</span>
+            <span className="metric-label normal-case text-xs">Urgent tickets</span>
             {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold text-[var(--color-status-rose-text)] border-[var(--color-status-rose-border)] px-1 rounded-lg ml-auto">{urgentCitations.length} DUE</span>}
           </div>
           <p className={`text-2xl font-mono font-bold relative z-10 ${urgentTotal > 0 ? 'text-[var(--color-status-rose-text)]' : 'text-[var(--color-status-emerald-text)]'}`}>
@@ -497,7 +497,7 @@ export default function Obligations() {
         extraHeader={
           <TransitionLink
             to={calendarHref}
-            className="text-[10px] font-sans font-medium text-content-primary hover:text-content-secondary border border-content-primary/20 rounded-lg px-2 py-0.5"
+            className="text-xs font-sans font-medium text-content-primary hover:text-content-secondary border border-content-primary/20 rounded-lg px-2 py-0.5"
           >
             Month view →
           </TransitionLink>
@@ -521,11 +521,11 @@ export default function Obligations() {
               ] as const
             ).map(({ key, label }) => (
               <div key={key} className="rounded-lg border border-surface-border bg-surface-base p-4">
-                <p className="text-[10px] font-mono uppercase tracking-wider text-content-tertiary mb-2">{label}</p>
+                <p className="text-xs font-mono uppercase tracking-wider text-content-tertiary mb-2">{label}</p>
                 <p className="text-xl font-mono font-bold text-content-primary tabular-nums">
                   ${horizonTotals[key].toLocaleString(undefined, { maximumFractionDigits: 0 })}
                 </p>
-                <p className="text-[10px] font-mono text-content-muted mt-1">{horizonBuckets[key].length} line items</p>
+                <p className="text-xs font-mono text-content-muted mt-1">{horizonBuckets[key].length} line items</p>
               </div>
             ))}
           </div>
@@ -572,7 +572,7 @@ export default function Obligations() {
               </div>
               <div className="flex items-center gap-3 bg-surface-base border border-surface-border rounded-lg px-3 py-1.5">
                 <Calculator className="w-3.5 h-3.5 text-content-tertiary" />
-                <span className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider">Extra per month:</span>
+                <span className="text-xs font-mono text-content-tertiary uppercase tracking-wider">Extra per month:</span>
                 <button type="button" aria-label="Decrease extra monthly payment by 100" onClick={() => setExtraPayment(e => Math.max(0, e - 100))} className="focus-app rounded text-content-tertiary hover:text-content-primary"><Minus className="w-3 h-3" aria-hidden /></button>
                 <span className="text-sm font-mono text-content-primary w-16 text-center">${extraPayment}</span>
                 <button type="button" aria-label="Increase extra monthly payment by 100" onClick={() => setExtraPayment(e => e + 100)} className="focus-app rounded text-content-tertiary hover:text-content-primary"><Plus className="w-3 h-3" aria-hidden /></button>
@@ -582,11 +582,11 @@ export default function Obligations() {
             {/* Summary */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
               <div className="bg-surface-elevated border border-surface-border rounded-lg p-4">
-                <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Debt-Free Date</p>
+                <p className="text-xs font-mono text-content-tertiary uppercase tracking-wider mb-1">Debt-Free Date</p>
                 <p className="text-lg font-mono font-bold text-content-primary">{payoffResult.months > 0 ? monthsToDate(payoffResult.months) : '—'}</p>
-                <p className="text-[10px] font-mono text-content-muted">{payoffResult.months} months</p>
+                <p className="text-xs font-mono text-content-muted">{payoffResult.months} months</p>
                 {payoffResult.months > 12 && monthsSavedBy50 > 0 && (
-                  <p className="mt-2 text-[11px] text-content-secondary leading-relaxed">
+                  <p className="mt-2 text-xs text-content-secondary leading-relaxed">
                     Add $50/month extra to cut{' '}
                     <span className="font-mono font-medium text-content-primary">{monthsSavedBy50}</span> months off your payoff
                     timeline — adjust &quot;Extra per month&quot; above to model it.{' '}
@@ -597,10 +597,10 @@ export default function Obligations() {
                 )}
               </div>
               <div className="bg-surface-elevated border border-surface-border rounded-lg p-4">
-                <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Paid</p>
+                <p className="text-xs font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Paid</p>
                 <p className="text-lg font-mono font-bold text-red-400">${payoffResult.totalInterest.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                 {payoffResult.totalInterest > 10_000 && (
-                  <p className="mt-2 text-[11px] text-content-secondary leading-relaxed">
+                  <p className="mt-2 text-xs text-content-secondary leading-relaxed">
                     Interest is sensitive to APR and payoff order — even small extra payments compound. Use the slider above or{' '}
                     <TransitionLink to={analyticsHref} className="text-content-primary underline underline-offset-2">
                       review spending trends
@@ -610,9 +610,9 @@ export default function Obligations() {
                 )}
               </div>
               <div className="bg-surface-elevated border border-[var(--color-status-emerald-border)] rounded-lg p-4">
-                <p className="text-[10px] font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Saved</p>
+                <p className="text-xs font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Saved</p>
                 <p className="text-lg font-mono font-bold text-[var(--color-status-emerald-text)]">${interestSaved.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
-                <p className="text-[10px] font-mono text-content-muted">vs. minimum payments only</p>
+                <p className="text-xs font-mono text-content-muted">vs. minimum payments only</p>
               </div>
             </div>
 
