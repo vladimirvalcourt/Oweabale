@@ -72,7 +72,7 @@ function ChoiceCard({ selected, onSelect, title, description, accent = 'neutral'
       onClick={onSelect}
       aria-pressed={selected}
       className={cn(
-        'relative flex min-h-[7.5rem] flex-col radius-card border p-5 text-left transition-colors focus-app sm:min-h-[8.25rem]',
+        'relative flex min-h-[7.5rem] flex-col rounded-xl border p-5 text-left transition-colors focus-app sm:min-h-[8.25rem]',
         selected
           ? accent === 'rose'
             ? 'border-rose-500/50 bg-surface-elevated ring-2 ring-rose-500/30'
@@ -249,7 +249,7 @@ export default function Onboarding() {
                 ].map(({ icon: Icon, label, desc }) => (
                   <div
                     key={label}
-                    className="flex gap-3 radius-card border border-surface-border-subtle bg-surface-highlight/50 p-4 transition-colors hover:border-content-primary/10"
+                    className="flex gap-3 rounded-xl border border-surface-border-subtle bg-surface-raised/50 p-4 transition-colors hover:border-content-primary/10"
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-surface-border bg-surface-elevated">
                       <Icon className="h-4 w-4 text-content-secondary" aria-hidden />
@@ -262,7 +262,7 @@ export default function Onboarding() {
                 ))}
               </div>
 
-              <div className="radius-card border border-surface-border bg-surface-highlight/30 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
+              <div className="rounded-xl border border-surface-border bg-surface-raised/30 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
                 <div className="mb-6 flex items-center gap-2">
                   <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" aria-hidden />
                   <p className="text-xs text-content-tertiary">Encrypted session · you control your data</p>
@@ -339,12 +339,12 @@ export default function Onboarding() {
                       initial={false}
                       animate={{
                         scale: currentStepIndex === index ? 1.1 : 1,
-                        backgroundColor: currentStepIndex > index ? 'var(--color-brand-profit)' : currentStepIndex === index ? 'var(--color-content-primary)' : 'var(--color-surface-border)',
+                        backgroundColor: currentStepIndex > index ? 'var(--color-success)' : currentStepIndex === index ? 'var(--color-content-primary)' : 'var(--color-surface-border)',
                       }}
                       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       className={`flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-medium transition-colors ${
                         currentStepIndex > index
-                          ? 'border-brand-profit bg-brand-profit text-surface-base'
+                          ? 'border-success bg-success text-surface-base'
                           : currentStepIndex === index
                             ? 'border-content-primary bg-content-primary text-surface-base'
                             : 'border-surface-border bg-surface-base text-content-muted'
@@ -357,7 +357,7 @@ export default function Onboarding() {
                         <motion.div
                           initial={false}
                           animate={{
-                            backgroundColor: currentStepIndex > index ? 'var(--color-brand-profit)' : 'var(--color-surface-border)',
+                            backgroundColor: currentStepIndex > index ? 'var(--color-success)' : 'var(--color-surface-border)',
                           }}
                           transition={{ duration: 0.3 }}
                           className="h-full"
@@ -383,7 +383,7 @@ export default function Onboarding() {
                 aria-labelledby="onboarding-step-title"
                 aria-live="polite"
               >
-                <div className="mb-2 flex h-11 w-11 items-center justify-center radius-card border border-surface-border bg-surface-raised">
+                <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl border border-surface-border bg-surface-raised">
                   {currentStepIndex === 0 && <Vault className="h-5 w-5 text-content-secondary" aria-hidden />}
                   {currentStepIndex === 1 && <Receipt className="h-5 w-5 text-content-secondary" aria-hidden />}
                   {currentStepIndex === 2 && <Activity className="h-5 w-5 text-content-secondary" aria-hidden />}
@@ -401,7 +401,7 @@ export default function Onboarding() {
                   ) : null}
                 </p>
 
-                <div className="radius-card border border-surface-border bg-surface-highlight/30 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
+                <div className="rounded-xl border border-surface-border bg-surface-raised/30 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] sm:p-8">
                   {currentStep.id === 'assets' && (
                     <div className="space-y-3">
                       <label className="sr-only" htmlFor="onboard-cash">

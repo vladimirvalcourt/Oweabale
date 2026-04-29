@@ -381,7 +381,7 @@ export default function Calendar() {
               const cfg = EVENT_CONFIG[ev.type];
               const Icon = cfg.icon;
               return (
-                <div key={ev.id} className="flex items-center justify-between py-2 border-b border-surface-highlight last:border-0 hover:bg-surface-elevated transition-colors rounded-lg px-2">
+                <div key={ev.id} className="flex items-center justify-between py-2 border-b border-surface-raised last:border-0 hover:bg-surface-elevated transition-colors rounded-lg px-2">
                   <div className="flex items-center gap-3">
                     <div className={`text-[10px] font-mono text-content-tertiary w-8 text-center uppercase tracking-widest`}>{ev.day}</div>
                     <Icon className={`w-3.5 h-3.5 ${cfg.text}`} />

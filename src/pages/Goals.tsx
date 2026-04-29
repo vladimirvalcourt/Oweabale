@@ -405,7 +405,7 @@ export default function Goals() {
                         </button>
                       </form>
                     )}
-                    <div className="flex items-center justify-between pt-4 border-t border-surface-highlight">
+                    <div className="flex items-center justify-between pt-4 border-t border-surface-raised">
                       <button
                         onClick={() => handleUpdateProgress(goal.id)}
                         disabled={isCompleted}

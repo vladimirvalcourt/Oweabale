@@ -279,7 +279,7 @@ export default function Insurance() {
                     <button
                       type="button"
                       onClick={() => openEdit(policy)}
-                      className="rounded-md p-1.5 text-content-tertiary transition-colors hover:bg-surface-highlight hover:text-content-primary"
+                      className="rounded-md p-1.5 text-content-tertiary transition-colors hover:bg-surface-raised hover:text-content-primary"
                       aria-label="Edit policy"
                     >
                       <Edit2 className="h-3.5 w-3.5" />
@@ -311,7 +311,7 @@ export default function Insurance() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-md p-1.5 text-content-tertiary transition-colors hover:bg-surface-highlight hover:text-content-primary"
+                  className="rounded-md p-1.5 text-content-tertiary transition-colors hover:bg-surface-raised hover:text-content-primary"
                 >
                   <X className="h-4 w-4" />
                 </button>

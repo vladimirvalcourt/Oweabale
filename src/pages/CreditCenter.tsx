@@ -301,7 +301,7 @@ ${user.firstName} ${user.lastName}
                 <button 
                   type="button"
                   onClick={() => setIsFixModalOpen(true)}
-                  className="focus-app rounded border border-surface-border bg-surface-elevated p-1 px-3 text-[10px] font-mono font-bold uppercase text-content-primary transition-all hover:bg-surface-highlight"
+                  className="focus-app rounded border border-surface-border bg-surface-elevated p-1 px-3 text-[10px] font-mono font-bold uppercase text-content-primary transition-all hover:bg-surface-raised"
                 >
                   New Case
                 </button>

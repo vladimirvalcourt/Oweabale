@@ -474,7 +474,7 @@ export default function Ingestion() {
                   <div className="col-span-4 md:col-span-2 flex items-center justify-end gap-2">
                     <button 
                       onClick={() => setSelectedId(selectedId === item.id ? null : item.id)}
-                      className={`p-2 transition-all rounded-lg ${selectedId === item.id ? 'text-content-primary bg-content-primary/[0.05]' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-highlight'}`}
+                      className={`p-2 transition-all rounded-lg ${selectedId === item.id ? 'text-content-primary bg-content-primary/[0.05]' : 'text-content-tertiary hover:text-content-primary hover:bg-surface-raised'}`}
                     >
                       <Eye className="w-4 h-4" />
                     </button>
@@ -835,7 +835,7 @@ export default function Ingestion() {
                                   type="number"
                                   value={item.extractedData.amount ?? ''} 
                                   onChange={(e) => updatePendingIngestion(item.id, { extractedData: { ...item.extractedData, amount: parseFloat(e.target.value) } })}
-                                  className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xl font-mono text-brand-profit focus-app focus:border-brand-profit transition-colors font-bold"
+                                  className="w-full bg-surface-raised border border-surface-border rounded-lg px-4 py-3 text-xl font-mono text-success focus-app focus:border-success transition-colors font-bold"
                                 />
                               </div>
                               <div>

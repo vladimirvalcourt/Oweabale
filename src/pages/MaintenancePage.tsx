@@ -9,7 +9,7 @@ export default function MaintenancePage() {
 
   return (
     <div className="min-h-screen bg-surface-base flex flex-col items-center justify-center px-6 py-16">
-      <p className="text-xs font-medium uppercase tracking-widest text-brand-profit mb-6">Maintenance</p>
+      <p className="text-xs font-medium uppercase tracking-widest text-success mb-6">Maintenance</p>
       <h1 className="mb-2 text-center text-3xl font-semibold tracking-tight text-content-primary sm:text-4xl">
         We&apos;re upgrading Oweable
       </h1>

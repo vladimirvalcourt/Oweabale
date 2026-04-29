@@ -340,7 +340,7 @@ export default function Subscriptions() {
                     const target = subscriptions.find((s) => s.id === sub.id);
                     if (target) startEdit(target);
                   }}
-                  className="rounded-md px-2 py-1 text-xs text-content-tertiary transition-colors hover:bg-surface-highlight hover:text-content-primary"
+                  className="rounded-md px-2 py-1 text-xs text-content-tertiary transition-colors hover:bg-surface-raised hover:text-content-primary"
                 >
                   Review
                 </button>
@@ -373,7 +373,7 @@ export default function Subscriptions() {
                   <button
                     type="button"
                     onClick={() => startEdit(sub)}
-                    className="rounded-md px-2 py-1 text-xs text-content-tertiary transition-colors hover:bg-surface-highlight hover:text-content-primary"
+                    className="rounded-md px-2 py-1 text-xs text-content-tertiary transition-colors hover:bg-surface-raised hover:text-content-primary"
                   >
                     Review
                   </button>

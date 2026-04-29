@@ -381,20 +381,20 @@ export default function Support() {
                   <motion.div variants={springButton} whileHover="hover" whileTap="tap">
                     <TransitionLink
                       to="/pricing"
-                      className="inline-flex items-center gap-2 rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
+                      className="inline-flex items-center gap-2 rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-raised"
                     >
                       Pricing
                     </TransitionLink>
                   </motion.div>
                   <TransitionLink
                     to="/security"
-                    className="inline-flex items-center gap-2 rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
+                    className="inline-flex items-center gap-2 rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-raised"
                   >
                     Security
                   </TransitionLink>
                   <TransitionLink
                     to="/privacy"
-                    className="inline-flex items-center gap-2 rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight"
+                    className="inline-flex items-center gap-2 rounded-md border border-surface-border px-5 py-2.5 text-sm font-medium text-content-primary transition-colors hover:bg-surface-raised"
                   >
                     Privacy
                   </TransitionLink>

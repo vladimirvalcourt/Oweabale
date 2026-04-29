@@ -428,7 +428,7 @@ function BillingPanelInner() {
             type="button"
             onClick={isProfileTrialOnly || !hasPaidAccess ? onUpgrade : onManageBilling}
             disabled={isWorking || isLoading}
-            className="focus-app mt-5 inline-flex min-h-10 items-center justify-center rounded-md border border-surface-border bg-surface-elevated px-4 py-2 text-sm font-medium text-content-primary transition-colors hover:bg-surface-highlight disabled:cursor-not-allowed disabled:opacity-60"
+            className="focus-app mt-5 inline-flex min-h-10 items-center justify-center rounded-md border border-surface-border bg-surface-elevated px-4 py-2 text-sm font-medium text-content-primary transition-colors hover:bg-surface-raised disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isProfileTrialOnly || !hasPaidAccess ? 'Add payment details' : 'Open billing portal'}
           </button>

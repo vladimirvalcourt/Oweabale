@@ -114,7 +114,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
           </motion.button>
 
           <div className="mt-8 flex items-center gap-3 border-t border-surface-border-subtle pt-8">
-            <CheckCircle2 className="h-5 w-5 shrink-0 text-brand-profit" aria-hidden />
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-success" aria-hidden />
             <p className="text-sm text-content-secondary">
               New here? Signing in creates your account automatically.
             </p>

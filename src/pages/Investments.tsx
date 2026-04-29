@@ -163,7 +163,7 @@ function PortfolioVsDebtWidget({
         <div className="h-2 w-full max-w-xs rounded-full overflow-hidden flex bg-surface-elevated border border-surface-border">
           {portfolio > 0 && (
             <div
-              className="h-full bg-brand-profit min-w-[4px] transition-all"
+              className="h-full bg-success min-w-[4px] transition-all"
               style={{ width: `${invPct}%` }}
               title={`Investments $${formatMoney(portfolio)}`}
             />
@@ -181,7 +181,7 @@ function PortfolioVsDebtWidget({
       <div className="mt-5 flex flex-col gap-2 text-xs">
         <span className="inline-flex items-center justify-between gap-2 text-content-secondary">
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-brand-profit" aria-hidden />
+            <span className="h-2 w-2 rounded-full bg-success" aria-hidden />
             Investments
           </span>
           <span className="font-mono tabular-nums text-content-primary">${formatMoney(portfolio)}</span>
@@ -417,7 +417,7 @@ export default function Investments() {
                       className={cn(
                         'mt-2 text-2xl sm:text-3xl font-bold font-mono tabular-nums',
                         todayPortfolioDelta > 0
-                          ? 'text-brand-profit'
+                          ? 'text-success'
                           : todayPortfolioDelta < 0
                             ? 'text-brand-expense'
                             : 'text-content-primary'
@@ -487,7 +487,7 @@ export default function Investments() {
                                     deltaUnknown
                                       ? 'text-content-tertiary'
                                       : delta > 0
-                                        ? 'text-brand-profit'
+                                        ? 'text-success'
                                         : delta < 0
                                           ? 'text-brand-expense'
                                           : 'text-content-tertiary'

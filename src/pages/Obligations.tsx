@@ -781,7 +781,7 @@ export default function Obligations() {
                   <tr 
                     key={ob.id} 
                     className={cn(
-                      'hover:bg-surface-highlight transition-colors',
+                      'hover:bg-surface-raised transition-colors',
                       overdueBand === 'warn' && 'bg-[var(--color-status-amber-bg)] border border-[var(--color-status-amber-border)]',
                       overdueBand === 'critical' && 'bg-[var(--color-status-rose-bg)] border border-[var(--color-status-rose-border)]',
                     )}
@@ -994,7 +994,7 @@ export default function Obligations() {
               </thead>
               <tbody>
                 {paymentHistoryRows.map((tx) => (
-                  <tr key={tx.id} className="border-b border-surface-highlight last:border-0">
+                  <tr key={tx.id} className="border-b border-surface-raised last:border-0">
                     <td className="px-2 py-2 text-xs text-content-secondary">{tx.date}</td>
                     <td className="px-2 py-2 text-xs text-content-primary">{tx.name}</td>
                     <td className="px-2 py-2 text-xs text-content-tertiary">{formatCategoryLabel(tx.category)}</td>
