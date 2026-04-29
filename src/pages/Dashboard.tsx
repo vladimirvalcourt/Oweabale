@@ -21,6 +21,7 @@ import { ProWelcomeModal } from '../components/common';
 import { TransitionLink } from '../components/common';
 import { computeSafeToSpend, calcMonthlyCashFlow } from '../lib/api/services/finance';
 import { useStore, type Bill, type Citation, type Debt, type Subscription } from '../store';
+import { StatusBadge, StatusIcon, MetricCard, QuickActionCard, DashboardButton } from '../components/dashboard';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const PAY_LIST_SNOOZE_KEY = 'oweable_pay_list_snoozed_v1';
@@ -250,35 +251,21 @@ function PayListRow({
   onSnooze: (id: string) => void;
 }) {
   const isUrgent = item.status === 'overdue' || item.status === 'today';
+  const statusTone = isUrgent ? 'urgent' : item.status === 'week' ? 'warning' : 'default';
+
   return (
     <li className="app-panel p-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
-          <div
-            className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border ${
-              isUrgent
-                ? 'border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]'
-                : item.status === 'week'
-                  ? 'border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]'
-                  : 'border-surface-border bg-surface-base text-content-secondary'
-            }`}
-          >
-            <PayListIcon kind={item.kind} />
-          </div>
+          <StatusIcon
+            icon={PayListIcon}
+            tone={statusTone}
+            iconProps={{ kind: item.kind }}
+          />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <p className="truncate text-sm font-semibold text-content-primary">{item.title}</p>
-              <span
-                className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                  isUrgent
-                    ? 'bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]'
-                    : item.status === 'week'
-                      ? 'bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]'
-                      : 'bg-content-primary/[0.06] text-content-secondary'
-                }`}
-              >
-                {dueLabel(item)}
-              </span>
+              <StatusBadge tone={statusTone}>{dueLabel(item)}</StatusBadge>
             </div>
             <p className="mt-1 text-xs text-content-secondary">
               {item.detail} · {formatDate(item.dueDate)}
@@ -289,38 +276,26 @@ function PayListRow({
           <p className="text-lg font-mono font-semibold tabular-nums text-content-primary">{formatMoney(item.amount)}</p>
           <div className="flex flex-wrap items-center gap-2 sm:justify-end">
             {item.kind === 'bill' && (
-              <button
-                type="button"
-                onClick={() => onMarkPaid(item.sourceId)}
-                className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-md bg-content-primary px-3 py-2 text-xs font-semibold text-surface-base transition-colors hover:bg-content-secondary focus-app"
-              >
+              <DashboardButton onClick={() => onMarkPaid(item.sourceId)} variant="primary">
                 <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
                 Mark paid
-              </button>
+              </DashboardButton>
             )}
             {item.kind === 'citation' && (
-              <button
-                type="button"
-                onClick={() => onResolve(item.sourceId)}
-                className="inline-flex min-h-12 items-center justify-center gap-1.5 rounded-md bg-content-primary px-3 py-2 text-xs font-semibold text-surface-base transition-colors hover:bg-content-secondary focus-app"
-              >
+              <DashboardButton onClick={() => onResolve(item.sourceId)} variant="primary">
                 <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
                 Resolve
-              </button>
+              </DashboardButton>
             )}
             <TransitionLink
               to={item.route}
-              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-surface-border px-3 py-2 text-xs font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
+              className="inline-flex min-h-12 items-center justify-center rounded-md border border-surface-border px-3 py-2 text-xs font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
             >
               Details
             </TransitionLink>
-            <button
-              type="button"
-              onClick={() => onSnooze(item.id)}
-              className="inline-flex min-h-12 items-center justify-center rounded-lg border border-surface-border px-3 py-2 text-xs font-medium text-content-secondary transition-colors hover:bg-content-primary/[0.04] hover:text-content-primary focus-app"
-            >
+            <DashboardButton onClick={() => onSnooze(item.id)} variant="secondary">
               Snooze
-            </button>
+            </DashboardButton>
           </div>
         </div>
       </div>
@@ -453,10 +428,10 @@ export default function Dashboard() {
       <AppPageShell>
         <div className="space-y-6 animate-pulse">
           <div className="h-8 w-48 rounded-lg bg-surface-border" />
-          <div className="h-44 border border-surface-border" />
+          <div className="h-44 rounded-xl border border-surface-border" />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {[1, 2, 3].map((item) => (
-              <div key={item} className="h-28 border border-surface-border" />
+              <div key={item} className="h-28 rounded-xl border border-surface-border" />
             ))}
           </div>
         </div>
@@ -506,34 +481,31 @@ export default function Dashboard() {
             { label: 'Toll / ticket / fine', detail: 'Citation, parking, penalty', icon: AlertTriangle, action: () => openQuickAdd('citation') },
           ].map((choice) => {
             const Icon = choice.icon;
-            const inner = (
-              <div className="app-panel flex h-full min-h-[5.5rem] items-start gap-3 p-4 text-left transition-colors hover:bg-surface-elevated">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center border border-surface-border text-content-secondary">
-                  <Icon className="h-4 w-4" aria-hidden />
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-sm font-semibold text-content-primary">{choice.label}</span>
-                  <span className="mt-1 block text-xs leading-relaxed text-content-tertiary">{choice.detail}</span>
-                </span>
-              </div>
-            );
             if ('to' in choice && choice.to) {
               return (
-                <TransitionLink key={choice.label} to={choice.to} className="rounded-lg focus-app">
-                  {inner}
-                </TransitionLink>
+                <QuickActionCard
+                  key={choice.label}
+                  icon={Icon}
+                  label={choice.label}
+                  description={choice.detail}
+                  href={choice.to}
+                />
               );
             }
             return (
-              <button key={choice.label} type="button" onClick={choice.action} className="rounded-lg focus-app">
-                {inner}
-              </button>
+              <QuickActionCard
+                key={choice.label}
+                icon={Icon}
+                label={choice.label}
+                description={choice.detail}
+                onClick={choice.action}
+              />
             );
           })}
         </section>
 
         <section className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(18rem,0.55fr)]">
-          <div className="app-panel p-5">
+          <div className="app-panel p-6">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
@@ -603,42 +575,30 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 xl:grid-cols-1">
-            <TransitionLink to="/pro/bills" className="rounded-lg focus-app">
-              <div className="app-panel h-full p-4 transition-colors hover:bg-surface-elevated">
-                <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
-                  <Clock className="h-3.5 w-3.5" aria-hidden />
-                  Overdue
-                </p>
-                <p className="mt-2 text-2xl font-semibold text-content-primary">{overdueItems.length}</p>
-              </div>
-            </TransitionLink>
-            <TransitionLink to="/pro/dashboard#safe-spend" className="rounded-lg focus-app">
-              <div className="app-panel h-full p-4 transition-colors hover:bg-surface-elevated">
-                <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
-                  <Wallet className="h-3.5 w-3.5" aria-hidden />
-                  Daily comfort
-                </p>
-                <p className="mt-2 text-2xl font-semibold text-content-primary">{formatMoney(Math.max(0, safeToSpend.dailySafeToSpend))}</p>
-              </div>
-            </TransitionLink>
-            <TransitionLink to="/pro/bills?tab=debt" className="rounded-lg focus-app">
-              <div className="app-panel h-full p-4 transition-colors hover:bg-surface-elevated">
-                <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
-                  <Landmark className="h-3.5 w-3.5" aria-hidden />
-                  Debt mins
-                </p>
-                <p className="mt-2 text-2xl font-semibold text-content-primary">{debtMinimumsDue.length}</p>
-              </div>
-            </TransitionLink>
-            <TransitionLink to="/pro/bills?tab=ambush" className="rounded-lg focus-app">
-              <div className="app-panel h-full p-4 transition-colors hover:bg-surface-elevated">
-                <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
-                  <ShieldAlert className="h-3.5 w-3.5" aria-hidden />
-                  Tolls & fines
-                </p>
-                <p className="mt-2 text-2xl font-semibold text-content-primary">{openCitationCount}</p>
-              </div>
-            </TransitionLink>
+            <MetricCard
+              icon={Clock}
+              label="Overdue"
+              value={overdueItems.length}
+              href="/pro/bills"
+            />
+            <MetricCard
+              icon={Wallet}
+              label="Daily comfort"
+              value={formatMoney(Math.max(0, safeToSpend.dailySafeToSpend))}
+              href="/pro/dashboard#safe-spend"
+            />
+            <MetricCard
+              icon={Landmark}
+              label="Debt mins"
+              value={debtMinimumsDue.length}
+              href="/pro/bills?tab=debt"
+            />
+            <MetricCard
+              icon={ShieldAlert}
+              label="Tolls & fines"
+              value={openCitationCount}
+              href="/pro/bills?tab=ambush"
+            />
           </div>
         </section>
 
@@ -720,8 +680,8 @@ export default function Dashboard() {
               </section>
 
               {unscheduledItems.length > 0 && (
-                <section className="border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] p-4">
-                  <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[var(--color-status-amber-text)]">
+                <section className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-4">
+                  <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-amber-700 dark:text-amber-200">
                     <CalendarDays className="h-4 w-4" aria-hidden />
                     Missing due dates
                   </p>
@@ -730,7 +690,7 @@ export default function Dashboard() {
                   </p>
                   <TransitionLink
                     to="/pro/bills?tab=debt"
-                    className="mt-4 inline-flex min-h-9 items-center justify-center border-[var(--color-status-amber-border)] px-3 py-1.5 text-xs font-medium text-[var(--color-status-amber-text)] focus-app"
+                    className="mt-4 inline-flex min-h-9 items-center justify-center border border-amber-500/40 px-3 py-1.5 text-xs font-medium text-amber-700 dark:text-amber-200 focus-app"
                   >
                     Add due dates
                   </TransitionLink>

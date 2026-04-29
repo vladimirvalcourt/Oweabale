@@ -1,0 +1,30 @@
+{
+    // Suppress Tailwind CSS at-rule warnings (@apply, @theme, @plugin)
+    "css.lint.unknownAtRules": "ignore",
+    // Associate CSS files with PostCSS for better Tailwind support
+    "files.associations": {
+        "*.css": "postcss"
+    },
+    // Enable Tailwind CSS IntelliSense features
+    "editor.quickSuggestions": {
+        "strings": true
+    },
+    // Tailwind CSS IntelliSense configuration
+    "tailwindCSS.emmetCompletions": true,
+    "tailwindCSS.classAttributes": [
+        "class",
+        "className",
+        "ngClass"
+    ],
+    "tailwindCSS.includeLanguages": {
+        "typescript": "javascript",
+        "typescriptreact": "javascript",
+        "html": "html"
+    },
+    // Format on save for consistent code style
+    "editor.formatOnSave": true,
+    // Recommended extensions:
+    // ✅ bradlc.vscode-tailwindcss (Tailwind CSS IntelliSense) - INSTALLED
+    // ⚠️ csstools.postcss (PostCSS Language Support) - Optional
+    // ⚠️ esbenp.prettier-vscode (Prettier formatter) - Optional
+}

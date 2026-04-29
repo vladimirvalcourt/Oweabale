@@ -1,6 +1,10 @@
 {
     "recommendations": [
         "supabase.vscode-supabase-extension",
-        "anthropic.claude-code"
+        "anthropic.claude-code",
+        "bradlc.vscode-tailwindcss",
+        "csstools.postcss",
+        "esbenp.prettier-vscode",
+        "numso.vscode-tailwindcss-with-hex-colors"
     ]
 }

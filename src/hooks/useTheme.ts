@@ -22,18 +22,20 @@ export function useTheme() {
     }
   }, []);
 
-  // Apply theme to document
+  // Apply theme to document - defer to avoid blocking user interaction
   useEffect(() => {
     if (!mounted) return;
 
     const root = document.documentElement;
     
-    if (theme === 'light') {
-      root.classList.add('theme-light');
-    } else {
-      // Dark mode is default - remove light class
-      root.classList.remove('theme-light');
-    }
+    // Use requestAnimationFrame to batch DOM updates with other renders
+    requestAnimationFrame(() => {
+      if (theme === 'light') {
+        root.classList.add('theme-light');
+      } else {
+        root.classList.remove('theme-light');
+      }
+    });
 
     localStorage.setItem('theme', theme);
   }, [theme, mounted]);

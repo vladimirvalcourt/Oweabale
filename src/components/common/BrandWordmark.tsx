@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { cn } from '../../lib/utils';
 
 type BrandWordmarkProps = {
@@ -7,7 +8,7 @@ type BrandWordmarkProps = {
   hideText?: boolean;
 };
 
-export function BrandWordmark({
+export const BrandWordmark = memo(function BrandWordmark({
   className,
   textClassName,
   logoClassName,
@@ -20,8 +21,9 @@ export function BrandWordmark({
         alt="Oweable logo"
         className={cn('h-5 w-5 rounded-sm object-contain', logoClassName)}
         loading="eager"
+        decoding="async"
       />
       {!hideText && <span className={cn('brand-header-text whitespace-nowrap', textClassName)}>Oweable</span>}
     </span>
   );
-}
+});

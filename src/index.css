@@ -178,7 +178,7 @@ html {
   }
 
   .premium-empty-state {
-    @apply flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-surface-border bg-surface-raised px-6 py-12 text-center;
+    @apply flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-surface-border bg-surface-raised px-6 py-12 text-center;
   }
 
   .ui-card {
@@ -383,7 +383,7 @@ html {
   }
 
   .app-panel {
-    @apply border border-surface-border bg-surface-raised;
+    @apply rounded-[22px] border border-surface-border bg-surface-raised;
   }
 
   /* Semantic shadow utility classes */

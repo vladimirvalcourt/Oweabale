@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo, startTransition, useDeferredValue } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo, startTransition, useDeferredValue, memo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { TransitionLink } from '../common/TransitionLink';
 import { 
@@ -40,6 +40,60 @@ import {
 function usePrefetchedSet() {
   return useRef<Set<string>>(new Set());
 }
+
+/**
+ * Memoized sidebar header - prevents unnecessary re-renders when store data changes.
+ * Only re-renders when sidebarCollapsed or sidebarOpen state changes.
+ */
+const SidebarHeader = memo(function SidebarHeader({
+  sidebarCollapsed,
+  sidebarOpen,
+  closeSidebarMobile,
+}: {
+  sidebarCollapsed: boolean;
+  sidebarOpen: boolean;
+  closeSidebarMobile: () => void;
+}) {
+  return (
+    <div className="flex h-[4.5rem] shrink-0 items-center justify-between gap-2 border-b border-surface-border/90 px-3 sm:px-4">
+      <div className="flex min-w-0 flex-1 items-center overflow-hidden">
+        {!sidebarCollapsed ? (
+          <TransitionLink to="/pro/dashboard" className="min-w-0 shrink focus-app rounded-lg">
+            <BrandWordmark textClassName="brand-header-text" />
+          </TransitionLink>
+        ) : (
+          <div className="flex w-full justify-center">
+            <TransitionLink
+              to="/pro/dashboard"
+              aria-label="Oweable home"
+              className="flex shrink-0 rounded-lg p-1 focus-app"
+            >
+              <img
+                src="/brand/oweable-logo-glyph.png"
+                alt=""
+                className="h-7 w-7 rounded-sm object-contain"
+                width={28}
+                height={28}
+              />
+            </TransitionLink>
+          </div>
+        )}
+      </div>
+      <div className="flex items-center gap-1">
+        {/* Theme Toggle (Mobile) */}
+        <ThemeToggle className="lg:hidden" />
+        <button 
+          type="button"
+          aria-label="Close navigation menu"
+          className="shrink-0 p-2 text-content-tertiary transition-colors hover:text-content-secondary focus-app rounded-lg lg:hidden"
+          onClick={closeSidebarMobile}
+        >
+          <MorphingMenuIcon isOpen={sidebarOpen} className="text-content-primary" />
+        </button>
+      </div>
+    </div>
+  );
+});
 
 export default function Layout() {
   const location = useLocation();
@@ -236,49 +290,60 @@ export default function Layout() {
 
   const deferredSearchQuery = useDeferredValue(searchQuery.trim());
 
+  // Extract search data once to avoid recreating function on every render
+  const searchData = useMemo(() => ({
+    bills,
+    debts,
+    transactions,
+    subscriptions,
+    goals,
+    incomes,
+    budgets,
+  }), [bills, debts, transactions, subscriptions, goals, incomes, budgets]);
+
   const searchResults = React.useMemo(() => {
     if (!deferredSearchQuery) return [];
 
     const query = deferredSearchQuery.toLowerCase();
     const results: { type: string; name: string; detail: string; path: string }[] = [];
 
-    bills.forEach(bill => {
+    searchData.bills.forEach(bill => {
       if (bill.biller.toLowerCase().includes(query) || bill.category.toLowerCase().includes(query)) {
         results.push({ type: 'Bill', name: bill.biller, detail: `$${bill.amount} - ${bill.status}`, path: '/pro/bills' });
       }
     });
 
-    debts.forEach(debt => {
+    searchData.debts.forEach(debt => {
       if (debt.name.toLowerCase().includes(query) || debt.type.toLowerCase().includes(query)) {
         results.push({ type: 'Debt', name: debt.name, detail: `$${debt.remaining} remaining`, path: '/pro/bills' });
       }
     });
 
-    transactions.forEach(tx => {
+    searchData.transactions.forEach(tx => {
       if (tx.name.toLowerCase().includes(query) || tx.category.toLowerCase().includes(query)) {
         results.push({ type: 'Transaction', name: tx.name, detail: `$${tx.amount} - ${tx.date}`, path: '/pro/transactions' });
       }
     });
 
-    subscriptions.forEach(sub => {
+    searchData.subscriptions.forEach(sub => {
       if (sub.name.toLowerCase().includes(query)) {
         results.push({ type: 'Subscription', name: sub.name, detail: `$${sub.amount} / ${sub.frequency}`, path: '/pro/subscriptions' });
       }
     });
 
-    goals.forEach(goal => {
+    searchData.goals.forEach(goal => {
       if (goal.name.toLowerCase().includes(query)) {
         results.push({ type: 'Goal', name: goal.name, detail: `$${goal.currentAmount} / $${goal.targetAmount}`, path: '/pro/goals' });
       }
     });
 
-    incomes.forEach(inc => {
+    searchData.incomes.forEach(inc => {
       if (inc.name.toLowerCase().includes(query) || inc.category.toLowerCase().includes(query)) {
         results.push({ type: 'Income', name: inc.name, detail: `$${inc.amount} / ${inc.frequency}`, path: '/pro/income' });
       }
     });
 
-    budgets.forEach(b => {
+    searchData.budgets.forEach(b => {
       if (b.category.toLowerCase().includes(query)) {
         results.push({
           type: 'Budget',
@@ -324,7 +389,7 @@ export default function Layout() {
     );
 
     return results.slice(0, 8); // Limit to 8 results
-  }, [deferredSearchQuery, bills, debts, transactions, subscriptions, goals, incomes, budgets]);
+  }, [deferredSearchQuery, searchData]);
 
   const dueSoonCount = React.useMemo(
     () => computeDueSoonCount({ bills, subscriptions, citations }),
@@ -412,43 +477,11 @@ export default function Layout() {
           !sidebarCollapsed && "shadow-[20px_0_80px_rgba(0,0,0,0.28)]"
         )}
       >
-        <div className="flex h-[4.5rem] shrink-0 items-center justify-between gap-2 border-b border-surface-border/90 px-3 sm:px-4">
-          <div className="flex min-w-0 flex-1 items-center overflow-hidden">
-            {!sidebarCollapsed ? (
-              <TransitionLink to="/pro/dashboard" className="min-w-0 shrink focus-app rounded-lg">
-                <BrandWordmark textClassName="brand-header-text" />
-              </TransitionLink>
-            ) : (
-              <div className="flex w-full justify-center">
-                <TransitionLink
-                  to="/pro/dashboard"
-                  aria-label="Oweable home"
-                  className="flex shrink-0 rounded-lg p-1 focus-app"
-                >
-                  <img
-                    src="/brand/oweable-logo-glyph.png"
-                    alt=""
-                    className="h-7 w-7 rounded-sm object-contain"
-                    width={28}
-                    height={28}
-                  />
-                </TransitionLink>
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-1">
-            {/* Theme Toggle (Mobile) */}
-            <ThemeToggle className="lg:hidden" />
-            <button 
-              type="button"
-              aria-label="Close navigation menu"
-              className="shrink-0 p-2 text-content-tertiary transition-colors hover:text-content-secondary focus-app rounded-lg lg:hidden"
-              onClick={closeSidebarMobile}
-            >
-              <MorphingMenuIcon isOpen={sidebarOpen} className="text-content-primary" />
-            </button>
-          </div>
-        </div>
+        <SidebarHeader
+          sidebarCollapsed={sidebarCollapsed}
+          sidebarOpen={sidebarOpen}
+          closeSidebarMobile={closeSidebarMobile}
+        />
 
           {/* Sidebar free-plan upgrade banner removed — Layout only renders for Pro users */}
 

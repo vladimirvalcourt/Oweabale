@@ -19,6 +19,19 @@ colors:
   success: "#27a644"
   emerald: "#10b981"
   expense: "#ef4444"
+  # Status colors for badges and indicators
+  status-urgent-bg: "rgba(239,68,68,0.10)"  # rose-500/10
+  status-urgent-border: "rgba(239,68,68,0.40)"  # rose-500/40
+  status-urgent-text: "#b91c1c"  # rose-700 (light mode)
+  status-urgent-text-dark: "#fecaca"  # rose-200 (dark mode)
+  status-warning-bg: "rgba(245,158,11,0.10)"  # amber-500/10
+  status-warning-border: "rgba(245,158,11,0.40)"  # amber-500/40
+  status-warning-text: "#b45309"  # amber-700 (light mode)
+  status-warning-text-dark: "#fde68a"  # amber-200 (dark mode)
+  status-info-bg: "rgba(99,102,241,0.10)"  # indigo-500/10
+  status-info-border: "rgba(99,102,241,0.40)"  # indigo-500/40
+  status-info-text: "#4338ca"  # indigo-700 (light mode)
+  status-info-text-dark: "#c7d2fe"  # indigo-200 (dark mode)
 typography:
   display-xl:
     fontFamily: Geist Sans
@@ -131,6 +144,35 @@ Buttons use 6px radius, not large pills except for true tags. Primary buttons us
 Panels use translucent white overlays on dark backgrounds. Depth comes from background luminance and thin borders, not heavy shadows.
 
 Cards should be sparse and purposeful. Use repeated cards for comparable items only. Avoid generic three-card marketing rows unless the content truly requires it.
+
+### Status Indicators
+
+Oweable uses a semantic status system for urgency and state communication:
+
+- **Urgent** (rose): Overdue bills, critical deadlines, immediate action required
+  - Background: `rose-500/10`
+  - Border: `rose-500/40`
+  - Text: `rose-700` (light) / `rose-200` (dark)
+  - Usage: `StatusBadge tone="urgent"`, `StatusIcon tone="urgent"`
+
+- **Warning** (amber): Due within 7 days, attention needed soon
+  - Background: `amber-500/10`
+  - Border: `amber-500/40`
+  - Text: `amber-700` (light) / `amber-200` (dark)
+  - Usage: `StatusBadge tone="warning"`, `StatusIcon tone="warning"`
+
+- **Info** (indigo): Informational states, upcoming events
+  - Background: `indigo-500/10`
+  - Border: `indigo-500/40`
+  - Text: `indigo-700` (light) / `indigo-200` (dark)
+  - Usage: `StatusBadge tone="info"`, `StatusIcon tone="info"`
+
+- **Default** (neutral): Normal state, no urgency
+  - Background: `content-primary/[0.06]`
+  - Text: `content-secondary`
+  - Usage: `StatusBadge`, `StatusIcon` without tone prop
+
+Use status indicators consistently across the app. Never mix status colors arbitrarily—always match the semantic meaning to the urgency level.
 
 ## 5. Layout Principles
 

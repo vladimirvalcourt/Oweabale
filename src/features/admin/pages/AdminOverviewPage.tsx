@@ -85,21 +85,21 @@ export default function AdminOverviewPage() {
   const total = data?.total_signups || 1;
   const steps: FunnelStep[] = data
     ? [
-        { label: 'Signed up', description: 'Created an account', count: data.total_signups, pct: 100 },
-        { label: 'Linked bank', description: 'Connected Plaid account', count: data.linked_bank, pct: Math.round((data.linked_bank / total) * 100) },
-        { label: 'Added a bill', description: 'Entered first bill', count: data.added_first_bill, pct: Math.round((data.added_first_bill / total) * 100) },
-        { label: 'Set a budget', description: 'Created first budget', count: data.set_first_budget, pct: Math.round((data.set_first_budget / total) * 100) },
-        { label: 'Set a goal', description: 'Created first goal', count: data.set_first_goal, pct: Math.round((data.set_first_goal / total) * 100) },
-        { label: 'Completed onboarding', description: 'Finished setup', count: data.completed_onboarding, pct: Math.round((data.completed_onboarding / total) * 100) },
-      ]
+      { label: 'Signed up', description: 'Created an account', count: data.total_signups, pct: 100 },
+      { label: 'Linked bank', description: 'Connected Plaid account', count: data.linked_bank, pct: Math.round((data.linked_bank / total) * 100) },
+      { label: 'Added a bill', description: 'Entered first bill', count: data.added_first_bill, pct: Math.round((data.added_first_bill / total) * 100) },
+      { label: 'Set a budget', description: 'Created first budget', count: data.set_first_budget, pct: Math.round((data.set_first_budget / total) * 100) },
+      { label: 'Set a goal', description: 'Created first goal', count: data.set_first_goal, pct: Math.round((data.set_first_goal / total) * 100) },
+      { label: 'Completed onboarding', description: 'Finished setup', count: data.completed_onboarding, pct: Math.round((data.completed_onboarding / total) * 100) },
+    ]
     : [];
 
   const biggestDrop = steps.length >= 2
     ? steps.reduce((best, step, i) => {
-        if (i === 0) return best;
-        const drop = steps[i - 1].pct - step.pct;
-        return drop > best.drop ? { drop, step: step.label } : best;
-      }, { drop: 0, step: '' })
+      if (i === 0) return best;
+      const drop = steps[i - 1].pct - step.pct;
+      return drop > best.drop ? { drop, step: step.label } : best;
+    }, { drop: 0, step: '' })
     : null;
   const completionRate = data && data.total_signups > 0 ? Math.round((data.completed_onboarding / data.total_signups) * 100) : 0;
 
@@ -132,7 +132,7 @@ export default function AdminOverviewPage() {
             <p className="p-4 text-xs text-rose-700 dark:text-rose-200">Failed to load ops metrics.</p>
           ) : (
             <div className="grid gap-3 p-4 md:grid-cols-2">
-              <Link to="/admin/user" className="border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary">
+              <Link to="/admin/user" className="rounded-xl border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-content-primary">User lookup</p>
@@ -141,15 +141,15 @@ export default function AdminOverviewPage() {
                   <AdminStatusBadge tone="info">Primary</AdminStatusBadge>
                 </div>
               </Link>
-              <Link to="/admin/compliance" className="border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary">
+              <Link to="/admin/compliance" className="rounded-xl border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary">
                 <p className="text-sm font-semibold text-content-primary">Compliance review</p>
                 <p className="mt-1 text-xs leading-5 text-content-tertiary">Investigate KYC/AML flags before account-level intervention.</p>
               </Link>
-              <Link to="/admin/audit-logs" className="border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary">
+              <Link to="/admin/audit-logs" className="rounded-xl border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary">
                 <p className="text-sm font-semibold text-content-primary">Recent admin actions</p>
                 <p className="mt-1 text-xs leading-5 text-content-tertiary">Use the audit log to verify who changed what and when.</p>
               </Link>
-              <Link to="/admin/telemetry" className="border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary">
+              <Link to="/admin/telemetry" className="rounded-xl border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary">
                 <p className="text-sm font-semibold text-content-primary">System health</p>
                 <p className="mt-1 text-xs leading-5 text-content-tertiary">Check Plaid relinks, webhook cadence, and edge action volume.</p>
               </Link>
@@ -178,7 +178,7 @@ export default function AdminOverviewPage() {
           {opsModules.map((module) => {
             const Icon = module.icon;
             return (
-              <Link key={module.href} to={module.href} className="group border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary">
+              <Link key={module.href} to={module.href} className="group rounded-xl border border-surface-border bg-surface-base p-4 transition-colors hover:border-content-primary">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex h-9 w-9 items-center justify-center border border-surface-border text-content-secondary group-hover:border-content-primary group-hover:text-content-primary">
                     <Icon className="h-4 w-4" />
@@ -210,7 +210,7 @@ export default function AdminOverviewPage() {
         ) : (
           <div className="space-y-2 p-4">
             {steps.map((step, i) => (
-              <div key={step.label} className="border border-surface-border bg-surface-base p-3">
+              <div key={step.label} className="rounded-xl border border-surface-border bg-surface-base p-3">
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2.5">
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center border border-surface-border bg-surface-raised text-[10px] font-bold text-content-primary">
@@ -226,8 +226,8 @@ export default function AdminOverviewPage() {
                     <p className="text-[10px] text-content-muted">{step.count.toLocaleString()} users</p>
                   </div>
                 </div>
-                <div className="relative h-2 w-full overflow-hidden bg-surface-elevated">
-                  <div className="h-full bg-content-primary transition-all duration-700" style={{ width: `${step.pct}%` }} />
+                <div className="relative h-2 w-full overflow-hidden rounded-full bg-surface-elevated">
+                  <div className="h-full rounded-full bg-content-primary transition-all duration-700" style={{ width: `${step.pct}%` }} />
                 </div>
                 {i < steps.length - 1 ? (
                   <div className="mt-1 flex items-center justify-end gap-1 text-[10px] text-content-muted">
@@ -254,15 +254,15 @@ export default function AdminOverviewPage() {
 
       <AdminPanel title="Operator runbook" description="Keep admin actions deliberate, reversible when possible, and easy to audit.">
         <div className="grid gap-3 p-4 md:grid-cols-3">
-          <div className="border border-surface-border bg-surface-base p-3 text-xs leading-5 text-content-secondary">
+          <div className="rounded-xl border border-surface-border bg-surface-base p-3 text-xs leading-5 text-content-secondary">
             <GitBranch className="mb-2 h-4 w-4 text-content-tertiary" />
             Start with the case file, then branch into sessions, compliance, or data only when the evidence calls for it.
           </div>
-          <div className="border border-surface-border bg-surface-base p-3 text-xs leading-5 text-content-secondary">
+          <div className="rounded-xl border border-surface-border bg-surface-base p-3 text-xs leading-5 text-content-secondary">
             <ShieldAlert className="mb-2 h-4 w-4 text-content-tertiary" />
             Use audit logs to confirm sensitive changes before and after any destructive action.
           </div>
-          <div className="border border-surface-border bg-surface-base p-3 text-xs leading-5 text-content-secondary">
+          <div className="rounded-xl border border-surface-border bg-surface-base p-3 text-xs leading-5 text-content-secondary">
             <BarChart3 className="mb-2 h-4 w-4 text-content-tertiary" />
             Treat estimates as estimates. Exact financial and cohort reporting needs source-of-truth data.
           </div>
