@@ -115,7 +115,7 @@ export default defineConfig(({ mode }) => {
                 lintCommand: 'eslint "src/**/*.{ts,tsx}"',
                 useFlatConfig: true,
               },
-              overlay: { initialIsOpen: false },
+              overlay: { initialIsOpen: false, badgeStyle: 'display: none;' },
               enableBuild: false, // Disable during build for faster dev HMR
             }),
           ]),

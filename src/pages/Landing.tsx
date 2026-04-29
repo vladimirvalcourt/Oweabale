@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Check, CircleDollarSign, Clock3, Layers3, ShieldCheck, Star } from 'lucide-react';
+import { ArrowRight, Check, CircleDollarSign, Clock3, Layers3, ShieldCheck } from 'lucide-react';
 import { Footer, PublicHeader } from '../components/layout';
 import { TransitionLink } from '../components/common';
 import ExitIntentModal from '../components/common/ExitIntentModal';
@@ -100,7 +100,7 @@ function ProductPreview() {
   useEffect(() => {
     const tl = gsap.timeline({ repeat: -1, repeatDelay: 2 });
 
-    cardRefs.current.forEach((card, index) => {
+    cardRefs.current.forEach((card) => {
       if (!card) return;
 
       tl.to(card, {
@@ -299,7 +299,7 @@ export default function Landing() {
       />
 
       <main>
-        <section className="relative px-5 pb-20 pt-32 sm:px-8 lg:pb-24 lg:pt-40">
+        <section className="relative px-5 pb-16 pt-28 sm:px-8 lg:pb-20 lg:pt-32">
           <div className="noise-overlay pointer-events-none fixed inset-0 opacity-[0.035]" />
           <div className="public-grid-bg pointer-events-none absolute inset-x-0 top-0 h-[760px] opacity-60" />
 
@@ -381,7 +381,7 @@ export default function Landing() {
               </div>
             </div>
 
-            <div className="public-fade-up public-delay-2 mt-16 lg:mt-20">
+            <div className="relative mt-12 lg:mt-14">
               <ProductPreview />
             </div>
           </div>
@@ -469,7 +469,7 @@ export default function Landing() {
                     className={`public-feature-card p-6 ${index === 1 ? 'lg:ml-14' : index === 2 ? 'lg:ml-28' : ''}`}
                   >
                     <blockquote className="text-base leading-7 text-content-secondary">
-                      "{testimonial.quote}"
+                      &ldquo;{testimonial.quote}&rdquo;
                     </blockquote>
                     <figcaption className="mt-6 flex items-center gap-3">
                       <img

@@ -237,7 +237,8 @@ export default function Pricing() {
               Start where the pressure is. Pay when you need the deeper plan.
             </h1>
             <p className="premium-lede mt-7 max-w-3xl public-fade-up public-delay-1">
-              Oweable starts with a focused Pay List for bills, debt, subscriptions, tolls, tickets, and the obligations that keep slipping into the back of your mind. Full Suite is there when you want help turning the whole picture into a plan you can keep coming back to.
+              Oweable starts with a focused Pay List for bills, debt, subscriptions, tolls, tickets, and the obligations that keep slipping into the back of your mind.{' '}
+              Full Suite is there when you want help turning the whole picture into a plan you can keep coming back to.
             </p>
             <div className="mt-8 flex flex-wrap gap-3 text-sm text-content-secondary public-fade-up public-delay-2">
               <span className="rounded-md border border-surface-border-subtle bg-surface-raised px-4 py-2">14-day Full Suite trial</span>
