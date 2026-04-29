@@ -46,7 +46,6 @@ export default function Layout() {
   const navigate = useNavigate();
   const prefetchedPaths = usePrefetchedSet(); // Fix 4
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   // Initialize theme system
   const { theme } = useTheme();
@@ -412,8 +411,7 @@ export default function Layout() {
         className={cn(
           "app-chrome fixed inset-y-0 left-0 z-50 flex flex-col backdrop-blur-xl transition-all duration-300 ease-in-out",
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-          sidebarCollapsed ? "w-20" : "w-[240px]",
-          "border-r border-surface-border"
+          "w-[240px] border-r border-surface-border"
         )}
       >
         <div className="flex h-[4.5rem] shrink-0 items-center justify-between gap-2 border-b border-surface-border/90 px-3 sm:px-4">
@@ -605,11 +603,9 @@ export default function Layout() {
             <TransitionLink
               to="/pro/settings"
               onClick={closeSidebarMobile}
-              title={sidebarCollapsed ? 'Settings' : undefined}
               aria-current={isSettingsRoute ? 'page' : undefined}
               className={cn(
-                'focus-app group flex min-h-10 w-full items-center rounded-lg border py-2.5 text-[12px] font-sans font-medium transition-all',
-                sidebarCollapsed ? 'justify-center px-1.5' : 'justify-start gap-3 px-3',
+                'focus-app group flex min-h-10 w-full items-center rounded-lg border py-2.5 text-[12px] font-sans font-medium transition-all justify-start gap-3 px-3',
                 isSettingsRoute
                   ? 'border-content-primary/30 bg-content-primary/[0.1] text-content-primary shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06)]'
                   : 'border-surface-border bg-surface-base/60 text-content-secondary hover:bg-content-primary/[0.06] hover:text-content-primary',
@@ -618,24 +614,8 @@ export default function Layout() {
               <div className="flex h-5 w-5 shrink-0 items-center justify-center">
                 <Settings className="h-4 w-4 shrink-0 text-content-tertiary transition-colors group-hover:text-content-primary" aria-hidden />
               </div>
-              {!sidebarCollapsed && <span>Account settings</span>}
+              <span>Account settings</span>
             </TransitionLink>
-
-            <button
-              type="button"
-              onClick={() => startTransition(() => setSidebarCollapsed((c) => !c))}
-              aria-expanded={!sidebarCollapsed}
-              aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              className={cn(
-                'focus-app group flex w-full items-center rounded-lg border border-surface-border bg-surface-base/40 py-2.5 text-[12px] font-sans font-medium text-content-secondary transition-all hover:bg-content-primary/[0.06] hover:text-content-primary',
-                sidebarCollapsed ? 'justify-center px-0' : 'justify-start gap-3 px-3',
-              )}
-            >
-              <div className="flex h-5 w-5 shrink-0 items-center justify-center">
-                <MorphingMenuIcon isOpen={!sidebarCollapsed} className="scale-75 text-content-tertiary transition-colors group-hover:text-content-primary" />
-              </div>
-              {!sidebarCollapsed && <span>Collapse</span>}
-            </button>
           </div>
         </div>
       </aside>
@@ -645,8 +625,7 @@ export default function Layout() {
         className={cn(
           /* scroll-padding: sticky app header (h-[4.5rem]) — keyboard focus stays clear of chrome (WCAG 2.4.11) */
           "flex h-[100dvh] flex-1 flex-col overflow-y-auto scroll-pt-[4.5rem] scrollbar-hide transition-all duration-300 ease-in-out",
-          /* pl must match aside width (240px), not pl-64 (256px), or the top hairline gaps under the search */
-          sidebarCollapsed ? "lg:pl-20" : "lg:pl-[240px]"
+          "lg:pl-[240px]"
         )}
       >
         {/* Top Bar */}
