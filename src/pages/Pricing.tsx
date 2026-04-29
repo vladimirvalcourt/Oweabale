@@ -229,16 +229,17 @@ export default function Pricing() {
       />
 
       <main>
-        <section className="premium-container pb-20 pt-36">
-          <div>
+        <section className="relative overflow-hidden pb-20 pt-32 lg:pt-40">
+          <div className="public-grid-bg pointer-events-none absolute inset-x-0 top-0 h-[620px] opacity-55" />
+          <div className="premium-container relative">
             <p className="premium-eyebrow">Pricing without another surprise</p>
-            <h1 className="premium-display mt-5 max-w-5xl">
+            <h1 className="premium-display mt-5 max-w-5xl public-fade-up">
               Start where the pressure is. Pay when you need the deeper plan.
             </h1>
-            <p className="premium-lede mt-7 max-w-3xl">
+            <p className="premium-lede mt-7 max-w-3xl public-fade-up public-delay-1">
               Oweable starts with a focused Pay List for bills, debt, subscriptions, tolls, tickets, and the obligations that keep slipping into the back of your mind. Full Suite is there when you want help turning the whole picture into a plan you can keep coming back to.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3 text-sm text-content-secondary">
+            <div className="mt-8 flex flex-wrap gap-3 text-sm text-content-secondary public-fade-up public-delay-2">
               <span className="rounded-md border border-surface-border-subtle bg-surface-raised px-4 py-2">14-day Full Suite trial</span>
               <span className="rounded-md border border-surface-border-subtle bg-surface-raised px-4 py-2">No credit card required</span>
               <span className="rounded-md border border-surface-border-subtle bg-surface-raised px-4 py-2">Cancel anytime</span>
@@ -248,7 +249,26 @@ export default function Pricing() {
 
         <section className="border-y border-surface-border-subtle bg-surface-raised/36 py-20">
           <div className="premium-container">
-            <div className="premium-panel mx-auto max-w-3xl p-7 text-content-primary shadow-panel sm:p-8">
+            <div className="grid gap-5 lg:grid-cols-[0.72fr_1.28fr] lg:items-stretch">
+              <aside className="premium-panel p-7 sm:p-8">
+                <p className="premium-eyebrow">What stays free</p>
+                <h2 className="mt-5 text-3xl font-medium leading-tight tracking-[-0.04em] text-content-primary">
+                  Get oriented before money leaves your account.
+                </h2>
+                <p className="mt-5 text-sm leading-6 text-content-tertiary">
+                  You can sign up, map the immediate Pay List, and decide whether the deeper planning tools are worth keeping.
+                </p>
+                <div className="mt-8 space-y-3 text-sm text-content-secondary">
+                  {['Create the first Pay List', 'Review due dates and pressure', 'Upgrade only when the system is useful'].map((item) => (
+                    <div key={item} className="flex items-center gap-3 border-b border-surface-border-subtle pb-3 last:border-b-0 last:pb-0">
+                      <span className="h-1.5 w-1.5 rounded-full bg-brand-violet" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </aside>
+
+              <div className="premium-panel p-7 text-content-primary shadow-panel sm:p-8">
                 <div className="flex items-center justify-between gap-4">
                   <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">Full Suite</p>
                   <span className="text-xs font-medium uppercase tracking-[0.14em] text-content-tertiary">
@@ -330,18 +350,19 @@ export default function Pricing() {
                   type="button"
                   onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                   disabled={isStartingCheckout}
-                  className="mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-md bg-content-primary px-6 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px disabled:cursor-not-allowed disabled:opacity-70"
+                  className="premium-button-primary mt-8 w-full disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {isStartingCheckout ? 'Getting things ready...' : 'Start Full Suite'}
                 </button>
                 <p className="mt-4 text-sm text-content-tertiary">
                   Starts with a 14-day free trial. No credit card required to create your account first.
                 </p>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="bg-surface-base py-28">
+        <section className="public-section-line bg-surface-base py-28">
           <div className="premium-container">
             <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr]">
               <div>
@@ -349,6 +370,9 @@ export default function Pricing() {
                 <h2 className="premium-heading mt-4 max-w-lg">
                   One calmer path for bills, debt, and the planning work behind them.
                 </h2>
+                <p className="mt-5 max-w-md text-base leading-7 text-content-tertiary">
+                  The plan is intentionally narrow at the start and deeper where ongoing money stress usually hides.
+                </p>
               </div>
               <div className="premium-panel overflow-x-auto">
                 <div className="grid grid-cols-2 border-b border-surface-border-subtle bg-surface-elevated text-sm font-medium text-content-primary">
@@ -394,7 +418,7 @@ export default function Pricing() {
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <TransitionLink
                 to="/onboarding?redirect=/pro/dashboard"
-                className="inline-flex min-h-12 items-center gap-3 rounded-md bg-content-primary px-7 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px"
+                className="premium-button-primary"
               >
                 Try Full Suite
                 <ArrowRight className="h-4 w-4" />
@@ -403,7 +427,7 @@ export default function Pricing() {
                 type="button"
                 onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                 disabled={isStartingCheckout}
-                className="inline-flex min-h-12 items-center gap-3 rounded-md border border-surface-border bg-surface-raised px-7 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-70"
+                className="premium-button-secondary disabled:cursor-not-allowed disabled:opacity-70"
               >
                 Start Full Suite
               </button>

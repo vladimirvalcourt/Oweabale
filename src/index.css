@@ -162,7 +162,15 @@ html {
   }
 
   .premium-panel {
-    @apply rounded-lg border border-surface-border bg-surface-raised shadow-card transition-colors;
+    @apply rounded-[22px] border border-surface-border bg-surface-raised shadow-card transition-colors;
+  }
+
+  .premium-button-primary {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-content-primary px-6 text-sm font-semibold text-surface-base transition-[background-color,transform,box-shadow] duration-200 hover:bg-content-secondary active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+  }
+
+  .premium-button-secondary {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-surface-border bg-surface-raised px-6 text-sm font-medium text-content-primary transition-[background-color,transform,border-color] duration-200 hover:border-surface-border hover:bg-surface-elevated active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .premium-page-header {
@@ -438,6 +446,23 @@ html {
   }
   .public-hover-lift {
     @apply transition-transform duration-300 ease-out hover:-translate-y-1;
+  }
+  .public-grid-bg {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: linear-gradient(to bottom, transparent, black 18%, black 72%, transparent);
+  }
+  .public-section-line {
+    @apply relative;
+  }
+  .public-section-line::before {
+    content: "";
+    @apply pointer-events-none absolute left-1/2 top-0 h-px w-screen -translate-x-1/2 bg-surface-border-subtle;
+  }
+  .public-feature-card {
+    @apply rounded-[22px] border border-surface-border-subtle bg-surface-raised/72 shadow-card transition-[background-color,border-color,transform] duration-300 ease-out hover:-translate-y-1 hover:border-surface-border hover:bg-surface-elevated;
   }
   .noise-overlay {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");

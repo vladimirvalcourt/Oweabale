@@ -15,8 +15,8 @@ function NavLink({
   return (
     <TransitionLink
       to={href}
-      className={`text-sm transition-colors ${
-        isActive ? 'text-content-primary' : 'text-content-secondary/72 hover:text-content-primary'
+      className={`rounded px-2 py-1 text-sm transition-colors ${
+        isActive ? 'bg-surface-elevated text-content-primary' : 'text-content-secondary/72 hover:text-content-primary'
       }`}
     >
       <span className="relative z-10">{children}</span>
@@ -61,8 +61,8 @@ export default function PublicHeader({ links = [] }: PublicHeaderProps) {
   }, [links]);
 
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 border-b border-surface-border-subtle bg-surface-base/88 backdrop-blur-xl">
-      <div className="premium-container flex h-[72px] items-center justify-between">
+    <nav className="fixed inset-x-0 top-0 z-50 bg-surface-base/72 backdrop-blur-xl">
+      <div className="premium-container flex h-[76px] items-center justify-between">
         <TransitionLink to="/" className="group flex items-center gap-2 text-content-primary">
           <BrandWordmark
             logoClassName="h-5 w-5 rounded"
@@ -71,7 +71,7 @@ export default function PublicHeader({ links = [] }: PublicHeaderProps) {
         </TransitionLink>
 
         {links.length > 0 && (
-          <div className="hidden items-center gap-6 rounded-md border border-surface-border-subtle bg-surface-raised/50 px-3 py-2 md:flex">
+          <div className="hidden items-center gap-1 rounded-md border border-surface-border-subtle bg-surface-raised/76 p-1 shadow-card md:flex">
             {links.map((link) => (
               <NavLink key={link.href} href={link.href} isActive={activeSection === link.id}>
                 {link.label}
