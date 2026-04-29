@@ -49,11 +49,11 @@ async function revokeSessions(
 ): Promise<void> {
   const { error: signOutErr } = await admin.auth.admin.signOut(userId, 'global');
   if (signOutErr) {
-    console.warn('[risc-google-receiver] auth.admin.signOut', signOutErr.message, reason);
+    console.warn('[risc-google-receiver] provider sign-out failed');
     const { error: rpcErr } = await admin.rpc('risc_revoke_user_sessions', { target_user: userId });
     if (rpcErr) console.warn('[risc-google-receiver] risc_revoke_user_sessions fallback', rpcErr.message);
   } else {
-    console.log('[risc-google-receiver] sessions revoked (global)', userId.slice(0, 8), reason);
+    console.log('[risc-google-receiver] sessions revoked (global)');
   }
 }
 

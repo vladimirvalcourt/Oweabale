@@ -50,7 +50,7 @@ export default function Freelance() {
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = event.target.files?.[0];
     if (!uploadedFile) return;
-    
+
     setIsScanning(true);
     await yieldForPaint();
     toast.info('Scanning statement...');
@@ -63,7 +63,7 @@ export default function Freelance() {
         const pdfjsWorkerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
         pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        
+
         for (let i = 1; i <= pdf.numPages; i++) {
           const page = await pdf.getPage(i);
           const textContent = await page.getTextContent();
@@ -75,9 +75,9 @@ export default function Freelance() {
       const isUber = fullText.toLowerCase().includes('uber');
       const isLyft = fullText.toLowerCase().includes('lyft');
       const isDoorDash = fullText.toLowerCase().includes('doordash');
-      
+
       const client = isUber ? 'Uber' : isLyft ? 'Lyft' : isDoorDash ? 'DoorDash' : uploadedFile.name.split('.')[0];
-      
+
       // Amount Extraction
       const amountMatches = fullText.match(/\$?\s*\d+,?\d*\.\d{2}/g);
       let amount = "";
@@ -89,29 +89,29 @@ export default function Freelance() {
       // Finding Write-offs: Mileage & Fees
       const milesMatch = fullText.match(/(\d+\.?\d*)\s*(miles?|mi|km)/i);
       const feeMatch = fullText.match(/(\$?\s*\d+\.\d{2})\s*(fees?|commission|service)/i);
-      
+
       let capturedWriteOffs = 0;
       if (milesMatch) {
-         const miles = parseFloat(milesMatch[1]);
-         const mileageDeduction = miles * IRS_MILEAGE_RATE;
-         addDeduction({
-           name: `Mileage: ${client} (${miles} mi)`,
-           category: 'Transportation',
-           amount: mileageDeduction,
-           date: new Date().toISOString()
-         });
-         capturedWriteOffs += mileageDeduction;
+        const miles = parseFloat(milesMatch[1]);
+        const mileageDeduction = miles * IRS_MILEAGE_RATE;
+        addDeduction({
+          name: `Mileage: ${client} (${miles} mi)`,
+          category: 'Transportation',
+          amount: mileageDeduction,
+          date: new Date().toISOString()
+        });
+        capturedWriteOffs += mileageDeduction;
       }
-      
+
       if (feeMatch) {
-         const feeAmount = parseFloat(feeMatch[1].replace(/[^0-9.]/g, ''));
-         addDeduction({
-           name: `${client} Platform Fees`,
-           category: 'Business',
-           amount: feeAmount,
-           date: new Date().toISOString()
-         });
-         capturedWriteOffs += feeAmount;
+        const feeAmount = parseFloat(feeMatch[1].replace(/[^0-9.]/g, ''));
+        addDeduction({
+          name: `${client} Platform Fees`,
+          category: 'Business',
+          amount: feeAmount,
+          date: new Date().toISOString()
+        });
+        capturedWriteOffs += feeAmount;
       }
 
       if (capturedWriteOffs > 0) {
@@ -158,14 +158,14 @@ export default function Freelance() {
       const seEstimate = entry.amount * SE_TAX_RATE;
       const totalLiability = fedEstimate + stateEstimate + seEstimate;
       const profit = entry.amount - totalLiability;
-      
+
       return {
-         ...entry,
-         totalLiability,
-         profit,
-         fedEstimate,
-         stateEstimate,
-         seEstimate
+        ...entry,
+        totalLiability,
+        profit,
+        fedEstimate,
+        stateEstimate,
+        seEstimate
       };
     });
   }, [freelanceEntries, stateRate]);
@@ -237,7 +237,7 @@ export default function Freelance() {
       <div className="bg-surface-raised border border-surface-border p-8 md:p-12 relative overflow-hidden group shadow-none">
         <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-surface-border" />
         <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-surface-border" />
-        
+
         <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-12">
           <div>
             <div className="flex items-center gap-3 mb-6">
@@ -250,7 +250,7 @@ export default function Freelance() {
                 Upload gig pay PDFs, log payments, and see how much to set aside for taxes.
               </p>
             </div>
-            
+
             <div className="flex flex-col">
               <span className="text-xs text-content-tertiary mb-1">Tax still owed (unreserved)</span>
               <h2 className="text-7xl md:text-8xl font-mono font-bold text-content-primary tracking-tighter tabular-nums leading-none data-numeric">
@@ -264,16 +264,16 @@ export default function Freelance() {
               <p className="text-xs text-content-tertiary mb-1">Moved to tax reserve</p>
               <p className="text-3xl font-mono tabular-nums text-emerald-400 font-bold data-numeric">${totalVaulted.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
             </div>
-            
+
             <div className="flex items-center gap-3">
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileUpload} 
-                accept=".pdf" 
-                className="hidden" 
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept=".pdf"
+                className="hidden"
               />
-              <button 
+              <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isScanning}
@@ -282,7 +282,7 @@ export default function Freelance() {
                 {isScanning ? <Loader2 className="w-4 h-4 animate-spin text-content-primary" /> : <UploadCloud className="w-4 h-4 group-hover:text-content-primary shrink-0" aria-hidden />}
                 Scan statement (PDF)
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={() => setIsAddModalOpen(true)}
                 className="bg-brand-cta hover:bg-brand-cta-hover text-surface-base text-sm font-sans font-semibold px-6 py-3 rounded-md shadow-none transition-all flex items-center gap-2"
@@ -298,153 +298,153 @@ export default function Freelance() {
         <div className="lg:col-span-2">
           <CollapsibleModule title="Income Tracker" icon={IncomeIcon}>
             <div className="p-0">
-               <div className="divide-y divide-surface-border">
-                  {entriesWithMath.length === 0 ? (
-                    <div className="px-6 py-20 text-center flex flex-col items-center">
-                       <Zap className="w-12 h-12 text-content-muted mb-4" />
-                       <p className="text-content-primary text-sm font-medium leading-relaxed max-w-sm">
-                         Add your first freelance payment to see your tax set-aside calculated automatically.
-                       </p>
-                       <button
-                         type="button"
-                         onClick={() => setIsAddModalOpen(true)}
-                         className="mt-6 inline-flex items-center gap-2 rounded-md bg-brand-cta px-5 py-2.5 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover"
-                       >
-                         <Plus className="w-4 h-4 shrink-0" aria-hidden /> Add payment
-                       </button>
-                    </div>
-                  ) : (
-                    entriesWithMath.map((entry) => (
-                      <div key={entry.id} className="px-6 py-6 hover:bg-surface-elevated/40 transition-colors group flex flex-col md:flex-row md:items-center justify-between gap-6">
-                        <div className="flex items-start gap-4">
-                           <div className={`w-12 h-12 flex items-center justify-center shrink-0 border ${entry.isVaulted ? 'border-emerald-500/20 bg-emerald-500/10' : 'border-surface-border bg-surface-raised'}`}>
-                             {entry.isVaulted ? <ShieldCheck className="w-6 h-6 text-emerald-500" /> : <ShieldAlert className="w-6 h-6 text-content-muted" />}
-                           </div>
-                           <div className="space-y-1">
-                              <h3 className="font-sans font-semibold text-content-primary text-sm">{entry.client}</h3>
-                              <p className="text-xs text-content-tertiary">
-                                {new Date(entry.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · Gross <span className="text-content-primary font-mono tabular-nums">${entry.amount.toFixed(0)}</span>
-                              </p>
-                              <div className="pt-2 flex flex-wrap gap-2">
-                                 <span className="text-xs font-mono tabular-nums text-rose-500 border border-rose-500/20 px-1.5 py-0.5 rounded-full">Tax −${entry.totalLiability.toFixed(0)}</span>
-                                 <span className="text-xs font-mono tabular-nums text-emerald-400 border border-emerald-400/20 px-1.5 py-0.5 rounded-full">You keep +${entry.profit.toFixed(0)}</span>
-                                 {entry.scouredWriteOffs && entry.scouredWriteOffs > 0 && (
-                                   <span className="text-xs font-sans bg-surface-elevated text-content-primary border border-surface-border px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                                     <ShieldCheck className="w-3 h-3 shrink-0" aria-hidden /> Deductions ${entry.scouredWriteOffs.toFixed(0)}
-                                   </span>
-                                 )}
-                              </div>
-                           </div>
+              <div className="divide-y divide-surface-border">
+                {entriesWithMath.length === 0 ? (
+                  <div className="px-6 py-20 text-center flex flex-col items-center">
+                    <Zap className="w-12 h-12 text-content-muted mb-4" />
+                    <p className="text-content-primary text-sm font-medium leading-relaxed max-w-sm">
+                      Add your first freelance payment to see your tax set-aside calculated automatically.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddModalOpen(true)}
+                      className="mt-6 inline-flex items-center gap-2 rounded-md bg-brand-cta px-5 py-2.5 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover"
+                    >
+                      <Plus className="w-4 h-4 shrink-0" aria-hidden /> Add payment
+                    </button>
+                  </div>
+                ) : (
+                  entriesWithMath.map((entry) => (
+                    <div key={entry.id} className="px-6 py-6 hover:bg-surface-elevated/40 transition-colors group flex flex-col md:flex-row md:items-center justify-between gap-6">
+                      <div className="flex items-start gap-4">
+                        <div className={`w-12 h-12 flex items-center justify-center shrink-0 border ${entry.isVaulted ? 'border-emerald-500/20 bg-emerald-500/10' : 'border-surface-border bg-surface-raised'}`}>
+                          {entry.isVaulted ? <ShieldCheck className="w-6 h-6 text-emerald-500" /> : <ShieldAlert className="w-6 h-6 text-content-muted" />}
                         </div>
-
-                        <div className="flex items-center gap-4">
-                           <div className="text-right">
-                              <p className="text-xs text-content-tertiary mb-1">% you keep</p>
-                              <div className="w-24 bg-surface-base h-1 rounded-none overflow-hidden">
-                                 <div className="bg-content-primary/50 h-full" style={{ width: `${(entry.profit / entry.amount) * 100}%` }} />
-                              </div>
-                           </div>
-                           <button 
-                             type="button"
-                             onClick={() => toggleFreelanceVault(entry.id)}
-                             className={`focus-app px-4 py-2 border text-xs font-sans font-semibold transition-all rounded-md ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-surface-border bg-brand-cta text-surface-base hover:bg-brand-cta-hover'}`}
-                           >
-                             {entry.isVaulted ? 'Saved' : 'Move to tax reserve'}
-                           </button>
-                           <button type="button" aria-label={`Delete freelance entry for ${entry.client}`} onClick={() => deleteFreelanceEntry(entry.id)} className="focus-app rounded p-2 text-content-muted transition-colors hover:text-rose-500"><Trash2 className="w-4 h-4" aria-hidden /></button>
+                        <div className="space-y-1">
+                          <h3 className="font-sans font-semibold text-content-primary text-sm">{entry.client}</h3>
+                          <p className="text-xs text-content-tertiary">
+                            {new Date(entry.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · Gross <span className="text-content-primary font-mono tabular-nums">${entry.amount.toFixed(0)}</span>
+                          </p>
+                          <div className="pt-2 flex flex-wrap gap-2">
+                            <span className="text-xs font-mono tabular-nums text-rose-500 border border-rose-500/20 px-1.5 py-0.5 rounded-full">Tax −${entry.totalLiability.toFixed(0)}</span>
+                            <span className="text-xs font-mono tabular-nums text-emerald-400 border border-emerald-400/20 px-1.5 py-0.5 rounded-full">You keep +${entry.profit.toFixed(0)}</span>
+                            {entry.scouredWriteOffs && entry.scouredWriteOffs > 0 && (
+                              <span className="text-xs font-sans bg-surface-elevated text-content-primary border border-surface-border px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                                <ShieldCheck className="w-3 h-3 shrink-0" aria-hidden /> Deductions ${entry.scouredWriteOffs.toFixed(0)}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    ))
-                  )}
-               </div>
+
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <p className="text-xs text-content-tertiary mb-1">% you keep</p>
+                          <div className="w-24 bg-surface-base h-1 rounded-none overflow-hidden">
+                            <div className="bg-content-primary/50 h-full" style={{ width: `${(entry.profit / entry.amount) * 100}%` }} />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => toggleFreelanceVault(entry.id)}
+                          className={`focus-app px-4 py-2 border text-xs font-sans font-semibold transition-all rounded-md ${entry.isVaulted ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-400 hover:bg-emerald-500/10' : 'border-surface-border bg-brand-cta text-surface-base hover:bg-brand-cta-hover'}`}
+                        >
+                          {entry.isVaulted ? 'Saved' : 'Move to tax reserve'}
+                        </button>
+                        <button type="button" aria-label={`Delete freelance entry for ${entry.client}`} onClick={() => deleteFreelanceEntry(entry.id)} className="focus-app rounded p-2 text-content-muted transition-colors hover:text-rose-500"><Trash2 className="w-4 h-4" aria-hidden /></button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </CollapsibleModule>
         </div>
 
         <div className="space-y-6">
-           <div className="rounded-xl border border-surface-border bg-surface-raised p-6">
-              <div className="flex items-center gap-2 text-content-tertiary mb-4">
-                 <Zap className="w-4 h-4 text-content-secondary" />
-                 <h3 className="text-sm font-sans font-semibold text-content-primary">Freelance tips</h3>
+          <div className="rounded-xl border border-surface-border bg-surface-raised p-6">
+            <div className="flex items-center gap-2 text-content-tertiary mb-4">
+              <Zap className="w-4 h-4 text-content-secondary" />
+              <h3 className="text-sm font-sans font-semibold text-content-primary">Freelance tips</h3>
+            </div>
+            <div className="space-y-6">
+              <div className="border-l-2 border-surface-border pl-4">
+                <p className="text-sm font-sans font-medium text-content-primary mb-1">Self-employment tax (15.3%)</p>
+                <p className="text-xs text-content-tertiary leading-relaxed">
+                  We set aside 15.3% from each payment toward self-employment tax.
+                </p>
               </div>
-              <div className="space-y-6">
-                 <div className="border-l-2 border-surface-border pl-4">
-                    <p className="text-sm font-sans font-medium text-content-primary mb-1">Self-employment tax (15.3%)</p>
-                    <p className="text-xs text-content-tertiary leading-relaxed">
-                      We set aside 15.3% from each payment toward self-employment tax.
-                    </p>
-                 </div>
-                 <div className="border-l-2 border-surface-border pl-4">
-                    <p className="text-sm font-sans font-medium text-content-primary mb-1">
-                      State tax · {hasTaxState ? taxState : '—'}
-                    </p>
-                    {!hasTaxState ? (
-                      <p className="text-xs text-amber-600/90 dark:text-amber-400/90 leading-relaxed">
-                        <TransitionLink
-                          to="/pro/settings?tab=financial#tax-state-preference"
-                          className="font-medium underline underline-offset-2"
-                        >
-                          Set your state
-                        </TransitionLink>{' '}
-                        so Freelance / gigs can estimate state withholding.
-                      </p>
-                    ) : (
-                      <p className="text-xs text-content-tertiary leading-relaxed">
-                        Save an extra {stateRate}% for state. Suggested total rate about {(stateRate + 15.3 + 12).toFixed(1)}%.
-                      </p>
-                    )}
-                 </div>
+              <div className="border-l-2 border-surface-border pl-4">
+                <p className="text-sm font-sans font-medium text-content-primary mb-1">
+                  State tax · {hasTaxState ? taxState : '—'}
+                </p>
+                {!hasTaxState ? (
+                  <p className="text-xs text-amber-600/90 dark:text-amber-400/90 leading-relaxed">
+                    <TransitionLink
+                      to="/pro/settings?tab=financial#tax-state-preference"
+                      className="font-medium underline underline-offset-2"
+                    >
+                      Set your state
+                    </TransitionLink>{' '}
+                    so Freelance / gigs can estimate state withholding.
+                  </p>
+                ) : (
+                  <p className="text-xs text-content-tertiary leading-relaxed">
+                    Save an extra {stateRate}% for state. Suggested total rate about {(stateRate + 15.3 + 12).toFixed(1)}%.
+                  </p>
+                )}
               </div>
-           </div>
+            </div>
+          </div>
 
-           <div className="rounded-xl border border-surface-border bg-surface-raised p-6">
-              <div className="flex items-center gap-2 mb-5">
-                 <div className="w-1.5 h-1.5 bg-emerald-500" />
-                 <h3 className="text-sm font-sans font-semibold text-content-primary">Weekly summary</h3>
-              </div>
-              <div className="space-y-2">
-                 {entriesWithMath.length === 0 ? (
-                   <>
-                     <div className="rounded-xl border border-dashed border-surface-border bg-surface-base p-4 text-left">
-                       <p className="text-xs font-medium text-content-secondary">Take-home (weekly)</p>
-                       <p className="mt-1 text-xs text-content-tertiary">Shows after you log payments.</p>
-                     </div>
-                     <div className="rounded-xl border border-dashed border-surface-border bg-surface-base p-4 text-left">
-                       <p className="text-xs font-medium text-content-secondary">Taxes owed (weekly)</p>
-                       <p className="mt-1 text-xs text-content-tertiary">We&apos;ll estimate federal, state, and SE tax.</p>
-                     </div>
-                     <div className="rounded-xl border border-dashed border-surface-border bg-surface-base p-4 text-left">
-                       <p className="text-xs font-medium text-content-secondary">Total earned</p>
-                       <p className="mt-1 text-xs text-content-tertiary">Your gross freelance inflow for the period.</p>
-                     </div>
-                   </>
-                 ) : (
-                   <>
-                     <div className="flex justify-between items-center bg-surface-elevated border border-surface-border p-3">
-                       <span className="text-xs text-content-tertiary">Take-home</span>
-                       <span className="text-sm font-mono tabular-nums text-emerald-400 font-bold data-numeric">
-                         ${entriesWithMath.reduce((s, e) => s + e.profit, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                       </span>
-                     </div>
-                     <div className="flex justify-between items-center bg-surface-elevated border border-surface-border p-3">
-                       <span className="text-xs text-content-tertiary">Taxes owed</span>
-                       <span className="text-sm font-mono tabular-nums text-rose-400 font-bold data-numeric">
-                         ${entriesWithMath.reduce((s, e) => s + e.totalLiability, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                       </span>
-                     </div>
-                     <div className="flex justify-between items-center bg-surface-elevated border border-surface-border p-3">
-                       <span className="text-xs text-content-tertiary">Total earned</span>
-                       <span className="text-sm font-mono tabular-nums text-content-primary font-bold data-numeric">
-                         ${entriesWithMath.reduce((s, e) => s + e.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                       </span>
-                     </div>
-                   </>
-                 )}
-              </div>
-              <p className="text-xs text-content-tertiary mt-4 leading-relaxed border-t border-surface-border pt-4">
-                “Saved” means you moved this amount to a separate account for taxes.
-              </p>
-           </div>
+          <div className="rounded-xl border border-surface-border bg-surface-raised p-6">
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-1.5 h-1.5 bg-emerald-500" />
+              <h3 className="text-sm font-sans font-semibold text-content-primary">Weekly summary</h3>
+            </div>
+            <div className="space-y-2">
+              {entriesWithMath.length === 0 ? (
+                <>
+                  <div className="rounded-xl border border-dashed border-surface-border bg-surface-base p-4 text-left">
+                    <p className="text-xs font-medium text-content-secondary">Take-home (weekly)</p>
+                    <p className="mt-1 text-xs text-content-tertiary">Shows after you log payments.</p>
+                  </div>
+                  <div className="rounded-xl border border-dashed border-surface-border bg-surface-base p-4 text-left">
+                    <p className="text-xs font-medium text-content-secondary">Taxes owed (weekly)</p>
+                    <p className="mt-1 text-xs text-content-tertiary">We&apos;ll estimate federal, state, and SE tax.</p>
+                  </div>
+                  <div className="rounded-xl border border-dashed border-surface-border bg-surface-base p-4 text-left">
+                    <p className="text-xs font-medium text-content-secondary">Total earned</p>
+                    <p className="mt-1 text-xs text-content-tertiary">Your gross freelance inflow for the period.</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-between items-center bg-surface-elevated border border-surface-border p-3">
+                    <span className="text-xs text-content-tertiary">Take-home</span>
+                    <span className="text-sm font-mono tabular-nums text-emerald-400 font-bold data-numeric">
+                      ${entriesWithMath.reduce((s, e) => s + e.profit, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center bg-surface-elevated border border-surface-border p-3">
+                    <span className="text-xs text-content-tertiary">Taxes owed</span>
+                    <span className="text-sm font-mono tabular-nums text-rose-400 font-bold data-numeric">
+                      ${entriesWithMath.reduce((s, e) => s + e.totalLiability, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center bg-surface-elevated border border-surface-border p-3">
+                    <span className="text-xs text-content-tertiary">Total earned</span>
+                    <span className="text-sm font-mono tabular-nums text-content-primary font-bold data-numeric">
+                      ${entriesWithMath.reduce((s, e) => s + e.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
+            <p className="text-xs text-content-tertiary mt-4 leading-relaxed border-t border-surface-border pt-4">
+              “Saved” means you moved this amount to a separate account for taxes.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -525,15 +525,14 @@ export default function Freelance() {
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="font-medium text-content-primary">{inv.clientName}</span>
                         <span
-                          className={`text-xs font-mono uppercase tracking-wide px-1.5 py-0.5 rounded border ${
-                            inv.status === 'paid'
+                          className={`text-xs font-mono uppercase tracking-wide px-1.5 py-0.5 rounded border ${inv.status === 'paid'
                               ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/5'
                               : inv.status === 'sent'
                                 ? 'border-amber-500/40 text-amber-300 bg-amber-500/5'
                                 : inv.status === 'void'
                                   ? 'border-surface-border text-content-muted'
                                   : 'border-surface-border text-content-tertiary'
-                          }`}
+                            }`}
                         >
                           {inv.status}
                         </span>

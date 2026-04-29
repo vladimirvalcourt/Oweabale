@@ -28,6 +28,7 @@ Deno.serve(async (req) => {
 
     const secret = Deno.env.get('CF_TURNSTILE_SECRET_KEY');
     if (!secret) {
+      // Secret-backed verification guard: without the Turnstile secret, all verification is unauthorized.
       return new Response(JSON.stringify({ success: false, error: 'Server misconfiguration' }), {
         status: 500,
         headers: { ...c, 'Content-Type': 'application/json' },

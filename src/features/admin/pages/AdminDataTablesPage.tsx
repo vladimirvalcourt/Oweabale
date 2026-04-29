@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, Download, ShieldCheck } from 'lucide-react';
+import { Download } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { getAdminActionErrorMessage } from '../../../lib/api/adminActions';
@@ -13,7 +13,6 @@ type EntityConfig = {
   table: string;
   primaryKey: string;
   columns: string[];
-  editableColumns: string[];
   defaultOrder: string;
 };
 
@@ -23,7 +22,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     table: 'profiles',
     primaryKey: 'id',
     columns: ['id', 'email', 'is_admin', 'is_banned', 'created_at'],
-    editableColumns: ['is_admin', 'is_banned'],
     defaultOrder: 'created_at',
   },
   {
@@ -31,7 +29,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     table: 'support_tickets',
     primaryKey: 'id',
     columns: ['id', 'ticket_number', 'status', 'priority', 'created_at'],
-    editableColumns: ['status', 'priority'],
     defaultOrder: 'created_at',
   },
   {
@@ -39,7 +36,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     table: 'user_feedback',
     primaryKey: 'id',
     columns: ['id', 'type', 'rating', 'created_at'],
-    editableColumns: ['type', 'rating'],
     defaultOrder: 'created_at',
   },
   {
@@ -47,7 +43,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     table: 'moderation_queue',
     primaryKey: 'id',
     columns: ['id', 'entity_type', 'status', 'created_at'],
-    editableColumns: ['status', 'moderator_note'],
     defaultOrder: 'created_at',
   },
   {
@@ -55,7 +50,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     table: 'system_notifications',
     primaryKey: 'id',
     columns: ['id', 'title', 'severity', 'is_read', 'created_at'],
-    editableColumns: ['severity', 'is_read'],
     defaultOrder: 'created_at',
   },
   {
@@ -63,7 +57,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     table: 'admin_broadcasts',
     primaryKey: 'id',
     columns: ['id', 'title', 'type', 'created_at'],
-    editableColumns: ['title', 'content', 'type'],
     defaultOrder: 'created_at',
   },
   {
@@ -71,7 +64,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     table: 'bills',
     primaryKey: 'id',
     columns: ['id', 'user_id', 'name', 'amount', 'due_date', 'status', 'type'],
-    editableColumns: ['status', 'amount'],
     defaultOrder: 'due_date',
   },
   {
@@ -79,7 +71,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     table: 'transactions',
     primaryKey: 'id',
     columns: ['id', 'user_id', 'merchant_name', 'amount', 'date', 'category', 'source'],
-    editableColumns: ['category'],
     defaultOrder: 'date',
   },
   {
@@ -87,7 +78,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     table: 'subscriptions',
     primaryKey: 'id',
     columns: ['id', 'user_id', 'name', 'amount', 'billing_cycle', 'status'],
-    editableColumns: ['status', 'billing_cycle'],
     defaultOrder: 'created_at',
   },
   {
@@ -95,7 +85,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     table: 'plaid_items',
     primaryKey: 'id',
     columns: ['id', 'user_id', 'institution_name', 'item_login_required', 'last_sync_at', 'last_sync_error'],
-    editableColumns: [],
     defaultOrder: 'last_sync_at',
   },
   {
@@ -103,7 +92,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     table: 'budgets',
     primaryKey: 'id',
     columns: ['id', 'user_id', 'category', 'limit', 'period', 'created_at'],
-    editableColumns: ['limit', 'period'],
     defaultOrder: 'created_at',
   },
   {
@@ -111,7 +99,6 @@ const ENTITY_CONFIGS: EntityConfig[] = [
     table: 'goals',
     primaryKey: 'id',
     columns: ['id', 'user_id', 'name', 'target_amount', 'current_amount', 'deadline', 'status'],
-    editableColumns: ['status', 'target_amount'],
     defaultOrder: 'deadline',
   },
 ];
@@ -133,9 +120,6 @@ export default function AdminDataTablesPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [planFilter, setPlanFilter] = useState<'any' | 'free' | 'pro' | 'lifetime'>('any');
   const [plaidFilter, setPlaidFilter] = useState<'any' | 'healthy' | 'error' | 'relink'>('any');
-  const [editingRow, setEditingRow] = useState<Record<string, unknown> | null>(null);
-  const [draftEdit, setDraftEdit] = useState<Record<string, unknown>>({});
-  const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const qc = useQueryClient();
 
   const config = useMemo(() => ENTITY_CONFIGS.find((c) => c.key === activeKey) ?? ENTITY_CONFIGS[0], [activeKey]);
@@ -202,23 +186,6 @@ export default function AdminDataTablesPage() {
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]));
   };
 
-  const handleBulkDelete = async () => {
-    if (selectedIds.length === 0) return;
-    if (deleteConfirmText !== config.table) {
-      toast.error(`Type ${config.table} in the danger zone before deleting rows.`);
-      return;
-    }
-    if (!window.confirm(`Delete ${selectedIds.length} selected rows from ${config.table}?`)) return;
-    const { error: deleteError } = await supabase.from(config.table as never).delete().in(config.primaryKey, selectedIds);
-    if (deleteError) {
-      toast.error(deleteError.message);
-      return;
-    }
-    setSelectedIds([]);
-    setDeleteConfirmText('');
-    await qc.invalidateQueries({ queryKey: ['admin', 'entity-table'] });
-  };
-
   const handleProfileBulkAction = async (bulkAction: 'ban' | 'unban' | 'grant_entitlement' | 'revoke_entitlement') => {
     if (selectedIds.length === 0) return;
     const actionLabelMap: Record<typeof bulkAction, string> = {
@@ -245,33 +212,6 @@ export default function AdminDataTablesPage() {
     }
     toast.success(typeof res.data?.message === 'string' ? res.data.message : 'Bulk action completed.');
     setSelectedIds([]);
-    await qc.invalidateQueries({ queryKey: ['admin', 'entity-table'] });
-  };
-
-  const openEdit = (row: Record<string, unknown>) => {
-    setEditingRow(row);
-    const initial: Record<string, unknown> = {};
-    config.editableColumns.forEach((c) => {
-      initial[c] = row[c] ?? '';
-    });
-    setDraftEdit(initial);
-  };
-
-  const saveEdit = async () => {
-    if (!editingRow) return;
-    const rowId = editingRow[config.primaryKey];
-    if (typeof rowId !== 'string') return;
-    const { error: updateError } = await supabase
-      .from(config.table as never)
-      .update(draftEdit as never)
-      .eq(config.primaryKey, rowId);
-    if (updateError) {
-      toast.error(updateError.message);
-      return;
-    }
-    toast.success('Row updated.');
-    setEditingRow(null);
-    setDraftEdit({});
     await qc.invalidateQueries({ queryKey: ['admin', 'entity-table'] });
   };
 
@@ -401,35 +341,9 @@ export default function AdminDataTablesPage() {
               </>
             ) : null}
           </div>
-          {selectedIds.length > 0 && !profilesView ? (
-            <div className="mt-4 border border-rose-500/40 bg-rose-500/10 p-3">
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="mt-0.5 h-4 w-4 text-rose-700 dark:text-rose-200" />
-                <div>
-                  <p className="text-xs font-semibold text-content-primary">Danger zone</p>
-                  <p className="mt-1 text-[11px] leading-5 text-content-secondary">
-                    Type <span className="font-mono text-content-primary">{config.table}</span> to unlock delete for {selectedIds.length} selected row(s).
-                  </p>
-                </div>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <input
-                  value={deleteConfirmText}
-                  onChange={(event) => setDeleteConfirmText(event.target.value)}
-                  className={cn(adminInputClass, 'min-w-48')}
-                  placeholder={config.table}
-                />
-                <button
-                  type="button"
-                  onClick={() => void handleBulkDelete()}
-                  disabled={deleteConfirmText !== config.table}
-                  className={adminDangerButtonClass}
-                >
-                  Delete selected
-                </button>
-              </div>
-            </div>
-          ) : null}
+          <p className="mt-3 text-[11px] leading-5 text-content-muted">
+            Direct row edits and deletes are disabled. Use case files or audited admin actions for changes.
+          </p>
           </div>
         </AdminPanel>
       </div>
@@ -484,7 +398,7 @@ export default function AdminDataTablesPage() {
                     </th>
                   ))}
                   {hasUserIdColumn ? <th className="px-3 py-2 font-medium">Case file</th> : null}
-                  <th className="px-3 py-2 font-medium">Edit</th>
+                  <th className="px-3 py-2 font-medium">Mode</th>
                 </tr>
               </thead>
               <tbody>
@@ -519,13 +433,9 @@ export default function AdminDataTablesPage() {
                       </td>
                     ) : null}
                     <td className="px-3 py-2">
-                      <button
-                        type="button"
-                        onClick={() => openEdit(row)}
-                      className="interactive-press interactive-focus border border-surface-border bg-surface-base px-2 py-1 text-[10px] text-content-tertiary"
-                    >
-                        Edit
-                      </button>
+                      <span className="border border-surface-border bg-surface-base px-2 py-1 text-[10px] text-content-tertiary">
+                        Read only
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -559,59 +469,6 @@ export default function AdminDataTablesPage() {
           </button>
         </div>
       </div>
-
-      {editingRow ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 p-4">
-          <div className="h-full w-full max-w-xl overflow-auto border border-surface-border bg-surface-base p-4 shadow-2xl">
-            <div className="mb-4 flex items-start gap-3 border-b border-surface-border pb-4">
-              <ShieldCheck className="mt-0.5 h-4 w-4 text-content-tertiary" />
-              <div>
-                <h3 className="text-sm font-semibold text-content-primary">Edit {config.key} row</h3>
-                <p className="mt-1 text-xs leading-5 text-content-tertiary">Review the old and new values before saving. This writes directly to {config.table}.</p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              {config.editableColumns.map((column) => (
-                <label key={column} className="block">
-                  <span className="mb-1 block text-[10px] uppercase tracking-wider text-content-tertiary">{column}</span>
-                  <input
-                    value={String(draftEdit[column] ?? '')}
-                    onChange={(e) => setDraftEdit((prev) => ({ ...prev, [column]: e.target.value }))}
-                    className={cn(adminInputClass, 'w-full')}
-                  />
-                  <span className="mt-1 block text-[10px] text-content-muted">Current: {String(editingRow[column] ?? '—')}</span>
-                </label>
-              ))}
-            </div>
-            <div className="mt-4 border border-surface-border bg-surface-raised p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-content-tertiary">Change summary</p>
-              <div className="mt-2 space-y-1 text-[11px] text-content-secondary">
-                {config.editableColumns.map((column) => (
-                  <p key={column}>
-                    <span className="font-mono text-content-tertiary">{column}</span>: {String(editingRow[column] ?? '—')} → {String(draftEdit[column] ?? '—')}
-                  </p>
-                ))}
-              </div>
-            </div>
-            <div className="mt-4 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setEditingRow(null)}
-                className={adminButtonClass}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => void saveEdit()}
-                className="interactive-press interactive-focus border border-content-primary bg-content-primary px-3 py-2 text-xs font-semibold text-surface-base"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </section>
   );
 }

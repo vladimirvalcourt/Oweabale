@@ -77,6 +77,10 @@ type UserDetail = {
     priority: string;
     created_at: string;
   }>;
+  admin_notes: Array<{ id: string; note_type: string; body: string; created_at: string }>;
+  lifecycle_events: Array<{ id: string; action: string; reason_code: string; reason: string; created_at: string }>;
+  trial_events: Array<{ id: string; additional_days: number; new_trial_ends_at: string; reason: string; created_at: string }>;
+  deletion_reviews: Array<{ id: string; status: string; reason_code: string; reason: string; created_at: string }>;
   compliance?: {
     user_id: string;
     kyc_status: string;
@@ -547,6 +551,47 @@ export default function AdminCaseFilePage() {
                 {detail.tickets.map((t) => (
                   <li key={t.id}>
                     #{t.ticket_number} · {t.subject} · {t.status}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <p className={SECTION}>Admin risk notes</p>
+            {detail.admin_notes.length === 0 ? (
+              <p className="text-xs text-content-muted">No admin notes.</p>
+            ) : (
+              <ul className="space-y-2 text-xs text-content-secondary">
+                {detail.admin_notes.map((note) => (
+                  <li key={note.id} className="border border-surface-border p-2">
+                    <span className="font-semibold text-content-primary">{note.note_type}</span>
+                    <p className="mt-1">{note.body}</p>
+                    <p className="mt-1 text-[10px] text-content-muted">{fmtDate(note.created_at)}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <p className={SECTION}>Lifecycle and billing ops</p>
+            {[...detail.lifecycle_events, ...detail.trial_events, ...detail.deletion_reviews].length === 0 ? (
+              <p className="text-xs text-content-muted">No lifecycle, deletion, or trial-extension events.</p>
+            ) : (
+              <ul className="space-y-2 text-xs text-content-secondary">
+                {detail.lifecycle_events.map((event) => (
+                  <li key={event.id} className="border border-surface-border p-2">
+                    {event.action} · {event.reason_code}
+                    <p className="mt-1 text-content-muted">{event.reason}</p>
+                  </li>
+                ))}
+                {detail.trial_events.map((event) => (
+                  <li key={event.id} className="border border-surface-border p-2">
+                    Trial +{event.additional_days} days · ends {fmtDate(event.new_trial_ends_at)}
+                    <p className="mt-1 text-content-muted">{event.reason}</p>
+                  </li>
+                ))}
+                {detail.deletion_reviews.map((review) => (
+                  <li key={review.id} className="border border-surface-border p-2">
+                    Deletion review · {review.status} · {review.reason_code}
+                    <p className="mt-1 text-content-muted">{review.reason}</p>
                   </li>
                 ))}
               </ul>

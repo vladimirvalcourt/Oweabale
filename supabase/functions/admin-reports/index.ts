@@ -1,8 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // admin-reports Edge Function
-// Action: report_pdf — generates a simple text-based PDF summary from passed report data.
-// Admin-only: validates the caller is a superadmin before processing.
+// Action: report_text — generates a simple text summary from passed report data.
+// Admin-only: validates the caller is a super admin before processing.
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,6 +12,12 @@ const corsHeaders = {
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
+  }
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   try {
@@ -27,7 +33,7 @@ Deno.serve(async (req: Request) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Verify the caller is a superadmin
+    // Verify the caller is a super admin.
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: userErr } = await supabase.auth.getUser(token);
     if (userErr || !user) {
@@ -37,13 +43,20 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const { data: adminRow } = await supabase
-      .from('admin_roles')
-      .select('role')
-      .eq('user_id', user.id)
-      .single();
+    const primaryAdminEmail = Deno.env.get('ADMIN_ALLOWED_EMAIL')?.trim().toLowerCase() ?? '';
+    const callerEmail = user.email?.trim().toLowerCase() ?? '';
+    const { data: roleRows, error: roleErr } = await supabase
+      .from('admin_user_roles')
+      .select('admin_roles(key)')
+      .eq('user_id', user.id);
+    if (roleErr) throw roleErr;
+    const isSuperAdmin = callerEmail === primaryAdminEmail || (roleRows ?? []).some((row) => {
+      const role = (row as { admin_roles?: { key?: string } | { key?: string }[] | null }).admin_roles;
+      const firstRole = Array.isArray(role) ? role[0] : role;
+      return firstRole?.key === 'super_admin';
+    });
 
-    if (!adminRow || adminRow.role !== 'superadmin') {
+    if (!isSuperAdmin) {
       return new Response(JSON.stringify({ error: 'Forbidden: superadmin required' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -58,7 +71,7 @@ Deno.serve(async (req: Request) => {
       totals?: { signups: number; tickets: number; feedback: number };
     };
 
-    if (body.action !== 'report_pdf') {
+    if (body.action !== 'report_text') {
       return new Response(JSON.stringify({ error: `Unknown action: ${body.action}` }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -67,8 +80,6 @@ Deno.serve(async (req: Request) => {
 
     const { fromDate, toDate, rows = [], totals } = body;
 
-    // Build a simple PDF-like structure using plain text encoded as base64.
-    // For a real PDF, integrate a PDF library (e.g. pdfmake via npm CDN) here.
     const lines: string[] = [
       'OWEABLE ADMIN REPORT',
       '====================',
@@ -99,9 +110,9 @@ Deno.serve(async (req: Request) => {
     for (let i = 0; i < bytes.length; i += chunkSize) {
       base64Chunks.push(String.fromCharCode(...bytes.slice(i, i + chunkSize)));
     }
-    const pdfBase64 = btoa(base64Chunks.join(''));
+    const textBase64 = btoa(base64Chunks.join(''));
 
-    return new Response(JSON.stringify({ pdfBase64 }), {
+    return new Response(JSON.stringify({ textBase64 }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (err) {

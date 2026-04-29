@@ -108,12 +108,6 @@ export default function AdminSessionsPage() {
         body: { action: 'revoke_sessions', targetUserId: userId, revokeScope: 'global' },
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
-      // Also mark rows in user_sessions as revoked
-      await supabase
-        .from('user_sessions')
-        .update({ revoked_at: new Date().toISOString() })
-        .eq('user_id', userId)
-        .is('revoked_at', null);
     }
     setRevokingUserId(null);
     await qc.invalidateQueries({ queryKey: ['admin', 'sessions'] });

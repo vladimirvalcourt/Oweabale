@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Mail, Send, Loader2, CheckCircle, ShieldCheck } from 'lucide-react';
-import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
+import { CheckCircle, ShieldCheck } from 'lucide-react';
 import { supabase } from '../../../lib/api/supabase';
 import { useAdminPermissions } from '../shared';
 import { AdminMetric, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminDangerButtonClass, adminInputClass } from '../shared/AdminUI';
@@ -30,12 +29,11 @@ const AUDIENCE_OPTIONS: { value: AudienceFilter; label: string; description: str
 export default function AdminEmailBlastPage() {
   const { hasPermission, isSuperAdmin } = useAdminPermissions();
   const canSend = isSuperAdmin || hasPermission('moderation.manage');
-  const qc = useQueryClient();
+  const backendEnabled = false;
 
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [audience, setAudience] = useState<AudienceFilter>('all');
-  const [isSending, setIsSending] = useState(false);
   const [preview, setPreview] = useState(false);
   const [reviewConfirmed, setReviewConfirmed] = useState(false);
 
@@ -52,35 +50,6 @@ export default function AdminEmailBlastPage() {
     },
   });
 
-  const handleSend = async () => {
-    if (!subject.trim()) { toast.error('Subject is required'); return; }
-    if (!body.trim()) { toast.error('Body is required'); return; }
-    if (body.trim().length < 30) { toast.error('Body must be at least 30 characters'); return; }
-    if (!reviewConfirmed) { toast.error('Confirm that the audience and preview were reviewed.'); return; }
-    if (!window.confirm(`Final send: deliver this blast to ${AUDIENCE_OPTIONS.find((o) => o.value === audience)?.label}? This action cannot be undone.`)) return;
-
-    setIsSending(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) throw new Error('Not signed in');
-      const { data, error } = await supabase.functions.invoke('admin-actions', {
-        body: { action: 'send_email_blast', subject: subject.trim(), body: body.trim(), audienceFilter: audience },
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-      if (error) throw error;
-      toast.success(`Email blast queued for ${data?.recipient_count ?? '?'} recipients.`);
-      setSubject('');
-      setBody('');
-      setAudience('all');
-      setReviewConfirmed(false);
-      await qc.invalidateQueries({ queryKey: ['admin', 'email-blasts'] });
-    } catch (err) {
-      toast.error((err as Error)?.message ?? 'Failed to send');
-    } finally {
-      setIsSending(false);
-    }
-  };
-
   return (
     <section className="mx-auto max-w-[92rem] space-y-5 px-4 py-5 sm:px-6 lg:px-8">
       <AdminPageHeader
@@ -89,9 +58,9 @@ export default function AdminEmailBlastPage() {
         description="Send targeted operational or marketing broadcasts with preview, permission checks, and a deliberate final confirmation."
         metrics={[
           { label: 'History', value: blasts.length },
-          { label: 'Permission', value: canSend ? 'Can send' : 'Read only', tone: canSend ? 'good' : 'warn' },
+          { label: 'Permission', value: canSend ? 'Can compose' : 'Read only', tone: canSend ? 'good' : 'warn' },
+          { label: 'Sender', value: backendEnabled ? 'Enabled' : 'Disabled', tone: backendEnabled ? 'good' : 'warn' },
           { label: 'Preview', value: preview ? 'Open' : 'Edit' },
-          { label: 'Audience', value: AUDIENCE_OPTIONS.find((o) => o.value === audience)?.label ?? audience },
         ]}
       />
 
@@ -104,6 +73,10 @@ export default function AdminEmailBlastPage() {
               You need super-admin or moderation.manage permission to send email blasts.
             </div>
           ) : null}
+          <div className="border border-amber-500/40 bg-amber-500/10 p-3 text-xs leading-5 text-amber-700 dark:text-amber-200">
+            Sending is disabled until the backend has a real queued sender with suppression lists,
+            unsubscribe enforcement, recipient estimates, rate limits, and audit records.
+          </div>
 
           <div>
             <label className="mb-1.5 block text-[11px] font-medium text-content-secondary">Audience</label>
@@ -185,12 +158,10 @@ export default function AdminEmailBlastPage() {
 
             <button
               type="button"
-              disabled={!canSend || isSending || !reviewConfirmed}
-              onClick={() => void handleSend()}
+              disabled
               className={cn(adminDangerButtonClass, 'w-full py-2.5 text-sm')}
             >
-              {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-              {isSending ? 'Sending...' : 'Send controlled blast'}
+              Send disabled until backend sender is implemented
             </button>
           </div>
         </AdminPanel>

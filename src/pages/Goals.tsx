@@ -325,7 +325,7 @@ export default function Goals() {
           </div>
         </div>
       ) : (
-        <CollapsibleModule 
+        <CollapsibleModule
           title="Your Goals"
           icon={GoalsIcon}
           extraHeader={<span className="text-xs font-sans text-content-tertiary">{goals.length} active</span>}
@@ -337,8 +337,8 @@ export default function Goals() {
               const isSavings = goal.type === 'savings';
 
               return (
-                <div 
-                  key={goal.id} 
+                <div
+                  key={goal.id}
                   className="bg-surface-elevated rounded-xl border border-surface-border overflow-hidden group hover:border-content-primary/15 transition-colors"
                 >
                   <div className="p-6">

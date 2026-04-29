@@ -17,13 +17,6 @@ export default function AdminGuard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { if (!cancelled) setStatus('denied'); return; }
 
-      const allowed = import.meta.env.VITE_ADMIN_EMAIL?.trim().toLowerCase();
-      const sessionEmail = user.email?.trim().toLowerCase();
-      if (!allowed || !sessionEmail || sessionEmail !== allowed) {
-        if (!cancelled) setStatus('denied');
-        return;
-      }
-
       const { data, error } = await supabase
         .from('profiles')
         .select('is_admin')
@@ -42,7 +35,7 @@ export default function AdminGuard() {
         if (!roleErr) {
           hasAdminRole = (roleRows ?? []).some((row: { admin_roles?: { key?: string } | { key?: string }[] }) => {
             const role = Array.isArray(row.admin_roles) ? row.admin_roles[0] : row.admin_roles;
-            return role?.key === 'admin';
+            return role?.key === 'admin' || role?.key === 'super_admin';
           });
         }
       }

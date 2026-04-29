@@ -90,9 +90,9 @@ Deno.serve(async (req: Request) => {
 
     return new Response(JSON.stringify({ ok: true }), { headers: { ...c, 'Content-Type': 'application/json' } });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : 'Failed to send email';
+    console.error('[trial-warning-email] send failed', err instanceof Error ? err.message : 'unknown');
     return new Response(
-      JSON.stringify({ error: msg }),
+      JSON.stringify({ error: 'Failed to send email' }),
       { status: 400, headers: { ...c, 'Content-Type': 'application/json' } },
     );
   }

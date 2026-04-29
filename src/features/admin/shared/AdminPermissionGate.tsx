@@ -28,18 +28,14 @@ export function AdminPermissionGate({
     );
   }
 
-  // Timed out while still loading: fall back to profile-level admin flag.
-  // Only grant pass-through when RBAC is still unresolved (isLoading),
-  // NOT when it has already resolved with a denial.
+  // Timed out while still loading: fail closed. Admin routes should not broaden
+  // access when RBAC cannot prove the caller's permission scope.
   if (timedOut && isLoading && !hasPermission(permission)) {
-    if (isAdminProfile) {
-      // RBAC never resolved — grant pass-through to admin profiles only
-      return <>{children}</>;
-    }
     return (
       <div className="mx-auto max-w-7xl px-4 py-6 space-y-3">
         <p className="text-xs text-amber-700 dark:text-amber-200">
-          Permission check timed out. Could not verify <code>{permission}</code>.
+          Permission check timed out. Could not verify <code>{permission}</code>
+          {isAdminProfile ? ' for this admin profile.' : '.'}
         </p>
         <button
           type="button"

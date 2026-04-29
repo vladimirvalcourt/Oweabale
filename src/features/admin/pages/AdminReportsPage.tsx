@@ -35,7 +35,6 @@ function StatCard({ label, value, sub, accent }: StatCardProps) {
 export default function AdminReportsPage() {
   const [fromDate, setFromDate] = useState(() => new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString().slice(0, 10));
   const [toDate, setToDate] = useState(() => new Date().toISOString().slice(0, 10));
-  const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [activeSection, setActiveSection] = useState<'overview' | 'revenue' | 'funnel' | 'retention' | 'adoption'>('overview');
 
   const { data: rows = [], isLoading, error } = useQuery({
@@ -185,30 +184,31 @@ export default function AdminReportsPage() {
     URL.revokeObjectURL(url);
   };
 
-  const exportPdf = async () => {
-    setIsExportingPdf(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) return;
-      const { data, error: invokeError } = await supabase.functions.invoke('admin-reports', {
-        body: { action: 'report_pdf', fromDate, toDate, rows, totals },
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-      if (invokeError) throw invokeError;
-      const base64 = data?.pdfBase64 as string | undefined;
-      if (!base64) return;
-      const binary = atob(base64);
-      const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
-      const blob = new Blob([bytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `admin-report-${fromDate}-to-${toDate}.pdf`;
-      link.click();
-      URL.revokeObjectURL(url);
-    } finally {
-      setIsExportingPdf(false);
-    }
+  const exportText = () => {
+    const lines = [
+      'OWEABLE ADMIN REPORT',
+      '====================',
+      `Period: ${fromDate} to ${toDate}`,
+      `Generated: ${new Date().toISOString()}`,
+      '',
+      'SUMMARY',
+      '-------',
+      `Total Signups:  ${totals.signups}`,
+      `Total Tickets:  ${totals.tickets}`,
+      `Total Feedback: ${totals.feedback}`,
+      '',
+      'DAILY BREAKDOWN',
+      '---------------',
+      'Date        | Signups | Tickets | Feedback',
+      ...rows.map((row) => `${row.date} | ${String(row.signups).padStart(7)} | ${String(row.tickets).padStart(7)} | ${String(row.feedback).padStart(8)}`),
+    ];
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `admin-report-${fromDate}-to-${toDate}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const sections = [
@@ -243,7 +243,7 @@ export default function AdminReportsPage() {
         ]}
       />
 
-      <AdminPanel title="Report controls" description="Export the currently loaded operational rows. PDF export still uses the existing admin-reports function.">
+      <AdminPanel title="Report controls" description="Export the currently loaded operational rows. Text export is intentionally honest until a real PDF renderer is added.">
       <div className="flex flex-wrap items-end gap-3 p-4">
         <div>
           <label className="mb-1 block text-[10px] uppercase tracking-wider text-content-tertiary">From</label>
@@ -256,8 +256,8 @@ export default function AdminReportsPage() {
         <button type="button" onClick={exportCsv} className={adminButtonClass}>
           <Download className="h-3.5 w-3.5" /> CSV
         </button>
-        <button type="button" onClick={() => void exportPdf()} disabled={isExportingPdf} className={adminButtonClass}>
-          <FileText className="h-3.5 w-3.5" /> {isExportingPdf ? 'PDF...' : 'PDF'}
+        <button type="button" onClick={exportText} className={adminButtonClass}>
+          <FileText className="h-3.5 w-3.5" /> TXT
         </button>
       </div>
       </AdminPanel>

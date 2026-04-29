@@ -5,15 +5,19 @@ import {
   ArrowRight,
   BarChart3,
   CheckCircle,
+  CreditCard,
   Database,
   FileText,
   Gavel,
   GitBranch,
   Mail,
+  Megaphone,
   Radio,
   Scale,
   Search,
   ShieldAlert,
+  ShieldCheck,
+  UserX,
   Users,
 } from 'lucide-react';
 import { supabase } from '../../../lib/api/supabase';
@@ -38,14 +42,19 @@ type OnboardingMetrics = {
 
 const opsModules = [
   { group: 'Users', title: 'Case files', description: 'Investigate one account across billing, access, support, Plaid, and compliance.', icon: Search, href: '/admin/user', tone: 'info' as const },
+  { group: 'Users', title: 'Support', description: 'Assign tickets, update SLA/status, and preserve internal response history.', icon: Megaphone, href: '/admin/support', tone: 'warn' as const },
+  { group: 'Users', title: 'Billing', description: 'Lookup subscriptions, entitlements, trial extensions, and refund review requests.', icon: CreditCard, href: '/admin/billing', tone: 'good' as const },
+  { group: 'Users', title: 'Lifecycle', description: 'Ban, restore, add risk notes, and queue deletion reviews with reasons.', icon: UserX, href: '/admin/lifecycle', tone: 'danger' as const },
   { group: 'Users', title: 'Sessions', description: 'Review device context and revoke sessions for account security incidents.', icon: Activity, href: '/admin/sessions', tone: 'warn' as const },
   { group: 'Data', title: 'Data explorer', description: 'Read operational tables first, then make scoped edits through controlled panels.', icon: Database, href: '/admin/data', tone: 'default' as const },
   { group: 'Data', title: 'Audit log', description: 'Trace admin and system actions with actor, record, and time context.', icon: ShieldAlert, href: '/admin/audit-logs', tone: 'danger' as const },
+  { group: 'Governance', title: 'RBAC governance', description: 'Audit roles, invites, admin assignments, and permission coverage.', icon: ShieldCheck, href: '/admin/governance', tone: 'info' as const },
+  { group: 'Governance', title: 'Incident controls', description: 'Operate feature flags, maintenance mode, broadcasts, and webhook replay queues.', icon: Radio, href: '/admin/incident', tone: 'warn' as const },
   { group: 'Governance', title: 'Moderation', description: 'Work reported content as a queue with review states and notes.', icon: Gavel, href: '/admin/moderation', tone: 'warn' as const },
   { group: 'Governance', title: 'Compliance', description: 'Monitor KYC, AML, sanctions, and high-risk user review queues.', icon: Scale, href: '/admin/compliance', tone: 'danger' as const },
   { group: 'Monitor', title: 'Telemetry', description: 'Watch Plaid, Stripe webhook cadence, and admin edge traffic.', icon: Radio, href: '/admin/telemetry', tone: 'good' as const },
   { group: 'Monitor', title: 'Reports', description: 'Export operational reports with clearly marked estimated metrics.', icon: FileText, href: '/admin/reports', tone: 'default' as const },
-  { group: 'Comms', title: 'Campaigns', description: 'Compose governed broadcasts with preview and confirmation steps.', icon: Mail, href: '/admin/email-blast', tone: 'info' as const },
+  { group: 'Comms', title: 'Communications', description: 'Manage templates, test sends, suppressions, estimates, and queued campaigns.', icon: Mail, href: '/admin/comms', tone: 'info' as const },
 ];
 
 export default function AdminOverviewPage() {

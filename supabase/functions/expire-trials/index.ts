@@ -86,6 +86,13 @@ async function downgradeExpiredTrial(
 }
 
 Deno.serve(async (req: Request) => {
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   // Verify cron secret for security
   const cronSecret = Deno.env.get('EXPIRE_TRIALS_CRON_SECRET');
   const authHeader = req.headers.get('Authorization');

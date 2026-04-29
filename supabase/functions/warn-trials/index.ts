@@ -8,6 +8,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
  */
 
 Deno.serve(async (req: Request) => {
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const cronSecret = Deno.env.get('WARN_TRIALS_CRON_SECRET');
   const authHeader = req.headers.get('Authorization');
 

@@ -2,7 +2,9 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, Eye, Flag, Gavel, X } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { supabase } from '../../../lib/api/supabase';
+import { getAdminActionErrorMessage } from '../../../lib/api/adminActions';
 import { AdminEmptyState, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass } from '../shared/AdminUI';
 import { cn } from '../../../lib/utils';
 
@@ -52,14 +54,24 @@ export default function AdminModerationPage() {
 
   async function setStatus(id: string, status: ModerationRow['status']) {
     setSavingId(id);
-    const { error: updateError } = await supabase
-      .from('moderation_queue')
-      .update({ status, reviewed_at: new Date().toISOString() })
-      .eq('id', id);
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      setSavingId(null);
+      toast.error('Not signed in.');
+      return;
+    }
+    const result = await supabase.functions.invoke('admin-actions', {
+      body: { action: 'update_moderation_status', moderationId: id, status },
+      headers: { Authorization: `Bearer ${session.access_token}` },
+    });
     setSavingId(null);
-    if (!updateError) {
+    if (!result.error) {
       setSelected((current) => (current?.id === id ? { ...current, status } : current));
       await qc.invalidateQueries({ queryKey: ['admin', 'moderation-queue'] });
+    } else {
+      toast.error(getAdminActionErrorMessage(result));
     }
   }
 

@@ -1,16 +1,20 @@
 import {
   Activity,
   Bell,
+  CreditCard,
   Database,
   FileText,
   Gavel,
   LayoutDashboard,
   Mail,
+  Megaphone,
   Radio,
   Scale,
   Search,
   ShieldAlert,
+  ShieldCheck,
   UserRound,
+  UserX,
 } from 'lucide-react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useMemo, useState } from 'react';
@@ -36,6 +40,9 @@ const navGroups = [
     label: 'Users',
     items: [
       { to: '/admin/user', label: 'Case files', requiredPermission: 'users.read', icon: UserRound },
+      { to: '/admin/support', label: 'Support', requiredPermission: 'support.manage', icon: Megaphone },
+      { to: '/admin/billing', label: 'Billing', requiredPermission: 'billing.manage', icon: CreditCard },
+      { to: '/admin/lifecycle', label: 'Lifecycle', requiredPermission: 'users.manage', icon: UserX },
       { to: '/admin/sessions', label: 'Sessions', requiredPermission: 'users.manage', icon: Activity },
     ],
   },
@@ -49,6 +56,8 @@ const navGroups = [
   {
     label: 'Governance',
     items: [
+      { to: '/admin/governance', label: 'RBAC', requiredPermission: 'governance.manage', icon: ShieldCheck },
+      { to: '/admin/incident', label: 'Incident', requiredPermission: 'incident.manage', icon: Radio },
       { to: '/admin/moderation', label: 'Moderation', requiredPermission: 'moderation.manage', icon: Gavel },
       { to: '/admin/compliance', label: 'Compliance', requiredPermission: 'compliance.read', icon: Scale },
     ],
@@ -56,7 +65,7 @@ const navGroups = [
   {
     label: 'Comms',
     items: [
-      { to: '/admin/email-blast', label: 'Campaigns', requiredPermission: 'moderation.manage', icon: Mail },
+      { to: '/admin/comms', label: 'Comms', requiredPermission: 'comms.manage', icon: Mail },
     ],
   },
 ];

@@ -80,8 +80,6 @@ const SidebarHeader = memo(function SidebarHeader({
         )}
       </div>
       <div className="flex items-center gap-1">
-        {/* Theme Toggle - only shown in mobile sidebar */}
-        <ThemeToggle className="lg:hidden" />
         <button
           type="button"
           aria-label="Close navigation menu"
@@ -759,8 +757,7 @@ export default function Layout() {
               <Plus className="w-3.5 h-3.5" aria-hidden />
             </button>
 
-            {/* Theme Toggle - only shown in desktop header */}
-            <ThemeToggle className="hidden lg:inline-flex" />
+            <ThemeToggle />
 
             {/* Notifications */}
             <div className="relative" ref={notifRef}>

@@ -176,16 +176,16 @@ export default function Categories() {
           </button>
         </div>
       ) : (
-        <CollapsibleModule 
-          title="Manage Categories" 
+        <CollapsibleModule
+          title="Manage Categories"
           icon={CategoriesIcon}
           extraHeader={<span className="text-xs font-mono text-content-tertiary uppercase tracking-widest">{categories.length} Categories Saved</span>}
         >
           <div className="bg-surface-raised rounded-xl border border-surface-border overflow-hidden -mx-6 -my-6">
             <ul className="divide-y divide-surface-highlight">
               {categories.map((category) => (
-                <li 
-                  key={category.id} 
+                <li
+                  key={category.id}
                   className="p-4 sm:px-6 hover:bg-surface-elevated transition-colors flex items-center justify-between group"
                 >
                   <div className="flex items-center gap-4">

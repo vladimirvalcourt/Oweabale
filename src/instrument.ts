@@ -10,6 +10,8 @@ import {
   useLocation,
   useNavigationType,
 } from 'react-router-dom';
+import { supabaseIntegration } from '@supabase/sentry-js-integration';
+import { supabase } from './lib/api/supabase/client';
 import { isStaleDynamicImportError } from './lib/utils/dynamicImportErrors';
 
 const dsn = typeof import.meta.env.VITE_SENTRY_DSN === 'string' ? import.meta.env.VITE_SENTRY_DSN.trim() : '';
@@ -44,6 +46,12 @@ if (dsn) {
     /** Financial app: keep false; use `Sentry.setUser` for explicit id/email only. */
     sendDefaultPii: false,
     integrations: [
+      // Supabase integration for error tracking, breadcrumbs, and tracing
+      supabaseIntegration(supabase, Sentry, {
+        tracing: true,
+        breadcrumbs: true,
+        errors: true,
+      }),
       Sentry.reactRouterV7BrowserTracingIntegration({
         useEffect: React.useEffect,
         useLocation,
