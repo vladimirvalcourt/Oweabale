@@ -44,3 +44,4 @@ server/.npm-cache/
 # Reference clones (awesome-vite, etc.) — not part of the app
 .ref/
 stats.html
+.env.local

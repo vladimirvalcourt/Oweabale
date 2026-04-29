@@ -3,6 +3,7 @@ import { corsHeaders } from '../_shared/cors.ts';
 import { plaidPost } from '../_shared/plaid_client.ts';
 import { hasPaidFullSuiteAccess } from '../_shared/plaidAccess.ts';
 import { runSyncAllForUser } from '../_shared/plaid_sync_runner.ts';
+import { createPostHogClient } from '../_shared/posthog.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
@@ -114,6 +115,19 @@ Deno.serve(async (req: Request) => {
     void runSyncAllForUser(supabaseAdmin, user.id).catch((e) =>
       console.error('[plaid-exchange] initial sync error:', e),
     );
+
+    const posthog = createPostHogClient();
+    if (posthog) {
+      posthog.capture({
+        distinctId: user.id,
+        event: 'bank account linked',
+        properties: {
+          institution_name: institutionName,
+          institution_id: institutionId,
+        },
+      });
+      await posthog.shutdown();
+    }
 
     return new Response(JSON.stringify({ ok: true, item_id: exchange.item_id }), {
       headers: { ...ch, 'Content-Type': 'application/json' },

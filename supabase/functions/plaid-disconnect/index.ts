@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 import { plaidPost } from '../_shared/plaid_client.ts';
+import { createPostHogClient } from '../_shared/posthog.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
@@ -77,6 +78,12 @@ Deno.serve(async (req: Request) => {
       })
       .eq('id', user.id);
     if (profErr) throw profErr;
+
+    const posthog = createPostHogClient();
+    if (posthog) {
+      posthog.capture({ distinctId: user.id, event: 'bank account disconnected' });
+      await posthog.shutdown();
+    }
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...ch, 'Content-Type': 'application/json' },

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import posthog from 'posthog-js';
 import { PostHogProvider as PHProvider } from 'posthog-js/react';
 import { useAuth } from './useAuth';
@@ -33,6 +33,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
  */
 export function usePostHogIdentity() {
   const { user } = useAuth();
+  const prevUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (user?.id && POSTHOG_KEY) {
@@ -40,9 +41,14 @@ export function usePostHogIdentity() {
         email: user.email,
         created_at: user.created_at,
       });
-    } else if (!user?.id) {
+      if (prevUserIdRef.current !== user.id) {
+        posthog.capture('user signed in', { email: user.email });
+      }
+    } else if (!user?.id && prevUserIdRef.current) {
+      posthog.capture('user signed out');
       posthog.reset();
     }
+    prevUserIdRef.current = user?.id ?? null;
   }, [user]);
 }
 

@@ -3,6 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 import { safeRedirectUrl } from '../_shared/stripeRedirects.ts';
 import { getStripeSecretKey } from '../_shared/stripeEnv.ts';
+import { createPostHogClient } from '../_shared/posthog.ts';
 
 type PlanKey = 'pro_monthly' | 'pro_yearly';
 
@@ -157,6 +158,19 @@ Deno.serve(async (req: Request) => {
           idempotencyKey: `checkout_${user.id}_${plan.planKey}_${checkoutAttemptId}_recustomer`,
         },
       );
+    }
+
+    const posthog = createPostHogClient();
+    if (posthog) {
+      posthog.capture({
+        distinctId: user.id,
+        event: 'checkout session created',
+        properties: {
+          plan_key: plan.planKey,
+          session_id: session.id,
+        },
+      });
+      await posthog.shutdown();
     }
 
     return new Response(

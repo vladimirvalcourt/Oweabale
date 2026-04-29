@@ -10,6 +10,7 @@ import {
   getStripeWebhookSecret,
   STRIPE_API_VERSION,
 } from '../_shared/stripeEnv.ts';
+import { createPostHogClient } from '../_shared/posthog.ts';
 
 type AdminClient = ReturnType<typeof createClient>;
 
@@ -105,6 +106,8 @@ Deno.serve(async (req: Request) => {
       return json({ received: true, duplicate: true }, 200);
     }
 
+    const posthog = createPostHogClient();
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
@@ -134,6 +137,17 @@ Deno.serve(async (req: Request) => {
             const sub = await stripe.subscriptions.retrieve(subId);
             await upsertSubscriptionAndEntitlement(supabaseAdmin, sub);
           }
+          if (posthog && userId) {
+            posthog.capture({
+              distinctId: userId,
+              event: 'subscription activated',
+              properties: {
+                plan_key: session.metadata?.plan_key,
+                mode: session.mode,
+                payment_status: session.payment_status,
+              },
+            });
+          }
         }
         break;
       }
@@ -142,6 +156,21 @@ Deno.serve(async (req: Request) => {
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         await upsertSubscriptionAndEntitlement(supabaseAdmin, subscription);
+        const subUserId = subscription.metadata?.user_id;
+        if (posthog && subUserId) {
+          const phEvent =
+            event.type === 'customer.subscription.deleted'
+              ? 'subscription cancelled'
+              : 'subscription updated';
+          posthog.capture({
+            distinctId: subUserId,
+            event: phEvent,
+            properties: {
+              status: subscription.status,
+              cancel_at_period_end: subscription.cancel_at_period_end,
+            },
+          });
+        }
         break;
       }
       case 'invoice.paid':
@@ -152,6 +181,14 @@ Deno.serve(async (req: Request) => {
         if (subId) {
           const sub = await stripe.subscriptions.retrieve(subId);
           await upsertSubscriptionAndEntitlement(supabaseAdmin, sub);
+          const invoiceUserId = sub.metadata?.user_id;
+          if (posthog && invoiceUserId && event.type === 'invoice.payment_failed') {
+            posthog.capture({
+              distinctId: invoiceUserId,
+              event: 'invoice payment failed',
+              properties: { subscription_id: subId },
+            });
+          }
         }
         break;
       }
@@ -159,6 +196,8 @@ Deno.serve(async (req: Request) => {
         console.log('[stripe-webhook] ignored event type', event.type);
         break;
     }
+
+    if (posthog) await posthog.shutdown();
 
     await markStripeWebhookEventComplete(supabaseAdmin, event.id);
 

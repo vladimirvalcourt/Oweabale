@@ -22,7 +22,7 @@ import { validateIngestionFile, sanitizeUrl } from '../lib/api/security';
 import { buildScanExtraction } from '../lib/api/services/ingestionExtraction';
 import { extractDocumentText } from '../lib/api/services/ingestionScan';
 import type { PendingIngestion } from '../store';
-import { yieldForPaint } from '../lib/utils';
+import { yieldForPaint, track } from '../lib/utils';
 import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '../lib/api/services/quickEntryCategories';
 
 // Upload rate limiter — max 5 files per 60 seconds
@@ -140,6 +140,11 @@ export default function Ingestion() {
       }
 
       const committed = await useStore.getState().commitIngestion(ingestionId);
+      track('document scanned', {
+        file_type: uploadedFile.type,
+        ingestion_type: ingestionType,
+        used_raster_ocr: usedRasterPdfOcr,
+      });
       if (!committed) {
         const stillNeedConfirm = trimmed.length < 35 && noAmount;
         if (!stillNeedConfirm) {

@@ -3,6 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 import { getStripeSecretKey } from '../_shared/stripeEnv.ts';
 import { upsertSubscriptionAndEntitlement } from '../_shared/stripeBilling.ts';
+import { createPostHogClient } from '../_shared/posthog.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
@@ -68,6 +69,20 @@ Deno.serve(async (req: Request) => {
       : await stripe.subscriptions.update(active.id, { cancel_at_period_end: true });
 
     await upsertSubscriptionAndEntitlement(supabaseAdmin, updated);
+
+    const posthog = createPostHogClient();
+    if (posthog) {
+      posthog.capture({
+        distinctId: user.id,
+        event: 'subscription cancellation requested',
+        properties: {
+          immediate,
+          cancel_at_period_end: updated.cancel_at_period_end,
+          status: updated.status,
+        },
+      });
+      await posthog.shutdown();
+    }
 
     return new Response(
       JSON.stringify({
