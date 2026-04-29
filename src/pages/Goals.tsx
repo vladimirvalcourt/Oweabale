@@ -95,7 +95,7 @@ export default function Goals() {
       currentAmount: startingAmount,
       deadline: newGoal.deadline,
       type: newGoal.type,
-      color: newGoal.type === 'debt' ? '#dc3545' : newGoal.type === 'emergency' ? '#f59e0b' : '#d4d4d4',
+      color: newGoal.type === 'debt' ? 'var(--color-status-urgent-text)' : newGoal.type === 'emergency' ? 'var(--color-status-warning-text)' : 'var(--color-content-tertiary)',
     });
     if (!ok) return;
 

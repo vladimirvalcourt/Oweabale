@@ -557,7 +557,7 @@ export default function Freelance() {
                         <button
                           type="button"
                           onClick={() => void updateClientInvoice(inv.id, { status: 'paid' })}
-                          className="rounded-lg bg-emerald-600/90 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600"
+                          className="rounded-md bg-brand-profit px-3 py-1.5 text-xs font-medium text-surface-base hover:bg-brand-profit/90"
                         >
                           Mark paid
                         </button>

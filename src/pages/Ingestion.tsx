@@ -327,7 +327,7 @@ export default function Ingestion() {
             <button 
               type="button"
               onClick={handleBulkCommit}
-              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-md bg-brand-indigo px-4 py-2.5 text-xs font-sans font-medium text-white shadow-none transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px btn-tactile sm:ml-auto sm:w-auto sm:min-w-[12rem]"
+              className="flex min-h-[2.75rem] w-full items-center justify-center gap-2 rounded-md bg-brand-cta px-4 py-2.5 text-xs font-sans font-medium text-surface-base shadow-none transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px btn-tactile sm:ml-auto sm:w-auto sm:min-w-[12rem]"
             >
               <FileCheck className="h-4 w-4 shrink-0" aria-hidden />
               Save all ready
@@ -351,7 +351,7 @@ export default function Ingestion() {
             <UploadCloud className={`w-12 h-12 mx-auto mb-6 transition-colors ${dragActive ? 'text-content-secondary' : 'text-content-muted'}`} />
             <h3 className="text-lg font-sans font-medium text-content-primary">No documents saved yet</h3>
             <p className="text-sm text-content-tertiary mt-2 max-w-md mx-auto">Drop a bill, toll notice, citation, fine, statement, or payment proof. Scanned PDFs are read page-by-page when needed; very blurry shots may still need manual entry.</p>
-            <div className="mt-8 inline-block px-8 py-3 rounded-md bg-brand-indigo text-white text-sm font-sans font-medium shadow-sm transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px btn-tactile">
+            <div className="mt-8 inline-block px-8 py-3 rounded-md bg-brand-cta text-surface-base text-sm font-sans font-medium shadow-sm transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px btn-tactile">
               Choose files
             </div>
           </div>

@@ -537,7 +537,7 @@ function ProfilePanelInner() {
           <Dialog.Panel className="flex w-full max-w-lg flex-col rounded-md border border-surface-border bg-surface-raised p-4 shadow-xl">
             <Dialog.Title className="text-lg font-medium tracking-[-0.024em] text-content-primary">Crop profile photo</Dialog.Title>
             <p className="mt-1 text-xs text-content-tertiary">Drag and zoom to frame your face.</p>
-            <div className="relative mt-4 h-64 w-full overflow-hidden rounded-md bg-black md:h-80">
+            <div className="relative mt-4 h-64 w-full overflow-hidden rounded-md bg-surface-base md:h-80">
               {cropSrc && (
                 <Cropper
                   image={cropSrc}

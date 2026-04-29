@@ -12,7 +12,7 @@ export default function Categories() {
   const [formData, setFormData] = useState({
     name: '',
     type: 'expense' as 'income' | 'expense',
-    color: '#737373',
+    color: 'var(--color-content-tertiary)',
   });
 
   const handleAdd = (e: React.FormEvent) => {
@@ -30,7 +30,7 @@ export default function Categories() {
 
     toast.success('Category added successfully');
     setIsAdding(false);
-    setFormData({ name: '', type: 'expense', color: '#737373' });
+    setFormData({ name: '', type: 'expense', color: 'var(--color-content-tertiary)' });
   };
 
   const handleUpdate = (e: React.FormEvent) => {
@@ -45,7 +45,7 @@ export default function Categories() {
 
     toast.success('Category updated');
     setEditingId(null);
-    setFormData({ name: '', type: 'expense', color: '#737373' });
+    setFormData({ name: '', type: 'expense', color: 'var(--color-content-tertiary)' });
   };
 
   const startEdit = (category: any) => {
@@ -53,14 +53,14 @@ export default function Categories() {
     setFormData({
       name: category.name,
       type: category.type,
-      color: category.color || '#737373',
+      color: category.color || 'var(--color-content-tertiary)',
     });
     setIsAdding(false);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setFormData({ name: '', type: 'expense', color: '#737373' });
+    setFormData({ name: '', type: 'expense', color: 'var(--color-content-tertiary)' });
   };
 
   const handleDelete = (id: string) => {
@@ -81,7 +81,7 @@ export default function Categories() {
           onClick={() => {
             setIsAdding(true);
             setEditingId(null);
-            setFormData({ name: '', type: 'expense', color: '#737373' });
+            setFormData({ name: '', type: 'expense', color: 'var(--color-content-tertiary)' });
           }}
           className="inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2 text-sm font-medium text-surface-base shadow-none transition-colors hover:bg-brand-cta-hover focus-app"
         >
@@ -191,9 +191,9 @@ export default function Categories() {
                   <div className="flex items-center gap-4">
                     <div
                       className="w-10 h-10 rounded-lg flex items-center justify-center text-content-primary border border-surface-border bg-surface-base group-hover:border-content-secondary/30 transition-colors"
-                      style={{ borderLeftColor: category.color || '#737373', borderLeftWidth: '3px' }}
+                      style={{ borderLeftColor: category.color || 'var(--color-content-tertiary)', borderLeftWidth: '3px' }}
                     >
-                      <Tag className="w-5 h-5" style={{ color: category.color || '#737373' }} />
+                      <Tag className="w-5 h-5" style={{ color: category.color || 'var(--color-content-tertiary)' }} />
                     </div>
                     <div>
                       <h4 className="text-sm font-mono font-bold uppercase tracking-widest text-content-primary">{category.name}</h4>
