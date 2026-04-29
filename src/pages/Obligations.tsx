@@ -389,7 +389,7 @@ export default function Obligations() {
           }}
           aria-disabled={activeTab === 'debt' && !canUseDebt}
           title={activeTab === 'debt' && !canUseDebt ? 'Full Suite required to add debt' : undefined}
-          className={`px-4 py-2.5 rounded-lg text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile ${
+          className={`px-4 py-2.5 rounded-md text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile ${
             activeTab === 'debt' && !canUseDebt
               ? 'bg-surface-elevated border border-surface-border text-content-tertiary'
               : 'bg-brand-cta hover:bg-brand-cta-hover text-surface-base'
@@ -401,26 +401,26 @@ export default function Obligations() {
       </div>
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-surface-elevated border border-surface-border p-5 rounded-lg">
+        <div className="bg-surface-elevated border border-surface-border p-5 rounded-xl">
           <div className="flex items-center gap-2 text-content-tertiary mb-3">
             <RecurringIcon className="w-3.5 h-3.5" />
             <span className="metric-label normal-case text-xs">Monthly payments</span>
           </div>
           <p className="text-2xl font-mono text-red-400 font-bold">${totalMonthlyBurn.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
-        <div className="bg-surface-elevated border border-surface-border p-5 rounded-lg">
+        <div className="bg-surface-elevated border border-surface-border p-5 rounded-xl">
           <div className="flex items-center gap-2 text-content-tertiary mb-3">
             <DebtIcon className="w-3.5 h-3.5" />
             <span className="metric-label normal-case text-xs">Total debt</span>
           </div>
           <p className="text-2xl font-mono text-[var(--color-status-amber-text)] font-bold">${activePrincipal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
         </div>
-        <div className={`bg-surface-elevated border p-5 rounded-lg relative overflow-hidden ${urgentTotal > 0 ? 'border-[var(--color-status-rose-border)]' : 'border-surface-border'}`}>
+        <div className={`bg-surface-elevated border p-5 rounded-xl relative overflow-hidden ${urgentTotal > 0 ? 'border-[var(--color-status-rose-border)]' : 'border-surface-border'}`}>
           {urgentTotal > 0 && <div className="absolute inset-0 bg-[var(--color-status-rose-bg)]" />}
           <div className="flex items-center gap-2 text-content-tertiary mb-3 relative z-10">
             <AlertTriangle className="w-3.5 h-3.5 text-[var(--color-status-rose-text)]" />
             <span className="metric-label normal-case text-xs">Urgent tickets</span>
-            {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold text-[var(--color-status-rose-text)] border-[var(--color-status-rose-border)] px-1 rounded-lg ml-auto">{urgentCitations.length} DUE</span>}
+            {urgentCitations.length > 0 && <span className="text-[9px] font-mono font-bold text-[var(--color-status-rose-text)] border-[var(--color-status-rose-border)] px-1 rounded-full ml-auto">{urgentCitations.length} DUE</span>}
           </div>
           <p className={`text-2xl font-mono font-bold relative z-10 ${urgentTotal > 0 ? 'text-[var(--color-status-rose-text)]' : 'text-[var(--color-status-emerald-text)]'}`}>
             ${urgentTotal.toFixed(2)}
@@ -429,7 +429,7 @@ export default function Obligations() {
       </div>
 
       {isLowBalanceWeekRisk && (
-        <div className="rounded-lg border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] p-4">
+        <div className="rounded-xl border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] p-4">
           <p className="text-sm font-medium text-[var(--color-status-rose-text)]">
             Low-balance warning: ${liquidCash.toFixed(0)} cash vs ${weekAheadDueTotal.toFixed(0)} due in the next 7 days.
           </p>
@@ -453,7 +453,7 @@ export default function Obligations() {
       )}
 
       {billAmountChanges.size > 0 && (
-        <div className="rounded-lg border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] p-4">
+        <div className="rounded-xl border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] p-4">
           <p className="text-sm font-medium text-[var(--color-status-amber-text)]">
             {billAmountChanges.size} bill {billAmountChanges.size === 1 ? 'has' : 'have'} increased based on recent charges.
           </p>
@@ -467,7 +467,7 @@ export default function Obligations() {
         <CollapsibleModule title="Bill Negotiation Suggestions" icon={PlanningIcon} defaultOpen={false}>
           <div className="space-y-3">
             {billNegotiationSuggestions.map((suggestion) => (
-              <div key={suggestion.id} className="rounded-lg border border-surface-border bg-surface-base p-4">
+              <div key={suggestion.id} className="rounded-xl border border-surface-border bg-surface-base p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold text-content-primary">{suggestion.provider}</p>
@@ -480,7 +480,7 @@ export default function Obligations() {
                     </p>
                     <p className="mt-1 text-xs text-content-tertiary">{suggestion.action}</p>
                   </div>
-                  <span className="rounded-lg border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-2 py-1 text-xs font-mono text-[var(--color-status-emerald-text)]">
+                  <span className="rounded-full border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-2 py-1 text-xs font-mono text-[var(--color-status-emerald-text)]">
                     Est. save ${suggestion.estimatedMonthlySavings.toFixed(0)}/mo
                   </span>
                 </div>
@@ -497,7 +497,7 @@ export default function Obligations() {
         extraHeader={
           <TransitionLink
             to={calendarHref}
-            className="text-xs font-sans font-medium text-content-primary hover:text-content-secondary border border-content-primary/20 rounded-lg px-2 py-0.5"
+            className="text-xs font-sans font-medium text-content-primary hover:text-content-secondary border border-content-primary/20 rounded-md px-2 py-0.5"
           >
             Month view →
           </TransitionLink>
@@ -520,7 +520,7 @@ export default function Obligations() {
                 { key: '61-90' as const, label: '61–90 days' },
               ] as const
             ).map(({ key, label }) => (
-              <div key={key} className="rounded-lg border border-surface-border bg-surface-base p-4">
+              <div key={key} className="rounded-xl border border-surface-border bg-surface-base p-4">
                 <p className="text-xs font-mono uppercase tracking-wider text-content-tertiary mb-2">{label}</p>
                 <p className="text-xl font-mono font-bold text-content-primary tabular-nums">
                   ${horizonTotals[key].toLocaleString(undefined, { maximumFractionDigits: 0 })}
@@ -538,13 +538,13 @@ export default function Obligations() {
           title="Debt Payoff Plan" 
           icon={ChartIcon}
           extraHeader={
-            <span className="text-xs font-sans text-content-tertiary bg-surface-base border border-surface-border px-2 py-0.5 rounded-lg">
+            <span className="text-xs font-sans text-content-tertiary bg-surface-base border border-surface-border px-2 py-0.5 rounded-full">
               Payoff {payoffResult.months > 0 ? monthsToDate(payoffResult.months) : '—'}
             </span>
           }
         >
           <div className="p-0">
-            <div className="mb-4 rounded-lg border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] p-3">
+            <div className="mb-4 rounded-xl border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] p-3">
               <p className="text-sm font-medium text-[var(--color-status-emerald-text)]">
                 Debt progress milestone: {unlockedMilestone > 0 ? `${unlockedMilestone}% unlocked` : 'Starting strong'}.
               </p>
@@ -557,12 +557,12 @@ export default function Obligations() {
 
             {/* Controls */}
             <div className="flex flex-col sm:flex-row gap-4 mb-6">
-              <div className="flex bg-surface-base border border-surface-border rounded-lg p-1">
+              <div className="flex bg-surface-base border border-surface-border rounded-xl p-1">
                 {(['avalanche', 'snowball'] as Strategy[]).map(s => (
                   <button
                     key={s}
                     onClick={() => setStrategy(s)}
-                    className={`px-3 py-1.5 text-xs font-mono rounded-lg transition-colors uppercase tracking-wider ${
+                    className={`px-3 py-1.5 text-xs font-mono rounded-md transition-colors uppercase tracking-wider ${
                       strategy === s ? 'bg-brand-cta text-surface-base' : 'text-content-tertiary hover:text-content-secondary'
                     }`}
                   >
@@ -581,7 +581,7 @@ export default function Obligations() {
 
             {/* Summary */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-surface-elevated border border-surface-border rounded-lg p-4">
+              <div className="bg-surface-elevated border border-surface-border rounded-xl p-4">
                 <p className="text-xs font-mono text-content-tertiary uppercase tracking-wider mb-1">Debt-Free Date</p>
                 <p className="text-lg font-mono font-bold text-content-primary">{payoffResult.months > 0 ? monthsToDate(payoffResult.months) : '—'}</p>
                 <p className="text-xs font-mono text-content-muted">{payoffResult.months} months</p>
@@ -596,7 +596,7 @@ export default function Obligations() {
                   </p>
                 )}
               </div>
-              <div className="bg-surface-elevated border border-surface-border rounded-lg p-4">
+              <div className="bg-surface-elevated border border-surface-border rounded-xl p-4">
                 <p className="text-xs font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Paid</p>
                 <p className="text-lg font-mono font-bold text-red-400">${payoffResult.totalInterest.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                 {payoffResult.totalInterest > 10_000 && (
@@ -609,7 +609,7 @@ export default function Obligations() {
                   </p>
                 )}
               </div>
-              <div className="bg-surface-elevated border border-[var(--color-status-emerald-border)] rounded-lg p-4">
+              <div className="bg-surface-elevated border border-[var(--color-status-emerald-border)] rounded-xl p-4">
                 <p className="text-xs font-mono text-content-tertiary uppercase tracking-wider mb-1">Interest Saved</p>
                 <p className="text-lg font-mono font-bold text-[var(--color-status-emerald-text)]">${interestSaved.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                 <p className="text-xs font-mono text-content-muted">vs. minimum payments only</p>
@@ -631,9 +631,9 @@ export default function Obligations() {
                     <div key={d.id}>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 bg-content-primary/[0.08] border border-surface-border text-content-primary text-[10px] font-mono font-bold flex items-center justify-center rounded-lg">{i + 1}</span>
+                          <span className="w-5 h-5 bg-content-primary/[0.08] border border-surface-border text-content-primary text-[10px] font-mono font-bold flex items-center justify-center rounded-full">{i + 1}</span>
                           <span className="text-sm text-content-primary">{d.name}</span>
-                          <span className="text-[10px] font-mono text-content-muted border border-surface-border px-1.5 py-0.5 rounded-lg">{d.apr}% interest rate</span>
+                          <span className="text-[10px] font-mono text-content-muted border border-surface-border px-1.5 py-0.5 rounded-full">{d.apr}% interest rate</span>
                         </div>
                         <span className="text-xs font-mono text-content-tertiary">${d.remaining.toLocaleString()} left</span>
                       </div>
@@ -793,13 +793,13 @@ export default function Obligations() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`text-xs font-mono px-2 py-0.5 rounded-lg border ${
+                      <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${
                         ob.type === 'debt' ? 'border-surface-border text-content-primary bg-content-primary/[0.05]' :
                         ob.type === 'ambush' ? 'border-rose-500/30 text-rose-400 bg-rose-500/10' :
                         'border-surface-border text-content-tertiary bg-surface-elevated'
                       }`}>{ob.subType}</span>
                       {ob.type === 'recurring' && billAmountChanges.get(ob.id) && (
-                        <span className="ml-2 inline-flex items-center rounded-lg border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-mono text-amber-300">
+                        <span className="ml-2 inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-mono text-amber-300">
                           +{billAmountChanges.get(ob.id)?.pct.toFixed(0)}%
                         </span>
                       )}
@@ -819,12 +819,12 @@ export default function Obligations() {
                         >
                           {ob.dueLabel}
                           {overdueBand === 'warn' && (
-                            <span className="ml-2 inline-flex items-center gap-1 rounded border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
+                            <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
                               ⚠️ OVERDUE {overdueDays} {overdueDays === 1 ? 'day' : 'days'}
                             </span>
                           )}
                           {overdueBand === 'critical' && (
-                            <span className="ml-2 inline-flex items-center gap-1 rounded border border-rose-500/40 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-bold text-rose-300">
+                            <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-rose-500/40 bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-bold text-rose-300">
                               ⚠️ OVERDUE {overdueDays} days
                             </span>
                           )}
@@ -876,7 +876,7 @@ export default function Obligations() {
                               toast.success(`✓ ${b.biller} marked as paid`);
                             }}
                             className={cn(
-                              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-colors',
+                              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-mono font-semibold transition-colors',
                               overdueBand === 'critical'
                                 ? 'bg-rose-600 text-white hover:bg-rose-500'
                                 : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover',
@@ -929,7 +929,7 @@ export default function Obligations() {
                               } else toast.error('Citation not found');
                             }}
                             className={cn(
-                              'px-3 py-1.5 text-xs font-mono font-bold rounded-lg transition-colors active:scale-[0.98]',
+                              'px-3 py-1.5 text-xs font-mono font-bold rounded-md transition-colors active:scale-[0.98]',
                               isPastDue
                                 ? 'border border-rose-500 bg-rose-600 text-white hover:bg-rose-500'
                                 : 'border border-rose-500/50 hover:bg-rose-500/10 text-rose-400',
@@ -957,7 +957,7 @@ export default function Obligations() {
                         <button
                           type="button"
                           onClick={() => openQuickAdd('citation')}
-                          className="mt-2 inline-flex items-center gap-2 rounded-lg bg-brand-cta px-4 py-2.5 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
+                          className="mt-2 inline-flex items-center gap-2 rounded-md bg-brand-cta px-4 py-2.5 text-sm font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover"
                         >
                           <Plus className="w-4 h-4 shrink-0" aria-hidden />
                           Add a fine or ticket
@@ -1103,10 +1103,10 @@ function EditBillDialog({
             </select>
           </div>
           <div className="mt-6 flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-content-tertiary hover:text-content-primary">
+            <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-content-tertiary hover:text-content-primary rounded-md">
               Cancel
             </button>
-            <button type="button" onClick={() => void save()} className="rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover">
+            <button type="button" onClick={() => void save()} className="rounded-md bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover">
               Save
             </button>
           </div>
@@ -1234,10 +1234,10 @@ function EditDebtDialog({
             )}
           </div>
           <div className="mt-6 flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-content-tertiary hover:text-content-primary">
+            <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-content-tertiary hover:text-content-primary rounded-md">
               Cancel
             </button>
-            <button type="button" onClick={() => void save()} className="rounded-lg bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover">
+            <button type="button" onClick={() => void save()} className="rounded-md bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover">
               Save
             </button>
           </div>
