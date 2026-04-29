@@ -53,21 +53,21 @@ export default function Privacy() {
           { href: '/support', label: 'Support' },
         ]}
       />
-      <div className="min-h-screen bg-surface-base px-5 pb-24 pt-36 text-content-primary selection:bg-brand-violet/25 sm:px-8">
-        <div className="mx-auto max-w-[1280px]">
+      <div className="min-h-screen bg-surface-base text-content-primary selection:bg-brand-violet/25">
+        <main className="premium-container pb-24 pt-36">
           <section className="grid gap-12 py-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Privacy</p>
-              <h1 className="mt-5 max-w-3xl text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
+              <p className="premium-eyebrow">Privacy</p>
+              <h1 className="premium-display mt-5 max-w-3xl">
                 Privacy for the money details you should not have to wonder about.
               </h1>
-              <p className="mt-7 max-w-xl text-base leading-7 text-content-tertiary">
+              <p className="premium-lede mt-7 max-w-xl">
                 This page is the plain-English summary of how Oweable approaches data handling, so you can understand what you are trusting us with and how that trust is handled.
               </p>
               <p className="mt-4 text-sm text-content-muted">Last updated April 2026</p>
             </div>
 
-            <div className="divide-y divide-surface-border rounded-[10px] border border-surface-border bg-surface-raised">
+            <div className="premium-panel divide-y divide-surface-border overflow-hidden p-0">
               {privacySections.map((section) => (
                 <section key={section.title} className="p-5">
                   <h2 className="text-lg font-medium tracking-[-0.024em] text-content-primary mb-3">{section.title}</h2>
@@ -90,7 +90,7 @@ export default function Privacy() {
               </div>
             </div>
           </section>
-        </div>
+        </main>
       </div>
       <Footer />
     </>

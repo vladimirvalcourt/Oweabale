@@ -344,7 +344,7 @@ export default function Onboarding() {
                       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                       className={`flex h-8 w-8 items-center justify-center rounded-full border-2 text-xs font-medium transition-colors ${
                         currentStepIndex > index
-                          ? 'border-brand-violet bg-brand-violet text-white'
+                          ? 'border-brand-profit bg-brand-profit text-surface-base'
                           : currentStepIndex === index
                             ? 'border-content-primary bg-content-primary text-surface-base'
                             : 'border-surface-border bg-surface-base text-content-muted'

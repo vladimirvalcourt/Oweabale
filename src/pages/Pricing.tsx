@@ -126,7 +126,7 @@ function buildPricingJsonLd(params: {
         unitText: 'MONTH',
       },
       description:
-        'Paid plan for people who need deeper support with bills, debt payoff, budgets, analytics, transaction views, cash-flow planning, and tax estimates when needed.',
+        'Paid plan for people who want more help making a real plan for bills, debt, spending, income, and tax reserves when money feels hard to hold together.',
       url: pageUrl,
     },
   ];
@@ -147,7 +147,7 @@ function buildPricingJsonLd(params: {
       description:
         yearlySavingsPct > 0
           ? `Annual Full Suite plan with about ${yearlySavingsPct}% savings versus twelve monthly renewals.`
-          : 'Annual Full Suite plan with deeper planning support.',
+          : 'Annual Full Suite plan for people who want steady support through bills, debt, and cash flow.',
       url: pageUrl,
     });
   }
@@ -159,11 +159,11 @@ const comparisonRows = [
   ['Bills and due dates', 'Included', 'Included'],
   ['Recurring obligations and subscriptions', 'Included', 'Included'],
   ['Core reminders and account settings', 'Included', 'Included'],
-  ['Debt payoff planner', 'Not included', 'Included'],
-  ['Budgets and analytics', 'Not included', 'Included'],
-  ['Income and transaction views', 'Not included', 'Included'],
-  ['Optional bank sync', 'Not included', 'Included'],
-  ['Tax estimates for variable income', 'Not included', 'Included'],
+  ['A debt plan you can actually follow', 'Not included', 'Included'],
+  ['Spending guardrails and clearer reports', 'Not included', 'Included'],
+  ['Income and transaction history', 'Not included', 'Included'],
+  ['Optional bank connection', 'Not included', 'Included'],
+  ['Tax reserve help for uneven income', 'Not included', 'Included'],
 ] as const;
 
 export default function Pricing() {
@@ -229,26 +229,26 @@ export default function Pricing() {
       />
 
       <main>
-        <section className="mx-auto max-w-6xl px-6 pb-20 pt-36 lg:px-8">
+        <section className="premium-container pb-20 pt-36">
           <div>
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Pricing without another surprise</p>
-            <h1 className="mt-5 max-w-5xl text-5xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-6xl md:text-7xl">
+            <p className="premium-eyebrow">Pricing without another surprise</p>
+            <h1 className="premium-display mt-5 max-w-5xl">
               Start where the pressure is. Pay when you need the deeper plan.
             </h1>
-            <p className="mt-7 max-w-3xl text-lg leading-8 text-content-tertiary">
-              Oweable starts with a focused Pay List for bills, debt, subscriptions, tolls, tickets, and the obligations that keep slipping into the back of your mind. Full Suite adds payoff planning, budgets, analytics, and cash-flow structure when you are ready.
+            <p className="premium-lede mt-7 max-w-3xl">
+              Oweable starts with a focused Pay List for bills, debt, subscriptions, tolls, tickets, and the obligations that keep slipping into the back of your mind. Full Suite is there when you want help turning the whole picture into a plan you can keep coming back to.
             </p>
             <div className="mt-8 flex flex-wrap gap-3 text-sm text-content-secondary">
-              <span className="rounded-full border border-surface-border-subtle bg-surface-raised px-4 py-2">14-day Full Suite trial</span>
-              <span className="rounded-full border border-surface-border-subtle bg-surface-raised px-4 py-2">No credit card required</span>
-              <span className="rounded-full border border-surface-border-subtle bg-surface-raised px-4 py-2">Cancel anytime</span>
+              <span className="rounded-md border border-surface-border-subtle bg-surface-raised px-4 py-2">14-day Full Suite trial</span>
+              <span className="rounded-md border border-surface-border-subtle bg-surface-raised px-4 py-2">No credit card required</span>
+              <span className="rounded-md border border-surface-border-subtle bg-surface-raised px-4 py-2">Cancel anytime</span>
             </div>
           </div>
         </section>
 
         <section className="border-y border-surface-border-subtle bg-surface-raised/36 py-20">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl rounded-[22px] border border-surface-border bg-surface-raised p-7 text-content-primary shadow-panel sm:p-8">
+          <div className="premium-container">
+            <div className="premium-panel mx-auto max-w-3xl p-7 text-content-primary shadow-panel sm:p-8">
                 <div className="flex items-center justify-between gap-4">
                   <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">Full Suite</p>
                   <span className="text-xs font-medium uppercase tracking-[0.14em] text-content-tertiary">
@@ -264,7 +264,7 @@ export default function Pricing() {
                       aria-pressed={billingPeriod === 'monthly'}
                     className={`rounded-[6px] px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
                         billingPeriod === 'monthly'
-                          ? 'bg-brand-indigo text-white'
+                          ? 'bg-content-primary text-surface-base'
                           : 'text-content-tertiary hover:text-content-primary'
                       }`}
                     >
@@ -276,7 +276,7 @@ export default function Pricing() {
                       aria-pressed={billingPeriod === 'yearly'}
                     className={`rounded-[6px] px-3 py-1.5 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-1 focus-visible:ring-offset-surface-highlight ${
                         billingPeriod === 'yearly'
-                          ? 'bg-brand-indigo text-white'
+                          ? 'bg-content-primary text-surface-base'
                           : 'text-content-tertiary hover:text-content-primary'
                       }`}
                     >
@@ -305,32 +305,32 @@ export default function Pricing() {
                 </div>
 
                 <p className="mt-5 max-w-md text-base leading-7 text-content-tertiary">
-                  For people who need more than a reminder: payoff strategy, budgets, analytics,
-                  cash-flow clarity, and tax planning when income gets uneven.
+                  For people who need more than reminders: a calmer way to decide what to pay first,
+                  what to protect, and what needs attention before it becomes another fee.
                 </p>
                 <ul className="mt-7 space-y-3 text-sm text-content-secondary">
                   <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-violet" />
-                    <span>Debt payoff engine with Snowball and Avalanche</span>
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-content-primary" />
+                    <span>Choose a debt payoff path that fits how you stay motivated</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-violet" />
-                    <span>Budgets, analytics, income ledger, and transaction views</span>
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-content-primary" />
+                    <span>See spending, income, and transactions without digging through tabs</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-violet" />
-                    <span>Optional bank sync and broader planning workflows</span>
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-content-primary" />
+                    <span>Connect a bank only if it helps you save time</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-violet" />
-                    <span>Tax estimates and reserve planning for variable income</span>
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-content-primary" />
+                    <span>Set aside tax money when income is uneven</span>
                   </li>
                 </ul>
                 <button
                   type="button"
                   onClick={() => startCheckout(hasYearlyPricing && billingPeriod === 'yearly' ? 'pro_yearly' : 'pro_monthly')}
                   disabled={isStartingCheckout}
-                  className="mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-md bg-brand-indigo px-6 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:cursor-not-allowed disabled:opacity-70"
+                  className="mt-8 inline-flex min-h-12 w-full items-center justify-center rounded-md bg-content-primary px-6 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {isStartingCheckout ? 'Getting things ready...' : 'Start Full Suite'}
                 </button>
@@ -342,15 +342,15 @@ export default function Pricing() {
         </section>
 
         <section className="bg-surface-base py-28">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="premium-container">
             <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr]">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">What you get</p>
-                <h2 className="mt-4 max-w-lg text-4xl font-medium leading-tight tracking-[-0.044em] text-content-primary">
+                <p className="premium-eyebrow">What you get</p>
+                <h2 className="premium-heading mt-4 max-w-lg">
                   One calmer path for bills, debt, and the planning work behind them.
                 </h2>
               </div>
-              <div className="overflow-x-auto rounded-[22px] border border-surface-border bg-surface-raised">
+              <div className="premium-panel overflow-x-auto">
                 <div className="grid grid-cols-2 border-b border-surface-border-subtle bg-surface-elevated text-sm font-medium text-content-primary">
                   <div className="min-w-[180px] px-4 py-4">Feature</div>
                   <div className="min-w-[160px] border-l border-surface-border px-4 py-4">Oweable</div>
@@ -369,8 +369,8 @@ export default function Pricing() {
         <section id="faq" className="border-y border-surface-border-subtle bg-surface-raised/36 py-28">
           <div className="mx-auto max-w-5xl px-6 lg:px-8">
             <div className="max-w-2xl">
-              <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">FAQ</p>
-              <h2 className="mt-4 text-4xl font-medium tracking-[-0.044em] text-content-primary">
+              <p className="premium-eyebrow">FAQ</p>
+              <h2 className="premium-heading mt-4">
                 The answers people usually need before trusting a tool with bills and debt.
               </h2>
             </div>
@@ -384,8 +384,8 @@ export default function Pricing() {
 
         <section className="bg-surface-base py-28 text-content-primary">
           <div className="mx-auto max-w-5xl px-6 text-center lg:px-8">
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-content-muted">Ready when you are</p>
-            <h2 className="mt-5 text-4xl font-medium tracking-[-0.044em] sm:text-6xl">
+            <p className="premium-eyebrow">Ready when you are</p>
+            <h2 className="premium-heading mt-5 sm:text-6xl">
               Start with relief. Keep the system simple.
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-content-tertiary">
@@ -394,7 +394,7 @@ export default function Pricing() {
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <TransitionLink
                 to="/onboarding?redirect=/pro/dashboard"
-                className="inline-flex min-h-12 items-center gap-3 rounded-md bg-brand-indigo px-7 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px"
+                className="inline-flex min-h-12 items-center gap-3 rounded-md bg-content-primary px-7 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px"
               >
                 Try Full Suite
                 <ArrowRight className="h-4 w-4" />

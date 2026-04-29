@@ -8,7 +8,7 @@ import { cn } from '../../lib/utils';
  */
 export function Card({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("bg-surface-raised rounded-lg border border-surface-border overflow-hidden shadow-none hover:bg-content-primary/[0.02] transition-colors", className)}>
+    <div className={cn("premium-panel overflow-hidden", className)}>
       {children}
     </div>
   );
@@ -22,8 +22,8 @@ export function Card({ children, className }: { children: React.ReactNode; class
  */
 export function CardHeader({ title, action, className }: { title: string; action?: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("px-6 py-4 border-b border-surface-border flex items-center justify-between", className)}>
-      <h2 className="text-base font-semibold tracking-tight text-content-primary leading-snug">{title}</h2>
+    <div className={cn("flex items-center justify-between border-b border-surface-border px-5 py-4", className)}>
+      <h2 className="text-base font-semibold tracking-[-0.01em] text-content-primary leading-snug">{title}</h2>
       {action && <div>{action}</div>}
     </div>
   );
@@ -36,7 +36,7 @@ export function CardHeader({ title, action, className }: { title: string; action
  */
 export function CardContent({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("p-6", className)}>
+    <div className={cn("p-5 sm:p-6", className)}>
       {children}
     </div>
   );

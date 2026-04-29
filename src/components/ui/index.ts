@@ -10,6 +10,15 @@ export { Button, buttonVariants } from './Button';
 export { Separator } from './Separator';
 export { Skeleton } from './Skeleton';
 export { Alert, AlertTitle, AlertDescription } from './Alert';
+export {
+  ProductPageHeader,
+  PremiumPanel,
+  PremiumEmptyState,
+  premiumInputClass,
+  premiumPrimaryButtonClass,
+  premiumSecondaryButtonClass,
+  premiumDangerButtonClass,
+} from './Polish';
 
 // Animated components
 export { BorderRotate } from './animated-gradient-border';

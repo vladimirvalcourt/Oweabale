@@ -228,31 +228,31 @@ export default function Support() {
       />
 
       <main>
-        <div className="mx-auto max-w-[1280px] px-5 pt-36 sm:px-8">
+        <div className="premium-container pt-36">
           <section className="grid gap-12 py-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Support</p>
-              <h1 className="mt-5 max-w-3xl text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
+              <p className="premium-eyebrow">Support</p>
+              <h1 className="premium-display mt-5 max-w-3xl sm:text-6xl">
                 Help for when money admin already feels heavy.
               </h1>
-              <p className="mt-7 max-w-xl text-base leading-7 text-content-tertiary">
+              <p className="premium-lede mt-7 max-w-xl">
                 Reach out for billing, access, account, product, or technical issues. Tell us what you were trying to do and where it got stuck. We usually reply within one business day.
               </p>
               <div className="mt-10 grid gap-3">
-                <div className="rounded-[10px] border border-surface-border-subtle bg-surface-raised p-5">
-                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Best for</p>
+                <div className="premium-panel p-5">
+                  <p className="premium-eyebrow">Best for</p>
                   <p className="mt-3 text-sm leading-6 text-content-tertiary">Account access problems, billing questions, bugs, and anything that is getting in the way while you are trying to manage bills or debt.</p>
                 </div>
-                <div className="rounded-[10px] border border-surface-border-subtle bg-surface-raised p-5">
-                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Contact Support</p>
+                <div className="premium-panel p-5">
+                  <p className="premium-eyebrow">Contact support</p>
                   {EMAIL_CONFIG.support.createContactLink(
                     'Get Help',
                     'mt-3 inline-flex h-11 min-w-[140px] items-center justify-center rounded-md bg-content-primary px-5 text-sm font-medium text-surface-base transition-colors hover:bg-content-secondary',
                     true
                   )}
                 </div>
-                <div className="rounded-[10px] border border-surface-border-subtle bg-surface-raised p-5">
-                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Sensitive requests</p>
+                <div className="premium-panel p-5">
+                  <p className="premium-eyebrow">Sensitive requests</p>
                   <p className="mt-3 text-sm leading-6 text-content-tertiary">
                     For privacy or security concerns, include that in your subject line so we can route it quickly and handle it with the right level of care.
                   </p>
@@ -261,7 +261,7 @@ export default function Support() {
             </div>
 
             <div className="grid gap-6">
-              <section className="rounded-[10px] border border-surface-border bg-surface-raised p-6 shadow-card sm:p-8">
+              <section className="premium-panel p-6 sm:p-8">
                 <h2 className="text-2xl font-medium tracking-[-0.03em] leading-tight text-content-primary">Send a message</h2>
                 <p className="mt-4 text-sm leading-6 text-content-tertiary">
                   Give us the basics and a little context. You do not need a perfect report. Just tell us what happened, what you were trying to get done, and what felt blocked.
@@ -289,7 +289,7 @@ export default function Support() {
                           type="text"
                           value={formData.name}
                           onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
-                          className="mt-2 w-full rounded-md border border-surface-border bg-surface-raised/80 px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-brand-violet/40"
+                          className="mt-2 w-full rounded-md border border-surface-border bg-surface-base px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-content-primary/30 focus-app-field"
                           placeholder="Your name"
                           required
                         />
@@ -300,7 +300,7 @@ export default function Support() {
                           type="email"
                           value={formData.email}
                           onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                          className="mt-2 w-full rounded-md border border-surface-border bg-surface-raised/80 px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-brand-violet/40"
+                          className="mt-2 w-full rounded-md border border-surface-border bg-surface-base px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-content-primary/30 focus-app-field"
                           placeholder="you@example.com"
                           required
                         />
@@ -313,7 +313,7 @@ export default function Support() {
                         type="text"
                         value={formData.subject}
                         onChange={(e) => setFormData((prev) => ({ ...prev, subject: e.target.value }))}
-                        className="mt-2 w-full rounded-md border border-surface-border bg-surface-raised/80 px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-brand-violet/40"
+                        className="mt-2 w-full rounded-md border border-surface-border bg-surface-base px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-content-primary/30 focus-app-field"
                         placeholder="Billing, login issue, bug report..."
                       />
                     </label>
@@ -323,7 +323,7 @@ export default function Support() {
                       <textarea
                         value={formData.message}
                         onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
-                        className="mt-2 min-h-[160px] w-full rounded-md border border-surface-border bg-surface-raised/80 px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-brand-violet/40"
+                        className="mt-2 min-h-[160px] w-full rounded-md border border-surface-border bg-surface-base px-4 py-3 text-content-primary outline-none transition-colors placeholder:text-content-muted focus:border-content-primary/30 focus-app-field"
                         placeholder="Tell us what happened, what you expected, and anything that would help us reproduce or understand the issue."
                         
                         required
@@ -352,7 +352,7 @@ export default function Support() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="mt-6 inline-flex h-11 items-center gap-3 rounded-md bg-content-primary px-6 text-sm font-medium text-surface-base transition-colors hover:bg-content-secondary disabled:cursor-not-allowed disabled:opacity-70"
+                      className="mt-6 inline-flex h-11 items-center gap-3 rounded-md bg-content-primary px-6 text-sm font-semibold text-surface-base transition-colors hover:bg-content-secondary disabled:cursor-not-allowed disabled:opacity-70"
                     >
                       {isSubmitting ? 'Sending...' : 'Send message'}
                       <ArrowRight className="h-4 w-4" />
@@ -361,7 +361,7 @@ export default function Support() {
                 )}
               </section>
 
-              <section className="rounded-[10px] border border-surface-border bg-surface-raised p-6 sm:p-8">
+              <section className="premium-panel p-6 sm:p-8">
                 <h2 className="text-2xl font-medium tracking-[-0.03em] leading-tight text-content-primary">Quick answers</h2>
                 <motion.div
                   className="mt-6 grid gap-5"

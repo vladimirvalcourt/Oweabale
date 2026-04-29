@@ -482,7 +482,7 @@ function ProfilePanelInner() {
                   className={cn(
                     'flex min-h-10 items-center gap-2 rounded-md px-6 py-2.5 text-sm font-medium shadow-none transition-[background-color,transform] disabled:cursor-not-allowed disabled:opacity-60',
                     saveVisual === 'saved'
-                      ? 'bg-[var(--color-status-emerald-text)] text-white hover:brightness-95'
+                      ? 'bg-[var(--color-status-emerald-text)] text-surface-base hover:brightness-95'
                       : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover',
                   )}
                 >
@@ -522,7 +522,7 @@ function ProfilePanelInner() {
                 type="button"
                 disabled={otpVerifying}
                 onClick={() => void submitOtp()}
-                className="rounded-md bg-brand-indigo px-4 py-2 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:opacity-50"
+                className="rounded-md bg-content-primary px-4 py-2 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px disabled:opacity-50"
               >
                 {otpVerifying ? 'Checking…' : 'Confirm'}
               </button>
@@ -574,7 +574,7 @@ function ProfilePanelInner() {
                 type="button"
                 disabled={cropApplying}
                 onClick={() => void applyCrop()}
-                className="flex items-center gap-2 rounded-md bg-brand-indigo px-4 py-2 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:opacity-50"
+                className="flex items-center gap-2 rounded-md bg-content-primary px-4 py-2 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px disabled:opacity-50"
               >
                 {cropApplying && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                 Save photo

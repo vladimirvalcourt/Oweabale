@@ -28,7 +28,7 @@ export function HouseholdPanel() {
         </p>
         <button 
           onClick={() => navigate('/pro')}
-          className="px-4 py-2 bg-brand-cta text-white rounded-lg text-xs font-medium hover:bg-brand-cta-hover transition-colors"
+          className="rounded-md bg-content-primary px-4 py-2 text-xs font-semibold text-surface-base transition-colors hover:bg-content-secondary"
         >
           Upgrade Now
         </button>

@@ -63,7 +63,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
   return (
     <div className="min-h-screen bg-surface-base text-content-primary font-sans selection:bg-brand-violet/25">
       <header className="fixed inset-x-0 top-0 z-50 border-b border-surface-border-subtle bg-surface-base/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-5 sm:px-8">
+        <div className="premium-container flex h-[72px] items-center justify-between">
           <TransitionLink to="/" className="group flex items-center gap-2 text-content-primary">
             <BrandWordmark
               logoClassName="h-5 w-5 rounded-[4px]"
@@ -76,17 +76,17 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
         </div>
       </header>
 
-      <main className="mx-auto grid min-h-screen max-w-[1280px] gap-12 px-5 pb-16 pt-36 sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
+      <main className="premium-container grid min-h-screen gap-12 pb-16 pt-36 lg:grid-cols-[0.78fr_1.22fr] lg:items-center">
         <section className="max-w-md">
           <p className="inline-flex items-center gap-2 rounded-full border border-surface-border-subtle bg-surface-raised px-3 py-1 text-xs text-content-secondary">
-            <span className="h-1.5 w-1.5 rounded-full bg-brand-indigo" aria-hidden />
+            <span className="h-1.5 w-1.5 rounded-full bg-content-primary" aria-hidden />
             Free to start · Google sign-in
           </p>
 
-          <h1 className="mt-7 text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
+          <h1 className="premium-display mt-7">
             {isSignupMode ? 'Create your account.' : 'Welcome back.'}
           </h1>
-          <p className="mt-6 text-base leading-7 text-content-tertiary">
+          <p className="premium-lede mt-6">
             One secure entry point for your Pay List, debt plan, subscriptions, and cash checks. New accounts are created automatically.
           </p>
 
@@ -114,7 +114,7 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
           </motion.button>
 
           <div className="mt-8 flex items-center gap-3 border-t border-surface-border-subtle pt-8">
-            <CheckCircle2 className="h-5 w-5 shrink-0 text-brand-violet" aria-hidden />
+            <CheckCircle2 className="h-5 w-5 shrink-0 text-brand-profit" aria-hidden />
             <p className="text-sm text-content-secondary">
               New here? Signing in creates your account automatically.
             </p>

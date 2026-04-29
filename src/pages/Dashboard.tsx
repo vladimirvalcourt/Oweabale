@@ -220,7 +220,7 @@ function PayListIcon({ kind }: { kind: PayListKind }) {
 
 function EmptyPayList({ onAdd }: { onAdd: () => void }) {
   return (
-    <div className="border border-dashed border-surface-border bg-surface-raised p-8 text-center">
+    <div className="premium-empty-state">
       <ListChecks className="mx-auto h-8 w-8 text-content-tertiary" aria-hidden />
       <h2 className="mt-4 text-lg font-semibold text-content-primary">Nothing urgent is tracked yet</h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-content-secondary">
@@ -229,7 +229,7 @@ function EmptyPayList({ onAdd }: { onAdd: () => void }) {
       <button
         type="button"
         onClick={onAdd}
-        className="mt-5 inline-flex min-h-10 items-center justify-center gap-2 border border-content-primary px-4 py-2 text-sm font-semibold text-content-primary focus-app"
+        className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-content-primary px-5 py-2 text-sm font-semibold text-surface-base transition-colors hover:bg-content-secondary focus-app"
       >
         <Plus className="h-4 w-4" aria-hidden />
         Add what&apos;s due
@@ -292,7 +292,7 @@ function PayListRow({
               <button
                 type="button"
                 onClick={() => onMarkPaid(item.sourceId)}
-                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-brand-cta px-3 py-1.5 text-xs font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app"
+                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md bg-content-primary px-3 py-1.5 text-xs font-semibold text-surface-base transition-colors hover:bg-content-secondary focus-app"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
                 Mark paid
@@ -302,7 +302,7 @@ function PayListRow({
               <button
                 type="button"
                 onClick={() => onResolve(item.sourceId)}
-                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-lg bg-brand-cta px-3 py-1.5 text-xs font-semibold text-surface-base transition-colors hover:bg-brand-cta-hover focus-app"
+                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md bg-content-primary px-3 py-1.5 text-xs font-semibold text-surface-base transition-colors hover:bg-content-secondary focus-app"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
                 Resolve

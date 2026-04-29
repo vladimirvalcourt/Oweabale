@@ -17,11 +17,11 @@ import { ThemeBackdrop } from './ThemeBackdrop';
 const STORAGE_KEY = 'oweable_pro_welcome_shown_v1';
 
 const HIGHLIGHTS = [
-  { icon: BarChart2,    label: 'Analytics & Reports',      desc: 'Cash flow trends, spending patterns, monthly reports.' },
-  { icon: DollarSign,  label: 'Income & Freelance tracker',desc: 'Log all income sources, invoices, and gig payments.' },
-  { icon: Target,      label: 'Debt Payoff Engine',        desc: 'Avalanche and Snowball calculators with live progress.' },
-  { icon: Shield,      label: 'Tax Shield',                desc: 'Deduction tracking, freelance tax estimates, exports.' },
-  { icon: Zap,         label: '15+ more tools',            desc: 'Net worth, budgets, investments, goals, and more.' },
+  { icon: BarChart2,    label: 'Reports that make sense',  desc: 'Cash flow, spending patterns, and month-by-month context.' },
+  { icon: DollarSign,  label: 'Income tracking',           desc: 'Keep steady, gig, invoice, and mixed income in one place.' },
+  { icon: Target,      label: 'Debt payoff planning',      desc: 'Choose quick wins or higher-interest balances first.' },
+  { icon: Shield,      label: 'Tax reserve help',          desc: 'Track deductions and set aside money when income is uneven.' },
+  { icon: Zap,         label: 'More room to plan',         desc: 'Net worth, budgets, investments, goals, and more.' },
 ] as const;
 
 export function ProWelcomeModal() {

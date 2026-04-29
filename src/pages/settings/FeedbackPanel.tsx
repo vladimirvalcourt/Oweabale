@@ -146,7 +146,7 @@ function FeedbackPanelInner() {
               <button
                 type="submit"
                 disabled={isSubmittingFeedback}
-                className="flex items-center gap-2 rounded-md bg-brand-indigo px-6 py-2.5 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:opacity-50"
+                className="flex items-center gap-2 rounded-md bg-content-primary px-6 py-2.5 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px disabled:opacity-50"
               >
                 {isSubmittingFeedback ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
                 {isSubmittingFeedback ? 'Sending...' : 'Send Feedback'}

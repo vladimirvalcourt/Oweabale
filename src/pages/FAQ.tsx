@@ -28,7 +28,7 @@ const FAQ_DATA = [
   {
     question: 'Can Oweable help with debt payoff?',
     answer:
-      'Yes. Full Suite includes debt payoff planning with both Snowball and Avalanche strategies, so you can stop guessing and start seeing a clearer path forward.',
+      'Yes. Full Suite lets you choose a payoff style that matches you: quick wins first, or highest-interest balances first. Either way, the point is to make the next step easier to see.',
   },
   {
     question: 'Can I use Oweable without downloading an app?',
@@ -38,7 +38,7 @@ const FAQ_DATA = [
   {
     question: 'Can I start before paying?',
     answer:
-      'Yes. You can create an account and start with the Pay List path for bills, due dates, and recurring obligations. Full Suite adds broader planning and payoff tools when you want more structure.',
+      'Yes. You can create an account and start with bills, due dates, and recurring obligations. When you want more help, Full Suite adds planning for debt, spending, income, and cash flow.',
   },
   {
     question: 'How secure is my data?',
@@ -77,7 +77,7 @@ export default function FAQ() {
   useSEO({
     title: 'Frequently Asked Questions — Oweable',
     description:
-      'Plain-English answers about how Oweable helps with bills, debt payoff, subscriptions, free plans, security, and uneven-income workflows.',
+      'Plain-English answers about how Oweable helps with bills, debt payoff, subscriptions, free plans, security, and uneven income.',
     canonical: 'https://www.oweable.com/faq',
     ogImage: 'https://www.oweable.com/og-image.svg',
   });
@@ -108,18 +108,18 @@ export default function FAQ() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <main className="pb-28 pt-36" id="faq">
-          <section className="mx-auto max-w-5xl px-6 lg:px-8">
+          <section className="premium-container max-w-5xl">
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">FAQ</p>
-              <h1 className="mt-5 max-w-4xl text-5xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-6xl md:text-7xl">
+              <p className="premium-eyebrow">FAQ</p>
+              <h1 className="premium-display mt-5 max-w-4xl">
                 The questions people ask when money already feels heavy.
               </h1>
-              <p className="mt-7 max-w-3xl text-lg leading-8 text-content-tertiary">
+              <p className="premium-lede mt-7 max-w-3xl">
                 Short answers, plain English, and no fake mystery. If money already feels heavy, this page should make the next step easier.
               </p>
             </div>
 
-            <div className="mt-14 rounded-[22px] border border-surface-border bg-surface-raised px-5 shadow-card sm:px-8">
+            <div className="premium-panel mt-14 px-5 sm:px-8">
               {FAQ_DATA.map((item) => (
                 <FaqCard key={item.question} question={item.question} answer={item.answer} />
               ))}

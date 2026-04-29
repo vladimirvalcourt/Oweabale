@@ -41,7 +41,7 @@ export default function ExitIntentModal({ isOpen, onClose }: ExitIntentModalProp
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative z-50 w-full max-w-md rounded-2xl border border-surface-border bg-surface-base p-8 shadow-2xl"
+            className="premium-panel relative z-50 w-full max-w-md p-8 shadow-panel"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -70,11 +70,11 @@ export default function ExitIntentModal({ isOpen, onClose }: ExitIntentModalProp
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full rounded-lg border border-surface-border bg-surface-raised px-4 py-3 text-sm text-content-primary placeholder:text-content-tertiary focus:border-brand-violet focus:outline-none focus:ring-2 focus:ring-brand-violet/20"
+                    className="focus-app-field w-full rounded-md border border-surface-border bg-surface-raised px-4 py-3 text-sm text-content-primary placeholder:text-content-tertiary"
                   />
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-brand-violet px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-violet/90"
+                    className="w-full rounded-md bg-content-primary px-4 py-3 text-sm font-semibold text-surface-base transition-colors hover:bg-content-secondary"
                   >
                     Send me the template
                   </button>
@@ -85,8 +85,8 @@ export default function ExitIntentModal({ isOpen, onClose }: ExitIntentModalProp
               </>
             ) : (
               <div className="py-8 text-center">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-violet/10">
-                  <svg className="h-8 w-8 text-brand-violet" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-lg bg-[var(--color-status-emerald-bg)]">
+                  <svg className="h-8 w-8 text-brand-profit" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>

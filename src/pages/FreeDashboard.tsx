@@ -244,7 +244,7 @@ export default function FreeDashboard() {
               <p className="text-sm font-semibold text-amber-300">Start Full Suite</p>
             </div>
             <p className="text-sm text-content-secondary leading-relaxed">
-              Income tracking, debt payoff engine (Avalanche &amp; Snowball), taxes, budgets, analytics, net worth, and 15+ more tools — all in one dashboard.
+              Get more help with debt payoff, spending guardrails, income, taxes, net worth, and the bigger money picture when the Pay List is not enough.
             </p>
           </div>
           <div className="flex flex-col gap-2 shrink-0">

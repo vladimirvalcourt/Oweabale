@@ -61,15 +61,14 @@ export default function Security() {
         ]}
       />
 
-      <main className="px-5 pb-24 pt-36 sm:px-8">
-        <div className="mx-auto max-w-[1280px]">
+      <main className="premium-container pb-24 pt-36">
           <section className="grid gap-12 py-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Security</p>
-              <h1 className="mt-5 max-w-3xl text-5xl font-medium leading-none tracking-[-0.055em] text-content-primary sm:text-6xl">
+              <p className="premium-eyebrow">Security</p>
+              <h1 className="premium-display mt-5 max-w-3xl">
                 Security for the financial details you are trusting us to hold.
               </h1>
-              <p className="mt-7 max-w-xl text-base leading-7 text-content-tertiary">
+              <p className="premium-lede mt-7 max-w-xl">
                 Bills, debt, income, and account details are personal. Oweable is built so security sits inside the product, the infrastructure, and the support process, not just on this page.
               </p>
             </div>
@@ -77,14 +76,14 @@ export default function Security() {
             <div>
               <div className="grid gap-3">
                 {securityCards.map((card) => (
-                <article key={card.title} className="rounded-[10px] border border-surface-border-subtle bg-surface-raised p-5 shadow-card">
+                <article key={card.title} className="premium-panel p-5">
                   <h2 className="text-lg font-medium tracking-[-0.024em] text-content-primary mb-3">{card.title}</h2>
                   <p className="text-sm leading-relaxed text-content-tertiary">{card.body}</p>
                 </article>
                 ))}
               </div>
 
-              <div className="mt-10 divide-y divide-surface-border rounded-[10px] border border-surface-border bg-surface-raised">
+              <div className="premium-panel mt-10 divide-y divide-surface-border overflow-hidden p-0">
                 {sections.map((section) => (
                   <section key={section.title} className="p-5">
                     <h2 className="text-xl font-medium tracking-[-0.03em] text-content-primary">{section.title}</h2>
@@ -94,7 +93,6 @@ export default function Security() {
               </div>
             </div>
           </section>
-        </div>
       </main>
       <Footer />
     </div>

@@ -23,10 +23,10 @@ html {
   --color-content-muted: #62666d;
 
   /* Brand colors - restrained Linear-style violet system */
-  --color-brand-indigo: #5e6ad2;
-  --color-brand-violet: #7170ff;
-  --color-brand-cta: #5e6ad2;
-  --color-brand-cta-hover: #828fff;
+  --color-brand-indigo: #6670d8;
+  --color-brand-violet: #7774e8;
+  --color-brand-cta: #f7f8f8;
+  --color-brand-cta-hover: #d0d6e0;
   --color-brand-profit: #22c55e;
   --color-brand-expense: #ef4444;
   --color-brand-tax: #a3a3a3;
@@ -46,9 +46,9 @@ html {
   --shadow-glow-indigo: 0 0 0 1px rgba(113, 112, 255, 0.28), 0 16px 48px rgba(94, 106, 210, 0.18);
   
   /* Semantic shadow tokens - theme-aware elevation */
-  --shadow-panel: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 40px 140px rgba(0, 0, 0, 0.42);
-  --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.035);
-  --shadow-elevated: 0 20px 50px rgba(0, 0, 0, 0.35);
+  --shadow-panel: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 28px 90px rgba(0, 0, 0, 0.32);
+  --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.035), 0 1px 0 rgba(255,255,255,0.02);
+  --shadow-elevated: 0 20px 52px rgba(0, 0, 0, 0.32);
 
   --radius-lg: 8px;
   --radius-md: 8px;
@@ -135,6 +135,42 @@ html {
   .data-numeric {
     @apply font-mono tabular-nums;
     letter-spacing: 0;
+  }
+
+  .premium-container {
+    @apply mx-auto w-full max-w-[1280px] px-5 sm:px-8;
+  }
+
+  .premium-section {
+    @apply px-5 py-20 sm:px-8 sm:py-24 lg:py-28;
+  }
+
+  .premium-eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.12em] text-content-muted;
+  }
+
+  .premium-heading {
+    @apply text-3xl font-semibold leading-[1.02] tracking-[-0.04em] text-content-primary sm:text-4xl;
+  }
+
+  .premium-display {
+    @apply text-[3rem] font-semibold leading-[0.98] tracking-[-0.055em] text-content-primary sm:text-[4.25rem] lg:text-[5rem];
+  }
+
+  .premium-lede {
+    @apply text-base leading-7 text-content-secondary sm:text-lg sm:leading-8;
+  }
+
+  .premium-panel {
+    @apply rounded-lg border border-surface-border bg-surface-raised shadow-card transition-colors;
+  }
+
+  .premium-page-header {
+    @apply flex flex-col gap-4 rounded-lg border border-surface-border bg-surface-raised px-5 py-5 shadow-card sm:px-6 lg:flex-row lg:items-end lg:justify-between;
+  }
+
+  .premium-empty-state {
+    @apply flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-surface-border bg-surface-raised px-6 py-12 text-center;
   }
 
   /* Focus — visible keyboard focus (WCAG 2.4.7) + border cues on fields. */
@@ -565,24 +601,24 @@ body {
 :root.theme-light {
   /* Clean white surfaces with subtle gray elevation */
   --color-surface-base: #ffffff;
-  --color-surface-raised: #fafafa;
-  --color-surface-elevated: #f5f5f5;
-  --color-surface-highlight: rgba(0, 0, 0, 0.03);
-  --color-surface-border: #e5e5e5;
-  --color-surface-border-subtle: #f0f0f0;
-  --color-surface-offset: #f8f8f8;
+  --color-surface-raised: #fbfbfa;
+  --color-surface-elevated: #f4f4f2;
+  --color-surface-highlight: rgba(9, 10, 11, 0.035);
+  --color-surface-border: #dededb;
+  --color-surface-border-subtle: #ececea;
+  --color-surface-offset: #f7f7f5;
 
   /* High-contrast text for readability */
-  --color-content-primary: #000000;
-  --color-content-secondary: #666666;
-  --color-content-tertiary: #888888;
-  --color-content-muted: #999999;
+  --color-content-primary: #101112;
+  --color-content-secondary: #4e535b;
+  --color-content-tertiary: #727780;
+  --color-content-muted: #8c9199;
 
   /* Brand colors - maintain violet identity in light mode */
-  --color-brand-indigo: #5e6ad2;
-  --color-brand-violet: #7170ff;
-  --color-brand-cta: #5e6ad2;
-  --color-brand-cta-hover: #7170ff;
+  --color-brand-indigo: #4f58bc;
+  --color-brand-violet: #655ed1;
+  --color-brand-cta: #101112;
+  --color-brand-cta-hover: #2b2f36;
   --color-brand-profit: #168449;
   --color-brand-expense: #c2413f;
   --color-brand-tax: #525252;
@@ -594,9 +630,9 @@ body {
   --shadow-glow-indigo: 0 0 0 1px rgba(0, 0, 0, 0.06);
   
   /* Light mode semantic shadows - subtle elevation */
-  --shadow-panel: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-panel: 0 18px 55px rgba(16, 17, 18, 0.08);
+  --shadow-card: 0 1px 2px rgba(16, 17, 18, 0.04);
+  --shadow-elevated: 0 24px 70px rgba(16, 17, 18, 0.14);
 }
 
 /* Ensure proper text rendering in light mode */

@@ -322,7 +322,7 @@ function BillingPanelInner() {
     ? 'border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)]'
     : isLockedTrial
       ? 'border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]'
-      : 'border-brand-indigo/25 bg-brand-indigo/[0.08] text-brand-indigo dark:text-brand-violet';
+      : 'border-surface-border bg-surface-base text-content-secondary';
 
   return (
     <div className="space-y-5">
@@ -389,7 +389,7 @@ function BillingPanelInner() {
                 type="button"
                 onClick={primaryAction}
                 disabled={isWorking || isLoading}
-                className="focus-app inline-flex min-h-11 items-center justify-center rounded-md bg-brand-indigo px-4 py-2 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
+                className="focus-app inline-flex min-h-11 items-center justify-center rounded-md bg-content-primary px-4 py-2 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {primaryActionLabel}
               </button>
@@ -542,7 +542,7 @@ function BillingPanelInner() {
                 type="button"
                 onClick={() => void onCancelImmediatelyConfirmed()}
                 disabled={isWorking}
-                className="rounded-md bg-brand-expense px-4 py-2 text-sm font-medium tracking-[-0.006em] text-white transition-[filter,transform] hover:brightness-90 active:translate-y-px disabled:opacity-60"
+                className="rounded-md bg-[var(--color-status-rose-text)] px-4 py-2 text-sm font-semibold tracking-[-0.006em] text-surface-base transition-[filter,transform] hover:brightness-95 active:translate-y-px disabled:opacity-60"
               >
                 {isWorking ? 'Working…' : 'End access today'}
               </button>
@@ -567,7 +567,7 @@ function BillingPanelInner() {
               <button
                 type="button"
                 onClick={() => setPeriodCancelOpen(false)}
-                className="rounded-md bg-brand-indigo px-4 py-2 text-sm font-medium tracking-[-0.006em] text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px"
+                className="rounded-md bg-content-primary px-4 py-2 text-sm font-semibold tracking-[-0.006em] text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px"
               >
                 Keep my plan
               </button>

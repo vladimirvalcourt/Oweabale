@@ -22,19 +22,19 @@ const legalLinks = [
 export default function Footer() {
   return (
     <footer className="border-t border-surface-border-subtle bg-surface-base text-content-primary">
-      <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="premium-container py-16">
+        <div className="grid gap-12 lg:grid-cols-[1.5fr_0.8fr_0.8fr_0.8fr]">
           <div>
             <TransitionLink to="/" className="inline-flex items-center gap-2 text-content-primary">
               <BrandWordmark textClassName="text-sm font-medium uppercase text-content-primary" />
             </TransitionLink>
-            <p className="mt-5 max-w-sm text-sm leading-relaxed text-content-tertiary">
+            <p className="mt-5 max-w-sm text-sm leading-6 text-content-tertiary">
               Oweable helps you see what is due, what is behind, and what to pay off next so your money stops running on guesswork.
             </p>
           </div>
 
           <div>
-            <h4 className="mb-4 text-xs font-medium uppercase text-content-secondary">Platform</h4>
+            <h4 className="premium-eyebrow mb-4">Platform</h4>
             <ul className="space-y-3">
               {platformLinks.map((link) => (
                 <li key={link.label}>
@@ -50,7 +50,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="mb-4 text-xs font-medium uppercase text-content-secondary">Company</h4>
+            <h4 className="premium-eyebrow mb-4">Company</h4>
             <ul className="space-y-3">
               {companyLinks.map((link) => (
                 <li key={link.label}>
@@ -66,7 +66,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="mb-4 text-xs font-medium uppercase text-content-secondary">Legal</h4>
+            <h4 className="premium-eyebrow mb-4">Legal</h4>
             <ul className="space-y-3">
               {legalLinks.map((link) => (
                 <li key={link.label}>

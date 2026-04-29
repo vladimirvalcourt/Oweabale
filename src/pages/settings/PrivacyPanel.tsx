@@ -201,7 +201,7 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
               <button
                 type="button"
                 onClick={handleExportData}
-                className="rounded-md bg-brand-indigo px-5 py-2.5 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px focus-app"
+                className="rounded-md bg-content-primary px-5 py-2.5 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px focus-app"
               >
                 Download JSON
               </button>
@@ -240,7 +240,7 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
           <button
             type="button"
             onClick={onOpenDeleteDialog}
-            className="rounded-lg border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:bg-brand-expense hover:text-white focus-app"
+            className="rounded-md border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] px-4 py-2 text-sm font-semibold text-[var(--color-status-rose-text)] transition-colors hover:bg-[var(--color-status-rose-text)] hover:text-surface-base focus-app"
           >
             Delete account
           </button>

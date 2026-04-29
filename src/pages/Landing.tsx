@@ -30,7 +30,7 @@ const featureRows = [
   {
     icon: Layers3,
     title: 'Build a payoff path you can follow',
-    body: 'Use snowball or avalanche planning when you are ready to turn balances into a sequence instead of a pile.',
+    body: 'Pick a payoff style that keeps you moving, then turn balances into next steps instead of one heavy pile.',
   },
   {
     icon: ShieldCheck,
@@ -75,7 +75,7 @@ const testimonials = [
     avatar: peopleAvatars.james,
   },
   {
-    quote: "The clarity this gives me is incredible. No more late fees, no more anxiety about what's due when.",
+    quote: "It feels like someone finally understood that money stress is emotional, not just math.",
     author: 'Emily R.',
     role: 'Mixed-income household',
     avatar: peopleAvatars.emily,
@@ -271,18 +271,34 @@ export default function Landing() {
       />
 
       <main>
-        <section className="relative px-5 pb-20 pt-40 sm:px-8 lg:pt-48">
+        <section className="relative px-5 pb-20 pt-36 sm:px-8 lg:pt-44">
           <div className="noise-overlay pointer-events-none fixed inset-0 opacity-[0.035]" />
 
           <div className="relative mx-auto max-w-[1280px]">
             <div className="grid gap-8 lg:grid-cols-[1fr_320px] lg:items-end">
               <div>
-                <h1 className="max-w-[840px] text-[3.25rem] font-medium leading-[0.98] tracking-[-0.055em] text-content-primary sm:text-[4rem] lg:text-[4.5rem]">
+                <h1 className="premium-display max-w-[900px]">
                   Stop guessing what you owe.
                 </h1>
-                <p className="mt-7 max-w-2xl text-base leading-7 tracking-[-0.01em] text-content-tertiary">
+                <p className="premium-lede mt-7 max-w-2xl">
                   When bills, debt, late fees, and due dates are all competing for your attention, Oweable gives you one ordered Pay List and a calmer way to decide what happens next.
                 </p>
+                <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                  <TransitionLink
+                    to={primaryHref}
+                    onClick={() => trackEvent('landing_cta_clicked', { location: 'hero' })}
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-content-primary px-6 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px"
+                  >
+                    {authUser?.id ? 'Open app' : 'Get started free'}
+                    <ArrowRight className="h-4 w-4" />
+                  </TransitionLink>
+                  <TransitionLink
+                    to="/pricing"
+                    className="inline-flex min-h-12 items-center justify-center rounded-md border border-surface-border bg-surface-raised px-6 text-sm font-medium text-content-primary transition-colors hover:bg-surface-elevated"
+                  >
+                    View pricing
+                  </TransitionLink>
+                </div>
 
                 <div className="mt-8 flex items-center gap-4">
                   <div className="flex -space-x-2">
@@ -306,7 +322,7 @@ export default function Landing() {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col items-start gap-5 lg:items-end">
+              <div className="hidden flex-col items-start gap-5 lg:flex lg:items-end">
                 <TransitionLink
                   to="/pricing"
                   className="inline-flex items-center gap-3 text-sm text-content-secondary transition-colors hover:text-content-primary"
@@ -328,12 +344,12 @@ export default function Landing() {
           </div>
         </section>
 
-        <section id="why" className="scroll-mt-24 px-4 py-24 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
+        <section id="why" className="premium-section scroll-mt-24">
+          <div className="premium-container">
             <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
               <div>
-                <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Why it feels calmer</p>
-                <h2 className="mt-4 max-w-xl text-4xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-5xl">
+                <p className="premium-eyebrow">Why it feels calmer</p>
+                <h2 className="premium-heading mt-4 max-w-xl sm:text-5xl">
                   Built for the part of money that keeps interrupting your day.
                 </h2>
               </div>
@@ -343,7 +359,7 @@ export default function Landing() {
                   return (
                     <article
                       key={feature.title}
-                      className="h-full rounded-[12px] border border-surface-border-subtle bg-surface-raised p-5 shadow-card transition-colors hover:bg-surface-elevated"
+                      className="premium-panel h-full p-5 transition-colors hover:bg-surface-elevated"
                     >
                       <Icon className="h-5 w-5 text-brand-violet" />
                       <h3 className="mt-5 text-xl font-medium tracking-[-0.024em] text-content-primary">{feature.title}</h3>
@@ -356,11 +372,11 @@ export default function Landing() {
           </div>
         </section>
 
-        <section id="flow" className="scroll-mt-24 border-y border-surface-border-subtle bg-surface-raised/36 px-4 py-24 sm:px-6 lg:px-8">
-          <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+        <section id="flow" className="premium-section scroll-mt-24 border-y border-surface-border-subtle bg-surface-raised/36">
+          <div className="premium-container grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">The operating flow</p>
-              <h2 className="mt-4 max-w-3xl text-4xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-5xl">
+              <p className="premium-eyebrow">The operating flow</p>
+              <h2 className="premium-heading mt-4 max-w-3xl sm:text-5xl">
                 Capture what you owe. Sort the urgency. Make the next payment feel less like a panic decision.
               </h2>
             </div>
@@ -379,11 +395,11 @@ export default function Landing() {
         </section>
 
         {/* Testimonials Section */}
-        <section className="border-t border-surface-border-subtle px-4 py-24 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-7xl">
+        <section className="premium-section border-t border-surface-border-subtle">
+          <div className="premium-container">
             <div className="text-center mb-16">
-              <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">What users say</p>
-              <h2 className="mt-4 text-4xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-5xl">
+              <p className="premium-eyebrow">What users say</p>
+              <h2 className="premium-heading mx-auto mt-4 max-w-3xl sm:text-5xl">
                 For people trying to get their footing back
               </h2>
             </div>
@@ -392,7 +408,7 @@ export default function Landing() {
               {testimonials.map((testimonial, index) => (
                 <div
                   key={index}
-                  className="flex h-full flex-col rounded-[12px] border border-surface-border-subtle bg-surface-raised p-6 shadow-card"
+                  className="premium-panel flex h-full flex-col p-6"
                 >
                   <div className="mb-4 flex gap-1">
                     {[...Array(5)].map((_, i) => (
@@ -417,17 +433,17 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="px-4 py-24 sm:px-6 lg:px-8">
+        <section className="premium-section">
           <div className="mx-auto max-w-5xl text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-content-muted">Ready when you are</p>
-            <h2 className="mx-auto mt-4 max-w-3xl text-4xl font-medium leading-none tracking-[-0.044em] text-content-primary sm:text-5xl">
+            <p className="premium-eyebrow">Ready when you are</p>
+            <h2 className="premium-heading mx-auto mt-4 max-w-3xl sm:text-5xl">
               Start with what is due. Add payoff planning when you are ready.
             </h2>
             <div className="mt-8 flex justify-center">
               <TransitionLink
                 to={primaryHref}
                 onClick={() => trackEvent('landing_cta_clicked', { location: 'bottom' })}
-                className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-brand-indigo px-5 text-sm font-medium text-white transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-content-primary px-6 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px"
               >
                 {authUser?.id ? 'Open app' : 'Get started free'}
                 <ArrowRight className="h-4 w-4" />

@@ -23,10 +23,10 @@ const tabs = [
 ];
 
 const BUTTON_BASE_CLASS =
-  'inline-flex min-h-10 items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors focus-app disabled:opacity-60 disabled:cursor-not-allowed';
-const BUTTON_SECONDARY_CLASS = `${BUTTON_BASE_CLASS} border border-surface-border bg-transparent text-content-secondary hover:bg-surface-elevated`;
-const BUTTON_WARNING_CLASS = `${BUTTON_BASE_CLASS} bg-[var(--color-status-amber-text)] text-white hover:bg-amber-600`;
-const BUTTON_DESTRUCTIVE_CLASS = `${BUTTON_BASE_CLASS} bg-brand-expense text-white hover:bg-rose-700`;
+  'inline-flex min-h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-semibold transition-colors focus-app disabled:opacity-60 disabled:cursor-not-allowed';
+const BUTTON_SECONDARY_CLASS = `${BUTTON_BASE_CLASS} border border-surface-border bg-surface-raised text-content-primary hover:bg-surface-elevated`;
+const BUTTON_WARNING_CLASS = `${BUTTON_BASE_CLASS} border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]`;
+const BUTTON_DESTRUCTIVE_CLASS = `${BUTTON_BASE_CLASS} border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]`;
 
 const SettingsNav = memo(function SettingsNav({
   activeTab,
@@ -43,7 +43,7 @@ const SettingsNav = memo(function SettingsNav({
           type="button"
           onClick={() => onSelect(tab.id)}
           className={cn(
-            'w-full flex items-center px-4 py-2.5 text-[10px] font-mono uppercase tracking-[0.2em] rounded-lg transition-all border border-transparent',
+            'flex w-full items-center rounded-md border border-transparent px-4 py-2.5 text-sm font-medium transition-all',
             activeTab === tab.id
               ? 'bg-content-primary/[0.08] text-content-primary border-content-primary/10 shadow-none'
               : 'text-content-tertiary hover:text-content-primary hover:bg-surface-raised',
@@ -146,11 +146,12 @@ export default function Settings() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6">
+    <div className="mx-auto w-full max-w-5xl space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Settings</h1>
-          <p className="mt-1 text-sm font-medium text-content-secondary">Account, plan, connections, security, and data.</p>
+          <p className="premium-eyebrow">Account</p>
+          <h1 className="premium-heading mt-2">Settings</h1>
+          <p className="mt-2 text-sm leading-6 text-content-secondary">Account, plan, connections, security, and data.</p>
         </div>
       </div>
 
@@ -178,7 +179,7 @@ export default function Settings() {
         </div>
       </div>
 
-      <p className="max-w-5xl mx-auto text-center text-[11px] font-mono text-content-muted">
+      <p className="mx-auto max-w-5xl text-center text-xs leading-5 text-content-muted">
         Most preferences sync to your Oweable profile. App Lock, web push, and some session data stay on this device.
       </p>
 

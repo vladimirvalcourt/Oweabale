@@ -31,7 +31,7 @@ interface PublicHeaderProps {
 export default function PublicHeader({ links = [] }: PublicHeaderProps) {
   const [activeSection, setActiveSection] = useState('');
   const { user: authUser } = useAuth();
-  const primaryHref = authUser?.id ? '/dashboard' : '/auth';
+  const primaryHref = authUser?.id ? '/pro/dashboard' : '/auth?mode=signup';
 
   // Track active section for nav highlighting
   useEffect(() => {
@@ -61,8 +61,8 @@ export default function PublicHeader({ links = [] }: PublicHeaderProps) {
   }, [links]);
 
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 border-b border-surface-border-subtle bg-surface-base/90 backdrop-blur-xl">
-      <div className="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-5 sm:px-8">
+    <nav className="fixed inset-x-0 top-0 z-50 border-b border-surface-border-subtle bg-surface-base/88 backdrop-blur-xl">
+      <div className="premium-container flex h-[72px] items-center justify-between">
         <TransitionLink to="/" className="group flex items-center gap-2 text-content-primary">
           <BrandWordmark
             logoClassName="h-5 w-5 rounded-[4px]"
@@ -71,7 +71,7 @@ export default function PublicHeader({ links = [] }: PublicHeaderProps) {
         </TransitionLink>
 
         {links.length > 0 && (
-          <div className="hidden items-center gap-7 md:flex">
+          <div className="hidden items-center gap-6 rounded-md border border-surface-border-subtle bg-surface-raised/50 px-3 py-2 md:flex">
             {links.map((link) => (
               <NavLink key={link.href} href={link.href} isActive={activeSection === link.id}>
                 {link.label}
@@ -80,16 +80,16 @@ export default function PublicHeader({ links = [] }: PublicHeaderProps) {
           </div>
         )}
 
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-3">
           <TransitionLink
             to="/auth"
-            className="hidden text-sm text-content-secondary/72 transition-colors hover:text-content-primary sm:inline-flex"
+            className="hidden rounded-md px-3 py-2 text-sm font-medium text-content-secondary/80 transition-colors hover:bg-surface-elevated hover:text-content-primary sm:inline-flex"
           >
             Log in
           </TransitionLink>
           <TransitionLink
             to={primaryHref}
-            className="inline-flex h-10 items-center justify-center rounded-[6px] bg-content-primary px-4 text-sm font-medium text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px"
+            className="inline-flex h-10 items-center justify-center rounded-md bg-content-primary px-4 text-sm font-semibold text-surface-base transition-[background-color,transform] hover:bg-content-secondary active:translate-y-px"
           >
             <span className="relative z-10">{authUser?.id ? 'Open app' : 'Sign up'}</span>
           </TransitionLink>
