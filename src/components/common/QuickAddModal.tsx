@@ -321,7 +321,7 @@ function FormRadioGroup({ id, name, label, value, onChange, options, required, d
               tabIndex={value === option.value ? 0 : -1}
               onClick={() => !disabled && onChange(option.value)}
               disabled={disabled}
-              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-sans font-medium transition-colors focus-app ${
+              className={`flex-1 rounded-full px-3 py-1.5 text-xs font-sans font-medium transition-colors focus-app text-center ${
                 value === option.value
                   ? 'bg-brand-cta text-surface-base'
                   : 'text-content-tertiary hover:text-content-primary'
