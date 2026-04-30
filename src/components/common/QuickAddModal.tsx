@@ -676,8 +676,20 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   /** Closed card / no statement cycle — omit payment due date on debt. */
   const [debtNoPaymentDue, setDebtNoPaymentDue] = useState(false);
   const [incomeTaxWithheld, setIncomeTaxWithheld] = useState(false);
-  // Validation state
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Initialize validation hook with form data
+  const validation = useQuickAddValidation(activeTab, {
+    amount,
+    description,
+    vendor,
+    date,
+    dueDate,
+    jurisdiction,
+    obligationKind,
+    debtNoPaymentDue,
+  });
+  const { errors, validateForm, clearErrors, clearFieldError } = validation;
+  
   // Scan state
   const [isScanning, setIsScanning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -691,7 +703,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     formState.resetForm();
     setNlpText('');
     setIsScanning(false);
-    setErrors({});
+    clearErrors();
     if (scanFileInputRef.current) scanFileInputRef.current.value = '';
     if (scanCameraInputRef.current) scanCameraInputRef.current.value = '';
     setScannedPreviewUrl((prev) => {
@@ -879,28 +891,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     }
   }, [vendor, description, activeTab, transactionLedgerKind]);
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
-    const parsedAmount = parseCurrencyInput(amount);
-    if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) newErrors.amount = "Please enter a valid amount greater than zero.";
-
-    if (activeTab === 'transaction') {
-      if (!description.trim()) newErrors.description = "Please describe the transaction.";
-    } else if (activeTab === 'obligation') {
-      if (!vendor.trim()) newErrors.vendor = "Please specify who is being paid.";
-      const needDue =
-        obligationKind.startsWith('bill-') ||
-        (obligationKind.startsWith('debt-') && !debtNoPaymentDue);
-      if (needDue && !dueDate) newErrors.dueDate = "Please select a due date.";
-    } else if (activeTab === 'income') {
-      if (!date) newErrors.date = "Please select a date.";
-    } else if (activeTab === 'citation') {
-      if (!jurisdiction.trim()) newErrors.jurisdiction = "Please enter the issuing jurisdiction.";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  // validateForm is now provided by useQuickAddValidation hook
 
   const handleNLPInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
@@ -1105,7 +1096,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     const tab = tabOrder[idx];
     if (!tab) return;
     setActiveTab(tab as TabType);
-    setErrors({});
+    clearErrors();
   };
   const onTabListKeyDown = (e: React.KeyboardEvent) => {
     const i = tabOrder.findIndex((t) => t === activeTab);
@@ -1277,7 +1268,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         isActive={activeTab === 'transaction'}
                         onClick={() => {
                           setActiveTab('transaction');
-                          setErrors({});
+                          clearErrors();
                         }}
                       />
                     )}
@@ -1287,7 +1278,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       isActive={activeTab === 'obligation'}
                       onClick={() => {
                         setActiveTab('obligation');
-                        setErrors({});
+                        clearErrors();
                       }}
                     />
                     {hasFullSuite && (
@@ -1297,7 +1288,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         isActive={activeTab === 'income'}
                         onClick={() => {
                           setActiveTab('income');
-                          setErrors({});
+                          clearErrors();
                         }}
                       />
                     )}
@@ -1307,7 +1298,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       isActive={activeTab === 'citation'}
                       onClick={() => {
                         setActiveTab('citation');
-                        setErrors({});
+                        clearErrors();
                       }}
                       icon={<AlertTriangle className="w-3 h-3 shrink-0" aria-hidden />}
                       variant="citation"
@@ -1330,7 +1321,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       id="amount"
                       label="Amount"
                       value={amount}
-                      onChange={(value) => { setAmount(value); if (errors.amount) setErrors({ ...errors, amount: '' }); }}
+                      onChange={(value) => { setAmount(value); if (errors.amount) clearFieldError('amount'); }}
                       placeholder="0.00"
                       error={errors.amount}
                       required
@@ -1372,7 +1363,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 id="description"
                                 label="Description"
                                 value={description}
-                                onChange={(e) => { setDescription(e.target.value); if (errors.description) setErrors({ ...errors, description: '' }); }}
+                                onChange={(e) => { setDescription(e.target.value); if (errors.description) clearFieldError('description'); }}
                                 placeholder="E.g., Whole Foods"
                                 error={errors.description}
                                 required
@@ -1490,7 +1481,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               id="dueDate"
                               label={obligationKind.startsWith('debt-') ? 'Payment due date' : 'Due Date'}
                               value={dueDate}
-                              onChange={(val) => { setDueDate(val); if (errors.dueDate) setErrors({ ...errors, dueDate: '' }); }}
+                              onChange={(val) => { setDueDate(val); if (errors.dueDate) clearFieldError('dueDate'); }}
                               error={errors.dueDate}
                               disabled={obligationKind.startsWith('debt-') && debtNoPaymentDue}
                               showDaysLeft={obligationKind.startsWith('bill-')}
@@ -1502,7 +1493,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 checked={debtNoPaymentDue}
                                 onChange={(e) => {
                                   setDebtNoPaymentDue(e.target.checked);
-                                  if (e.target.checked && errors.dueDate) setErrors({ ...errors, dueDate: '' });
+                                  if (e.target.checked && errors.dueDate) clearFieldError('dueDate');
                                 }}
                                 description="Skip payment due date for closed accounts"
                                 className="mt-2"
@@ -1516,7 +1507,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               id="vendor"
                               label="Biller Name"
                               value={vendor}
-                              onChange={(value) => { setVendor(value); if (errors.vendor) setErrors({ ...errors, vendor: '' }); }}
+                              onChange={(value) => { setVendor(value); if (errors.vendor) clearFieldError('vendor'); }}
                               placeholder={
                                 obligationKind.startsWith('bill-')
                                   ? 'E.g., AT&T'
@@ -1647,7 +1638,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 </span>
                               }
                               value={jurisdiction}
-                              onChange={(value) => { setJurisdiction(value); if (errors.jurisdiction) setErrors({ ...errors, jurisdiction: '' }); }}
+                              onChange={(value) => { setJurisdiction(value); if (errors.jurisdiction) clearFieldError('jurisdiction'); }}
                               placeholder="E.g., Dallas County, TX"
                               error={errors.jurisdiction}
                               required
@@ -1767,7 +1758,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             id="incDate"
                             label="Next pay date"
                             value={date}
-                            onChange={(val) => { setDate(val); if (errors.date) setErrors({ ...errors, date: '' }); }}
+                            onChange={(val) => { setDate(val); if (errors.date) clearFieldError('date'); }}
                             error={errors.date}
                           />
                         </div>
