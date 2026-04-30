@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Minus, Plus } from 'lucide-react';
-import { PublicHeader } from '../components/layout';
-import { Footer } from '../components/layout';
-import { useSEO } from '../hooks';
+import { PublicHeader } from '@/components/layout';
+import { Footer } from '@/components/layout';
+import { useSEO } from '@/hooks';
 
 const FAQ_DATA = [
   {

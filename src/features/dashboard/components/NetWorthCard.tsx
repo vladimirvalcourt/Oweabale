@@ -1,7 +1,7 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
-import { Card, CardContent } from '../../../components/ui/Card';
-import { formatCurrency } from '../../../lib/utils';
+import { Card, CardContent } from '@/components/ui/Card';
+import { formatCurrency } from '@/lib/utils';
 
 interface NetWorthCardProps {
   totalAssets: number;

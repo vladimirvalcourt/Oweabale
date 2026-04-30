@@ -1,5 +1,5 @@
-import { ThemeToggle, TransitionLink } from '../components/common';
-import { useAuth } from '../hooks';
+import { ThemeToggle, TransitionLink } from '@/components/common';
+import { useAuth } from '@/hooks';
 
 /**
  * Global 404 — matches unknown paths via `<Route path="*" />`.

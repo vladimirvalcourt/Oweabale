@@ -1,8 +1,8 @@
 import type { StateCreator } from 'zustand';
 import { toast } from 'sonner';
-import { applyCategorizationRules, merchantKey } from '../../lib/api/services/categorizationRules';
-import { supabase } from '../../lib/api/supabase';
-import type { AppState, CategorizationExclusion, CategorizationRule } from '../types';
+import { applyCategorizationRules, merchantKey } from '@/lib/api/services/categorizationRules';
+import { supabase } from '@/lib/api/supabase';
+import type { AppState, CategorizationExclusion, CategorizationRule } from '@/types';
 
 type StoreSlice<T> = StateCreator<AppState, [['zustand/persist', unknown]], [], T>;
 

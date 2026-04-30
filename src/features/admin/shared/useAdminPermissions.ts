@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../../lib/api/supabase';
+import { supabase } from '@/lib/api/supabase';
 
 type AdminRolesPayload = {
   roles: { id: string; key: string; label: string }[];

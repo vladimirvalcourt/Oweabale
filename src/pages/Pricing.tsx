@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Minus, Plus } from 'lucide-react';
-import { Footer } from '../components/layout';
-import { PublicHeader } from '../components/layout';
-import { useAuth, useJsonLd, useSEO } from '../hooks';
+import { Footer } from '@/components/layout';
+import { PublicHeader } from '@/components/layout';
+import { useAuth, useJsonLd, useSEO } from '@/hooks';
 
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);

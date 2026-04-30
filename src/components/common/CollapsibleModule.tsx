@@ -1,6 +1,6 @@
 import React, { useState, startTransition } from 'react';
 import { ChevronUp, ChevronDown } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 
 interface CollapsibleModuleProps {
   title: string;

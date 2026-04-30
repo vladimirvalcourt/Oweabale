@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
-import MaintenancePage from '../../pages/MaintenancePage';
-import { useStore } from '../../store';
+import MaintenancePage from '@/pages/MaintenancePage';
+import { useStore } from '@/store';
 
 /**
  * Blocks the signed-in app shell when maintenance mode is enabled, except for admins.

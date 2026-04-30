@@ -3,8 +3,8 @@
  * Shared between desktop upload and mobile sync re-scan.
  */
 import { guessCategory } from './categorizer';
-import { extractCitationFieldsFromText, looksLikeCitationDocument } from '../citation';
-import type { PendingIngestion } from '../../../store';
+import { extractCitationFieldsFromText, looksLikeCitationDocument } from '@/lib/api/citation';
+import type { PendingIngestion } from '@/store';
 
 const RECEIPT_NOISE =
   /^(receipt|invoice|thank you|thanks|welcome|store|branch|tel:|phone:|www\.|http|address:|date:|time:|cashier|order #|order:|transaction|subtotal|total|tax|amount|change|cash|card|approved|auth|ref:|refund|void|copy|customer|#\d+|\d{3}[-.\s]\d{3}[-.\s]\d{4}|\d{1,5}\s+\w+\s+(st|ave|blvd|rd|dr|lane|ln|way|ct|pl|suite))/i;

@@ -1,13 +1,13 @@
 import React, { memo, useEffect, useState } from 'react';
 import { LifeBuoy, MessageSquare, Send, Loader2, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
-import { CollapsibleModule } from '../../components/common';
-import { supabase } from '../../lib/api/supabase';
+import { CollapsibleModule } from '@/components/common';
+import { supabase } from '@/lib/api/supabase';
 import { toast } from 'sonner';
 import type { SupportTicket } from './types';
-import { useStore } from '../../store';
-import { yieldForPaint } from "../../lib/api/services";
-import { getCustomIcon } from '../../lib/utils/customIcons';
+import { useStore } from '@/store';
+import { yieldForPaint } from "@/lib/api/services";
+import { getCustomIcon } from '@/lib/utils/customIcons';
 
 function SupportPanelInner() {
   const SupportIcon = getCustomIcon('support');

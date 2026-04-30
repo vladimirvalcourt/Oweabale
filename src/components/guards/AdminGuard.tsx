@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { supabase } from '../../lib/api/supabase';
-import { AppLoader } from '../common';
+import { supabase } from '@/lib/api/supabase';
+import { AppLoader } from '@/components/common';
 
 /**
  * AdminGuard — verifies is_admin + primary admin email on every mount.

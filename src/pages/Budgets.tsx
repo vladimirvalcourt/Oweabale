@@ -1,19 +1,19 @@
 import React, { useState, useMemo } from 'react';
 import { Plus, MoreHorizontal, X, PieChart, Edit2, Trash2, AlertTriangle, CheckCircle2 } from 'lucide-react';
-import { useStore, Budget } from '../store';
+import { useStore, Budget } from '@/store';
 import {
   buildMonthlySavingsTargetSnapshot,
   buildPersonalizedSavingsSuggestions,
   detectSpendingAnomalies,
-} from '../lib/api/services/finance';
-import { yieldForPaint } from '../lib/utils';
-import { startOfBudgetPeriod, shiftBudgetPeriod } from '../lib/api/services/budgetPeriods';
-import { CollapsibleModule } from '../components/common';
+} from '@/lib/api/services/finance';
+import { yieldForPaint } from '@/lib/utils';
+import { startOfBudgetPeriod, shiftBudgetPeriod } from '@/lib/api/services/budgetPeriods';
+import { CollapsibleModule } from '@/components/common';
 import { Dialog, Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { toast } from 'sonner';
-import { formatCategoryLabel } from '../lib/api/services/categoryDisplay';
-import { getCustomIcon } from '../lib/utils';
+import { formatCategoryLabel } from '@/lib/api/services/categoryDisplay';
+import { getCustomIcon } from '@/lib/utils';
 
 const BUDGET_PERIODS: Budget['period'][] = ['Weekly', 'Bi-weekly', 'Monthly', 'Quarterly', 'Yearly'];
 const SAVINGS_TARGET_STORAGE_KEY = 'oweable_budget_monthly_savings_target';

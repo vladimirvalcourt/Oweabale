@@ -1,7 +1,7 @@
 import React from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { motion, useInView } from "framer-motion";
-import { TransitionLink } from "../common/TransitionLink";
+import { TransitionLink } from '@/components/common/TransitionLink';
 
 // Inline Button Component - Adapted to use design tokens
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

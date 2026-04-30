@@ -1,5 +1,5 @@
 import type { StateCreator } from 'zustand';
-import type { AppState } from '../types';
+import type { AppState } from '@/types';
 
 export type StoreSlice<T> = StateCreator<AppState, [['zustand/persist', unknown]], [], T>;
 

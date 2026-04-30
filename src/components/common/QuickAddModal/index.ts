@@ -20,4 +20,4 @@
 // export { useQuickAddSubmission } from './hooks/useQuickAddSubmission';
 
 // For now, continue using the main component from parent directory
-export { default } from '../QuickAddModal';
+export { default } from '@/QuickAddModal';

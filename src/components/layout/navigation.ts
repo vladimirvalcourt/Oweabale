@@ -20,7 +20,7 @@ import {
   TrendingUp,
   Wallet,
 } from 'lucide-react';
-import type { Citation, Bill, Subscription } from '../../store';
+import type { Citation, Bill, Subscription } from '@/store';
 
 export const NAV_ROUTE_HASHES: Record<string, string[]> = {
   '/pro/dashboard': ['safe-spend'],

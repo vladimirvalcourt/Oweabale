@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { ThemeBackdrop } from './ThemeBackdrop';
-import { trackEvent } from '../../hooks/usePostHog';
+import { trackEvent } from '@/hooks/usePostHog';
 
 interface ExitIntentModalProps {
   isOpen: boolean;

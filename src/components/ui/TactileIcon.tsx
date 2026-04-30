@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'motion/react';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 
 export type AppIcon = React.ComponentType<{
   size?: number | string;

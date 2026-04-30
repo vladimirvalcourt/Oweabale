@@ -7,9 +7,9 @@ import {
   type PlaidLinkError,
 } from 'react-plaid-link';
 import { toast } from 'sonner';
-import { createPlaidLinkToken, exchangePlaidPublicToken } from '../lib/api/plaid';
-import { normalizePlaidFlowErrorMessage } from '../lib/api/plaid/errors';
-import { track } from '../lib/utils';
+import { createPlaidLinkToken, exchangePlaidPublicToken } from '@/lib/api/plaid';
+import { normalizePlaidFlowErrorMessage } from '@/lib/api/plaid/errors';
+import { track } from '@/lib/utils';
 
 export type PlaidFlowIntent = 'create' | 'update';
 export type PlaidFlowStage =

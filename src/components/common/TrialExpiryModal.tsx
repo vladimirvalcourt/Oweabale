@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getUserProfile } from '../../app/constants';
-import { useStore } from '../../store';
+import { getUserProfile } from '@/app/constants';
+import { useStore } from '@/store';
 import { Lock } from 'lucide-react';
 import { ThemeBackdrop } from './ThemeBackdrop';
 

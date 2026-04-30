@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { TransitionLink } from './TransitionLink';
-import { getTrialDaysRemaining } from '../../app/constants';
-import { useStore } from '../../store';
+import { getTrialDaysRemaining } from '@/app/constants';
+import { useStore } from '@/store';
 import { AlertCircle, Clock } from 'lucide-react';
 
 export default function TrialBanner() {

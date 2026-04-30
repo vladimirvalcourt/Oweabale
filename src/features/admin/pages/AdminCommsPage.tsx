@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Mail, Send, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
-import { AdminEmptyState, AdminMetric, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminDangerButtonClass, adminInputClass } from '../shared/AdminUI';
-import { invokeAdminAction } from '../shared/adminActionClient';
-import { cn } from '../../../lib/utils';
+import { AdminEmptyState, AdminMetric, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminDangerButtonClass, adminInputClass } from '@/features/admin/shared/AdminUI';
+import { invokeAdminAction } from '@/features/admin/shared/adminActionClient';
+import { cn } from '@/lib/utils';
 
 type CommsPayload = {
   templates: Array<Record<string, unknown>>;

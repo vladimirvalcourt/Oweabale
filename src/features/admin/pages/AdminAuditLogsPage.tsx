@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Download, FileSearch, Search } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../../lib/api/supabase';
-import { AdminEmptyState, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminInputClass } from '../shared/AdminUI';
-import { cn } from '../../../lib/utils';
+import { supabase } from '@/lib/api/supabase';
+import { AdminEmptyState, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminInputClass } from '@/features/admin/shared/AdminUI';
+import { cn } from '@/lib/utils';
 
 type AuditRow = {
   id: string;

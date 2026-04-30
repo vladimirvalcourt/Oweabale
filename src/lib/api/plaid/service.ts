@@ -1,4 +1,4 @@
-import { supabase } from "../supabase/client";
+import { supabase } from '@/lib/api/supabase/client';
 import { normalizePlaidFlowErrorMessage } from "./errors";
 
 async function parseFunctionError(error: unknown): Promise<string> {

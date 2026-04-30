@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from 'react';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 
 type IconType = ComponentType<{ className?: string; 'aria-hidden'?: boolean }>;
 

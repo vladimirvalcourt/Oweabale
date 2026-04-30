@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Check, CircleDollarSign, Clock3, Layers3, ShieldCheck } from 'lucide-react';
-import { Footer, PublicHeader } from '../components/layout';
-import { TransitionLink } from '../components/common';
-import ExitIntentModal from '../components/common/ExitIntentModal';
-import { useAuth, useSEO, trackEvent } from '../hooks';
+import { Footer, PublicHeader } from '@/components/layout';
+import { TransitionLink } from '@/components/common';
+import ExitIntentModal from '@/components/common/ExitIntentModal';
+import { useAuth, useSEO, trackEvent } from '@/hooks';
 import gsap from 'gsap';
 
 const proofPoints = ['Bills', 'Debt', 'Subscriptions', 'Tolls', 'Tickets', 'Taxes'];

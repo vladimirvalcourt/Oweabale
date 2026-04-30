@@ -1,9 +1,9 @@
 import type { StateCreator } from 'zustand';
 import { toast } from 'sonner';
-import { supabase } from '../../lib/api/supabase';
-import { clearUserStorageKeys } from '../../app/constants';
-import { initialData, DEFAULT_NOTIF_PREFS, NOTIF_PREFS_STORAGE_KEY, normalizeNotificationPrefsRecord } from '../initialState';
-import type { AppState } from '../types';
+import { supabase } from '@/lib/api/supabase';
+import { clearUserStorageKeys } from '@/app/constants';
+import { initialData, DEFAULT_NOTIF_PREFS, NOTIF_PREFS_STORAGE_KEY, normalizeNotificationPrefsRecord } from '@/store/initialState';
+import type { AppState } from '@/types';
 
 type StoreSlice<T> = StateCreator<AppState, [['zustand/persist', unknown]], [], T>;
 

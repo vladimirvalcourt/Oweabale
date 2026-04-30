@@ -1,6 +1,6 @@
 import React from "react";
 import { ArrowRight } from "lucide-react";
-import { TransitionLink } from "../common/TransitionLink";
+import { TransitionLink } from '@/components/common/TransitionLink';
 
 // Inline Button Component for Hero CTA
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

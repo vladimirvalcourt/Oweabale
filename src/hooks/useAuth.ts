@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { AuthChangeEvent, Session, User } from '@supabase/supabase-js';
-import { supabase } from '../lib/api/supabase';
-import { syncSentryUserFromSupabaseUser } from '../lib/utils';
+import { supabase } from '@/lib/api/supabase';
+import { syncSentryUserFromSupabaseUser } from '@/lib/utils';
 
 export interface AuthState {
   user: User | null;

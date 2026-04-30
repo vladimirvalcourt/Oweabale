@@ -1,12 +1,12 @@
 import React, { memo, useMemo, useState } from 'react';
 import { AlertTriangle, CheckSquare } from 'lucide-react';
 import { Filter, Plus, Trash2, RefreshCw, Loader2, Undo2 } from 'lucide-react';
-import { CollapsibleModule } from '../../components/common';
+import { CollapsibleModule } from '@/components/common';
 import { toast } from 'sonner';
-import { useStore } from '../../store';
-import { applyCategorizationRules, type CategorizationRule } from "../../lib/api/services/categorizationRules";
-import { formatCategoryLabel } from "../../lib/api/services/categoryDisplay";
-import { getCustomIcon } from '../../lib/utils/customIcons';
+import { useStore } from '@/store';
+import { applyCategorizationRules, type CategorizationRule } from "@/lib/api/services/categorizationRules";
+import { formatCategoryLabel } from "@/lib/api/services/categoryDisplay";
+import { getCustomIcon } from '@/lib/utils/customIcons';
 
 type RuleScope = 'one' | 'merchant' | 'similar';
 

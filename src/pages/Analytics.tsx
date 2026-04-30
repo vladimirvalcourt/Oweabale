@@ -8,14 +8,14 @@ import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine,
 } from 'recharts';
-import { supabase } from '../lib/api/supabase';
-import { useStore } from '../store';
-import { CollapsibleModule } from '../components/common';
-import { rechartsTooltipStableProps } from '../lib/utils';
-import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
-import { formatCategoryLabel } from '../lib/api/services/categoryDisplay';
-import { TransitionLink } from '../components/common';
-import { getCustomIcon } from '../lib/utils';
+import { supabase } from '@/lib/api/supabase';
+import { useStore } from '@/store';
+import { CollapsibleModule } from '@/components/common';
+import { rechartsTooltipStableProps } from '@/lib/utils';
+import { SafeResponsiveContainer } from '@/components/charts/SafeResponsiveContainer';
+import { formatCategoryLabel } from '@/lib/api/services/categoryDisplay';
+import { TransitionLink } from '@/components/common';
+import { getCustomIcon } from '@/lib/utils';
 
 type Period = '1M' | '3M' | '6M' | '1Y' | 'ALL';
 

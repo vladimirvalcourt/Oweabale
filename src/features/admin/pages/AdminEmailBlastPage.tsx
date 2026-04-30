@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { CheckCircle, ShieldCheck } from 'lucide-react';
-import { supabase } from '../../../lib/api/supabase';
-import { useAdminPermissions } from '../shared';
-import { AdminMetric, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminDangerButtonClass, adminInputClass } from '../shared/AdminUI';
-import { cn } from '../../../lib/utils';
+import { supabase } from '@/lib/api/supabase';
+import { useAdminPermissions } from '@/features/admin/shared';
+import { AdminMetric, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminDangerButtonClass, adminInputClass } from '@/features/admin/shared/AdminUI';
+import { cn } from '@/lib/utils';
 
 type AudienceFilter = 'all' | 'free' | 'pro' | 'lifetime' | 'inactive_30d' | 'needs_relink';
 

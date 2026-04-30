@@ -10,7 +10,7 @@ export * from './finance';
 export * from './financialAlertPrefs';
 export * from './ingestionExtraction';
 export * from './ingestionScan';
-export * from '../../utils/interaction';
+export * from '@/lib/utils/interaction';
 export * from './notificationPreferences';
 export * from './quickEntryCategories';
 export * from './quickEntryNlp';

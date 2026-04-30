@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo, startTransition, useDeferredValue, memo } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { TransitionLink } from '../common/TransitionLink';
+import { TransitionLink } from '@/components/common/TransitionLink';
 import {
   Bell, Search, Settings, Plus, X,
   Command, Home, Activity, AlertTriangle, MoreHorizontal,
@@ -8,22 +8,22 @@ import {
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
-import { cn } from '../../lib/utils';
-import { useStore } from '../../store';
+import { cn } from '@/lib/utils';
+import { useStore } from '@/store';
 import { useShallow } from 'zustand/react/shallow';
-import QuickAddModal from '../common/QuickAddModal';
-import { TactileIcon, MorphingMenuIcon } from '../ui/TactileIcon';
-import { HouseholdAvatarStack } from '../common/HouseholdAvatarStack';
-import type { Notification } from '../../store';
-import { useFullSuiteAccess } from '../../hooks';
-import { formatCategoryLabel } from '../../lib/api/services/categoryDisplay';
-import { BrandWordmark } from '../common/BrandWordmark';
-import { KeyboardShortcutsDialog } from '../common/KeyboardShortcutsDialog';
-import { isApplePointerPlatform } from '../../lib/utils';
-import type { HouseholdMember } from '../../types';
-import TrialBanner from '../common/TrialBanner';
-import { ThemeToggle } from '../common/ThemeToggle';
-import { useTheme } from '../../hooks';
+import QuickAddModal from '@/components/common/QuickAddModal';
+import { TactileIcon, MorphingMenuIcon } from '@/components/ui/TactileIcon';
+import { HouseholdAvatarStack } from '@/components/common/HouseholdAvatarStack';
+import type { Notification } from '@/store';
+import { useFullSuiteAccess } from '@/hooks';
+import { formatCategoryLabel } from '@/lib/api/services/categoryDisplay';
+import { BrandWordmark } from '@/components/common/BrandWordmark';
+import { KeyboardShortcutsDialog } from '@/components/common/KeyboardShortcutsDialog';
+import { isApplePointerPlatform } from '@/lib/utils';
+import type { HouseholdMember } from '@/types';
+import TrialBanner from '@/components/common/TrialBanner';
+import { ThemeToggle } from '@/components/common/ThemeToggle';
+import { useTheme } from '@/hooks';
 import {
   buildDueSoonPreview,
   buildNavGroups,

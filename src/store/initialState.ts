@@ -1,12 +1,12 @@
 import {
   DEFAULT_FINANCIAL_ALERT_PREFS,
-} from '../lib/api/services/financialAlertPrefs';
+} from '@/lib/api/services/financialAlertPrefs';
 import {
   DEFAULT_NOTIF_PREFS,
   NOTIF_PREFS_STORAGE_KEY,
   loadNotifPrefs,
-} from '../pages/settings/constants';
-import { mergeNotificationPrefsFromSources, normalizeNotificationPrefsRecord } from '../lib/api/services/notificationPreferences';
+} from '@/pages/settings/constants';
+import { mergeNotificationPrefsFromSources, normalizeNotificationPrefsRecord } from '@/lib/api/services/notificationPreferences';
 import type { AppState } from './types';
 
 export const initialData: Pick<

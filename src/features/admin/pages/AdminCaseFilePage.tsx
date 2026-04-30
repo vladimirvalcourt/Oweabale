@@ -11,11 +11,11 @@ import {
   UserRound,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '../../../lib/api/supabase';
-import { useAdminPermissions } from '../shared';
+import { supabase } from '@/lib/api/supabase';
+import { useAdminPermissions } from '@/features/admin/shared';
 import { useMemo } from 'react';
-import { AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminDangerButtonClass, adminInputClass } from '../shared/AdminUI';
-import { cn } from '../../../lib/utils';
+import { AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminDangerButtonClass, adminInputClass } from '@/features/admin/shared/AdminUI';
+import { cn } from '@/lib/utils';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

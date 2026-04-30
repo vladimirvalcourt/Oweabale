@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { browserSupportsModernWebCrypto } from '../../lib/utils';
+import { browserSupportsModernWebCrypto } from '@/lib/utils';
 
 /**
  * Shown when the runtime cannot use PKCE / Web Crypto (legacy browsers, some embedded WebViews).

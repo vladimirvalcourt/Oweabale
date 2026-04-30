@@ -1,4 +1,4 @@
-import { supabase } from '../supabase/client';
+import { supabase } from '@/lib/api/supabase/client';
 
 /** Never show raw Edge Function / network errors in billing UI — log for support. */
 export const BILLING_USER_SAFE_MESSAGE =

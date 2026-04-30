@@ -1,4 +1,4 @@
-import { supabase } from '../supabase/client';
+import { supabase } from '@/lib/api/supabase/client';
 
 const SW_PATH = '/push-handler.js';
 

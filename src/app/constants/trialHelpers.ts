@@ -1,4 +1,4 @@
-import { supabase } from '../../lib/api/supabase';
+import { supabase } from '@/lib/api/supabase';
 
 export type UserPlan = 'tracker' | 'trial' | 'full_suite';
 

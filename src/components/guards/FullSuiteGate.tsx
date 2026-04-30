@@ -1,10 +1,10 @@
 import { useState, type ReactNode } from 'react';
 import { Lock, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { createStripeCheckoutSession } from '../../lib/api/stripe';
-import { useFullSuiteAccess } from '../../hooks';
-import { AppLoader } from '../common';
-import { TransitionLink } from '../common';
+import { createStripeCheckoutSession } from '@/lib/api/stripe';
+import { useFullSuiteAccess } from '@/hooks';
+import { AppLoader } from '@/components/common';
+import { TransitionLink } from '@/components/common';
 
 type FullSuiteGateCardProps = {
   title: string;

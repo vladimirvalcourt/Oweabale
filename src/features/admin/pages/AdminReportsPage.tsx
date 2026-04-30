@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Download, FileText, TrendingUp, Users, Zap, BarChart3 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../../lib/api/supabase';
-import { AdminPageHeader, AdminPanel, adminButtonClass, adminInputClass } from '../shared/AdminUI';
+import { supabase } from '@/lib/api/supabase';
+import { AdminPageHeader, AdminPanel, adminButtonClass, adminInputClass } from '@/features/admin/shared/AdminUI';
 
 type ReportRow = {
   date: string;

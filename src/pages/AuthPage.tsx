@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { supabase } from '../lib/api/supabase';
+import { supabase } from '@/lib/api/supabase';
 import { toast } from 'sonner';
-import { TransitionLink } from '../components/common';
-import { useSEO, trackEvent } from '../hooks';
-import { runAfterPaint } from '../lib/utils';
-import { BrandWordmark, ThemeToggle } from '../components/common';
+import { TransitionLink } from '@/components/common';
+import { useSEO, trackEvent } from '@/hooks';
+import { runAfterPaint } from '@/lib/utils';
+import { BrandWordmark, ThemeToggle } from '@/components/common';
 import { CheckCircle2, LockKeyhole, ReceiptText, WalletCards } from 'lucide-react';
 
 type AuthPageProps = {

@@ -1,14 +1,14 @@
 import type { StateCreator } from 'zustand';
 import { toast } from 'sonner';
-import { supabase } from '../../lib/api/supabase';
+import { supabase } from '@/lib/api/supabase';
 import {
   normalizeFinancialAlertPrefs,
-} from '../../lib/api/services/financialAlertPrefs';
+} from '@/lib/api/services/financialAlertPrefs';
 import {
   isNotificationPrefsEmpty,
   mergeNotificationPrefsFromSources,
-} from '../../lib/api/services/notificationPreferences';
-import { loadNotifPrefs, NOTIF_PREFS_STORAGE_KEY } from '../../pages/settings/constants';
+} from '@/lib/api/services/notificationPreferences';
+import { loadNotifPrefs, NOTIF_PREFS_STORAGE_KEY } from '@/pages/settings/constants';
 import type {
   AdminBroadcast,
   AppState,
@@ -27,7 +27,7 @@ import type {
   MileageLogEntry,
   Subscription,
   Transaction,
-} from '../types';
+} from '@/types';
 
 type StoreSlice<T> = StateCreator<AppState, [['zustand/persist', unknown]], [], T>;
 

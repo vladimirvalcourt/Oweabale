@@ -12,24 +12,24 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 import {
   hasFullSuiteAccess,
   isEntitlementActive,
   isProfileTrialActive,
   isSubscriptionLive,
-} from "../../app/constants/fullSuiteAccess";
-import { supabase } from '../../lib/api/supabase';
+} from "@/app/constants/fullSuiteAccess";
+import { supabase } from '@/lib/api/supabase';
 import { loadNotifPrefs } from './constants';
-import { sendWebPushMessage } from '../../lib/api/services/webPush';
-import { getCustomIcon } from '../../lib/utils/customIcons';
+import { sendWebPushMessage } from '@/lib/api/services/webPush';
+import { getCustomIcon } from '@/lib/utils/customIcons';
 import {
   cancelStripeSubscription,
   createStripeCheckoutSession,
   createStripePortalSession,
   syncStripeBilling,
-} from '../../lib/api/stripe';
-import { yieldForPaint } from "../../lib/api/services";
+} from '@/lib/api/stripe';
+import { yieldForPaint } from "@/lib/api/services";
 
 function BillingPanelInner() {
   const BillingIcon = getCustomIcon('billing');

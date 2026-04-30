@@ -1,7 +1,7 @@
 import { Activity, AlertTriangle, Radio, RefreshCw, Webhook } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../../lib/api/supabase';
-import { AdminEmptyState, AdminPageHeader, AdminPanel, AdminStatusBadge } from '../shared/AdminUI';
+import { supabase } from '@/lib/api/supabase';
+import { AdminEmptyState, AdminPageHeader, AdminPanel, AdminStatusBadge } from '@/features/admin/shared/AdminUI';
 
 type TelemetryPayload = {
   telemetry: {

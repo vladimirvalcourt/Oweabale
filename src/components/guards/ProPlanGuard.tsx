@@ -12,8 +12,8 @@
  */
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth, useFullSuiteAccess } from '../../hooks';
-import { AppLoader } from '../common';
+import { useAuth, useFullSuiteAccess } from '@/hooks';
+import { AppLoader } from '@/components/common';
 import { isBillingLockBypass } from './proPlanGuardPolicy';
 
 export function ProPlanGuard({ children }: { children: ReactNode }) {

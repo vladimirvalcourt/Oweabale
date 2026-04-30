@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { Download } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { getAdminActionErrorMessage } from '../../../lib/api/adminActions';
-import { supabase } from '../../../lib/api/supabase';
-import { AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminDangerButtonClass, adminInputClass } from '../shared/AdminUI';
-import { cn } from '../../../lib/utils';
+import { getAdminActionErrorMessage } from '@/lib/api/adminActions';
+import { supabase } from '@/lib/api/supabase';
+import { AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminDangerButtonClass, adminInputClass } from '@/features/admin/shared/AdminUI';
+import { cn } from '@/lib/utils';
 
 type EntityConfig = {
   key: string;

@@ -16,12 +16,12 @@ import {
   Wallet,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { AppPageShell } from '../components/layout';
-import { ProWelcomeModal } from '../components/common';
-import { TransitionLink } from '../components/common';
-import { computeSafeToSpend, calcMonthlyCashFlow } from '../lib/api/services/finance';
-import { useStore, type Bill, type Citation, type Debt, type Subscription, type Transaction } from '../store';
-import { StatusBadge, StatusIcon, MetricCard, QuickActionCard, DashboardButton } from '../components/dashboard';
+import { AppPageShell } from '@/components/layout';
+import { ProWelcomeModal } from '@/components/common';
+import { TransitionLink } from '@/components/common';
+import { computeSafeToSpend, calcMonthlyCashFlow } from '@/lib/api/services/finance';
+import { useStore, type Bill, type Citation, type Debt, type Subscription, type Transaction } from '@/store';
+import { StatusBadge, StatusIcon, MetricCard, QuickActionCard, DashboardButton } from '@/components/dashboard';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const PAY_LIST_SNOOZE_KEY = 'oweable_pay_list_snoozed_v1';

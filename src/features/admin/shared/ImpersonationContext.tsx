@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { supabase } from '../../../lib/api/supabase';
+import { supabase } from '@/lib/api/supabase';
 
 const STORAGE_KEY = 'oweable_impersonation';
 

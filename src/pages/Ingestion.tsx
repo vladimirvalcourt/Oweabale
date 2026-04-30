@@ -15,15 +15,15 @@ import {
   Camera
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useStore } from '../store';
-import { supabase } from '../lib/api/supabase';
+import { useStore } from '@/store';
+import { supabase } from '@/lib/api/supabase';
 import { toast } from 'sonner';
-import { validateIngestionFile, sanitizeUrl } from '../lib/api/security';
-import { buildScanExtraction } from '../lib/api/services/ingestionExtraction';
-import { extractDocumentText } from '../lib/api/services/ingestionScan';
-import type { PendingIngestion } from '../store';
-import { yieldForPaint, track } from '../lib/utils';
-import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '../lib/api/services/quickEntryCategories';
+import { validateIngestionFile, sanitizeUrl } from '@/lib/api/security';
+import { buildScanExtraction } from '@/lib/api/services/ingestionExtraction';
+import { extractDocumentText } from '@/lib/api/services/ingestionScan';
+import type { PendingIngestion } from '@/store';
+import { yieldForPaint, track } from '@/lib/utils';
+import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '@/lib/api/services/quickEntryCategories';
 
 // Upload rate limiter — max 5 files per 60 seconds
 const uploadTimestamps: number[] = [];

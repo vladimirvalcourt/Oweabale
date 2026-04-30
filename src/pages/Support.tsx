@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { Footer } from '../components/layout';
-import { PublicHeader } from '../components/layout';
-import { TransitionLink } from '../components/common';
-import { useJsonLd } from '../hooks';
-import { useSEO } from '../hooks';
-import { submitSupportContact } from '../app/constants';
-import { EMAIL_CONFIG } from '../lib/utils/emailObfuscation';
+import { Footer } from '@/components/layout';
+import { PublicHeader } from '@/components/layout';
+import { TransitionLink } from '@/components/common';
+import { useJsonLd } from '@/hooks';
+import { useSEO } from '@/hooks';
+import { submitSupportContact } from '@/app/constants';
+import { EMAIL_CONFIG } from '@/lib/utils/emailObfuscation';
 import { toast } from 'sonner';
 
 // Framer Motion Variants

@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { useStore } from '../store';
-import type { Goal } from '../store';
+import { useStore } from '@/store';
+import type { Goal } from '@/store';
 import { Target, Plus, TrendingUp, TrendingDown, CheckCircle2, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { CollapsibleModule } from '../components/common';
-import { yieldForPaint } from '../lib/utils';
-import { getCustomIcon } from '../lib/utils';
+import { CollapsibleModule } from '@/components/common';
+import { yieldForPaint } from '@/lib/utils';
+import { getCustomIcon } from '@/lib/utils';
 
 const ACCOUNTABILITY_CHECKIN_KEY = 'oweable_accountability_checkins_v1';
 export default function Goals() {

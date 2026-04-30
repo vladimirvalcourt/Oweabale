@@ -1,5 +1,5 @@
-import { BrandWordmark } from '../common/BrandWordmark';
-import { TransitionLink } from '../common/TransitionLink';
+import { BrandWordmark } from '@/components/common/BrandWordmark';
+import { TransitionLink } from '@/components/common/TransitionLink';
 
 const platformLinks = [
   { label: 'Features', href: '/#why' },

@@ -1,17 +1,17 @@
 import React, { useMemo } from 'react';
-import { useStore } from '../store';
-import { projectNetWorth } from '../lib/api/services/finance';
-import { rechartsTooltipStableProps } from '../lib/utils';
+import { useStore } from '@/store';
+import { projectNetWorth } from '@/lib/api/services/finance';
+import { rechartsTooltipStableProps } from '@/lib/utils';
 import { TrendingUp, TrendingDown, Hash, Building2, CreditCard, Vault, PieChart, Plus, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart as RechartsPie, Pie, Cell } from 'recharts';
 import { toast } from 'sonner';
 import { motion, animate, useMotionValue, useTransform } from 'motion/react';
 import { useState, useEffect } from 'react';
-import { usePrefersReducedMotion } from '../hooks';
-import { CollapsibleModule } from '../components/common';
-import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
-import { TransitionLink } from '../components/common';
-import { getCustomIcon } from '../lib/utils';
+import { usePrefersReducedMotion } from '@/hooks';
+import { CollapsibleModule } from '@/components/common';
+import { SafeResponsiveContainer } from '@/components/charts/SafeResponsiveContainer';
+import { TransitionLink } from '@/components/common';
+import { getCustomIcon } from '@/lib/utils';
 
 function AnimatedValue({ value, prefix = "", suffix = "", decimals = 0 }: { value: number, prefix?: string, suffix?: string, decimals?: number }) {
   const prefersReducedMotion = usePrefersReducedMotion();

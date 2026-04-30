@@ -2,17 +2,17 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import { User, Loader2, Camera, Copy, Check, Info } from 'lucide-react';
 import Cropper, { type Area } from 'react-easy-crop';
 import { Dialog } from '@headlessui/react';
-import { useStore } from '../../store';
+import { useStore } from '@/store';
 import { toast } from 'sonner';
-import { validateAvatarFile } from '../../lib/api/security';
-import { supabase } from '../../lib/api/supabase';
-import { CollapsibleModule } from '../../components/common';
-import { yieldForPaint } from "../../lib/api/services";
-import { getCroppedAvatarBlob } from "../../lib/utils/cropAvatar";
-import { getIanaTimezoneOptions, normalizeTimezoneToIana } from "../../lib/utils/timezones";
-import { formatUsNational, nationalDigitsFromStored, toE164 } from "../../lib/utils/phoneInput";
-import { cn } from '../../lib/utils';
-import { getCustomIcon } from '../../lib/utils/customIcons';
+import { validateAvatarFile } from '@/lib/api/security';
+import { supabase } from '@/lib/api/supabase';
+import { CollapsibleModule } from '@/components/common';
+import { yieldForPaint } from "@/lib/api/services";
+import { getCroppedAvatarBlob } from "@/lib/utils/cropAvatar";
+import { getIanaTimezoneOptions, normalizeTimezoneToIana } from "@/lib/utils/timezones";
+import { formatUsNational, nationalDigitsFromStored, toE164 } from "@/lib/utils/phoneInput";
+import { cn } from '@/lib/utils';
+import { getCustomIcon } from '@/lib/utils/customIcons';
 
 // E-07: Comprehensive ITU calling code dataset (60+ countries).
 // Sorted by usage frequency (US first) then alphabetically.

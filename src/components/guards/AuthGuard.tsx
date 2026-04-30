@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '../../hooks';
-import { AppLoader } from '../common';
-import { useStore } from '../../store';
+import { useAuth } from '@/hooks';
+import { AppLoader } from '@/components/common';
+import { useStore } from '@/store';
 
 /**
  * AuthGuard — wraps all protected dashboard routes.

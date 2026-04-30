@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { BrandWordmark } from '../common/BrandWordmark';
-import { ThemeToggle } from '../common/ThemeToggle';
-import { TransitionLink } from '../common/TransitionLink';
-import { useAuth } from '../../hooks';
+import { BrandWordmark } from '@/components/common/BrandWordmark';
+import { ThemeToggle } from '@/components/common/ThemeToggle';
+import { TransitionLink } from '@/components/common/TransitionLink';
+import { useAuth } from '@/hooks';
 
 function NavLink({
   href,

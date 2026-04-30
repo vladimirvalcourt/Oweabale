@@ -1,5 +1,5 @@
 import React from 'react';
-import type { HouseholdMember } from '../../types';
+import type { HouseholdMember } from '@/types';
 
 interface HouseholdAvatarStackProps {
   members: HouseholdMember[];

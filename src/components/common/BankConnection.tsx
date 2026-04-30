@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { Lock, Loader2, RefreshCw, Unplug, AlertTriangle, ShieldCheck, ShieldAlert, Clock3 } from 'lucide-react';
-import { useStore } from '../../store';
+import { useStore } from '@/store';
 import { toast } from 'sonner';
-import { isPlaidLinkUiEnabled } from '../../app/constants';
-import { usePlaidFlow } from '../../hooks';
-import { createStripeCheckoutSession } from '../../lib/api/stripe';
-import { useFullSuiteAccess } from '../../hooks';
-import { yieldForPaint } from '../../lib/utils';
+import { isPlaidLinkUiEnabled } from '@/app/constants';
+import { usePlaidFlow } from '@/hooks';
+import { createStripeCheckoutSession } from '@/lib/api/stripe';
+import { useFullSuiteAccess } from '@/hooks';
+import { yieldForPaint } from '@/lib/utils';
 
 const CONNECTION_TIMELINE_STORAGE_KEY = 'oweable_connection_timeline_v1';
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/api/supabase';
-import { AppLoader } from '../components/common';
+import { supabase } from '@/lib/api/supabase';
+import { AppLoader } from '@/components/common';
 import { toast } from 'sonner';
 
 async function waitForSession(maxMs: number) {

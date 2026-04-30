@@ -3,8 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { Dialog } from '@headlessui/react';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
-import { cn } from '../lib/utils';
-import { useStore } from '../store';
+import { cn } from '@/lib/utils';
+import { useStore } from '@/store';
 import { toast } from 'sonner';
 import { SETTINGS_TAB_IDS, type SettingsTab } from './settings/constants';
 import { ProfilePanel } from './settings/ProfilePanel';
@@ -12,7 +12,7 @@ import { SecurityPanel } from './settings/SecurityPanel';
 import { BillingPanel } from './settings/BillingPanel';
 import { IntegrationsPanel } from './settings/IntegrationsPanel';
 import { PrivacyPanel } from './settings/PrivacyPanel';
-import { yieldForPaint } from '../lib/utils';
+import { yieldForPaint } from '@/lib/utils';
 
 const tabs = [
   { id: 'profile' as const, name: 'Profile' },

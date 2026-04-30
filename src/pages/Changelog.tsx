@@ -1,6 +1,6 @@
 import React from 'react';
-import { Footer } from '../components/layout';
-import { PublicHeader } from '../components/layout';
+import { Footer } from '@/components/layout';
+import { PublicHeader } from '@/components/layout';
 
 const ENTRIES: { date: string; title: string; bullets: string[] }[] = [
   {

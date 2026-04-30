@@ -1,8 +1,8 @@
 import type { StateCreator } from 'zustand';
 import { toast } from 'sonner';
-import { disconnectPlaid, syncPlaidTransactions as invokePlaidSync } from '../../lib/api/plaid';
-import { supabase } from '../../lib/api/supabase';
-import type { AppState } from '../types';
+import { disconnectPlaid, syncPlaidTransactions as invokePlaidSync } from '@/lib/api/plaid';
+import { supabase } from '@/lib/api/supabase';
+import type { AppState } from '@/types';
 
 type StoreSlice<T> = StateCreator<AppState, [['zustand/persist', unknown]], [], T>;
 

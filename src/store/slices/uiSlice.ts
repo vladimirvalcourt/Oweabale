@@ -1,5 +1,5 @@
 import type { StateCreator } from 'zustand';
-import type { AppState, TabType } from '../types';
+import type { AppState, TabType } from '@/types';
 
 type StoreSlice<T> = StateCreator<AppState, [['zustand/persist', unknown]], [], T>;
 

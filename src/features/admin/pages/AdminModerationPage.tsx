@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { Check, Eye, Flag, Gavel, X } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { supabase } from '../../../lib/api/supabase';
-import { getAdminActionErrorMessage } from '../../../lib/api/adminActions';
-import { AdminEmptyState, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass } from '../shared/AdminUI';
-import { cn } from '../../../lib/utils';
+import { supabase } from '@/lib/api/supabase';
+import { getAdminActionErrorMessage } from '@/lib/api/adminActions';
+import { AdminEmptyState, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass } from '@/features/admin/shared/AdminUI';
+import { cn } from '@/lib/utils';
 
 type ModerationRow = {
   id: string;

@@ -1,10 +1,10 @@
 import React, { memo, useEffect, useState } from 'react';
 import { Lock, Shield, CheckCircle2, Loader2, ShieldCheck, ShieldAlert } from 'lucide-react';
-import { CollapsibleModule } from '../../components/common';
-import { supabase } from '../../lib/api/supabase';
+import { CollapsibleModule } from '@/components/common';
+import { supabase } from '@/lib/api/supabase';
 import { toast } from 'sonner';
-import { useStore } from '../../store';
-import { getCustomIcon } from '../../lib/utils/customIcons';
+import { useStore } from '@/store';
+import { getCustomIcon } from '@/lib/utils/customIcons';
 
 
 function SecurityPanelInner() {

@@ -1,4 +1,4 @@
-import { PLAID_CATEGORY_LABELS } from '../plaid/labels';
+import { PLAID_CATEGORY_LABELS } from '@/lib/api/plaid/labels';
 import { EXPENSE_CATEGORY_LABELS } from './quickEntryCategories';
 
 const CATEGORY_LABEL_MAP: Record<string, string> = {

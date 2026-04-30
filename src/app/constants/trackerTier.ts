@@ -1,4 +1,4 @@
-import type { TabType } from '../../store';
+import type { TabType } from '@/store';
 
 /**
  * Limited-access policy contract used while Full Suite access is unavailable.

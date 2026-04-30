@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { ShieldAlert, UserX } from 'lucide-react';
 import { toast } from 'sonner';
-import { AdminEmptyState, AdminMetric, AdminPageHeader, AdminPanel, adminButtonClass, adminDangerButtonClass, adminInputClass } from '../shared/AdminUI';
-import { invokeAdminAction } from '../shared/adminActionClient';
-import { cn } from '../../../lib/utils';
+import { AdminEmptyState, AdminMetric, AdminPageHeader, AdminPanel, adminButtonClass, adminDangerButtonClass, adminInputClass } from '@/features/admin/shared/AdminUI';
+import { invokeAdminAction } from '@/features/admin/shared/adminActionClient';
+import { cn } from '@/lib/utils';
 
 const reasonCodes = ['abuse', 'fraud_risk', 'chargeback', 'user_request', 'policy_violation', 'security_incident'];
 

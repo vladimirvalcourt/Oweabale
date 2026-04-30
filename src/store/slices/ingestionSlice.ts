@@ -1,8 +1,8 @@
 import type { StateCreator } from 'zustand';
 import { toast } from 'sonner';
-import { supabase } from '../../lib/api/supabase';
-import { suggestPlatformFromMerchant } from '../../lib/utils';
-import type { AppState, Bill, IncomeSource, Transaction } from '../types';
+import { supabase } from '@/lib/api/supabase';
+import { suggestPlatformFromMerchant } from '@/lib/utils';
+import type { AppState, Bill, IncomeSource, Transaction } from '@/types';
 
 type StoreSlice<T> = StateCreator<AppState, [['zustand/persist', unknown]], [], T>;
 

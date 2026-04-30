@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Download, MonitorSmartphone, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { STORAGE_KEYS } from '../../app/constants';
+import { STORAGE_KEYS } from '@/app/constants';
 
 // The BeforeInstallPromptEvent is not in standard TS lib
 interface BeforeInstallPromptEvent extends Event {

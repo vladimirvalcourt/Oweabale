@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { type CategorizationRule, type CategorizationExclusion } from '../lib/api/services/categorizationRules';
-import { type FinancialAlertPrefs } from '../lib/api/services/financialAlertPrefs';
+import { type CategorizationRule, type CategorizationExclusion } from '@/lib/api/services/categorizationRules';
+import { type FinancialAlertPrefs } from '@/lib/api/services/financialAlertPrefs';
 import { initialData } from './initialState';
 import { createAccountSlice } from './slices/accountSlice';
 import { createCategorizationSlice } from './slices/categorizationSlice';

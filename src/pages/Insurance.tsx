@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { useStore, type InsurancePolicy } from '../store';
+import { useStore, type InsurancePolicy } from '@/store';
 import { Shield, Plus, Edit2, Trash2, AlertCircle, CheckCircle2, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { normalizeToMonthly } from '../lib/api/services/finance';
-import { CollapsibleModule } from '../components/common';
-import { AppPageShell } from '../components/layout';
+import { normalizeToMonthly } from '@/lib/api/services/finance';
+import { CollapsibleModule } from '@/components/common';
+import { AppPageShell } from '@/components/layout';
 import { Dialog } from '@headlessui/react';
-import { yieldForPaint } from '../lib/utils';
-import { getCustomIcon } from '../lib/utils';
+import { yieldForPaint } from '@/lib/utils';
+import { getCustomIcon } from '@/lib/utils';
 
 const TYPE_LABELS: Record<InsurancePolicy['type'], string> = {
   health: 'Health', life: 'Life', auto: 'Auto', renters: 'Renters',

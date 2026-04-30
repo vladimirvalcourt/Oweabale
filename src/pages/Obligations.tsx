@@ -10,26 +10,26 @@ import {
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 import { toast } from 'sonner';
-import { useStore } from '../store';
+import { useStore } from '@/store';
 import { useShallow } from 'zustand/react/shallow';
-import { CollapsibleModule } from '../components/common';
-import { BrandLogo } from '../components/common';
+import { CollapsibleModule } from '@/components/common';
+import { BrandLogo } from '@/components/common';
 import { Dialog } from '@headlessui/react';
 import {
   buildBillNegotiationSuggestions,
   generateAmortizationSchedule,
   groupOutflowsByHorizon,
-} from '../lib/api/services/finance';
-import { TransitionLink } from '../components/common';
-import { rechartsTooltipStableProps } from '../lib/utils';
-import { SafeResponsiveContainer } from '../components/charts/SafeResponsiveContainer';
-import type { Bill, Debt } from '../store';
-import { useFullSuiteAccess } from '../hooks';
-import { FullSuiteGateCard } from '../components/guards';
-import { formatCategoryLabel } from '../lib/api/services/categoryDisplay';
-import { cn } from '../lib/utils';
-import { canUseDebtActions, TRACKER_FREE_TIER_SUMMARY } from '../app/constants';
-import { getCustomIcon } from '../lib/utils';
+} from '@/lib/api/services/finance';
+import { TransitionLink } from '@/components/common';
+import { rechartsTooltipStableProps } from '@/lib/utils';
+import { SafeResponsiveContainer } from '@/components/charts/SafeResponsiveContainer';
+import type { Bill, Debt } from '@/store';
+import { useFullSuiteAccess } from '@/hooks';
+import { FullSuiteGateCard } from '@/components/guards';
+import { formatCategoryLabel } from '@/lib/api/services/categoryDisplay';
+import { cn } from '@/lib/utils';
+import { canUseDebtActions, TRACKER_FREE_TIER_SUMMARY } from '@/app/constants';
+import { getCustomIcon } from '@/lib/utils';
 
 type ObligationType = 'recurring' | 'debt' | 'ambush';
 type Strategy = 'avalanche' | 'snowball';

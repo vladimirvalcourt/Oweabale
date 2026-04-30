@@ -1,5 +1,5 @@
-import { supabase } from '../../../lib/api/supabase';
-import { getAdminActionErrorMessage } from '../../../lib/api/adminActions';
+import { supabase } from '@/lib/api/supabase';
+import { getAdminActionErrorMessage } from '@/lib/api/adminActions';
 
 export async function invokeAdminAction<T>(body: Record<string, unknown>): Promise<T> {
   const {

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { useStore } from '../../store';
-import { useAuth } from '../../hooks';
-import { BrandWordmark } from '../common/BrandWordmark';
-import { TransitionLink } from '../common/TransitionLink';
-import { ThemeToggle } from '../common/ThemeToggle';
+import { useStore } from '@/store';
+import { useAuth } from '@/hooks';
+import { BrandWordmark } from '@/components/common/BrandWordmark';
+import { TransitionLink } from '@/components/common/TransitionLink';
+import { ThemeToggle } from '@/components/common/ThemeToggle';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);

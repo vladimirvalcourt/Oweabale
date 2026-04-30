@@ -19,13 +19,13 @@ import {
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '../../lib/api/supabase';
+import { supabase } from '@/lib/api/supabase';
 import { useAdminPermissions } from './shared';
-import { ThemeToggle } from '../../components/common';
-import { BrandWordmark } from '../../components/common';
-import { TransitionLink } from '../../components/common';
+import { ThemeToggle } from '@/components/common';
+import { BrandWordmark } from '@/components/common';
+import { TransitionLink } from '@/components/common';
 import { adminInputClass } from './shared/AdminUI';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 
 const navGroups = [
   {

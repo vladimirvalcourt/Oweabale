@@ -1,7 +1,7 @@
 import {
   DEFAULT_NOTIF_PREFS,
   type NotifPrefKey,
-} from '../../../pages/settings/constants';
+} from '@/pages/settings/constants';
 
 export type NotificationPrefsRecord = Record<NotifPrefKey, boolean>;
 

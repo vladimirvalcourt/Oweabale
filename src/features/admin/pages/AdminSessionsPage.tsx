@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { ChevronDown, ChevronRight, Monitor, Smartphone } from 'lucide-react';
-import { supabase } from '../../../lib/api/supabase';
-import { useAdminPermissions } from '../shared';
-import { AdminPageHeader, AdminPanel, AdminStatusBadge, adminDangerButtonClass } from '../shared/AdminUI';
+import { supabase } from '@/lib/api/supabase';
+import { useAdminPermissions } from '@/features/admin/shared';
+import { AdminPageHeader, AdminPanel, AdminStatusBadge, adminDangerButtonClass } from '@/features/admin/shared/AdminUI';
 
 type SessionUser = {
   id: string;

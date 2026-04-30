@@ -1,7 +1,7 @@
 import React, { Component, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
-import { useStore } from '../../store';
-import { isStaleDynamicImportError } from '../../lib/utils';
+import { useStore } from '@/store';
+import { isStaleDynamicImportError } from '@/lib/utils';
 
 interface Props {
   children: ReactNode;

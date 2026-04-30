@@ -1,8 +1,8 @@
 import React from 'react';
-import { Footer } from '../components/layout';
-import { PublicHeader } from '../components/layout';
-import { TransitionLink } from '../components/common';
-import { useSEO } from '../hooks';
+import { Footer } from '@/components/layout';
+import { PublicHeader } from '@/components/layout';
+import { TransitionLink } from '@/components/common';
+import { useSEO } from '@/hooks';
 
 const privacySections = [
   {

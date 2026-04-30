@@ -1,7 +1,7 @@
-import type { FinancialAlertPrefs } from '../lib/api/services/financialAlertPrefs';
-import type { NotificationPrefsRecord } from '../lib/api/services/notificationPreferences';
-import type { CategorizationRule, CategorizationExclusion } from '../lib/api/services/categorizationRules';
-import type { Household, HouseholdMember, UserRole } from '../types';
+import type { FinancialAlertPrefs } from '@/lib/api/services/financialAlertPrefs';
+import type { NotificationPrefsRecord } from '@/lib/api/services/notificationPreferences';
+import type { CategorizationRule, CategorizationExclusion } from '@/lib/api/services/categorizationRules';
+import type { Household, HouseholdMember, UserRole } from '@/types';
 
 export type { CategorizationRule, CategorizationExclusion };
 

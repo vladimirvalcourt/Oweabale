@@ -1,10 +1,10 @@
 import React, { memo, useEffect, useState } from 'react';
 import { MapPin } from 'lucide-react';
-import { CollapsibleModule } from '../../components/common';
+import { CollapsibleModule } from '@/components/common';
 import { toast } from 'sonner';
-import { useStore } from '../../store';
-import { STATE_TAX_MAP } from '../Taxes';
-import { getCustomIcon } from '../../lib/utils/customIcons';
+import { useStore } from '@/store';
+import { STATE_TAX_MAP } from '@/Taxes';
+import { getCustomIcon } from '@/lib/utils/customIcons';
 
 // When the stored taxRate is 0 (never been explicitly saved), fall back to the map
 // rate for the user's actual state. This keeps FinancialPanel in sync with Taxes.tsx.

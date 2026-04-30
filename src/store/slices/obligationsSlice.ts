@@ -1,6 +1,6 @@
 import { toast } from 'sonner';
-import { supabase } from '../../lib/api/supabase';
-import type { AppState, Transaction } from '../types';
+import { supabase } from '@/lib/api/supabase';
+import type { AppState, Transaction } from '@/types';
 import { isFullSuiteRlsDenied, type StoreSlice } from './sliceUtils';
 
 export const createObligationsSlice: StoreSlice<

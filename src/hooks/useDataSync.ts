@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { supabase } from '../lib/api/supabase';
-import { useStore } from '../store';
+import { supabase } from '@/lib/api/supabase';
+import { useStore } from '@/store';
 
 const VISIBILITY_REFETCH_MS = 45_000;
 

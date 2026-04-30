@@ -5,17 +5,17 @@ import { X, AlertCircle, Loader2, Camera, Eye, EyeOff, AlertTriangle, Upload } f
 import { BrandLogo } from './BrandLogo';
 import { ThemeBackdrop } from './ThemeBackdrop';
 import { toast } from 'sonner';
-import { useStore, type IncomeSource, type TabType } from '../../store';
-import { guessCategory } from '../../lib/api/services/categorizer';
-import { validateIngestionFile } from '../../lib/api/security';
-import { extractCitationFieldsFromText, looksLikeCitationDocument } from '../../lib/api';
-import { yieldForPaint } from '../../lib/utils';
-import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '../../lib/api/services/quickEntryCategories';
-import { formatLocalISODate, parseQuickEntryDateHint } from '../../lib/api/services/quickEntryNlp';
-import { useFullSuiteAccess } from '../../hooks';
-import { clampQuickAddTabForTier, canUseQuickAddTab, isTrackerObligationDebtBlocked } from '../../app/constants';
-import { getCustomIcon } from '../../lib/utils';
-import { FormInput, FormCurrency, FormAutocomplete } from '../forms';
+import { useStore, type IncomeSource, type TabType } from '@/store';
+import { guessCategory } from '@/lib/api/services/categorizer';
+import { validateIngestionFile } from '@/lib/api/security';
+import { extractCitationFieldsFromText, looksLikeCitationDocument } from '@/lib/api';
+import { yieldForPaint } from '@/lib/utils';
+import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '@/lib/api/services/quickEntryCategories';
+import { formatLocalISODate, parseQuickEntryDateHint } from '@/lib/api/services/quickEntryNlp';
+import { useFullSuiteAccess } from '@/hooks';
+import { clampQuickAddTabForTier, canUseQuickAddTab, isTrackerObligationDebtBlocked } from '@/app/constants';
+import { getCustomIcon } from '@/lib/utils';
+import { FormInput, FormCurrency, FormAutocomplete } from '@/components/forms';
 
 interface QuickAddModalProps {
   isOpen: boolean;

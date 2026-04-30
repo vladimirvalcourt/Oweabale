@@ -20,8 +20,8 @@ import {
   UserX,
   Users,
 } from 'lucide-react';
-import { supabase } from '../../../lib/api/supabase';
-import { AdminEmptyState, AdminMetric, AdminPageHeader, AdminPanel, AdminStatusBadge } from '../shared/AdminUI';
+import { supabase } from '@/lib/api/supabase';
+import { AdminEmptyState, AdminMetric, AdminPageHeader, AdminPanel, AdminStatusBadge } from '@/features/admin/shared/AdminUI';
 
 type FunnelStep = {
   label: string;

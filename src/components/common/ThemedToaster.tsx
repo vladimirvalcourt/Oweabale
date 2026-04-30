@@ -1,5 +1,5 @@
 import { Toaster } from 'sonner';
-import { useStore } from '../../store';
+import { useStore } from '@/store';
 
 export function ThemedToaster() {
   const themePref = useStore((s) => (s.user?.theme === 'Light' ? 'light' : 'dark'));

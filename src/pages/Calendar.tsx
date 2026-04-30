@@ -7,9 +7,9 @@ import { useLocation } from 'react-router-dom';
 import {
   ChevronLeft, ChevronRight, Receipt, TrendingUp, Repeat, Target, CalendarDays
 } from 'lucide-react';
-import { CollapsibleModule } from '../components/common';
-import { useStore } from '../store';
-import { getCustomIcon } from '../lib/utils';
+import { CollapsibleModule } from '@/components/common';
+import { useStore } from '@/store';
+import { getCustomIcon } from '@/lib/utils';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];

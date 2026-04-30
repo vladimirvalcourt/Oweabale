@@ -1,4 +1,4 @@
-import type { Transaction } from '../../../store';
+import type { Transaction } from '@/store';
 
 export type SubscriptionCandidate = {
   id: string;

@@ -1,5 +1,5 @@
 import { Dialog } from '@headlessui/react';
-import { isApplePointerPlatform } from '../../lib/utils';
+import { isApplePointerPlatform } from '@/lib/utils';
 import { ThemeBackdrop } from './ThemeBackdrop';
 
 type Props = {
