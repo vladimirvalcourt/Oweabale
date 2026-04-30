@@ -23,6 +23,7 @@ export default function AdminGuard() {
         .eq('id', user.id)
         .single();
 
+      // Check legacy admin flag OR RBAC roles
       let hasAdminRole = false;
       if (!error && data?.is_admin === true) {
         hasAdminRole = true;
@@ -40,13 +41,21 @@ export default function AdminGuard() {
         }
       }
 
-      const requireMfa = (import.meta.env.VITE_ADMIN_REQUIRE_MFA ?? 'false').toLowerCase() === 'true';
-      if (requireMfa && hasAdminRole) {
+      // CRITICAL: MFA is now mandatory for all admin access
+      // Removed VITE_ADMIN_REQUIRE_MFA env var - always enforce
+      if (hasAdminRole) {
         try {
-          const { data: factorsData } = await supabase.auth.mfa.listFactors();
-          const hasVerifiedTotp = (factorsData?.totp ?? []).some((f) => f.status === 'verified');
-          hasAdminRole = hasVerifiedTotp;
-        } catch {
+          const { data: factorsData, error: mfaError } = await supabase.auth.mfa.listFactors();
+          if (mfaError || !factorsData) {
+            hasAdminRole = false;
+          } else {
+            const hasVerifiedTotp = (factorsData.totp ?? []).some((f) => f.status === 'verified');
+            if (!hasVerifiedTotp) {
+              hasAdminRole = false;
+            }
+          }
+        } catch (mfaCheckError) {
+          // If MFA check fails, deny access (fail closed)
           hasAdminRole = false;
         }
       }
