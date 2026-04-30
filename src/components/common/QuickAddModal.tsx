@@ -31,8 +31,6 @@ interface QuickAddModalProps {
 /** Quick Add → Bill/Debt: bill cadence or debt instrument (card vs loan). */
 type ObligationKind = 'bill-weekly' | 'bill-biweekly' | 'bill-monthly' | 'debt-card' | 'debt-loan';
 
-const parseCurrencyInput = (value: string) => parseFloat(value.replace(/,/g, ''));
-
 export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const NlpIcon = getCustomIcon('nlp');
   const UploadIcon = getCustomIcon('upload');
@@ -106,6 +104,18 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const scanFileInputRef = useRef<HTMLInputElement>(null);
   const scanCameraInputRef = useRef<HTMLInputElement>(null);
 
+  // Replace resetFormPreserveTab with formState.resetForm + additional resets
+  const resetFormPreserveTab = React.useCallback(() => {
+    formState.resetForm();
+    setNlpText('');
+    clearErrors();
+    clearScan();
+    if (scanFileInputRef.current) scanFileInputRef.current.value = '';
+    if (scanCameraInputRef.current) scanCameraInputRef.current.value = '';
+    setAllowBudgetOverride(false);
+    clearLastBudgetGuardrail();
+  }, [formState, clearLastBudgetGuardrail]);
+
   // Initialize submission hook
   const submission = useQuickAddSubmission({
     activeTab,
@@ -121,18 +131,6 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     onClose,
   });
   const { submit: submitEntry, isSubmitting } = submission;
-
-  // Replace resetFormPreserveTab with formState.resetForm + additional resets
-  const resetFormPreserveTab = React.useCallback(() => {
-    formState.resetForm();
-    setNlpText('');
-    clearErrors();
-    clearScan();
-    if (scanFileInputRef.current) scanFileInputRef.current.value = '';
-    if (scanCameraInputRef.current) scanCameraInputRef.current.value = '';
-    setAllowBudgetOverride(false);
-    clearLastBudgetGuardrail();
-  }, [formState, clearLastBudgetGuardrail]);
 
   // Wrapper for OCR hook's scanFile with component state callbacks
   const handleScanFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
