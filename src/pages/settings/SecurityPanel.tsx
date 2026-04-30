@@ -54,7 +54,7 @@ function SecurityPanelInner() {
 
       {/* E-02: Show trust badge for SSO users instead of a misleading 0/2 score */}
       {isSsoOnly ? (
-        <div className="flex items-start gap-3 rounded-full border border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-4 py-3">
+        <div className="flex items-start gap-3 rounded-md border border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-4 py-3">
           <ShieldCheck className="w-5 h-5 shrink-0 text-[var(--color-status-emerald-text)] mt-0.5" aria-hidden />
           <div>
             <p className="text-sm font-medium text-[var(--color-status-emerald-text)]">
