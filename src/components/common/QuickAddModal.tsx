@@ -641,41 +641,41 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     clearLastBudgetGuardrail,
   } = useStore();
   const [activeTab, setActiveTab] = useState<'transaction' | 'obligation' | 'income' | 'citation'>('transaction');
-  const [allowBudgetOverride, setAllowBudgetOverride] = useState(false);
 
   // Initialize form state hook (will replace individual useState calls incrementally)
   const formState = useQuickAddFormState(activeTab);
 
-  // Form states - TODO: Replace with formState hook usage
-  const [amount, setAmount] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('food');
-  const [date, setDate] = useState(() => formatLocalISODate());
-  const [obligationKind, setObligationKind] = useState<ObligationKind>('bill-monthly');
+  // Form states - Using formState hook (all form fields managed by hook)
+  const {
+    amount, setAmount,
+    description, setDescription,
+    date, setDate,
+    category, setCategory,
+    vendor, setVendor,
+    obligationKind, setObligationKind,
+    dueDate, setDueDate,
+    incomeCategory, setIncomeCategory,
+    incomeFrequency, setIncomeFrequency,
+    transactionLedgerKind, setTransactionLedgerKind,
+    txIncomeCategory, setTxIncomeCategory,
+    memoNotes, setMemoNotes,
+    citationType, setCitationType,
+    jurisdiction, setJurisdiction,
+    citationNumber, setCitationNumber,
+    penaltyFee, setPenaltyFee,
+    apr, setApr,
+    minPayment, setMinPayment,
+    daysLeft, setDaysLeft,
+    paymentUrl, setPaymentUrl,
+    citationDueDate, setCitationDueDate,
+    nlpText, setNlpText,
+    allowBudgetOverride, setAllowBudgetOverride,
+  } = formState;
+
+  // Non-form state (UI state, not managed by formState hook)
   /** Closed card / no statement cycle — omit payment due date on debt. */
   const [debtNoPaymentDue, setDebtNoPaymentDue] = useState(false);
-  const [dueDate, setDueDate] = useState('');
-  const [vendor, setVendor] = useState('');
-  const [incomeCategory, setIncomeCategory] = useState('Salary');
-  const [incomeFrequency, setIncomeFrequency] = useState<IncomeSource['frequency']>('Monthly');
-  /** Transaction tab: expense vs income/refund (stored as income row). */
-  const [transactionLedgerKind, setTransactionLedgerKind] = useState<'expense' | 'income'>('expense');
-  const [txIncomeCategory, setTxIncomeCategory] = useState('Reimbursements');
   const [incomeTaxWithheld, setIncomeTaxWithheld] = useState(false);
-  const [memoNotes, setMemoNotes] = useState('');
-  // Citation-specific states
-  const [citationType, setCitationType] = useState('Toll Violation');
-  const [jurisdiction, setJurisdiction] = useState('');
-  const [citationNumber, setCitationNumber] = useState('');
-  const [penaltyFee, setPenaltyFee] = useState('');
-  const [apr, setApr] = useState('19.99');
-  const [minPayment, setMinPayment] = useState('');
-  const [daysLeft, setDaysLeft] = useState('30');
-  const [paymentUrl, setPaymentUrl] = useState('');
-  // Citation due date (separate from incident date, drives daysLeft)
-  const [citationDueDate, setCitationDueDate] = useState('');
-  // NLP input state
-  const [nlpText, setNlpText] = useState('');
   // Validation state
   const [errors, setErrors] = useState<Record<string, string>>({});
   // Scan state

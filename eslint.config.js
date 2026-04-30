@@ -48,7 +48,7 @@ export default [
       'no-undef': 'off', // TypeScript handles undefined identifiers; avoids false positives on types
       'no-empty': 'warn',
       'no-useless-escape': 'warn',
-      
+
       // Path Alias Enforcement - Prefer @/ over deep relative imports
       'no-restricted-imports': [
         'warn',
