@@ -676,7 +676,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   /** Closed card / no statement cycle — omit payment due date on debt. */
   const [debtNoPaymentDue, setDebtNoPaymentDue] = useState(false);
   const [incomeTaxWithheld, setIncomeTaxWithheld] = useState(false);
-  
+
   // Initialize validation hook with form data
   const validation = useQuickAddValidation(activeTab, {
     amount,
@@ -689,15 +689,30 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     debtNoPaymentDue,
   });
   const { errors, validateForm, clearErrors, clearFieldError } = validation;
-  
+
   // Initialize OCR hook
   const ocr = useQuickAddOCR();
   const { isScanning, scannedPreviewUrl, showPreview, setShowPreview, scanFile, clearScan } = ocr;
-  
+
   // Non-scan UI state
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const scanFileInputRef = useRef<HTMLInputElement>(null);
   const scanCameraInputRef = useRef<HTMLInputElement>(null);
+
+  // Initialize submission hook
+  const submission = useQuickAddSubmission({
+    activeTab,
+    hasFullSuite,
+    storeActions: {
+      addTransaction,
+      addBill,
+      addDebt,
+      addIncome,
+      addCitation,
+    },
+    resetForm: resetFormPreserveTab,
+    onClose,
+  });
+  const { submit: submitEntry, isSubmitting } = submission;
 
   // Replace resetFormPreserveTab with formState.resetForm + additional resets
   const resetFormPreserveTab = React.useCallback(() => {
@@ -710,7 +725,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     setAllowBudgetOverride(false);
     clearLastBudgetGuardrail();
   }, [formState, clearLastBudgetGuardrail]);
-  
+
   // Wrapper for OCR hook's scanFile with component state callbacks
   const handleScanFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -856,124 +871,35 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     }
   };
 
-  const submitEntry = async (addAnother: boolean) => {
-    if (isSubmitting) return;
+  // Wrapper for submission hook with validation and form data
+  const handleSubmit = async (addAnother: boolean) => {
     if (!validateForm()) return;
 
-    if (trackerOnly) {
-      if (!canUseQuickAddTab(activeTab, hasFullSuite)) {
-        toast.error('Full Suite access is needed for ledger and income entries.');
-        return;
-      }
-      if (trackerOnly && activeTab === 'obligation' && isTrackerObligationDebtBlocked(obligationKind, hasFullSuite)) {
-        toast.error('Adding loans and credit cards needs Full Suite.');
-        return;
-      }
-    }
-
-    const numAmount = parseCurrencyInput(amount);
-
-    setIsSubmitting(true);
-    await yieldForPaint();
-    try {
-      if (activeTab === 'transaction') {
-        const isIncome = transactionLedgerKind === 'income';
-        const ok = await addTransaction(
-          {
-            name: description,
-            amount: numAmount,
-            category: isIncome ? txIncomeCategory : category,
-            date: date,
-            type: isIncome ? 'income' : 'expense',
-            notes: memoNotes.trim() || undefined,
-          },
-          { allowBudgetOverride: isIncome ? false : allowBudgetOverride },
-        );
-        if (!ok) return;
-        toast.success(isIncome ? 'Income saved to ledger' : 'Transaction saved');
-      } else if (activeTab === 'obligation') {
-        if (obligationKind.startsWith('bill-')) {
-          const freq =
-            obligationKind === 'bill-weekly'
-              ? 'Weekly'
-              : obligationKind === 'bill-biweekly'
-                ? 'Bi-weekly'
-                : 'Monthly';
-          const ok = await addBill({
-            biller: vendor,
-            amount: numAmount,
-            category: category,
-            dueDate: dueDate || date,
-            frequency: freq,
-            status: 'upcoming',
-            autoPay: false
-          });
-          if (!ok) return;
-          toast.success(`Bill added`);
-        } else {
-          const ok = await addDebt({
-            name: vendor,
-            type: obligationKind === 'debt-card' ? 'Credit Card' : 'Loan',
-            apr: parseFloat(apr) || 0,
-            remaining: numAmount,
-            minPayment: parseCurrencyInput(minPayment) || 0,
-            paid: 0,
-            paymentDueDate: debtNoPaymentDue ? null : dueDate || null,
-          });
-          if (!ok) return;
-          toast.success(`Debt recorded`);
-        }
-      } else if (activeTab === 'income') {
-        const ok = await addIncome({
-          name: description.trim() || incomeCategory,
-          amount: numAmount,
-          frequency: incomeFrequency,
-          category: incomeCategory,
-          nextDate: date,
-          status: 'active',
-          isTaxWithheld: incomeTaxWithheld,
-        });
-        if (!ok) return;
-        toast.success(`Income recorded`);
-      } else if (activeTab === 'citation') {
-        const ok = await addCitation({
-          type: citationType,
-          jurisdiction: jurisdiction.trim(),
-          daysLeft: parseInt(daysLeft) || 30,
-          amount: numAmount,
-          penaltyFee: parseCurrencyInput(penaltyFee) || 0,
-          date: date,
-          citationNumber: citationNumber.trim(),
-          paymentUrl: (() => {
-            const u = paymentUrl.trim();
-            if (!u) return '';
-            try {
-              const parsed = new URL(u);
-              return parsed.protocol === 'https:' || parsed.protocol === 'http:' ? u : '';
-            } catch { return ''; }
-          })(),
-          status: 'open',
-        });
-        if (!ok) return;
-        toast.success(`Citation recorded`);
-        if (addAnother) {
-          resetFormPreserveTab();
-          return;
-        }
-        onClose();
-        return;
-      }
-      if (addAnother) {
-        resetFormPreserveTab();
-        return;
-      }
-      onClose();
-    } catch (error) {
-      toast.error('Failed to save to ledger');
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await submitEntry({
+      amount,
+      description,
+      vendor,
+      date,
+      dueDate,
+      category,
+      obligationKind,
+      debtNoPaymentDue,
+      apr,
+      minPayment,
+      transactionLedgerKind,
+      txIncomeCategory,
+      memoNotes,
+      allowBudgetOverride,
+      incomeCategory,
+      incomeFrequency,
+      incomeTaxWithheld,
+      citationType,
+      jurisdiction,
+      daysLeft,
+      penaltyFee,
+      citationNumber,
+      paymentUrl,
+    }, { addAnother });
   };
 
   const handleFormSubmit = (e: React.FormEvent) => {
