@@ -122,6 +122,18 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           supabase.from('household_members').select('*, profiles!inner(email, first_name, avatar_url)').eq('status', 'accepted'),
         ]);
 
+        // Debug logging for Plaid sync troubleshooting
+        console.log('[fetchData] Transactions fetched:', transactionsPage?.length || 0);
+        console.log('[fetchData] Plaid accounts fetched:', plaidAccountsRows?.length || 0);
+        if (plaidAccountsRows && plaidAccountsRows.length > 0) {
+          console.log('[fetchData] First plaid account:', {
+            id: plaidAccountsRows[0].id,
+            name: plaidAccountsRows[0].name,
+            account_type: plaidAccountsRows[0].account_type,
+          });
+        }
+        console.log('[fetchData] Bank connected:', !!(profile && (profile as Record<string, unknown>).plaid_linked_at));
+
         if (billsError) {
           console.error('[fetchData] Bills fetch error:', billsError);
           console.error('[fetchData] Bills error details:', { code: billsError.code, message: billsError.message });

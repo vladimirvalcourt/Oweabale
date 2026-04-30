@@ -34,31 +34,52 @@ export const createPlaidSlice: StoreSlice<
       return false;
     }
 
-    // Poll for data changes to ensure Edge Function DB writes are fully committed
+    // Enhanced polling for data changes to ensure Edge Function DB writes are fully committed
     // before we consider the sync complete. Prevents race conditions where
     // fetchData() reads stale data immediately after sync completes.
-    const previousTransactionCount = get().transactions.length;
-    const previousLastSyncAt = get().plaidLastSyncAt;
-    const previousRelinkState = get().plaidNeedsRelink;
+    const previousState = {
+      transactionCount: get().transactions.length,
+      plaidAccountCount: get().plaidAccounts.length,
+      lastSyncAt: get().plaidLastSyncAt,
+      relinkState: get().plaidNeedsRelink,
+    };
+    
     let attempts = 0;
-    const maxAttempts = 5;
+    const maxAttempts = 8; // Increased from 5 to 8 for better reliability
     
     while (attempts < maxAttempts) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 750)); // Increased delay from 500ms to 750ms
       console.log(`[Plaid Sync] Polling for updates (attempt ${attempts + 1}/${maxAttempts})...`);
       await get().fetchData();
       
-      const newTransactionCount = get().transactions.length;
-      const syncStateChanged =
-        get().plaidLastSyncAt !== previousLastSyncAt ||
-        get().plaidNeedsRelink !== previousRelinkState;
-      if (newTransactionCount !== previousTransactionCount || syncStateChanged) {
-        console.log('[Plaid Sync] Data updated successfully');
+      const currentState = {
+        transactionCount: get().transactions.length,
+        plaidAccountCount: get().plaidAccounts.length,
+        lastSyncAt: get().plaidLastSyncAt,
+        relinkState: get().plaidNeedsRelink,
+      };
+      
+      const dataChanged = 
+        currentState.transactionCount !== previousState.transactionCount ||
+        currentState.plaidAccountCount !== previousState.plaidAccountCount ||
+        currentState.lastSyncAt !== previousState.lastSyncAt ||
+        currentState.relinkState !== previousState.relinkState;
+      
+      if (dataChanged) {
+        console.log('[Plaid Sync] Data changes detected:', {
+          transactions: `${previousState.transactionCount} → ${currentState.transactionCount}`,
+          accounts: `${previousState.plaidAccountCount} → ${currentState.plaidAccountCount}`,
+          lastSyncAt: previousState.lastSyncAt !== currentState.lastSyncAt,
+          relinkState: previousState.relinkState !== currentState.relinkState,
+        });
         break;
       }
       
       attempts++;
     }
+    
+    // Final fetch to ensure state consistency
+    await get().fetchData();
     
     if (attempts === maxAttempts) {
       console.warn('[Plaid Sync] Max polling attempts reached — data may not have changed');
