@@ -4,13 +4,13 @@
 export { FormInput } from './FormInput';
 export { FormCurrency } from './FormCurrency';
 export { FormAutocomplete } from './FormAutocomplete';
-
-// TODO: Extract remaining components from QuickAddModal.tsx
-// - FormSelect
-// - FormDate / FormDatePicker
-// - FormCheckbox
-// - FormTextarea
-// - FormRadioGroup
-// - FormFieldset
-// - Tooltip
-// - FormFileUpload
+export { FormSelect } from './FormSelect';
+export { FormDate } from './FormDate';
+export { FormTab } from './FormTab';
+export { FormCheckbox } from './FormCheckbox';
+export { FormTextarea } from './FormTextarea';
+export { FormRadioGroup } from './FormRadioGroup';
+export { FormFieldset } from './FormFieldset';
+export { Tooltip } from './Tooltip';
+export { FormDatePicker } from './FormDatePicker';
+export { FormFileUpload } from './FormFileUpload';
