@@ -1412,7 +1412,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                           onChange={(value) => setTransactionLedgerKind(value as 'expense' | 'income')}
                           options={[
                             { value: 'expense', label: 'Expense' },
-                            { value: 'income', label: 'Income / refund' }
+                            { value: 'income', label: 'Income / Refund' }
                           ]}
                           hint="Refunds and deposits save as income; choose the category that matches the source."
                         />
