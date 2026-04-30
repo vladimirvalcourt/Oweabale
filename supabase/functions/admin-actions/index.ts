@@ -292,17 +292,17 @@ Deno.serve(async (req: Request) => {
 
     // CRITICAL: CSRF Protection - validate CSRF token for state-changing operations
     const csrfToken = req.headers.get('x-csrf-token')
-    const isReadOperation = ['list', 'health', 'audit_feed', 'billing_stats', 'billing_by_user', 
-      'plaid_items_list', 'plaid_stats', 'revenue_chart', 'growth_chart', 'churn_stats', 
-      'webhook_list', 'user_detail', 'rbac_context', 'users_query', 'user_timeline', 
+    const isReadOperation = ['list', 'health', 'audit_feed', 'billing_stats', 'billing_by_user',
+      'plaid_items_list', 'plaid_stats', 'revenue_chart', 'growth_chart', 'churn_stats',
+      'webhook_list', 'user_detail', 'rbac_context', 'users_query', 'user_timeline',
       'compliance_overview', 'telemetry_overview', 'support_queue', 'support_reply_history',
       'billing_user_lookup', 'billing_entitlement_timeline', 'governance_snapshot',
       'platform_controls_get', 'comms_templates_list', 'comms_recipient_estimate'].includes(action)
-    
+
     if (!isReadOperation && !csrfToken) {
       throw new Error('CSRF token missing. Include x-csrf-token header with your request.')
     }
-    
+
     // TODO: In production, verify CSRF token against session store
     // For now, just ensure the header is present (better than nothing)
     // Future enhancement: Store CSRF tokens in Redis/Supabase and validate here
@@ -1465,15 +1465,15 @@ Deno.serve(async (req: Request) => {
 
     if (action === 'support_update_ticket') {
       requirePermission(adminCtx, 'support.manage')
-      
+
       // CRITICAL: Validate input with Zod schema
       const validationResult = TicketUpdateSchema.safeParse(body)
       if (!validationResult.success) {
         throw new Error(`Validation failed: ${validationResult.error.issues.map(i => i.message).join(', ')}`)
       }
-      
+
       const { ticketId, status, priority, assignedAdminId } = validationResult.data
-      
+
       const patch: Record<string, unknown> = {}
       const eventRows: Record<string, unknown>[] = []
       const { data: existing, error: readErr } = await supabaseAdmin
@@ -1483,7 +1483,7 @@ Deno.serve(async (req: Request) => {
         .maybeSingle()
       if (readErr) throw readErr
       if (!existing) throw new Error('Ticket not found')
-      
+
       if (status) {
         patch.status = status
         if (status === 'Resolved') patch.resolved_at = new Date().toISOString()
@@ -1497,7 +1497,7 @@ Deno.serve(async (req: Request) => {
         patch.assigned_admin_id = assignedAdminId
         eventRows.push({ event_type: 'assigned', old_value: existing.assigned_admin_id, new_value: assignedAdminId })
       }
-      
+
       if (Object.keys(patch).length === 0) throw new Error('No ticket update provided')
       const { error } = await supabaseAdmin.from('support_tickets').update(patch).eq('id', ticketId)
       if (error) throw error
@@ -1515,31 +1515,31 @@ Deno.serve(async (req: Request) => {
 
     if (action === 'support_add_note') {
       requirePermission(adminCtx, 'support.manage')
-      
+
       // CRITICAL: Validate input with Zod schema
       const validationResult = SupportNoteSchema.safeParse(body)
       if (!validationResult.success) {
         throw new Error(`Validation failed: ${validationResult.error.issues.map(i => i.message).join(', ')}`)
       }
-      
+
       const { ticketId, note } = validationResult.data
-      
+
       // Additional XSS sanitization (basic HTML tag stripping)
       const sanitizedNote = note.replace(/<script[^>]*>.*?<\/script>/gi, '')
-                                 .replace(/<iframe[^>]*>.*?<\/iframe>/gi, '')
-                                 .replace(/on\w+="[^"]*"/gi, '')
-      
-      const { error } = await supabaseAdmin.from('support_ticket_notes').insert({ 
-        ticket_id: ticketId, 
-        admin_user_id: user.id, 
-        body: sanitizedNote 
+        .replace(/<iframe[^>]*>.*?<\/iframe>/gi, '')
+        .replace(/on\w+="[^"]*"/gi, '')
+
+      const { error } = await supabaseAdmin.from('support_ticket_notes').insert({
+        ticket_id: ticketId,
+        admin_user_id: user.id,
+        body: sanitizedNote
       })
       if (error) throw error
-      await supabaseAdmin.from('support_ticket_events').insert({ 
-        ticket_id: ticketId, 
-        actor_user_id: user.id, 
-        event_type: 'note', 
-        body: sanitizedNote 
+      await supabaseAdmin.from('support_ticket_events').insert({
+        ticket_id: ticketId,
+        actor_user_id: user.id,
+        event_type: 'note',
+        body: sanitizedNote
       })
       await logAdminAction(supabaseAdmin, user.id, callerEmailForAudit, requestMeta, 'support_add_note', { ticketId })
       return new Response(JSON.stringify({ message: 'Note added.' }), { headers: jsonHeaders })
@@ -1599,16 +1599,16 @@ Deno.serve(async (req: Request) => {
 
     if (action === 'billing_extend_trial') {
       requirePermission(adminCtx, 'billing.manage')
-      
+
       // CRITICAL: Validate input with Zod schema
       const validationResult = TrialExtensionSchema.safeParse(body)
       if (!validationResult.success) {
         throw new Error(`Validation failed: ${validationResult.error.issues.map(i => i.message).join(', ')}`)
       }
-      
+
       const { target, additionalDays, reason } = validationResult.data
       const targetUserId = await resolveUserId(supabaseAdmin, target)
-      
+
       const { data: profile, error: profileErr } = await supabaseAdmin
         .from('profiles')
         .select('trial_ends_at, plan')
@@ -1617,12 +1617,12 @@ Deno.serve(async (req: Request) => {
       if (profileErr) throw profileErr
       if (!profile) throw new Error('User not found')
       if (profile.plan === 'full_suite') throw new Error('Cannot extend trial for a Full Suite user')
-      
+
       const baseTime = profile.trial_ends_at && new Date(profile.trial_ends_at).getTime() > Date.now()
         ? new Date(profile.trial_ends_at).getTime()
         : Date.now()
       const nextTrialEndsAt = new Date(baseTime + additionalDays * 24 * 60 * 60 * 1000).toISOString()
-      
+
       await enforceRateLimit(supabaseAdmin, user.id, 'billing_extend_trial')
       const { error } = await supabaseAdmin.from('profiles').update({
         plan: 'trial',
@@ -1630,7 +1630,7 @@ Deno.serve(async (req: Request) => {
         trial_ends_at: nextTrialEndsAt,
       }).eq('id', targetUserId)
       if (error) throw error
-      
+
       await supabaseAdmin.from('admin_trial_extension_events').insert({
         target_user_id: targetUserId,
         admin_user_id: user.id,

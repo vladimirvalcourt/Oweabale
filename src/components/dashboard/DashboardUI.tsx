@@ -154,7 +154,7 @@ export function MetricCard({
 
     if (href) {
         return (
-            <a href={href} className="rounded-md focus-app">
+            <a href={href} className="rounded-[22px] focus-app">
                 {Inner}
             </a>
         );
@@ -162,13 +162,13 @@ export function MetricCard({
 
     if (onClick) {
         return (
-            <button type="button" onClick={onClick} className="w-full rounded-md focus-app">
+            <button type="button" onClick={onClick} className="w-full rounded-[22px] focus-app">
                 {Inner}
             </button>
         );
     }
 
-    return <div className="rounded-md">{Inner}</div>;
+    return <div className="rounded-[22px]">{Inner}</div>;
 }
 
 /**
@@ -200,7 +200,7 @@ export function QuickActionCard({
 
     if (href) {
         return (
-            <a href={href} className="block rounded-md focus-app">
+            <a href={href} className="block rounded-[22px] focus-app">
                 {inner}
             </a>
         );
@@ -208,13 +208,13 @@ export function QuickActionCard({
 
     if (onClick) {
         return (
-            <button type="button" onClick={onClick} className="w-full rounded-md focus-app">
+            <button type="button" onClick={onClick} className="w-full rounded-[22px] focus-app">
                 {inner}
             </button>
         );
     }
 
-    return <div className="rounded-md">{inner}</div>;
+    return <div className="rounded-[22px]">{inner}</div>;
 }
 
 // ============================================================================
