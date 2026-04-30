@@ -150,15 +150,15 @@ html {
   }
 
   .premium-heading {
-    @apply text-3xl font-semibold leading-[1.02] tracking-[-0.04em] text-content-primary sm:text-4xl;
+    @apply text-[2rem] font-medium leading-[1.13] tracking-[-0.024em] text-content-primary;
   }
 
   .premium-display {
-    @apply text-[3rem] font-semibold leading-[0.98] tracking-[-0.055em] text-content-primary sm:text-[4.25rem] lg:text-[5rem];
+    @apply text-[3rem] font-medium leading-[0.95] tracking-[-0.04em] text-content-primary sm:text-[4.25rem] lg:text-[6.75rem] lg:tracking-[-0.055em];
   }
 
   .premium-lede {
-    @apply text-base leading-7 text-content-secondary sm:text-lg sm:leading-8;
+    @apply text-[0.875rem] font-normal leading-[1.5] tracking-[-0.006em] text-content-secondary sm:text-base sm:leading-[1.6];
   }
 
   .premium-panel {
@@ -166,11 +166,11 @@ html {
   }
 
   .premium-button-primary {
-    @apply inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-md bg-content-primary px-5 text-sm font-semibold leading-none tracking-normal text-surface-base transition-[background-color,border-color,color,transform,box-shadow,opacity] duration-200 ease-out hover:bg-content-secondary active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-md bg-[#5e6ad2] px-5 text-sm font-medium text-white transition-all duration-200 ease-out hover:bg-[#828fff] hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .premium-button-secondary {
-    @apply inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-md border border-surface-border bg-surface-raised px-5 text-sm font-semibold leading-none tracking-normal text-content-primary transition-[background-color,border-color,color,transform,box-shadow,opacity] duration-200 ease-out hover:border-surface-border hover:bg-surface-elevated active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
+    @apply inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-md border border-surface-border bg-[rgba(255,255,255,0.02)] px-5 text-sm font-medium text-content-secondary transition-all duration-200 ease-out hover:border-surface-border hover:bg-[rgba(255,255,255,0.05)] hover:text-content-primary active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base;
   }
 
   .premium-page-header {
@@ -182,7 +182,7 @@ html {
   }
 
   .ui-card {
-    @apply rounded-[22px] border border-surface-border bg-surface-raised shadow-card transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out;
+    @apply rounded-[22px] border border-surface-border bg-[rgba(255,255,255,0.025)] shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_40px_140px_rgba(0,0,0,0.42)] transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out;
   }
 
   .ui-card-soft {
