@@ -9,9 +9,40 @@ function dataSyncDevLog(...args: unknown[]) {
 }
 
 /**
- * Loads server data only after auth has settled (`authLoading === false` and `userId` exists).
- * Uses a ref to avoid calling `fetchData` twice for the same user in one mount cycle when
- * React re-runs effects with stable deps.
+ * Automatically sync user data from Supabase based on authentication state.
+ *
+ * This hook implements a three-tier synchronization strategy:
+ *
+ * **1. Initial Load:** When user signs in, fetches all data immediately
+ * - Triggers when `authLoading` becomes false and `authUserId` is available
+ * - Shows loading spinner via `useStore.setState({ isLoading: true })`
+ * - Prevents duplicate fetches using `lastFetchedUserIdRef`
+ *
+ * **2. Sign Out Cleanup:** When user signs out, clears local store
+ * - Listens to Supabase auth state changes
+ * - Calls `clearLocalData()` to remove sensitive information
+ * - Resets tracking refs to allow fresh load on next login
+ *
+ * **3. Background Refresh:** On tab visibility change (every 45s)
+ * - Fetches data silently when user returns to tab
+ * - Rate-limited to once per 45 seconds to avoid excessive API calls
+ * - Updates data without showing loading spinner (`background: true`)
+ *
+ * **Why this pattern?**
+ * - Ensures data is always fresh without manual refresh
+ * - Prevents stale data after sign-in/sign-out cycles
+ * - Optimizes for perceived performance (loading states only when needed)
+ * - Handles edge cases: rapid sign-in/out, multiple tabs, browser sleep
+ *
+ * @param authUserId - Current authenticated user ID (from useAuth hook)
+ * @param authLoading - Whether authentication state is still resolving
+ *
+ * @example
+ * ```ts
+ * // In App.tsx or root layout component
+ * const { user, loading } = useAuth();
+ * useDataSync({ authUserId: user?.id ?? null, authLoading: loading });
+ * ```
  */
 export function useDataSync({
   authUserId,

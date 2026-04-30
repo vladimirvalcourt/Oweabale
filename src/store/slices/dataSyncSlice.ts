@@ -36,6 +36,46 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
     isLoading: false,
     phase2Hydrated: false,
 
+/**
+ * Fetch all user data from Supabase in a two-phase loading strategy.
+ *
+ * **Phase 1 (Critical):** Loads core financial records needed for immediate UI rendering:
+ * - User profile and household membership
+ * - Transactions (paginated, 100 at a time)
+ * - Bills, debts, income sources, subscriptions
+ * - Plaid-connected bank accounts
+ *
+ * **Phase 2 (Background):** Loads secondary data for advanced features:
+ * - Goals, budgets, categories
+ * - Citations, deductions, freelance entries
+ * - Mileage logs, client invoices
+ * - Categorization rules and exclusions
+ * - Credit fixes, investment accounts, insurance policies
+ *
+ * **Loading Strategy:**
+ * - Initial fetch: Shows loading spinner, blocks UI
+ * - Background refresh: Silent update, no spinner
+ * - Load more transactions: Cursor-based pagination, appends to existing list
+ *
+ * **Data Mapping:** Converts snake_case database columns to camelCase TypeScript fields.
+ * Handles both formats for backward compatibility: `(w.snake_case ?? w.camelCase)`
+ *
+ * @param userId - Optional user ID override (defaults to current auth user)
+ * @param options.background - If true, fetch silently without showing loading state
+ * @param options.loadMore - If true, fetch next page of transactions using cursor
+ *
+ * @example
+ * ```ts
+ * // Initial load on login
+ * await fetchData();
+ *
+ * // Background refresh every 5 minutes
+ * setInterval(() => fetchData(undefined, { background: true }), 300000);
+ *
+ * // Load more transactions when user scrolls
+ * await fetchData(undefined, { loadMore: true });
+ * ```
+ */
     fetchData: async (userId?: string, options?: { background?: boolean; loadMore?: boolean }) => {
       const background = options?.background === true;
       const loadMore = options?.loadMore === true;

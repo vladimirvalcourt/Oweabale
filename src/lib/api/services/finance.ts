@@ -115,7 +115,27 @@ export interface SurplusAllocation {
 // Private helpers
 // ---------------------------------------------------------------------------
 
-/** Normalize recurring amount to a monthly equivalent (bills, subscriptions, income). */
+/**
+ * Normalize a recurring amount to its monthly equivalent.
+ *
+ * Converts weekly, bi-weekly, quarterly, or annual amounts to monthly
+ * using standard financial conversion factors:
+ * - Weekly × 4.33 (52 weeks / 12 months)
+ * - Bi-weekly × 2.165 (26 periods / 12 months)
+ * - Quarterly ÷ 3
+ * - Annual ÷ 12
+ *
+ * @param amount - The recurring payment/income amount
+ * @param frequency - One of: 'weekly', 'bi-weekly', 'monthly', 'quarterly', 'annual'
+ * @returns Monthly equivalent amount (never negative)
+ *
+ * @example
+ * ```ts
+ * normalizeToMonthly(500, 'weekly')    // → 2165
+ * normalizeToMonthly(1200, 'annual')   // → 100
+ * normalizeToMonthly(100, 'monthly')   // → 100
+ * ```
+ */
 export function normalizeToMonthly(amount: number, frequency: string): number {
   const f = (frequency || '').toLowerCase();
   if (f === 'weekly') return (amount || 0) * 4.33;
@@ -131,10 +151,36 @@ function monthLabel(offsetMonths: number, fromDate: Date = new Date()): string {
   return d.toLocaleString('default', { month: 'short', year: 'numeric' });
 }
 
-// ---------------------------------------------------------------------------
-// generateAmortizationSchedule
-// ---------------------------------------------------------------------------
-
+/**
+ * Generate a month-by-month amortization schedule for a debt.
+ *
+ * Uses standard amortization formula: each payment covers interest first,
+ * then principal. Continues until balance reaches zero or max months hit.
+ *
+ * Algorithm:
+ * 1. Calculate monthly interest rate (APR / 12)
+ * 2. For each month: interest = balance × monthlyRate
+ * 3. Payment = min(balance + interest, minPayment + extraPayment)
+ * 4. Principal = payment - interest
+ * 5. New balance = old balance - principal
+ *
+ * @param debt - Debt with APR, remaining balance, and minimum payment
+ * @param extraMonthly - Additional monthly payment beyond minimum (default: 0)
+ * @returns Array of monthly payment breakdowns, stops when debt is paid off
+ *
+ * @example
+ * ```ts
+ * const schedule = generateAmortizationSchedule({
+ *   id: 'debt-1',
+ *   name: 'Credit Card',
+ *   apr: 19.99,
+ *   remaining: 5000,
+ *   minPayment: 150,
+ *   paid: 0
+ * }, 100); // Extra $100/month
+ * // Returns ~28 months of payments
+ * ```
+ */
 export function generateAmortizationSchedule(
   debt: DebtInput,
   extraMonthly: number = 0
@@ -166,10 +212,38 @@ export function generateAmortizationSchedule(
   return rows;
 }
 
-// ---------------------------------------------------------------------------
-// calcMonthlyCashFlow
-// ---------------------------------------------------------------------------
-
+/**
+ * Calculate monthly cash flow after accounting for taxes and fixed expenses.
+ *
+ * Implements the "Financial Guy Protocol" for conservative budgeting:
+ * 1. Sum all active income sources (normalized to monthly)
+ * 2. Reserve 25% tax on non-withheld income (self-employed/freelance)
+ * 3. Subtract fixed expenses: bills + debt minimum payments
+ * 4. Subtract active subscriptions
+ * 5. Surplus = disposable income - fixed expenses - subscriptions
+ *
+ * Key metrics returned:
+ * - **disposableIncome**: Income after tax reserve (what you actually have to spend)
+ * - **fixedExpenses**: Non-negotiable monthly commitments
+ * - **surplus**: What's left for goals, investments, or discretionary spending
+ *
+ * @param incomes - All income sources (salary, freelance, etc.)
+ * @param bills - Recurring bills (rent, utilities, insurance)
+ * @param debts - Active debts with minimum payments
+ * @param subscriptions - Active subscriptions (Netflix, gym, etc.)
+ * @returns Complete cash flow breakdown with all intermediate values
+ *
+ * @example
+ * ```ts
+ * const cashFlow = calcMonthlyCashFlow(
+ *   [{ id: '1', amount: 5000, frequency: 'monthly', status: 'active', isTaxWithheld: true }],
+ *   [{ id: '2', amount: 1500, frequency: 'monthly', status: 'active' }],
+ *   [{ id: '3', name: 'CC', apr: 20, remaining: 3000, minPayment: 100, paid: 0 }],
+ *   [{ id: '4', amount: 15, frequency: 'monthly', status: 'active' }]
+ * );
+ * // Returns: { monthlyIncome: 5000, taxReserve: 0, fixedExpenses: 1600, ... }
+ * ```
+ */
 export function calcMonthlyCashFlow(
   incomes: IncomeInput[],
   bills: BillInput[],
