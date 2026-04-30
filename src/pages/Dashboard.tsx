@@ -453,24 +453,6 @@ export default function Dashboard() {
               Bills, debt minimums, subscriptions, tolls, tickets, and fines sorted by urgency so nothing sneaks up.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => openQuickAdd('obligation')}
-              className="inline-flex min-h-10 items-center justify-center gap-2 border border-content-primary px-4 py-2 text-sm font-semibold text-content-primary focus-app"
-            >
-              <Plus className="h-4 w-4" aria-hidden />
-              Add what&apos;s due
-            </button>
-            <button
-              type="button"
-              onClick={() => openQuickAdd('citation')}
-              className="inline-flex min-h-10 items-center justify-center gap-2 border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary focus-app"
-            >
-              <AlertTriangle className="h-4 w-4" aria-hidden />
-              Add toll or ticket
-            </button>
-          </div>
         </header>
 
         <section aria-label="Quick add choices" className="grid grid-cols-2 gap-3 md:grid-cols-4">
