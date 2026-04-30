@@ -326,10 +326,10 @@ export default function Freelance() {
                             {new Date(entry.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} · Gross <span className="text-content-primary font-mono tabular-nums">${entry.amount.toFixed(0)}</span>
                           </p>
                           <div className="pt-2 flex flex-wrap gap-2">
-                            <span className="text-xs font-mono tabular-nums text-rose-500 border border-rose-500/20 px-1.5 py-0.5 rounded-full">Tax −${entry.totalLiability.toFixed(0)}</span>
-                            <span className="text-xs font-mono tabular-nums text-emerald-400 border border-emerald-400/20 px-1.5 py-0.5 rounded-full">You keep +${entry.profit.toFixed(0)}</span>
+                            <span className="text-xs font-mono tabular-nums text-rose-500 border border-rose-500/20 px-2 py-0.5 rounded-full">Tax −${entry.totalLiability.toFixed(0)}</span>
+                            <span className="text-xs font-mono tabular-nums text-emerald-400 border border-emerald-400/20 px-2 py-0.5 rounded-full">You keep +${entry.profit.toFixed(0)}</span>
                             {entry.scouredWriteOffs && entry.scouredWriteOffs > 0 && (
-                              <span className="text-xs font-sans bg-surface-elevated text-content-primary border border-surface-border px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                              <span className="text-xs font-sans bg-surface-elevated text-content-primary border border-surface-border px-2 py-0.5 rounded-full flex items-center gap-1">
                                 <ShieldCheck className="w-3 h-3 shrink-0" aria-hidden /> Deductions ${entry.scouredWriteOffs.toFixed(0)}
                               </span>
                             )}

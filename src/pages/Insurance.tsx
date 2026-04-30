@@ -248,7 +248,7 @@ export default function Insurance() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-semibold text-content-primary">{policy.provider}</span>
-                      <span className="rounded-full border border-surface-border bg-content-primary/[0.04] px-1.5 py-0.5 text-xs font-semibold text-content-secondary">
+                      <span className="rounded-full border border-surface-border bg-content-primary/[0.04] px-2 py-0.5 text-xs font-semibold text-content-secondary">
                         {TYPE_LABELS[policy.type]}
                       </span>
                       {policy.status !== 'active' && (

@@ -346,7 +346,7 @@ export default function Budgets() {
                         <p className="mt-1 text-xs text-content-secondary">{suggestion.rationale}</p>
                         <p className="mt-1 text-xs text-content-tertiary">{suggestion.action}</p>
                       </div>
-                      <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-xs font-mono text-emerald-300">
+                      <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-mono text-emerald-300">
                         Save ~${suggestion.estimatedMonthlySavings.toFixed(0)}/mo
                       </span>
                     </div>
@@ -400,7 +400,7 @@ export default function Budgets() {
                       <h3 className="text-sm font-semibold text-content-primary flex items-center gap-1.5">
                         {formatCategoryLabel(budget.category)}
                         {anomalyMap[budget.category] && (
-                          <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-1.5 py-0.5 text-xs font-semibold text-amber-400">
+                          <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-400">
                             ↑{anomalyMap[budget.category].overagePercent.toFixed(0)}%
                           </span>
                         )}

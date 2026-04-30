@@ -292,7 +292,7 @@ export default function Goals() {
         <div className="space-y-4">
           {/* PAGE-05: Ghost example goal card — sets expectations before first goal is created */}
           <div className="relative rounded-md border border-surface-border border-dashed bg-surface-raised/50 p-5 opacity-60 select-none pointer-events-none">
-            <div className="absolute -top-2.5 left-4 rounded-full border border-surface-border bg-surface-elevated px-2.5 py-0.5 text-xs font-medium text-content-muted tracking-wide">
+            <div className="absolute -top-2.5 left-4 rounded-full border border-surface-border bg-surface-elevated px-2 py-0.5 text-xs font-medium text-content-muted tracking-wide">
               Example
             </div>
             <div className="flex items-start justify-between gap-4 mb-4">

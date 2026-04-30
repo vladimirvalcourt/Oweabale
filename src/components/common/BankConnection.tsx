@@ -268,7 +268,7 @@ function BankConnectionPlaid() {
               )}
               <p className="text-sm font-medium text-content-primary">Connection resilience center</p>
             </div>
-            <span className="rounded-full border border-surface-border bg-surface-raised px-2.5 py-0.5 text-xs font-medium text-content-secondary">
+            <span className="rounded-full border border-surface-border bg-surface-raised px-2 py-0.5 text-xs font-medium text-content-secondary">
               Health score: {syncHealth.score}/100
             </span>
           </div>
@@ -389,7 +389,7 @@ function BankConnectionPlaid() {
           <div className="rounded-lg border border-surface-border bg-surface-base p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex min-w-0 flex-wrap items-center gap-2">
-                <span className="inline-flex shrink-0 items-center rounded-full border border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-2.5 py-0.5 text-xs font-medium text-[var(--color-status-emerald-text)]">
+                <span className="inline-flex shrink-0 items-center rounded-full border border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-2 py-0.5 text-xs font-medium text-[var(--color-status-emerald-text)]">
                   Active
                 </span>
                 <span className="truncate text-sm font-medium text-content-primary">{displayName}</span>

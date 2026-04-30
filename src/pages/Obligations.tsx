@@ -479,7 +479,7 @@ export default function Obligations() {
                     </p>
                     <p className="mt-1 text-xs text-content-tertiary">{suggestion.action}</p>
                   </div>
-                  <span className="rounded-full border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-2 py-1 text-xs font-mono text-[var(--color-status-emerald-text)]">
+                  <span className="rounded-full border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-2 py-0.5 text-xs font-mono text-[var(--color-status-emerald-text)]">
                     Est. save ${suggestion.estimatedMonthlySavings.toFixed(0)}/mo
                   </span>
                 </div>
@@ -813,12 +813,12 @@ export default function Obligations() {
                           >
                             {ob.dueLabel}
                             {overdueBand === 'warn' && (
-                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 text-xs font-bold text-amber-300">
+                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-300">
                                 ⚠️ OVERDUE {overdueDays} {overdueDays === 1 ? 'day' : 'days'}
                               </span>
                             )}
                             {overdueBand === 'critical' && (
-                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-rose-500/40 bg-rose-500/10 px-1.5 py-0.5 text-xs font-bold text-rose-300">
+                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-rose-500/40 bg-rose-500/10 px-2 py-0.5 text-xs font-bold text-rose-300">
                                 ⚠️ OVERDUE {overdueDays} days
                               </span>
                             )}
