@@ -790,7 +790,7 @@ export default function Obligations() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${ob.type === 'debt' ? 'border-surface-border text-content-primary bg-content-primary/[0.05]' :
-                            ob.type === 'ambush' ? 'border-rose-500/30 text-rose-400 bg-rose-500/10' :
+                            ob.type === 'ambush' ? 'border-[var(--color-status-urgent-border)] text-[var(--color-status-urgent-text-dark)] bg-[var(--color-status-urgent-bg)]' :
                               'border-surface-border text-content-tertiary bg-surface-elevated'
                           }`}>{ob.subType}</span>
                         {ob.type === 'recurring' && billAmountChanges.get(ob.id) && (
@@ -813,12 +813,12 @@ export default function Obligations() {
                           >
                             {ob.dueLabel}
                             {overdueBand === 'warn' && (
-                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-xs font-bold text-amber-300">
+                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] px-2 py-0.5 text-xs font-bold text-[var(--color-status-warning-text-dark)]">
                                 ⚠️ OVERDUE {overdueDays} {overdueDays === 1 ? 'day' : 'days'}
                               </span>
                             )}
                             {overdueBand === 'critical' && (
-                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-rose-500/40 bg-rose-500/10 px-2 py-0.5 text-xs font-bold text-rose-300">
+                              <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-[var(--color-status-urgent-border)] bg-[var(--color-status-urgent-bg)] px-2 py-0.5 text-xs font-bold text-[var(--color-status-urgent-text-dark)]">
                                 ⚠️ OVERDUE {overdueDays} days
                               </span>
                             )}
