@@ -789,6 +789,11 @@ body {
   --color-status-emerald-bg: rgba(22, 132, 73, 0.1);
   --color-status-emerald-border: rgba(22, 132, 73, 0.28);
   --color-status-emerald-text: #16623d;
+  
+  /* Info/Blue states - informational messages */
+  --color-status-info-bg: rgba(59, 130, 246, 0.1);
+  --color-status-info-border: rgba(59, 130, 246, 0.3);
+  --color-status-info-text: #1e40af;
 
   /* Retune direct Tailwind status ramps used throughout older app surfaces. */
   --color-red-100: #f8e8e7;
@@ -853,6 +858,11 @@ body {
   --color-status-emerald-bg: rgba(16, 185, 129, 0.1);
   --color-status-emerald-border: rgba(16, 185, 129, 0.35);
   --color-status-emerald-text: #34d399;
+  
+  /* Info/Blue states */
+  --color-status-info-bg: rgba(96, 165, 250, 0.1);
+  --color-status-info-border: rgba(96, 165, 250, 0.35);
+  --color-status-info-text: #93c5fd;
 }
 
 /*

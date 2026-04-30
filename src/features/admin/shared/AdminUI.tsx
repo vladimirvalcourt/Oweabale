@@ -73,16 +73,16 @@ export function AdminMetric({
 }) {
   const toneClass = {
     default: 'border-surface-border text-content-primary',
-    good: 'border-emerald-500/35 text-emerald-700 dark:text-emerald-200',
-    warn: 'border-amber-500/40 text-amber-700 dark:text-amber-200',
-    danger: 'border-rose-500/40 text-rose-700 dark:text-rose-200',
+    good: 'border-[var(--color-status-emerald-border)] text-[var(--color-status-emerald-text)]',
+    warn: 'border-[var(--color-status-amber-border)] text-[var(--color-status-amber-text)]',
+    danger: 'border-[var(--color-status-rose-border)] text-[var(--color-status-rose-text)]',
   }[tone];
 
   return (
     <div className={cn('ui-card-compact px-3 py-2.5', toneClass)}>
-      <p className="ui-label text-[10px]">{label}</p>
+      <p className="ui-label text-xs">{label}</p>
       <p className="mt-1 text-lg font-semibold tabular-nums">{value}</p>
-      {sub ? <p className="mt-0.5 text-[11px] leading-4 text-content-muted">{sub}</p> : null}
+      {sub ? <p className="mt-0.5 text-xs leading-4 text-content-tertiary">{sub}</p> : null}
     </div>
   );
 }
@@ -96,10 +96,10 @@ export function AdminStatusBadge({
 }) {
   const toneClass = {
     default: 'border-surface-border bg-surface-base text-content-secondary',
-    good: 'border-emerald-500/35 bg-emerald-500/10 text-emerald-700 dark:text-emerald-200',
-    warn: 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-200',
-    danger: 'border-rose-500/40 bg-rose-500/10 text-rose-700 dark:text-rose-200',
-    info: 'border-sky-500/35 bg-sky-500/10 text-sky-700 dark:text-sky-200',
+    good: 'border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)]',
+    warn: 'border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]',
+    danger: 'border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]',
+    info: 'border-[var(--color-status-info-border)] bg-[var(--color-status-info-bg)] text-[var(--color-status-info-text)]',
   }[tone];
 
   return (

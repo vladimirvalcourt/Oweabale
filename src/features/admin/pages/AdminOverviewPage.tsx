@@ -64,18 +64,18 @@ export default function AdminOverviewPage() {
       const [signupsRes, onboardedRes, plaidRes, billRes, budgetRes, goalRes] = await Promise.all([
         supabase.from('profiles').select('id', { count: 'exact', head: true }),
         supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('has_completed_onboarding', true),
-        supabase.from('plaid_items').select('user_id'),
-        supabase.from('bills').select('user_id'),
-        supabase.from('budgets').select('user_id'),
-        supabase.from('goals').select('user_id'),
+        supabase.from('plaid_items').select('user_id', { count: 'exact', head: true }),
+        supabase.from('bills').select('user_id', { count: 'exact', head: true }),
+        supabase.from('budgets').select('user_id', { count: 'exact', head: true }),
+        supabase.from('goals').select('user_id', { count: 'exact', head: true }),
       ]);
 
       const totalSignups = signupsRes.count ?? 0;
       const completedOnboarding = onboardedRes.count ?? 0;
-      const withBank = new Set((plaidRes.data ?? []).map((r) => r.user_id)).size;
-      const withBill = new Set((billRes.data ?? []).map((r) => r.user_id)).size;
-      const withBudget = new Set((budgetRes.data ?? []).map((r) => r.user_id)).size;
-      const withGoal = new Set((goalRes.data ?? []).map((r) => r.user_id)).size;
+      const withBank = plaidRes.count ?? 0;
+      const withBill = billRes.count ?? 0;
+      const withBudget = budgetRes.count ?? 0;
+      const withGoal = goalRes.count ?? 0;
 
       return {
         total_signups: totalSignups,
