@@ -48,6 +48,19 @@ export default [
       'no-undef': 'off', // TypeScript handles undefined identifiers; avoids false positives on types
       'no-empty': 'warn',
       'no-useless-escape': 'warn',
+      
+      // Path Alias Enforcement - Prefer @/ over deep relative imports
+      'no-restricted-imports': [
+        'warn',
+        {
+          patterns: [
+            {
+              group: ['../*', '../../*', '../../../*', '../../../../*'],
+              message: 'Use @/ path aliases instead of deep relative imports. Example: import { useStore } from "@/store" instead of "../../store"',
+            },
+          ],
+        },
+      ],
     },
     settings: {
       react: {
