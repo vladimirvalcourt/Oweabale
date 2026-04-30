@@ -275,9 +275,8 @@ function BankConnectionPlaid() {
           <p className="mt-2 text-xs font-medium text-content-secondary">{syncHealth.detail}</p>
           <div className="mt-3 h-2 w-full overflow-hidden rounded-full border border-surface-border bg-surface-raised">
             <div
-              className={`h-full transition-all ${
-                syncHealth.score >= 90 ? 'bg-brand-profit' : syncHealth.score >= 70 ? 'bg-[var(--color-status-amber-text)]' : 'bg-brand-expense'
-              }`}
+              className={`h-full transition-all ${syncHealth.score >= 90 ? 'bg-brand-profit' : syncHealth.score >= 70 ? 'bg-[var(--color-status-amber-text)]' : 'bg-brand-expense'
+                }`}
               style={{ width: `${Math.max(8, syncHealth.score)}%` }}
             />
           </div>
@@ -437,8 +436,8 @@ function BankConnectionPlaid() {
                         {acct.lastSyncAt
                           ? `Synced ${new Date(acct.lastSyncAt).toLocaleString()}`
                           : lastSyncLabel
-                          ? `Synced ${lastSyncLabel}`
-                          : 'Not yet synced'}
+                            ? `Synced ${lastSyncLabel}`
+                            : 'Not yet synced'}
                       </span>
                     </li>
                   ))}

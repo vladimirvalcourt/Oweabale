@@ -390,8 +390,8 @@ export default function Obligations() {
           aria-disabled={activeTab === 'debt' && !canUseDebt}
           title={activeTab === 'debt' && !canUseDebt ? 'Full Suite required to add debt' : undefined}
           className={`px-4 py-2.5 rounded-md text-sm font-sans font-semibold shadow-sm transition-all flex items-center gap-2 self-start btn-tactile ${activeTab === 'debt' && !canUseDebt
-              ? 'bg-surface-elevated border border-surface-border text-content-tertiary'
-              : 'bg-brand-cta hover:bg-brand-cta-hover text-surface-base'
+            ? 'bg-surface-elevated border border-surface-border text-content-tertiary'
+            : 'bg-brand-cta hover:bg-brand-cta-hover text-surface-base'
             }`}
         >
           <Plus className="w-4 h-4 shrink-0" aria-hidden />
@@ -790,8 +790,8 @@ export default function Obligations() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${ob.type === 'debt' ? 'border-surface-border text-content-primary bg-content-primary/[0.05]' :
-                            ob.type === 'ambush' ? 'border-[var(--color-status-urgent-border)] text-[var(--color-status-urgent-text-dark)] bg-[var(--color-status-urgent-bg)]' :
-                              'border-surface-border text-content-tertiary bg-surface-elevated'
+                          ob.type === 'ambush' ? 'border-[var(--color-status-urgent-border)] text-[var(--color-status-urgent-text-dark)] bg-[var(--color-status-urgent-bg)]' :
+                            'border-surface-border text-content-tertiary bg-surface-elevated'
                           }`}>{ob.subType}</span>
                         {ob.type === 'recurring' && billAmountChanges.get(ob.id) && (
                           <span className="ml-2 inline-flex items-center rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-xs font-mono text-amber-300">
@@ -803,12 +803,12 @@ export default function Obligations() {
                         <div className="flex flex-col gap-1">
                           <span
                             className={`text-sm font-mono ${overdueBand === 'critical'
-                                ? 'text-rose-400'
-                                : overdueBand === 'warn'
-                                  ? 'text-amber-400'
-                                  : isDebtNoDue
-                                    ? 'text-content-muted'
-                                    : 'text-content-secondary'
+                              ? 'text-rose-400'
+                              : overdueBand === 'warn'
+                                ? 'text-amber-400'
+                                : isDebtNoDue
+                                  ? 'text-content-muted'
+                                  : 'text-content-secondary'
                               }`}
                           >
                             {ob.dueLabel}

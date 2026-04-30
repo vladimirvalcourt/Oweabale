@@ -39,7 +39,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
     fetchData: async (userId?: string, options?: { background?: boolean; loadMore?: boolean }) => {
       const background = options?.background === true;
       const loadMore = options?.loadMore === true;
-      
+
       // Only show loading spinner on initial fetch, not when loading more
       if (!background && !loadMore) set({ isLoading: true, phase2Hydrated: false });
 
@@ -63,14 +63,14 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
       // Transaction pagination: fetch in pages of 100
       const TRANSACTION_PAGE_SIZE = 100;
       const lastCursor = get().lastTransactionCursor;
-      
+
       let transactionsQuery = supabase
         .from('transactions')
         .select('*')
         .eq('user_id', resolvedUserId)
         .order('date', { ascending: false })
         .limit(TRANSACTION_PAGE_SIZE);
-      
+
       // If loading more, use cursor-based pagination
       if (loadMore && lastCursor) {
         transactionsQuery = transactionsQuery.lt('date', lastCursor);
@@ -199,7 +199,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
                 return typeof plaidAccountId === 'string' && plaidAccountId.length > 0 ? plaidAccountId : undefined;
               })(),
             }));
-            
+
             // If loading more, append to existing; otherwise replace
             if (loadMore) {
               return [...get().transactions, ...newTransactions];
@@ -252,55 +252,55 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           plaidNeedsRelink: profile ? ((profile as Record<string, unknown>).plaid_needs_relink === true) : false,
           // Update pagination cursors
           hasMoreTransactions: (transactionsPage?.length ?? 0) === TRANSACTION_PAGE_SIZE,
-          lastTransactionCursor: transactionsPage && transactionsPage.length > 0 
-            ? transactionsPage[transactionsPage.length - 1].date as string 
+          lastTransactionCursor: transactionsPage && transactionsPage.length > 0
+            ? transactionsPage[transactionsPage.length - 1].date as string
             : get().lastTransactionCursor,
           credit: profile
             ? {
-                ...get().credit,
-                score: profile.credit_score ?? get().credit.score,
-                lastUpdated: profile.credit_last_updated ?? get().credit.lastUpdated,
-              }
+              ...get().credit,
+              score: profile.credit_score ?? get().credit.score,
+              lastUpdated: profile.credit_last_updated ?? get().credit.lastUpdated,
+            }
             : get().credit,
           user: profile
             ? {
-                id: profile.id,
-                firstName: profile.first_name ?? '',
-                lastName: profile.last_name ?? '',
-                email: profile.email ?? '',
-                avatar: profile.avatar ?? '',
-                theme: profile.theme ?? 'Dark',
-                phone: profile.phone ?? '',
-                timezone: profile.timezone ?? 'America/New_York',
-                language: profile.language || 'English (US)',
-                notificationPrefs: (() => {
-                  const serverRaw = (profile as { notification_prefs?: unknown }).notification_prefs;
-                  const merged = mergeNotificationPrefsFromSources(serverRaw, loadNotifPrefs());
-                  if (typeof window !== 'undefined') {
-                    try {
-                      localStorage.setItem(NOTIF_PREFS_STORAGE_KEY, JSON.stringify(merged));
-                    } catch {
-                      // ignore storage failures
-                    }
+              id: profile.id,
+              firstName: profile.first_name ?? '',
+              lastName: profile.last_name ?? '',
+              email: profile.email ?? '',
+              avatar: profile.avatar ?? '',
+              theme: profile.theme ?? 'Dark',
+              phone: profile.phone ?? '',
+              timezone: profile.timezone ?? 'America/New_York',
+              language: profile.language || 'English (US)',
+              notificationPrefs: (() => {
+                const serverRaw = (profile as { notification_prefs?: unknown }).notification_prefs;
+                const merged = mergeNotificationPrefsFromSources(serverRaw, loadNotifPrefs());
+                if (typeof window !== 'undefined') {
+                  try {
+                    localStorage.setItem(NOTIF_PREFS_STORAGE_KEY, JSON.stringify(merged));
+                  } catch {
+                    // ignore storage failures
                   }
-                  if (isNotificationPrefsEmpty(serverRaw)) {
-                    void supabase.from('profiles').upsert(
-                      { id: resolvedUserId, notification_prefs: merged },
-                      { onConflict: 'id' },
-                    );
-                  }
-                  return merged;
-                })(),
-                hasCompletedOnboarding: profile.has_completed_onboarding === true,
-                taxState: profile.tax_state ?? '',
-                taxRate: profile.tax_rate ?? 0,
-                taxReservePercent: (profile as { tax_reserve_percent?: number }).tax_reserve_percent ?? 30,
-                steadySalaryTarget: (profile as { steady_salary_target?: number }).steady_salary_target ?? 0,
-                financialAlertPrefs: normalizeFinancialAlertPrefs(
-                  (profile as { alert_preferences?: unknown }).alert_preferences,
-                ),
-                isAdmin: profile.is_admin === true,
-              }
+                }
+                if (isNotificationPrefsEmpty(serverRaw)) {
+                  void supabase.from('profiles').upsert(
+                    { id: resolvedUserId, notification_prefs: merged },
+                    { onConflict: 'id' },
+                  );
+                }
+                return merged;
+              })(),
+              hasCompletedOnboarding: profile.has_completed_onboarding === true,
+              taxState: profile.tax_state ?? '',
+              taxRate: profile.tax_rate ?? 0,
+              taxReservePercent: (profile as { tax_reserve_percent?: number }).tax_reserve_percent ?? 30,
+              steadySalaryTarget: (profile as { steady_salary_target?: number }).steady_salary_target ?? 0,
+              financialAlertPrefs: normalizeFinancialAlertPrefs(
+                (profile as { alert_preferences?: unknown }).alert_preferences,
+              ),
+              isAdmin: profile.is_admin === true,
+            }
             : { ...get().user, id: resolvedUserId },
           currentHousehold: households || null,
           householdMembers: (householdMembersRows || []).map((member: Record<string, unknown>) => ({
@@ -479,13 +479,13 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
             })),
             platformSettings: platformSettings
               ? {
-                  id: platformSettings.id as string,
-                  maintenanceMode: platformSettings.maintenance_mode as boolean,
-                  plaidEnabled: platformSettings.plaid_enabled as boolean,
-                  broadcastMessage: platformSettings.broadcast_message as string,
-                  taxStandardDeduction: platformSettings.tax_standard_deduction as number,
-                  taxTopBracket: platformSettings.tax_top_bracket as number,
-                }
+                id: platformSettings.id as string,
+                maintenanceMode: platformSettings.maintenance_mode as boolean,
+                plaidEnabled: platformSettings.plaid_enabled as boolean,
+                broadcastMessage: platformSettings.broadcast_message as string,
+                taxStandardDeduction: platformSettings.tax_standard_deduction as number,
+                taxTopBracket: platformSettings.tax_top_bracket as number,
+              }
               : null,
             netWorthSnapshots: (netWorthSnapshots || []).map((snapshot: Record<string, unknown>) => ({
               id: snapshot.id as string,

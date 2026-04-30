@@ -43,28 +43,28 @@ export const createPlaidSlice: StoreSlice<
       lastSyncAt: get().plaidLastSyncAt,
       relinkState: get().plaidNeedsRelink,
     };
-    
+
     let attempts = 0;
     const maxAttempts = 8; // Increased from 5 to 8 for better reliability
-    
+
     while (attempts < maxAttempts) {
       await new Promise((resolve) => setTimeout(resolve, 750)); // Increased delay from 500ms to 750ms
       console.log(`[Plaid Sync] Polling for updates (attempt ${attempts + 1}/${maxAttempts})...`);
       await get().fetchData();
-      
+
       const currentState = {
         transactionCount: get().transactions.length,
         plaidAccountCount: get().plaidAccounts.length,
         lastSyncAt: get().plaidLastSyncAt,
         relinkState: get().plaidNeedsRelink,
       };
-      
-      const dataChanged = 
+
+      const dataChanged =
         currentState.transactionCount !== previousState.transactionCount ||
         currentState.plaidAccountCount !== previousState.plaidAccountCount ||
         currentState.lastSyncAt !== previousState.lastSyncAt ||
         currentState.relinkState !== previousState.relinkState;
-      
+
       if (dataChanged) {
         console.log('[Plaid Sync] Data changes detected:', {
           transactions: `${previousState.transactionCount} → ${currentState.transactionCount}`,
@@ -74,13 +74,13 @@ export const createPlaidSlice: StoreSlice<
         });
         break;
       }
-      
+
       attempts++;
     }
-    
+
     // Final fetch to ensure state consistency
     await get().fetchData();
-    
+
     if (attempts === maxAttempts) {
       console.warn('[Plaid Sync] Max polling attempts reached — data may not have changed');
     }

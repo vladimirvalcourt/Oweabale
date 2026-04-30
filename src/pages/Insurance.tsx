@@ -181,11 +181,10 @@ export default function Insurance() {
               return (
                 <div
                   key={key}
-                  className={`flex items-start gap-3 rounded-xl border p-3 ${
-                    covered
+                  className={`flex items-start gap-3 rounded-xl border p-3 ${covered
                       ? 'border-emerald-500/20 bg-emerald-500/5'
                       : 'border-amber-500/20 bg-amber-500/5'
-                  }`}
+                    }`}
                 >
                   {covered
                     ? <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
@@ -194,9 +193,8 @@ export default function Insurance() {
                   <div>
                     <p className="text-sm font-medium text-content-primary flex items-center gap-2">
                       {label}
-                      <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${
-                        covered ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'
-                      }`}>
+                      <span className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${covered ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'
+                        }`}>
                         {covered ? 'Covered' : 'Gap'}
                       </span>
                     </p>

@@ -141,12 +141,12 @@ function FormTab({ id, label, isActive, onClick, icon, variant = 'default' }: Fo
       tabIndex={isActive ? 0 : -1}
       onClick={onClick}
       className={`min-h-10 min-w-0 px-3 py-2 text-xs font-sans font-medium transition-all rounded-lg focus-app ${variant === 'citation'
-          ? isActive
-            ? 'bg-content-primary/[0.08] text-content-primary border border-surface-border'
-            : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
-          : isActive
-            ? 'bg-brand-cta text-surface-base'
-            : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
+        ? isActive
+          ? 'bg-content-primary/[0.08] text-content-primary border border-surface-border'
+          : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
+        : isActive
+          ? 'bg-brand-cta text-surface-base'
+          : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
         }`}
     >
       {icon && <span className="inline-flex min-w-0 items-center justify-center gap-1.5">{icon}<span className="truncate">{label}</span></span>}
@@ -321,8 +321,8 @@ function FormRadioGroup({ id, name, label, value, onChange, options, required, d
               onClick={() => !disabled && onChange(option.value)}
               disabled={disabled}
               className={`flex-1 rounded-full px-3 py-1.5 text-xs font-sans font-medium transition-colors focus-app text-center ${value === option.value
-                  ? 'bg-brand-cta text-surface-base'
-                  : 'text-content-tertiary hover:text-content-primary'
+                ? 'bg-brand-cta text-surface-base'
+                : 'text-content-tertiary hover:text-content-primary'
                 } disabled:opacity-40`}
             >
               {option.label}
@@ -551,10 +551,10 @@ function FormFileUpload({
         <div className="flex min-w-0 gap-2">
           <label
             className={`flex min-h-10 min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 overflow-hidden border px-3 py-2.5 transition-all radius-input ${disabled
-                ? 'border-surface-border bg-surface-raised text-content-muted cursor-not-allowed'
-                : fileName
-                  ? 'border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)]'
-                  : 'border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary hover:bg-content-primary/[0.04]'
+              ? 'border-surface-border bg-surface-raised text-content-muted cursor-not-allowed'
+              : fileName
+                ? 'border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)]'
+                : 'border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary hover:bg-content-primary/[0.04]'
               }`}
           >
             <input
@@ -596,8 +596,8 @@ function FormFileUpload({
               type="button"
               onClick={onPreviewToggle}
               className={`min-h-10 shrink-0 border px-3 py-2.5 transition-all radius-input ${showPreview
-                  ? 'border-surface-border text-content-primary bg-content-primary/[0.06]'
-                  : 'border-surface-border text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
+                ? 'border-surface-border text-content-primary bg-content-primary/[0.06]'
+                : 'border-surface-border text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
                 }`}
               title={showPreview ? 'Hide preview' : 'Show preview'}
             >
@@ -1354,8 +1354,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                         {lastBudgetGuardrail && transactionLedgerKind === 'expense' && (
                           <div
                             className={`rounded-lg border px-3 py-2 text-xs ${lastBudgetGuardrail.type === 'hard'
-                                ? 'border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]'
-                                : 'border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]'
+                              ? 'border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]'
+                              : 'border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]'
                               }`}
                           >
                             <p className="font-medium">{lastBudgetGuardrail.message}</p>
@@ -1826,8 +1826,8 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     disabled={isSubmitting}
                     aria-busy={isSubmitting}
                     className={`min-h-10 px-5 py-2 text-sm font-sans font-medium transition-colors radius-button focus-app disabled:opacity-50 ${activeTab === 'citation'
-                        ? 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover border border-surface-border'
-                        : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover'
+                      ? 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover border border-surface-border'
+                      : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover'
                       }`}
                   >
                     {isSubmitting ? 'Getting things ready...' : 'Save entry'}

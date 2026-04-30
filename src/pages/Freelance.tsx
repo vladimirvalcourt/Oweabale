@@ -526,12 +526,12 @@ export default function Freelance() {
                         <span className="font-medium text-content-primary">{inv.clientName}</span>
                         <span
                           className={`text-xs font-mono uppercase tracking-wide px-1.5 py-0.5 rounded border ${inv.status === 'paid'
-                              ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/5'
-                              : inv.status === 'sent'
-                                ? 'border-amber-500/40 text-amber-300 bg-amber-500/5'
-                                : inv.status === 'void'
-                                  ? 'border-surface-border text-content-muted'
-                                  : 'border-surface-border text-content-tertiary'
+                            ? 'border-emerald-500/40 text-emerald-400 bg-emerald-500/5'
+                            : inv.status === 'sent'
+                              ? 'border-amber-500/40 text-amber-300 bg-amber-500/5'
+                              : inv.status === 'void'
+                                ? 'border-surface-border text-content-muted'
+                                : 'border-surface-border text-content-tertiary'
                             }`}
                         >
                           {inv.status}

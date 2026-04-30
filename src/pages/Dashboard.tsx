@@ -5,14 +5,14 @@ import {
   Bell,
   CalendarDays,
   CheckCircle2,
-  Clock,
   CreditCard,
   Landmark,
   ListChecks,
   Plus,
   Receipt,
   Repeat,
-  ShieldAlert,
+  TrendingDown,
+  TrendingUp,
   Wallet,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -20,7 +20,7 @@ import { AppPageShell } from '../components/layout';
 import { ProWelcomeModal } from '../components/common';
 import { TransitionLink } from '../components/common';
 import { computeSafeToSpend, calcMonthlyCashFlow } from '../lib/api/services/finance';
-import { useStore, type Bill, type Citation, type Debt, type Subscription } from '../store';
+import { useStore, type Bill, type Citation, type Debt, type Subscription, type Transaction } from '../store';
 import { StatusBadge, StatusIcon, MetricCard, QuickActionCard, DashboardButton } from '../components/dashboard';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -91,6 +91,44 @@ function formatMoney(value: number): string {
     currency: 'USD',
     maximumFractionDigits: value % 1 === 0 ? 0 : 2,
   });
+}
+
+function formatSignedMoney(value: number): string {
+  if (value === 0) return formatMoney(0);
+  const prefix = value > 0 ? '+' : '-';
+  return `${prefix}${formatMoney(Math.abs(value))}`;
+}
+
+function isSameMonth(dateValue: string, today: Date): boolean {
+  const parsed = parseLocalDate(dateValue);
+  return !!parsed && parsed.getFullYear() === today.getFullYear() && parsed.getMonth() === today.getMonth();
+}
+
+function summarizeBankTransactions(transactions: Transaction[], today: Date) {
+  const bankTransactions = transactions
+    .filter((transaction) => !!transaction.plaidAccountId)
+    .sort((a, b) => {
+      const bTime = parseLocalDate(b.date)?.getTime() ?? 0;
+      const aTime = parseLocalDate(a.date)?.getTime() ?? 0;
+      return bTime - aTime;
+    });
+  const monthTransactions = bankTransactions.filter((transaction) => isSameMonth(transaction.date, today));
+
+  const monthIncome = monthTransactions
+    .filter((transaction) => transaction.type === 'income')
+    .reduce((sum, transaction) => sum + transaction.amount, 0);
+  const monthExpenses = monthTransactions
+    .filter((transaction) => transaction.type === 'expense')
+    .reduce((sum, transaction) => sum + transaction.amount, 0);
+
+  return {
+    bankTransactions,
+    recentBankTransactions: bankTransactions.slice(0, 5),
+    monthTransactionCount: monthTransactions.length,
+    monthIncome,
+    monthExpenses,
+    monthNet: monthIncome - monthExpenses,
+  };
 }
 
 function readSnoozedItems(): Record<string, number> {
@@ -352,6 +390,8 @@ export default function Dashboard() {
   const incomes = useStore((state) => state.incomes);
   const assets = useStore((state) => state.assets);
   const transactions = useStore((state) => state.transactions);
+  const bankConnected = useStore((state) => state.bankConnected);
+  const plaidLastSyncAt = useStore((state) => state.plaidLastSyncAt);
   const user = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
   const openQuickAdd = useStore((state) => state.openQuickAdd);
@@ -404,6 +444,10 @@ export default function Dashboard() {
   const openCitationCount = citations.filter((citation) => citation.status === 'open').length;
   const nextDebtTarget = [...activeDebt].sort((a, b) => (b.apr || 0) - (a.apr || 0))[0] || null;
   const totalDueThisWeek = [...overdueItems, ...todayItems, ...weekItems].reduce((sum, item) => sum + item.amount, 0);
+  const bankSummary = useMemo(() => summarizeBankTransactions(transactions || [], today), [transactions, today]);
+  const hasBankDashboardData = bankSummary.bankTransactions.length > 0;
+  const shouldShowBankActivity = bankConnected || hasBankDashboardData;
+  const syncLabel = plaidLastSyncAt ? new Date(plaidLastSyncAt).toLocaleString() : null;
 
   const handleSnooze = useCallback((id: string) => {
     const next = { ...snoozedItems, [id]: Date.now() + MS_PER_DAY };
@@ -561,19 +605,22 @@ export default function Dashboard() {
               icon={Wallet}
               label="Monthly cash flow"
               value={formatMoney(cashFlow.surplus ?? 0)}
+              sublabel={hasBankDashboardData ? `${formatSignedMoney(bankSummary.monthNet)} bank net this month` : undefined}
               href="/pro/dashboard#safe-spend"
             />
             <MetricCard
-              icon={Wallet}
-              label="Liquid cash"
-              value={formatMoney(liquidCash)}
-              href="/pro/assets"
+              icon={TrendingUp}
+              label="Bank income"
+              value={formatMoney(bankSummary.monthIncome)}
+              sublabel={`${bankSummary.monthTransactionCount} bank transaction${bankSummary.monthTransactionCount === 1 ? '' : 's'} this month`}
+              href="/pro/transactions"
             />
             <MetricCard
-              icon={Clock}
-              label="Overdue"
-              value={overdueItems.length}
-              href="/pro/bills"
+              icon={TrendingDown}
+              label="Bank spending"
+              value={formatMoney(bankSummary.monthExpenses)}
+              sublabel={syncLabel ? `Synced ${syncLabel}` : undefined}
+              href="/pro/transactions"
             />
             <MetricCard
               icon={Landmark}
@@ -583,6 +630,58 @@ export default function Dashboard() {
             />
           </div>
         </section>
+
+        {shouldShowBankActivity && (
+          <section className="app-panel p-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
+                  <Landmark className="h-4 w-4" aria-hidden />
+                  Linked bank activity
+                </p>
+                <h2 className="mt-2 text-lg font-semibold text-content-primary">
+                  {hasBankDashboardData ? 'Latest Plaid transactions are feeding the dashboard' : 'Bank connected, waiting for transactions'}
+                </h2>
+                <p className="mt-1 text-sm text-content-secondary">
+                  {hasBankDashboardData
+                    ? `${bankSummary.bankTransactions.length} linked-bank transaction${bankSummary.bankTransactions.length === 1 ? '' : 's'} loaded from Plaid.`
+                    : 'Plaid is connected, but no imported transactions are visible in the dashboard store yet.'}
+                </p>
+              </div>
+              <TransitionLink
+                to="/pro/transactions"
+                className="inline-flex min-h-10 items-center justify-center gap-2 border border-surface-border px-4 py-2 text-sm font-medium text-content-secondary focus-app"
+              >
+                View transactions
+                <ArrowRight className="h-4 w-4" aria-hidden />
+              </TransitionLink>
+            </div>
+
+            {hasBankDashboardData ? (
+              <ul className="mt-4 divide-y divide-surface-border">
+                {bankSummary.recentBankTransactions.map((transaction) => (
+                  <li key={transaction.id} className="flex items-center justify-between gap-4 py-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-content-primary">{transaction.name}</p>
+                      <p className="mt-1 text-xs text-content-secondary">
+                        {formatDate(parseLocalDate(transaction.date))} · {transaction.category || 'Uncategorized'}
+                      </p>
+                    </div>
+                    <p className={`shrink-0 font-mono text-sm font-semibold tabular-nums ${transaction.type === 'income' ? 'text-brand-profit' : 'text-content-primary'}`}>
+                      {transaction.type === 'income' ? '+' : '-'}{formatMoney(transaction.amount)}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="mt-4 border border-surface-border bg-surface-base p-4">
+                <p className="text-sm text-content-secondary">
+                  Use Sync now in Settings if this stays empty after Plaid finishes loading transaction history.
+                </p>
+              </div>
+            )}
+          </section>
+        )}
 
         {visibleItems.length === 0 ? (
           <EmptyPayList onAdd={() => openQuickAdd('obligation')} />

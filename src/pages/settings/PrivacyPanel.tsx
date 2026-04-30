@@ -231,16 +231,16 @@ function PrivacyPanelInner({ onOpenResetDialog, onOpenDeleteDialog }: PrivacyPan
         </div>
       </CollapsibleModule>
 
-      <CollapsibleModule title="Danger Zone" icon={SecurityIcon} defaultOpen={false} className="border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <CollapsibleModule title="Danger Zone" icon={SecurityIcon} defaultOpen={false}>
+        <div className="rounded-md border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h4 className="text-sm font-medium text-content-primary">Delete Account</h4>
+            <h4 className="text-sm font-medium text-[var(--color-status-rose-text)]">Delete Account</h4>
             <p className="text-xs text-content-tertiary mt-1">Permanently delete your account and all associated data.</p>
           </div>
           <button
             type="button"
             onClick={onOpenDeleteDialog}
-            className="rounded-md border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] px-4 py-2 text-sm font-semibold text-[var(--color-status-rose-text)] transition-colors hover:bg-[var(--color-status-rose-text)] hover:text-surface-base focus-app"
+            className="shrink-0 rounded-md border border-[var(--color-status-rose-border)] bg-surface-base px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:bg-[var(--color-status-rose-bg)] focus-app"
           >
             Delete account
           </button>

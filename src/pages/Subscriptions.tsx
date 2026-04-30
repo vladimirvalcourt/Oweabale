@@ -542,82 +542,81 @@ export default function Subscriptions() {
                   const detectedChange = detectedAmountChanges.get(sub.id);
                   return (
                     <>
-                <div className="flex items-center gap-4">
-                  <BrandLogo size="lg" name={sub.name} fallbackIcon={<SubscriptionsIcon className="w-5 h-5 text-content-muted" />} />
-                  <div>
-                    <h4 className="text-sm font-sans font-semibold text-content-primary flex items-center gap-2">
-                      {sub.name}
-                      {(() => {
-                        const hike = getPriceHike(sub);
-                        if (!hike) return null;
-                        return (
-                          <span className="flex items-center gap-1 text-xs font-mono font-bold text-amber-400 border border-amber-500/30 bg-amber-500/5 px-2 py-0.5 rounded-full">
-                            <TrendingUp className="w-2.5 h-2.5" />
-                            +{hike.pct}%
-                          </span>
-                        );
-                      })()}
-                    </h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className={`inline-flex items-center text-xs font-sans font-medium ${
-                        sub.status === 'active' ? 'text-emerald-400' :
-                        sub.status === 'paused' ? 'text-amber-400' :
-                        'text-content-tertiary'
-                      }`}>
-                        {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
-                      </span>
-                      <span className="text-xs font-sans text-content-tertiary">Renews {sub.nextBillingDate}</span>
-                      {(() => {
-                        const hike = getPriceHike(sub);
-                        if (!hike) return null;
-                        return <span className="text-xs font-mono text-content-muted">(was ${hike.prev.toFixed(2)})</span>;
-                      })()}
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between sm:justify-end gap-12 w-full sm:w-auto">
-                  <div className="text-right">
-                    <p className="text-base font-bold font-mono tabular-nums text-content-primary data-numeric">${sub.amount.toFixed(2)}</p>
-                    <p className="text-xs text-content-tertiary normal-case">{sub.frequency}</p>
-                        {detectedChange && (
-                          <p className="text-xs text-amber-300 mt-1">
-                            Detected from transactions: ${detectedChange.detected.toFixed(2)}
-                          </p>
-                        )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                        {detectedChange && (
+                      <div className="flex items-center gap-4">
+                        <BrandLogo size="lg" name={sub.name} fallbackIcon={<SubscriptionsIcon className="w-5 h-5 text-content-muted" />} />
+                        <div>
+                          <h4 className="text-sm font-sans font-semibold text-content-primary flex items-center gap-2">
+                            {sub.name}
+                            {(() => {
+                              const hike = getPriceHike(sub);
+                              if (!hike) return null;
+                              return (
+                                <span className="flex items-center gap-1 text-xs font-mono font-bold text-amber-400 border border-amber-500/30 bg-amber-500/5 px-2 py-0.5 rounded-full">
+                                  <TrendingUp className="w-2.5 h-2.5" />
+                                  +{hike.pct}%
+                                </span>
+                              );
+                            })()}
+                          </h4>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className={`inline-flex items-center text-xs font-sans font-medium ${sub.status === 'active' ? 'text-emerald-400' :
+                                sub.status === 'paused' ? 'text-amber-400' :
+                                  'text-content-tertiary'
+                              }`}>
+                              {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
+                            </span>
+                            <span className="text-xs font-sans text-content-tertiary">Renews {sub.nextBillingDate}</span>
+                            {(() => {
+                              const hike = getPriceHike(sub);
+                              if (!hike) return null;
+                              return <span className="text-xs font-mono text-content-muted">(was ${hike.prev.toFixed(2)})</span>;
+                            })()}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between sm:justify-end gap-12 w-full sm:w-auto">
+                        <div className="text-right">
+                          <p className="text-base font-bold font-mono tabular-nums text-content-primary data-numeric">${sub.amount.toFixed(2)}</p>
+                          <p className="text-xs text-content-tertiary normal-case">{sub.frequency}</p>
+                          {detectedChange && (
+                            <p className="text-xs text-amber-300 mt-1">
+                              Detected from transactions: ${detectedChange.detected.toFixed(2)}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {detectedChange && (
+                            <button
+                              onClick={() => void applyDetectedPriceChange(sub)}
+                              className="rounded-md px-2 py-1 text-xs text-amber-300 border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
+                              title="Apply detected amount change"
+                            >
+                              Apply change
+                            </button>
+                          )}
                           <button
-                            onClick={() => void applyDetectedPriceChange(sub)}
+                            onClick={() => flagForCancellationReview(sub.id)}
                             className="rounded-md px-2 py-1 text-xs text-amber-300 border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
-                            title="Apply detected amount change"
+                            title="Flag for cancellation review"
                           >
-                            Apply change
+                            Flag
                           </button>
-                        )}
-                      <button
-                        onClick={() => flagForCancellationReview(sub.id)}
-                        className="rounded-md px-2 py-1 text-xs text-amber-300 border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
-                        title="Flag for cancellation review"
-                      >
-                        Flag
-                      </button>
-                    <button
-                      onClick={() => startEdit(sub)}
-                      className="p-2 text-content-tertiary hover:text-content-secondary rounded-md hover:bg-surface-elevated transition-colors"
-                      title="Edit"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(sub.id)}
-                      className="p-2 text-content-tertiary hover:text-brand-expense rounded-md hover:bg-surface-elevated transition-colors"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                          <button
+                            onClick={() => startEdit(sub)}
+                            className="p-2 text-content-tertiary hover:text-content-secondary rounded-md hover:bg-surface-elevated transition-colors"
+                            title="Edit"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(sub.id)}
+                            className="p-2 text-content-tertiary hover:text-brand-expense rounded-md hover:bg-surface-elevated transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
                     </>
                   );
                 })()}
