@@ -99,6 +99,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^17.4.0",
+    "jsdom": "^29.1.0",
     "rollup-plugin-visualizer": "^7.0.1",
     "sharp": "^0.34.5",
     "supabase": "^2.92.1",

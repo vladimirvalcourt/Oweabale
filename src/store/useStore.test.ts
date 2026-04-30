@@ -1,14 +1,28 @@
+// @vitest-environment jsdom
+
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const insertMock = vi.fn();
-const getUserMock = vi.fn();
-const plaidDisconnectMock = vi.fn(async () => ({ ok: true }));
-const plaidSyncMock = vi.fn(async () => ({ added: 0, updated: 0, errors: 0 }));
-const toastErrorMock = vi.fn();
-const toastSuccessMock = vi.fn();
-const toastMessageMock = vi.fn();
+const mocks = vi.hoisted(() => ({
+  insertMock: vi.fn(),
+  getUserMock: vi.fn(),
+  plaidDisconnectMock: vi.fn(async () => ({ ok: true })),
+  plaidSyncMock: vi.fn(async () => ({ added: 0, updated: 0, errors: 0 })),
+  toastErrorMock: vi.fn(),
+  toastSuccessMock: vi.fn(),
+  toastMessageMock: vi.fn(),
+}));
 
-vi.mock('../lib/supabase', () => ({
+const {
+  insertMock,
+  getUserMock,
+  plaidDisconnectMock,
+  plaidSyncMock,
+  toastErrorMock,
+  toastSuccessMock,
+  toastMessageMock,
+} = mocks;
+
+vi.mock('../lib/api/supabase', () => ({
   supabase: {
     auth: {
       getUser: getUserMock,
@@ -19,7 +33,7 @@ vi.mock('../lib/supabase', () => ({
   },
 }));
 
-vi.mock('../lib/plaid', () => ({
+vi.mock('../lib/api/plaid', () => ({
   disconnectPlaid: plaidDisconnectMock,
   syncPlaidTransactions: plaidSyncMock,
 }));
