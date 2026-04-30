@@ -690,11 +690,12 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   });
   const { errors, validateForm, clearErrors, clearFieldError } = validation;
   
-  // Scan state
-  const [isScanning, setIsScanning] = useState(false);
+  // Initialize OCR hook
+  const ocr = useQuickAddOCR();
+  const { isScanning, scannedPreviewUrl, showPreview, setShowPreview, scanFile, clearScan } = ocr;
+  
+  // Non-scan UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [scannedPreviewUrl, setScannedPreviewUrl] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
   const scanFileInputRef = useRef<HTMLInputElement>(null);
   const scanCameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -702,159 +703,48 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const resetFormPreserveTab = React.useCallback(() => {
     formState.resetForm();
     setNlpText('');
-    setIsScanning(false);
     clearErrors();
+    clearScan();
     if (scanFileInputRef.current) scanFileInputRef.current.value = '';
     if (scanCameraInputRef.current) scanCameraInputRef.current.value = '';
-    setScannedPreviewUrl((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
-    setShowPreview(false);
     setAllowBudgetOverride(false);
     clearLastBudgetGuardrail();
   }, [formState, clearLastBudgetGuardrail]);
-
-  // Noise patterns that should be skipped when finding a merchant name
-  const RECEIPT_NOISE = /^(receipt|invoice|thank you|thanks|welcome|store|branch|tel:|phone:|www\.|http|address:|date:|time:|cashier|order #|order:|transaction|subtotal|total|tax|amount|change|cash|card|approved|auth|ref:|refund|void|copy|customer|#\d+|\d{3}[-.\s]\d{3}[-.\s]\d{4}|\d{1,5}\s+\w+\s+(st|ave|blvd|rd|dr|lane|ln|way|ct|pl|suite))/i;
-
-  const extractMerchantName = (lines: string[]): string | null => {
-    // Prefer lines that look like business names: mixed/upper case, no digits-only, not noise
-    for (const line of lines.slice(0, 10)) {
-      const trimmed = line.trim();
-      if (trimmed.length < 3 || trimmed.length > 60) continue;
-      if (RECEIPT_NOISE.test(trimmed)) continue;
-      if (/^\d+$/.test(trimmed)) continue; // pure number line
-      if (/^\$[\d.,]+$/.test(trimmed)) continue; // pure dollar amount
-      return trimmed.substring(0, 50);
-    }
-    return null;
-  };
-
+  
+  // Wrapper for OCR hook's scanFile with component state callbacks
   const handleScanFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const validation = validateIngestionFile(file);
-    if (!validation.ok) {
-      toast.error(validation.error);
-      e.target.value = '';
-      return;
-    }
-
-    // Generate preview URL for images; show PDF placeholder
-    if (file.type.startsWith('image/')) {
-      const url = URL.createObjectURL(file);
-      setScannedPreviewUrl(url);
-      setShowPreview(true);
-    } else {
-      setScannedPreviewUrl(null);
-      setShowPreview(false);
-    }
-
-    setIsScanning(true);
-    try {
-      let fullText = '';
-
-      if (file.type.startsWith('image/')) {
-        const Tesseract = (await import('tesseract.js')).default;
-        const result = await Tesseract.recognize(file, 'eng');
-        fullText = result.data.text;
-      } else if (file.type === 'application/pdf') {
-        const pdfjsLib = await import('pdfjs-dist');
-        const pdfjsWorkerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
-        pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl;
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        const pages = Math.min(pdf.numPages, 3);
-        for (let i = 1; i <= pages; i++) {
-          const page = await pdf.getPage(i);
-          const textContent = await page.getTextContent();
-          fullText += textContent.items.map((item: any) => item.str).join(' ') + '\n';
-        }
-      }
-
-      // ── Extract amount: largest dollar value, ignoring obvious tax/subtotal lines ──
-      const amountMatches = fullText.match(/\$?\s*\d{1,6}\.\d{2}/g);
-      if (amountMatches) {
-        const amounts = amountMatches
-          .map(m => parseFloat(m.replace(/[^0-9.]/g, '')))
-          .filter(n => !isNaN(n) && n > 0 && n < 100_000);
-        if (amounts.length > 0) setAmount(Math.max(...amounts).toFixed(2));
-      }
-
-      // ── Auto-detect toll / traffic ticket and switch tab ──
-      const isCitationDoc = looksLikeCitationDocument(fullText);
-      if (isCitationDoc && activeTab !== 'citation') {
-        setActiveTab('citation');
-      }
-
-      // ── Extract merchant: skip noise, find first meaningful line ──
-      const lines = fullText.split('\n').filter(l => l.trim().length > 2);
-      const merchantName = extractMerchantName(lines);
-      if (merchantName && !isCitationDoc) {
-        if (activeTab === 'transaction') setDescription(merchantName);
-        else if (activeTab === 'obligation') setVendor(merchantName);
-        const guessed = guessCategory(merchantName);
-        if (guessed && !(activeTab === 'transaction' && transactionLedgerKind === 'income')) setCategory(guessed);
-      }
-
-      if (!merchantName) {
-        const guessed = guessCategory(fullText.substring(0, 500));
-        if (guessed && !(activeTab === 'transaction' && transactionLedgerKind === 'income')) setCategory(guessed);
-      }
-
-      if (isCitationDoc) {
-        const cit = extractCitationFieldsFromText(fullText);
+    const success = await scanFile(file, {
+      onAmount: setAmount,
+      onDescription: setDescription,
+      onVendor: setVendor,
+      onCategory: setCategory,
+      onDate: setDate,
+      onDueDate: setDueDate,
+      onCitationFields: (cit) => {
         if (cit.citationNumber) setCitationNumber(cit.citationNumber);
         if (cit.jurisdiction) setJurisdiction(cit.jurisdiction);
         if (cit.penaltyFee) setPenaltyFee(cit.penaltyFee);
         setDaysLeft(cit.daysLeft);
         if (cit.citationDueDate) setCitationDueDate(cit.citationDueDate);
         setCitationType(cit.citationType);
-      }
+      },
+      onActiveTabChange: setActiveTab,
+      getActiveTab: () => activeTab,
+      hasFullSuite,
+    });
 
-      // ── Extract date ──
-      const dateMatch = fullText.match(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/);
-      if (dateMatch) {
-        try {
-          const parsed = new Date(dateMatch[0]);
-          if (!isNaN(parsed.getTime())) {
-            const dateStr = parsed.toISOString().split('T')[0];
-            setDate(dateStr);
-            if (activeTab === 'obligation') setDueDate(dateStr);
-          }
-        } catch (error) {
-          console.warn('[QuickAdd] Date parsing failed:', error);
-          toast.warning('Could not detect date — please enter manually');
-        }
-      }
-
-      if (!hasFullSuite && !isCitationDoc) {
-        setActiveTab('obligation');
-        if (merchantName) setVendor(merchantName);
-      }
-
-      if (!fullText.trim()) {
-        toast.warning('Could not extract text — fill in the fields manually.');
-      } else {
-        toast.success('Document scanned — review the pre-filled fields and save.');
-      }
-    } catch {
-      toast.error('Could not read document. Try a clearer photo or PDF.');
-    } finally {
-      setIsScanning(false);
-      e.target.value = '';
-    }
+    if (success && e.target) e.target.value = '';
   };
 
   // Revoke preview blob URL whenever the modal closes to prevent memory leak
   useEffect(() => {
     if (!isOpen) {
-      setScannedPreviewUrl(prev => { if (prev) URL.revokeObjectURL(prev); return null; });
-      setShowPreview(false);
+      clearScan();
     }
-  }, [isOpen]);
+  }, [isOpen, clearScan]);
 
   useEffect(() => {
     if (isOpen) {
