@@ -179,9 +179,9 @@ function FormCheckbox({ id, label, checked, onChange, disabled, className = '', 
         onChange={onChange}
         disabled={disabled}
         aria-describedby={description ? `${id}-desc` : undefined}
-        className="mt-0.5 rounded border-surface-border bg-surface-base focus-app disabled:opacity-40"
+        className="mt-0.5 shrink-0 rounded border-surface-border bg-surface-base focus-app disabled:opacity-40"
       />
-      <span>
+      <span className="min-w-0 break-words leading-snug">
         {label}
         {description && (
           <span id={`${id}-desc`} className="sr-only">
