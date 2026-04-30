@@ -16,6 +16,12 @@ import { useFullSuiteAccess } from '@/hooks';
 import { clampQuickAddTabForTier, canUseQuickAddTab, isTrackerObligationDebtBlocked } from '@/app/constants';
 import { getCustomIcon } from '@/lib/utils';
 import { FormInput, FormCurrency, FormAutocomplete } from '@/components/forms';
+import {
+  useQuickAddOCR,
+  useQuickAddValidation,
+  useQuickAddSubmission,
+  useQuickAddFormState,
+} from '@/hooks';
 
 interface QuickAddModalProps {
   isOpen: boolean;
@@ -637,7 +643,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const [activeTab, setActiveTab] = useState<'transaction' | 'obligation' | 'income' | 'citation'>('transaction');
   const [allowBudgetOverride, setAllowBudgetOverride] = useState(false);
 
-  // Form states
+  // Initialize form state hook (will replace individual useState calls incrementally)
+  const formState = useQuickAddFormState(activeTab);
+
+  // Form states - TODO: Replace with formState hook usage
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('food');
