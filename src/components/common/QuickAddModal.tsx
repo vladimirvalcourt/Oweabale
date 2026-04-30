@@ -686,20 +686,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   const scanFileInputRef = useRef<HTMLInputElement>(null);
   const scanCameraInputRef = useRef<HTMLInputElement>(null);
 
+  // Replace resetFormPreserveTab with formState.resetForm + additional resets
   const resetFormPreserveTab = React.useCallback(() => {
-    setAmount('');
-    setDescription('');
-    setVendor('');
-    setCategory('food');
-    setDate(formatLocalISODate());
-    setTransactionLedgerKind('expense');
-    setTxIncomeCategory('Reimbursements');
-    setMemoNotes('');
-    setIncomeTaxWithheld(false);
-    setObligationKind('bill-monthly');
-    setDueDate('');
-    setIncomeCategory('Salary');
-    setIncomeFrequency('Monthly');
+    formState.resetForm();
     setNlpText('');
     setIsScanning(false);
     setErrors({});
@@ -710,19 +699,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
       return null;
     });
     setShowPreview(false);
-    setCitationType('Toll Violation');
-    setJurisdiction('');
-    setCitationNumber('');
-    setPenaltyFee('');
-    setApr('19.99');
-    setMinPayment('');
-    setDebtNoPaymentDue(false);
-    setDaysLeft('30');
-    setCitationDueDate('');
-    setPaymentUrl('');
     setAllowBudgetOverride(false);
     clearLastBudgetGuardrail();
-  }, [clearLastBudgetGuardrail]);
+  }, [formState, clearLastBudgetGuardrail]);
 
   // Noise patterns that should be skipped when finding a merchant name
   const RECEIPT_NOISE = /^(receipt|invoice|thank you|thanks|welcome|store|branch|tel:|phone:|www\.|http|address:|date:|time:|cashier|order #|order:|transaction|subtotal|total|tax|amount|change|cash|card|approved|auth|ref:|refund|void|copy|customer|#\d+|\d{3}[-.\s]\d{3}[-.\s]\d{4}|\d{1,5}\s+\w+\s+(st|ave|blvd|rd|dr|lane|ln|way|ct|pl|suite))/i;
