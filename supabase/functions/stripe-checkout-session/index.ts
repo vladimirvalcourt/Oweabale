@@ -92,6 +92,9 @@ Deno.serve(async (req: Request) => {
     const stripe = new Stripe(stripeSecret, { apiVersion: '2024-06-20' });
     const checkoutAttemptId = crypto.randomUUID();
 
+    // Generate idempotency key to prevent duplicate charges from retries
+    const idempotencyKey = `checkout:${user.id}:${body.planKey}:${Date.now()}`;
+
     const { data: profile } = await supabaseAdmin
       .from('profiles')
       .select('email, stripe_customer_id')
