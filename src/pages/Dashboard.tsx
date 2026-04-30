@@ -558,28 +558,28 @@ export default function Dashboard() {
 
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 xl:grid-cols-1">
             <MetricCard
+              icon={Wallet}
+              label="Monthly cash flow"
+              value={formatMoney(cashFlow.surplus ?? 0)}
+              href="/pro/dashboard#safe-spend"
+            />
+            <MetricCard
+              icon={Wallet}
+              label="Liquid cash"
+              value={formatMoney(liquidCash)}
+              href="/pro/assets"
+            />
+            <MetricCard
               icon={Clock}
               label="Overdue"
               value={overdueItems.length}
               href="/pro/bills"
             />
             <MetricCard
-              icon={Wallet}
-              label="Daily comfort"
-              value={formatMoney(Math.max(0, safeToSpend.dailySafeToSpend))}
-              href="/pro/dashboard#safe-spend"
-            />
-            <MetricCard
               icon={Landmark}
               label="Debt mins"
               value={debtMinimumsDue.length}
               href="/pro/bills?tab=debt"
-            />
-            <MetricCard
-              icon={ShieldAlert}
-              label="Tolls & fines"
-              value={openCitationCount}
-              href="/pro/bills?tab=ambush"
             />
           </div>
         </section>
