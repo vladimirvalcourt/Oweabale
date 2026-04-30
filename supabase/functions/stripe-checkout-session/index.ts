@@ -4,6 +4,7 @@ import { corsHeaders } from '../_shared/cors.ts';
 import { safeRedirectUrl } from '../_shared/stripeRedirects.ts';
 import { getStripeSecretKey } from '../_shared/stripeEnv.ts';
 import { createPostHogClient } from '../_shared/posthog.ts';
+import { enforceRateLimit, rateLimiters } from '../_shared/rateLimiter.ts';
 
 type PlanKey = 'pro_monthly' | 'pro_yearly';
 
@@ -47,6 +48,12 @@ Deno.serve(async (req: Request) => {
       status: 405,
       headers: { ...ch, 'Content-Type': 'application/json' },
     });
+  }
+
+  // Enforce strict rate limiting on payment endpoints
+  const rateLimitCheck = await enforceRateLimit(req, rateLimiters.api);
+  if (!rateLimitCheck.allowed) {
+    return rateLimitCheck.response!;
   }
 
   try {

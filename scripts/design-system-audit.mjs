@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+admin #!/usr/bin / env node
 
 /**
  * Comprehensive Design System Compliance Audit Script

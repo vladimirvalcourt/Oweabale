@@ -4,6 +4,7 @@ import { plaidPost } from '../_shared/plaid_client.ts';
 import { hasPaidFullSuiteAccess } from '../_shared/plaidAccess.ts';
 import { runSyncAllForUser } from '../_shared/plaid_sync_runner.ts';
 import { createPostHogClient } from '../_shared/posthog.ts';
+import { enforceRateLimit, rateLimiters } from '../_shared/rateLimiter.ts';
 
 Deno.serve(async (req: Request) => {
   const origin = req.headers.get('origin');
@@ -18,6 +19,12 @@ Deno.serve(async (req: Request) => {
       status: 405,
       headers: { ...ch, 'Content-Type': 'application/json' },
     });
+  }
+
+  // Enforce rate limiting before auth check (IP-based for unauthenticated requests)
+  const rateLimitCheck = await enforceRateLimit(req, rateLimiters.api);
+  if (!rateLimitCheck.allowed) {
+    return rateLimitCheck.response!;
   }
 
   try {
