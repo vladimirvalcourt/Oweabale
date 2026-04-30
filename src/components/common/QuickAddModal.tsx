@@ -140,15 +140,14 @@ function FormTab({ id, label, isActive, onClick, icon, variant = 'default' }: Fo
       aria-controls="quick-add-form"
       tabIndex={isActive ? 0 : -1}
       onClick={onClick}
-      className={`min-h-10 min-w-0 px-3 py-2 text-xs font-sans font-medium transition-all rounded-lg focus-app ${
-        variant === 'citation'
+      className={`min-h-10 min-w-0 px-3 py-2 text-xs font-sans font-medium transition-all rounded-lg focus-app ${variant === 'citation'
           ? isActive
             ? 'bg-content-primary/[0.08] text-content-primary border border-surface-border'
             : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
           : isActive
             ? 'bg-brand-cta text-surface-base'
             : 'text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
-      }`}
+        }`}
     >
       {icon && <span className="inline-flex min-w-0 items-center justify-center gap-1.5">{icon}<span className="truncate">{label}</span></span>}
       {!icon && <span className="truncate">{label}</span>}
@@ -250,7 +249,7 @@ function FormTextarea({
         aria-required={required}
         className={`w-full bg-surface-base border ${hasError ? 'border-[var(--color-status-rose-border)]' : 'border-surface-border'} radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted resize-none transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
       />
-      {hint && <p id={hintId} className="text-[10px] text-content-muted mt-1">{hint}</p>}
+      {hint && <p id={hintId} className="text-xs text-content-muted mt-1">{hint}</p>}
       {hasError && (
         <p id={errorId} className="mt-1.5 flex items-center gap-1.5 text-xs text-[var(--color-status-rose-text)]" role="alert" aria-live="polite">
           <AlertCircle className="w-3 h-3" aria-hidden />
@@ -260,7 +259,7 @@ function FormTextarea({
       {showProgress && (
         <div className="mt-1.5">
           <div className="flex items-center justify-between mb-1">
-            <p id={`${id}-count`} className={`text-[10px] font-mono ${isNearLimit ? 'text-[var(--color-status-amber-text)]' : 'text-content-muted'}`} aria-live="polite">
+            <p id={`${id}-count`} className={`text-xs font-mono ${isNearLimit ? 'text-[var(--color-status-amber-text)]' : 'text-content-muted'}`} aria-live="polite">
               {charCount}/{maxLength} characters
             </p>
             {isNearLimit && (
@@ -310,8 +309,8 @@ function FormRadioGroup({ id, name, label, value, onChange, options, required, d
         {label}
         {required && <span className="ml-0.5 text-[var(--color-status-rose-text)]">*</span>}
       </legend>
-      <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex rounded-lg border border-surface-border p-0.5 bg-surface-raised gap-0.5">
+      <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center">
+        <div className="flex rounded-lg border border-surface-border p-0.5 bg-surface-raised gap-0.5 w-full sm:w-auto">
           {options.map((option) => (
             <button
               key={option.value}
@@ -321,18 +320,17 @@ function FormRadioGroup({ id, name, label, value, onChange, options, required, d
               tabIndex={value === option.value ? 0 : -1}
               onClick={() => !disabled && onChange(option.value)}
               disabled={disabled}
-              className={`flex-1 rounded-full px-3 py-1.5 text-xs font-sans font-medium transition-colors focus-app text-center ${
-                value === option.value
+              className={`flex-1 rounded-full px-3 py-1.5 text-xs font-sans font-medium transition-colors focus-app text-center ${value === option.value
                   ? 'bg-brand-cta text-surface-base'
                   : 'text-content-tertiary hover:text-content-primary'
-              } disabled:opacity-40`}
+                } disabled:opacity-40`}
             >
               {option.label}
             </button>
           ))}
         </div>
       </div>
-      {hint && <p id={hintId} className="text-[10px] text-content-muted mt-2 leading-snug">{hint}</p>}
+      {hint && <p id={hintId} className="text-xs text-content-muted mt-2 leading-snug">{hint}</p>}
     </fieldset>
   );
 }
@@ -352,7 +350,7 @@ function FormFieldset({ legend, children, className = '', hint }: FormFieldsetPr
     <fieldset className={`rounded-lg border border-surface-border bg-surface-base p-3 ${className}`}>
       <legend className="text-xs font-sans font-medium text-content-tertiary mb-2">{legend}</legend>
       {children}
-      {hint && <p id={hintId} className="text-[10px] text-content-muted mt-2 leading-snug">{hint}</p>}
+      {hint && <p id={hintId} className="text-xs text-content-muted mt-2 leading-snug">{hint}</p>}
     </fieldset>
   );
 }
@@ -461,11 +459,11 @@ function FormDatePicker({
         className={`input-date-dark w-full bg-surface-base border ${hasError ? 'border-[var(--color-status-rose-border)]' : 'border-surface-border'} radius-input focus-app-field px-3 py-2 text-sm font-sans transition-colors hover:border-content-primary/15 disabled:opacity-40 disabled:hover:border-surface-border`}
       />
       {daysLeft !== null && (
-        <p className={`mt-1 text-[10px] font-mono ${daysLeft < 0 ? 'text-[var(--color-status-rose-text)]' : daysLeft <= 7 ? 'text-[var(--color-status-amber-text)]' : 'text-content-muted'}`} aria-live="polite">
+        <p className={`mt-1 text-xs font-mono ${daysLeft < 0 ? 'text-[var(--color-status-rose-text)]' : daysLeft <= 7 ? 'text-[var(--color-status-amber-text)]' : 'text-content-muted'}`} aria-live="polite">
           {daysLeft < 0 ? `${Math.abs(daysLeft)} days overdue` : daysLeft === 0 ? 'Due today' : `${daysLeft} days remaining`}
         </p>
       )}
-      {hint && !showDaysLeft && <p id={hintId} className="text-[10px] text-content-muted mt-1">{hint}</p>}
+      {hint && !showDaysLeft && <p id={hintId} className="text-xs text-content-muted mt-1">{hint}</p>}
       {hasError && (
         <p id={errorId} className="mt-1.5 text-xs text-[var(--color-status-rose-text)]" role="alert" aria-live="polite">
           {error}
@@ -548,17 +546,16 @@ function FormFileUpload({
           {required && <span className="ml-0.5 text-[var(--color-status-rose-text)]">*</span>}
         </label>
       ) : null}
-      
+
       <div className="space-y-2">
         <div className="flex min-w-0 gap-2">
           <label
-            className={`flex min-h-10 min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 overflow-hidden border px-3 py-2.5 transition-all radius-input ${
-              disabled
+            className={`flex min-h-10 min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 overflow-hidden border px-3 py-2.5 transition-all radius-input ${disabled
                 ? 'border-surface-border bg-surface-raised text-content-muted cursor-not-allowed'
                 : fileName
                   ? 'border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)]'
                   : 'border-surface-border bg-surface-raised text-content-secondary hover:text-content-primary hover:bg-content-primary/[0.04]'
-            }`}
+              }`}
           >
             <input
               ref={fileInputRef}
@@ -593,16 +590,15 @@ function FormFileUpload({
               </>
             )}
           </label>
-          
+
           {previewUrl && onPreviewToggle && (
             <button
               type="button"
               onClick={onPreviewToggle}
-              className={`min-h-10 shrink-0 border px-3 py-2.5 transition-all radius-input ${
-                showPreview
+              className={`min-h-10 shrink-0 border px-3 py-2.5 transition-all radius-input ${showPreview
                   ? 'border-surface-border text-content-primary bg-content-primary/[0.06]'
                   : 'border-surface-border text-content-tertiary hover:text-content-primary hover:bg-surface-elevated'
-              }`}
+                }`}
               title={showPreview ? 'Hide preview' : 'Show preview'}
             >
               {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -610,8 +606,8 @@ function FormFileUpload({
           )}
         </div>
 
-        {hint && <p id={hintId} className="text-[10px] text-content-muted">{hint}</p>}
-        
+        {hint && <p id={hintId} className="text-xs text-content-muted">{hint}</p>}
+
         {hasError && (
           <p id={errorId} className="flex items-center gap-1.5 text-xs text-[var(--color-status-rose-text)]" role="alert" aria-live="polite">
             <AlertCircle className="w-3 h-3" aria-hidden />
@@ -899,7 +895,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     const newErrors: Record<string, string> = {};
     const parsedAmount = parseCurrencyInput(amount);
     if (!amount || isNaN(parsedAmount) || parsedAmount <= 0) newErrors.amount = "Please enter a valid amount greater than zero.";
-    
+
     if (activeTab === 'transaction') {
       if (!description.trim()) newErrors.description = "Please describe the transaction.";
     } else if (activeTab === 'obligation') {
@@ -1144,9 +1140,9 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <Dialog 
-          open={isOpen} 
-          onClose={onClose} 
+        <Dialog
+          open={isOpen}
+          onClose={onClose}
           className="relative z-50"
         >
           {/* Backdrop */}
@@ -1161,14 +1157,14 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
               className="w-full sm:max-w-xl"
             >
               <Dialog.Panel className="flex max-h-[90vh] min-h-0 flex-col overflow-hidden rounded-lg border border-surface-border bg-surface-elevated shadow-elevated">
-                
+
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-surface-border bg-surface-raised shrink-0">
                   <Dialog.Title className="text-sm font-sans font-semibold text-content-primary">
                     Add what&apos;s due
                   </Dialog.Title>
-                  <button 
-                    onClick={onClose} 
+                  <button
+                    onClick={onClose}
                     className="text-content-tertiary hover:text-content-primary transition-colors focus-app rounded-lg"
                   >
                     <span className="sr-only">Close</span>
@@ -1181,10 +1177,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   <div className="bg-surface-base border-b border-surface-border">
                     <div className="grid gap-3 px-5 py-4 sm:grid-cols-[minmax(0,1fr)_minmax(16rem,18rem)] sm:items-start sm:px-6">
                       <div className="min-w-0">
-                        <p className="text-[11px] font-sans font-medium uppercase tracking-[0.08em] text-content-secondary">
+                        <p className="text-xs font-sans font-medium uppercase tracking-[0.08em] text-content-secondary">
                           Scan receipt, image or PDF
                         </p>
-                        <p className="mt-1 text-[10px] font-mono uppercase tracking-[0.12em] text-content-muted">
+                        <p className="mt-1 text-xs font-mono uppercase tracking-[0.12em] text-content-muted">
                           JPG · PNG · WEBP · PDF
                         </p>
                         <p className="mt-2 max-w-prose text-xs leading-5 text-content-tertiary">
@@ -1221,7 +1217,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             <Camera className="relative z-10 h-3.5 w-3.5 shrink-0" aria-hidden />
                             <span className="relative z-10 truncate">Camera</span>
                           </label>
-                          
+
                           {/* File Upload using FormFileUpload component */}
                           <FormFileUpload
                             id="scan-file"
@@ -1269,7 +1265,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       <NlpIcon className="w-4 h-4 text-content-secondary" />
                       <span className="text-xs font-sans font-medium text-content-secondary">Natural language speed input</span>
                     </div>
-                    
+
                     <textarea
                       placeholder={hasFullSuite ? "e.g. Rent 1200 on the 1st · Comcast bill 120 next Tuesday · Parking ticket 65 due Friday" : "e.g. Rent 1200 on the 1st · Internet bill 80 next Tuesday · Parking ticket 65 due Friday"}
                       value={nlpText}
@@ -1280,12 +1276,12 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                   </div>
 
                   {/* Tabs */}
-                    <div
-                      role="tablist"
-                      aria-label="Record type"
-                      onKeyDown={onTabListKeyDown}
-                      className="grid grid-cols-[repeat(auto-fit,minmax(7.25rem,1fr))] gap-1 border-b border-surface-border bg-surface-raised p-1"
-                    >
+                  <div
+                    role="tablist"
+                    aria-label="Record type"
+                    onKeyDown={onTabListKeyDown}
+                    className="grid grid-cols-[repeat(auto-fit,minmax(7.25rem,1fr))] gap-1 border-b border-surface-border bg-surface-raised p-1"
+                  >
                     {hasFullSuite && (
                       <FormTab
                         id="qa-tab-transaction"
@@ -1340,13 +1336,13 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     aria-busy={isSubmitting}
                     className="space-y-5 p-5 sm:p-6"
                   >
-                    
+
                     {/* AMOUNT FIELD (ALWAYS PRESENT) */}
                     <FormCurrency
                       id="amount"
                       label="Amount"
                       value={amount}
-                      onChange={(value) => { setAmount(value); if(errors.amount) setErrors({...errors, amount: ''}); }}
+                      onChange={(value) => { setAmount(value); if (errors.amount) setErrors({ ...errors, amount: '' }); }}
                       placeholder="0.00"
                       error={errors.amount}
                       required
@@ -1357,11 +1353,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                       <>
                         {lastBudgetGuardrail && transactionLedgerKind === 'expense' && (
                           <div
-                            className={`rounded-lg border px-3 py-2 text-xs ${
-                              lastBudgetGuardrail.type === 'hard'
+                            className={`rounded-lg border px-3 py-2 text-xs ${lastBudgetGuardrail.type === 'hard'
                                 ? 'border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]'
                                 : 'border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]'
-                            }`}
+                              }`}
                           >
                             <p className="font-medium">{lastBudgetGuardrail.message}</p>
                             <p className="mt-1 text-content-secondary">
@@ -1389,7 +1384,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 id="description"
                                 label="Description"
                                 value={description}
-                                onChange={(e) => { setDescription(e.target.value); if(errors.description) setErrors({...errors, description: ''}); }}
+                                onChange={(e) => { setDescription(e.target.value); if (errors.description) setErrors({ ...errors, description: '' }); }}
                                 placeholder="E.g., Whole Foods"
                                 error={errors.description}
                                 required
@@ -1496,7 +1491,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 </>
                               )}
                             </FormSelect>
-                            <p className="text-[10px] font-mono text-content-tertiary mt-1.5 leading-snug" id="obligation-kind-hint">
+                            <p className="text-xs font-mono text-content-tertiary mt-1.5 leading-snug" id="obligation-kind-hint">
                               {obligationKind.startsWith('bill-')
                                 ? 'Amount is per bill cycle (weekly, bi-weekly, or monthly).'
                                 : 'Balance owed; APR and minimum payment are optional.'}
@@ -1507,7 +1502,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               id="dueDate"
                               label={obligationKind.startsWith('debt-') ? 'Payment due date' : 'Due Date'}
                               value={dueDate}
-                              onChange={(val) => { setDueDate(val); if(errors.dueDate) setErrors({...errors, dueDate: ''}); }}
+                              onChange={(val) => { setDueDate(val); if (errors.dueDate) setErrors({ ...errors, dueDate: '' }); }}
                               error={errors.dueDate}
                               disabled={obligationKind.startsWith('debt-') && debtNoPaymentDue}
                               showDaysLeft={obligationKind.startsWith('bill-')}
@@ -1533,7 +1528,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               id="vendor"
                               label="Biller Name"
                               value={vendor}
-                              onChange={(value) => { setVendor(value); if(errors.vendor) setErrors({...errors, vendor: ''}); }}
+                              onChange={(value) => { setVendor(value); if (errors.vendor) setErrors({ ...errors, vendor: '' }); }}
                               placeholder={
                                 obligationKind.startsWith('bill-')
                                   ? 'E.g., AT&T'
@@ -1697,7 +1692,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                                 aria-describedby="citation-number-count"
                                 className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2.5 text-sm font-mono text-content-primary placeholder:text-content-muted transition-colors uppercase hover:border-content-primary/15"
                               />
-                              <p id="citation-number-count" className="text-[10px] font-mono text-content-muted mt-1" aria-live="polite">
+                              <p id="citation-number-count" className="text-xs font-mono text-content-muted mt-1" aria-live="polite">
                                 {citationNumber.length}/50 characters
                               </p>
                             </div>
@@ -1722,7 +1717,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               aria-describedby="payment-url-hint"
                               className="w-full bg-surface-base border border-surface-border radius-input focus-app-field px-3 py-2.5 text-sm font-sans text-content-primary placeholder:text-content-muted transition-colors hover:border-content-primary/15"
                             />
-                            <p id="payment-url-hint" className="text-[10px] text-content-muted mt-1">Direct link to the payment portal</p>
+                            <p id="payment-url-hint" className="text-xs text-content-muted mt-1">Direct link to the payment portal</p>
                           </div>
                         </FormFieldset>
 
@@ -1784,7 +1779,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                             id="incDate"
                             label="Next pay date"
                             value={date}
-                            onChange={(val) => { setDate(val); if(errors.date) setErrors({...errors, date: ''}); }}
+                            onChange={(val) => { setDate(val); if (errors.date) setErrors({ ...errors, date: '' }); }}
                             error={errors.date}
                           />
                         </div>
@@ -1830,11 +1825,10 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                     type="submit"
                     disabled={isSubmitting}
                     aria-busy={isSubmitting}
-                    className={`min-h-10 px-5 py-2 text-sm font-sans font-medium transition-colors radius-button focus-app disabled:opacity-50 ${
-                      activeTab === 'citation'
+                    className={`min-h-10 px-5 py-2 text-sm font-sans font-medium transition-colors radius-button focus-app disabled:opacity-50 ${activeTab === 'citation'
                         ? 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover border border-surface-border'
                         : 'bg-brand-cta text-surface-base hover:bg-brand-cta-hover'
-                    }`}
+                      }`}
                   >
                     {isSubmitting ? 'Getting things ready...' : 'Save entry'}
                   </button>
