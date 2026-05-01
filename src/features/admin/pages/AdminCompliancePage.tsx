@@ -154,9 +154,9 @@ export default function AdminCompliancePage() {
                     <span
                       className={`border px-2 py-0.5 text-[10px] uppercase tracking-wide ${
                         item.severity === 'critical'
-                          ? 'border-rose-500/40 text-rose-200'
+                          ? 'border-[var(--color-status-urgent-border)] bg-[var(--color-status-urgent-bg)] text-[var(--color-status-urgent-text-dark)]'
                           : item.severity === 'high'
-                            ? 'border-amber-500/40 text-amber-200'
+                            ? 'border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] text-[var(--color-status-warning-text-dark)]'
                             : 'border-surface-border text-content-tertiary'
                       }`}
                     >

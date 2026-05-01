@@ -190,7 +190,7 @@ html {
   }
 
   .ui-card-compact {
-    @apply rounded-lg border border-surface-border-subtle bg-surface-base/50 shadow-card;
+    @apply rounded-[12px] border border-surface-border-subtle bg-surface-base/50 shadow-card;
   }
 
   .ui-card-hover {

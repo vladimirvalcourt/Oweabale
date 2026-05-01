@@ -340,7 +340,7 @@ export default function AdminReportsPage() {
           ) : (
             <p className="text-xs text-content-muted">Loading revenue data…</p>
           )}
-          <p className="border border-amber-500/35 bg-amber-500/10 p-3 text-[11px] leading-5 text-content-secondary">
+          <p className="border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] p-3 text-[11px] leading-5 text-content-secondary">
             Estimated MRR/ARR are based on active subscription count x $17/mo average. Exact figures require Stripe source-of-truth amounts.
           </p>
         </div>
@@ -372,7 +372,7 @@ export default function AdminReportsPage() {
                 </div>
               ))}
               {funnelSteps.length >= 2 ? (
-                <div className="border border-amber-500/35 p-3 text-xs">
+                <div className="border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] p-3 text-xs">
                   <p className="font-semibold text-content-primary">Biggest drop-off</p>
                   <p className="mt-1 text-content-secondary">
                     {(() => {

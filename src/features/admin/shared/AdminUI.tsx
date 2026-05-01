@@ -73,9 +73,9 @@ export function AdminMetric({
 }) {
   const toneClass = {
     default: 'border-surface-border text-content-primary',
-    good: 'border-[var(--color-status-emerald-border)] text-[var(--color-status-emerald-text)]',
-    warn: 'border-[var(--color-status-amber-border)] text-[var(--color-status-amber-text)]',
-    danger: 'border-[var(--color-status-rose-border)] text-[var(--color-status-rose-text)]',
+    good: 'border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)]',
+    warn: 'border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] text-[var(--color-status-warning-text)] dark:text-[var(--color-status-warning-text-dark)]',
+    danger: 'border-[var(--color-status-urgent-border)] bg-[var(--color-status-urgent-bg)] text-[var(--color-status-urgent-text)] dark:text-[var(--color-status-urgent-text-dark)]',
   }[tone];
 
   return (
@@ -96,10 +96,10 @@ export function AdminStatusBadge({
 }) {
   const toneClass = {
     default: 'border-surface-border bg-surface-base text-content-secondary',
-    good: 'border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)]',
-    warn: 'border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]',
-    danger: 'border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]',
-    info: 'border-[var(--color-status-info-border)] bg-[var(--color-status-info-bg)] text-[var(--color-status-info-text)]',
+    good: 'border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] text-[var(--color-status-emerald-text)] dark:text-[var(--color-status-emerald-text-dark)]',
+    warn: 'border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] text-[var(--color-status-warning-text)] dark:text-[var(--color-status-warning-text-dark)]',
+    danger: 'border-[var(--color-status-urgent-border)] bg-[var(--color-status-urgent-bg)] text-[var(--color-status-urgent-text)] dark:text-[var(--color-status-urgent-text-dark)]',
+    info: 'border-[var(--color-status-info-border)] bg-[var(--color-status-info-bg)] text-[var(--color-status-info-text)] dark:text-[var(--color-status-info-text-dark)]',
   }[tone];
 
   return (
@@ -137,7 +137,7 @@ export const adminInputClass =
   'ui-field text-xs';
 
 export const adminButtonClass =
-  'ui-button ui-button-sm ui-button-secondary text-content-secondary hover:text-content-primary disabled:opacity-40';
+  'ui-button ui-button-md ui-button-secondary text-content-secondary hover:text-content-primary disabled:opacity-40';
 
 export const adminDangerButtonClass =
-  'ui-button ui-button-sm border border-rose-500/50 bg-rose-500/10 text-rose-700 hover:bg-rose-500/15 disabled:opacity-40 dark:text-rose-100';
+  'ui-button ui-button-md border border-[var(--color-status-urgent-border)] bg-[var(--color-status-urgent-bg)] text-[var(--color-status-urgent-text)] hover:bg-[var(--color-status-urgent-bg)]/20 disabled:opacity-40 dark:text-[var(--color-status-urgent-text-dark)]';

@@ -166,17 +166,17 @@ export default function AdminModerationPage() {
                 <p className="mt-2 leading-5 text-content-secondary">{selected.moderator_note ?? 'No note recorded.'}</p>
               </div>
 
-              <div className="border border-amber-500/35 bg-amber-500/10 p-3">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-200">Controlled review actions</p>
+              <div className="border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] p-3">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-status-warning-text)] dark:text-[var(--color-status-warning-text-dark)]">Controlled review actions</p>
                 <p className="mt-1 leading-5 text-content-secondary">These actions only update moderation status. Use the case file for account-level enforcement.</p>
                 <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                  <button type="button" disabled={savingId === selected.id} onClick={() => void setStatus(selected.id, 'approved')} className="border border-emerald-500/40 px-2.5 py-2 text-[11px] font-semibold text-emerald-700 disabled:opacity-40 dark:text-emerald-200">
+                  <button type="button" disabled={savingId === selected.id} onClick={() => void setStatus(selected.id, 'approved')} className="border border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-2.5 py-2 text-[11px] font-semibold text-[var(--color-status-emerald-text)] disabled:opacity-40 dark:text-[var(--color-status-emerald-text-dark)]">
                     <Check className="mr-1 inline h-3 w-3" /> Approve
                   </button>
-                  <button type="button" disabled={savingId === selected.id} onClick={() => void setStatus(selected.id, 'flagged')} className="border border-amber-500/40 px-2.5 py-2 text-[11px] font-semibold text-amber-700 disabled:opacity-40 dark:text-amber-200">
+                  <button type="button" disabled={savingId === selected.id} onClick={() => void setStatus(selected.id, 'flagged')} className="border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] px-2.5 py-2 text-[11px] font-semibold text-[var(--color-status-warning-text)] disabled:opacity-40 dark:text-[var(--color-status-warning-text-dark)]">
                     <Flag className="mr-1 inline h-3 w-3" /> Flag
                   </button>
-                  <button type="button" disabled={savingId === selected.id} onClick={() => void setStatus(selected.id, 'rejected')} className="border border-rose-500/40 px-2.5 py-2 text-[11px] font-semibold text-rose-700 disabled:opacity-40 dark:text-rose-200">
+                  <button type="button" disabled={savingId === selected.id} onClick={() => void setStatus(selected.id, 'rejected')} className="border border-[var(--color-status-urgent-border)] bg-[var(--color-status-urgent-bg)] px-2.5 py-2 text-[11px] font-semibold text-[var(--color-status-urgent-text)] disabled:opacity-40 dark:text-[var(--color-status-urgent-text-dark)]">
                     <X className="mr-1 inline h-3 w-3" /> Reject
                   </button>
                 </div>

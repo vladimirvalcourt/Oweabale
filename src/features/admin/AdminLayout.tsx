@@ -129,7 +129,7 @@ export function AdminLayout() {
               {envLabel}
             </span>
             {isSuperAdmin ? (
-              <span className="border border-amber-500/35 bg-amber-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-700 dark:text-amber-200">
+              <span className="border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--color-status-warning-text)] dark:text-[var(--color-status-warning-text-dark)]">
                 Super admin
               </span>
             ) : null}

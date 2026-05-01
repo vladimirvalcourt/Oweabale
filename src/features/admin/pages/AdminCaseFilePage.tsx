@@ -98,14 +98,14 @@ function StatusBadge({ status }: { status: string }) {
   const s = status.toLowerCase();
   const cls =
     s === 'active'
-      ? 'text-emerald-700 border-emerald-500/30 dark:text-emerald-200'
+      ? 'text-[var(--color-status-emerald-text)] border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] dark:text-[var(--color-status-emerald-text-dark)]'
       : s === 'trialing'
-        ? 'text-sky-700 border-sky-500/30 dark:text-sky-200'
+        ? 'text-[var(--color-status-info-text)] border-[var(--color-status-info-border)] bg-[var(--color-status-info-bg)] dark:text-[var(--color-status-info-text-dark)]'
         : s === 'past_due'
-          ? 'text-amber-700 border-amber-500/30 dark:text-amber-200'
+          ? 'text-[var(--color-status-warning-text)] border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] dark:text-[var(--color-status-warning-text-dark)]'
           : 'text-content-muted border-surface-border';
   return (
-    <span className={`inline-block rounded border px-1.5 py-0.5 text-[10px] font-medium ${cls}`}>{status}</span>
+    <span className={`inline-block rounded-md border px-1.5 py-0.5 text-[10px] font-medium ${cls}`}>{status}</span>
   );
 }
 
@@ -393,7 +393,7 @@ export default function AdminCaseFilePage() {
       ) : null}
 
       {detailQuery.error ? (
-        <p className="border border-rose-500/30 p-4 text-xs text-rose-200">
+        <p className="border border-[var(--color-status-urgent-border)] bg-[var(--color-status-urgent-bg)] p-4 text-xs text-[var(--color-status-urgent-text-dark)]">
           {(detailQuery.error as Error)?.message ?? 'Failed to load user.'}
         </p>
       ) : null}
@@ -432,8 +432,8 @@ export default function AdminCaseFilePage() {
             <div className="space-y-1 p-5">
 
             {isSuperAdmin ? (
-              <div className="mt-4 border border-amber-500/35 p-3">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-amber-200">Super-admin actions</p>
+              <div className="mt-4 border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] p-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--color-status-warning-text-dark)]">Super-admin actions</p>
                 <p className="mt-1 text-[11px] text-content-secondary">
                   Impersonation signs you in as this user in a new tab (full app access). Use a dedicated browser profile
                   for stricter isolation. Every handoff is audited; magic links are single-use.
@@ -457,7 +457,7 @@ export default function AdminCaseFilePage() {
                       if (!window.confirm('Open a magic link to sign in as this user in a new tab?')) return;
                       impersonateMutation.mutate();
                     }}
-                    className="interactive-press inline-flex items-center gap-1 border border-amber-500/50 bg-amber-500/10 px-3 py-1.5 text-[11px] font-semibold text-amber-700 disabled:opacity-40 dark:text-amber-100"
+                    className="interactive-press inline-flex items-center gap-1 border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-status-warning-text)] disabled:opacity-40 dark:text-[var(--color-status-warning-text-dark)]"
                   >
                     {impersonateMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
                     Impersonate (magic link)

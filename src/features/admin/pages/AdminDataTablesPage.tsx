@@ -334,7 +334,7 @@ export default function AdminDataTablesPage() {
                 <button
                   type="button"
                   onClick={() => void handleProfileBulkAction('unban')}
-                  className="interactive-press interactive-focus border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-700 dark:text-emerald-200"
+                  className="interactive-press interactive-focus border border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-3 py-2 text-xs font-semibold text-[var(--color-status-emerald-text)] dark:text-[var(--color-status-emerald-text-dark)]"
                 >
                   Unban selected
                 </button>

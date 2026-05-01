@@ -247,9 +247,9 @@ export default function AdminOverviewPage() {
               </div>
             ))}
             {biggestDrop && biggestDrop.drop > 0 ? (
-              <div className="border border-amber-500/35 bg-amber-500/10 p-3 text-xs">
+              <div className="border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] p-3 text-xs">
                 <div className="flex items-center gap-2">
-                  <BarChart3 className="h-3.5 w-3.5 text-amber-700 dark:text-amber-200" />
+                  <BarChart3 className="h-3.5 w-3.5 text-[var(--color-status-warning-text)] dark:text-[var(--color-status-warning-text-dark)]" />
                   <p className="font-semibold text-content-primary">Highest drop-off</p>
                 </div>
                 <p className="mt-1 text-content-secondary">

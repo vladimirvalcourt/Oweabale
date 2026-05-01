@@ -69,11 +69,11 @@ export default function AdminEmailBlastPage() {
           <div className="space-y-4 p-5">
 
           {!canSend ? (
-            <div className="border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-700 dark:text-amber-200">
+            <div className="border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] p-3 text-xs text-[var(--color-status-warning-text)] dark:text-[var(--color-status-warning-text-dark)]">
               You need super-admin or moderation.manage permission to send email blasts.
             </div>
           ) : null}
-          <div className="border border-amber-500/40 bg-amber-500/10 p-3 text-xs leading-5 text-amber-700 dark:text-amber-200">
+          <div className="border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] p-3 text-xs leading-5 text-[var(--color-status-warning-text)] dark:text-[var(--color-status-warning-text-dark)]">
             Sending is disabled until the backend has a real queued sender with suppression lists,
             unsubscribe enforcement, recipient estimates, rate limits, and audit records.
           </div>
