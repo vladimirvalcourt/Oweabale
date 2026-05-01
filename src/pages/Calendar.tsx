@@ -7,7 +7,7 @@ import { useLocation } from 'react-router-dom';
 import {
   ChevronLeft, ChevronRight, Receipt, TrendingUp, Repeat, Target, CalendarDays
 } from 'lucide-react';
-import { CollapsibleModule } from '@/components/common';
+import { CollapsibleModule, GuidedEmptyState } from '@/components/common';
 import { useStore } from '@/store';
 import { getCustomIcon } from '@/lib/utils';
 
@@ -396,9 +396,23 @@ export default function Calendar() {
                 </div>
               );
             })}
-          {Array.from(eventsByDay.values()).flat().length === 0 && (
-            <p className="text-sm font-mono text-content-tertiary text-center py-4 uppercase tracking-[0.2em]">No upcoming events</p>
-          )}
+          {Array.from(eventsByDay.values()).flat().length === 0 ? (
+            <GuidedEmptyState
+              icon={CalendarDays}
+              title="No upcoming events"
+              description="Add bills, subscriptions, or income to see them on your calendar. Plan ahead and never miss a payment."
+              primaryAction={{
+                label: 'Add Bill',
+                onClick: () => window.location.href = '/pro/obligations',
+                icon: Receipt,
+              }}
+              secondaryAction={{
+                label: 'View Pay List',
+                href: '/pro/obligations',
+              }}
+              hint="Connected bank accounts will automatically populate recurring payments."
+            />
+          ) : null}
         </div>
       </CollapsibleModule>
     </div>

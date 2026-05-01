@@ -21,6 +21,7 @@ import {
   groupOutflowsByHorizon,
 } from '@/lib/api/services/finance';
 import { TransitionLink } from '@/components/common';
+import { GuidedEmptyState } from '@/components/common';
 import { rechartsTooltipStableProps } from '@/lib/utils';
 import { SafeResponsiveContainer } from '@/components/charts/SafeResponsiveContainer';
 import type { Bill, Debt } from '@/store';
@@ -370,6 +371,41 @@ export default function Obligations() {
     { key: 'debt', label: 'Debt minimums', count: allObligations.filter(o => o.type === 'debt').length },
     { key: 'ambush', label: 'Tolls, tickets & fines', count: allObligations.filter(o => o.type === 'ambush').length },
   ];
+
+  // Show guided empty state when no obligations exist
+  if (allObligations.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="mb-1 text-2xl font-medium tracking-tight text-content-primary sm:text-3xl">Pay List details</h1>
+            <p className="text-sm text-content-tertiary">Bills, debt minimums, subscriptions, tolls, tickets, and fines in one place.</p>
+            {!hasFullSuite && (
+              <p className="mt-2 text-xs text-content-secondary max-w-xl leading-relaxed">
+                {TRACKER_FREE_TIER_SUMMARY}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <GuidedEmptyState
+          icon={CreditCard}
+          title="No obligations yet"
+          description="Add your first bill, debt, or subscription to start tracking what needs paying. Stay on top of your financial commitments."
+          primaryAction={{
+            label: 'Add Bill',
+            onClick: () => openQuickAdd('obligation'),
+            icon: Plus,
+          }}
+          secondaryAction={{
+            label: 'Learn about Pay List',
+            href: '/pro/app/support',
+          }}
+          hint="Connect your bank account to automatically import recurring bills and subscriptions."
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

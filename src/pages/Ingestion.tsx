@@ -24,6 +24,7 @@ import { extractDocumentText } from '@/lib/api/services/ingestionScan';
 import type { PendingIngestion } from '@/store';
 import { yieldForPaint, track } from '@/lib/utils';
 import { EXPENSE_CATEGORY_OPTGROUPS, INCOME_CATEGORY_OPTIONS } from '@/lib/api/services/quickEntryCategories';
+import { GuidedEmptyState } from '@/components/common';
 
 // Upload rate limiter — max 5 files per 60 seconds
 const uploadTimestamps: number[] = [];
@@ -347,12 +348,21 @@ export default function Ingestion() {
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
           >
-            <UploadCloud className={`w-12 h-12 mx-auto mb-6 transition-colors ${dragActive ? 'text-content-secondary' : 'text-content-muted'}`} />
-            <h3 className="text-lg font-sans font-medium text-content-primary">No documents saved yet</h3>
-            <p className="text-sm text-content-tertiary mt-2 max-w-md mx-auto">Drop a bill, toll notice, citation, fine, statement, or payment proof. Scanned PDFs are read page-by-page when needed; very blurry shots may still need manual entry.</p>
-            <div className="mt-8 inline-block px-8 py-3 rounded-md bg-brand-cta text-surface-base text-sm font-sans font-medium shadow-sm transition-[background-color,transform] hover:bg-brand-cta-hover active:translate-y-px btn-tactile">
-              Choose files
-            </div>
+            <GuidedEmptyState
+              icon={UploadCloud}
+              title="No documents saved yet"
+              description="Drop a bill, toll notice, citation, fine, statement, or payment proof. Our OCR will extract and categorize the information automatically."
+              primaryAction={{
+                label: 'Upload Document',
+                onClick: () => fileInputRef.current?.click(),
+                icon: CloudUpload,
+              }}
+              secondaryAction={{
+                label: 'How OCR works',
+                href: '/pro/app/support',
+              }}
+              hint="Supported formats: PDF, JPG, PNG. Max file size: 10MB. Scanned PDFs are read page-by-page when needed."
+            />
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-px bg-surface-border border border-surface-border rounded-xl overflow-hidden shadow-none">
