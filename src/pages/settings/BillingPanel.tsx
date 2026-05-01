@@ -489,7 +489,7 @@ function BillingPanelInner() {
       </section>
 
       {hasPaidAccess && !isProfileTrialOnly && (
-        <section className="rounded-full border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] p-5">
+        <section className="rounded-[12px] border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] p-5">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--color-status-rose-text)]">Danger zone</p>
@@ -504,7 +504,7 @@ function BillingPanelInner() {
                 type="button"
                 onClick={onCancelAtPeriodEnd}
                 disabled={isWorking}
-                className="focus-app inline-flex min-h-10 items-center justify-center rounded-md border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-60"
+                className="ui-button ui-button-md focus-app inline-flex items-center justify-center rounded-md border border-surface-border bg-surface-raised px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancel at period end
               </button>
@@ -512,7 +512,7 @@ function BillingPanelInner() {
                 type="button"
                 onClick={() => setImmediateCancelOpen(true)}
                 disabled={isWorking}
-                className="focus-app inline-flex min-h-10 items-center justify-center rounded-md border border-[var(--color-status-rose-border)] bg-transparent px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:bg-[var(--color-status-rose-bg)] disabled:cursor-not-allowed disabled:opacity-60"
+                className="ui-button ui-button-md focus-app inline-flex items-center justify-center rounded-md border border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] px-4 py-2 text-sm font-medium text-[var(--color-status-rose-text)] transition-colors hover:bg-[var(--color-status-rose-bg)]/20 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancel immediately
               </button>
