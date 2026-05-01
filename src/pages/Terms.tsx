@@ -47,8 +47,8 @@ export default function Terms() {
   useSEO({
     title: 'Terms of Service — Oweable',
     description: 'Terms covering use of Oweable, plan billing, cancellations, platform restrictions, and legal responsibilities in plain language.',
-        canonical: SITE_CONFIG.getUrl('/terms'),
-        ogImage: SITE_CONFIG.defaultOgImage,
+    canonical: SITE_CONFIG.getUrl('/terms'),
+    ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   return (
@@ -83,21 +83,21 @@ export default function Terms() {
               ))}
 
               <div className="p-5">
-              <p className="text-sm leading-6 text-content-tertiary">
-                For billing and plan details, visit{' '}
-                <TransitionLink to="/pricing" className="font-medium text-content-primary underline underline-offset-4 hover:text-content-secondary">
-                  Pricing
-                </TransitionLink>
-                . For data handling, use{' '}
-                <TransitionLink to="/privacy" className="font-medium text-content-primary underline underline-offset-4 hover:text-content-secondary">
-                  Privacy
-                </TransitionLink>
-                . If something is unclear, contact{' '}
-                <TransitionLink to="/support" className="font-medium text-content-primary underline underline-offset-4 hover:text-content-secondary">
-                  Support
-                </TransitionLink>
-                .
-              </p>
+                <p className="text-sm leading-6 text-content-tertiary">
+                  For billing and plan details, visit{' '}
+                  <TransitionLink to="/pricing" className="font-medium text-content-primary underline underline-offset-4 hover:text-content-secondary">
+                    Pricing
+                  </TransitionLink>
+                  . For data handling, use{' '}
+                  <TransitionLink to="/privacy" className="font-medium text-content-primary underline underline-offset-4 hover:text-content-secondary">
+                    Privacy
+                  </TransitionLink>
+                  . If something is unclear, contact{' '}
+                  <TransitionLink to="/support" className="font-medium text-content-primary underline underline-offset-4 hover:text-content-secondary">
+                    Support
+                  </TransitionLink>
+                  .
+                </p>
               </div>
             </div>
           </section>

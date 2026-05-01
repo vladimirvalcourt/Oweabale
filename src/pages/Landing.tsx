@@ -117,13 +117,13 @@ function ProductPreview() {
         duration: 0.1,
         ease: "power2.in",
       })
-      .to(card, {
-        scale: 1,
-        opacity: 1,
-        duration: 0.35,
-        ease: "elastic.out(1, 0.5)",
-      }, "+=0.05")
-      .to({}, { duration: 0.8 });
+        .to(card, {
+          scale: 1,
+          opacity: 1,
+          duration: 0.35,
+          ease: "elastic.out(1, 0.5)",
+        }, "+=0.05")
+        .to({}, { duration: 0.8 });
     });
 
     return () => {
@@ -132,7 +132,7 @@ function ProductPreview() {
   }, []);
 
   return (
-      <div className="ui-card relative mx-auto max-w-[1320px] overflow-hidden shadow-panel">
+    <div className="ui-card relative mx-auto max-w-[1320px] overflow-hidden shadow-panel">
       <div className="public-grid-bg pointer-events-none absolute inset-0 opacity-35" />
       <div className="relative flex h-12 items-center justify-between border-b border-surface-border-subtle bg-surface-raised/82 px-5">
         <div className="flex items-center gap-2">
@@ -181,8 +181,8 @@ function ProductPreview() {
 
           <div className="ui-card-compact divide-y divide-surface-border-subtle overflow-hidden">
             {payListRows.map((row, index) => (
-              <div 
-                key={row.label} 
+              <div
+                key={row.label}
                 ref={(el) => { cardRefs.current[index] = el; }}
                 className="grid grid-cols-[1fr_auto] gap-4 px-4 py-4 sm:grid-cols-[1fr_auto_auto_auto] transition-all"
               >
@@ -201,29 +201,29 @@ function ProductPreview() {
 
           <div className="mt-8 grid gap-4 lg:grid-cols-[1fr_180px]">
             <div>
-            <p className="mb-3 text-sm font-medium text-content-primary">Activity</p>
-            <div className="space-y-3">
-              {activityRows.map((row, index) => (
-                <div 
-                  key={row.name} 
-                  ref={(el) => { cardRefs.current[payListRows.length + index] = el; }}
-                  className="flex items-center gap-3 text-sm transition-all"
-                >
-                  <img
-                    src={row.image}
-                    alt={`${row.name} avatar`}
-                    className="h-7 w-7 rounded-full border border-surface-border object-cover"
-                    loading="lazy"
-                  />
-                  <div className="min-w-0">
-                    <p className="text-content-secondary">
-                      <span className="text-content-primary">{row.name}</span> {row.text}
-                    </p>
-                    <p className="text-xs text-content-muted">{row.time}</p>
+              <p className="mb-3 text-sm font-medium text-content-primary">Activity</p>
+              <div className="space-y-3">
+                {activityRows.map((row, index) => (
+                  <div
+                    key={row.name}
+                    ref={(el) => { cardRefs.current[payListRows.length + index] = el; }}
+                    className="flex items-center gap-3 text-sm transition-all"
+                  >
+                    <img
+                      src={row.image}
+                      alt={`${row.name} avatar`}
+                      className="h-7 w-7 rounded-full border border-surface-border object-cover"
+                      loading="lazy"
+                    />
+                    <div className="min-w-0">
+                      <p className="text-content-secondary">
+                        <span className="text-content-primary">{row.name}</span> {row.text}
+                      </p>
+                      <p className="text-xs text-content-muted">{row.time}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
             </div>
             <div className="ui-card-compact p-4">
               <p className="ui-label">This week</p>
@@ -523,7 +523,7 @@ export default function Landing() {
       </main>
 
       <Footer />
-      
+
       {/* Exit Intent Modal */}
       <ExitIntentModal isOpen={showExitModal} onClose={() => setShowExitModal(false)} />
     </div>

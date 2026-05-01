@@ -24,8 +24,8 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
     description: isSignupMode
       ? 'Create your Oweable account to start 14 days of Full Suite access for bills, debt, due dates, and what needs attention next.'
       : 'Sign in to Oweable with Google for secure access to your Pay List, debt plan, subscriptions, and cash-flow tools.',
-        canonical: isSignupMode ? SITE_CONFIG.getUrl('/onboarding') : SITE_CONFIG.getUrl('/auth'),
-        ogImage: SITE_CONFIG.defaultOgImage,
+    canonical: isSignupMode ? SITE_CONFIG.getUrl('/onboarding') : SITE_CONFIG.getUrl('/auth'),
+    ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   const handleGoogleSignIn = async () => {

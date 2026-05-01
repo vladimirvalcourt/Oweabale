@@ -62,12 +62,17 @@ if (dsn) {
       Sentry.replayIntegration({
         maskAllText: true,
         blockAllMedia: true,
+        // Performance optimization: reduce DOM serialization overhead
+        mutationBreadcrumbLimit: 500, // Limit mutation breadcrumbs
+        mutationLimit: 1000, // Limit mutations captured
+        slowClickTimeout: 3000, // Only capture slow clicks (>3s)
       }),
     ],
     tracesSampleRate: import.meta.env.PROD ? 0.15 : 1.0,
     tracePropagationTargets,
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
+    // Session replay sampling - reduced to minimize DOM serialization overhead
+    replaysSessionSampleRate: 0.05, // Reduced from 0.1 (5% of sessions)
+    replaysOnErrorSampleRate: 1.0, // Keep 100% for error sessions
     enableLogs: true,
     beforeSend(event, hint) {
       if (isStaleDynamicImportError(hint.originalException)) return null;

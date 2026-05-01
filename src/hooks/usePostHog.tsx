@@ -21,7 +21,25 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       person_profiles: 'identified_only', // Don't create profiles for anonymous users
       capture_pageview: true, // Capture pageviews automatically
       capture_pageleave: true, // Capture page leave events
-      disable_session_recording: true, // Disable session recording for privacy
+      disable_session_recording: true, // Disable session recording for privacy & performance
+      // Performance optimizations
+      autocapture: false, // Disable autocapture to reduce event processing overhead
+      rageclick: false, // Disable rage click detection
+      cross_subdomain_cookie: false, // Reduce cookie overhead
+      persistence: 'localStorage', // Use localStorage instead of cookies for better performance
+      request_batching: true, // Batch requests to reduce network overhead
+      properties_string_max_length: 500, // Limit property string length
+      session_recording: {
+        maskAllInputs: true,
+        blockClass: 'ph-no-capture',
+        blockSelector: undefined,
+        ignoreClass: 'ph-ignore',
+        maskTextClass: 'ph-mask',
+        maskTextSelector: undefined,
+        maskInputOptions: {
+          password: true,
+        },
+      },
     });
   }, []);
 

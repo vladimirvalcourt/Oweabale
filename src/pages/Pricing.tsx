@@ -24,9 +24,8 @@ function FaqItem({ question, answer }: { question: string; answer: string }) {
         )}
       </button>
       <div
-        className={`overflow-hidden transition-all duration-300 ease-out ${
-          isOpen ? 'mt-4 max-h-72 opacity-100' : 'max-h-0 opacity-0'
-        }`}
+        className={`overflow-hidden transition-all duration-300 ease-out ${isOpen ? 'mt-4 max-h-72 opacity-100' : 'max-h-0 opacity-0'
+          }`}
       >
         <p className="max-w-3xl text-sm leading-6 text-content-secondary sm:text-base sm:leading-7">{answer}</p>
       </div>
@@ -181,8 +180,8 @@ export default function Pricing() {
     title: 'Pricing — Oweable',
     description:
       'Oweable pricing for staying on top of bills, debt payoff, subscriptions, cash flow, budgets, and uneven income without adding more noise.',
-        canonical: SITE_CONFIG.getUrl('/pricing'),
-        ogImage: SITE_CONFIG.defaultOgImage,
+    canonical: SITE_CONFIG.getUrl('/pricing'),
+    ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   useJsonLd(
@@ -272,11 +271,10 @@ export default function Pricing() {
                       type="button"
                       onClick={() => setBillingPeriod('monthly')}
                       aria-pressed={billingPeriod === 'monthly'}
-                    className={`ui-button ui-button-sm ${
-                        billingPeriod === 'monthly'
+                      className={`ui-button ui-button-sm ${billingPeriod === 'monthly'
                           ? 'bg-content-primary text-surface-base'
                           : 'text-content-tertiary hover:text-content-primary'
-                      }`}
+                        }`}
                     >
                       Monthly
                     </button>
@@ -284,11 +282,10 @@ export default function Pricing() {
                       type="button"
                       onClick={() => setBillingPeriod('yearly')}
                       aria-pressed={billingPeriod === 'yearly'}
-                    className={`ui-button ui-button-sm ${
-                        billingPeriod === 'yearly'
+                      className={`ui-button ui-button-sm ${billingPeriod === 'yearly'
                           ? 'bg-content-primary text-surface-base'
                           : 'text-content-tertiary hover:text-content-primary'
-                      }`}
+                        }`}
                     >
                       Yearly{yearlySavingsPct > 0 ? ` (-${yearlySavingsPct}%)` : ''}
                     </button>
@@ -363,7 +360,7 @@ export default function Pricing() {
                   The plan is intentionally narrow at the start and deeper where ongoing money stress usually hides.
                 </p>
               </div>
-                <div className="premium-panel overflow-x-auto">
+              <div className="premium-panel overflow-x-auto">
                 <div className="grid grid-cols-2 border-b border-surface-border-subtle bg-surface-elevated text-sm font-semibold text-content-primary">
                   <div className="min-w-[180px] px-4 py-4">Feature</div>
                   <div className="min-w-[160px] border-l border-surface-border px-4 py-4">Oweable</div>

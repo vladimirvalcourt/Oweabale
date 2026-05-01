@@ -1,6 +1,7 @@
 import './instrument';
 import { registerSW } from 'virtual:pwa-register';
 import { initWebVitalsReporting } from './lib/utils/webVitalsReporting';
+import { monitorLongTasks, lazyInit } from './lib/utils/performanceMonitor';
 import { StrictMode, lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MotionConfig } from 'motion/react';
@@ -94,3 +95,12 @@ createRoot(rootEl, {
     </MotionConfig>
   </StrictMode>,
 );
+
+// Initialize performance monitoring after app renders
+if (typeof window !== 'undefined') {
+  // Monitor long tasks (>50ms) to identify blocking operations
+  monitorLongTasks(50);
+  
+  // Defer non-critical initializations
+  lazyInit.initializeWhenIdle();
+}

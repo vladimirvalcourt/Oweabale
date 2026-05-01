@@ -42,8 +42,8 @@ export default function Privacy() {
   useSEO({
     title: 'Privacy Policy — Oweable',
     description: 'How Oweable handles bill, debt, and financial planning data collection, encryption, retention, third-party services, and privacy rights.',
-        canonical: SITE_CONFIG.getUrl('/privacy'),
-        ogImage: SITE_CONFIG.defaultOgImage,
+    canonical: SITE_CONFIG.getUrl('/privacy'),
+    ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   return (
@@ -77,17 +77,17 @@ export default function Privacy() {
               ))}
 
               <div className="p-5">
-              <p className="text-sm leading-6 text-content-tertiary">
-                For more technical detail, visit the{' '}
-                <TransitionLink to="/security" className="font-medium text-content-primary underline underline-offset-4 hover:text-brand-violet">
-                  Security page
-                </TransitionLink>
-                . For requests involving your data, use the{' '}
-                <TransitionLink to="/support" className="font-medium text-content-primary underline underline-offset-4 hover:text-brand-violet">
-                  support page
-                </TransitionLink>
-                {' '}or contact us through the support channels.
-              </p>
+                <p className="text-sm leading-6 text-content-tertiary">
+                  For more technical detail, visit the{' '}
+                  <TransitionLink to="/security" className="font-medium text-content-primary underline underline-offset-4 hover:text-brand-violet">
+                    Security page
+                  </TransitionLink>
+                  . For requests involving your data, use the{' '}
+                  <TransitionLink to="/support" className="font-medium text-content-primary underline underline-offset-4 hover:text-brand-violet">
+                    support page
+                  </TransitionLink>
+                  {' '}or contact us through the support channels.
+                </p>
               </div>
             </div>
           </section>

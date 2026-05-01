@@ -27,7 +27,7 @@ interface PopoverState {
   events: CalendarEvent[];
   x: number;
   y: number;
-} 
+}
 
 export default function Calendar() {
   const CalendarIcon = getCustomIcon('calendar');
@@ -213,7 +213,7 @@ export default function Calendar() {
           })}
         </div>
       </div>      {/* Month Navigation & Grid */}
-      <CollapsibleModule 
+      <CollapsibleModule
         title="Financial Calendar"
         icon={CalendarIcon}
         extraHeader={<span className="text-xs font-mono text-content-tertiary uppercase tracking-widest">{Array.from(eventsByDay.values()).flat().length} Events Detected</span>}

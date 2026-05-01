@@ -79,8 +79,8 @@ export default function FAQ() {
     title: 'Frequently Asked Questions — Oweable',
     description:
       'Plain-English answers about how Oweable helps with bills, debt payoff, subscriptions, the 14-day trial, security, and uneven income.',
-        canonical: SITE_CONFIG.getUrl('/faq'),
-        ogImage: SITE_CONFIG.defaultOgImage,
+    canonical: SITE_CONFIG.getUrl('/faq'),
+    ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   const faqSchema = {
@@ -109,10 +109,10 @@ export default function FAQ() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       <main className="relative overflow-hidden pb-28 pt-32 lg:pt-40" id="faq">
-          <div className="public-grid-bg pointer-events-none absolute inset-x-0 top-0 h-[600px] opacity-50" />
-          <section className="premium-container relative max-w-6xl">
-            <div className="grid gap-10 lg:grid-cols-[0.85fr_0.5fr] lg:items-end">
-              <div>
+        <div className="public-grid-bg pointer-events-none absolute inset-x-0 top-0 h-[600px] opacity-50" />
+        <section className="premium-container relative max-w-6xl">
+          <div className="grid gap-10 lg:grid-cols-[0.85fr_0.5fr] lg:items-end">
+            <div>
               <p className="premium-eyebrow">FAQ</p>
               <h1 className="premium-display mt-5 max-w-4xl">
                 The questions people ask when money already feels heavy.
@@ -120,21 +120,21 @@ export default function FAQ() {
               <p className="premium-lede mt-7 max-w-3xl">
                 Short answers, plain English, and no fake mystery. If money already feels heavy, this page should make the next step easier.
               </p>
-              </div>
-              <aside className="premium-panel p-5">
-                <p className="ui-label">Fast answer</p>
-                <p className="mt-4 text-sm leading-6 text-content-secondary">
-                  You can start manually, try the deeper suite for 14 days, and connect accounts only if it reduces effort.
-                </p>
-              </aside>
             </div>
+            <aside className="premium-panel p-5">
+              <p className="ui-label">Fast answer</p>
+              <p className="mt-4 text-sm leading-6 text-content-secondary">
+                You can start manually, try the deeper suite for 14 days, and connect accounts only if it reduces effort.
+              </p>
+            </aside>
+          </div>
 
-            <div className="premium-panel mt-14 px-5 sm:px-8">
-              {FAQ_DATA.map((item) => (
-                <FaqCard key={item.question} question={item.question} answer={item.answer} />
-              ))}
-            </div>
-          </section>
+          <div className="premium-panel mt-14 px-5 sm:px-8">
+            {FAQ_DATA.map((item) => (
+              <FaqCard key={item.question} question={item.question} answer={item.answer} />
+            ))}
+          </div>
+        </section>
       </main>
       <Footer />
     </div>
