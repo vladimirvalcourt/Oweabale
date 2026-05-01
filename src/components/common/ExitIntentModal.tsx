@@ -21,7 +21,7 @@ export default function ExitIntentModal({ isOpen, onClose }: ExitIntentModalProp
     if (!email) return;
 
     setSubmitted(true);
-    
+
     // Send to your email service (Resend, etc.)
     // For now, just track it
     setTimeout(() => {
