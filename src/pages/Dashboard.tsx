@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import {
   AlertTriangle,
   ArrowRight,
@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { AppPageShell } from '@/components/layout';
-import { ProWelcomeModal } from '@/components/common';
+import { ProWelcomeModal, FeatureGuide, type GuideStep } from '@/components/common';
 import { TransitionLink } from '@/components/common';
 import { computeSafeToSpend, calcMonthlyCashFlow } from '@/lib/api/services/finance';
 import { useStore, type Bill, type Citation, type Debt, type Subscription, type Transaction } from '@/store';
@@ -401,6 +401,34 @@ export default function Dashboard() {
   const [today] = useState(() => startOfLocalDay());
   const [nowMs, setNowMs] = useState(() => Date.now());
   const [snoozedItems, setSnoozedItems] = useState<Record<string, number>>(() => readSnoozedItems());
+  const [showPlaidGuide, setShowPlaidGuide] = useState(false);
+
+  // Show Plaid guide on first visit if bank is connected but no transactions
+  useEffect(() => {
+    if (bankConnected && !hasBankDashboardData && !localStorage.getItem('oweable_plaid_guide_seen')) {
+      setShowPlaidGuide(true);
+      localStorage.setItem('oweable_plaid_guide_seen', 'true');
+    }
+  }, [bankConnected]);
+
+  const plaidGuideSteps: GuideStep[] = [
+    {
+      title: 'Sync Your Transactions',
+      description: 'Click "Sync now" in Settings to fetch your latest bank transactions from Plaid.',
+      action: {
+        label: 'Go to Settings',
+        onClick: () => window.location.href = '/pro/settings',
+      },
+    },
+    {
+      title: 'View All Transactions',
+      description: 'See your complete transaction history with categories and filters.',
+      action: {
+        label: 'View Transactions',
+        onClick: () => window.location.href = '/pro/transactions',
+      },
+    },
+  ];
 
   const liquidCash = useMemo(
     () => (assets || []).filter((asset) => asset?.type === 'Cash').reduce((sum, asset) => sum + (asset?.value || 0), 0),
@@ -633,7 +661,18 @@ export default function Dashboard() {
         </section>
 
         {shouldShowBankActivity && (
-          <section className="app-panel p-5">
+          <section className="app-panel p-5 relative">
+            {/* Plaid Sync Guide */}
+            {!hasBankDashboardData && (
+              <FeatureGuide
+                featureId="plaid-sync"
+                steps={plaidGuideSteps}
+                position="bottom"
+                autoShow={showPlaidGuide}
+                onDismiss={() => setShowPlaidGuide(false)}
+              />
+            )}
+            
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-content-tertiary">
