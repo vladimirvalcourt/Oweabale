@@ -87,6 +87,10 @@ function formatDate(date: Date | null): string {
 }
 
 function formatMoney(value: number): string {
+  // Defensive check for invalid numbers
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return '$0';
+  }
   // Use centralized currency formatter with dynamic decimal places
   return formatCurrency(value, {
     minimumFractionDigits: value % 1 === 0 ? 0 : 2,
@@ -95,6 +99,10 @@ function formatMoney(value: number): string {
 }
 
 function formatSignedMoney(value: number): string {
+  // Defensive check for invalid numbers
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return '$0';
+  }
   if (value === 0) return formatMoney(0);
   // Use centralized formatter with sign indicator
   return formatCurrencyWithSign(value, {
@@ -126,13 +134,17 @@ function summarizeBankTransactions(transactions: Transaction[], today: Date) {
     .filter((transaction) => transaction.type === 'expense')
     .reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
 
+  // Ensure all values are valid numbers (defensive against NaN)
+  const safeMonthIncome = Number.isFinite(monthIncome) ? monthIncome : 0;
+  const safeMonthExpenses = Number.isFinite(monthExpenses) ? monthExpenses : 0;
+
   return {
     bankTransactions,
     recentBankTransactions: bankTransactions.slice(0, 5),
     monthTransactionCount: monthTransactions.length,
-    monthIncome,
-    monthExpenses,
-    monthNet: monthIncome - monthExpenses,
+    monthIncome: safeMonthIncome,
+    monthExpenses: safeMonthExpenses,
+    monthNet: safeMonthIncome - safeMonthExpenses,
   };
 }
 
@@ -409,9 +421,13 @@ export default function Dashboard() {
 
   // Show Plaid guide on first visit if bank is connected but no transactions
   useEffect(() => {
-    if (bankConnected && !hasBankDashboardData && !localStorage.getItem('oweable_plaid_guide_seen')) {
-      setShowPlaidGuide(true);
-      localStorage.setItem('oweable_plaid_guide_seen', 'true');
+    try {
+      if (bankConnected && !localStorage.getItem('oweable_plaid_guide_seen')) {
+        setShowPlaidGuide(true);
+        localStorage.setItem('oweable_plaid_guide_seen', 'true');
+      }
+    } catch (error) {
+      console.warn('[Dashboard] Failed to check Plaid guide state:', error);
     }
   }, [bankConnected]);
 
