@@ -4,6 +4,8 @@
 
 ### 1. Core Components Created
 
+### 1. Core Components Created
+
 #### FeatureGuide Component (`src/components/common/FeatureGuide.tsx`)
 - Interactive multi-step tooltip system for contextual feature guidance
 - Supports positioning (top, bottom, left, right)
@@ -78,89 +80,38 @@
 - Guide steps defined as `GuideStep[]` array
 - Integrated into Dashboard's bank activity section with conditional rendering
 
-### 3. Component Exports
+### 3. Empty State Integration Across Pages
+
+#### Obligations Page (`src/pages/Obligations.tsx`)
+- Shows GuidedEmptyState when no bills, debts, or subscriptions exist
+- Clear CTA: "Add Bill" button opens QuickAdd modal
+- Secondary action links to support page for learning more
+- Helpful hint about bank auto-import functionality
+- Preserves full suite access messaging
+
+#### Calendar Page (`src/pages/Calendar.tsx`)
+- Replaces simple "No upcoming events" text with GuidedEmptyState
+- Primary action navigates to Obligations page to add bills
+- Secondary action provides link to view Pay List
+- Hint explains that connected banks auto-populate recurring payments
+- Uses CalendarDays icon for visual context
+
+#### Documents/Ingestion Page (`src/pages/Ingestion.tsx`)
+- Wraps existing drag-and-drop area with GuidedEmptyState
+- Maintains all drag-drop functionality while adding guidance
+- Primary action triggers file input click
+- Secondary action links to OCR documentation
+- Detailed hint about supported formats and file size limits
+- Explains OCR capabilities and limitations
+
+### 4. Component Exports
 - Both components exported from `src/components/common/index.ts`
 - TypeScript types exported for reuse
 - Proper barrel export pattern maintained
 
 ## 📋 Pending Implementation
 
-### 1. Obligations Page Empty States
-**File:** `src/pages/Obligations.tsx`
-
-Replace current empty state with `GuidedEmptyState`:
-```tsx
-if (allObligations.length === 0) {
-  return (
-    <AppPageShell>
-      <header className="mb-6">
-        <h1 className="text-2xl font-semibold text-content-primary">Pay List</h1>
-        <p className="mt-2 text-sm text-content-secondary">
-          Track bills, debts, subscriptions, tolls, tickets, and fines.
-        </p>
-      </header>
-
-      <GuidedEmptyState
-        icon={CreditCard}
-        title="No obligations yet"
-        description="Add your first bill, debt, or subscription to start tracking what needs paying."
-        primaryAction={{
-          label: 'Add Bill',
-          onClick: () => openQuickAdd('obligation'),
-          icon: Plus,
-        }}
-        secondaryAction={{
-          label: 'Learn about Pay List',
-          href: '/pro/app/support', // Link to FAQ tab
-        }}
-        hint="You can also connect your bank account to automatically import recurring bills."
-      />
-    </AppPageShell>
-  );
-}
-```
-
-### 2. Calendar Page Empty State
-**File:** `src/pages/Calendar.tsx`
-
-Add guided empty state when no obligations exist:
-```tsx
-<GuidedEmptyState
-  icon={Calendar}
-  title="No events scheduled"
-  description="Add bills, debts, or subscriptions to see them on your calendar."
-  primaryAction={{
-    label: 'Add Obligation',
-    onClick: () => openQuickAdd('obligation'),
-    icon: Plus,
-  }}
-  hint="Connected bank accounts will automatically populate recurring payments."
-/>
-```
-
-### 3. Documents Page Empty State
-**File:** `src/pages/Documents.tsx` (or wherever documents are managed)
-
-Add OCR upload guidance:
-```tsx
-<GuidedEmptyState
-  icon={Upload}
-  title="No documents uploaded"
-  description="Upload bills, receipts, or statements. Our OCR will extract and categorize the information."
-  primaryAction={{
-    label: 'Upload Document',
-    onClick: () => openUploadModal(),
-    icon: Upload,
-  }}
-  secondaryAction={{
-    label: 'How OCR works',
-    href: '/pro/app/support',
-  }}
-  hint="Supported formats: PDF, JPG, PNG. Max file size: 10MB."
-/>
-```
-
-### 4. First-Time User Walkthrough
+### 1. First-Time User Walkthrough
 **Status:** Component created but not integrated
 
 The `Walkthrough` component code was designed but not yet created as a file. To implement:
@@ -211,7 +162,7 @@ function AppRoutes() {
 <section data-tour="quick-stats">...</section>
 ```
 
-### 5. Help Center / FAQ Integration
+### 2. Help Center / FAQ Integration
 **File:** `src/pages/HelpDesk.tsx`
 
 The HelpDesk page exists but needs FAQ content added. Options:
@@ -228,7 +179,7 @@ Recommended approach (Option A):
   - Troubleshooting (Plaid issues, sync problems)
 - Use native `<details>` elements for expandable FAQs
 
-### 6. Additional Contextual Guides
+### 3. Additional Contextual Guides
 
 Consider adding guides for:
 
@@ -295,9 +246,9 @@ Consider adding analytics for:
 ## 🚀 Next Steps Priority
 
 1. **High Priority:**
-   - Add GuidedEmptyState to Obligations page
-   - Add GuidedEmptyState to Calendar page
-   - Add GuidedEmptyState to Documents page
+   - ~~Add GuidedEmptyState to Obligations page~~ ✅ DONE
+   - ~~Add GuidedEmptyState to Calendar page~~ ✅ DONE
+   - ~~Add GuidedEmptyState to Documents page~~ ✅ DONE
 
 2. **Medium Priority:**
    - Implement Walkthrough component and integrate
@@ -324,5 +275,5 @@ Consider adding analytics for:
 ---
 
 **Last Updated:** 2026-04-30  
-**Status:** Phase 1 Complete (Core Components + Dashboard Integration)  
-**Next Phase:** Empty State Integration Across All Pages
+**Status:** Phase 1 & 2 Complete (Core Components + Dashboard Integration + Empty States)  
+**Next Phase:** First-Time Walkthrough & FAQ Integration
