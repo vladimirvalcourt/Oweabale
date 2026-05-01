@@ -33,6 +33,5 @@ export * from './phoneInput';
 export * from './platform';
 export * from './platformTag';
 export * from './rechartsTooltip';
-export * from './sentry';
 export * from './timezones';
 export * from './webVitalsReporting';
