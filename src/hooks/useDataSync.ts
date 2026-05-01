@@ -56,6 +56,16 @@ export function useDataSync({
   const hadSessionRef = useRef(false);
   const lastFetchedUserIdRef = useRef<string | null>(null);
   const lastVisibilityFetchRef = useRef(0);
+  
+  // Store stable references to prevent infinite loops
+  const fetchDataRef = useRef(fetchData);
+  const clearLocalDataRef = useRef(clearLocalData);
+  
+  // Update refs when methods change
+  useEffect(() => {
+    fetchDataRef.current = fetchData;
+    clearLocalDataRef.current = clearLocalData;
+  }, [fetchData, clearLocalData]);
 
   useEffect(() => {
     if (authLoading) {
@@ -74,7 +84,7 @@ export function useDataSync({
       console.log('[useDataSync] Triggering fetchData for user:', authUserId);
       // Same-frame loading gate as fetchData (effect runs after paint; this minimizes the onboarding flash).
       useStore.setState({ isLoading: true });
-      void fetchData(authUserId);
+      void fetchDataRef.current(authUserId);
       return;
     }
 
@@ -82,9 +92,9 @@ export function useDataSync({
     lastFetchedUserIdRef.current = null;
     if (hadSessionRef.current) {
       hadSessionRef.current = false;
-      clearLocalData();
+      clearLocalDataRef.current();
     }
-  }, [authLoading, authUserId, fetchData, clearLocalData]);
+  }, [authLoading, authUserId]); // Removed fetchData and clearLocalData from deps
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -93,11 +103,11 @@ export function useDataSync({
         console.log('[useDataSync] User signed out, clearing data');
         hadSessionRef.current = false;
         lastFetchedUserIdRef.current = null;
-        clearLocalData();
+        clearLocalDataRef.current();
       }
     });
     return () => subscription.unsubscribe();
-  }, [clearLocalData]);
+  }, []); // Removed clearLocalData from deps
 
   useEffect(() => {
     if (authLoading || !authUserId) return;
@@ -108,10 +118,10 @@ export function useDataSync({
       if (now - lastVisibilityFetchRef.current < VISIBILITY_REFETCH_MS) return;
       lastVisibilityFetchRef.current = now;
       dataSyncDevLog('[useDataSync] visibility refetch for user:', authUserId);
-      void fetchData(authUserId, { background: true });
+      void fetchDataRef.current(authUserId, { background: true });
     };
 
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);
-  }, [authLoading, authUserId, fetchData]);
+  }, [authLoading, authUserId]); // Removed fetchData from deps
 }
