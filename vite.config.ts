@@ -44,9 +44,9 @@ export default defineConfig(({ mode }) => {
     ? [
       "default-src 'self'",
       "script-src 'self' 'wasm-unsafe-eval'",
-      "style-src 'self' 'unsafe-inline'", // Tailwind injects styles at runtime
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // Tailwind injects styles at runtime + Google Fonts
       "img-src 'self' data: https:",
-      "font-src 'self' data:",
+      "font-src 'self' data: https://fonts.gstatic.com",
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com",
       "worker-src 'self' blob:",
       "frame-src https://*.supabase.co",
@@ -57,9 +57,9 @@ export default defineConfig(({ mode }) => {
     : [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'", // HMR requires unsafe-inline
-      "style-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: https:",
-      "font-src 'self' data:",
+      "font-src 'self' data: https://fonts.gstatic.com",
       "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com",
       "worker-src 'self' blob:",
       "frame-src https://*.supabase.co",
