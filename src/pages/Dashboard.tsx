@@ -676,8 +676,11 @@ export default function Dashboard() {
               </ul>
             ) : (
               <div className="mt-4 border border-surface-border bg-surface-base p-4">
-                <p className="text-sm text-content-secondary">
-                  Use Sync now in Settings if this stays empty after Plaid finishes loading transaction history.
+                <p className="text-sm text-content-secondary mb-2">
+                  Plaid is connected but transactions haven't been synced yet.
+                </p>
+                <p className="text-xs text-content-tertiary">
+                  Go to Settings → Bank Connection and click "Sync now" to fetch your latest transactions from Plaid.
                 </p>
               </div>
             )}

@@ -27,12 +27,15 @@ export const createPlaidSlice: StoreSlice<
   },
 
   syncPlaidTransactions: async (opts?: { quiet?: boolean }) => {
+    console.log('[Plaid Sync] Starting transaction sync...');
     const result = await invokePlaidSync();
     if ('error' in result) {
       console.error('[Plaid Sync] Error:', result.error);
       if (!opts?.quiet) toast.error(result.error);
       return false;
     }
+
+    console.log('[Plaid Sync] Sync completed, polling for data changes...', result);
 
     // Enhanced polling for data changes to ensure Edge Function DB writes are fully committed
     // before we consider the sync complete. Prevents race conditions where
