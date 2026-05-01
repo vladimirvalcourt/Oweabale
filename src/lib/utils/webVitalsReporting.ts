@@ -1,21 +1,17 @@
 /**
  * Real-user INP (Interaction to Next Paint) with web-vitals attribution.
- * Sends actionable context to Sentry when interactions are slow — see
+ * Logs slow interactions to console in development mode.
  * https://web.dev/articles/inp
  */
-import * as Sentry from '@sentry/react';
 import { onINP } from 'web-vitals/attribution';
-import type { INPAttribution, INPMetricWithAttribution } from 'web-vitals';
-
-const sentryDsn =
-  typeof import.meta.env.VITE_SENTRY_DSN === 'string' ? import.meta.env.VITE_SENTRY_DSN.trim() : '';
+import type { INPMetricWithAttribution } from 'web-vitals';
 
 const reportAll =
   import.meta.env.DEV ||
   import.meta.env.VITE_WEB_VITALS_VERBOSE === 'true' ||
   import.meta.env.VITE_WEB_VITALS_VERBOSE === '1';
 
-function summarizeLoafEntries(entries: INPAttribution['longAnimationFrameEntries']) {
+function summarizeLoafEntries(entries: INPMetricWithAttribution['attribution']['longAnimationFrameEntries']) {
   if (!entries?.length) return { count: 0, samples: [] as { startTime: number; duration: number }[] };
   const samples = entries.slice(0, 3).map((e) => ({
     startTime: e.startTime,
@@ -43,43 +39,16 @@ function inpPayload(metric: INPMetricWithAttribution) {
   };
 }
 
-function shouldSendToSentry(metric: INPMetricWithAttribution): boolean {
-  if (!sentryDsn) return false;
-  if (reportAll) return true;
-  return metric.rating !== 'good';
-}
-
-function reportInpToSentry(metric: INPMetricWithAttribution) {
-  const data = inpPayload(metric);
-  const level =
-    metric.rating === 'poor' ? 'warning' : metric.rating === 'needs-improvement' ? 'info' : 'info';
-
-  Sentry.captureMessage(`INP ${data.value_ms}ms (${metric.rating})`, {
-    level,
-    tags: {
-      web_vital: 'INP',
-      inp_rating: metric.rating,
-      path: data.path || 'unknown',
-    },
-    contexts: {
-      web_vitals_inp: data as Record<string, unknown>,
-    },
-    fingerprint: ['web-vitals-inp', data.interaction_target || 'unknown', data.path || ''],
-  });
-}
-
 /**
- * Subscribe to INP; safe to call once after Sentry `init` (see `instrument.ts`).
+ * Subscribe to INP performance metric.
+ * Logs slow interactions to console in development.
  */
 export function initWebVitalsReporting(): void {
   if (typeof window === 'undefined') return;
 
   onINP((metric) => {
-    if (import.meta.env.DEV && metric.rating !== 'good') {
+    if ((import.meta.env.DEV || reportAll) && metric.rating !== 'good') {
       console.warn('[web-vitals] Slow INP', inpPayload(metric));
-    }
-    if (shouldSendToSentry(metric)) {
-      reportInpToSentry(metric);
     }
   });
 }
