@@ -5,6 +5,7 @@ import { TransitionLink } from '@/components/common';
 import ExitIntentModal from '@/components/common/ExitIntentModal';
 import { useAuth, useSEO, trackEvent } from '@/hooks';
 import { SITE_CONFIG } from '@/config/site';
+import { format, addDays } from 'date-fns';
 import gsap from 'gsap';
 
 const proofPoints = ['Bills', 'Debt', 'Subscriptions', 'Tolls', 'Tickets', 'Taxes'];
@@ -40,12 +41,18 @@ const featureRows = [
   },
 ];
 
-const payListRows = [
-  { label: 'Rent', due: 'Apr 30', state: 'Ready', amount: '$1,842.00' },
-  { label: 'Student loan', due: 'May 02', state: 'Next', amount: '$318.44' },
-  { label: 'Car insurance', due: 'May 06', state: 'Watch', amount: '$186.17' },
-  { label: 'Toll notice', due: 'May 09', state: 'New', amount: '$47.20' },
-];
+// Generate dynamic demo dates relative to current date
+const generatePayListDemoData = () => {
+  const today = new Date();
+  return [
+    { label: 'Rent', due: format(today, 'MMM dd'), state: 'Ready', amount: '$1,842.00' },
+    { label: 'Student loan', due: format(addDays(today, 2), 'MMM dd'), state: 'Next', amount: '$318.44' },
+    { label: 'Car insurance', due: format(addDays(today, 6), 'MMM dd'), state: 'Watch', amount: '$186.17' },
+    { label: 'Toll notice', due: format(addDays(today, 9), 'MMM dd'), state: 'New', amount: '$47.20' },
+  ];
+};
+
+const payListRows = generatePayListDemoData();
 
 const activityRows = [
   {
