@@ -291,7 +291,6 @@ export interface AppState {
   clientInvoices: ClientInvoice[];
   notifications: Notification[];
   pendingIngestions: PendingIngestion[];
-  categorizationRules: CategorizationRule[];
   categorizationExclusions: CategorizationExclusion[];
   adminBroadcasts: AdminBroadcast[];
   platformSettings: PlatformSettings | null;
@@ -321,17 +320,9 @@ export interface AppState {
     factors: CreditFactor[];
     fixes: CreditFix[];
   };
-  investmentAccounts: InvestmentAccount[];
-  insurancePolicies: InsurancePolicy[];
   currentHousehold: Household | null;
   householdMembers: HouseholdMember[];
   userRole: UserRole | null;
-  addInvestmentAccount: (account: Omit<InvestmentAccount, 'id' | 'lastUpdated'>) => Promise<boolean>;
-  editInvestmentAccount: (id: string, updates: Partial<InvestmentAccount>) => Promise<boolean>;
-  deleteInvestmentAccount: (id: string) => Promise<boolean>;
-  addInsurancePolicy: (policy: Omit<InsurancePolicy, 'id'>) => Promise<boolean>;
-  editInsurancePolicy: (id: string, updates: Partial<InsurancePolicy>) => Promise<boolean>;
-  deleteInsurancePolicy: (id: string) => Promise<boolean>;
   setTaxSettings: (state: string, rate: number) => void;
   bankConnected: boolean;
   plaidInstitutionName: string | null;

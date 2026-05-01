@@ -174,9 +174,6 @@ export function buildNavGroups({
     { name: 'Goals', path: '/pro/goals', icon: Target, lazyImport: () => import('../../pages/Goals') },
     { name: 'Savings', path: '/pro/savings', icon: Wallet, lazyImport: () => import('../../pages/Savings') },
     { name: 'Net worth', path: '/pro/net-worth', icon: TrendingUp, lazyImport: () => import('../../pages/NetWorth') },
-    { name: 'Investments', path: '/pro/investments', icon: BarChart3, lazyImport: () => import('../../pages/Investments') },
-    { name: 'Insurance', path: '/pro/insurance', icon: ShieldCheck, lazyImport: () => import('../../pages/Insurance') },
-    { name: 'Credit center', path: '/pro/credit', icon: Landmark, lazyImport: () => import('../../pages/CreditCenter') },
   ];
 
   const insightNavItems: NavItem[] = [

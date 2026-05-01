@@ -25,8 +25,6 @@ const Freelance = lazy(() => import('./pages/Freelance'));
 const Goals = lazy(() => import('./pages/Goals'));
 const Savings = lazy(() => import('./pages/Savings'));
 const Income = lazy(() => import('./pages/Income'));
-const Investments = lazy(() => import('./pages/Investments'));
-const Insurance = lazy(() => import('./pages/Insurance'));
 const Budgets = lazy(() => import('./pages/Budgets'));
 const NetWorth = lazy(() => import('./pages/NetWorth'));
 const Calendar = lazy(() => import('./pages/Calendar'));
@@ -54,7 +52,6 @@ import CrispChat from './components/common/CrispChat';
 
 const Changelog = lazy(() => import('./pages/Changelog'));
 const Analytics = lazy(() => import('./pages/Analytics'));
-const CreditCenter = lazy(() => import('./pages/CreditCenter'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const SAASLandingDemo = lazy(() => import('./pages/SAASLandingDemo'));
 
@@ -149,9 +146,6 @@ function AppRoutes() {
             <Route path="pro/subscriptions" element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Subscriptions /></Suspense></ErrorBoundary>} />
             <Route path="pro/reports" element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><Reports /></Suspense></ErrorBoundary>} />
             <Route path="pro/analytics" element={<ErrorBoundary><Suspense fallback={<DashboardSkeleton />}><Analytics /></Suspense></ErrorBoundary>} />
-            <Route path="pro/investments" element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Investments /></Suspense></ErrorBoundary>} />
-            <Route path="pro/insurance" element={<ErrorBoundary><Suspense fallback={<ListSkeleton rows={6} />}><Insurance /></Suspense></ErrorBoundary>} />
-            <Route path="pro/credit" element={<ErrorBoundary><CreditCenter /></ErrorBoundary>} />
             <Route path="pro/app/support" element={<ErrorBoundary><HelpDesk /></ErrorBoundary>} />
             <Route path="pro/changelog" element={<ErrorBoundary><Changelog /></ErrorBoundary>} />
             <Route
@@ -193,9 +187,6 @@ function AppRoutes() {
               <Route path="subscriptions" element={<PlanAwareRedirect pro="/pro/subscriptions" />} />
               <Route path="reports" element={<PlanAwareRedirect pro="/pro/reports" />} />
               <Route path="analytics" element={<PlanAwareRedirect pro="/pro/analytics" />} />
-              <Route path="investments" element={<PlanAwareRedirect pro="/pro/investments" />} />
-              <Route path="insurance" element={<PlanAwareRedirect pro="/pro/insurance" />} />
-              <Route path="credit" element={<PlanAwareRedirect pro="/pro/credit" />} />
               <Route path="settings" element={<PlanAwareRedirect pro="/pro/settings" />} />
               <Route path="app/support" element={<PlanAwareRedirect pro="/pro/app/support" />} />
               <Route path="changelog" element={<PlanAwareRedirect pro="/pro/changelog" />} />

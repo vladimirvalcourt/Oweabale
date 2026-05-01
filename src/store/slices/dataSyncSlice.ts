@@ -127,15 +127,11 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         supabase.from('mileage_log').select('*').eq('user_id', resolvedUserId).order('trip_date', { ascending: false }),
         supabase.from('client_invoices').select('*').eq('user_id', resolvedUserId).order('due_date', { ascending: false }),
         supabase.from('pending_ingestions').select('*').eq('user_id', resolvedUserId),
-        supabase.from('categorization_rules').select('*').eq('user_id', resolvedUserId).order('priority', { ascending: false }).order('created_at', { ascending: false }),
         supabase.from('categorization_exclusions').select('*').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
         supabase.from('credit_fixes').select('*').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
         supabase.from('admin_broadcasts').select('*').order('created_at', { ascending: false }).limit(10),
         supabase.from('platform_settings').select('*').order('created_at', { ascending: true }).limit(1).maybeSingle(),
         supabase.from('net_worth_snapshots').select('*').eq('user_id', resolvedUserId).order('date', { ascending: true }).limit(90),
-        supabase.from('credit_factors').select('*').eq('user_id', resolvedUserId),
-        supabase.from('investment_accounts').select('id,name,type,institution,balance,notes,last_updated').eq('user_id', resolvedUserId),
-        supabase.from('insurance_policies').select('id,type,provider,premium,frequency,coverage_amount,deductible,expiration_date,status,notes').eq('user_id', resolvedUserId),
       ]);
 
       try {
@@ -365,15 +361,11 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
             { data: mileageLogRows },
             { data: clientInvoicesRows },
             { data: pendingIngestions },
-            { data: categorizationRules },
             { data: categorizationExclusions },
             { data: creditFixes },
             { data: adminBroadcasts },
             { data: platformSettings },
             { data: netWorthSnapshots },
-            { data: creditFactors },
-            { data: investmentAccountsData },
-            { data: insurancePoliciesData },
           ] = await phase2Promise;
           console.timeEnd('[fetchData] Phase 2 queries');
           console.log('[fetchData] Phase 2 complete - goals:', goals?.length, 'citations:', citations?.length);
@@ -471,13 +463,6 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
               storagePath: (pending.storage_path ?? undefined) as string | undefined,
               storageUrl: (pending.storage_url ?? undefined) as string | undefined,
             })),
-            categorizationRules: (categorizationRules || []).map((rule: Record<string, unknown>) => ({
-              id: rule.id as string,
-              match_type: rule.match_type as CategorizationRule['match_type'],
-              match_value: rule.match_value as string,
-              category: rule.category as string,
-              priority: rule.priority as number,
-            })),
             categorizationExclusions: (categorizationExclusions || []).map((exclusion: Record<string, unknown>) => ({
               id: exclusion.id as string,
               scope: exclusion.scope as CategorizationExclusion['scope'],
@@ -493,13 +478,6 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
                 status: fix.status as CreditFix['status'],
                 bureau: fix.bureau as string,
                 notes: (fix.notes ?? '') as string,
-              })),
-              factors: (creditFactors || []).map((factor: Record<string, unknown>) => ({
-                id: factor.id as string,
-                name: factor.name as string,
-                impact: factor.impact as 'high' | 'medium' | 'low',
-                status: factor.status as 'excellent' | 'good' | 'fair' | 'poor',
-                description: factor.description as string,
               })),
             },
             adminBroadcasts: (adminBroadcasts || []).map((broadcast: Record<string, unknown>) => ({
@@ -526,27 +504,6 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
               assets: snapshot.assets as number,
               debts: snapshot.debts as number,
             })),
-            investmentAccounts: (investmentAccountsData ?? []).map((account: Record<string, unknown>) => ({
-              id: account.id as string,
-              name: account.name as string,
-              type: account.type as InvestmentAccount['type'],
-              institution: (account.institution as string) ?? '',
-              balance: Number(account.balance) || 0,
-              notes: (account.notes as string) ?? '',
-              lastUpdated: (account.last_updated as string) ?? '',
-            })),
-            insurancePolicies: (insurancePoliciesData ?? []).map((policy: Record<string, unknown>) => ({
-              id: policy.id as string,
-              type: policy.type as InsurancePolicy['type'],
-              provider: policy.provider as string,
-              premium: Number(policy.premium) || 0,
-              frequency: (policy.frequency as string) ?? 'Monthly',
-              coverageAmount: policy.coverage_amount != null ? Number(policy.coverage_amount) : undefined,
-              deductible: policy.deductible != null ? Number(policy.deductible) : undefined,
-              expirationDate: (policy.expiration_date as string) ?? undefined,
-              status: (policy.status as InsurancePolicy['status']) ?? 'active',
-              notes: (policy.notes as string) ?? '',
-            })),
           });
 
           phase2RecordCount =
@@ -559,10 +516,8 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
             (mileageLogRows?.length ?? 0) +
             (clientInvoicesRows?.length ?? 0) +
             (pendingIngestions?.length ?? 0) +
-            (categorizationRules?.length ?? 0) +
             (creditFixes?.length ?? 0) +
             (netWorthSnapshots?.length ?? 0) +
-            (creditFactors?.length ?? 0) +
             (adminBroadcasts?.length ?? 0);
         } catch (phase2Error) {
           console.error('[fetchData] phase 2 hydration failed:', phase2Error);

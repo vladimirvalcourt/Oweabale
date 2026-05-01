@@ -36,7 +36,6 @@ export const initialData: Pick<
   | 'lastBudgetGuardrail'
   | 'pendingIngestions'
   | 'notifications'
-  | 'categorizationRules'
   | 'categorizationExclusions'
   | 'adminBroadcasts'
   | 'platformSettings'
@@ -44,8 +43,6 @@ export const initialData: Pick<
   | 'lastAutoCategorization'
   | 'netWorthSnapshots'
   | 'credit'
-  | 'investmentAccounts'
-  | 'insurancePolicies'
   | 'currentHousehold'
   | 'householdMembers'
   | 'userRole'
@@ -93,7 +90,6 @@ export const initialData: Pick<
   lastBudgetGuardrail: null,
   pendingIngestions: [],
   notifications: [],
-  categorizationRules: [],
   categorizationExclusions: [],
   adminBroadcasts: [],
   platformSettings: null,
@@ -106,8 +102,6 @@ export const initialData: Pick<
     factors: [],
     fixes: [],
   },
-  investmentAccounts: [],
-  insurancePolicies: [],
   currentHousehold: null,
   householdMembers: [],
   userRole: null,
