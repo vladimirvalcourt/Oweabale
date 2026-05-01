@@ -10,10 +10,11 @@ import { getCustomIcon } from '@/lib/utils/customIcons';
 function SecurityPanelInner() {
   const SecurityIcon = getCustomIcon('security');
   const userEmail = useStore((s) => s.user.email);
+  const isAdmin = useStore((s) => s.user.isAdmin);
   const [mfaEnabled, setMfaEnabled] = useState<boolean | null>(null);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [hasEmailPassword, setHasEmailPassword] = useState<boolean | null>(null);
-  
+
   // MFA Enrollment State
   const [showMfaSetup, setShowMfaSetup] = useState(false);
   const [mfaQrCode, setMfaQrCode] = useState<string | null>(null);
@@ -42,18 +43,18 @@ function SecurityPanelInner() {
   const startMfaEnrollment = async () => {
     try {
       setIsEnrollingMfa(true);
-      
+
       // Step 1: Enroll a new TOTP factor
       const { data, error } = await supabase.auth.mfa.enroll({
         factorType: 'totp',
       });
-      
+
       if (error) {
         console.error('MFA enrollment error:', error);
         toast.error('Failed to start MFA setup. Please try again.');
         return;
       }
-      
+
       // Step 2: Show QR code and secret
       setMfaQrCode(data.totp.qr_code);
       setMfaSecret(data.totp.secret);
@@ -72,22 +73,22 @@ function SecurityPanelInner() {
       toast.error('Please enter a valid 6-digit code');
       return;
     }
-    
+
     try {
       setIsEnrollingMfa(true);
-      
+
       // Verify the TOTP code
       const { data, error } = await supabase.auth.mfa.challengeAndVerify({
         factorId: mfaFactorId!,
         code: mfaVerifyCode,
       });
-      
+
       if (error) {
         console.error('MFA verification error:', error);
         toast.error('Invalid code. Please check your authenticator app and try again.');
         return;
       }
-      
+
       // Success!
       toast.success('Two-factor authentication enabled successfully!');
       setMfaEnabled(true);
@@ -287,14 +288,14 @@ function SecurityPanelInner() {
               <p className="text-xs text-content-secondary mb-4">
                 Scan the QR code below with your authenticator app (Google Authenticator, Authy, 1Password, etc.)
               </p>
-              
+
               {/* QR Code Display */}
               <div className="flex justify-center mb-4">
                 <div className="bg-white p-4 rounded-lg inline-block">
                   <img src={mfaQrCode} alt="MFA QR Code" className="w-48 h-48" />
                 </div>
               </div>
-              
+
               {/* Manual Entry Option */}
               <div className="mb-4">
                 <p className="text-xs text-content-tertiary mb-2">Can't scan? Enter this code manually:</p>
@@ -315,7 +316,7 @@ function SecurityPanelInner() {
                   </button>
                 </div>
               </div>
-              
+
               {/* Verification Code Input */}
               <div className="space-y-3">
                 <label className="block text-xs font-medium text-content-secondary">
@@ -359,9 +360,11 @@ function SecurityPanelInner() {
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-content-primary">Authenticator 2FA is enabled</p>
               <p className="mt-1 text-sm text-content-tertiary">Your account uses a verified authenticator factor.</p>
-              <p className="mt-2 text-xs text-[var(--color-status-emerald-text)] font-medium">
-                ✓ Admin panel access granted
-              </p>
+              {isAdmin && (
+                <p className="mt-2 text-xs text-[var(--color-status-emerald-text)] font-medium">
+                  ✓ Admin panel access granted
+                </p>
+              )}
             </div>
           </div>
         ) : (
@@ -383,7 +386,7 @@ function SecurityPanelInner() {
                 )}
               </div>
             </div>
-            
+
             <button
               type="button"
               onClick={() => void startMfaEnrollment()}
@@ -402,7 +405,7 @@ function SecurityPanelInner() {
                 </>
               )}
             </button>
-            
+
             <div className="rounded-lg border border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] p-3">
               <p className="text-xs text-[var(--color-status-amber-text)]">
                 <strong>Important:</strong> After enabling 2FA, you'll need to enter a code from your authenticator app each time you sign in. This is required for admin panel access.
