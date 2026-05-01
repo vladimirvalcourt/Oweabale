@@ -22,6 +22,7 @@ import { TransitionLink } from '@/components/common';
 import { computeSafeToSpend, calcMonthlyCashFlow } from '@/lib/api/services/finance';
 import { useStore, type Bill, type Citation, type Debt, type Subscription, type Transaction } from '@/store';
 import { StatusBadge, StatusIcon, MetricCard, QuickActionCard, DashboardButton } from '@/components/dashboard';
+import { formatCurrency, formatCurrencyWithSign } from '@/lib/utils/formatCurrency';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const PAY_LIST_SNOOZE_KEY = 'oweable_pay_list_snoozed_v1';
@@ -86,17 +87,20 @@ function formatDate(date: Date | null): string {
 }
 
 function formatMoney(value: number): string {
-  return value.toLocaleString(undefined, {
-    style: 'currency',
-    currency: 'USD',
+  // Use centralized currency formatter with dynamic decimal places
+  return formatCurrency(value, {
+    minimumFractionDigits: value % 1 === 0 ? 0 : 2,
     maximumFractionDigits: value % 1 === 0 ? 0 : 2,
   });
 }
 
 function formatSignedMoney(value: number): string {
   if (value === 0) return formatMoney(0);
-  const prefix = value > 0 ? '+' : '-';
-  return `${prefix}${formatMoney(Math.abs(value))}`;
+  // Use centralized formatter with sign indicator
+  return formatCurrencyWithSign(value, {
+    minimumFractionDigits: Math.abs(value) % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: Math.abs(value) % 1 === 0 ? 0 : 2,
+  });
 }
 
 function isSameMonth(dateValue: string, today: Date): boolean {

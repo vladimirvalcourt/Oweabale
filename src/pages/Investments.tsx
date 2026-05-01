@@ -18,6 +18,7 @@ import { Dialog } from '@headlessui/react';
 import { yieldForPaint } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 import { TransitionLink } from '@/components/common';
+import { formatCurrency, formatCurrencyWithSign } from '@/lib/utils/formatCurrency';
 
 const TYPE_LABELS: Record<InvestmentAccount['type'], string> = {
   brokerage: 'Brokerage',
@@ -50,16 +51,19 @@ const EMPTY_FORM = {
 type FormState = typeof EMPTY_FORM;
 
 function formatMoney(n: number, opts?: { maximumFractionDigits?: number }) {
-  return n.toLocaleString('en-US', {
+  // Use centralized currency formatter
+  return formatCurrency(n, {
     minimumFractionDigits: 0,
     maximumFractionDigits: opts?.maximumFractionDigits ?? 0,
   });
 }
 
 function formatSignedMoney(n: number) {
-  const sign = n > 0 ? '+' : n < 0 ? '−' : '';
-  const abs = Math.abs(n);
-  return `${sign}$${formatMoney(abs)}`;
+  // Use centralized formatter with sign indicator
+  return formatCurrencyWithSign(n, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
 }
 
 function formatRelativeTime(iso: string) {
