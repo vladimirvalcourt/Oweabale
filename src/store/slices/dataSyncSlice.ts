@@ -159,6 +159,23 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         console.timeEnd('[fetchData] Phase 1 queries');
         console.log('[fetchData] Phase 1 complete - bills:', bills?.length, 'debts:', debts?.length, 'transactions:', transactionsPage?.length);
 
+        // Check for critical RLS errors (500 status codes indicate policy failures)
+        const criticalErrors = [
+          { name: 'Bills', error: billsError },
+          { name: 'Debts', error: debtsError },
+          { name: 'Transactions', error: transactionsError },
+          { name: 'Assets', error: assetsError },
+          { name: 'Incomes', error: incomesError },
+          { name: 'Subscriptions', error: subscriptionsError },
+        ].filter(item => item.error && (item.error as any).code === '42501' || (item.error as any).status === 500);
+
+        if (criticalErrors.length > 0) {
+          console.error('[fetchData] CRITICAL RLS ERRORS DETECTED:', criticalErrors);
+          const tableNames = criticalErrors.map(e => e.name).join(', ');
+          toast.error(`Database access error for: ${tableNames}. Please contact support.`);
+          // Don't return early - continue with empty arrays to avoid white screen
+        }
+
         // Debug logging for Plaid sync troubleshooting
         console.log('[fetchData] Transactions fetched:', transactionsPage?.length || 0);
         console.log('[fetchData] Plaid accounts fetched:', plaidAccountsRows?.length || 0);

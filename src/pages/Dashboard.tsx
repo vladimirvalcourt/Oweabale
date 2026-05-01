@@ -460,7 +460,10 @@ export default function Dashboard() {
   ];
 
   const liquidCash = useMemo(
-    () => safeAssets.filter((asset) => asset?.type === 'Cash').reduce((sum, asset) => sum + (asset?.value || 0), 0),
+    () => {
+      if (!Array.isArray(safeAssets)) return 0;
+      return safeAssets.filter((asset) => asset?.type === 'Cash').reduce((sum, asset) => sum + (asset?.value || 0), 0);
+    },
     [safeAssets],
   );
   const cashFlow = useMemo(
