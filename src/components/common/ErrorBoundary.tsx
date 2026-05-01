@@ -74,6 +74,32 @@ export class ErrorBoundary extends Component<Props, State> {
         );
       }
 
+      // Production: Auto-recover after showing brief message
+      // Development: Show full error details for debugging
+      if (!import.meta.env.DEV) {
+        // In production, attempt automatic recovery
+        setTimeout(() => {
+          this.handleReset();
+          window.location.reload();
+        }, 2000);
+
+        return (
+          <div className="min-h-[400px] flex items-center justify-center p-8">
+            <div className="max-w-md w-full text-center">
+              <div className="flex justify-center mb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-elevated">
+                  <RefreshCw className="h-5 w-5 text-content-muted animate-spin" />
+                </div>
+              </div>
+              <p className="text-sm text-content-secondary">
+                Recovering...
+              </p>
+            </div>
+          </div>
+        );
+      }
+
+      // Development mode - show full error details
       return (
         <div className="min-h-[400px] flex items-center justify-center p-8">
           <div className="relative max-w-md w-full border border-[var(--color-status-rose-border)] bg-surface-base p-8 text-center">
@@ -88,27 +114,25 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
 
             <h2 className="mb-2 text-[11px] font-mono font-bold uppercase tracking-[0.3em] text-[var(--color-status-rose-text)]">
-              {import.meta.env.DEV ? 'Render fault detected' : 'Something went wrong'}
+              Render fault detected
             </h2>
             <p className="text-sm text-content-tertiary mb-3 leading-relaxed">
-              {import.meta.env.DEV
-                ? 'This screen crashed while rendering. Technical details are below for debugging.'
-                : 'This screen hit an unexpected problem. Try again, or refresh the page. If it keeps happening, contact support.'}
+              This screen crashed while rendering. Technical details are below for debugging.
             </p>
 
-            {import.meta.env.DEV && this.state.error && (
+            {this.state.error && (
               <pre className="mb-3 max-h-28 overflow-auto border border-surface-border bg-surface-elevated p-3 text-left text-[9px] font-mono text-[var(--color-status-amber-text)] text-wrap break-words">
                 {this.state.error.message}
               </pre>
             )}
 
-            {import.meta.env.DEV && this.state.errorInfo && (
+            {this.state.errorInfo && (
               <pre className="text-left text-[8px] font-mono text-content-muted bg-black/30 border border-surface-border/80 p-3 mb-4 overflow-auto max-h-24 text-wrap opacity-90">
                 {this.state.errorInfo}
               </pre>
             )}
 
-            {import.meta.env.DEV && this.state.error && (
+            {this.state.error && (
               <button
                 type="button"
                 onClick={() => {
