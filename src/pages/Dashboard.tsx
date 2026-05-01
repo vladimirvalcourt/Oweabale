@@ -105,8 +105,9 @@ function isSameMonth(dateValue: string, today: Date): boolean {
 }
 
 function summarizeBankTransactions(transactions: Transaction[], today: Date) {
-  const bankTransactions = transactions
-    .filter((transaction) => !!transaction.plaidAccountId)
+  const safeTransactions = Array.isArray(transactions) ? transactions : [];
+  const bankTransactions = safeTransactions
+    .filter((transaction) => !!transaction.plaidAccountId && transaction.date && typeof transaction.amount === 'number')
     .sort((a, b) => {
       const bTime = parseLocalDate(b.date)?.getTime() ?? 0;
       const aTime = parseLocalDate(a.date)?.getTime() ?? 0;
@@ -116,10 +117,10 @@ function summarizeBankTransactions(transactions: Transaction[], today: Date) {
 
   const monthIncome = monthTransactions
     .filter((transaction) => transaction.type === 'income')
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
+    .reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
   const monthExpenses = monthTransactions
     .filter((transaction) => transaction.type === 'expense')
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
+    .reduce((sum, transaction) => sum + (transaction.amount || 0), 0);
 
   return {
     bankTransactions,
@@ -659,16 +660,16 @@ export default function Dashboard() {
 
             {hasBankDashboardData ? (
               <ul className="mt-4 divide-y divide-surface-border">
-                {bankSummary.recentBankTransactions.map((transaction) => (
+                {Array.isArray(bankSummary.recentBankTransactions) && bankSummary.recentBankTransactions.map((transaction) => (
                   <li key={transaction.id} className="flex items-center justify-between gap-4 py-3">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-content-primary">{transaction.name}</p>
+                      <p className="truncate text-sm font-medium text-content-primary">{transaction.name || 'Transaction'}</p>
                       <p className="mt-1 text-xs text-content-secondary">
                         {formatDate(parseLocalDate(transaction.date))} · {transaction.category || 'Uncategorized'}
                       </p>
                     </div>
                     <p className={`shrink-0 font-mono text-sm font-semibold tabular-nums ${transaction.type === 'income' ? 'text-brand-profit' : 'text-content-primary'}`}>
-                      {transaction.type === 'income' ? '+' : '-'}{formatMoney(transaction.amount)}
+                      {transaction.type === 'income' ? '+' : '-'}{formatMoney(transaction.amount || 0)}
                     </p>
                   </li>
                 ))}

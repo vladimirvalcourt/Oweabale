@@ -142,24 +142,27 @@ export default function Subscriptions() {
     toast.success('Subscription deleted');
   };
 
-  const activeSubscriptions = subscriptions.filter(s => s.status === 'active');
+  const safeSubscriptions = Array.isArray(subscriptions) ? subscriptions : [];
+  const safeTransactions = Array.isArray(transactions) ? transactions : [];
+
+  const activeSubscriptions = safeSubscriptions.filter(s => s.status === 'active');
   const monthlyCost = activeSubscriptions.reduce(
-    (acc, sub) => acc + normalizeToMonthly(sub.amount, sub.frequency),
+    (acc, sub) => acc + normalizeToMonthly(sub.amount || 0, sub.frequency),
     0
   );
 
   const subscriptionCandidates = useMemo(() => {
-    const existing = new Set(subscriptions.map((s) => s.name.trim().toLowerCase()));
-    return detectSubscriptionCandidates(transactions, existing);
-  }, [transactions, subscriptions]);
+    const existing = new Set(safeSubscriptions.map((s) => (s.name || '').trim().toLowerCase()));
+    return detectSubscriptionCandidates(safeTransactions, existing);
+  }, [safeTransactions, safeSubscriptions]);
 
   const unusedSubs = useMemo(() =>
-    detectUnusedSubscriptions(subscriptions, transactions),
-    [subscriptions, transactions]
+    detectUnusedSubscriptions(safeSubscriptions, safeTransactions),
+    [safeSubscriptions, safeTransactions]
   );
 
   // Price hike detector
-  const hikedSubs = subscriptions.filter(sub => {
+  const hikedSubs = safeSubscriptions.filter(sub => {
     const hist = sub.priceHistory;
     if (!hist || hist.length < 2) return false;
     const sorted = [...hist].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -175,7 +178,7 @@ export default function Subscriptions() {
     if (curr <= prev) return null;
     return { prev, curr, pct: (((curr - prev) / prev) * 100).toFixed(0) };
   };
-  const cancellationQueue = subscriptions.filter((sub) => cancellationReviewIds.includes(sub.id));
+  const cancellationQueue = safeSubscriptions.filter((sub) => cancellationReviewIds.includes(sub.id));
 
   const detectedAmountChanges = useMemo(() => {
     const changes = new Map<string, { previous: number; detected: number; pct: number; txDate: string }>();
@@ -533,7 +536,7 @@ export default function Subscriptions() {
       ) : (
         <CollapsibleModule title="Your subscriptions" icon={SubscriptionsIcon}>
           <ul className="divide-y divide-surface-highlight -mx-6 -my-6">
-            {subscriptions.map((sub) => (
+            {safeSubscriptions.map((sub) => (
               <li
                 key={sub.id}
                 className="p-4 sm:px-6 hover:bg-surface-elevated transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4"
@@ -560,8 +563,8 @@ export default function Subscriptions() {
                           </h4>
                           <div className="flex items-center gap-2 mt-1">
                             <span className={`inline-flex items-center text-xs font-sans font-medium ${sub.status === 'active' ? 'text-emerald-400' :
-                                sub.status === 'paused' ? 'text-amber-400' :
-                                  'text-content-tertiary'
+                              sub.status === 'paused' ? 'text-amber-400' :
+                                'text-content-tertiary'
                               }`}>
                               {sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
                             </span>

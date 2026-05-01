@@ -34,12 +34,16 @@ export default function Savings() {
   const [savingAccountId, setSavingAccountId] = useState<string | null>(null);
 
   const trackedPlaidIds = useMemo(
-    () => new Set(plaidAccounts.filter((a) => a.includeInSavings).map((a) => a.plaidAccountId)),
+    () => {
+      const safeAccounts = Array.isArray(plaidAccounts) ? plaidAccounts : [];
+      return new Set(safeAccounts.filter((a) => a.includeInSavings).map((a) => a.plaidAccountId || ''));
+    },
     [plaidAccounts],
   );
 
   const savingsTransactions = useMemo(() => {
-    return transactions.filter((t) => t.plaidAccountId && trackedPlaidIds.has(t.plaidAccountId));
+    const safeTransactions = Array.isArray(transactions) ? transactions : [];
+    return safeTransactions.filter((t) => t.plaidAccountId && trackedPlaidIds.has(t.plaidAccountId));
   }, [transactions, trackedPlaidIds]);
 
   const windowStart = useMemo(() => {

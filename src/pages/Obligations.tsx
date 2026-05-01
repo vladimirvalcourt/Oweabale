@@ -182,40 +182,44 @@ export default function Obligations() {
   const [obligationNowMs] = useState(() => Date.now());
 
   const allObligations: Obligation[] = useMemo(() => {
-    const recurringObligations: Obligation[] = bills.map(b => ({
+    const safeBills = Array.isArray(bills) ? bills : [];
+    const safeDebts = Array.isArray(debts) ? debts : [];
+    const safeCitations = Array.isArray(citations) ? citations : [];
+
+    const recurringObligations: Obligation[] = safeBills.map(b => ({
       id: b.id,
-      name: b.biller,
+      name: b.biller || 'Unknown Biller',
       type: 'recurring' as ObligationType,
       subType: b.frequency === 'Monthly' ? 'Fixed Bill' : `${b.frequency} Bill`,
-      dueDate: b.dueDate,
-      dueLabel: b.dueDate,
-      amount: b.amount,
+      dueDate: b.dueDate || new Date().toISOString().split('T')[0],
+      dueLabel: b.dueDate || 'No date',
+      amount: b.amount || 0,
       icon: RecurringIcon,
     }));
     return [
       ...recurringObligations,
-      ...debts.map(d => {
+      ...safeDebts.map(d => {
         const pdd = d.paymentDueDate?.trim() || null;
         const sortDue = pdd || '9999-12-31';
         return {
           id: d.id,
-          name: d.name,
+          name: d.name || 'Unknown Debt',
           type: 'debt' as ObligationType,
-          subType: d.type,
+          subType: d.type || 'Debt',
           dueDate: sortDue,
           dueLabel: pdd ?? 'No due date',
-          amount: d.remaining,
+          amount: d.remaining || 0,
           icon: DebtIcon,
         };
       }),
-      ...citations.filter(c => c.status === 'open').map(c => ({
+      ...safeCitations.filter(c => c.status === 'open').map(c => ({
         id: c.id,
-        name: `${c.type} — ${c.jurisdiction}`,
+        name: `${c.type || 'Citation'} — ${c.jurisdiction || 'Unknown'}`,
         type: 'ambush' as ObligationType,
         subType: 'Citation',
-        dueDate: new Date(scheduleBaseMs + c.daysLeft * 86400000).toISOString().split('T')[0],
-        dueLabel: new Date(scheduleBaseMs + c.daysLeft * 86400000).toISOString().split('T')[0],
-        amount: c.amount,
+        dueDate: new Date(scheduleBaseMs + (c.daysLeft || 0) * 86400000).toISOString().split('T')[0],
+        dueLabel: new Date(scheduleBaseMs + (c.daysLeft || 0) * 86400000).toISOString().split('T')[0],
+        amount: c.amount || 0,
         icon: TicketIcon,
       })),
     ];
@@ -246,8 +250,9 @@ export default function Obligations() {
     .filter(ob => activeTab === 'all' || ob.type === activeTab)
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
-  const totalMonthlyBurn = allObligations.filter(o => o.type === 'recurring').reduce((sum, o) => sum + o.amount, 0);
-  const activePrincipal = debts.reduce((sum, d) => sum + d.remaining, 0);
+  const totalMonthlyBurn = allObligations.filter(o => o.type === 'recurring').reduce((sum, o) => sum + (o.amount || 0), 0);
+  const safeDebtsForCalc = Array.isArray(debts) ? debts : [];
+  const activePrincipal = safeDebtsForCalc.reduce((sum, d) => sum + (d.remaining || 0), 0);
   const liquidCash = useMemo(
     () =>
       (assets || [])

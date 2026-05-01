@@ -42,8 +42,8 @@ export default function Transactions() {
   const [editingPlatform, setEditingPlatform] = useState<{ id: string; value: string } | null>(null);
   // PAGE-08: inline category editing
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
-  const [dateRange, setDateRange] = useState<{start: string, end: string}>({start: '', end: ''});
-  const [amountRange, setAmountRange] = useState<{min: string, max: string}>({min: '', max: ''});
+  const [dateRange, setDateRange] = useState<{ start: string, end: string }>({ start: '', end: '' });
+  const [amountRange, setAmountRange] = useState<{ min: string, max: string }>({ min: '', max: '' });
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [page, setPage] = useState(1);
   const [historyScope, setHistoryScope] = useState<'recent' | 'all'>('recent');
@@ -90,7 +90,8 @@ export default function Transactions() {
   const pagedTransactions = filteredTransactions.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const uniqueCategories = useMemo(() => {
-    const cats = new Set(transactions.map(t => t.category));
+    const safeTransactions = Array.isArray(transactions) ? transactions : [];
+    const cats = new Set(safeTransactions.map(t => t.category || 'Uncategorized'));
     return Array.from(cats).sort();
   }, [transactions]);
 
@@ -140,7 +141,7 @@ export default function Transactions() {
             const CHUNK_SIZE = 500;
             const headers = ['Date', 'Name', 'Category', 'Platform', 'Type', 'Amount'];
             const csvRows: string[] = [headers.join(',')];
-            
+
             for (let i = 0; i < rowsSource.length; i += CHUNK_SIZE) {
               const chunk = rowsSource.slice(i, i + CHUNK_SIZE);
               const chunkRows = chunk.map((t) => [
@@ -152,13 +153,13 @@ export default function Transactions() {
                 t.amount.toFixed(2),
               ].join(','));
               csvRows.push(...chunkRows);
-              
+
               // Yield between chunks to let browser paint
               if (i + CHUNK_SIZE < rowsSource.length) {
                 await new Promise(resolve => setTimeout(resolve, 0));
               }
             }
-            
+
             const csv = csvRows.join('\n');
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
@@ -174,7 +175,7 @@ export default function Transactions() {
         </button>
       </div>
 
-      <CollapsibleModule 
+      <CollapsibleModule
         title="Filter Transactions"
         icon={FiltersIcon}
         extraHeader={<span className="text-xs font-mono text-content-tertiary uppercase tracking-widest">{filteredTransactions.length} Records Detected</span>}
@@ -208,11 +209,10 @@ export default function Transactions() {
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-                className={`${BUTTON_BASE_CLASS} gap-2 border ${
-                  showAdvancedFilters 
+                className={`${BUTTON_BASE_CLASS} gap-2 border ${showAdvancedFilters
                     ? 'bg-brand-cta border-surface-border text-surface-base'
                     : 'bg-transparent border-surface-border text-content-secondary hover:text-content-primary hover:bg-surface-elevated'
-                }`}
+                  }`}
               >
                 <Filter className="w-3.5 h-3.5" />
                 More Filters
@@ -281,14 +281,14 @@ export default function Transactions() {
                   <input
                     type="date"
                     value={dateRange.start}
-                    onChange={(e) => setDateRange({...dateRange, start: e.target.value})}
+                    onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
                     className="block w-full px-2 py-2 border border-surface-border rounded-md bg-surface-base text-xs font-mono text-content-primary focus-app-field transition-colors"
                   />
                   <span className="text-surface-border">::</span>
                   <input
                     type="date"
                     value={dateRange.end}
-                    onChange={(e) => setDateRange({...dateRange, end: e.target.value})}
+                    onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
                     className="block w-full px-2 py-2 border border-surface-border rounded-md bg-surface-base text-xs font-mono text-content-primary focus-app-field transition-colors"
                   />
                 </div>
@@ -303,7 +303,7 @@ export default function Transactions() {
                     type="number"
                     placeholder="MIN"
                     value={amountRange.min}
-                    onChange={(e) => setAmountRange({...amountRange, min: e.target.value})}
+                    onChange={(e) => setAmountRange({ ...amountRange, min: e.target.value })}
                     className="block w-full px-2 py-2 border border-surface-border rounded-md bg-surface-base text-xs font-mono text-content-primary placeholder:text-content-muted focus-app-field transition-colors"
                   />
                   <span className="text-surface-border">::</span>
@@ -311,7 +311,7 @@ export default function Transactions() {
                     type="number"
                     placeholder="MAX"
                     value={amountRange.max}
-                    onChange={(e) => setAmountRange({...amountRange, max: e.target.value})}
+                    onChange={(e) => setAmountRange({ ...amountRange, max: e.target.value })}
                     className="block w-full px-2 py-2 border border-surface-border rounded-md bg-surface-base text-xs font-mono text-content-primary placeholder:text-content-muted focus-app-field transition-colors"
                   />
                 </div>
@@ -321,76 +321,76 @@ export default function Transactions() {
         </div>
       </CollapsibleModule>
 
-        {filteredTransactions.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 text-center">
-            <div className="w-16 h-16 border border-surface-border rounded-full flex items-center justify-center mb-4">
-              <TransactionsIcon className="w-8 h-8 text-content-tertiary" />
-            </div>
-            <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-1">No transactions found</h3>
-            <p className="text-sm text-content-tertiary max-w-sm">
-              {searchTerm || filterType !== 'all' 
-                ? "We couldn't find any transactions matching your current filters."
-                : "You don't have any transaction history yet. Pay a bill or record a debt payment to see it here."}
-            </p>
-            {transactions.length === 0 &&
-              !searchTerm &&
-              filterType === 'all' &&
-              filterCategory === 'all' &&
-              filterPlatform === 'all' &&
-              !dateRange.start &&
-              !dateRange.end &&
-              !amountRange.min &&
-              !amountRange.max && (
-                <button
-                  type="button"
-                  onClick={() => openQuickAdd()}
-                  className={`${BUTTON_PRIMARY_CLASS} mt-6 gap-2`}
-                >
-                  Add your first transaction
-                </button>
-              )}
-            {(searchTerm || filterType !== 'all' || filterCategory !== 'all' || filterPlatform !== 'all' || dateRange.start || dateRange.end || amountRange.min || amountRange.max) && (
+      {filteredTransactions.length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-12 text-center">
+          <div className="w-16 h-16 border border-surface-border rounded-full flex items-center justify-center mb-4">
+            <TransactionsIcon className="w-8 h-8 text-content-tertiary" />
+          </div>
+          <h3 className="text-lg font-semibold tracking-tight text-content-primary mb-1">No transactions found</h3>
+          <p className="text-sm text-content-tertiary max-w-sm">
+            {searchTerm || filterType !== 'all'
+              ? "We couldn't find any transactions matching your current filters."
+              : "You don't have any transaction history yet. Pay a bill or record a debt payment to see it here."}
+          </p>
+          {transactions.length === 0 &&
+            !searchTerm &&
+            filterType === 'all' &&
+            filterCategory === 'all' &&
+            filterPlatform === 'all' &&
+            !dateRange.start &&
+            !dateRange.end &&
+            !amountRange.min &&
+            !amountRange.max && (
               <button
                 type="button"
-                onClick={() => { 
-                  setSearchTerm(''); 
-                  setFilterType('all'); 
-                  setFilterCategory('all');
-                  setFilterPlatform('all');
-                  setDateRange({start: '', end: ''});
-                  setAmountRange({min: '', max: ''});
-                }}
-                className={`${BUTTON_SECONDARY_CLASS} mt-4`}
+                onClick={() => openQuickAdd()}
+                className={`${BUTTON_PRIMARY_CLASS} mt-6 gap-2`}
               >
-                Clear Filters
+                Add your first transaction
               </button>
             )}
-          </div>
-        ) : (
+          {(searchTerm || filterType !== 'all' || filterCategory !== 'all' || filterPlatform !== 'all' || dateRange.start || dateRange.end || amountRange.min || amountRange.max) && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm('');
+                setFilterType('all');
+                setFilterCategory('all');
+                setFilterPlatform('all');
+                setDateRange({ start: '', end: '' });
+                setAmountRange({ min: '', max: '' });
+              }}
+              className={`${BUTTON_SECONDARY_CLASS} mt-4`}
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+      ) : (
         <>
-        <CollapsibleModule title="Your Transactions" icon={TransactionsIcon}>
-          <div className="overflow-x-auto -mx-6 -my-6">
-            <table className="min-w-full divide-y divide-surface-highlight">
-              <thead className="bg-surface-base">
-                <tr>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
-                    Description
-                  </th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
-                    Timestamp
-                  </th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
-                    Category
-                  </th>
-                  <th scope="col" className="px-6 py-4 text-left text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
-                    Platform
-                  </th>
-                  <th scope="col" className="px-6 py-4 text-right text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
-                    Amount
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-surface-raised divide-y divide-surface-highlight">
+          <CollapsibleModule title="Your Transactions" icon={TransactionsIcon}>
+            <div className="overflow-x-auto -mx-6 -my-6">
+              <table className="min-w-full divide-y divide-surface-highlight">
+                <thead className="bg-surface-base">
+                  <tr>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
+                      Description
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
+                      Timestamp
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
+                      Category
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
+                      Platform
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-right text-xs font-mono font-bold text-content-muted uppercase tracking-[0.2em]">
+                      Amount
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-surface-raised divide-y divide-surface-highlight">
                   {pagedTransactions.map((transaction) => {
                     const subData = subscriptionByNameLower.get(transaction.name.toLowerCase());
                     const isPriceHike = subData && transaction.type === 'expense' && transaction.amount > subData.amount;
@@ -401,10 +401,10 @@ export default function Transactions() {
                       : merchantExclusionId
                         ? 'Auto-categorization disabled for this merchant.'
                         : null;
-                    
+
                     return (
-                      <tr 
-                        key={transaction.id} 
+                      <tr
+                        key={transaction.id}
                         className="group hover:bg-surface-elevated transition-colors border-l-2 border-transparent hover:border-content-secondary/50"
                       >
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -499,7 +499,7 @@ export default function Transactions() {
                                   const oldCat = transaction.category;
                                   setEditingCategory(null);
                                   await updateTransaction(transaction.id, { category: newCat });
-                                  
+
                                   // Smart suggestion: offer to create a rule
                                   if (newCat !== oldCat && transaction.name && transaction.name.trim().length > 0) {
                                     const merchantName = transaction.name.trim();
@@ -594,45 +594,44 @@ export default function Transactions() {
                             </button>
                           )}
                         </td>
-                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold font-mono tabular-nums text-right ${
-                          transaction.type === 'income' ? 'text-emerald-500' : 'text-content-primary'
-                        }`}>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm font-bold font-mono tabular-nums text-right ${transaction.type === 'income' ? 'text-emerald-500' : 'text-content-primary'
+                          }`}>
                           {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
                       </tr>
                     );
                   })}
-              </tbody>
-            </table>
-          </div>
-        </CollapsibleModule>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-2 px-1">
-            <span className="text-xs font-mono text-content-muted uppercase tracking-widest">
-              Page {currentPage} of {totalPages} — {filteredTransactions.length} records
-            </span>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
-                className={BUTTON_SECONDARY_CLASS}
-              >
-                Prev
-              </button>
-              <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className={BUTTON_SECONDARY_CLASS}
-              >
-                Next
-              </button>
+                </tbody>
+              </table>
             </div>
-          </div>
-        )}
+          </CollapsibleModule>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between pt-2 px-1">
+              <span className="text-xs font-mono text-content-muted uppercase tracking-widest">
+                Page {currentPage} of {totalPages} — {filteredTransactions.length} records
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className={BUTTON_SECONDARY_CLASS}
+                >
+                  Prev
+                </button>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className={BUTTON_SECONDARY_CLASS}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </>
-        )}
+      )}
     </div>
   );
 }

@@ -70,7 +70,16 @@ export default function Reports() {
   }, [dateRange]);
 
   const filteredTx = useMemo(
-    () => transactions.filter(t => new Date(t.date) >= cutoffDate),
+    () => {
+      const safeTransactions = Array.isArray(transactions) ? transactions : [];
+      return safeTransactions.filter(t => {
+        try {
+          return new Date(t.date) >= cutoffDate;
+        } catch {
+          return false;
+        }
+      });
+    },
     [transactions, cutoffDate]
   );
 
@@ -78,7 +87,9 @@ export default function Reports() {
   const categoryData = useMemo(() => {
     const map = new Map<string, number>();
     filteredTx.filter(t => t.type === 'expense').forEach(t => {
-      map.set(t.category, (map.get(t.category) || 0) + t.amount);
+      const amount = t.amount || 0;
+      const category = t.category || 'Uncategorized';
+      map.set(category, (map.get(category) || 0) + amount);
     });
     return Array.from(map.entries())
       .map(([name, value]) => ({ name, value: parseFloat(value.toFixed(2)) }))
@@ -87,17 +98,18 @@ export default function Reports() {
 
   // Monthly income vs expenses (bar chart — last 6 months)
   const monthlyData = useMemo(() => {
+    const safeTransactions = Array.isArray(transactions) ? transactions : [];
     const months: { month: string; income: number; expenses: number }[] = [];
     for (let i = 5; i >= 0; i--) {
       const d = new Date();
       d.setMonth(d.getMonth() - i);
       const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
       const label = d.toLocaleString('default', { month: 'short' });
-      const monthTx = transactions.filter(t => t.date.startsWith(monthKey));
+      const monthTx = safeTransactions.filter(t => t.date && t.date.startsWith(monthKey));
       months.push({
         month: label,
-        income: parseFloat(monthTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0).toFixed(2)),
-        expenses: parseFloat(monthTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0).toFixed(2)),
+        income: parseFloat(monthTx.filter(t => t.type === 'income').reduce((s, t) => s + (t.amount || 0), 0).toFixed(2)),
+        expenses: parseFloat(monthTx.filter(t => t.type === 'expense').reduce((s, t) => s + (t.amount || 0), 0).toFixed(2)),
       });
     }
     return months;
@@ -108,9 +120,11 @@ export default function Reports() {
     const MONTHS = 12;
     const result: { month: string; netWorth: number }[] = [];
 
-    // Clone mutable state for simulation
-    let simAssets = assets.map(a => ({ value: a.value, rate: a.appreciationRate ?? 0 }));
-    let simDebts = debts.map(d => ({ remaining: d.remaining, minPayment: d.minPayment, apr: d.apr }));
+    // Clone mutable state for simulation with defensive checks
+    const safeAssets = Array.isArray(assets) ? assets : [];
+    const safeDebts = Array.isArray(debts) ? debts : [];
+    let simAssets = safeAssets.map(a => ({ value: a.value || 0, rate: a.appreciationRate ?? 0 }));
+    let simDebts = safeDebts.map(d => ({ remaining: d.remaining || 0, minPayment: d.minPayment || 0, apr: d.apr || 0 }));
 
     for (let i = 0; i < MONTHS; i++) {
       const d = new Date();
@@ -137,15 +151,21 @@ export default function Reports() {
     return result;
   }, [assets, debts]);
 
-  // Debt payoff progress
-  const debtProgress = debts.map(d => ({
-    name: d.name,
-    paid: d.paid,
-    remaining: d.remaining,
-    total: d.paid + d.remaining,
-    pct: Math.round((d.paid / (d.paid + d.remaining)) * 100),
-    apr: d.apr,
-  }));
+  // Debt payoff progress with defensive checks
+  const safeDebtsForProgress = Array.isArray(debts) ? debts : [];
+  const debtProgress = safeDebtsForProgress.map(d => {
+    const paid = d.paid || 0;
+    const remaining = d.remaining || 0;
+    const total = paid + remaining;
+    return {
+      name: d.name || 'Unknown Debt',
+      paid,
+      remaining,
+      total,
+      pct: total > 0 ? Math.round((paid / total) * 100) : 0,
+      apr: d.apr || 0,
+    };
+  });
 
   const tooltipStyle = {
     backgroundColor: 'var(--color-surface-raised)',
@@ -173,9 +193,8 @@ export default function Reports() {
               <button
                 key={r}
                 onClick={() => setDateRange(r)}
-                className={`px-3 py-1 text-xs font-sans font-medium rounded-md transition-colors ${
-                  dateRange === r ? 'bg-surface-elevated text-content-primary border border-surface-border' : 'text-content-tertiary hover:text-content-secondary'
-                }`}
+                className={`px-3 py-1 text-xs font-sans font-medium rounded-md transition-colors ${dateRange === r ? 'bg-surface-elevated text-content-primary border border-surface-border' : 'text-content-tertiary hover:text-content-secondary'
+                  }`}
               >
                 {r === '30d' ? '30D' : r === '90d' ? '90D' : '1Y'}
               </button>
@@ -242,7 +261,7 @@ export default function Reports() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Income vs Expenses */}
-        <CollapsibleModule 
+        <CollapsibleModule
           title="Monthly Cash Flow"
           icon={ChartIcon}
         >
@@ -251,7 +270,7 @@ export default function Reports() {
               <BarChart data={monthlyData} margin={{ top: 8, right: 8, left: 8, bottom: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridColor} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${v >= 1000 ? `${(v/1000).toFixed(0)}k` : v}`} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${v >= 1000 ? `${(v / 1000).toFixed(0)}k` : v}`} />
                 <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v, name) => [`$${Number(v ?? 0).toLocaleString()}`, name === 'income' ? 'Income' : 'Expenses']} />
                 <Bar dataKey="income" fill={chartProfitColor} radius={0} />
                 <Bar dataKey="expenses" fill={chartExpenseColor} radius={0} />
@@ -265,7 +284,7 @@ export default function Reports() {
         </CollapsibleModule>
 
         {/* Spending by Category */}
-        <CollapsibleModule 
+        <CollapsibleModule
           title="Spending by Category"
           icon={ChartIcon}
         >
@@ -300,7 +319,7 @@ export default function Reports() {
       </div>
 
       {/* Net Worth Trend */}
-      <CollapsibleModule 
+      <CollapsibleModule
         title="Net Worth Over Time"
         icon={ChartIcon}
       >
@@ -314,7 +333,7 @@ export default function Reports() {
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartGridColor} />
             <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${(v/1000).toFixed(0)}k`} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fill: chartTickColor, fontSize: 10, fontFamily: 'monospace' }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
             <Tooltip {...rechartsTooltipStableProps} contentStyle={tooltipStyle} formatter={(v) => [`$${Number(v ?? 0).toLocaleString()}`, 'Net Worth']} />
             <Area type="monotone" dataKey="netWorth" stroke={chartNeutralColor} strokeWidth={2} fillOpacity={1} fill="url(#nwGradient)" dot={{ fill: chartNeutralColor, strokeWidth: 0, r: 3 }} />
           </AreaChart>
@@ -322,7 +341,7 @@ export default function Reports() {
       </CollapsibleModule>
 
       {/* Debt Payoff Progress */}
-      <CollapsibleModule 
+      <CollapsibleModule
         title="Debt Payoff Progress"
         icon={DebtIcon}
         extraHeader={<span className="text-sm font-sans font-semibold text-content-primary">{debtProgress.length} accounts</span>}
