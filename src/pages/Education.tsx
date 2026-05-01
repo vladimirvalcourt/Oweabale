@@ -250,11 +250,10 @@ export default function Education() {
                     <button
                       key={mod.id}
                       onClick={() => setSelectedModule(mod.id)}
-                      className={`w-full flex items-start gap-4 p-4 rounded-xl border text-left transition-all ${
-                        isSelected
+                      className={`w-full flex items-start gap-4 p-4 rounded-xl border text-left transition-all ${isSelected
                           ? 'border-surface-border bg-content-primary/[0.03] bg-surface-base'
                           : 'border-surface-border bg-surface-elevated hover:bg-surface-base'
-                      }`}
+                        }`}
                     >
                       <div className={`p-2 rounded-md shrink-0 ${isSelected ? 'bg-content-primary/[0.05] text-content-primary' : 'bg-surface-base border border-surface-border text-content-tertiary'}`}>
                         <Icon className="w-5 h-5" />

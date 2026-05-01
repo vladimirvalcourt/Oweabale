@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { ThemeBackdrop } from './ThemeBackdrop';
-import { trackEvent } from '@/hooks/usePostHog';
 
 interface ExitIntentModalProps {
   isOpen: boolean;
@@ -21,7 +20,6 @@ export default function ExitIntentModal({ isOpen, onClose }: ExitIntentModalProp
     e.preventDefault();
     if (!email) return;
 
-    trackEvent('exit_intent_email_captured', { email });
     setSubmitted(true);
     
     // Send to your email service (Resend, etc.)

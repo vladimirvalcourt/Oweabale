@@ -3,7 +3,7 @@ import { ArrowRight, Check, CircleDollarSign, Clock3, Layers3, ShieldCheck } fro
 import { Footer, PublicHeader } from '@/components/layout';
 import { TransitionLink } from '@/components/common';
 import ExitIntentModal from '@/components/common/ExitIntentModal';
-import { useAuth, useSEO, trackEvent } from '@/hooks';
+import { useAuth, useSEO } from '@/hooks';
 import { SITE_CONFIG } from '@/config/site';
 import { format, addDays } from 'date-fns';
 import gsap from 'gsap';
@@ -280,7 +280,6 @@ export default function Landing() {
       if (e.clientY <= 0 && !hasShownExitModal && !authUser) {
         setShowExitModal(true);
         setHasShownExitModal(true);
-        trackEvent('exit_intent_triggered');
       }
     };
 
@@ -324,7 +323,6 @@ export default function Landing() {
                 <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                   <TransitionLink
                     to={primaryHref}
-                    onClick={() => trackEvent('landing_cta_clicked', { location: 'hero' })}
                     className="premium-button-primary"
                   >
                     {authUser?.id ? 'Open app' : 'Get started free'}
@@ -510,7 +508,6 @@ export default function Landing() {
                 </div>
                 <TransitionLink
                   to={primaryHref}
-                  onClick={() => trackEvent('landing_cta_clicked', { location: 'bottom' })}
                   className="premium-button-primary"
                 >
                   {authUser?.id ? 'Open app' : 'Get started free'}
