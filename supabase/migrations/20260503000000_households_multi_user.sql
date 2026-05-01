@@ -75,31 +75,37 @@ CREATE POLICY "household_owner_update" ON households
   );
 
 -- Members can see other members in their household
+-- Use EXISTS to avoid infinite recursion
 CREATE POLICY "household_members_select" ON household_members
   FOR SELECT USING (
-    household_id IN (
-      SELECT household_id FROM household_members
-      WHERE user_id = auth.uid() AND status = 'accepted'
+    EXISTS (
+      SELECT 1 FROM household_members hm
+      WHERE hm.user_id = auth.uid() 
+        AND hm.status = 'accepted'
+        AND hm.household_id = household_members.household_id
     )
   );
 
 -- Owners can manage members
 CREATE POLICY "household_owner_manage_members" ON household_members
   FOR ALL USING (
-    household_id IN (
-      SELECT id FROM households WHERE owner_id = auth.uid()
+    EXISTS (
+      SELECT 1 FROM households 
+      WHERE households.id = household_members.household_id 
+        AND households.owner_id = auth.uid()
     )
   );
 
 -- Partners can invite others
 CREATE POLICY "household_partner_invite" ON household_members
   FOR INSERT WITH CHECK (
-    household_id IN (
-      SELECT h.id FROM households h
-      JOIN household_members hm ON h.id = hm.household_id
+    EXISTS (
+      SELECT 1 FROM households h
+      INNER JOIN household_members hm ON h.id = hm.household_id
       WHERE hm.user_id = auth.uid() 
         AND hm.status = 'accepted' 
         AND hm.role IN ('owner', 'partner')
+        AND h.id = household_members.household_id
     )
   );
 

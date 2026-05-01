@@ -43,11 +43,11 @@ export default defineConfig(({ mode }) => {
   const cspDirectives = isProd
     ? [
       "default-src 'self'",
-      "script-src 'self' 'wasm-unsafe-eval'",
+      "script-src 'self' 'wasm-unsafe-eval' https://client.crisp.chat",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // Tailwind injects styles at runtime + Google Fonts
       "img-src 'self' data: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://o4511242266738688.ingest.us.sentry.io https://us.i.posthog.com https://us-assets.i.posthog.com https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com https://client.crisp.chat",
       "worker-src 'self' blob:",
       "frame-src https://*.supabase.co",
       "object-src 'none'",
@@ -56,11 +56,11 @@ export default defineConfig(({ mode }) => {
     ]
     : [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'", // HMR requires unsafe-inline
+      "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://client.crisp.chat", // HMR requires unsafe-inline
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://o4511242266738688.ingest.us.sentry.io https://us.i.posthog.com https://us-assets.i.posthog.com https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com https://client.crisp.chat",
       "worker-src 'self' blob:",
       "frame-src https://*.supabase.co",
       "object-src 'none'",

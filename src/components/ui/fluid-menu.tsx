@@ -10,10 +10,13 @@ interface MenuProps {
 
 export function Menu({ trigger, children, align = "left", showChevron = true }: MenuProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const menuId = React.useId()
+  const buttonId = `${menuId}-button`
 
   return (
     <div className="relative inline-block text-left">
       <div
+        id={buttonId}
         onClick={() => setIsOpen(!isOpen)}
         className="cursor-pointer inline-flex items-center"
         role="button"
@@ -33,7 +36,7 @@ export function Menu({ trigger, children, align = "left", showChevron = true }: 
           } mt-2 w-56 rounded-md bg-surface-raised shadow-xl ring-1 ring-content-primary/10 focus-app z-50`}
           role="menu"
           aria-orientation="vertical"
-          aria-labelledby="menu-button"
+          aria-labelledby={buttonId}
         >
           <div className="py-1" role="none">
             {children}
