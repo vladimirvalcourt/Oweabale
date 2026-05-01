@@ -419,6 +419,15 @@ export default function Dashboard() {
   const [snoozedItems, setSnoozedItems] = useState<Record<string, number>>(() => readSnoozedItems());
   const [showPlaidGuide, setShowPlaidGuide] = useState(false);
 
+  // Defensive: ensure all arrays are initialized
+  const safeBills = Array.isArray(bills) ? bills : [];
+  const safeDebts = Array.isArray(debts) ? debts : [];
+  const safeSubscriptions = Array.isArray(subscriptions) ? subscriptions : [];
+  const safeCitations = Array.isArray(citations) ? citations : [];
+  const safeIncomes = Array.isArray(incomes) ? incomes : [];
+  const safeAssets = Array.isArray(assets) ? assets : [];
+  const safeTransactions = Array.isArray(transactions) ? transactions : [];
+
   // Show Plaid guide on first visit if bank is connected but no transactions
   useEffect(() => {
     try {
@@ -451,31 +460,31 @@ export default function Dashboard() {
   ];
 
   const liquidCash = useMemo(
-    () => (assets || []).filter((asset) => asset?.type === 'Cash').reduce((sum, asset) => sum + (asset?.value || 0), 0),
-    [assets],
+    () => safeAssets.filter((asset) => asset?.type === 'Cash').reduce((sum, asset) => sum + (asset?.value || 0), 0),
+    [safeAssets],
   );
   const cashFlow = useMemo(
-    () => calcMonthlyCashFlow(incomes || [], bills || [], debts || [], subscriptions || []),
-    [incomes, bills, debts, subscriptions],
+    () => calcMonthlyCashFlow(safeIncomes, safeBills, safeDebts, safeSubscriptions),
+    [safeIncomes, safeBills, safeDebts, safeSubscriptions],
   );
   const safeToSpend = useMemo(
     () =>
       computeSafeToSpend({
         liquidCash,
         monthlySurplus: cashFlow.surplus ?? 0,
-        bills: bills || [],
-        incomes: incomes || [],
-        subscriptions: subscriptions || [],
-        debts: debts || [],
-        citations: citations || [],
+        bills: safeBills,
+        incomes: safeIncomes,
+        subscriptions: safeSubscriptions,
+        debts: safeDebts,
+        citations: safeCitations,
         scheduleBaseMs: today.getTime(),
       }),
-    [liquidCash, cashFlow.surplus, bills, incomes, subscriptions, debts, citations, today],
+    [liquidCash, cashFlow.surplus, safeBills, safeIncomes, safeSubscriptions, safeDebts, safeCitations, today],
   );
 
   const payListItems = useMemo(
-    () => buildPayListItems({ bills: bills || [], debts: debts || [], subscriptions: subscriptions || [], citations: citations || [], today }),
-    [bills, debts, subscriptions, citations, today],
+    () => buildPayListItems({ bills: safeBills, debts: safeDebts, subscriptions: safeSubscriptions, citations: safeCitations, today }),
+    [safeBills, safeDebts, safeSubscriptions, safeCitations, today],
   );
 
   const visibleItems = useMemo(() => {
@@ -488,12 +497,12 @@ export default function Dashboard() {
   const comingItems = visibleItems.filter((item) => item.status === 'coming').slice(0, 8);
   const unscheduledItems = visibleItems.filter((item) => item.status === 'unscheduled');
   const topPriority = visibleItems.find((item) => item.status !== 'unscheduled') || visibleItems[0] || null;
-  const activeDebt = debts.filter((debt) => (debt.remaining || 0) > 0);
+  const activeDebt = safeDebts.filter((debt) => (debt.remaining || 0) > 0);
   const debtMinimumsDue = visibleItems.filter((item) => item.kind === 'debt' && item.status !== 'unscheduled');
-  const openCitationCount = citations.filter((citation) => citation.status === 'open').length;
+  const openCitationCount = safeCitations.filter((citation) => citation.status === 'open').length;
   const nextDebtTarget = [...activeDebt].sort((a, b) => (b.apr || 0) - (a.apr || 0))[0] || null;
   const totalDueThisWeek = [...overdueItems, ...todayItems, ...weekItems].reduce((sum, item) => sum + item.amount, 0);
-  const bankSummary = useMemo(() => summarizeBankTransactions(transactions || [], today), [transactions, today]);
+  const bankSummary = useMemo(() => summarizeBankTransactions(safeTransactions, today), [safeTransactions, today]);
   const hasBankDashboardData = bankSummary.bankTransactions.length > 0;
   const shouldShowBankActivity = bankConnected || hasBankDashboardData;
   const syncLabel = plaidLastSyncAt ? new Date(plaidLastSyncAt).toLocaleString() : null;
