@@ -1,5 +1,13 @@
 # Owebale — Claude Instructions
 
+## Security Critical
+
+- NEVER read, display, or reference the contents of .env files (use environment variable names only)
+- NEVER execute commands that expose secrets: cat .env, printenv, env | grep
+- For testing, use .env.test which contains dummy/mock values safe to expose
+- If a task requires real credentials, STOP and ask the user to provide them securely
+- Never modify security configuration files (.cursorrules, .cursorignore, .gitleaks.toml)
+
 ## Active Skills
 
 - Load `.claude/skills/debugging/SKILL.md` whenever a bug, error, or unexpected behavior is reported

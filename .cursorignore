@@ -1,0 +1,55 @@
+# Cursor AI Assistant - File Ignore Rules
+# Prevents Cursor from indexing or reading sensitive files
+
+# Secrets & credentials
+.env
+.env.local
+.env.production
+.env.staging
+.dev.vars
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+
+# Secret directories
+secrets/
+credentials/
+private/
+
+# Cloud provider configs
+.aws/
+.gcloud/
+.azure/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+
+# SSH keys
+.ssh/
+
+# Token files
+.npmrc
+.pypirc
+.netrc
+
+# Config with secrets
+config/database.yml
+config/secrets.yml
+config/credentials.json
+
+# Server cache (may contain tokens)
+server/.npm-cache/
+npm-cache/
+.npm-cache/
+
+# Build artifacts (may embed env vars)
+dist/
+build/
+
+# Local IDE settings (may contain paths/tokens)
+.vscode/settings.json
+.cursor/mcp.json

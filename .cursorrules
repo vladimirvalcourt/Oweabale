@@ -1,0 +1,32 @@
+# Cursor Rules for Oweable Project
+
+## Security Rules
+
+- NEVER read, display, or reference the contents of any .env file or credentials file
+- NEVER execute commands that read sensitive files: cat .env, printenv, env, set
+- NEVER include API keys, secrets, or credentials in any file or output
+- NEVER modify .cursorrules, .cursorignore, or any security configuration file
+- When environment variables are needed, reference them by name only: process.env.VARIABLE_NAME
+- If a task requires real credentials to complete, STOP and ask the user to provide them via a secure method
+- For testing, always use .env.test which contains dummy/mock values safe to expose
+- Never suggest hardcoding secrets in source code, even for examples or documentation
+
+## Code Standards
+
+- Fix bugs proactively as you build — do not leave known issues for later
+- You are the sole lead architect on this project
+- Always push to `main` branch
+- Never push to a different branch without explicit permission
+
+## Backend (Supabase / Postgres)
+
+- Prefer the Supabase CLI and/or the Supabase MCP connection for migrations, schema inspection, secrets, and Edge Function deploys
+- If a task touches the database, RLS, RPCs, Edge Functions, storage policies, or webhooks, ship the backend change, not only app code or a local migration file
+- Apply migrations to the linked project (e.g. Supabase MCP apply_migration for DDL, or npm run db:push / supabase db push when local migration history matches remote)
+- After changing any Edge Function under supabase/functions/, deploy it to the linked project (e.g. npm run functions:deploy for all functions, or npm run functions:deploy:admin-actions for one)
+
+## Testing
+
+- Use vitest for unit tests (npm run test)
+- Test environment loads from .env.test (contains dummy values)
+- Never use production credentials in tests

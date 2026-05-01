@@ -34,6 +34,7 @@ coverage/
 *.log
 .env*
 !.env.example
+!.env.test
 npm-cache/
 .npm-cache/
 .npm_cache/
