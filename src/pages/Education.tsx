@@ -17,7 +17,7 @@ const MODULES = [
     category: 'ESSENTIALS',
     icon: ShieldCheck,
     lessons: [
-      { id: '1-1', title: 'The 50/30/20 Rule Decoded', type: 'article', readTime: '5 MIN', content: "The 50/30/20 rule is a straightforward budgeting method that can help you manage your money simply. The basic rule of thumb is to divide your after-tax income and allocate it to spend: 50% on needs, 30% on wants, and socking away 20% to savings.\n\nNeeds are bills that you absolutely must pay and are the things necessary for survival. These include rent or mortgage payments, car payments, groceries, insurance, health care, minimum debt payment, and utilities.\n\nWants are all the things you spend money on that are not absolutely essential. This includes dinner and movies out, that new handbag, tickets to sporting events, vacations, the latest electronic gadget, and ultra-high-speed internet.\n\nSavings is the money you sock away for your future." },
+      { id: '1-1', title: 'The 50/30/20 Rule Decoded', type: 'article', readTime: '5 MIN', content: "The 50/30/20 rule is a straightforward budgeting method that can help you manage your money simply. The basic rule of thumb is to divide your after-tax income and allocate it to spend: 50% on needs, 30% on wants, and socking away 20% to savings.\n\nNeeds are bills that you absolutely must pay and are the things necessary for survival. These include rent or mortgage payments, car payments, groceries, healthcare, minimum debt payment, and utilities.\n\nWants are all the things you spend money on that are not absolutely essential. This includes dinner and movies out, that new handbag, tickets to sporting events, vacations, the latest electronic gadget, and ultra-high-speed internet.\n\nSavings is the money you sock away for your future." },
       { id: '1-2', title: 'Why Emergency Funds Are Mandatory', type: 'article', readTime: '12 MIN', content: "An emergency fund is a stash of money set aside to cover the financial surprises life throws your way. These unexpected events can be stressful and costly:\n- Job loss\n- Medical or dental emergency\n- Unexpected car repairs\n- Boiler breaking down\n\nHaving an emergency fund creates a financial buffer that can keep you afloat in a time of need without having to rely on credit cards or high-interest loans." },
       { id: '1-3', title: 'Tracking vs. Budgeting', type: 'article', readTime: '8 MIN', content: "Tracking is looking backwards. Budgeting is looking forwards.\n\nWhen you track your expenses, you are simply logging what you have already spent. While this is a critical first step to understand your baseline, it does not change your future behavior.\n\nBudgeting is giving every dollar a job BEFORE you spend it. Oweable's protocol requires you to define exactly where your money goes on the 1st of the month, so you aren't wondering where it went on the 31st." },
     ]
@@ -115,13 +115,13 @@ const MODULES = [
   },
   {
     id: 'estate',
-    title: 'Estate Protection & Insurance',
+    title: 'Estate Protection & Legacy Planning',
     duration: '2 HRS',
     category: 'PROTECTION',
     icon: Shield,
     lessons: [
       { id: '10-1', title: 'Trusts vs. Wills', type: 'article', readTime: '15 MIN', content: "A Will explicitly tells the government how to distribute your assets when you die—but it still goes through Probate Court, which is public, slow, and expensive. A Living Trust literally transfers ownership of your assets into a legal entity while you are alive. When you die, there is no court. The assets automatically and privately pass to your heirs. The wealthy use Trusts." },
-      { id: '10-2', title: 'The Whole Life Insurance Trap', type: 'article', readTime: '18 MIN', content: "Financial advisors make massive commissions selling 'Whole Life Insurance' because the premiums are exorbitant. They pitch it as an 'investment.' It's a terrible investment. For 99% of people, the mathematically superior move is 'Buy Term and Invest the Difference.' Buy a cheap 20-year Term Life policy to protect your family, and put the thousands of dollars you saved into an S&P 500 Index Fund." }
+      { id: '10-2', title: 'Term Life vs. Investment Strategies', type: 'article', readTime: '18 MIN', content: "Financial advisors often push complex financial products with high commissions. For most people, the mathematically superior move is simple: protect your family with affordable term coverage, and invest the difference in low-cost index funds. This 'Buy Term and Invest the Difference' strategy has historically outperformed bundled insurance-investment products for 99% of households." }
     ]
   }
 ];

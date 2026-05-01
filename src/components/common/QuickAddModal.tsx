@@ -743,7 +743,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
                               suggestions={[
                                 'AT&T', 'Verizon', 'Comcast', 'T-Mobile', 'Sprint',
                                 'Electric Company', 'Water Utility', 'Gas Company',
-                                'Internet Provider', 'Phone Service', 'Insurance',
+                                'Internet Provider', 'Phone Service',
                                 'Rent', 'Mortgage', 'Car Payment', 'Student Loan',
                                 'Chase', 'Bank of America', 'Wells Fargo', 'Citibank',
                                 'Capital One', 'American Express', 'Discover'
