@@ -3,6 +3,7 @@ import { Footer } from '@/components/layout';
 import { PublicHeader } from '@/components/layout';
 import { TransitionLink } from '@/components/common';
 import { useSEO } from '@/hooks';
+import { SITE_CONFIG } from '@/config/site';
 
 const privacySections = [
   {
@@ -41,8 +42,8 @@ export default function Privacy() {
   useSEO({
     title: 'Privacy Policy — Oweable',
     description: 'How Oweable handles bill, debt, and financial planning data collection, encryption, retention, third-party services, and privacy rights.',
-    canonical: 'https://www.oweable.com/privacy',
-    ogImage: 'https://www.oweable.com/og-image.svg',
+        canonical: SITE_CONFIG.getUrl('/privacy'),
+        ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   return (

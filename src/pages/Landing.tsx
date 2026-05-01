@@ -4,6 +4,7 @@ import { Footer, PublicHeader } from '@/components/layout';
 import { TransitionLink } from '@/components/common';
 import ExitIntentModal from '@/components/common/ExitIntentModal';
 import { useAuth, useSEO, trackEvent } from '@/hooks';
+import { SITE_CONFIG } from '@/config/site';
 import gsap from 'gsap';
 
 const proofPoints = ['Bills', 'Debt', 'Subscriptions', 'Tolls', 'Tickets', 'Taxes'];
@@ -284,8 +285,8 @@ export default function Landing() {
     title: 'Oweable — Stop guessing what you owe',
     description:
       'Oweable helps you manage bills, debt, subscriptions, due dates, and overdue obligations in one calm Pay List when money already feels heavy.',
-    canonical: 'https://www.oweable.com/',
-    ogImage: 'https://www.oweable.com/og-image.svg',
+    canonical: SITE_CONFIG.getUrl('/'),
+    ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   return (

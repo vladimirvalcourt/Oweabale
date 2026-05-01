@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { AppPageShell } from '@/components/layout';
 import { TransitionLink } from '@/components/common';
 import { yieldForPaint } from '@/lib/utils';
+import { EXTERNAL_RESOURCES } from '@/config/externalResources';
 
 export default function CreditCenter() {
   const { credit, updateCreditScore, addCreditFix, updateCreditFix, deleteCreditFix, debts, user } = useStore();
@@ -378,10 +379,10 @@ ${user.firstName} ${user.lastName}
                   <ShieldAlert className="w-3.5 h-3.5 text-content-secondary" /> Protection Shield
                 </div>
                 <div className="space-y-2">
-                  <a href="https://www.annualcreditreport.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2.5 text-xs text-content-tertiary hover:text-content-primary bg-surface-elevated border border-surface-border rounded-xl transition-all group">
+                  <a href={EXTERNAL_RESOURCES.credit.annualReport} target="_blank" rel="noreferrer" className="flex items-center justify-between p-2.5 text-xs text-content-tertiary hover:text-content-primary bg-surface-elevated border border-surface-border rounded-xl transition-all group">
                     Full Credit Report <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100" />
                   </a>
-                  <a href="https://www.experian.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2.5 text-xs text-content-tertiary hover:text-content-primary bg-surface-elevated border border-surface-border rounded-xl transition-all group">
+                  <a href={EXTERNAL_RESOURCES.credit.experian} target="_blank" rel="noreferrer" className="flex items-center justify-between p-2.5 text-xs text-content-tertiary hover:text-content-primary bg-surface-elevated border border-surface-border rounded-xl transition-all group">
                     Freeze Credit <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100" />
                   </a>
                 </div>

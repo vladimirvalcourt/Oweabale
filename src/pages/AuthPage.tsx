@@ -8,6 +8,7 @@ import { useSEO, trackEvent } from '@/hooks';
 import { runAfterPaint } from '@/lib/utils';
 import { BrandWordmark, ThemeToggle } from '@/components/common';
 import { CheckCircle2, LockKeyhole, ReceiptText, WalletCards } from 'lucide-react';
+import { SITE_CONFIG } from '@/config/site';
 
 type AuthPageProps = {
   mode?: 'signin' | 'signup';
@@ -23,8 +24,8 @@ export default function AuthPage({ mode = 'signin' }: AuthPageProps) {
     description: isSignupMode
       ? 'Create your Oweable account to start 14 days of Full Suite access for bills, debt, due dates, and what needs attention next.'
       : 'Sign in to Oweable with Google for secure access to your Pay List, debt plan, subscriptions, and cash-flow tools.',
-    canonical: isSignupMode ? 'https://www.oweable.com/onboarding' : 'https://www.oweable.com/auth',
-    ogImage: 'https://www.oweable.com/og-image.svg',
+        canonical: isSignupMode ? SITE_CONFIG.getUrl('/onboarding') : SITE_CONFIG.getUrl('/auth'),
+        ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   const handleGoogleSignIn = async () => {

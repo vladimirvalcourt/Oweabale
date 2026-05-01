@@ -4,6 +4,7 @@ import { ArrowRight, Minus, Plus } from 'lucide-react';
 import { Footer } from '@/components/layout';
 import { PublicHeader } from '@/components/layout';
 import { useAuth, useJsonLd, useSEO } from '@/hooks';
+import { SITE_CONFIG } from '@/config/site';
 
 function FaqItem({ question, answer }: { question: string; answer: string }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -180,8 +181,8 @@ export default function Pricing() {
     title: 'Pricing — Oweable',
     description:
       'Oweable pricing for staying on top of bills, debt payoff, subscriptions, cash flow, budgets, and uneven income without adding more noise.',
-    canonical: 'https://www.oweable.com/pricing',
-    ogImage: 'https://www.oweable.com/og-image.svg',
+        canonical: SITE_CONFIG.getUrl('/pricing'),
+        ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   useJsonLd(

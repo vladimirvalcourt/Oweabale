@@ -346,36 +346,36 @@ export default function AdminCaseFilePage() {
         description="Consolidated account investigation for support, security, billing, Plaid, and compliance. Controlled actions stay isolated and audited."
         actions={
           <>
-          <Link
-            to="/admin/user"
-            className={cn(adminButtonClass, 'py-1.5')}
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> User lookup
-          </Link>
-          <Link
-            to="/admin"
-            className={cn(adminButtonClass, 'py-1.5')}
-          >
-            <Shield className="h-3.5 w-3.5" /> Overview & controls
-          </Link>
-          <Link
-            to="/admin/sessions"
-            className={cn(adminButtonClass, 'py-1.5')}
-          >
-            Sessions
-          </Link>
-          <Link
-            to="/admin/compliance"
-            className={cn(adminButtonClass, 'py-1.5')}
-          >
-            Compliance
-          </Link>
-          <Link
-            to="/admin/telemetry"
-            className={cn(adminButtonClass, 'py-1.5')}
-          >
-            Telemetry
-          </Link>
+            <Link
+              to="/admin/user"
+              className={cn(adminButtonClass, 'py-1.5')}
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> User lookup
+            </Link>
+            <Link
+              to="/admin"
+              className={cn(adminButtonClass, 'py-1.5')}
+            >
+              <Shield className="h-3.5 w-3.5" /> Overview & controls
+            </Link>
+            <Link
+              to="/admin/sessions"
+              className={cn(adminButtonClass, 'py-1.5')}
+            >
+              Sessions
+            </Link>
+            <Link
+              to="/admin/compliance"
+              className={cn(adminButtonClass, 'py-1.5')}
+            >
+              Compliance
+            </Link>
+            <Link
+              to="/admin/telemetry"
+              className={cn(adminButtonClass, 'py-1.5')}
+            >
+              Telemetry
+            </Link>
           </>
         }
         metrics={[
@@ -402,228 +402,228 @@ export default function AdminCaseFilePage() {
         <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
           <AdminPanel>
             <div className="sticky top-0 z-10 -mx-0 border-b border-surface-border bg-surface-raised/95 p-5">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-base font-semibold text-content-primary">{detail.profile.email ?? '(no email)'}</span>
-              {detail.profile.is_admin ? (
-                <AdminStatusBadge tone="warn">Admin</AdminStatusBadge>
-              ) : null}
-              {detail.profile.is_banned ? (
-                <AdminStatusBadge tone="danger">Banned</AdminStatusBadge>
-              ) : null}
-              {detail.profile.has_completed_onboarding ? <AdminStatusBadge tone="good">Onboarded</AdminStatusBadge> : <AdminStatusBadge>Setup open</AdminStatusBadge>}
-            </div>
-            <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-content-muted">
-              <span className="max-w-full truncate" title={detail.profile.id}>
-                {detail.profile.id}
-              </span>
-              <button
-                type="button"
-                className="interactive-focus inline-flex items-center gap-1 rounded border border-surface-border px-1.5 py-0.5 text-[10px] text-content-tertiary hover:text-content-secondary"
-                onClick={() => {
-                  void navigator.clipboard.writeText(detail.profile.id);
-                  toast.success('User id copied');
-                }}
-              >
-                <ClipboardCopy className="h-3 w-3" /> Copy
-              </button>
-            </div>
-            <p className="text-xs text-content-tertiary">Member since {fmtDate(detail.profile.created_at)}</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-base font-semibold text-content-primary">{detail.profile.email ?? '(no email)'}</span>
+                {detail.profile.is_admin ? (
+                  <AdminStatusBadge tone="warn">Admin</AdminStatusBadge>
+                ) : null}
+                {detail.profile.is_banned ? (
+                  <AdminStatusBadge tone="danger">Banned</AdminStatusBadge>
+                ) : null}
+                {detail.profile.has_completed_onboarding ? <AdminStatusBadge tone="good">Onboarded</AdminStatusBadge> : <AdminStatusBadge>Setup open</AdminStatusBadge>}
+              </div>
+              <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-content-muted">
+                <span className="max-w-full truncate" title={detail.profile.id}>
+                  {detail.profile.id}
+                </span>
+                <button
+                  type="button"
+                  className="interactive-focus inline-flex items-center gap-1 rounded border border-surface-border px-1.5 py-0.5 text-[10px] text-content-tertiary hover:text-content-secondary"
+                  onClick={() => {
+                    void navigator.clipboard.writeText(detail.profile.id);
+                    toast.success('User id copied');
+                  }}
+                >
+                  <ClipboardCopy className="h-3 w-3" /> Copy
+                </button>
+              </div>
+              <p className="text-xs text-content-tertiary">Member since {fmtDate(detail.profile.created_at)}</p>
             </div>
             <div className="space-y-1 p-5">
 
-            {isSuperAdmin ? (
-              <div className="mt-4 border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] p-3">
-                <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--color-status-warning-text-dark)]">Super-admin actions</p>
-                <p className="mt-1 text-[11px] text-content-secondary">
-                  Impersonation signs you in as this user in a new tab (full app access). Use a dedicated browser profile
-                  for stricter isolation. Every handoff is audited; magic links are single-use.
-                </p>
-                <textarea
-                  value={impersonationReason}
-                  onChange={(e) => setImpersonationReason(e.target.value)}
-                  rows={2}
-                  placeholder="Reason (min. 8 characters, stored in audit log)"
-                  className={cn(adminInputClass, 'mt-2 w-full text-content-secondary')}
-                />
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    disabled={isOwnAccount || impersonateMutation.isPending}
-                    onClick={() => {
-                      if (impersonationReason.trim().length < 8) {
-                        toast.error('Add an impersonation reason (at least 8 characters).');
-                        return;
-                      }
-                      if (!window.confirm('Open a magic link to sign in as this user in a new tab?')) return;
-                      impersonateMutation.mutate();
-                    }}
-                    className="interactive-press inline-flex items-center gap-1 border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-status-warning-text)] disabled:opacity-40 dark:text-[var(--color-status-warning-text-dark)]"
-                  >
-                    {impersonateMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
-                    Impersonate (magic link)
-                  </button>
-                  <button
-                    type="button"
-                    disabled={revokeSessionsMutation.isPending}
-                    onClick={() => {
-                      if (!window.confirm('Revoke all Supabase sessions for this user globally?')) return;
-                      revokeSessionsMutation.mutate();
-                    }}
-                    className={cn(adminDangerButtonClass, 'py-1.5 text-[11px]')}
-                  >
-                    {revokeSessionsMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-                    Revoke sessions
-                  </button>
+              {isSuperAdmin ? (
+                <div className="mt-4 border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--color-status-warning-text-dark)]">Super-admin actions</p>
+                  <p className="mt-1 text-[11px] text-content-secondary">
+                    Impersonation signs you in as this user in a new tab (full app access). Use a dedicated browser profile
+                    for stricter isolation. Every handoff is audited; magic links are single-use.
+                  </p>
+                  <textarea
+                    value={impersonationReason}
+                    onChange={(e) => setImpersonationReason(e.target.value)}
+                    rows={2}
+                    placeholder="Reason (min. 8 characters, stored in audit log)"
+                    className={cn(adminInputClass, 'mt-2 w-full text-content-secondary')}
+                  />
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      disabled={isOwnAccount || impersonateMutation.isPending}
+                      onClick={() => {
+                        if (impersonationReason.trim().length < 8) {
+                          toast.error('Add an impersonation reason (at least 8 characters).');
+                          return;
+                        }
+                        if (!window.confirm('Open a magic link to sign in as this user in a new tab?')) return;
+                        impersonateMutation.mutate();
+                      }}
+                      className="interactive-press inline-flex items-center gap-1 border border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] px-3 py-1.5 text-[11px] font-semibold text-[var(--color-status-warning-text)] disabled:opacity-40 dark:text-[var(--color-status-warning-text-dark)]"
+                    >
+                      {impersonateMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <ExternalLink className="h-3.5 w-3.5" />}
+                      Impersonate (magic link)
+                    </button>
+                    <button
+                      type="button"
+                      disabled={revokeSessionsMutation.isPending}
+                      onClick={() => {
+                        if (!window.confirm('Revoke all Supabase sessions for this user globally?')) return;
+                        revokeSessionsMutation.mutate();
+                      }}
+                      className={cn(adminDangerButtonClass, 'py-1.5 text-[11px]')}
+                    >
+                      {revokeSessionsMutation.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                      Revoke sessions
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ) : null}
+              ) : null}
 
-            <p className={SECTION}>Entitlements</p>
-            {detail.entitlements.length === 0 ? (
-              <p className="text-xs text-content-muted">No entitlements.</p>
-            ) : (
-              <ul className="space-y-2">
-                {detail.entitlements.map((ent) => (
-                  <li key={ent.id} className="border border-surface-border p-2 text-xs">
-                    <span className="font-medium text-content-primary">{ent.feature_key}</span>{' '}
-                    <StatusBadge status={ent.status} />
-                    <span className="mt-1 block text-content-muted">
-                      {ent.source}
-                      {ent.ends_at ? ` · ends ${fmtDate(ent.ends_at)}` : ''}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
+              <p className={SECTION}>Entitlements</p>
+              {detail.entitlements.length === 0 ? (
+                <p className="text-xs text-content-muted">No entitlements.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {detail.entitlements.map((ent) => (
+                    <li key={ent.id} className="border border-surface-border p-2 text-xs">
+                      <span className="font-medium text-content-primary">{ent.feature_key}</span>{' '}
+                      <StatusBadge status={ent.status} />
+                      <span className="mt-1 block text-content-muted">
+                        {ent.source}
+                        {ent.ends_at ? ` · ends ${fmtDate(ent.ends_at)}` : ''}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            <p className={SECTION}>Billing</p>
-            <p className="mb-1 text-[11px] text-content-muted">Recent subscriptions</p>
-            {detail.subscriptions.length === 0 ? (
-              <p className="text-xs text-content-muted">No subscriptions.</p>
-            ) : (
-              <ul className="space-y-1.5 text-xs">
-                {detail.subscriptions.map((s) => (
-                  <li key={s.id} className="border border-surface-border px-2 py-1.5">
-                    <StatusBadge status={s.status} />
-                    <span className="ml-2 text-content-muted">{s.stripe_subscription_id}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <p className="mb-1 mt-3 text-[11px] text-content-muted">Recent payments</p>
-            {detail.payments.length === 0 ? (
-              <p className="text-xs text-content-muted">No payments.</p>
-            ) : (
-              <ul className="space-y-1 text-xs text-content-secondary">
-                {detail.payments.map((p) => (
-                  <li key={p.id}>
-                    {fmtUsd(p.amount_total)} {p.currency?.toUpperCase()} · {p.status} · {fmtDate(p.created_at)}
-                  </li>
-                ))}
-              </ul>
-            )}
+              <p className={SECTION}>Billing</p>
+              <p className="mb-1 text-[11px] text-content-muted">Recent subscriptions</p>
+              {detail.subscriptions.length === 0 ? (
+                <p className="text-xs text-content-muted">No subscriptions.</p>
+              ) : (
+                <ul className="space-y-1.5 text-xs">
+                  {detail.subscriptions.map((s) => (
+                    <li key={s.id} className="border border-surface-border px-2 py-1.5">
+                      <StatusBadge status={s.status} />
+                      <span className="ml-2 text-content-muted">{s.stripe_subscription_id}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <p className="mb-1 mt-3 text-[11px] text-content-muted">Recent payments</p>
+              {detail.payments.length === 0 ? (
+                <p className="text-xs text-content-muted">No payments.</p>
+              ) : (
+                <ul className="space-y-1 text-xs text-content-secondary">
+                  {detail.payments.map((p) => (
+                    <li key={p.id}>
+                      {fmtUsd(p.amount_total)} {p.currency?.toUpperCase()} · {p.status} · {fmtDate(p.created_at)}
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            <p className={SECTION}>Plaid</p>
-            {detail.plaid_items.length === 0 ? (
-              <p className="text-xs text-content-muted">No Plaid items.</p>
-            ) : (
-              <ul className="space-y-2 text-xs">
-                {detail.plaid_items.map((it, i) => (
-                  <li key={i} className="border border-surface-border p-2">
-                    <span className="font-medium text-content-primary">{it.institution_name ?? 'Institution'}</span>
-                    {it.item_login_required ? (
-                      <span className="ml-2 text-amber-700 dark:text-amber-200">Needs relink</span>
-                    ) : null}
-                    {it.last_sync_error ? (
-                      <span className="mt-1 block text-rose-200/90">{String(it.last_sync_error)}</span>
-                    ) : null}
-                    <span className="mt-0.5 block text-content-muted">Last sync {fmtDate(it.last_sync_at)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+              <p className={SECTION}>Plaid</p>
+              {detail.plaid_items.length === 0 ? (
+                <p className="text-xs text-content-muted">No Plaid items.</p>
+              ) : (
+                <ul className="space-y-2 text-xs">
+                  {detail.plaid_items.map((it, i) => (
+                    <li key={i} className="border border-surface-border p-2">
+                      <span className="font-medium text-content-primary">{it.institution_name ?? 'Institution'}</span>
+                      {it.item_login_required ? (
+                        <span className="ml-2 text-amber-700 dark:text-amber-200">Needs relink</span>
+                      ) : null}
+                      {it.last_sync_error ? (
+                        <span className="mt-1 block text-rose-200/90">{String(it.last_sync_error)}</span>
+                      ) : null}
+                      <span className="mt-0.5 block text-content-muted">Last sync {fmtDate(it.last_sync_at)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            <p className={SECTION}>Support tickets</p>
-            {detail.tickets.length === 0 ? (
-              <p className="text-xs text-content-muted">No tickets.</p>
-            ) : (
-              <ul className="space-y-1 text-xs text-content-secondary">
-                {detail.tickets.map((t) => (
-                  <li key={t.id}>
-                    #{t.ticket_number} · {t.subject} · {t.status}
-                  </li>
-                ))}
-              </ul>
-            )}
+              <p className={SECTION}>Support tickets</p>
+              {detail.tickets.length === 0 ? (
+                <p className="text-xs text-content-muted">No tickets.</p>
+              ) : (
+                <ul className="space-y-1 text-xs text-content-secondary">
+                  {detail.tickets.map((t) => (
+                    <li key={t.id}>
+                      #{t.ticket_number} · {t.subject} · {t.status}
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            <p className={SECTION}>Admin risk notes</p>
-            {detail.admin_notes.length === 0 ? (
-              <p className="text-xs text-content-muted">No admin notes.</p>
-            ) : (
-              <ul className="space-y-2 text-xs text-content-secondary">
-                {detail.admin_notes.map((note) => (
-                  <li key={note.id} className="border border-surface-border p-2">
-                    <span className="font-semibold text-content-primary">{note.note_type}</span>
-                    <p className="mt-1">{note.body}</p>
-                    <p className="mt-1 text-[10px] text-content-muted">{fmtDate(note.created_at)}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
+              <p className={SECTION}>Admin risk notes</p>
+              {detail.admin_notes.length === 0 ? (
+                <p className="text-xs text-content-muted">No admin notes.</p>
+              ) : (
+                <ul className="space-y-2 text-xs text-content-secondary">
+                  {detail.admin_notes.map((note) => (
+                    <li key={note.id} className="border border-surface-border p-2">
+                      <span className="font-semibold text-content-primary">{note.note_type}</span>
+                      <p className="mt-1">{note.body}</p>
+                      <p className="mt-1 text-[10px] text-content-muted">{fmtDate(note.created_at)}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            <p className={SECTION}>Lifecycle and billing ops</p>
-            {[...detail.lifecycle_events, ...detail.trial_events, ...detail.deletion_reviews].length === 0 ? (
-              <p className="text-xs text-content-muted">No lifecycle, deletion, or trial-extension events.</p>
-            ) : (
-              <ul className="space-y-2 text-xs text-content-secondary">
-                {detail.lifecycle_events.map((event) => (
-                  <li key={event.id} className="border border-surface-border p-2">
-                    {event.action} · {event.reason_code}
-                    <p className="mt-1 text-content-muted">{event.reason}</p>
-                  </li>
-                ))}
-                {detail.trial_events.map((event) => (
-                  <li key={event.id} className="border border-surface-border p-2">
-                    Trial +{event.additional_days} days · ends {fmtDate(event.new_trial_ends_at)}
-                    <p className="mt-1 text-content-muted">{event.reason}</p>
-                  </li>
-                ))}
-                {detail.deletion_reviews.map((review) => (
-                  <li key={review.id} className="border border-surface-border p-2">
-                    Deletion review · {review.status} · {review.reason_code}
-                    <p className="mt-1 text-content-muted">{review.reason}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
+              <p className={SECTION}>Lifecycle and billing ops</p>
+              {[...detail.lifecycle_events, ...detail.trial_events, ...detail.deletion_reviews].length === 0 ? (
+                <p className="text-xs text-content-muted">No lifecycle, deletion, or trial-extension events.</p>
+              ) : (
+                <ul className="space-y-2 text-xs text-content-secondary">
+                  {detail.lifecycle_events.map((event) => (
+                    <li key={event.id} className="border border-surface-border p-2">
+                      {event.action} · {event.reason_code}
+                      <p className="mt-1 text-content-muted">{event.reason}</p>
+                    </li>
+                  ))}
+                  {detail.trial_events.map((event) => (
+                    <li key={event.id} className="border border-surface-border p-2">
+                      Trial +{event.additional_days} days · ends {fmtDate(event.new_trial_ends_at)}
+                      <p className="mt-1 text-content-muted">{event.reason}</p>
+                    </li>
+                  ))}
+                  {detail.deletion_reviews.map((review) => (
+                    <li key={review.id} className="border border-surface-border p-2">
+                      Deletion review · {review.status} · {review.reason_code}
+                      <p className="mt-1 text-content-muted">{review.reason}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            {detail.compliance ? (
-              <>
-                <p className={SECTION}>Compliance snapshot</p>
-                <div className="border border-surface-border p-3 text-xs text-content-secondary">
-                  <p>KYC: {detail.compliance.kyc_status}</p>
-                  <p>AML: {detail.compliance.aml_status}</p>
-                  <p>Risk score: {detail.compliance.risk_score}</p>
-                  <p>PEP / sanctions hit: {detail.compliance.pep_sanctions_hit ? 'Yes' : 'No'}</p>
-                  <p className="text-content-muted">Updated {fmtDate(detail.compliance.updated_at)}</p>
-                </div>
-              </>
-            ) : null}
+              {detail.compliance ? (
+                <>
+                  <p className={SECTION}>Compliance snapshot</p>
+                  <div className="border border-surface-border p-3 text-xs text-content-secondary">
+                    <p>KYC: {detail.compliance.kyc_status}</p>
+                    <p>AML: {detail.compliance.aml_status}</p>
+                    <p>Risk score: {detail.compliance.risk_score}</p>
+                    <p>PEP / sanctions hit: {detail.compliance.pep_sanctions_hit ? 'Yes' : 'No'}</p>
+                    <p className="text-content-muted">Updated {fmtDate(detail.compliance.updated_at)}</p>
+                  </div>
+                </>
+              ) : null}
 
-            <p className={SECTION}>Timeline</p>
-            {timeline.length === 0 ? (
-              <p className="text-xs text-content-muted">No timeline events.</p>
-            ) : (
-              <ul className="max-h-80 space-y-2 overflow-y-auto text-xs">
-                {timeline.map((row, idx) => (
-                  <li key={idx} className="border-l-2 border-surface-border pl-2">
-                    <span className="text-content-muted">{fmtDate(row.at)}</span>
-                    <span className="ml-2 text-[10px] uppercase text-content-tertiary">{row.source}</span>
-                    <p className="text-content-secondary">{row.label}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
+              <p className={SECTION}>Timeline</p>
+              {timeline.length === 0 ? (
+                <p className="text-xs text-content-muted">No timeline events.</p>
+              ) : (
+                <ul className="max-h-80 space-y-2 overflow-y-auto text-xs">
+                  {timeline.map((row, idx) => (
+                    <li key={idx} className="border-l-2 border-surface-border pl-2">
+                      <span className="text-content-muted">{fmtDate(row.at)}</span>
+                      <span className="ml-2 text-[10px] uppercase text-content-tertiary">{row.source}</span>
+                      <p className="text-content-secondary">{row.label}</p>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </AdminPanel>
 

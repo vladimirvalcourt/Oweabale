@@ -3,6 +3,7 @@ import { Footer } from '@/components/layout';
 import { PublicHeader } from '@/components/layout';
 import { TransitionLink } from '@/components/common';
 import { useSEO } from '@/hooks';
+import { SITE_CONFIG } from '@/config/site';
 
 const sections = [
   {
@@ -46,8 +47,8 @@ export default function Terms() {
   useSEO({
     title: 'Terms of Service — Oweable',
     description: 'Terms covering use of Oweable, plan billing, cancellations, platform restrictions, and legal responsibilities in plain language.',
-    canonical: 'https://www.oweable.com/terms',
-    ogImage: 'https://www.oweable.com/og-image.svg',
+        canonical: SITE_CONFIG.getUrl('/terms'),
+        ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   return (

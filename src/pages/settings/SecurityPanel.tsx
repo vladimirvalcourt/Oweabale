@@ -5,6 +5,7 @@ import { supabase } from '@/lib/api/supabase';
 import { toast } from 'sonner';
 import { useStore } from '@/store';
 import { getCustomIcon } from '@/lib/utils/customIcons';
+import { EXTERNAL_RESOURCES } from '@/config/externalResources';
 
 
 function SecurityPanelInner() {
@@ -146,7 +147,7 @@ function SecurityPanelInner() {
               Your account is secured through your Google sign-in. Manage your password and
               two-factor authentication directly in your{' '}
               <a
-                href="https://myaccount.google.com/security"
+                href={EXTERNAL_RESOURCES.auth.googleSecurity}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline underline-offset-2 hover:no-underline"

@@ -3,6 +3,7 @@ import { Minus, Plus } from 'lucide-react';
 import { PublicHeader } from '@/components/layout';
 import { Footer } from '@/components/layout';
 import { useSEO } from '@/hooks';
+import { SITE_CONFIG } from '@/config/site';
 
 const FAQ_DATA = [
   {
@@ -78,8 +79,8 @@ export default function FAQ() {
     title: 'Frequently Asked Questions — Oweable',
     description:
       'Plain-English answers about how Oweable helps with bills, debt payoff, subscriptions, the 14-day trial, security, and uneven income.',
-    canonical: 'https://www.oweable.com/faq',
-    ogImage: 'https://www.oweable.com/og-image.svg',
+        canonical: SITE_CONFIG.getUrl('/faq'),
+        ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   const faqSchema = {

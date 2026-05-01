@@ -9,6 +9,8 @@ import { useSEO } from '@/hooks';
 import { submitSupportContact } from '@/app/constants';
 import { EMAIL_CONFIG } from '@/lib/utils/emailObfuscation';
 import { toast } from 'sonner';
+import { SITE_CONFIG } from '@/config/site';
+import { EXTERNAL_RESOURCES } from '@/config/externalResources';
 
 // Framer Motion Variants
 const fadeInUp = {
@@ -31,7 +33,7 @@ const springButton = {
   tap: { scale: 0.97, transition: { type: 'spring' as const, stiffness: 400, damping: 17 } },
 };
 
-const SUPPORT_PAGE_URL = 'https://www.oweable.com/support';
+const SUPPORT_PAGE_URL = SITE_CONFIG.getUrl('/support');
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY?.trim();
 const TURNSTILE_ENFORCED = Boolean(TURNSTILE_SITE_KEY);
 
@@ -100,10 +102,10 @@ export default function Support() {
   useSEO({
     title: 'Support — Oweable',
     description: 'Contact Oweable support for billing, access, privacy, security, or product questions when bills, debt, or account issues need a real answer.',
-    canonical: 'https://www.oweable.com/support',
+        canonical: SITE_CONFIG.getUrl('/support'),
     ogTitle: 'Support — Oweable',
     ogDescription: 'Get help with account access, billing, subscriptions, and product questions from a real person.',
-    ogImage: 'https://www.oweable.com/og-image.svg',
+    ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   useJsonLd('support', buildSupportJsonLd, []);
@@ -427,7 +429,7 @@ function loadTurnstileScript() {
     }
 
     const script = document.createElement('script');
-    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+    script.src = `${EXTERNAL_RESOURCES.security.cloudflareTurnstile}?render=explicit`;
     script.async = true;
     script.defer = true;
     script.dataset.turnstileScript = 'true';

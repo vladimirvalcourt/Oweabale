@@ -152,13 +152,12 @@ export default function AdminCompliancePage() {
                   <div className="flex items-center justify-between gap-2">
                     <p className="truncate text-xs font-medium text-content-primary">{item.user_id}</p>
                     <span
-                      className={`border px-2 py-0.5 text-[10px] uppercase tracking-wide ${
-                        item.severity === 'critical'
+                      className={`border px-2 py-0.5 text-[10px] uppercase tracking-wide ${item.severity === 'critical'
                           ? 'border-[var(--color-status-urgent-border)] bg-[var(--color-status-urgent-bg)] text-[var(--color-status-urgent-text-dark)]'
                           : item.severity === 'high'
                             ? 'border-[var(--color-status-warning-border)] bg-[var(--color-status-warning-bg)] text-[var(--color-status-warning-text-dark)]'
                             : 'border-surface-border text-content-tertiary'
-                      }`}
+                        }`}
                     >
                       {item.severity}
                     </span>

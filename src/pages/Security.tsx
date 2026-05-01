@@ -3,6 +3,7 @@ import { Footer } from '@/components/layout';
 import { PublicHeader } from '@/components/layout';
 import { useSEO } from '@/hooks';
 import { EMAIL_CONFIG } from '@/lib/utils/emailObfuscation';
+import { SITE_CONFIG } from '@/config/site';
 
 const securityCards = [
   {
@@ -47,8 +48,8 @@ export default function Security() {
     title: 'Security — Oweable',
     description:
       'How Oweable protects sensitive bill, debt, and financial planning data with encryption, controlled access, infrastructure safeguards, and vulnerability reporting.',
-    canonical: 'https://www.oweable.com/security',
-    ogImage: 'https://www.oweable.com/og-image.svg',
+        canonical: SITE_CONFIG.getUrl('/security'),
+        ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   return (

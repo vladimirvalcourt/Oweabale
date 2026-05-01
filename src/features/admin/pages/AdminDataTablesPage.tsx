@@ -242,11 +242,10 @@ export default function AdminDataTablesPage() {
                 setPage(0);
                 setSelectedIds([]);
               }}
-              className={`interactive-press interactive-focus shrink-0 border px-3 py-1.5 text-xs font-medium ${
-                activeKey === entity.key
+              className={`interactive-press interactive-focus shrink-0 border px-3 py-1.5 text-xs font-medium ${activeKey === entity.key
                   ? 'border-content-primary bg-content-primary text-surface-base'
                   : 'border-surface-border bg-surface-base text-content-secondary hover:text-content-primary'
-              }`}
+                }`}
             >
               {entity.key}
             </button>
@@ -257,93 +256,93 @@ export default function AdminDataTablesPage() {
       <div className="grid grid-cols-1 gap-3 xl:grid-cols-[1fr_auto]">
         <AdminPanel title="Filters">
           <div className="p-4">
-          <p className="mb-3 text-[10px] uppercase tracking-wide text-content-tertiary">Filters</p>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {profilesView ? (
-              <>
-                <select
-                  value={planFilter}
-                  onChange={(e) => {
-                    setPlanFilter(e.target.value as 'any' | 'free' | 'pro' | 'lifetime');
-                    setPage(0);
-                  }}
-                  className={adminInputClass}
-                >
-                  <option value="any">Any plan</option>
-                  <option value="free">Free</option>
-                  <option value="pro">Pro</option>
-                  <option value="lifetime">Lifetime</option>
-                </select>
-                <select
-                  value={plaidFilter}
-                  onChange={(e) => {
-                    setPlaidFilter(e.target.value as 'any' | 'healthy' | 'error' | 'relink');
-                    setPage(0);
-                  }}
-                  className={adminInputClass}
-                >
-                  <option value="any">Any Plaid</option>
-                  <option value="healthy">Healthy</option>
-                  <option value="error">Sync error</option>
-                  <option value="relink">Needs relink</option>
-                </select>
-              </>
-            ) : null}
-            <select
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setPage(0);
-              }}
-              className={adminInputClass}
-            >
-              <option value={10}>10 rows / page</option>
-              <option value={25}>25 rows / page</option>
-              <option value={50}>50 rows / page</option>
-            </select>
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Filter current table..."
-              className={cn(adminInputClass, 'sm:col-span-2 lg:col-span-1')}
-            />
-          </div>
+            <p className="mb-3 text-[10px] uppercase tracking-wide text-content-tertiary">Filters</p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
+              {profilesView ? (
+                <>
+                  <select
+                    value={planFilter}
+                    onChange={(e) => {
+                      setPlanFilter(e.target.value as 'any' | 'free' | 'pro' | 'lifetime');
+                      setPage(0);
+                    }}
+                    className={adminInputClass}
+                  >
+                    <option value="any">Any plan</option>
+                    <option value="free">Free</option>
+                    <option value="pro">Pro</option>
+                    <option value="lifetime">Lifetime</option>
+                  </select>
+                  <select
+                    value={plaidFilter}
+                    onChange={(e) => {
+                      setPlaidFilter(e.target.value as 'any' | 'healthy' | 'error' | 'relink');
+                      setPage(0);
+                    }}
+                    className={adminInputClass}
+                  >
+                    <option value="any">Any Plaid</option>
+                    <option value="healthy">Healthy</option>
+                    <option value="error">Sync error</option>
+                    <option value="relink">Needs relink</option>
+                  </select>
+                </>
+              ) : null}
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPage(0);
+                }}
+                className={adminInputClass}
+              >
+                <option value={10}>10 rows / page</option>
+                <option value={25}>25 rows / page</option>
+                <option value={50}>50 rows / page</option>
+              </select>
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Filter current table..."
+                className={cn(adminInputClass, 'sm:col-span-2 lg:col-span-1')}
+              />
+            </div>
           </div>
         </AdminPanel>
 
         <AdminPanel title="Actions" description="Exports are safe. Bulk mutations are intentionally gated.">
           <div className="p-4">
-          <p className="mb-3 text-[10px] uppercase tracking-wide text-content-tertiary">Actions</p>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={handleExportCsv}
-              className={adminButtonClass}
-            >
-              <Download className="h-3.5 w-3.5" /> Export CSV
-            </button>
-            {profilesView && selectedIds.length > 0 ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => void handleProfileBulkAction('ban')}
-                  className={adminDangerButtonClass}
-                >
-                  Ban selected
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void handleProfileBulkAction('unban')}
-                  className="interactive-press interactive-focus border border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-3 py-2 text-xs font-semibold text-[var(--color-status-emerald-text)] dark:text-[var(--color-status-emerald-text-dark)]"
-                >
-                  Unban selected
-                </button>
-              </>
-            ) : null}
-          </div>
-          <p className="mt-3 text-[11px] leading-5 text-content-muted">
-            Direct row edits and deletes are disabled. Use case files or audited admin actions for changes.
-          </p>
+            <p className="mb-3 text-[10px] uppercase tracking-wide text-content-tertiary">Actions</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleExportCsv}
+                className={adminButtonClass}
+              >
+                <Download className="h-3.5 w-3.5" /> Export CSV
+              </button>
+              {profilesView && selectedIds.length > 0 ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => void handleProfileBulkAction('ban')}
+                    className={adminDangerButtonClass}
+                  >
+                    Ban selected
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void handleProfileBulkAction('unban')}
+                    className="interactive-press interactive-focus border border-[var(--color-status-emerald-border)] bg-[var(--color-status-emerald-bg)] px-3 py-2 text-xs font-semibold text-[var(--color-status-emerald-text)] dark:text-[var(--color-status-emerald-text-dark)]"
+                  >
+                    Unban selected
+                  </button>
+                </>
+              ) : null}
+            </div>
+            <p className="mt-3 text-[11px] leading-5 text-content-muted">
+              Direct row edits and deletes are disabled. Use case files or audited admin actions for changes.
+            </p>
           </div>
         </AdminPanel>
       </div>

@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { CollapsibleModule } from '@/components/common';
 import { TransitionLink } from '@/components/common';
+import { TAX_YEAR_2024, calculateStandardDeduction, calculateSelfEmploymentTax } from '@/config/taxRates';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { getCustomIcon } from '@/lib/utils';
@@ -137,7 +138,7 @@ export default function Taxes() {
 
   // Self-Employment Tax Calculation (15.3% on 92.35% of earnings)
   const calculateFederal = (income: number, status: 'single' | 'married') => {
-    const standardDeduction = status === 'single' ? 14600 : 29200;
+    const standardDeduction = calculateStandardDeduction(status === 'single' ? 'single' : 'marriedFilingJointly');
     const taxableBase = Math.max(0, income - standardDeduction - totalDeductions);
     
     let tax = 0;
@@ -170,7 +171,7 @@ export default function Taxes() {
     return tax;
   };
 
-  const seTax = (incomeStats.grossGig * 0.9235) * 0.153;
+  const seTax = calculateSelfEmploymentTax(incomeStats.grossGig);
   const fedTax = calculateFederal(incomeStats.total, filingStatus);
   const stateTax = incomeStats.total * (stateRate / 100);
   const totalLiability = fedTax + seTax + stateTax;
@@ -751,7 +752,7 @@ export default function Taxes() {
                    <div>
                      <p className="text-sm font-sans font-medium text-content-primary">Check your real pay</p>
                      <p className="text-xs text-content-tertiary mt-1 leading-normal">
-                       Don't spend all your income — set aside at least 30% for taxes.
+                       Don't spend all your income — set aside at least {Math.round(TAX_YEAR_2024.recommendedReservePercentage * 100)}% for taxes.
                      </p>
                    </div>
                  </div>

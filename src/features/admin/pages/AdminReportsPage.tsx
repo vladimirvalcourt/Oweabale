@@ -222,11 +222,11 @@ export default function AdminReportsPage() {
   const funnel = funnelData;
   const funnelSteps = funnel
     ? [
-        { label: 'Signed up', count: funnel.totalSignups, pct: 100 },
-        { label: 'Connected bank', count: funnel.withBank, pct: funnel.totalSignups > 0 ? Math.round((funnel.withBank / funnel.totalSignups) * 100) : 0 },
-        { label: 'Added a bill', count: funnel.withBill, pct: funnel.totalSignups > 0 ? Math.round((funnel.withBill / funnel.totalSignups) * 100) : 0 },
-        { label: 'Set a budget', count: funnel.withBudget, pct: funnel.totalSignups > 0 ? Math.round((funnel.withBudget / funnel.totalSignups) * 100) : 0 },
-      ]
+      { label: 'Signed up', count: funnel.totalSignups, pct: 100 },
+      { label: 'Connected bank', count: funnel.withBank, pct: funnel.totalSignups > 0 ? Math.round((funnel.withBank / funnel.totalSignups) * 100) : 0 },
+      { label: 'Added a bill', count: funnel.withBill, pct: funnel.totalSignups > 0 ? Math.round((funnel.withBill / funnel.totalSignups) * 100) : 0 },
+      { label: 'Set a budget', count: funnel.withBudget, pct: funnel.totalSignups > 0 ? Math.round((funnel.withBudget / funnel.totalSignups) * 100) : 0 },
+    ]
     : [];
 
   return (
@@ -244,22 +244,22 @@ export default function AdminReportsPage() {
       />
 
       <AdminPanel title="Report controls" description="Export the currently loaded operational rows. Text export is intentionally honest until a real PDF renderer is added.">
-      <div className="flex flex-wrap items-end gap-3 p-4">
-        <div>
-          <label className="mb-1 block text-[10px] uppercase tracking-wider text-content-tertiary">From</label>
-          <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className={adminInputClass} />
+        <div className="flex flex-wrap items-end gap-3 p-4">
+          <div>
+            <label className="mb-1 block text-[10px] uppercase tracking-wider text-content-tertiary">From</label>
+            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className={adminInputClass} />
+          </div>
+          <div>
+            <label className="mb-1 block text-[10px] uppercase tracking-wider text-content-tertiary">To</label>
+            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className={adminInputClass} />
+          </div>
+          <button type="button" onClick={exportCsv} className={adminButtonClass}>
+            <Download className="h-3.5 w-3.5" /> CSV
+          </button>
+          <button type="button" onClick={exportText} className={adminButtonClass}>
+            <FileText className="h-3.5 w-3.5" /> TXT
+          </button>
         </div>
-        <div>
-          <label className="mb-1 block text-[10px] uppercase tracking-wider text-content-tertiary">To</label>
-          <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className={adminInputClass} />
-        </div>
-        <button type="button" onClick={exportCsv} className={adminButtonClass}>
-          <Download className="h-3.5 w-3.5" /> CSV
-        </button>
-        <button type="button" onClick={exportText} className={adminButtonClass}>
-          <FileText className="h-3.5 w-3.5" /> TXT
-        </button>
-      </div>
       </AdminPanel>
 
       {/* Section tabs */}
@@ -271,11 +271,10 @@ export default function AdminReportsPage() {
               key={s.key}
               type="button"
               onClick={() => setActiveSection(s.key)}
-              className={`shrink-0 inline-flex items-center gap-1.5 border px-3 py-1.5 text-xs font-medium ${
-                activeSection === s.key
+              className={`shrink-0 inline-flex items-center gap-1.5 border px-3 py-1.5 text-xs font-medium ${activeSection === s.key
                   ? 'border-content-primary bg-content-primary text-surface-base'
                   : 'border-surface-border bg-surface-base text-content-secondary hover:text-content-primary'
-              }`}
+                }`}
             >
               <Icon className="h-3.5 w-3.5" />
               {s.label}
