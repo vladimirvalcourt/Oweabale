@@ -1,11 +1,12 @@
 import './instrument';
 import { registerSW } from 'virtual:pwa-register';
 import { initWebVitalsReporting } from './lib/utils/webVitalsReporting';
-import { StrictMode } from 'react';
+import { StrictMode, lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MotionConfig } from 'motion/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Analytics } from '@vercel/analytics/react';
+// Lazy-load Vercel Analytics to avoid blocking initial page load
+const Analytics = lazy(() => import('@vercel/analytics/react').then(mod => ({ default: mod.Analytics })));
 import { reactErrorHandler } from '@sentry/react';
 import App from './App.tsx';
 import 'sonner/dist/styles.css';
@@ -86,7 +87,9 @@ createRoot(rootEl, {
     <MotionConfig reducedMotion="user">
       <QueryClientProvider client={queryClient}>
         <App />
-        <Analytics />
+        <Suspense fallback={null}>
+          <Analytics />
+        </Suspense>
       </QueryClientProvider>
     </MotionConfig>
   </StrictMode>,

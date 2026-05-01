@@ -9,7 +9,8 @@ import { lazy, Suspense } from 'react';
 import { Layout, DeviceGuard, ErrorBoundary, AuthGuard, AdminGuard, MaintenanceGuard, ProPlanGuard, DashboardSkeleton, ListSkeleton, AppLoader, SessionWarningModal, PWAInstallBanner } from './components';
 import { useStore } from './store';
 import { useAuth, usePWAUpdateNotification, usePWAStandaloneMode, usePostHogIdentity, useTheme } from './hooks';
-import { SpeedInsights } from '@vercel/speed-insights/react';
+// Lazy-load SpeedInsights to avoid blocking initial page load
+const SpeedInsights = lazy(() => import('@vercel/speed-insights/react').then(mod => ({ default: mod.SpeedInsights })));
 
 // Fix 1: Dashboard is now lazy — this keeps recharts + motion/react OUT of the initial
 // bundle. The 70 KB page was previously blocking first paint for ALL authenticated users.
@@ -221,7 +222,9 @@ export default function App() {
     <BrowserRouter>
       <PostHogProvider>
         <AppShell />
-        <SpeedInsights />
+        <Suspense fallback={null}>
+          <SpeedInsights />
+        </Suspense>
         <CrispChat />
       </PostHogProvider>
     </BrowserRouter>

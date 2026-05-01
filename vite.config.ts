@@ -190,6 +190,8 @@ export default defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 1400,
       minify: 'esbuild',
       sourcemap: isProd ? 'hidden' : false,
+      // Target modern browsers only — no unnecessary polyfills
+      target: ['chrome90', 'firefox88', 'safari14', 'edge90'],
       rollupOptions: {
         output: {
           /**
