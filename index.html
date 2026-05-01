@@ -1,70 +1,83 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a0a0a" />
 
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/manifest.json" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
 
-    <!-- iOS Safari PWA -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Oweable" />
-    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-pwa.png" />
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
 
-    <!-- Windows / Edge PWA tile -->
-    <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
-    <meta name="msapplication-TileColor" content="#0a0a0a" />
-    <meta name="msapplication-config" content="none" />
+  <!-- iOS Safari PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Oweable" />
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-pwa.png" />
 
-    <!-- Inter: fallback only — primary UI uses self-hosted Geist (see main.tsx + index.css) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..700;1,14..32,400..700&amp;display=swap" />
+  <!-- Windows / Edge PWA tile -->
+  <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+  <meta name="msapplication-TileColor" content="#0a0a0a" />
+  <meta name="msapplication-config" content="none" />
 
-    <!-- Primary meta -->
-    <title>Oweable — Stop Guessing What You Owe</title>
-    <meta name="description" content="Oweable helps you manage bills, debt minimums, subscriptions, tolls, tickets, fines, and overdue obligations in one calm Pay List when money already feels heavy." />
-    <meta name="keywords" content="personal finance app, bill tracker, budget app, debt payoff planner, net worth tracker, subscription tracker, cash flow, financial calendar, spending analytics, money management, household finance, variable income, quarterly taxes, traffic ticket fines, oweable" />
-    <meta name="author" content="Oweable" />
-    <meta name="publisher" content="Oweable" />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://www.oweable.com" />
-    <link rel="alternate" type="text/plain" title="Oweable machine-readable summary (llms.txt)" href="https://www.oweable.com/llms.txt" />
+  <!-- Inter: fallback only — primary UI uses self-hosted Geist (see main.tsx + index.css) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..700;1,14..32,400..700&amp;display=swap" />
 
-    <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://www.oweable.com" />
-    <meta property="og:title" content="Oweable — Stop Guessing What You Owe" />
-    <meta property="og:description" content="A calm Pay List for bills, debt minimums, subscriptions, tolls, tickets, fines, and overdue obligations. See what needs attention next without carrying it all in your head." />
-    <meta property="og:image" content="https://www.oweable.com/og-image.svg" />
-    <meta property="og:image:alt" content="Oweable dashboard showing bills, debt tracker, budget categories, and net worth overview on a clean web interface." />
-    <meta property="og:site_name" content="Oweable" />
-    <meta property="og:locale" content="en_US" />
+  <!-- Preload critical Geist fonts for faster FCP -->
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 
-    <!-- Twitter / X Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@oweable" />
-    <meta name="twitter:title" content="Stop guessing what you owe." />
-    <meta name="twitter:description" content="Oweable keeps a calm Pay List for bills, debt minimums, subscriptions, tolls, tickets, fines, and overdue obligations." />
-    <meta name="twitter:image" content="https://www.oweable.com/og-image.svg" />
-    <meta name="twitter:image:alt" content="Oweable dashboard showing bills, debt tracker, budget categories, and net worth overview on a clean web interface." />
+  <!-- Primary meta -->
+  <title>Oweable — Stop Guessing What You Owe</title>
+  <meta name="description"
+    content="Oweable helps you manage bills, debt minimums, subscriptions, tolls, tickets, fines, and overdue obligations in one calm Pay List when money already feels heavy." />
+  <meta name="keywords"
+    content="personal finance app, bill tracker, budget app, debt payoff planner, net worth tracker, subscription tracker, cash flow, financial calendar, spending analytics, money management, household finance, variable income, quarterly taxes, traffic ticket fines, oweable" />
+  <meta name="author" content="Oweable" />
+  <meta name="publisher" content="Oweable" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.oweable.com" />
+  <link rel="alternate" type="text/plain" title="Oweable machine-readable summary (llms.txt)"
+    href="https://www.oweable.com/llms.txt" />
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.oweable.com" />
+  <meta property="og:title" content="Oweable — Stop Guessing What You Owe" />
+  <meta property="og:description"
+    content="A calm Pay List for bills, debt minimums, subscriptions, tolls, tickets, fines, and overdue obligations. See what needs attention next without carrying it all in your head." />
+  <meta property="og:image" content="https://www.oweable.com/og-image.svg" />
+  <meta property="og:image:alt"
+    content="Oweable dashboard showing bills, debt tracker, budget categories, and net worth overview on a clean web interface." />
+  <meta property="og:site_name" content="Oweable" />
+  <meta property="og:locale" content="en_US" />
 
-<!-- ═══════════════════════════════════════════════
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@oweable" />
+  <meta name="twitter:title" content="Stop guessing what you owe." />
+  <meta name="twitter:description"
+    content="Oweable keeps a calm Pay List for bills, debt minimums, subscriptions, tolls, tickets, fines, and overdue obligations." />
+  <meta name="twitter:image" content="https://www.oweable.com/og-image.svg" />
+  <meta name="twitter:image:alt"
+    content="Oweable dashboard showing bills, debt tracker, budget categories, and net worth overview on a clean web interface." />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+  <!-- ═══════════════════════════════════════════════
          STRUCTURED DATA — parsed by Google, Perplexity,
          Claude, ChatGPT, and other AI research engines
          ═══════════════════════════════════════════════ -->
 
-    <!-- 1. SoftwareApplication -->
-    <script type="application/ld+json">
+  <!-- 1. SoftwareApplication -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
@@ -107,8 +120,8 @@
     }
     </script>
 
-    <!-- 2. Organization -->
-    <script type="application/ld+json">
+  <!-- 2. Organization -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Organization",
@@ -124,8 +137,8 @@
     }
     </script>
 
-    <!-- 3. FAQPage — heavily indexed by AI search engines -->
-    <script type="application/ld+json">
+  <!-- 3. FAQPage — heavily indexed by AI search engines -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "FAQPage",
@@ -246,8 +259,8 @@
     }
     </script>
 
-    <!-- 4. WebSite -->
-    <script type="application/ld+json">
+  <!-- 4. WebSite -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
@@ -262,8 +275,8 @@
     }
     </script>
 
-    <!-- 5. BreadcrumbList — site navigation for search engines -->
-    <script type="application/ld+json">
+  <!-- 5. BreadcrumbList — site navigation for search engines -->
+  <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "BreadcrumbList",
@@ -307,33 +320,39 @@
       ]
     }
     </script>
-  </head>
-  <body>
-    <!-- Static content for crawlers that don't execute JavaScript -->
-    <noscript>
-      <header>
-        <h1>Oweable — Stop guessing what you owe</h1>
-        <p>Oweable is a personal finance web app for people who need a calmer way to face bills, debt minimums, subscriptions, tolls, tickets, fines, overdue obligations, budgets, cash flow, and uneven income.</p>
-        <h2>Key Features</h2>
-        <ul>
-          <li>Debt payoff planning that helps you choose what to tackle next</li>
-          <li>Bills, debts, and fines in one list, with overdue items called out clearly</li>
-          <li>Spending guardrails that help protect money before it is gone</li>
-          <li>Credit score tracking and credit workshop tools</li>
-          <li>Income tracking for steady, mixed, gig, and self-employed income</li>
-          <li>Tax reserve help when income is uneven</li>
-          <li>Net worth, investments, and insurance views</li>
-          <li>Spending patterns, reports, and subscription tracking</li>
-          <li>Document ingestion with OCR for receipts, invoices, and statements</li>
-          <li>Mobile document capture via QR code — no app download required</li>
-          <li>Financial Academy: self-paced personal finance tracks</li>
-        </ul>
-        <h2>Who It's For</h2>
-        <p>Households and individuals who want bills, debt, and budgets in one place — including salaried professionals, families, gig workers, and self-employed earners.</p>
-        <p><a href="https://www.oweable.com/pricing">Pricing</a> | <a href="https://www.oweable.com/support">Support</a> | <a href="https://www.oweable.com/security">Security</a> | <a href="https://www.oweable.com/privacy">Privacy</a></p>
-      </header>
-    </noscript>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+</head>
+
+<body>
+  <!-- Static content for crawlers that don't execute JavaScript -->
+  <noscript>
+    <header>
+      <h1>Oweable — Stop guessing what you owe</h1>
+      <p>Oweable is a personal finance web app for people who need a calmer way to face bills, debt minimums,
+        subscriptions, tolls, tickets, fines, overdue obligations, budgets, cash flow, and uneven income.</p>
+      <h2>Key Features</h2>
+      <ul>
+        <li>Debt payoff planning that helps you choose what to tackle next</li>
+        <li>Bills, debts, and fines in one list, with overdue items called out clearly</li>
+        <li>Spending guardrails that help protect money before it is gone</li>
+        <li>Credit score tracking and credit workshop tools</li>
+        <li>Income tracking for steady, mixed, gig, and self-employed income</li>
+        <li>Tax reserve help when income is uneven</li>
+        <li>Net worth, investments, and insurance views</li>
+        <li>Spending patterns, reports, and subscription tracking</li>
+        <li>Document ingestion with OCR for receipts, invoices, and statements</li>
+        <li>Mobile document capture via QR code — no app download required</li>
+        <li>Financial Academy: self-paced personal finance tracks</li>
+      </ul>
+      <h2>Who It's For</h2>
+      <p>Households and individuals who want bills, debt, and budgets in one place — including salaried professionals,
+        families, gig workers, and self-employed earners.</p>
+      <p><a href="https://www.oweable.com/pricing">Pricing</a> | <a href="https://www.oweable.com/support">Support</a> |
+        <a href="https://www.oweable.com/security">Security</a> | <a href="https://www.oweable.com/privacy">Privacy</a>
+      </p>
+    </header>
+  </noscript>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

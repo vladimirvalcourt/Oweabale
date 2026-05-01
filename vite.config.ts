@@ -138,13 +138,25 @@ export default defineConfig(({ mode }) => {
           'push-handler.js',
         ],
         workbox: {
-          // Pre-cache the full app shell
-          globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,webp,jpg}'],
+          // Optimize precache: only cache critical app shell assets
+          // Large chunks (charts, pdfjs, motion) loaded on-demand via runtime caching
+          globPatterns: ['index.html', 'manifest.json', 'favicon*.png', 'apple-touch-icon*.png', 'icons/*.png'],
+          globIgnores: ['**/node_modules/**', '**/stats.html'],
           // React SPA routing: ALWAYS fallback to index.html for navigation.
           navigateFallback: '/index.html',
           // Don't use offline fallback for admin routes — they have no offline value
           navigateFallbackDenylist: [/^\/admin/],
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB limit
           runtimeCaching: [
+            {
+              // App bundles (JS/CSS) — StaleWhileRevalidate for fast updates
+              urlPattern: /\.(?:js|css)$/,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'app-bundles',
+                expiration: { maxEntries: 60, maxAgeSeconds: 7 * 24 * 60 * 60 }, // 7 days
+              },
+            },
             {
               // Supabase REST API — NetworkFirst so UI always tries live data
               urlPattern: /^https:\/\/.*\.supabase\.co\/(rest|auth|storage)\//i,
@@ -166,9 +178,18 @@ export default defineConfig(({ mode }) => {
             },
             {
               // Google Fonts — StaleWhileRevalidate
-              urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
+              urlPattern: ({ url }) => url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com',
               handler: 'StaleWhileRevalidate',
               options: { cacheName: 'google-fonts', expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } },
+            },
+            {
+              // Video assets — CacheFirst with large TTL
+              urlPattern: /\.(?:mp4|webm)$/,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'video-assets',
+                expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              },
             },
           ],
         },

@@ -152,7 +152,7 @@ const Hero = React.memo(() => {
           loop
           muted
           playsInline
-          poster="/hero-loop-poster.jpg"
+          poster="/hero-loop-poster.webp"
           className="absolute inset-0 h-full w-full object-cover"
           src="/hero-loop.mp4"
         />
