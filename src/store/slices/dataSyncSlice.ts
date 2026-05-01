@@ -150,8 +150,6 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           { data: incomes, error: incomesError },
           { data: subscriptions, error: subscriptionsError },
           { data: plaidAccountsRows, error: plaidAccountsError },
-          { data: households, error: householdsError },
-          { data: householdMembersRows, error: householdMembersError },
         ] = await Promise.all([
           supabase.from('profiles').select('*').eq('id', resolvedUserId).maybeSingle(),
           supabase.from('bills').select('*').eq('user_id', resolvedUserId),
@@ -161,8 +159,6 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           supabase.from('incomes').select('*').eq('user_id', resolvedUserId),
           supabase.from('subscriptions').select('*').eq('user_id', resolvedUserId),
           supabase.from('plaid_accounts').select('*').eq('user_id', resolvedUserId).order('name', { ascending: true }),
-          supabase.from('households').select('*').maybeSingle(),
-          supabase.from('household_members').select('*, profiles!household_members_user_id_fkey(email, first_name, avatar_url)').eq('status', 'accepted'),
         ]);
         console.timeEnd('[fetchData] Phase 1 queries');
         console.log('[fetchData] Phase 1 complete - bills:', bills?.length, 'debts:', debts?.length, 'transactions:', transactionsPage?.length);
@@ -189,20 +185,6 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         if (incomesError) console.error('[fetchData] Incomes fetch error:', incomesError);
         if (subscriptionsError) console.error('[fetchData] Subscriptions fetch error:', subscriptionsError);
         if (plaidAccountsError) console.error('[fetchData] Plaid accounts fetch error:', plaidAccountsError);
-        if (householdsError) console.error('[fetchData] Households fetch error:', householdsError);
-        if (householdMembersError) {
-          console.error('[fetchData] Household members fetch error:', householdMembersError);
-          console.error('[fetchData] Household members error details:', { code: householdMembersError.code, message: householdMembersError.message });
-          // If the join fails, try fetching without the profile join
-          if (householdMembersError.code === 'PGRST200' || householdMembersError.message?.includes('relationship')) {
-            console.warn('[fetchData] Retrying household_members without profile join...');
-            const { data: retryMembers } = await supabase
-              .from('household_members')
-              .select('*')
-              .eq('status', 'accepted');
-            householdMembersRows = retryMembers;
-          }
-        }
         if (profileError && profileError.code !== 'PGRST116') {
           console.error('[fetchData] Profile fetch error:', profileError);
         }
@@ -360,35 +342,6 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
               isAdmin: profile.is_admin === true,
             }
             : { ...get().user, id: resolvedUserId },
-          currentHousehold: households || null,
-          householdMembers: (() => {
-            try {
-              return (householdMembersRows || []).map((member: Record<string, unknown>) => {
-                // Defensive: check if profiles join succeeded
-                const profilesData = member.profiles as { email?: string; first_name?: string; avatar_url?: string } | null;
-                return {
-                  id: member.id as string,
-                  household_id: member.household_id as string,
-                  user_id: (member.user_id ?? null) as string | null,
-                  role: member.role as 'owner' | 'partner' | 'viewer',
-                  invited_email: (member.invited_email ?? null) as string | null,
-                  status: member.status as 'pending' | 'accepted',
-                  joined_at: (member.joined_at ?? null) as string | null,
-                  email: (profilesData?.email ?? null) as string | null,
-                  first_name: (profilesData?.first_name ?? null) as string | null,
-                  avatar_url: (profilesData?.avatar_url ?? null) as string | null,
-                };
-              });
-            } catch (err) {
-              console.error('[fetchData] Error mapping household members:', err);
-              return [];
-            }
-          })(),
-          userRole: (() => {
-            if (!households || !householdMembersRows) return null;
-            const member = householdMembersRows.find((row: Record<string, unknown>) => row.user_id === resolvedUserId);
-            return (member?.role as AppState['userRole']) ?? null;
-          })(),
         });
 
         if (!background) set({ isLoading: false });

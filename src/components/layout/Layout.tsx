@@ -13,7 +13,6 @@ import { useStore } from '@/store';
 import { useShallow } from 'zustand/react/shallow';
 import QuickAddModal from '@/components/common/QuickAddModal';
 import { TactileIcon, MorphingMenuIcon } from '@/components/ui/TactileIcon';
-import { HouseholdAvatarStack } from '@/components/common/HouseholdAvatarStack';
 import type { Notification } from '@/store';
 import { useFullSuiteAccess } from '@/hooks';
 import { formatCategoryLabel } from '@/lib/api/services/categoryDisplay';
@@ -139,7 +138,6 @@ export default function Layout() {
     markNotificationsRead,
     clearNotifications,
     citations,
-    householdMembers,
   } = useStore(
     useShallow((s) => ({
       bills: s.bills,
@@ -159,7 +157,6 @@ export default function Layout() {
       markNotificationsRead: s.markNotificationsRead,
       clearNotifications: s.clearNotifications,
       citations: s.citations,
-      householdMembers: s.householdMembers,
     }))
   );
   const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -812,8 +809,7 @@ export default function Layout() {
               )}
             </div>
 
-            {/* Household Members Avatar Stack */}
-            <HouseholdAvatarStack members={householdMembers} />
+
 
             {/* Profile Dropdown */}
             <HeadlessMenu as="div" className="relative">
