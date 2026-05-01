@@ -93,7 +93,8 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         return;
       }
 
-      console.log('[fetchData] starting fetch...');
+      console.log('[fetchData] starting fetch for user:', resolvedUserId);
+      console.time('[fetchData] Total fetch time');
 
       void (async () => {
         const { error } = await supabase.rpc('flip_overdue_bills');
@@ -138,6 +139,8 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
       ]);
 
       try {
+        console.log('[fetchData] Executing phase1 queries...');
+        console.time('[fetchData] Phase 1 queries');
         const [
           { data: profile, error: profileError },
           { data: bills, error: billsError },
@@ -161,6 +164,8 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           supabase.from('households').select('*').maybeSingle(),
           supabase.from('household_members').select('*, profiles!inner(email, first_name, avatar_url)').eq('status', 'accepted'),
         ]);
+        console.timeEnd('[fetchData] Phase 1 queries');
+        console.log('[fetchData] Phase 1 complete - bills:', bills?.length, 'debts:', debts?.length, 'transactions:', transactionsPage?.length);
 
         // Debug logging for Plaid sync troubleshooting
         console.log('[fetchData] Transactions fetched:', transactionsPage?.length || 0);
@@ -190,6 +195,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           console.error('[fetchData] Profile fetch error:', profileError);
         }
 
+        console.log('[fetchData] Setting phase1 state...');
         set({
           bills: (bills || []).map((bill: Record<string, unknown>) => ({
             id: bill.id as string,
@@ -364,6 +370,12 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
 
         if (!background) set({ isLoading: false });
 
+        console.log('[fetchData] Phase 1 state updated, starting phase2...');
+        console.time('[fetchData] Phase 2 queries');
+
+        console.log('[fetchData] Phase 1 state updated, starting phase2...');
+        console.time('[fetchData] Phase 2 queries');
+
         let phase2RecordCount = 0;
 
         try {
@@ -387,6 +399,10 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
             { data: investmentAccountsData },
             { data: insurancePoliciesData },
           ] = await phase2Promise;
+          console.timeEnd('[fetchData] Phase 2 queries');
+          console.log('[fetchData] Phase 2 complete - goals:', goals?.length, 'citations:', citations?.length);
+          console.timeEnd('[fetchData] Phase 2 queries');
+          console.log('[fetchData] Phase 2 complete - goals:', goals?.length, 'citations:', citations?.length);
 
           set({
             goals: (goals || []).map((goal: Record<string, unknown>) => ({
@@ -611,12 +627,21 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           (subscriptions?.length ?? 0) +
           phase2RecordCount;
 
-        console.log(`[fetchData] done, loaded ${recordCount} records`);
+        console.log('[fetchData] All data loaded successfully, clearing loading state...');
+        console.timeEnd('[fetchData] Total fetch time');
       } catch (err) {
-        console.error('[fetchData] failed:', err);
+        console.error('[fetchData] CRITICAL ERROR:', err);
+        console.error('[fetchData] Error stack:', err instanceof Error ? err.stack : 'No stack');
+        toast.error('Failed to load your financial data. Please refresh the page.');
       } finally {
+        console.log('[fetchData] Finally block - clearing isLoading');
         if (!background) {
-          if (get().isLoading) set({ isLoading: false });
+          if (get().isLoading) {
+            console.log('[fetchData] Setting isLoading to false');
+            set({ isLoading: false });
+          } else {
+            console.warn('[fetchData] isLoading was already false - possible double-call?');
+          }
           if (!get().phase2Hydrated) set({ phase2Hydrated: true });
         }
       }

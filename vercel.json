@@ -4,9 +4,18 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "crons": [
-    { "path": "/api/cron/expire-trials", "schedule": "0 2 * * *" },
-    { "path": "/api/cron/trial-warning", "schedule": "0 8 * * *" },
-    { "path": "/api/cron/plaid-sync", "schedule": "0 3 * * *" }
+    {
+      "path": "/api/cron/expire-trials",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/trial-warning",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/plaid-sync",
+      "schedule": "0 3 * * *"
+    }
   ],
   "rewrites": [
     {

@@ -100,7 +100,7 @@ createRoot(rootEl, {
 if (typeof window !== 'undefined') {
   // Monitor long tasks (>50ms) to identify blocking operations
   monitorLongTasks(50);
-  
+
   // Defer non-critical initializations
   lazyInit.initializeWhenIdle();
 }

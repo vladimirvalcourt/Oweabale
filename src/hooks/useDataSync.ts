@@ -58,19 +58,27 @@ export function useDataSync({
   const lastVisibilityFetchRef = useRef(0);
 
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading) {
+      console.log('[useDataSync] Auth still loading, waiting...');
+      return;
+    }
 
     if (authUserId) {
+      console.log('[useDataSync] User authenticated:', authUserId);
       hadSessionRef.current = true;
-      if (lastFetchedUserIdRef.current === authUserId) return;
+      if (lastFetchedUserIdRef.current === authUserId) {
+        console.log('[useDataSync] Already fetched for this user, skipping');
+        return;
+      }
       lastFetchedUserIdRef.current = authUserId;
-      dataSyncDevLog('[useDataSync] triggering fetchData for user:', authUserId);
+      console.log('[useDataSync] Triggering fetchData for user:', authUserId);
       // Same-frame loading gate as fetchData (effect runs after paint; this minimizes the onboarding flash).
       useStore.setState({ isLoading: true });
       void fetchData(authUserId);
       return;
     }
 
+    console.log('[useDataSync] No user ID, clearing session');
     lastFetchedUserIdRef.current = null;
     if (hadSessionRef.current) {
       hadSessionRef.current = false;
@@ -79,8 +87,10 @@ export function useDataSync({
   }, [authLoading, authUserId, fetchData, clearLocalData]);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('[useDataSync] Auth state changed:', event, 'Session:', session ? 'present' : 'null');
       if (event === 'SIGNED_OUT') {
+        console.log('[useDataSync] User signed out, clearing data');
         hadSessionRef.current = false;
         lastFetchedUserIdRef.current = null;
         clearLocalData();

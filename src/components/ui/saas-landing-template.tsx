@@ -13,20 +13,20 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = "default", size = "default", className = "", children, ...props }, ref) => {
     const baseStyles = "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-indigo focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
-    
+
     const variants = {
       default: "bg-brand-indigo text-white border border-brand-violet/30 hover:bg-brand-cta-hover",
       secondary: "bg-surface-elevated text-content-primary hover:bg-surface-highlight",
       ghost: "hover:bg-surface-highlight text-content-secondary hover:text-content-primary",
       gradient: "bg-brand-indigo text-white hover:bg-brand-cta-hover active:translate-y-px"
     };
-    
+
     const sizes = {
       default: "h-10 px-4 py-2 text-sm",
       sm: "h-10 px-5 text-sm",
       lg: "h-12 px-8 text-base"
     };
-    
+
     return (
       <button
         ref={ref}
@@ -50,7 +50,7 @@ const Navigation = React.memo(() => {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
         <div className="flex items-center justify-start">
           <div className="text-xl font-semibold text-content-primary mr-auto">Oweable</div>
-          
+
           <div className="hidden md:flex items-center justify-center gap-8 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             <a href="#features" className="text-sm text-content-secondary hover:text-content-primary transition-colors">
               Features
@@ -137,7 +137,7 @@ const Hero = React.memo(() => {
   const titleRef = React.useRef<HTMLHeadingElement>(null);
   const subtitleRef = React.useRef<HTMLParagraphElement>(null);
   const ctaRef = React.useRef<HTMLDivElement>(null);
-  
+
   const isTitleInView = useInView(titleRef, { once: true });
   const isSubtitleInView = useInView(subtitleRef, { once: true });
   const isCtaInView = useInView(ctaRef, { once: true });
@@ -145,7 +145,7 @@ const Hero = React.memo(() => {
   return (
     <section className="min-h-[100dvh] w-full p-3">
       <div className="relative min-h-[calc(100dvh-1.5rem)] w-full overflow-hidden rounded-3xl border border-surface-border-subtle bg-surface-base">
-        
+
         {/* Background video */}
         <video
           autoPlay
@@ -166,7 +166,7 @@ const Hero = React.memo(() => {
         {/* Hero content */}
         <div className="absolute bottom-0 left-0 right-0 px-4 pb-2 sm:px-6 md:px-10">
           <div className="grid grid-cols-12 items-end gap-4">
-            
+
             <div className="col-span-12 lg:col-span-8">
               <motion.h1
                 ref={titleRef}
@@ -180,7 +180,7 @@ const Hero = React.memo(() => {
             </div>
 
             <div className="col-span-12 flex flex-col gap-5 pb-6 lg:col-span-4 lg:pb-10">
-              
+
               <motion.p
                 ref={subtitleRef}
                 initial={{ y: 20, opacity: 0 }}

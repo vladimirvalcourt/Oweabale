@@ -48,8 +48,8 @@ export default function Security() {
     title: 'Security — Oweable',
     description:
       'How Oweable protects sensitive bill, debt, and financial planning data with encryption, controlled access, infrastructure safeguards, and vulnerability reporting.',
-        canonical: SITE_CONFIG.getUrl('/security'),
-        ogImage: SITE_CONFIG.defaultOgImage,
+    canonical: SITE_CONFIG.getUrl('/security'),
+    ogImage: SITE_CONFIG.defaultOgImage,
   });
 
   return (
@@ -63,37 +63,37 @@ export default function Security() {
       />
 
       <main className="premium-container pb-24 pt-36">
-          <section className="grid gap-12 py-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
-            <div>
-              <p className="premium-eyebrow">Security</p>
-              <h1 className="premium-display mt-5 max-w-3xl">
-                Security for the financial details you are trusting us to hold.
-              </h1>
-              <p className="premium-lede mt-7 max-w-xl">
-                Bills, debt, income, and account details are personal. Oweable is built so security sits inside the product, the infrastructure, and the support process, not just on this page.
-              </p>
-            </div>
+        <section className="grid gap-12 py-16 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
+          <div>
+            <p className="premium-eyebrow">Security</p>
+            <h1 className="premium-display mt-5 max-w-3xl">
+              Security for the financial details you are trusting us to hold.
+            </h1>
+            <p className="premium-lede mt-7 max-w-xl">
+              Bills, debt, income, and account details are personal. Oweable is built so security sits inside the product, the infrastructure, and the support process, not just on this page.
+            </p>
+          </div>
 
-            <div>
-              <div className="grid gap-3">
-                {securityCards.map((card) => (
+          <div>
+            <div className="grid gap-3">
+              {securityCards.map((card) => (
                 <article key={card.title} className="premium-panel p-5">
                   <h2 className="text-lg font-medium tracking-[-0.024em] text-content-primary mb-3">{card.title}</h2>
                   <p className="text-sm leading-relaxed text-content-tertiary">{card.body}</p>
                 </article>
-                ))}
-              </div>
-
-              <div className="premium-panel mt-10 divide-y divide-surface-border overflow-hidden p-0">
-                {sections.map((section) => (
-                  <section key={section.title} className="p-5">
-                    <h2 className="text-xl font-medium tracking-[-0.03em] text-content-primary">{section.title}</h2>
-                    <p className="mt-4 max-w-4xl text-sm leading-6 text-content-tertiary">{section.copy}</p>
-                  </section>
-                ))}
-              </div>
+              ))}
             </div>
-          </section>
+
+            <div className="premium-panel mt-10 divide-y divide-surface-border overflow-hidden p-0">
+              {sections.map((section) => (
+                <section key={section.title} className="p-5">
+                  <h2 className="text-xl font-medium tracking-[-0.03em] text-content-primary">{section.title}</h2>
+                  <p className="mt-4 max-w-4xl text-sm leading-6 text-content-tertiary">{section.copy}</p>
+                </section>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
       <Footer />
     </div>

@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Dialog } from '@headlessui/react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  ShieldCheck, AlertCircle, TrendingUp, HelpCircle, 
-  ChevronRight, ArrowUpRight, CheckCircle2, XCircle, 
+import {
+  ShieldCheck, AlertCircle, TrendingUp, HelpCircle,
+  ChevronRight, ArrowUpRight, CheckCircle2, XCircle,
   Mail, ExternalLink, Calendar, Calculator, Plus, Trash2, Edit3, Send,
   FileText, Download, Copy, ShieldAlert, X
 } from 'lucide-react';
@@ -19,7 +19,7 @@ export default function CreditCenter() {
   const [isFixModalOpen, setIsFixModalOpen] = useState(false);
   const [isLetterModalOpen, setIsLetterModalOpen] = useState(false);
   const [selectedFixId, setSelectedFixId] = useState<string | null>(null);
-  
+
   const [fixItem, setFixItem] = useState('');
   const [fixAmount, setFixAmount] = useState('');
   const [fixBureau, setFixBureau] = useState('Experian');
@@ -30,12 +30,12 @@ export default function CreditCenter() {
   const activeFixes = (credit?.fixes || []).filter(f => f.status !== 'resolved');
   const itemsSent = (credit?.fixes || []).filter(f => f.status === 'sent').length;
   const itemsResolved = (credit?.fixes || []).filter(f => f.status === 'resolved').length;
-  
+
   const scoreProgress = ((creditScore - 300) / (850 - 300)) * 100;
 
-  const selectedFix = useMemo(() => 
-    (credit?.fixes || []).find(f => f.id === selectedFixId), 
-  [credit?.fixes, selectedFixId]);
+  const selectedFix = useMemo(() =>
+    (credit?.fixes || []).find(f => f.id === selectedFixId),
+    [credit?.fixes, selectedFixId]);
 
   // 1. Calculate a simple "Quick Boost" Tip
   const highBalanceCard = useMemo(() => {
@@ -71,7 +71,7 @@ export default function CreditCenter() {
       status: 'todo',
       notes: fixNotes
     });
-    
+
     toast.success('Added to your fix-it list');
     setIsFixModalOpen(false);
     setFixItem('');
@@ -132,7 +132,7 @@ ${user.firstName} ${user.lastName}
   return (
     <AppPageShell className="min-h-screen">
       <div className="space-y-8 w-full pb-12">
-        
+
         {/* Header & Score Gauge */}
         <div className="flex flex-col md:flex-row gap-8 items-start">
           <div className="flex-1 space-y-2">
@@ -143,7 +143,7 @@ ${user.firstName} ${user.lastName}
           </div>
 
           {/* Tactile Score Display */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="bg-surface-raised border border-surface-border p-8 rounded-xl shrink-0 w-full md:w-64 text-center relative overflow-hidden shadow-none"
@@ -163,10 +163,10 @@ ${user.firstName} ${user.lastName}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Left: Factors & Boost Tips */}
           <div className="lg:col-span-2 space-y-8">
-            
+
             {/* Main Factors */}
             <section className="bg-surface-raised border border-surface-border rounded-xl overflow-hidden shadow-none">
               <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-raised/80">
@@ -210,7 +210,7 @@ ${user.firstName} ${user.lastName}
                 {boostTip ? (
                   <>
                     <p className="text-2xl font-sans font-bold text-content-primary mb-4 italic leading-tight">
-                      Reduce <span className="text-content-primary">{boostTip.cardName}</span> balance <br className="hidden md:block"/>
+                      Reduce <span className="text-content-primary">{boostTip.cardName}</span> balance <br className="hidden md:block" />
                       to <span className="text-content-primary">10% utilization</span>
                     </p>
                     <p className="text-sm text-content-tertiary mb-6 max-w-lg leading-relaxed">
@@ -229,8 +229,8 @@ ${user.firstName} ${user.lastName}
                 {creditScore > 0 && (() => {
                   const bracket =
                     creditScore >= 740 ? 'excellent' :
-                    creditScore >= 670 ? 'good' :
-                    creditScore >= 580 ? 'fair' : 'building';
+                      creditScore >= 670 ? 'good' :
+                        creditScore >= 580 ? 'fair' : 'building';
                   const tipsByBracket: Record<string, { label: string; tips: string[] }> = {
                     building: {
                       label: '300–579 · Building',
@@ -292,14 +292,14 @@ ${user.firstName} ${user.lastName}
 
           {/* Right: Fix Mistakes & To-Do */}
           <div className="space-y-8">
-            
+
             {/* Fix-it List */}
             <section className="bg-surface-raised border border-surface-border rounded-xl flex flex-col h-full shadow-none">
               <div className="px-6 py-4 border-b border-surface-border flex items-center justify-between bg-surface-raised/80">
                 <h2 className="text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-500" /> Dispute Hub
                 </h2>
-                <button 
+                <button
                   type="button"
                   onClick={() => setIsFixModalOpen(true)}
                   className="focus-app rounded border border-surface-border bg-surface-elevated p-1 px-3 text-xs font-mono font-bold uppercase text-content-primary transition-all hover:bg-surface-raised"
@@ -307,7 +307,7 @@ ${user.firstName} ${user.lastName}
                   New Case
                 </button>
               </div>
-              
+
               <div className="flex-1 divide-y divide-surface-border overflow-y-auto max-h-[500px] focus-app">
                 {(!credit?.fixes || credit.fixes.length === 0) ? (
                   <div className="p-12 text-center space-y-4">
@@ -317,8 +317,8 @@ ${user.firstName} ${user.lastName}
                     <div>
                       <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">Clear Record</p>
                       <p className="text-xs text-content-muted mt-1 uppercase tracking-tight max-w-xs mx-auto leading-relaxed">
-                      Add a dispute case to track letters and status. Annual review helps catch reporting errors early.
-                    </p>
+                        Add a dispute case to track letters and status. Annual review helps catch reporting errors early.
+                      </p>
                     </div>
                   </div>
                 ) : (
@@ -329,11 +329,10 @@ ${user.firstName} ${user.lastName}
                           <h3 className="text-sm font-sans font-bold text-content-primary">{fix.item}</h3>
                           <p className="text-xs font-mono text-content-tertiary uppercase tracking-widest">{fix.bureau}</p>
                         </div>
-                        <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${
-                          fix.status === 'resolved' ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/5' : 
-                          fix.status === 'sent' ? 'border-surface-border text-content-primary bg-content-primary/[0.03]' : 
-                          'border-content-primary/10 text-content-tertiary'
-                        }`}>
+                        <span className={`text-xs font-mono px-2 py-0.5 rounded-full border ${fix.status === 'resolved' ? 'border-emerald-500/30 text-emerald-500 bg-emerald-500/5' :
+                            fix.status === 'sent' ? 'border-surface-border text-content-primary bg-content-primary/[0.03]' :
+                              'border-content-primary/10 text-content-tertiary'
+                          }`}>
                           {fix.status.toUpperCase()}
                         </span>
                       </div>
@@ -341,9 +340,9 @@ ${user.firstName} ${user.lastName}
                         <span className="text-xs font-mono text-content-primary font-bold">${fix.amount.toLocaleString()}</span>
                         <div className="h-px bg-surface-border flex-1" />
                       </div>
-                      
+
                       <div className="flex items-center gap-2 pt-1 opacity-80 group-hover:opacity-100 transition-opacity">
-                        <button 
+                        <button
                           type="button"
                           onClick={() => {
                             setSelectedFixId(fix.id);
@@ -353,14 +352,14 @@ ${user.firstName} ${user.lastName}
                         >
                           <FileText className="w-3 h-3" aria-hidden /> Letter
                         </button>
-                        <button 
+                        <button
                           type="button"
                           onClick={() => updateCreditFix(fix.id, { status: fix.status === 'resolved' ? 'todo' : 'resolved' })}
                           className="focus-app flex-1 rounded-md border border-content-primary/5 bg-surface-elevated py-1.5 text-xs font-mono font-bold uppercase tracking-widest text-content-secondary transition-all hover:bg-surface-border"
                         >
                           {fix.status === 'resolved' ? 'Undo' : 'Resolve'}
                         </button>
-                        <button 
+                        <button
                           type="button"
                           aria-label={`Delete dispute case ${fix.item}`}
                           onClick={() => deleteCreditFix(fix.id)}
@@ -416,9 +415,9 @@ ${user.firstName} ${user.lastName}
                     <form onSubmit={handleAddFix} className="space-y-4">
                       <div>
                         <label className="block text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Description</label>
-                        <input 
+                        <input
                           autoFocus
-                          type="text" 
+                          type="text"
                           value={fixItem}
                           onChange={e => setFixItem(e.target.value)}
                           placeholder="e.g., Inaccurate Medical Collection"
@@ -428,8 +427,8 @@ ${user.firstName} ${user.lastName}
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Amount ($)</label>
-                          <input 
-                            type="number" 
+                          <input
+                            type="number"
                             value={fixAmount}
                             onChange={e => setFixAmount(e.target.value)}
                             placeholder="0.00"
@@ -438,7 +437,7 @@ ${user.firstName} ${user.lastName}
                         </div>
                         <div>
                           <label className="block text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Bureau</label>
-                          <select 
+                          <select
                             value={fixBureau}
                             onChange={e => setFixBureau(e.target.value)}
                             className="w-full bg-surface-base border border-surface-border rounded-md px-3 py-3 text-sm text-content-primary focus-app-field h-[46px]"
@@ -452,7 +451,7 @@ ${user.firstName} ${user.lastName}
                       </div>
                       <div>
                         <label className="block text-xs font-mono font-bold text-content-tertiary uppercase tracking-widest mb-1.5">Evidence / Notes</label>
-                        <textarea 
+                        <textarea
                           value={fixNotes}
                           onChange={e => setFixNotes(e.target.value)}
                           placeholder="Explain why this is incorrect..."
@@ -460,14 +459,14 @@ ${user.firstName} ${user.lastName}
                         />
                       </div>
                       <div className="flex gap-3 pt-4">
-                        <button 
+                        <button
                           type="button"
                           onClick={() => setIsFixModalOpen(false)}
                           className="flex-1 py-3 text-xs font-mono font-bold text-content-tertiary hover:text-content-secondary uppercase tracking-widest transition-colors"
                         >
                           Dismiss
                         </button>
-                        <button 
+                        <button
                           type="submit"
                           className="flex-1 py-3 bg-brand-cta text-surface-base hover:bg-brand-cta-hover rounded-md text-xs font-mono font-bold uppercase tracking-widest transition-all shadow-none"
                         >
@@ -505,63 +504,63 @@ ${user.firstName} ${user.lastName}
                   className="w-full max-w-2xl"
                 >
                   <Dialog.Panel className="bg-brand-cta text-surface-base rounded-xl shadow-2xl p-10 font-serif border border-surface-base/15">
-                <div className="flex justify-between items-start mb-8 border-b border-surface-base/15 pb-4 no-print">
-                  <div className="space-y-1">
-                    <Dialog.Title className="text-xl font-sans font-black uppercase italic tracking-tighter text-surface-base">
-                      Dispute <span className="text-emerald-800">Letter</span>
-                    </Dialog.Title>
-                    <p className="text-xs font-sans text-content-tertiary uppercase tracking-widest">Formal Legal Correspondence</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button 
-                      onClick={() => {
-                        navigator.clipboard.writeText(generateLetter(selectedFix));
-                        toast.success('Letter copied to clipboard');
-                      }}
-                      className="p-2 bg-surface-base/10 hover:bg-surface-base/20 rounded-full transition-colors text-surface-base"
-                      title="Copy text"
-                      type="button"
-                    >
-                      <Copy className="w-4 h-4" />
-                    </button>
-                    <button 
-                      onClick={() => window.print()}
-                      className="p-2 bg-surface-base/10 hover:bg-surface-base/20 rounded-full transition-colors text-surface-base"
-                      title="Print"
-                      type="button"
-                    >
-                      <Download className="w-4 h-4" />
-                    </button>
-                    <button 
-                      onClick={() => setIsLetterModalOpen(false)}
-                      className="p-2 bg-black/5 hover:bg-rose-100 hover:text-rose-600 rounded-full transition-colors"
-                      type="button"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                    <div className="flex justify-between items-start mb-8 border-b border-surface-base/15 pb-4 no-print">
+                      <div className="space-y-1">
+                        <Dialog.Title className="text-xl font-sans font-black uppercase italic tracking-tighter text-surface-base">
+                          Dispute <span className="text-emerald-800">Letter</span>
+                        </Dialog.Title>
+                        <p className="text-xs font-sans text-content-tertiary uppercase tracking-widest">Formal Legal Correspondence</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(generateLetter(selectedFix));
+                            toast.success('Letter copied to clipboard');
+                          }}
+                          className="p-2 bg-surface-base/10 hover:bg-surface-base/20 rounded-full transition-colors text-surface-base"
+                          title="Copy text"
+                          type="button"
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => window.print()}
+                          className="p-2 bg-surface-base/10 hover:bg-surface-base/20 rounded-full transition-colors text-surface-base"
+                          title="Print"
+                          type="button"
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => setIsLetterModalOpen(false)}
+                          className="p-2 bg-black/5 hover:bg-rose-100 hover:text-rose-600 rounded-full transition-colors"
+                          type="button"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
 
-                <div className="whitespace-pre-wrap text-[11pt] leading-relaxed max-h-[60vh] overflow-y-auto pr-4 text-surface-base scrollbar-thin scrollbar-thumb-surface-base/20">
-                  {generateLetter(selectedFix)}
-                </div>
+                    <div className="whitespace-pre-wrap text-[11pt] leading-relaxed max-h-[60vh] overflow-y-auto pr-4 text-surface-base scrollbar-thin scrollbar-thumb-surface-base/20">
+                      {generateLetter(selectedFix)}
+                    </div>
 
-                <div className="mt-8 pt-8 border-t border-surface-base/10 flex items-center justify-between no-print">
-                  <p className="text-xs font-sans text-content-tertiary italic">
-                    Certified Mail is recommended for all legal disputes.
-                  </p>
-                  <button 
-                    onClick={() => {
-                      updateCreditFix(selectedFix.id, { status: 'sent' });
-                      setIsLetterModalOpen(false);
-                      toast.success('Status updated to SENT');
-                    }}
-                    className="px-6 py-2 bg-surface-base text-content-primary font-sans font-bold text-xs uppercase tracking-widest rounded-md hover:bg-brand-cta hover:text-surface-base transition-colors"
-                    type="button"
-                  >
-                    Mark as Sent
-                  </button>
-                </div>
+                    <div className="mt-8 pt-8 border-t border-surface-base/10 flex items-center justify-between no-print">
+                      <p className="text-xs font-sans text-content-tertiary italic">
+                        Certified Mail is recommended for all legal disputes.
+                      </p>
+                      <button
+                        onClick={() => {
+                          updateCreditFix(selectedFix.id, { status: 'sent' });
+                          setIsLetterModalOpen(false);
+                          toast.success('Status updated to SENT');
+                        }}
+                        className="px-6 py-2 bg-surface-base text-content-primary font-sans font-bold text-xs uppercase tracking-widest rounded-md hover:bg-brand-cta hover:text-surface-base transition-colors"
+                        type="button"
+                      >
+                        Mark as Sent
+                      </button>
+                    </div>
                   </Dialog.Panel>
                 </motion.div>
               </div>

@@ -66,7 +66,7 @@ function buildSupportJsonLd() {
         url: SUPPORT_PAGE_URL,
         name: 'Support — Oweable',
         description: 'Contact Oweable support for billing, access, product, privacy, or technical questions.',
-        
+
       },
       {
         '@type': 'FAQPage',
@@ -102,7 +102,7 @@ export default function Support() {
   useSEO({
     title: 'Support — Oweable',
     description: 'Contact Oweable support for billing, access, privacy, security, or product questions when bills, debt, or account issues need a real answer.',
-        canonical: SITE_CONFIG.getUrl('/support'),
+    canonical: SITE_CONFIG.getUrl('/support'),
     ogTitle: 'Support — Oweable',
     ogDescription: 'Get help with account access, billing, subscriptions, and product questions from a real person.',
     ogImage: SITE_CONFIG.defaultOgImage,
@@ -327,7 +327,7 @@ export default function Support() {
                         onChange={(e) => setFormData((prev) => ({ ...prev, message: e.target.value }))}
                         className="ui-field mt-2 min-h-[160px] py-3"
                         placeholder="Tell us what happened, what you expected, and anything that would help us reproduce or understand the issue."
-                        
+
                         required
                       />
                     </label>

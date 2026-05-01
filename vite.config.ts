@@ -42,31 +42,31 @@ export default defineConfig(({ mode }) => {
   // Dev CSP is permissive to allow Vite HMR and inline style injection
   const cspDirectives = isProd
     ? [
-        "default-src 'self'",
-        "script-src 'self' 'wasm-unsafe-eval'",
-        "style-src 'self' 'unsafe-inline'", // Tailwind injects styles at runtime
-        "img-src 'self' data: https:",
-        "font-src 'self' data:",
-        "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com",
-        "worker-src 'self' blob:",
-        "frame-src https://*.supabase.co",
-        "object-src 'none'",
-        "base-uri 'self'",
-        "form-action 'self'",
-      ]
+      "default-src 'self'",
+      "script-src 'self' 'wasm-unsafe-eval'",
+      "style-src 'self' 'unsafe-inline'", // Tailwind injects styles at runtime
+      "img-src 'self' data: https:",
+      "font-src 'self' data:",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com",
+      "worker-src 'self' blob:",
+      "frame-src https://*.supabase.co",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+    ]
     : [
-        "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'", // HMR requires unsafe-inline
-        "style-src 'self' 'unsafe-inline'",
-        "img-src 'self' data: https:",
-        "font-src 'self' data:",
-        "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com",
-        "worker-src 'self' blob:",
-        "frame-src https://*.supabase.co",
-        "object-src 'none'",
-        "base-uri 'self'",
-        "form-action 'self'",
-      ];
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'", // HMR requires unsafe-inline
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: https:",
+      "font-src 'self' data:",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com",
+      "worker-src 'self' blob:",
+      "frame-src https://*.supabase.co",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+    ];
 
   return {
     define: {
@@ -83,42 +83,42 @@ export default defineConfig(({ mode }) => {
       tailwindcss(),
       ...(sentryUpload
         ? [
-            sentryVitePlugin({
-              org: process.env.SENTRY_ORG ?? '',
-              project: process.env.SENTRY_PROJECT ?? '',
-              authToken: process.env.SENTRY_AUTH_TOKEN ?? '',
-              telemetry: false,
-              release: {
-                name: sentryReleaseName,
-                ...(process.env.VERCEL_ENV?.trim()
-                  ? { deploy: { env: process.env.VERCEL_ENV.trim() } }
-                  : {}),
-              },
-              sourcemaps: {
-                // Only upload Vite application bundles. The root PWA/workbox files are generated
-                // service-worker artifacts and can trigger noisy source-map-reference warnings.
-                assets: ['./dist/assets/**/*.{js,map}'],
-                ignore: ['./dist/sw.js', './dist/sw.js.map', './dist/workbox-*.js', './dist/workbox-*.js.map'],
-                filesToDeleteAfterUpload: ['./dist/assets/**/*.map'],
-              },
-            }),
-          ]
+          sentryVitePlugin({
+            org: process.env.SENTRY_ORG ?? '',
+            project: process.env.SENTRY_PROJECT ?? '',
+            authToken: process.env.SENTRY_AUTH_TOKEN ?? '',
+            telemetry: false,
+            release: {
+              name: sentryReleaseName,
+              ...(process.env.VERCEL_ENV?.trim()
+                ? { deploy: { env: process.env.VERCEL_ENV.trim() } }
+                : {}),
+            },
+            sourcemaps: {
+              // Only upload Vite application bundles. The root PWA/workbox files are generated
+              // service-worker artifacts and can trigger noisy source-map-reference warnings.
+              assets: ['./dist/assets/**/*.{js,map}'],
+              ignore: ['./dist/sw.js', './dist/sw.js.map', './dist/workbox-*.js', './dist/workbox-*.js.map'],
+              filesToDeleteAfterUpload: ['./dist/assets/**/*.map'],
+            },
+          }),
+        ]
         : []),
       // awesome-vite: vite-plugin-checker — TS + ESLint overlay in dev; DISABLED on production build for speed
       // TypeScript type-checking is handled by CI/CD pipeline separately
       ...(isProd
         ? []
         : [
-            checker({
-              typescript: true,
-              eslint: {
-                lintCommand: 'eslint "src/**/*.{ts,tsx}"',
-                useFlatConfig: true,
-              },
-              overlay: { initialIsOpen: false, badgeStyle: 'display: none;' },
-              enableBuild: false, // Disable during build for faster dev HMR
-            }),
-          ]),
+          checker({
+            typescript: true,
+            eslint: {
+              lintCommand: 'eslint "src/**/*.{ts,tsx}"',
+              useFlatConfig: true,
+            },
+            overlay: { initialIsOpen: false, badgeStyle: 'display: none;' },
+            enableBuild: false, // Disable during build for faster dev HMR
+          }),
+        ]),
       // PWA — service worker + manifest plumbing
       VitePWA({
         registerType: 'autoUpdate',
@@ -264,13 +264,13 @@ export default defineConfig(({ mode }) => {
         },
         plugins: analyze
           ? [
-              visualizer({
-                filename: 'stats.html',
-                gzipSize: true,
-                brotliSize: true,
-                open: process.env.CI !== 'true',
-              }),
-            ]
+            visualizer({
+              filename: 'stats.html',
+              gzipSize: true,
+              brotliSize: true,
+              open: process.env.CI !== 'true',
+            }),
+          ]
           : [],
       },
     },
