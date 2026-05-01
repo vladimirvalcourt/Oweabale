@@ -8,7 +8,7 @@ import type { User } from '@supabase/supabase-js';
 import { lazy, Suspense } from 'react';
 import { Layout, DeviceGuard, ErrorBoundary, AuthGuard, AdminGuard, MaintenanceGuard, ProPlanGuard, DashboardSkeleton, ListSkeleton, AppLoader, SessionWarningModal, PWAInstallBanner } from './components';
 import { useStore } from './store';
-import { useAuth, usePWAUpdateNotification, usePWAStandaloneMode, usePostHogIdentity, useTheme } from './hooks';
+import { useAuth, usePWAUpdateNotification, usePWAStandaloneMode, useTheme } from './hooks';
 // Lazy-load SpeedInsights to avoid blocking initial page load
 const SpeedInsights = lazy(() => import('@vercel/speed-insights/react').then(mod => ({ default: mod.SpeedInsights })));
 
@@ -47,8 +47,7 @@ import AuthCallback from './pages/AuthCallback';
 import PlaidCallback from './pages/PlaidCallback';
 import { useDataSync } from './hooks';
 import { ThemedToaster, UnsupportedBrowserBanner } from './components';
-import { PostHogProvider } from './hooks/usePostHog';
-import CrispChat from './components/common/CrispChat';
+
 
 const Changelog = lazy(() => import('./pages/Changelog'));
 const Analytics = lazy(() => import('./pages/Analytics'));
@@ -211,13 +210,10 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <PostHogProvider>
-        <AppShell />
-        <Suspense fallback={null}>
-          <SpeedInsights />
-        </Suspense>
-        <CrispChat />
-      </PostHogProvider>
+      <AppShell />
+      <Suspense fallback={null}>
+        <SpeedInsights />
+      </Suspense>
     </BrowserRouter>
   );
 }
@@ -228,9 +224,6 @@ function AppShell() {
   const location = useLocation();
   const isProRoute = location.pathname.startsWith('/pro');
   useTheme();
-
-  // Track user identity in PostHog
-  usePostHogIdentity();
 
   return (
     <>

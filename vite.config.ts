@@ -1,42 +1,14 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import { sentryVitePlugin } from '@sentry/vite-plugin';
 import path from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 import checker from 'vite-plugin-checker';
 import { VitePWA } from 'vite-plugin-pwa';
 
-/** Same resolution as Sentry bundler `release.name` — keep browser SDK + uploaded artifacts aligned. */
-function resolveSentryReleaseName(): string | undefined {
-  const explicit =
-    process.env.VITE_SENTRY_RELEASE?.trim() || process.env.SENTRY_RELEASE?.trim();
-  if (explicit) return explicit;
-  const version = process.env.VITE_APP_VERSION?.trim();
-  if (version) return version;
-  const sha = process.env.VERCEL_GIT_COMMIT_SHA?.trim();
-  if (sha) return `oweable@${sha}`;
-  return undefined;
-}
-
-function resolveSentryEnvironment(mode: string): string {
-  const override = process.env.VITE_SENTRY_ENVIRONMENT?.trim();
-  if (override) return override;
-  const vercel = process.env.VERCEL_ENV?.trim();
-  if (vercel) return vercel;
-  return mode;
-}
-
 export default defineConfig(({ mode }) => {
   const isProd = mode === 'production';
   const analyze = process.env.ANALYZE === 'true';
-  const sentryUpload =
-    isProd &&
-    Boolean(process.env.SENTRY_AUTH_TOKEN?.trim()) &&
-    Boolean(process.env.SENTRY_ORG?.trim()) &&
-    Boolean(process.env.SENTRY_PROJECT?.trim());
-  const sentryReleaseName = resolveSentryReleaseName();
-  const sentryEnvironment = resolveSentryEnvironment(mode);
 
   // Production CSP is strict — no unsafe-inline for scripts
   // Dev CSP is permissive to allow Vite HMR and inline style injection
@@ -47,7 +19,7 @@ export default defineConfig(({ mode }) => {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com", // Tailwind injects styles at runtime + Google Fonts
       "img-src 'self' data: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://o4511242266738688.ingest.us.sentry.io https://us.i.posthog.com https://us-assets.i.posthog.com https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com https://client.crisp.chat https://fonts.googleapis.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://accounts.google.com https://cdn.plaid.com https://sandbox.plaid.com https://development.plaid.com https://production.plaid.com https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com https://fonts.googleapis.com",
       "worker-src 'self' blob:",
       "frame-src https://*.supabase.co",
       "object-src 'none'",
@@ -60,7 +32,7 @@ export default defineConfig(({ mode }) => {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: https:",
       "font-src 'self' data: https://fonts.gstatic.com",
-      "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* https://*.ingest.sentry.io https://*.ingest.de.sentry.io https://o4511242266738688.ingest.us.sentry.io https://us.i.posthog.com https://us-assets.i.posthog.com https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com https://client.crisp.chat https://fonts.googleapis.com",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co ws://localhost:* https://fcm.googleapis.com https://fcmregistrations.googleapis.com https://updates.push.services.mozilla.com https://android.googleapis.com wss://push.services.mozilla.com https://fonts.googleapis.com",
       "worker-src 'self' blob:",
       "frame-src https://*.supabase.co",
       "object-src 'none'",
@@ -69,10 +41,6 @@ export default defineConfig(({ mode }) => {
     ];
 
   return {
-    define: {
-      'import.meta.env.VITE_SENTRY_RELEASE_RESOLVED': JSON.stringify(sentryReleaseName ?? ''),
-      'import.meta.env.VITE_SENTRY_ENVIRONMENT_RESOLVED': JSON.stringify(sentryEnvironment),
-    },
     test: {
       globals: true,
       environment: 'node',
@@ -81,29 +49,6 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       tailwindcss(),
-      ...(sentryUpload
-        ? [
-          sentryVitePlugin({
-            org: process.env.SENTRY_ORG ?? '',
-            project: process.env.SENTRY_PROJECT ?? '',
-            authToken: process.env.SENTRY_AUTH_TOKEN ?? '',
-            telemetry: false,
-            release: {
-              name: sentryReleaseName,
-              ...(process.env.VERCEL_ENV?.trim()
-                ? { deploy: { env: process.env.VERCEL_ENV.trim() } }
-                : {}),
-            },
-            sourcemaps: {
-              // Only upload Vite application bundles. The root PWA/workbox files are generated
-              // service-worker artifacts and can trigger noisy source-map-reference warnings.
-              assets: ['./dist/assets/**/*.{js,map}'],
-              ignore: ['./dist/sw.js', './dist/sw.js.map', './dist/workbox-*.js', './dist/workbox-*.js.map'],
-              filesToDeleteAfterUpload: ['./dist/assets/**/*.map'],
-            },
-          }),
-        ]
-        : []),
       // awesome-vite: vite-plugin-checker — TS + ESLint overlay in dev; DISABLED on production build for speed
       // TypeScript type-checking is handled by CI/CD pipeline separately
       ...(isProd
@@ -240,8 +185,6 @@ export default defineConfig(({ mode }) => {
             if (id.includes('@supabase')) return 'supabase';
             // Route/navigation dependencies
             if (id.includes('react-router') || id.includes('@remix-run/router') || id.includes('history')) return 'router';
-            // Observability and errors
-            if (id.includes('@sentry')) return 'sentry';
             // PDF stack
             if (id.includes('pdfjs-dist')) return 'pdfjs';
             // Data/query layer

@@ -644,7 +644,7 @@ html {
 
 html {
   min-height: 100dvh;
-  /* Crisp Geist/Inter rendering (Vercel dashboard–style) */
+  /* Premium font rendering */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
