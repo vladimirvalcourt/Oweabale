@@ -31,9 +31,8 @@ export function Menu({ trigger, children, align = "left", showChevron = true }: 
 
       {isOpen && (
         <div
-          className={`absolute ${
-            align === "right" ? "right-0" : "left-0"
-          } mt-2 w-56 rounded-md bg-surface-raised shadow-xl ring-1 ring-content-primary/10 focus-app z-50`}
+          className={`absolute ${align === "right" ? "right-0" : "left-0"
+            } mt-2 w-56 rounded-md bg-surface-raised shadow-xl ring-1 ring-content-primary/10 focus-app z-50`}
           role="menu"
           aria-orientation="vertical"
           aria-labelledby={buttonId}
@@ -93,7 +92,7 @@ export function MenuContainer({ children }: { children: React.ReactNode }) {
       {/* Container for all items */}
       <div className="relative">
         {/* First item - always visible */}
-        <div 
+        <div
           className="relative w-16 h-16 bg-surface-raised border border-surface-border cursor-pointer rounded-full group will-change-transform z-50 flex items-center justify-center shadow-lg hover:shadow-content-primary/10 transition-shadow"
           onClick={handleToggle}
         >
@@ -102,8 +101,8 @@ export function MenuContainer({ children }: { children: React.ReactNode }) {
 
         {/* Other items */}
         {childrenArray.slice(1).map((child, index) => (
-          <div 
-            key={index} 
+          <div
+            key={index}
             className="absolute top-0 left-0 w-16 h-16 bg-surface-raised border border-surface-border rounded-full flex items-center justify-center will-change-transform shadow-xl"
             style={{
               transform: `translateY(${isExpanded ? (index + 1) * 72 : 0}px)`,
