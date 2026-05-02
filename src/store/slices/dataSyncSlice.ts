@@ -439,25 +439,40 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
 
         try {
           const [
-            { data: goals },
-            { data: budgets },
-            { data: categories },
-            { data: citations },
-            { data: deductions },
-            { data: freelanceEntries },
-            { data: mileageLogRows },
-            { data: clientInvoicesRows },
-            { data: pendingIngestions },
-            { data: categorizationExclusions },
-            { data: creditFixes },
-            { data: adminBroadcasts },
-            { data: platformSettings },
-            { data: netWorthSnapshots },
+            { data: goalsRaw, error: goalsError },
+            { data: budgetsRaw, error: budgetsError },
+            { data: categoriesRaw, error: categoriesError },
+            { data: citationsRaw, error: citationsError },
+            { data: deductionsRaw, error: deductionsError },
+            { data: freelanceEntriesRaw, error: freelanceEntriesError },
+            { data: mileageLogRowsRaw, error: mileageLogError },
+            { data: clientInvoicesRowsRaw, error: clientInvoicesError },
+            { data: pendingIngestionsRaw, error: pendingIngestionsError },
+            { data: categorizationExclusionsRaw, error: categorizationExclusionsError },
+            { data: creditFixesRaw, error: creditFixesError },
+            { data: adminBroadcastsRaw, error: adminBroadcastsError },
+            { data: platformSettingsRaw, error: platformSettingsError },
+            { data: netWorthSnapshotsRaw, error: netWorthSnapshotsError },
           ] = await phase2Promise;
+          
+          // Ensure all data is an array, never undefined
+          const goals = goalsError ? [] : (goalsRaw ?? []);
+          const budgets = budgetsError ? [] : (budgetsRaw ?? []);
+          const categories = categoriesError ? [] : (categoriesRaw ?? []);
+          const citations = citationsError ? [] : (citationsRaw ?? []);
+          const deductions = deductionsError ? [] : (deductionsRaw ?? []);
+          const freelanceEntries = freelanceEntriesError ? [] : (freelanceEntriesRaw ?? []);
+          const mileageLogRows = mileageLogError ? [] : (mileageLogRowsRaw ?? []);
+          const clientInvoicesRows = clientInvoicesError ? [] : (clientInvoicesRowsRaw ?? []);
+          const pendingIngestions = pendingIngestionsError ? [] : (pendingIngestionsRaw ?? []);
+          const categorizationExclusions = categorizationExclusionsError ? [] : (categorizationExclusionsRaw ?? []);
+          const creditFixes = creditFixesError ? [] : (creditFixesRaw ?? []);
+          const adminBroadcasts = adminBroadcastsError ? [] : (adminBroadcastsRaw ?? []);
+          const platformSettings = platformSettingsError ? null : platformSettingsRaw;
+          const netWorthSnapshots = netWorthSnapshotsError ? [] : (netWorthSnapshotsRaw ?? []);
+          
           console.timeEnd('[fetchData] Phase 2 queries');
-          console.log('[fetchData] Phase 2 complete - goals:', goals?.length, 'citations:', citations?.length);
-          console.timeEnd('[fetchData] Phase 2 queries');
-          console.log('[fetchData] Phase 2 complete - goals:', goals?.length, 'citations:', citations?.length);
+          console.log('[fetchData] Phase 2 complete - goals:', goals.length, 'citations:', citations.length);
 
           set({
             goals: (goals || []).map((goal: Record<string, unknown>) => ({

@@ -85,7 +85,14 @@ export function useDataSync({
       // Same-frame loading gate as fetchData (effect runs after paint; this minimizes the onboarding flash).
       useStore.setState({ isLoading: true });
       void fetchDataRef.current(authUserId);
-      return;
+      
+      // Safety timeout: force-clear loading after 8 seconds no matter what
+      const loadingTimeout = setTimeout(() => {
+        console.warn('[useDataSync] Loading timeout - forcing isLoading to false');
+        useStore.setState({ isLoading: false });
+      }, 8000);
+      
+      return () => clearTimeout(loadingTimeout);
     }
 
     console.log('[useDataSync] No user ID, clearing session');
