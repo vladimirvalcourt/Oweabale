@@ -333,6 +333,8 @@ export interface AppState {
   disconnectBank: () => Promise<void>;
   syncPlaidTransactions: (opts?: { quiet?: boolean }) => Promise<boolean>;
   updatePlaidAccountIncludeInSavings: (accountRowId: string, include: boolean) => Promise<boolean>;
+  // Egress optimization: track last successful data fetch
+  lastDataFetchTime?: number;
   addTransaction: (transaction: Omit<Transaction, 'id'>, opts?: { allowBudgetOverride?: boolean }) => Promise<boolean>;
   updateTransaction: (id: string, patch: Partial<Pick<Transaction, 'category' | 'platformTag' | 'name' | 'notes'>>) => Promise<boolean>;
   lastBudgetGuardrail: {

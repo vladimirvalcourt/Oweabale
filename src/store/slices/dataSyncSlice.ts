@@ -92,6 +92,16 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         return;
       }
 
+      // EGRESS OPTIMIZATION: Skip refetch if data is fresh (< 5 minutes old)
+      const now = Date.now();
+      const lastFetchTime = state.lastDataFetchTime || 0;
+      const FRESHNESS_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
+      
+      if (!options?.loadMore && !options?.background && (now - lastFetchTime < FRESHNESS_THRESHOLD_MS)) {
+        console.log('[fetchData] Data is fresh, skipping refetch to save egress');
+        return;
+      }
+
       const background = options?.background === true;
       const loadMore = options?.loadMore === true;
 
@@ -152,8 +162,8 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         if (error) console.warn('[fetchData] flip_overdue_bills RPC failed:', error.message);
       })();
 
-      // Transaction pagination: fetch in pages of 100
-      const TRANSACTION_PAGE_SIZE = 100;
+      // Transaction pagination: fetch in pages of 50 to reduce egress
+      const TRANSACTION_PAGE_SIZE = 50;
       const lastCursor = get().lastTransactionCursor;
 
       let transactionsQuery = supabase
@@ -201,7 +211,8 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           supabase.from('profiles').select('id,first_name,last_name,email,avatar,theme,phone,timezone,language,notification_prefs,plan,trial_started_at,trial_ends_at,trial_expired,credit_score,credit_last_updated,plaid_linked_at,plaid_institution_name,plaid_last_sync_at,plaid_needs_relink,tax_state,tax_rate').eq('id', resolvedUserId).maybeSingle(),
           supabase.from('bills').select('id,biller,amount,category,due_date,frequency,status,auto_pay,user_id').eq('user_id', resolvedUserId),
           supabase.from('debts').select('id,name,type,apr,remaining,min_payment,paid,payment_due_date,original_amount,origination_date,term_months,user_id').eq('user_id', resolvedUserId),
-          supabase.from('transactions').select('id,name,category,date,amount,type,platform_tag,notes,plaid_account_id').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(500),
+          // Reduced from 500 to TRANSACTION_PAGE_SIZE (50) to minimize egress
+          transactionsQuery,
           supabase.from('assets').select('id,name,value,type,appreciation_rate,purchase_price,purchase_date,user_id').eq('user_id', resolvedUserId),
           supabase.from('incomes').select('id,name,amount,frequency,category,next_date,status,is_tax_withheld,user_id').eq('user_id', resolvedUserId),
           supabase.from('subscriptions').select('id,name,amount,frequency,next_billing_date,status,price_history,user_id').eq('user_id', resolvedUserId),
@@ -662,6 +673,9 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
 
         console.log('[fetchData] All data loaded successfully, clearing loading state...');
         console.timeEnd('[fetchData] Total fetch time');
+        
+        // Update last fetch timestamp for egress optimization
+        set({ lastDataFetchTime: Date.now() });
       } catch (err) {
         console.error('[fetchData] CRITICAL ERROR:', err);
         console.error('[fetchData] Error stack:', err instanceof Error ? err.stack : 'No stack');
