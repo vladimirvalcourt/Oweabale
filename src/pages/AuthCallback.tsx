@@ -4,18 +4,6 @@ import { supabase } from '@/lib/api/supabase';
 import { AppLoader } from '@/components/common';
 import { toast } from 'sonner';
 
-async function waitForSession(maxMs: number) {
-  const deadline = Date.now() + maxMs;
-  while (Date.now() < deadline) {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (session) return session;
-    await new Promise((r) => setTimeout(r, 120));
-  }
-  return null;
-}
-
 function isRecentSignup(createdAt: string | undefined, maxAgeMs = 30 * 60 * 1000) {
   if (!createdAt) return false;
   const createdMs = new Date(createdAt).getTime();
@@ -23,14 +11,13 @@ function isRecentSignup(createdAt: string | undefined, maxAgeMs = 30 * 60 * 1000
   return Date.now() - createdMs <= maxAgeMs;
 }
 
-async function ensureReverseTrial(session: NonNullable<Awaited<ReturnType<typeof waitForSession>>>) {
-  const user = session.user;
-  if (!isRecentSignup(user.created_at)) return;
+async function ensureReverseTrial(session: NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>>['data']['session']) {
+  if (!session || !isRecentSignup(session.user.created_at)) return;
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('id, plan, trial_started_at, trial_ends_at, trial_expired')
-    .eq('id', user.id)
+    .eq('id', session.user.id)
     .maybeSingle();
 
   if (profileError) {
@@ -53,21 +40,21 @@ async function ensureReverseTrial(session: NonNullable<Awaited<ReturnType<typeof
 
   const { error: upsertError } = await supabase.from('profiles').upsert(
     {
-      id: user.id,
-      email: user.email ?? null,
+      id: session.user.id,
+      email: session.user.email ?? null,
       first_name:
-        user.user_metadata?.given_name ??
-        user.user_metadata?.first_name ??
-        user.user_metadata?.full_name?.split(' ')[0] ??
-        user.user_metadata?.name?.split(' ')[0] ??
+        session.user.user_metadata?.given_name ??
+        session.user.user_metadata?.first_name ??
+        session.user.user_metadata?.full_name?.split(' ')[0] ??
+        session.user.user_metadata?.name?.split(' ')[0] ??
         '',
       last_name:
-        user.user_metadata?.family_name ??
-        user.user_metadata?.last_name ??
-        user.user_metadata?.full_name?.split(' ').slice(1).join(' ') ??
-        user.user_metadata?.name?.split(' ').slice(1).join(' ') ??
+        session.user.user_metadata?.family_name ??
+        session.user.user_metadata?.last_name ??
+        session.user.user_metadata?.full_name?.split(' ').slice(1).join(' ') ??
+        session.user.user_metadata?.name?.split(' ').slice(1).join(' ') ??
         '',
-      avatar: user.user_metadata?.picture ?? user.user_metadata?.avatar_url ?? '',
+      avatar: session.user.user_metadata?.picture ?? session.user.user_metadata?.avatar_url ?? '',
       has_completed_onboarding: false,
       is_admin: false,
       plan: 'trial',
@@ -85,6 +72,7 @@ async function ensureReverseTrial(session: NonNullable<Awaited<ReturnType<typeof
 
 /**
  * Handle Supabase OAuth callback and ensure session is hydrated before redirect.
+ * Uses only onAuthStateChange listener with timeout fallback to prevent race conditions.
  */
 export default function AuthCallback() {
   const navigate = useNavigate();
@@ -100,6 +88,7 @@ export default function AuthCallback() {
       redirectTarget && redirectTarget.startsWith('/') ? redirectTarget : '/dashboard';
     const oauthError = params.get('error') ?? hashParams.get('error');
     const oauthDesc = params.get('error_description') ?? hashParams.get('error_description');
+    
     if (oauthError && !handledOAuthErrorRef.current) {
       handledOAuthErrorRef.current = true;
       const msg = oauthDesc
@@ -116,7 +105,8 @@ export default function AuthCallback() {
       navigate(path, { replace: true });
     };
 
-    const finishSignedIn = async (session: NonNullable<Awaited<ReturnType<typeof waitForSession>>>) => {
+    const finishSignedIn = async (session: NonNullable<Awaited<ReturnType<typeof supabase.auth.getSession>>>['data']['session']) => {
+      if (!session) return;
       await ensureReverseTrial(session);
 
       if (isRecentSignup(session.user.created_at) && !welcomeEmailSentRef.current) {
@@ -148,25 +138,32 @@ export default function AuthCallback() {
       go(finalRedirect);
     };
 
-    void (async () => {
-      const session = await waitForSession(20_000);
-      if (session) {
-        await finishSignedIn(session);
-        return;
+    // Use ONLY onAuthStateChange with timeout - no polling to prevent race conditions
+    let timedOut = false;
+    const timeoutId = setTimeout(() => {
+      timedOut = true;
+      if (!navigatedRef.current) {
+        toast.error('Sign-in timed out. Please try again.');
+        go('/auth');
       }
-      toast.error('Could not restore your session. Try signing in again.');
-      go('/auth');
-    })();
+    }, 20_000);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (timedOut || navigatedRef.current) return;
+      
       if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
+        clearTimeout(timeoutId);
         void finishSignedIn(session);
       } else if (event === 'SIGNED_OUT') {
+        clearTimeout(timeoutId);
         go('/auth');
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      clearTimeout(timeoutId);
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   return <AppLoader message="Signing you in…" />;

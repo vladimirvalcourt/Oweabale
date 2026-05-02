@@ -17,7 +17,7 @@ export function useFullSuiteAccess() {
 
   const refresh = useCallback(async () => {
     setState((prev) => ({ ...prev, isLoading: true }));
-    
+
     let userId: string | undefined;
     try {
       const {
@@ -28,7 +28,7 @@ export function useFullSuiteAccess() {
         setState({ isLoading: false, hasFullSuite: false, isAdmin: false });
         return;
       }
-      
+
       userId = user.id; // Capture userId to avoid scope issues in minified code
     } catch (authError) {
       console.error('[useFullSuiteAccess] Auth error:', authError);

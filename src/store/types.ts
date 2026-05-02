@@ -1,7 +1,6 @@
 import type { FinancialAlertPrefs } from '@/lib/api/services/financialAlertPrefs';
 import type { NotificationPrefsRecord } from '@/lib/api/services/notificationPreferences';
 import type { CategorizationRule, CategorizationExclusion } from '@/lib/api/services/categorizationRules';
-import type { Household, HouseholdMember, UserRole } from '@/types';
 
 export type { CategorizationRule, CategorizationExclusion };
 
@@ -320,9 +319,6 @@ export interface AppState {
     factors: CreditFactor[];
     fixes: CreditFix[];
   };
-  currentHousehold: Household | null;
-  householdMembers: HouseholdMember[];
-  userRole: UserRole | null;
   setTaxSettings: (state: string, rate: number) => void;
   bankConnected: boolean;
   plaidInstitutionName: string | null;
@@ -432,8 +428,4 @@ export interface AppState {
   quickAddTab: TabType;
   openQuickAdd: (tab?: TabType) => void;
   closeQuickAdd: () => void;
-  inviteHouseholdMember: (email: string, role: 'partner' | 'viewer') => Promise<boolean>;
-  removeHouseholdMember: (memberId: string) => Promise<boolean>;
-  updateMemberRole: (memberId: string, role: 'partner' | 'viewer') => Promise<boolean>;
-  acceptHouseholdInvite: (householdId: string) => Promise<boolean>;
 }

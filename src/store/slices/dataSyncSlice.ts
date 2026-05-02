@@ -31,7 +31,7 @@ import type {
 
 type StoreSlice<T> = StateCreator<AppState, [['zustand/persist', unknown]], [], T>;
 
-export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase2Hydrated' | 'fetchData' | 'loadMoreTransactions'>> =
+export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase2Hydrated' | 'fetchData' | 'loadMoreTransactions' | 'loadPhase2Data'>> =
   (set, get) => ({
     isLoading: false,
     phase2Hydrated: false,
@@ -40,8 +40,8 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
      * Fetch all user data from Supabase in a two-phase loading strategy.
      *
      * **Phase 1 (Critical):** Loads core financial records needed for immediate UI rendering:
-     * - User profile and household membership
-     * - Transactions (paginated, 100 at a time)
+     * - User profile
+     * - Transactions (paginated, 50 at a time)
      * - Bills, debts, income sources, subscriptions
      * - Plaid-connected bank accounts
      *
@@ -96,7 +96,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
       const now = Date.now();
       const lastFetchTime = state.lastDataFetchTime || 0;
       const FRESHNESS_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
-      
+
       if (!options?.loadMore && !options?.background && (now - lastFetchTime < FRESHNESS_THRESHOLD_MS)) {
         console.log('[fetchData] Data is fresh, skipping refetch to save egress');
         return;
@@ -447,7 +447,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         // EGRESS OPTIMIZATION: Only load Phase 2 data if explicitly requested or first load
         // This prevents loading goals, budgets, citations etc. on every dashboard refresh
         const shouldLoadPhase2 = fullLoad || !state.phase2Hydrated;
-        
+
         if (!shouldLoadPhase2) {
           console.log('[fetchData] Skipping Phase 2 (not full load, already hydrated)');
           set({ phase2Hydrated: true });
@@ -473,7 +473,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
             { data: platformSettingsRaw, error: platformSettingsError },
             { data: netWorthSnapshotsRaw, error: netWorthSnapshotsError },
           ] = await phase2Promise;
-          
+
           // Ensure all data is an array, never undefined
           const goals = goalsError ? [] : (goalsRaw ?? []);
           const budgets = budgetsError ? [] : (budgetsRaw ?? []);
@@ -489,7 +489,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           const adminBroadcasts = adminBroadcastsError ? [] : (adminBroadcastsRaw ?? []);
           const platformSettings = platformSettingsError ? null : platformSettingsRaw;
           const netWorthSnapshots = netWorthSnapshotsError ? [] : (netWorthSnapshotsRaw ?? []);
-          
+
           console.timeEnd('[fetchData] Phase 2 queries');
           console.log('[fetchData] Phase 2 complete - goals:', goals.length, 'citations:', citations.length);
 
@@ -681,7 +681,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
 
         console.log('[fetchData] All data loaded successfully, clearing loading state...');
         console.timeEnd('[fetchData] Total fetch time');
-        
+
         // Update last fetch timestamp for egress optimization
         set({ lastDataFetchTime: Date.now() });
       } catch (err) {
@@ -724,12 +724,12 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         console.warn('[loadPhase2Data] No user ID available');
         return;
       }
-      
+
       if (state.phase2Hydrated) {
         console.log('[loadPhase2Data] Phase 2 already loaded, skipping');
         return;
       }
-      
+
       console.log('[loadPhase2Data] Loading Phase 2 data on demand...');
       await get().fetchData(state.user.id, { fullLoad: true, background: true });
     },

@@ -7,7 +7,6 @@ import { createAccountSlice } from './slices/accountSlice';
 import { createCategorizationSlice } from './slices/categorizationSlice';
 import { createDataSyncSlice } from './slices/dataSyncSlice';
 import { createEarningsSlice } from './slices/earningsSlice';
-import { createHouseholdSlice } from './slices/householdSlice';
 import { createIngestionSlice } from './slices/ingestionSlice';
 import { createObligationsSlice } from './slices/obligationsSlice';
 import { createPlaidSlice } from './slices/plaidSlice';
@@ -27,7 +26,6 @@ export const useStore = create<AppState>()(
   ...createUiSlice(set, get, store),
   ...createAccountSlice(set, get, store),
   ...createPlaidSlice(set, get, store),
-  ...createHouseholdSlice(set, get, store),
   ...createRecordsSlice(set, get, store),
   ...createObligationsSlice(set, get, store),
   ...createPlanningSlice(set, get, store),

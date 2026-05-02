@@ -49,11 +49,10 @@ export default function TrialBanner() {
 
   return (
     <div
-      className={`w-full py-3 px-4 ${
-        isUrgent
+      className={`w-full py-3 px-4 ${isUrgent
           ? 'border-b border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)]'
           : 'border-b border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)]'
-      }`}
+        }`}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -78,11 +77,10 @@ export default function TrialBanner() {
 
         <TransitionLink
           to="/pricing"
-          className={`shrink-0 text-sm font-semibold underline underline-offset-2 hover:no-underline ${
-            isUrgent
+          className={`shrink-0 text-sm font-semibold underline underline-offset-2 hover:no-underline ${isUrgent
               ? 'text-[var(--color-status-rose-text)] hover:text-brand-expense'
               : 'text-[var(--color-status-amber-text)] hover:text-content-primary'
-          }`}
+            }`}
         >
           {isUrgent ? 'Upgrade now →' : 'View plans →'}
         </TransitionLink>

@@ -20,7 +20,7 @@ const SpeedInsights = lazy(async () => {
       setTimeout(resolve, 1000); // Fallback: load after 1 second
     }
   });
-  
+
   const mod = await import('@vercel/speed-insights/react');
   return { default: mod.SpeedInsights };
 });

@@ -16,7 +16,6 @@ export { CollapsibleModule } from './CollapsibleModule';
 export { ErrorBoundary } from './ErrorBoundary';
 export { FeatureGuide, type GuideStep, type FeatureGuideProps } from './FeatureGuide';
 export { GuidedEmptyState, type EmptyStateProps } from './GuidedEmptyState';
-export { HouseholdAvatarStack } from './HouseholdAvatarStack';
 export { KeyboardShortcutsDialog } from './KeyboardShortcutsDialog';
 export { DashboardSkeleton, ListSkeleton, AppLoader } from './PageSkeleton';
 export { ProWelcomeModal } from './ProWelcomeModal';

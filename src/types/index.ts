@@ -3,5 +3,4 @@
  * Re-export all types from this file for cleaner imports
  */
 
-export type * from './household';
 export type * from './supabase';

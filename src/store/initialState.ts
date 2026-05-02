@@ -43,9 +43,6 @@ export const initialData: Pick<
   | 'lastAutoCategorization'
   | 'netWorthSnapshots'
   | 'credit'
-  | 'currentHousehold'
-  | 'householdMembers'
-  | 'userRole'
 > = {
   bills: [],
   debts: [],
@@ -102,9 +99,6 @@ export const initialData: Pick<
     factors: [],
     fixes: [],
   },
-  currentHousehold: null,
-  householdMembers: [],
-  userRole: null,
 };
 
 export { DEFAULT_NOTIF_PREFS, NOTIF_PREFS_STORAGE_KEY, normalizeNotificationPrefsRecord };

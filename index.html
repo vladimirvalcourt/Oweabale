@@ -24,12 +24,37 @@
   <!-- Critical CSS inlined to prevent render-blocking (above-the-fold styles) -->
   <style>
     /* Critical above-the-fold CSS — dashboard shell */
-    *,*::before,*::after{box-sizing:border-box}
-    html{line-height:1.5;-webkit-text-size-adjust:100%;font-family:var(--font-sans,"Geist Sans","Inter",ui-sans-serif,system-ui,sans-serif)}
-    body{margin:0;background-color:var(--color-surface-base,#08090a);color:var(--color-content-primary,#f7f8f8)}
-    #root{min-height:100vh;display:flex;flex-direction:column}
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box
+    }
+
+    html {
+      line-height: 1.5;
+      -webkit-text-size-adjust: 100%;
+      font-family: var(--font-sans, "Geist Sans", "Inter", ui-sans-serif, system-ui, sans-serif)
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--color-surface-base, #08090a);
+      color: var(--color-content-primary, #f7f8f8)
+    }
+
+    #root {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column
+    }
+
     /* Basic layout for app shell while JS loads */
-    .app-loader{display:flex;align-items:center;justify-content:center;min-height:100vh}
+    .app-loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh
+    }
   </style>
 
   <!-- Inter: fallback only — primary UI uses self-hosted Geist (see main.tsx + index.css) -->

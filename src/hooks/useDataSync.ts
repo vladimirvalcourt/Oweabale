@@ -72,7 +72,7 @@ export function useDataSync({
   // Initialize auth state on mount - wait for Supabase to resolve session
   useEffect(() => {
     let mounted = true;
-    
+
     async function initializeAuth() {
       try {
         // Wait for Supabase to resolve the current session
@@ -80,7 +80,7 @@ export function useDataSync({
         if (mounted) {
           authInitializedRef.current = true;
           console.log('[useDataSync] Auth initialized, session:', session ? 'present' : 'none');
-          
+
           // If there's already a session on mount, handle it immediately
           if (session?.user?.id && !handledUserIdsRef.current.has(session.user.id)) {
             handledUserIdsRef.current.add(session.user.id);
@@ -96,9 +96,9 @@ export function useDataSync({
         }
       }
     }
-    
+
     initializeAuth();
-    
+
     return () => {
       mounted = false;
     };
@@ -110,26 +110,26 @@ export function useDataSync({
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('[useDataSync] Auth state changed:', event, 'Session:', session ? 'present' : 'null');
-      
+
       // Only handle SIGNED_IN events, skip INITIAL_SESSION if already handled
       if (event === 'INITIAL_SESSION') {
         console.log('[useDataSync] Skipping INITIAL_SESSION - already handled in mount');
         return;
       }
-      
+
       if (event === 'SIGNED_IN' && session?.user?.id) {
         // Deduplicate: only fetch once per user ID
         if (handledUserIdsRef.current.has(session.user.id)) {
           console.log('[useDataSync] User already handled, skipping duplicate:', session.user.id);
           return;
         }
-        
+
         handledUserIdsRef.current.add(session.user.id);
         console.log('[useDataSync] User signed in, fetching data for:', session.user.id);
         useStore.setState({ isLoading: true });
         void fetchDataRef.current(session.user.id);
       }
-      
+
       if (event === 'SIGNED_OUT') {
         console.log('[useDataSync] User signed out, clearing data');
         hadSessionRef.current = false;
