@@ -160,6 +160,10 @@ export default defineConfig(({ mode }) => {
       target: ['chrome90', 'firefox88', 'safari14', 'edge90'],
       // Defer non-critical CSS loading
       cssCodeSplit: true,
+      // Reduce main-thread blocking by deferring module preload
+      modulePreload: {
+        polyfill: false, // Modern browsers support native module preload
+      },
       rollupOptions: {
         output: {
           /**

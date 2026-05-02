@@ -10,7 +10,20 @@ import { Layout, DeviceGuard, ErrorBoundary, AuthGuard, AdminGuard, MaintenanceG
 import { useStore } from './store';
 import { useAuth, usePWAUpdateNotification, usePWAStandaloneMode, useTheme } from './hooks';
 // Lazy-load SpeedInsights to avoid blocking initial page load
-const SpeedInsights = lazy(() => import('@vercel/speed-insights/react').then(mod => ({ default: mod.SpeedInsights })));
+// Load only after LCP has occurred to prevent main-thread contention
+const SpeedInsights = lazy(async () => {
+  // Defer loading until browser is idle or after timeout
+  await new Promise<void>((resolve) => {
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(() => resolve(), { timeout: 2000 });
+    } else {
+      setTimeout(resolve, 1000); // Fallback: load after 1 second
+    }
+  });
+  
+  const mod = await import('@vercel/speed-insights/react');
+  return { default: mod.SpeedInsights };
+});
 
 // Fix 1: Dashboard is now lazy — this keeps recharts + motion/react OUT of the initial
 // bundle. The 70 KB page was previously blocking first paint for ALL authenticated users.
