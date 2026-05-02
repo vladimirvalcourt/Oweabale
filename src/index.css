@@ -779,11 +779,13 @@ body {
   --color-status-rose-bg: rgba(194, 65, 63, 0.1);
   --color-status-rose-border: rgba(194, 65, 63, 0.28);
   --color-status-rose-text: #9f332f;
+  --color-status-rose-text-dark: #fecaca;  /* rose-200 for dark mode fallback */
   
   /* Amber/Yellow states - utility tone, not warning-sign neon */
   --color-status-amber-bg: rgba(172, 111, 28, 0.1);
   --color-status-amber-border: rgba(172, 111, 28, 0.3);
   --color-status-amber-text: #7a4f12;
+  --color-status-amber-text-dark: #fde68a;  /* amber-200 for dark mode fallback */
   
   /* Emerald/Green states - financial positive without drifting mint */
   --color-status-emerald-bg: rgba(22, 132, 73, 0.1);
@@ -794,6 +796,7 @@ body {
   --color-status-info-bg: rgba(59, 130, 246, 0.1);
   --color-status-info-border: rgba(59, 130, 246, 0.3);
   --color-status-info-text: #1e40af;
+  --color-status-info-text-dark: #c7d2fe;  /* indigo-200 for dark mode fallback */
 
   /* Retune direct Tailwind status ramps used throughout older app surfaces. */
   --color-red-100: #f8e8e7;
@@ -848,11 +851,13 @@ body {
   --color-status-rose-bg: rgba(244, 63, 94, 0.1);
   --color-status-rose-border: rgba(244, 63, 94, 0.35);
   --color-status-rose-text: #fb7185;
+  --color-status-rose-text-dark: #fb7185;  /* same as base for dark mode */
   
   /* Amber/Yellow states */
   --color-status-amber-bg: rgba(245, 158, 11, 0.1);
   --color-status-amber-border: rgba(245, 158, 11, 0.35);
   --color-status-amber-text: #fbbf24;
+  --color-status-amber-text-dark: #fbbf24;  /* same as base for dark mode */
   
   /* Emerald/Green states */
   --color-status-emerald-bg: rgba(16, 185, 129, 0.1);
@@ -863,6 +868,7 @@ body {
   --color-status-info-bg: rgba(96, 165, 250, 0.1);
   --color-status-info-border: rgba(96, 165, 250, 0.35);
   --color-status-info-text: #93c5fd;
+  --color-status-info-text-dark: #93c5fd;  /* same as base for dark mode */
 }
 
 /*

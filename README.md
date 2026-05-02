@@ -1,6 +1,6 @@
 # Oweable — Financial Command Center
 
-Ultra-premium personal finance dashboard for debt elimination, tax defense, and wealth tracking. Dark, brutalist, deterministic — no AI slop, just hard math.
+Ultra-premium personal finance dashboard for debt elimination, tax defense, and wealth tracking. Linear-inspired dark system with deterministic calculations — no AI slop, just hard math.
 
 ---
 

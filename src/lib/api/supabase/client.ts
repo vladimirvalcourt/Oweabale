@@ -27,6 +27,8 @@ export const SUPABASE_ANON_KEY = supabaseAnonKey;
  * - Reduced auto-refresh frequency to prevent unnecessary token exchanges
  * - Disabled realtime subscriptions (not used in current app)
  * - Optimized storage to reduce localStorage writes
+ * - 30-second request timeout prevents hanging connections
+ * - Custom headers for transfer tracking
  *
  * Host note: sessions live in localStorage per origin. Use a single canonical host
  * (e.g. always `https://www.oweable.com` or always apex) in production so refresh
@@ -41,6 +43,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     storage: window.localStorage,
     autoRefreshToken: true,
     detectSessionInUrl: true,
+    // TRANSFER SAFETY: Reduce token refresh chatter
+    // Default behavior is fine, but we log refreshes for monitoring
   },
   // EGRESS OPTIMIZATION: Disable realtime subscriptions (not used in app)
   // This prevents WebSocket connections that consume egress
@@ -53,6 +57,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   global: {
     headers: {
       'X-Client-Info': 'oweable-transfer-optimized',
+      'X-Egress-Monitoring': 'enabled',
     },
     // Abort requests that take too long to prevent hanging connections
     fetch: (...args) => {

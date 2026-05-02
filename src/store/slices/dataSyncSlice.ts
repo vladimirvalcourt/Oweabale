@@ -1,6 +1,8 @@
 import type { StateCreator } from 'zustand';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/api/supabase';
+import { trackEgressRequest } from '@/lib/utils/egressMonitor';
+import { getTransferSafetyConfig, isTransferSafetyMode } from '@/lib/config/transferSafety';
 import {
   normalizeFinancialAlertPrefs,
 } from '@/lib/api/services/financialAlertPrefs';
@@ -9,25 +11,7 @@ import {
   mergeNotificationPrefsFromSources,
 } from '@/lib/api/services/notificationPreferences';
 import { loadNotifPrefs, NOTIF_PREFS_STORAGE_KEY } from '@/pages/settings/constants';
-import type {
-  AdminBroadcast,
-  AppState,
-  Bill,
-  Budget,
-  CategorizationExclusion,
-  CategorizationRule,
-  Category,
-  Citation,
-  ClientInvoice,
-  CreditFix,
-  Goal,
-  IncomeSource,
-  InsurancePolicy,
-  InvestmentAccount,
-  MileageLogEntry,
-  Subscription,
-  Transaction,
-} from '@/types';
+import type { AppState, Bill, Transaction, IncomeSource, Subscription, Goal, Budget, Category, Citation, Deduction, FreelanceEntry, MileageLogEntry, ClientInvoice, PendingIngestion, CategorizationExclusion, CreditFix, AdminBroadcast, PlatformSettings, NetWorthSnapshot } from '@/store/types';
 
 type StoreSlice<T> = StateCreator<AppState, [['zustand/persist', unknown]], [], T>;
 
@@ -92,10 +76,14 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         return;
       }
 
+      // TRANSFER SAFETY: Check if transfer safety mode is active
+      const transferConfig = isTransferSafetyMode() ? getTransferSafetyConfig() : null;
+
       // EGRESS OPTIMIZATION: Skip refetch if data is fresh (< 5 minutes old)
+      // TRANSFER SAFETY: Increase freshness threshold during project migration to reduce API calls
       const now = Date.now();
       const lastFetchTime = state.lastDataFetchTime || 0;
-      const FRESHNESS_THRESHOLD_MS = 5 * 60 * 1000; // 5 minutes
+      const FRESHNESS_THRESHOLD_MS = transferConfig?.DATA_FRESHNESS_THRESHOLD_MS ?? (5 * 60 * 1000); // 5 min default, 10 min in transfer mode
 
       if (!options?.loadMore && !options?.background && (now - lastFetchTime < FRESHNESS_THRESHOLD_MS)) {
         console.log('[fetchData] Data is fresh, skipping refetch to save egress');
@@ -163,8 +151,9 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         if (error) console.warn('[fetchData] flip_overdue_bills RPC failed:', error.message);
       })();
 
-      // Transaction pagination: fetch in pages of 50 to reduce egress
-      const TRANSACTION_PAGE_SIZE = 50;
+      // Transaction pagination: fetch in pages to reduce egress
+      // TRANSFER SAFETY: Use more conservative limits during project migration
+      const TRANSACTION_PAGE_SIZE = transferConfig?.MAX_TRANSACTIONS_PER_PAGE ?? 50;
       const lastCursor = get().lastTransactionCursor;
 
       let transactionsQuery = supabase
@@ -179,19 +168,22 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         transactionsQuery = transactionsQuery.lt('date', lastCursor);
       }
 
+      const phase2Limit = transferConfig?.MAX_PHASE2_RECORDS ?? 100;
+      
       const phase2Promise = Promise.all([
         supabase.from('goals').select('id,name,target_amount,current_amount,deadline,priority,status,type,color,user_id').eq('user_id', resolvedUserId),
         supabase.from('budgets').select('id,category,amount,period,rollover_enabled,lock_mode,user_id').eq('user_id', resolvedUserId),
         supabase.from('categories').select('id,name,type,color,icon,user_id').eq('user_id', resolvedUserId),
         // EGRESS OPTIMIZATION: Add reasonable limits to prevent excessive data fetching
-        supabase.from('citations').select('id,type,jurisdiction,days_left,amount,penalty_fee,date,citation_number,payment_url,status,user_id').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(100),
-        supabase.from('deductions').select('id,name,category,amount,date,user_id').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(100),
-        supabase.from('freelance_entries').select('id,client,amount,date,is_vaulted,scoured_write_offs,user_id').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(100),
-        supabase.from('mileage_log').select('id,trip_date,start_location,end_location,miles,purpose,platform,irs_rate_per_mile,deduction_amount,user_id').eq('user_id', resolvedUserId).order('trip_date', { ascending: false }).limit(100),
-        supabase.from('client_invoices').select('id,client_name,amount,issued_date,due_date,status,notes,user_id').eq('user_id', resolvedUserId).order('due_date', { ascending: false }).limit(100),
-        supabase.from('pending_ingestions').select('id,type,status,extracted_data,original_file,storage_path,storage_url,user_id').eq('user_id', resolvedUserId).limit(50),
-        supabase.from('categorization_exclusions').select('id,scope,transaction_id,merchant_name,user_id').eq('user_id', resolvedUserId).order('created_at', { ascending: false }).limit(200),
-        supabase.from('credit_fixes').select('id,item_type,description,status,created_at,user_id').eq('user_id', resolvedUserId).order('created_at', { ascending: false }).limit(50),
+        // TRANSFER SAFETY: Use more conservative limits during project migration
+        supabase.from('citations').select('id,type,jurisdiction,days_left,amount,penalty_fee,date,citation_number,payment_url,status,user_id').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(phase2Limit),
+        supabase.from('deductions').select('id,name,category,amount,date,user_id').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(phase2Limit),
+        supabase.from('freelance_entries').select('id,client,amount,date,is_vaulted,scoured_write_offs,user_id').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(phase2Limit),
+        supabase.from('mileage_log').select('id,trip_date,start_location,end_location,miles,purpose,platform,irs_rate_per_mile,deduction_amount,user_id').eq('user_id', resolvedUserId).order('trip_date', { ascending: false }).limit(phase2Limit),
+        supabase.from('client_invoices').select('id,client_name,amount,issued_date,due_date,status,notes,user_id').eq('user_id', resolvedUserId).order('due_date', { ascending: false }).limit(phase2Limit),
+        supabase.from('pending_ingestions').select('id,type,status,extracted_data,original_file,storage_path,storage_url,user_id').eq('user_id', resolvedUserId).limit(transferConfig ? Math.min(50, phase2Limit) : 50),
+        supabase.from('categorization_exclusions').select('id,scope,transaction_id,merchant_name,user_id').eq('user_id', resolvedUserId).order('created_at', { ascending: false }).limit(transferConfig ? Math.min(200, phase2Limit * 4) : 200),
+        supabase.from('credit_fixes').select('id,item_type,description,status,created_at,user_id').eq('user_id', resolvedUserId).order('created_at', { ascending: false }).limit(phase2Limit),
         supabase.from('admin_broadcasts').select('id,title,message,level,created_at').order('created_at', { ascending: false }).limit(10),
         supabase.from('platform_settings').select('id,key,value,created_at').order('created_at', { ascending: true }).limit(1).maybeSingle(),
         supabase.from('net_worth_snapshots').select('id,date,net_worth,assets,debts,user_id').eq('user_id', resolvedUserId).order('date', { ascending: true }).limit(90),

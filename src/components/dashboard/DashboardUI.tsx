@@ -75,9 +75,9 @@ export function StatusBadge({
 }) {
     const toneClass = {
         default: 'bg-content-primary/[0.06] text-content-secondary',
-        urgent: 'bg-rose-500/10 text-rose-700 dark:text-rose-200',
-        warning: 'bg-amber-500/10 text-amber-700 dark:text-amber-200',
-        info: 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-200',
+        urgent: 'bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)] dark:text-[var(--color-status-rose-text-dark,--color-status-rose-text)]',
+        warning: 'bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)] dark:text-[var(--color-status-amber-text-dark,--color-status-amber-text)]',
+        info: 'bg-[var(--color-status-info-bg)] text-[var(--color-status-info-text)] dark:text-[var(--color-status-info-text-dark,--color-status-info-text)]',
     }[tone];
 
     return (
@@ -104,9 +104,9 @@ export function StatusIcon({
 }) {
     const toneClass = {
         default: 'border-surface-border bg-surface-base text-content-secondary',
-        urgent: 'border-rose-500/40 bg-rose-500/10 text-rose-700 dark:text-rose-200',
-        warning: 'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-200',
-        info: 'border-indigo-500/40 bg-indigo-500/10 text-indigo-700 dark:text-indigo-200',
+        urgent: 'border-[var(--color-status-rose-border)] bg-[var(--color-status-rose-bg)] text-[var(--color-status-rose-text)]',
+        warning: 'border-[var(--color-status-amber-border)] bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]',
+        info: 'border-[var(--color-status-info-border)] bg-[var(--color-status-info-bg)] text-[var(--color-status-info-text)]',
     }[tone];
 
     return (

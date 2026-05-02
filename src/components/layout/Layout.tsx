@@ -565,7 +565,7 @@ export default function Layout() {
                               </span>
                               {navCount !== undefined && navCount > 0 && (
                                 <span className="relative flex items-center gap-1.5 shrink-0 px-1">
-                                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden />
+                                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-status-amber-text)]" aria-hidden />
                                   <span className="text-[10px] font-mono text-content-secondary tabular-nums">
                                     {navCount}
                                   </span>
@@ -794,7 +794,7 @@ export default function Layout() {
                       notifications.map((n: Notification) => (
                         <div key={n.id} className={cn('px-4 py-3 border-b border-surface-border last:border-0', !n.read && 'bg-content-primary/[0.03]')}>
                           <div className="flex items-start gap-2">
-                            <div className={cn('w-1.5 h-1.5 rounded-full mt-1.5 shrink-0', n.type === 'success' ? 'bg-emerald-500' : n.type === 'warning' ? 'bg-amber-500' : n.type === 'error' ? 'bg-red-500' : 'bg-neutral-500')} />
+                            <div className={cn('w-1.5 h-1.5 rounded-full mt-1.5 shrink-0', n.type === 'success' ? 'bg-[var(--color-status-emerald-text)]' : n.type === 'warning' ? 'bg-[var(--color-status-amber-text)]' : n.type === 'error' ? 'bg-[var(--color-status-rose-text)]' : 'bg-content-muted')} />
                             <div>
                               <p className="text-[12px] font-mono text-content-primary font-medium">{n.title}</p>
                               <p className="text-[11px] font-mono text-content-tertiary mt-0.5 leading-relaxed">{n.message}</p>
@@ -927,7 +927,7 @@ export default function Layout() {
                           title="Opens confirmation — permanently deletes your bills, debts, and transactions"
                           className={cn(
                             'flex w-full flex-col items-start gap-0.5 px-3 py-2 text-left text-sm transition-colors',
-                            active ? 'bg-amber-500/10 text-amber-200' : 'text-content-tertiary',
+                            active ? 'bg-[var(--color-status-amber-bg)] text-[var(--color-status-amber-text)]' : 'text-content-tertiary',
                           )}
                         >
                           <span className="flex w-full items-center gap-3">
@@ -1153,8 +1153,8 @@ export default function Layout() {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto max-w-sm rounded-lg bg-surface-raised border border-surface-border p-6 shadow-elevated">
             <div className="flex items-center gap-4 mb-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full border border-amber-500/30 flex items-center justify-center bg-amber-500/5">
-                <AlertTriangle className="w-5 h-5 text-amber-500" />
+              <div className="flex-shrink-0 w-10 h-10 rounded-full border border-[var(--color-status-amber-border)] flex items-center justify-center bg-[var(--color-status-amber-bg)]">
+                <AlertTriangle className="w-5 h-5 text-[var(--color-status-amber-text)]" />
               </div>
               <Dialog.Title className="text-lg font-semibold tracking-tight text-content-primary font-sans">Erase all data?</Dialog.Title>
             </div>

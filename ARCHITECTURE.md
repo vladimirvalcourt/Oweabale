@@ -8,7 +8,7 @@ This document is written for the next engineer or architect picking up this code
 
 > **No AI Slop.** Every number displayed is the result of a deterministic algorithm in `lib/finance.ts`. No LLM inference, no vague estimates. Hard math only.
 
-The UI is intentionally dense, monospace-heavy, and brutalist. Do not soften it. The target user wants data, not encouragement.
+The UI follows a **Linear-inspired dark system** (see [DESIGN.md](./DESIGN.md)): near-black canvas, translucent borders, restrained violet accents, and precise typography. The interface should feel calm, exact, and fast rather than decorative.
 
 ---
 
@@ -164,6 +164,21 @@ Tab type must be one of: `'transaction' | 'obligation' | 'income'`
 ### DeviceGuard
 
 Wraps the entire authenticated app in `App.tsx`. Blocks viewport widths below 768px with a full-screen restriction message. This is intentional — the app is desktop-only while native mobile is in development. Do not remove or bypass it.
+
+### Design System Compliance
+
+All UI components must follow the **Linear-inspired design system** defined in [DESIGN.md](./DESIGN.md):
+
+- **Colors**: Near-black base (`#08090a`), raised panels (`#0f1011`), translucent borders
+- **Typography**: Geist Sans for UI, Geist Mono for financial amounts
+- **Components**: 6px buttons, 12px cards, 22px panels
+- **Status Indicators**: Semantic urgent/warning/info badges with proper color tokens
+- **Depth**: Translucent surfaces, thin borders, subtle shadows (no heavy drop shadows)
+
+When building new UI, use this prompt:
+> "Build this in Oweable's Linear-inspired system: near-black `#08090a`, raised panels `#0f1011`, translucent white borders, Geist Sans with tight display tracking, Geist Mono for amounts, violet `#5e6ad2` only for CTAs and active states, 6px controls, 12px cards, 22px panels, no beige, no decorative gradients, no generic three-card row."
+
+Refer to [DESIGN.md](./DESIGN.md) for complete specifications including color tokens, typography scales, component styles, and responsive behavior.
 
 ### Resilience Layer: Boundaries & Loaders
 
