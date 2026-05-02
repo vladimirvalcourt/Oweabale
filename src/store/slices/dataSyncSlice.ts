@@ -77,6 +77,21 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
      * ```
      */
     fetchData: async (userId?: string, options?: { background?: boolean; loadMore?: boolean }) => {
+      const state = get();
+
+      // Guard against concurrent calls
+      if (state.isLoading && !options?.background) {
+        console.warn('[fetchData] Already loading, skipping duplicate call');
+        return;
+      }
+
+      // Guard against calling without valid user
+      const currentUserId = userId ?? state.user?.id;
+      if (!currentUserId && !options?.background) {
+        console.warn('[fetchData] No user ID available — skipping load');
+        return;
+      }
+
       const background = options?.background === true;
       const loadMore = options?.loadMore === true;
 
@@ -95,7 +110,16 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
       } catch (authError) {
         console.error('[fetchData] Auth session error:', authError);
-        toast.error('Authentication error. Please refresh the page.');
+        toast.error('Authentication error. Please refresh the page.', {
+          action: {
+            label: 'Clear & Reload',
+            onClick: () => {
+              import('@/lib/api/supabase/client').then(({ clearLocalState }) => {
+                clearLocalState();
+              });
+            },
+          },
+        });
         clearTimeout(safetyTimeout);
         if (!background) set({ isLoading: false, phase2Hydrated: true });
         return;
@@ -103,8 +127,18 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
 
       if (!resolvedUserId) {
         console.warn('[fetchData] No user ID available — skipping load');
+        clearTimeout(safetyTimeout);
         if (!background) {
-          toast.error('Session expired. Please sign in again.');
+          toast.error('Session expired. Please sign in again.', {
+            action: {
+              label: 'Sign Out',
+              onClick: () => {
+                import('@/lib/api/supabase/client').then(({ clearLocalState }) => {
+                  clearLocalState();
+                });
+              },
+            },
+          });
           set({ isLoading: false, phase2Hydrated: true });
         }
         return;
@@ -184,13 +218,32 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           { name: 'Assets', error: assetsError },
           { name: 'Incomes', error: incomesError },
           { name: 'Subscriptions', error: subscriptionsError },
-        ].filter(item => item.error && (item.error as any).code === '42501' || (item.error as any).status === 500);
+        ].filter(item => item.error && ((item.error as any).code === '42501' || (item.error as any).status === 500));
 
         if (criticalErrors.length > 0) {
           console.error('[fetchData] CRITICAL RLS ERRORS DETECTED:', criticalErrors);
           const tableNames = criticalErrors.map(e => e.name).join(', ');
-          toast.error(`Database access error for: ${tableNames}. Please contact support.`);
+          toast.error(`Database access error for: ${tableNames}.`, {
+            description: 'Try signing out and back in to refresh your session.',
+            action: {
+              label: 'Clear State',
+              onClick: () => {
+                import('@/lib/api/supabase/client').then(({ clearLocalState }) => {
+                  clearLocalState();
+                });
+              },
+            },
+          });
           // Don't return early - continue with empty arrays to avoid white screen
+        }
+
+        // Handle profile fetch errors specifically - may indicate missing profile
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('[fetchData] Profile fetch error:', profileError);
+          if ((profileError as any).status === 500) {
+            console.error('[fetchData] Profile query returned 500 - possible RLS or trigger issue');
+            toast.warning('Profile sync issue detected. Try refreshing the page.');
+          }
         }
 
         // Debug logging for Plaid sync troubleshooting

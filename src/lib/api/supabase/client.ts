@@ -12,7 +12,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
     .join(', ');
   throw new Error(
     `[Supabase] Missing required environment variables: ${missing}. ` +
-      'Add them to .env.local (local) or the Vercel project settings (production/preview).'
+    'Add them to .env.local (local) or the Vercel project settings (production/preview).'
   );
 }
 
@@ -44,4 +44,29 @@ export const getProfile = async (userId: string) => {
 
   if (error) throw error;
   return data;
+};
+
+/**
+ * Clear all local storage and sign out user - useful for recovering from auth/session issues
+ */
+export const clearLocalState = async () => {
+  try {
+    // Sign out from Supabase
+    await supabase.auth.signOut();
+
+    // Clear localStorage
+    localStorage.clear();
+
+    // Clear sessionStorage
+    sessionStorage.clear();
+
+    console.log('[clearLocalState] All local state cleared successfully');
+
+    // Force page reload to reset application state
+    window.location.href = '/';
+  } catch (error) {
+    console.error('[clearLocalState] Error clearing state:', error);
+    // Even if there's an error, still try to reload
+    window.location.href = '/';
+  }
 };
