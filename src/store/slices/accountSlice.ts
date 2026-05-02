@@ -116,7 +116,15 @@ export const createAccountSlice: StoreSlice<
   },
 
   resetData: async () => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let userId: string | undefined;
+    try {
+      userId = (await supabase.auth.getUser()).data.user?.id;
+    } catch (authError) {
+      console.error('[accountSlice] Auth error in resetData:', authError);
+      toast.error('Authentication error. Please refresh.');
+      return;
+    }
+    
     if (!userId) return;
 
     set({ isLoading: true });
@@ -176,7 +184,15 @@ export const createAccountSlice: StoreSlice<
   },
 
   deleteAccount: async () => {
-    const userId = (await supabase.auth.getUser()).data.user?.id;
+    let userId: string | undefined;
+    try {
+      userId = (await supabase.auth.getUser()).data.user?.id;
+    } catch (authError) {
+      console.error('[accountSlice] Auth error in deleteAccount:', authError);
+      toast.error('Authentication error. Please refresh.');
+      return;
+    }
+    
     if (userId) {
       await Promise.all([
         supabase.from('bills').delete().eq('user_id', userId),

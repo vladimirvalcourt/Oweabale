@@ -62,9 +62,17 @@ function BillingPanelInner() {
         if (!benign) toast.error(sync.error);
       }
     }
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    let user;
+    try {
+      const result = await supabase.auth.getUser();
+      user = result.data.user;
+    } catch (authError) {
+      console.error('[BillingPanel] Auth error:', authError);
+      toast.error('Authentication error. Please refresh.');
+      setIsLoading(false);
+      return false;
+    }
+    
     if (!user) {
       setIsLoading(false);
       return false;

@@ -93,20 +93,26 @@ export default function Analytics() {
         .eq('user_id', userId)
         .order('date', { ascending: true });
 
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (!user || cancelled) { setLoading(false); return; }
-      const { data } = await querySnapshots(user.id);
-      if (cancelled) return;
-      setSnapshots(
-        (data || []).map((r: any) => ({
-          date:      r.date as string,
-          net_worth: parseFloat(r.net_worth),
-          assets:    parseFloat(r.assets),
-          debts:     parseFloat(r.debts),
-        }))
-      );
-      setLoading(false);
-    });
+    supabase.auth.getUser()
+      .then(async ({ data: { user } }) => {
+        if (!user || cancelled) { setLoading(false); return; }
+        const { data } = await querySnapshots(user.id);
+        if (cancelled) return;
+        setSnapshots(
+          (data || []).map((r: any) => ({
+            date:      r.date as string,
+            net_worth: parseFloat(r.net_worth),
+            assets:    parseFloat(r.assets),
+            debts:     parseFloat(r.debts),
+          }))
+        );
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('[Analytics] Auth error:', error);
+        toast.error('Authentication error. Please refresh.');
+        setLoading(false);
+      });
 
     return () => { cancelled = true; };
   }, []);

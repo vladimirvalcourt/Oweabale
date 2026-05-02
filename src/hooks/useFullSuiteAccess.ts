@@ -17,11 +17,17 @@ export function useFullSuiteAccess() {
 
   const refresh = useCallback(async () => {
     setState((prev) => ({ ...prev, isLoading: true }));
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    if (!user) {
+      if (!user) {
+        setState({ isLoading: false, hasFullSuite: false, isAdmin: false });
+        return;
+      }
+    } catch (authError) {
+      console.error('[useFullSuiteAccess] Auth error:', authError);
       setState({ isLoading: false, hasFullSuite: false, isAdmin: false });
       return;
     }

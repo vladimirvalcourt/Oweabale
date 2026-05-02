@@ -45,25 +45,31 @@ export default function HelpDesk() {
   useEffect(() => {
     async function loadTickets() {
       setIsLoading(true);
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (!authUser) { setIsLoading(false); return; }
-      const { data, error } = await supabase
-        .from('support_tickets')
-        .select('*')
-        .eq('user_id', authUser.id)
-        .order('created_at', { ascending: false });
+      try {
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (!authUser) { setIsLoading(false); return; }
+        const { data, error } = await supabase
+          .from('support_tickets')
+          .select('*')
+          .eq('user_id', authUser.id)
+          .order('created_at', { ascending: false });
 
-      if (!error && data) {
-        setTickets(data.map((t: Record<string, any>) => ({
-          id: t.ticket_number,
-          subject: t.subject,
-          status: t.status as Ticket['status'],
-          priority: t.priority as Ticket['priority'],
-          date: (t.created_at as string).split('T')[0],
-          department: t.department,
-        })));
+        if (!error && data) {
+          setTickets(data.map((t: Record<string, any>) => ({
+            id: t.ticket_number,
+            subject: t.subject,
+            status: t.status as Ticket['status'],
+            priority: t.priority as Ticket['priority'],
+            date: (t.created_at as string).split('T')[0],
+            department: t.department,
+          })));
+        }
+      } catch (error) {
+        console.error('[HelpDesk] Error loading tickets:', error);
+        toast.error('Failed to load support tickets');
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     }
 
     async function loadBroadcasts() {
