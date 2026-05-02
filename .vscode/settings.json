@@ -23,6 +23,8 @@
     },
     // Format on save for consistent code style
     "editor.formatOnSave": true,
+    "snyk.advanced.organization": "d20afb84-752f-4da0-9957-6382501e9a42",
+    "snyk.advanced.autoSelectOrganization": true,
     // Recommended extensions:
     // ✅ bradlc.vscode-tailwindcss (Tailwind CSS IntelliSense) - INSTALLED
     // ⚠️ csstools.postcss (PostCSS Language Support) - Optional

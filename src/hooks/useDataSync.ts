@@ -56,11 +56,11 @@ export function useDataSync({
   const hadSessionRef = useRef(false);
   const lastFetchedUserIdRef = useRef<string | null>(null);
   const lastVisibilityFetchRef = useRef(0);
-  
+
   // Store stable references to prevent infinite loops
   const fetchDataRef = useRef(fetchData);
   const clearLocalDataRef = useRef(clearLocalData);
-  
+
   // Update refs when methods change
   useEffect(() => {
     fetchDataRef.current = fetchData;

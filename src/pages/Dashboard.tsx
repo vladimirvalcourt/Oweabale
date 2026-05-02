@@ -494,11 +494,11 @@ export default function Dashboard() {
     return payListItems.filter((item) => !snoozedItems[item.id] || snoozedItems[item.id] <= nowMs);
   }, [payListItems, snoozedItems, nowMs]);
 
-  const overdueItems = visibleItems.filter((item) => item.status === 'overdue');
-  const todayItems = visibleItems.filter((item) => item.status === 'today');
-  const weekItems = visibleItems.filter((item) => item.status === 'week');
-  const comingItems = visibleItems.filter((item) => item.status === 'coming').slice(0, 8);
-  const unscheduledItems = visibleItems.filter((item) => item.status === 'unscheduled');
+  const overdueItems = useMemo(() => visibleItems.filter((item) => item.status === 'overdue'), [visibleItems]);
+  const todayItems = useMemo(() => visibleItems.filter((item) => item.status === 'today'), [visibleItems]);
+  const weekItems = useMemo(() => visibleItems.filter((item) => item.status === 'week'), [visibleItems]);
+  const comingItems = useMemo(() => visibleItems.filter((item) => item.status === 'coming').slice(0, 8), [visibleItems]);
+  const unscheduledItems = useMemo(() => visibleItems.filter((item) => item.status === 'unscheduled'), [visibleItems]);
   const topPriority = visibleItems.find((item) => item.status !== 'unscheduled') || visibleItems[0] || null;
   const activeDebt = safeDebts.filter((debt) => (debt.remaining || 0) > 0);
   const debtMinimumsDue = visibleItems.filter((item) => item.kind === 'debt' && item.status !== 'unscheduled');
@@ -858,4 +858,5 @@ export default function Dashboard() {
       </div>
     </AppPageShell>
   );
+}
 }

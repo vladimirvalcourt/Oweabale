@@ -82,8 +82,25 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
 
       // Only show loading spinner on initial fetch, not when loading more
       if (!background && !loadMore) set({ isLoading: true, phase2Hydrated: false });
+      // Safety timeout: force dismiss loader after 15 seconds to prevent infinite loading
+      const safetyTimeout = setTimeout(() => {
+        console.warn('[fetchData] SAFETY TIMEOUT: Fetch taking too long, forcing loader dismissal');
+        toast.warning('Data sync is taking longer than expected. Showing available data.');
+        set({ isLoading: false, phase2Hydrated: true });
+      }, 15000);
 
-      const resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
+
+      let resolvedUserId: string | undefined;
+      try {
+        resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
+      } catch (authError) {
+        console.error('[fetchData] Auth session error:', authError);
+        toast.error('Authentication error. Please refresh the page.');
+        clearTimeout(safetyTimeout);
+        if (!background) set({ isLoading: false, phase2Hydrated: true });
+        return;
+      }
+
       if (!resolvedUserId) {
         console.warn('[fetchData] No user ID available — skipping load');
         if (!background) {
@@ -582,6 +599,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         console.error('[fetchData] Error stack:', err instanceof Error ? err.stack : 'No stack');
         toast.error('Failed to load your financial data. Please refresh the page.');
       } finally {
+        clearTimeout(safetyTimeout);
         console.log('[fetchData] Finally block - clearing isLoading');
         if (!background) {
           if (get().isLoading) {
