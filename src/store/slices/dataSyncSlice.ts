@@ -158,7 +158,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
 
       let transactionsQuery = supabase
         .from('transactions')
-        .select('*')
+        .select('id,name,category,date,amount,type,platform_tag,notes,plaid_account_id')
         .eq('user_id', resolvedUserId)
         .order('date', { ascending: false })
         .limit(TRANSACTION_PAGE_SIZE);
@@ -169,20 +169,20 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
       }
 
       const phase2Promise = Promise.all([
-        supabase.from('goals').select('*').eq('user_id', resolvedUserId),
-        supabase.from('budgets').select('*').eq('user_id', resolvedUserId),
-        supabase.from('categories').select('*').eq('user_id', resolvedUserId),
-        supabase.from('citations').select('*').eq('user_id', resolvedUserId),
-        supabase.from('deductions').select('*').eq('user_id', resolvedUserId),
-        supabase.from('freelance_entries').select('*').eq('user_id', resolvedUserId),
-        supabase.from('mileage_log').select('*').eq('user_id', resolvedUserId).order('trip_date', { ascending: false }),
-        supabase.from('client_invoices').select('*').eq('user_id', resolvedUserId).order('due_date', { ascending: false }),
-        supabase.from('pending_ingestions').select('*').eq('user_id', resolvedUserId),
-        supabase.from('categorization_exclusions').select('*').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
-        supabase.from('credit_fixes').select('*').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
-        supabase.from('admin_broadcasts').select('*').order('created_at', { ascending: false }).limit(10),
-        supabase.from('platform_settings').select('*').order('created_at', { ascending: true }).limit(1).maybeSingle(),
-        supabase.from('net_worth_snapshots').select('*').eq('user_id', resolvedUserId).order('date', { ascending: true }).limit(90),
+        supabase.from('goals').select('id,name,target_amount,current_amount,deadline,priority,status,user_id').eq('user_id', resolvedUserId),
+        supabase.from('budgets').select('id,category,amount,period,user_id').eq('user_id', resolvedUserId),
+        supabase.from('categories').select('id,name,type,color,icon,user_id').eq('user_id', resolvedUserId),
+        supabase.from('citations').select('id,status,amount,date,description,user_id').eq('user_id', resolvedUserId),
+        supabase.from('deductions').select('id,category,amount,date,description,user_id').eq('user_id', resolvedUserId),
+        supabase.from('freelance_entries').select('id,client_name,amount,date,status,description,user_id').eq('user_id', resolvedUserId),
+        supabase.from('mileage_log').select('id,trip_date,miles,purpose,rate,amount,user_id').eq('user_id', resolvedUserId).order('trip_date', { ascending: false }),
+        supabase.from('client_invoices').select('id,client_name,amount,due_date,status,description,user_id').eq('user_id', resolvedUserId).order('due_date', { ascending: false }),
+        supabase.from('pending_ingestions').select('id,filename,status,created_at,user_id').eq('user_id', resolvedUserId),
+        supabase.from('categorization_exclusions').select('id,merchant_pattern,category,created_at,user_id').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
+        supabase.from('credit_fixes').select('id,item_type,description,status,created_at,user_id').eq('user_id', resolvedUserId).order('created_at', { ascending: false }),
+        supabase.from('admin_broadcasts').select('id,title,message,level,created_at').order('created_at', { ascending: false }).limit(10),
+        supabase.from('platform_settings').select('id,key,value,created_at').order('created_at', { ascending: true }).limit(1).maybeSingle(),
+        supabase.from('net_worth_snapshots').select('id,date,net_worth,assets,debts,user_id').eq('user_id', resolvedUserId).order('date', { ascending: true }).limit(90),
       ]);
 
       try {
@@ -198,14 +198,14 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           { data: subscriptions, error: subscriptionsError },
           { data: plaidAccountsRows, error: plaidAccountsError },
         ] = await Promise.all([
-          supabase.from('profiles').select('*').eq('id', resolvedUserId).maybeSingle(),
-          supabase.from('bills').select('*').eq('user_id', resolvedUserId),
-          supabase.from('debts').select('*').eq('user_id', resolvedUserId),
-          supabase.from('transactions').select('*').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(500),
-          supabase.from('assets').select('*').eq('user_id', resolvedUserId),
-          supabase.from('incomes').select('*').eq('user_id', resolvedUserId),
-          supabase.from('subscriptions').select('*').eq('user_id', resolvedUserId),
-          supabase.from('plaid_accounts').select('*').eq('user_id', resolvedUserId).order('name', { ascending: true }),
+          supabase.from('profiles').select('id,first_name,last_name,email,avatar,theme,phone,timezone,language,notification_prefs,plan,trial_started_at,trial_ends_at,trial_expired,credit_score,credit_last_updated,plaid_linked_at,plaid_institution_name,plaid_last_sync_at,plaid_needs_relink,tax_state,tax_rate').eq('id', resolvedUserId).maybeSingle(),
+          supabase.from('bills').select('id,biller,amount,category,due_date,frequency,status,auto_pay,user_id').eq('user_id', resolvedUserId),
+          supabase.from('debts').select('id,name,type,apr,remaining,min_payment,paid,payment_due_date,original_amount,origination_date,term_months,user_id').eq('user_id', resolvedUserId),
+          supabase.from('transactions').select('id,name,category,date,amount,type,platform_tag,notes,plaid_account_id').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(500),
+          supabase.from('assets').select('id,name,value,type,appreciation_rate,purchase_price,purchase_date,user_id').eq('user_id', resolvedUserId),
+          supabase.from('incomes').select('id,name,amount,frequency,category,next_date,status,is_tax_withheld,user_id').eq('user_id', resolvedUserId),
+          supabase.from('subscriptions').select('id,name,amount,frequency,next_billing_date,status,price_history,user_id').eq('user_id', resolvedUserId),
+          supabase.from('plaid_accounts').select('id,plaid_account_id,name,official_name,account_type,account_subtype,mask,subtype_suggested_savings,include_in_savings,updated_at,user_id').eq('user_id', resolvedUserId).order('name', { ascending: true }),
         ]);
         console.timeEnd('[fetchData] Phase 1 queries');
         console.log('[fetchData] Phase 1 complete - bills:', bills?.length, 'debts:', debts?.length, 'transactions:', transactionsPage?.length);
