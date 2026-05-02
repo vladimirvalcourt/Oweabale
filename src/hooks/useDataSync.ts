@@ -56,6 +56,7 @@ export function useDataSync({
   const hadSessionRef = useRef(false);
   const lastFetchedUserIdRef = useRef<string | null>(null);
   const lastVisibilityFetchRef = useRef(0);
+  const authInitializedRef = useRef(false);
 
   // Store stable references to prevent infinite loops
   const fetchDataRef = useRef(fetchData);
@@ -67,7 +68,40 @@ export function useDataSync({
     clearLocalDataRef.current = clearLocalData;
   }, [fetchData, clearLocalData]);
 
+  // Initialize auth state on mount - wait for Supabase to resolve session
   useEffect(() => {
+    let mounted = true;
+    
+    async function initializeAuth() {
+      try {
+        // Wait for Supabase to resolve the current session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (mounted) {
+          authInitializedRef.current = true;
+          console.log('[useDataSync] Auth initialized, session:', session ? 'present' : 'none');
+        }
+      } catch (error) {
+        console.error('[useDataSync] Auth initialization error:', error);
+        if (mounted) {
+          authInitializedRef.current = true; // Mark as initialized even on error to prevent blocking
+        }
+      }
+    }
+    
+    initializeAuth();
+    
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    // Guard: Don't proceed until auth is fully initialized
+    if (!authInitializedRef.current) {
+      console.log('[useDataSync] Auth not yet initialized, waiting...');
+      return;
+    }
+
     if (authLoading) {
       console.log('[useDataSync] Auth still loading, waiting...');
       return;

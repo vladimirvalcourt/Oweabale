@@ -54,11 +54,22 @@ if (!supabaseUrl || !supabaseKey) {
   );
 }
 
-initWebVitalsReporting();
+// Defer non-critical initializations to reduce main-thread blocking on page load
+if (typeof window !== 'undefined') {
+  // Use requestIdleCallback to defer Web Vitals reporting until browser is idle
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(() => {
+      initWebVitalsReporting();
+    }, { timeout: 2000 });
+  } else {
+    // Fallback: defer with setTimeout
+    setTimeout(() => initWebVitalsReporting(), 1000);
+  }
 
-// Register the Service Worker for PWA (with immediate update check)
-if ('serviceWorker' in navigator) {
-  registerSW({ immediate: true });
+  // Register Service Worker after initial render
+  if ('serviceWorker' in navigator) {
+    setTimeout(() => registerSW({ immediate: true }), 500);
+  }
 }
 
 const queryClient = new QueryClient({
@@ -92,11 +103,18 @@ createRoot(rootEl).render(
   </StrictMode>,
 );
 
-// Initialize performance monitoring after app renders
+// Initialize performance monitoring after app renders - defer to avoid blocking
 if (typeof window !== 'undefined') {
-  // Monitor long tasks (>50ms) to identify blocking operations
-  monitorLongTasks(50);
-
-  // Defer non-critical initializations
-  lazyInit.initializeWhenIdle();
+  // Defer long task monitoring until after LCP
+  if ('requestIdleCallback' in window) {
+    (window as any).requestIdleCallback(() => {
+      monitorLongTasks(50);
+      lazyInit.initializeWhenIdle();
+    }, { timeout: 3000 });
+  } else {
+    setTimeout(() => {
+      monitorLongTasks(50);
+      lazyInit.initializeWhenIdle();
+    }, 1500);
+  }
 }
