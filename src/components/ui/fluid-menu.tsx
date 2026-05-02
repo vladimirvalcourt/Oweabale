@@ -15,11 +15,11 @@ export function Menu({ trigger, children, align = "left", showChevron = true }: 
 
   return (
     <div className="relative inline-block text-left">
-      <div
+      <button
         id={buttonId}
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="cursor-pointer inline-flex items-center"
-        role="button"
+        className="cursor-pointer inline-flex items-center bg-transparent border-0 p-0"
         aria-haspopup="true"
         aria-expanded={isOpen}
       >
@@ -27,7 +27,7 @@ export function Menu({ trigger, children, align = "left", showChevron = true }: 
         {showChevron && (
           <ChevronDown className="ml-2 -mr-1 h-4 w-4 text-content-muted" aria-hidden="true" />
         )}
-      </div>
+      </button>
 
       {isOpen && (
         <div
