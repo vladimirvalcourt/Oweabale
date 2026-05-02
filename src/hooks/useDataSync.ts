@@ -57,6 +57,7 @@ export function useDataSync({
   const lastFetchedUserIdRef = useRef<string | null>(null);
   const lastVisibilityFetchRef = useRef(0);
   const authInitializedRef = useRef(false);
+  const handledUserIdsRef = useRef(new Set<string>());
 
   // Store stable references to prevent infinite loops
   const fetchDataRef = useRef(fetchData);
@@ -79,6 +80,14 @@ export function useDataSync({
         if (mounted) {
           authInitializedRef.current = true;
           console.log('[useDataSync] Auth initialized, session:', session ? 'present' : 'none');
+          
+          // If there's already a session on mount, handle it immediately
+          if (session?.user?.id && !handledUserIdsRef.current.has(session.user.id)) {
+            handledUserIdsRef.current.add(session.user.id);
+            console.log('[useDataSync] Initial session found, fetching data for:', session.user.id);
+            useStore.setState({ isLoading: true });
+            void fetchDataRef.current(session.user.id);
+          }
         }
       } catch (error) {
         console.error('[useDataSync] Auth initialization error:', error);
@@ -95,55 +104,37 @@ export function useDataSync({
     };
   }, []);
 
-  useEffect(() => {
-    // Guard: Don't proceed until auth is fully initialized
-    if (!authInitializedRef.current) {
-      console.log('[useDataSync] Auth not yet initialized, waiting...');
-      return;
-    }
-
-    if (authLoading) {
-      console.log('[useDataSync] Auth still loading, waiting...');
-      return;
-    }
-
-    if (authUserId) {
-      console.log('[useDataSync] User authenticated:', authUserId);
-      hadSessionRef.current = true;
-      if (lastFetchedUserIdRef.current === authUserId) {
-        console.log('[useDataSync] Already fetched for this user, skipping');
-        return;
-      }
-      lastFetchedUserIdRef.current = authUserId;
-      console.log('[useDataSync] Triggering fetchData for user:', authUserId);
-      // Same-frame loading gate as fetchData (effect runs after paint; this minimizes the onboarding flash).
-      useStore.setState({ isLoading: true });
-      void fetchDataRef.current(authUserId);
-      
-      // Safety timeout: force-clear loading after 8 seconds no matter what
-      const loadingTimeout = setTimeout(() => {
-        console.warn('[useDataSync] Loading timeout - forcing isLoading to false');
-        useStore.setState({ isLoading: false });
-      }, 8000);
-      
-      return () => clearTimeout(loadingTimeout);
-    }
-
-    console.log('[useDataSync] No user ID, clearing session');
-    lastFetchedUserIdRef.current = null;
-    if (hadSessionRef.current) {
-      hadSessionRef.current = false;
-      clearLocalDataRef.current();
-    }
-  }, [authLoading, authUserId]); // Removed fetchData and clearLocalData from deps
+  // Main effect removed - auth is now handled by onAuthStateChange listener and initial getSession()
+  // This prevents race conditions and duplicate fetchData calls
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('[useDataSync] Auth state changed:', event, 'Session:', session ? 'present' : 'null');
+      
+      // Only handle SIGNED_IN events, skip INITIAL_SESSION if already handled
+      if (event === 'INITIAL_SESSION') {
+        console.log('[useDataSync] Skipping INITIAL_SESSION - already handled in mount');
+        return;
+      }
+      
+      if (event === 'SIGNED_IN' && session?.user?.id) {
+        // Deduplicate: only fetch once per user ID
+        if (handledUserIdsRef.current.has(session.user.id)) {
+          console.log('[useDataSync] User already handled, skipping duplicate:', session.user.id);
+          return;
+        }
+        
+        handledUserIdsRef.current.add(session.user.id);
+        console.log('[useDataSync] User signed in, fetching data for:', session.user.id);
+        useStore.setState({ isLoading: true });
+        void fetchDataRef.current(session.user.id);
+      }
+      
       if (event === 'SIGNED_OUT') {
         console.log('[useDataSync] User signed out, clearing data');
         hadSessionRef.current = false;
         lastFetchedUserIdRef.current = null;
+        handledUserIdsRef.current.clear(); // Clear handled users on sign out
         clearLocalDataRef.current();
       }
     });
