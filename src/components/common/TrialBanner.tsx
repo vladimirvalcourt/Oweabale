@@ -16,10 +16,11 @@ export default function TrialBanner() {
     }
 
     let mounted = true;
+    const userId = user.id; // Capture userId to avoid scope issues in minified code
 
     async function fetchTrialStatus() {
       try {
-        const days = await getTrialDaysRemaining(user.id);
+        const days = await getTrialDaysRemaining(userId);
         if (mounted) {
           setDaysRemaining(days);
         }
