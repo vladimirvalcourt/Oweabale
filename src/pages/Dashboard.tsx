@@ -859,4 +859,3 @@ export default function Dashboard() {
     </AppPageShell>
   );
 }
-}
