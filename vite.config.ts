@@ -158,6 +158,8 @@ export default defineConfig(({ mode }) => {
       sourcemap: isProd ? 'hidden' : false,
       // Target modern browsers only — no unnecessary polyfills
       target: ['chrome90', 'firefox88', 'safari14', 'edge90'],
+      // Defer non-critical CSS loading
+      cssCodeSplit: true,
       rollupOptions: {
         output: {
           /**

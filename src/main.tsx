@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 const Analytics = lazy(() => import('@vercel/analytics/react').then(mod => ({ default: mod.Analytics })));
 import App from './App.tsx';
 import 'sonner/dist/styles.css';
+// Defer font loading — use font-display: swap for better perceived performance
 import '@fontsource/geist-sans/400.css';
 import '@fontsource/geist-sans/500.css';
 import '@fontsource/geist-sans/600.css';
@@ -82,8 +83,9 @@ createRoot(rootEl).render(
     <MotionConfig reducedMotion="user">
       <QueryClientProvider client={queryClient}>
         <App />
+        {/* Defer analytics until after initial render to reduce main-thread blocking */}
         <Suspense fallback={null}>
-          <Analytics />
+          <Analytics mode="production" />
         </Suspense>
       </QueryClientProvider>
     </MotionConfig>
