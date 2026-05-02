@@ -17,6 +17,8 @@ export function useFullSuiteAccess() {
 
   const refresh = useCallback(async () => {
     setState((prev) => ({ ...prev, isLoading: true }));
+    
+    let userId: string | undefined;
     try {
       const {
         data: { user },
@@ -26,6 +28,8 @@ export function useFullSuiteAccess() {
         setState({ isLoading: false, hasFullSuite: false, isAdmin: false });
         return;
       }
+      
+      userId = user.id; // Capture userId to avoid scope issues in minified code
     } catch (authError) {
       console.error('[useFullSuiteAccess] Auth error:', authError);
       setState({ isLoading: false, hasFullSuite: false, isAdmin: false });
@@ -33,11 +37,11 @@ export function useFullSuiteAccess() {
     }
 
     const [profileRes, entitlementRes, subscriptionRes] = await Promise.all([
-      supabase.from('profiles').select('is_admin, plan, trial_ends_at, trial_expired').eq('id', user.id).maybeSingle(),
+      supabase.from('profiles').select('is_admin, plan, trial_ends_at, trial_expired').eq('id', userId).maybeSingle(),
       supabase
         .from('entitlements')
         .select('status, ends_at')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .eq('feature_key', 'full_suite')
         .order('updated_at', { ascending: false })
         .limit(1)
@@ -45,7 +49,7 @@ export function useFullSuiteAccess() {
       supabase
         .from('billing_subscriptions')
         .select('status')
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
         .order('updated_at', { ascending: false })
         .limit(1)
         .maybeSingle(),
