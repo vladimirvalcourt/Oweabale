@@ -421,6 +421,8 @@ export interface AppState {
   commitIngestion: (id: string) => Promise<boolean>;
   fetchData: (userId?: string, options?: { background?: boolean; loadMore?: boolean }) => Promise<void>;
   loadMoreTransactions: () => Promise<void>;
+  /** Egress optimization: Load Phase 2 data on demand */
+  loadPhase2Data: () => Promise<void>;
   isLoading: boolean;
   phase2Hydrated: boolean;
   addNotification: (note: Omit<Notification, 'id' | 'timestamp' | 'read'>) => void;

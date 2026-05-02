@@ -76,7 +76,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
      * await fetchData(undefined, { loadMore: true });
      * ```
      */
-    fetchData: async (userId?: string, options?: { background?: boolean; loadMore?: boolean }) => {
+    fetchData: async (userId?: string, options?: { background?: boolean; loadMore?: boolean; fullLoad?: boolean }) => {
       const state = get();
 
       // Guard against concurrent calls
@@ -104,6 +104,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
 
       const background = options?.background === true;
       const loadMore = options?.loadMore === true;
+      const fullLoad = options?.fullLoad === true; // Load all Phase 2 data
 
       // Only show loading spinner on initial fetch, not when loading more
       if (!background && !loadMore) set({ isLoading: true, phase2Hydrated: false });
@@ -443,8 +444,15 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         console.log('[fetchData] Phase 1 state updated, starting phase2...');
         console.time('[fetchData] Phase 2 queries');
 
-        console.log('[fetchData] Phase 1 state updated, starting phase2...');
-        console.time('[fetchData] Phase 2 queries');
+        // EGRESS OPTIMIZATION: Only load Phase 2 data if explicitly requested or first load
+        // This prevents loading goals, budgets, citations etc. on every dashboard refresh
+        const shouldLoadPhase2 = fullLoad || !state.phase2Hydrated;
+        
+        if (!shouldLoadPhase2) {
+          console.log('[fetchData] Skipping Phase 2 (not full load, already hydrated)');
+          set({ phase2Hydrated: true });
+          return;
+        }
 
         let phase2RecordCount = 0;
 
@@ -704,5 +712,25 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
 
       console.log('[loadMoreTransactions] Loading next page...');
       await get().fetchData(undefined, { loadMore: true });
+    },
+
+    /**
+     * EGRESS OPTIMIZATION: Explicitly load Phase 2 data (goals, budgets, citations, etc.)
+     * Call this when user navigates to pages that need this data
+     */
+    loadPhase2Data: async () => {
+      const state = get();
+      if (!state.user?.id) {
+        console.warn('[loadPhase2Data] No user ID available');
+        return;
+      }
+      
+      if (state.phase2Hydrated) {
+        console.log('[loadPhase2Data] Phase 2 already loaded, skipping');
+        return;
+      }
+      
+      console.log('[loadPhase2Data] Loading Phase 2 data on demand...');
+      await get().fetchData(state.user.id, { fullLoad: true, background: true });
     },
   });
