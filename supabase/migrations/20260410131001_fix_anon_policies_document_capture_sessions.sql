@@ -24,22 +24,32 @@ COMMENT ON FUNCTION public.request_x_session_token() IS
 GRANT EXECUTE ON FUNCTION public.request_x_session_token() TO anon, authenticated;
 
 -- ── Session expiry + status: allow QR flow "pending" and bound session lifetime ─
-ALTER TABLE public.document_capture_sessions
-  ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
+-- NOTE: This table was dropped in 20260428180411_remove_mobile_capture_flow.sql
+-- Skip all changes if the table doesn't exist
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'document_capture_sessions'
+  ) THEN
+    ALTER TABLE public.document_capture_sessions
+      ADD COLUMN IF NOT EXISTS expires_at TIMESTAMPTZ;
 
-UPDATE public.document_capture_sessions
-SET expires_at = COALESCE(created_at, now()) + interval '24 hours'
-WHERE expires_at IS NULL;
+    UPDATE public.document_capture_sessions
+    SET expires_at = COALESCE(created_at, now()) + interval '24 hours'
+    WHERE expires_at IS NULL;
 
-ALTER TABLE public.document_capture_sessions
-  ALTER COLUMN expires_at SET DEFAULT (now() + interval '24 hours');
+    ALTER TABLE public.document_capture_sessions
+      ALTER COLUMN expires_at SET DEFAULT (now() + interval '24 hours');
 
-ALTER TABLE public.document_capture_sessions
-  DROP CONSTRAINT IF EXISTS document_capture_sessions_status_check;
+    ALTER TABLE public.document_capture_sessions
+      DROP CONSTRAINT IF EXISTS document_capture_sessions_status_check;
 
-ALTER TABLE public.document_capture_sessions
-  ADD CONSTRAINT document_capture_sessions_status_check
-  CHECK (status IN ('idle', 'pending', 'active', 'completed', 'error'));
+    ALTER TABLE public.document_capture_sessions
+      ADD CONSTRAINT document_capture_sessions_status_check
+      CHECK (status IN ('idle', 'pending', 'active', 'completed', 'error'));
+  END IF;
+END $$;
 
 -- ── Prevent privilege escalation via user_id swap on updates ────────────────────
 CREATE OR REPLACE FUNCTION public.prevent_document_capture_session_user_change()
@@ -55,50 +65,58 @@ BEGIN
 END;
 $$;
 
-DROP TRIGGER IF EXISTS trg_prevent_document_capture_session_user_change ON public.document_capture_sessions;
-CREATE TRIGGER trg_prevent_document_capture_session_user_change
-  BEFORE UPDATE ON public.document_capture_sessions
-  FOR EACH ROW
-  EXECUTE FUNCTION public.prevent_document_capture_session_user_change();
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'document_capture_sessions'
+  ) THEN
+    DROP TRIGGER IF EXISTS trg_prevent_document_capture_session_user_change ON public.document_capture_sessions;
+    CREATE TRIGGER trg_prevent_document_capture_session_user_change
+      BEFORE UPDATE ON public.document_capture_sessions
+      FOR EACH ROW
+      EXECUTE FUNCTION public.prevent_document_capture_session_user_change();
 
--- ── Drop unsafe / duplicate policy names (remote DBs may vary) ─────────────────
-DROP POLICY IF EXISTS "Mobile tokens can access sessions" ON public.document_capture_sessions;
-DROP POLICY IF EXISTS "anon can update session status" ON public.document_capture_sessions;
+    -- ── Drop unsafe / duplicate policy names (remote DBs may vary) ─────────────────
+    DROP POLICY IF EXISTS "Mobile tokens can access sessions" ON public.document_capture_sessions;
+    DROP POLICY IF EXISTS "anon can update session status" ON public.document_capture_sessions;
 
--- Authenticated: full CRUD on own rows only (explicit TO authenticated)
-DROP POLICY IF EXISTS "Users manage own sessions" ON public.document_capture_sessions;
-CREATE POLICY "document_capture_sessions_authenticated_own"
-  ON public.document_capture_sessions
-  FOR ALL
-  TO authenticated
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+    -- Authenticated: full CRUD on own rows only (explicit TO authenticated)
+    DROP POLICY IF EXISTS "Users manage own sessions" ON public.document_capture_sessions;
+    CREATE POLICY "document_capture_sessions_authenticated_own"
+      ON public.document_capture_sessions
+      FOR ALL
+      TO authenticated
+      USING (auth.uid() = user_id)
+      WITH CHECK (auth.uid() = user_id);
 
--- Anon: read only rows whose token matches the request header
-CREATE POLICY "document_capture_sessions_anon_select_by_header_token"
-  ON public.document_capture_sessions
-  FOR SELECT
-  TO anon
-  USING (
-    token IS NOT NULL
-    AND token = public.request_x_session_token()
-    AND (expires_at IS NULL OR expires_at > now())
-  );
+    -- Anon: read only rows whose token matches the request header
+    CREATE POLICY "document_capture_sessions_anon_select_by_header_token"
+      ON public.document_capture_sessions
+      FOR SELECT
+      TO anon
+      USING (
+        token IS NOT NULL
+        AND token = public.request_x_session_token()
+        AND (expires_at IS NULL OR expires_at > now())
+      );
 
--- Anon: update only matching token; WITH CHECK blocks token/user_id swaps
-CREATE POLICY "document_capture_sessions_anon_update_by_header_token"
-  ON public.document_capture_sessions
-  FOR UPDATE
-  TO anon
-  USING (
-    token IS NOT NULL
-    AND token = public.request_x_session_token()
-    AND (expires_at IS NULL OR expires_at > now())
-  )
-  WITH CHECK (
-    token = public.request_x_session_token()
-    AND user_id IS NOT NULL
-  );
+    -- Anon: update only matching token; WITH CHECK blocks token/user_id swaps
+    CREATE POLICY "document_capture_sessions_anon_update_by_header_token"
+      ON public.document_capture_sessions
+      FOR UPDATE
+      TO anon
+      USING (
+        token IS NOT NULL
+        AND token = public.request_x_session_token()
+        AND (expires_at IS NULL OR expires_at > now())
+      )
+      WITH CHECK (
+        token = public.request_x_session_token()
+        AND user_id IS NOT NULL
+      );
+  END IF;
+END $$;
 
 -- Anon must not insert/delete capture sessions (desktop creates sessions while logged in)
 -- No INSERT/DELETE policies for anon → denied by default when RLS is enabled.

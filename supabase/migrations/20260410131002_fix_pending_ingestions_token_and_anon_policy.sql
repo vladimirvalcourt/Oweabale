@@ -25,20 +25,30 @@ CREATE POLICY "pending_ingestions_authenticated_all"
   WITH CHECK (auth.uid() = user_id);
 
 -- Anon: insert only when token proves an active capture session for the same user
-CREATE POLICY "pending_ingestions_anon_insert_with_valid_capture_token"
-  ON public.pending_ingestions
-  FOR INSERT
-  TO anon
-  WITH CHECK (
-    token IS NOT NULL
-    AND EXISTS (
-      SELECT 1
-      FROM public.document_capture_sessions d
-      WHERE d.token = token
-        AND d.user_id = user_id
-        AND d.status IN ('idle', 'pending', 'active')
-        AND (d.expires_at IS NULL OR d.expires_at > now())
-    )
-  );
+-- NOTE: document_capture_sessions was dropped in 20260428180411_remove_mobile_capture_flow.sql
+-- Skip this policy if the table doesn't exist
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'document_capture_sessions'
+  ) THEN
+    CREATE POLICY "pending_ingestions_anon_insert_with_valid_capture_token"
+      ON public.pending_ingestions
+      FOR INSERT
+      TO anon
+      WITH CHECK (
+        token IS NOT NULL
+        AND EXISTS (
+          SELECT 1
+          FROM public.document_capture_sessions d
+          WHERE d.token = token
+            AND d.user_id = user_id
+            AND d.status IN ('idle', 'pending', 'active')
+            AND (d.expires_at IS NULL OR d.expires_at > now())
+        )
+      );
+  END IF;
+END $$;
 
 -- Anon cannot SELECT/UPDATE/DELETE pending_ingestions (no policies → denied)

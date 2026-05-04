@@ -61,7 +61,12 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
      * ```
      */
     fetchData: async (userId?: string, options?: { background?: boolean; loadMore?: boolean; fullLoad?: boolean }) => {
+      console.log('[fetchData] ===== CALLED =====');
+      console.log('[fetchData] userId:', userId);
+      console.log('[fetchData] options:', options);
+      
       const state = get();
+      console.log('[fetchData] Current state - isLoading:', state.isLoading, 'user.id:', state.user?.id);
 
       // Guard against concurrent calls
       if (state.isLoading && !options?.background) {
@@ -85,10 +90,13 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
       const lastFetchTime = state.lastDataFetchTime || 0;
       const FRESHNESS_THRESHOLD_MS = transferConfig?.DATA_FRESHNESS_THRESHOLD_MS ?? (5 * 60 * 1000); // 5 min default, 10 min in transfer mode
 
-      if (!options?.loadMore && !options?.background && (now - lastFetchTime < FRESHNESS_THRESHOLD_MS)) {
-        console.log('[fetchData] Data is fresh, skipping refetch to save egress');
-        return;
-      }
+      // DISABLED: Always fetch to ensure data loads properly
+      // Only skip if we have actual data already loaded
+      // const hasExistingData = state.bills.length > 0 || state.debts.length > 0 || state.transactions.length > 0;
+      // if (!options?.loadMore && !options?.background && hasExistingData && (now - lastFetchTime < FRESHNESS_THRESHOLD_MS)) {
+      //   console.log('[fetchData] Data is fresh, skipping refetch to save egress');
+      //   return;
+      // }
 
       const background = options?.background === true;
       const loadMore = options?.loadMore === true;
@@ -96,19 +104,30 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
 
       // Only show loading spinner on initial fetch, not when loading more
       if (!background && !loadMore) set({ isLoading: true, phase2Hydrated: false });
-      // Safety timeout: force dismiss loader after 15 seconds to prevent infinite loading
+      
+      // Safety timeout: force dismiss loader after 10 seconds to prevent infinite loading
       const safetyTimeout = setTimeout(() => {
         console.warn('[fetchData] SAFETY TIMEOUT: Fetch taking too long, forcing loader dismissal');
         toast.warning('Data sync is taking longer than expected. Showing available data.');
         set({ isLoading: false, phase2Hydrated: true });
-      }, 15000);
+      }, 10000); // Reduced from 15s to 10s
 
 
       let resolvedUserId: string | undefined;
       try {
         resolvedUserId = userId ?? (await supabase.auth.getUser()).data.user?.id;
+        
+        if (!resolvedUserId) {
+          console.error('[fetchData] No user ID found');
+          clearTimeout(safetyTimeout);
+          set({ isLoading: false, phase2Hydrated: true });
+          toast.error('Not authenticated. Please sign in.');
+          return;
+        }
       } catch (authError) {
         console.error('[fetchData] Auth session error:', authError);
+        clearTimeout(safetyTimeout);
+        set({ isLoading: false, phase2Hydrated: true });
         toast.error('Authentication error. Please refresh the page.', {
           action: {
             label: 'Clear & Reload',
@@ -144,6 +163,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
       }
 
       console.log('[fetchData] starting fetch for user:', resolvedUserId);
+      console.log('[fetchData] Current state - bills:', state.bills.length, 'debts:', state.debts.length, 'transactions:', state.transactions.length);
       console.time('[fetchData] Total fetch time');
 
       void (async () => {
@@ -169,7 +189,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
       }
 
       const phase2Limit = transferConfig?.MAX_PHASE2_RECORDS ?? 100;
-      
+
       const phase2Promise = Promise.all([
         supabase.from('goals').select('id,name,target_amount,current_amount,deadline,priority,status,type,color,user_id').eq('user_id', resolvedUserId),
         supabase.from('budgets').select('id,category,amount,period,rollover_enabled,lock_mode,user_id').eq('user_id', resolvedUserId),
@@ -181,12 +201,12 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
         supabase.from('freelance_entries').select('id,client,amount,date,is_vaulted,scoured_write_offs,user_id').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(phase2Limit),
         supabase.from('mileage_log').select('id,trip_date,start_location,end_location,miles,purpose,platform,irs_rate_per_mile,deduction_amount,user_id').eq('user_id', resolvedUserId).order('trip_date', { ascending: false }).limit(phase2Limit),
         supabase.from('client_invoices').select('id,client_name,amount,issued_date,due_date,status,notes,user_id').eq('user_id', resolvedUserId).order('due_date', { ascending: false }).limit(phase2Limit),
-        supabase.from('pending_ingestions').select('id,type,status,extracted_data,original_file,storage_path,storage_url,user_id').eq('user_id', resolvedUserId).limit(transferConfig ? Math.min(50, phase2Limit) : 50),
-        supabase.from('categorization_exclusions').select('id,scope,transaction_id,merchant_name,user_id').eq('user_id', resolvedUserId).order('created_at', { ascending: false }).limit(transferConfig ? Math.min(200, phase2Limit * 4) : 200),
-        supabase.from('credit_fixes').select('id,item_type,description,status,created_at,user_id').eq('user_id', resolvedUserId).order('created_at', { ascending: false }).limit(phase2Limit),
+        supabase.from('pending_ingestions').select('id,user_id,type,status,source,extracted_data,original_file,storage_path,storage_url,created_at,updated_at').eq('user_id', resolvedUserId).order('created_at', { ascending: false }).limit(phase2Limit),
+        supabase.from('categorization_exclusions').select('id,user_id,scope,transaction_id,merchant_name,created_at,updated_at').eq('user_id', resolvedUserId).order('created_at', { ascending: false }).limit(phase2Limit),
+        supabase.from('net_worth_snapshots').select('id,user_id,date,net_worth,assets,debts,created_at').eq('user_id', resolvedUserId).order('date', { ascending: false }).limit(phase2Limit),
+        supabase.from('credit_fixes').select('id,item_type,amount,status,bureau,notes,created_at,user_id').eq('user_id', resolvedUserId).order('created_at', { ascending: false }).limit(phase2Limit),
         supabase.from('admin_broadcasts').select('id,title,message,level,created_at').order('created_at', { ascending: false }).limit(10),
         supabase.from('platform_settings').select('id,key,value,created_at').order('created_at', { ascending: true }).limit(1).maybeSingle(),
-        supabase.from('net_worth_snapshots').select('id,date,net_worth,assets,debts,user_id').eq('user_id', resolvedUserId).order('date', { ascending: true }).limit(90),
       ]);
 
       try {
@@ -202,7 +222,7 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           { data: subscriptions, error: subscriptionsError },
           { data: plaidAccountsRows, error: plaidAccountsError },
         ] = await Promise.all([
-          supabase.from('profiles').select('id,first_name,last_name,email,avatar,theme,phone,timezone,language,notification_prefs,plan,trial_started_at,trial_ends_at,trial_expired,credit_score,credit_last_updated,plaid_linked_at,plaid_institution_name,plaid_last_sync_at,plaid_needs_relink,tax_state,tax_rate').eq('id', resolvedUserId).maybeSingle(),
+          supabase.from('profiles').select('id,first_name,last_name,email,avatar,theme,phone,timezone,language,notification_prefs,plan,trial_started_at,trial_ends_at,trial_expired,credit_score,credit_last_updated,plaid_linked_at,plaid_institution_name,plaid_last_sync_at,plaid_needs_relink,tax_state,tax_rate,has_completed_onboarding,is_admin,alert_preferences,tax_reserve_percent,steady_salary_target').eq('id', resolvedUserId).maybeSingle(),
           supabase.from('bills').select('id,biller,amount,category,due_date,frequency,status,auto_pay,user_id').eq('user_id', resolvedUserId),
           supabase.from('debts').select('id,name,type,apr,remaining,min_payment,paid,payment_due_date,original_amount,origination_date,term_months,user_id').eq('user_id', resolvedUserId),
           // Reduced from 500 to TRANSACTION_PAGE_SIZE (50) to minimize egress
@@ -461,10 +481,10 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
             { data: clientInvoicesRowsRaw, error: clientInvoicesError },
             { data: pendingIngestionsRaw, error: pendingIngestionsError },
             { data: categorizationExclusionsRaw, error: categorizationExclusionsError },
+            { data: netWorthSnapshotsRaw, error: netWorthSnapshotsError },
             { data: creditFixesRaw, error: creditFixesError },
             { data: adminBroadcastsRaw, error: adminBroadcastsError },
             { data: platformSettingsRaw, error: platformSettingsError },
-            { data: netWorthSnapshotsRaw, error: netWorthSnapshotsError },
           ] = await phase2Promise;
 
           // Ensure all data is an array, never undefined
@@ -478,10 +498,10 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
           const clientInvoicesRows = clientInvoicesError ? [] : (clientInvoicesRowsRaw ?? []);
           const pendingIngestions = pendingIngestionsError ? [] : (pendingIngestionsRaw ?? []);
           const categorizationExclusions = categorizationExclusionsError ? [] : (categorizationExclusionsRaw ?? []);
+          const netWorthSnapshots = netWorthSnapshotsError ? [] : (netWorthSnapshotsRaw ?? []);
           const creditFixes = creditFixesError ? [] : (creditFixesRaw ?? []);
           const adminBroadcasts = adminBroadcastsError ? [] : (adminBroadcastsRaw ?? []);
           const platformSettings = platformSettingsError ? null : platformSettingsRaw;
-          const netWorthSnapshots = netWorthSnapshotsError ? [] : (netWorthSnapshotsRaw ?? []);
 
           console.timeEnd('[fetchData] Phase 2 queries');
           console.log('[fetchData] Phase 2 complete - goals:', goals.length, 'citations:', citations.length);
@@ -567,50 +587,22 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
               status: invoice.status as ClientInvoice['status'],
               notes: String(invoice.notes ?? ''),
             })),
-            pendingIngestions: (pendingIngestions || []).map((pending: Record<string, unknown>) => ({
-              id: pending.id as string,
-              type: pending.type as AppState['pendingIngestions'][number]['type'],
-              status: pending.status as string,
-              source: 'desktop',
-              extractedData: (pending.extracted_data ?? {}) as AppState['pendingIngestions'][number]['extractedData'],
-              originalFile: (pending.original_file ?? undefined) as AppState['pendingIngestions'][number]['originalFile'],
-              storagePath: (pending.storage_path ?? undefined) as string | undefined,
-              storageUrl: (pending.storage_url ?? undefined) as string | undefined,
+            pendingIngestions: (pendingIngestions || []).map((ingestion: Record<string, unknown>) => ({
+              id: ingestion.id as string,
+              type: ingestion.type as PendingIngestion['type'],
+              status: ingestion.status as string,
+              extractedData: ingestion.extracted_data as PendingIngestion['extractedData'],
+              originalFile: ingestion.original_file as PendingIngestion['originalFile'],
+              storagePath: ingestion.storage_path as string | undefined,
+              storageUrl: ingestion.storage_url as string | undefined,
+              source: ingestion.source as 'desktop',
             })),
             categorizationExclusions: (categorizationExclusions || []).map((exclusion: Record<string, unknown>) => ({
               id: exclusion.id as string,
               scope: exclusion.scope as CategorizationExclusion['scope'],
-              transaction_id: (exclusion.transaction_id ?? null) as string | null,
-              merchant_name: (exclusion.merchant_name ?? null) as string | null,
+              transactionId: exclusion.transaction_id as string | null,
+              merchantName: exclusion.merchant_name as string | null,
             })),
-            credit: {
-              ...get().credit,
-              fixes: (creditFixes || []).map((fix: Record<string, unknown>) => ({
-                id: fix.id as string,
-                item: fix.item as string,
-                amount: fix.amount as number,
-                status: fix.status as CreditFix['status'],
-                bureau: fix.bureau as string,
-                notes: (fix.notes ?? '') as string,
-              })),
-            },
-            adminBroadcasts: (adminBroadcasts || []).map((broadcast: Record<string, unknown>) => ({
-              id: broadcast.id as string,
-              title: broadcast.title as string,
-              content: broadcast.content as string,
-              type: broadcast.type as AdminBroadcast['type'],
-              createdAt: broadcast.created_at as string,
-            })),
-            platformSettings: platformSettings
-              ? {
-                id: platformSettings.id as string,
-                maintenanceMode: platformSettings.maintenance_mode as boolean,
-                plaidEnabled: platformSettings.plaid_enabled as boolean,
-                broadcastMessage: platformSettings.broadcast_message as string,
-                taxStandardDeduction: platformSettings.tax_standard_deduction as number,
-                taxTopBracket: platformSettings.tax_top_bracket as number,
-              }
-              : null,
             netWorthSnapshots: (netWorthSnapshots || []).map((snapshot: Record<string, unknown>) => ({
               id: snapshot.id as string,
               date: snapshot.date as string,
@@ -618,6 +610,37 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
               assets: snapshot.assets as number,
               debts: snapshot.debts as number,
             })),
+            credit: {
+              ...get().credit,
+              fixes: (creditFixes || []).map((fix: Record<string, unknown>) => ({
+                id: fix.id as string,
+                item: (fix.item_type ?? '') as string,
+                amount: (fix.amount ?? 0) as number,
+                status: fix.status as CreditFix['status'],
+                bureau: (fix.bureau ?? '') as string,
+                notes: (fix.notes ?? '') as string,
+              })),
+            },
+            adminBroadcasts: (adminBroadcasts || []).map((broadcast: Record<string, unknown>) => ({
+              id: broadcast.id as string,
+              title: broadcast.title as string,
+              content: (broadcast.message ?? '') as string,
+              type: (broadcast.level ?? 'info') as AdminBroadcast['type'],
+              createdAt: broadcast.created_at as string,
+            })),
+            platformSettings: platformSettings
+              ? (() => {
+                const val = (platformSettings.value ?? {}) as Record<string, unknown>;
+                return {
+                  id: platformSettings.id as string,
+                  maintenanceMode: val.maintenance_mode === true,
+                  plaidEnabled: val.plaid_enabled !== false,
+                  broadcastMessage: (val.broadcast_message ?? '') as string,
+                  taxStandardDeduction: (val.tax_standard_deduction ?? 0) as number,
+                  taxTopBracket: (val.tax_top_bracket ?? 0) as number,
+                };
+              })()
+              : null,
           });
 
           phase2RecordCount =
@@ -630,8 +653,9 @@ export const createDataSyncSlice: StoreSlice<Pick<AppState, 'isLoading' | 'phase
             (mileageLogRows?.length ?? 0) +
             (clientInvoicesRows?.length ?? 0) +
             (pendingIngestions?.length ?? 0) +
-            (creditFixes?.length ?? 0) +
+            (categorizationExclusions?.length ?? 0) +
             (netWorthSnapshots?.length ?? 0) +
+            (creditFixes?.length ?? 0) +
             (adminBroadcasts?.length ?? 0);
         } catch (phase2Error) {
           console.error('[fetchData] phase 2 hydration failed:', phase2Error);

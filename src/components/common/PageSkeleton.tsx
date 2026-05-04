@@ -82,7 +82,6 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
 export function AppLoader({ message = 'Syncing financial data' }: { message?: string }) {
   return (
     <main
-      id="main-content"
       aria-busy="true"
       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-surface-base font-sans selection:bg-content-primary/15"
     >

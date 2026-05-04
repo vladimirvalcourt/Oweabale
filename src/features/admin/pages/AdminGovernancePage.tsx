@@ -29,7 +29,7 @@ export default function AdminGovernancePage() {
     mutationFn: (action: string) => invokeAdminAction<{ message: string; token?: string }>({ action, email, target, roleKey }),
     onSuccess: async (data) => {
       toast.success(data.token ? `${data.message} Token copied to console for local handoff.` : data.message);
-      if (data.token) console.info('[admin-invite-token]', data.token);
+      if (data.token) console.warn('[admin-invite-token]', data.token);
       await qc.invalidateQueries({ queryKey: ['admin', 'governance'] });
     },
     onError: (e: Error) => toast.error(e.message),

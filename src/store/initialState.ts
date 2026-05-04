@@ -36,6 +36,7 @@ export const initialData: Pick<
   | 'lastBudgetGuardrail'
   | 'pendingIngestions'
   | 'notifications'
+  | 'categorizationRules'
   | 'categorizationExclusions'
   | 'adminBroadcasts'
   | 'platformSettings'
@@ -87,6 +88,7 @@ export const initialData: Pick<
   lastBudgetGuardrail: null,
   pendingIngestions: [],
   notifications: [],
+  categorizationRules: [],
   categorizationExclusions: [],
   adminBroadcasts: [],
   platformSettings: null,

@@ -27,10 +27,6 @@ DROP TABLE IF EXISTS public.document_capture_sessions CASCADE;
 DROP FUNCTION IF EXISTS public.prevent_document_capture_session_user_change();
 DROP FUNCTION IF EXISTS public.request_x_session_token();
 
-DELETE FROM storage.buckets
-WHERE id = 'scans'
-  AND NOT EXISTS (
-    SELECT 1
-    FROM storage.objects
-    WHERE bucket_id = 'scans'
-  );
+-- NOTE: Direct deletion from storage.buckets is not allowed via SQL
+-- This must be done via the Supabase Storage API
+-- The scans bucket deletion is skipped here and should be done manually if needed

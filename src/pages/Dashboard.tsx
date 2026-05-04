@@ -23,6 +23,7 @@ import { computeSafeToSpend, calcMonthlyCashFlow } from '@/lib/api/services/fina
 import { useStore, type Bill, type Citation, type Debt, type Subscription, type Transaction } from '@/store';
 import { StatusBadge, StatusIcon, MetricCard, QuickActionCard, DashboardButton } from '@/components/dashboard';
 import { formatCurrency, formatCurrencyWithSign } from '@/lib/utils/formatCurrency';
+import { startOfLocalDay, parseLocalDate, addDays, daysUntil, formatShortDate, dueLabel } from '@/lib/utils/dates';
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const PAY_LIST_SNOOZE_KEY = 'oweable_pay_list_snoozed_v1';
@@ -43,47 +44,12 @@ type PayListItem = {
   route: string;
 };
 
-function startOfLocalDay(date = new Date()): Date {
-  const next = new Date(date);
-  next.setHours(0, 0, 0, 0);
-  return next;
-}
-
-function parseLocalDate(value?: string | null): Date | null {
-  if (!value) return null;
-  const date = new Date(value.includes('T') ? value : `${value}T12:00:00`);
-  if (Number.isNaN(date.getTime())) return null;
-  return startOfLocalDay(date);
-}
-
-function addDays(date: Date, days: number): Date {
-  return new Date(date.getTime() + days * MS_PER_DAY);
-}
-
-function daysUntil(date: Date | null, today: Date): number | null {
-  if (!date) return null;
-  return Math.round((startOfLocalDay(date).getTime() - today.getTime()) / MS_PER_DAY);
-}
-
 function statusForDueInDays(value: number | null): PayListStatus {
   if (value === null) return 'unscheduled';
   if (value < 0) return 'overdue';
   if (value === 0) return 'today';
   if (value <= 7) return 'week';
   return 'coming';
-}
-
-function dueLabel(item: PayListItem): string {
-  if (item.dueInDays === null) return 'No due date yet';
-  if (item.dueInDays < 0) return `Overdue by ${Math.abs(item.dueInDays)} day${Math.abs(item.dueInDays) === 1 ? '' : 's'}`;
-  if (item.dueInDays === 0) return 'Due today';
-  if (item.dueInDays === 1) return 'Due tomorrow';
-  return `Due in ${item.dueInDays} days`;
-}
-
-function formatDate(date: Date | null): string {
-  if (!date) return 'Set a date';
-  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
 function formatMoney(value: number): string {
@@ -320,10 +286,10 @@ function PayListRow({
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <p className="truncate text-sm font-semibold text-content-primary">{item.title}</p>
-              <StatusBadge tone={statusTone}>{dueLabel(item)}</StatusBadge>
+              <StatusBadge tone={statusTone}>{dueLabel(item.dueInDays)}</StatusBadge>
             </div>
             <p className="mt-1 text-xs text-content-secondary">
-              {item.detail} · {formatDate(item.dueDate)}
+              {item.detail} · {formatShortDate(item.dueDate)}
             </p>
           </div>
         </div>
@@ -528,6 +494,19 @@ export default function Dashboard() {
     if (ok) toast.success('Ticket, toll, or fine resolved');
   }, [resolveCitation]);
 
+  // EMERGENCY OVERRIDE: Force stop loading after 8 seconds
+  useEffect(() => {
+    if (!isLoading) return;
+    
+    const timeout = setTimeout(() => {
+      console.warn('[Dashboard] EMERGENCY OVERRIDE: Forcing isLoading to false');
+      useStore.setState({ isLoading: false, phase2Hydrated: true });
+      toast.warning('Loading took too long. Showing available data.');
+    }, 8000);
+    
+    return () => clearTimeout(timeout);
+  }, [isLoading]);
+
   if (isLoading) {
     return (
       <AppPageShell>
@@ -603,7 +582,7 @@ export default function Dashboard() {
                   <>
                     <h2 className="mt-3 text-2xl font-semibold text-content-primary">{topPriority.title}</h2>
                     <p className="mt-1 text-sm text-content-secondary">
-                      {dueLabel(topPriority)} · {topPriority.detail} · {formatDate(topPriority.dueDate)}
+                      {dueLabel(topPriority.dueInDays)} · {topPriority.detail} · {formatShortDate(topPriority.dueDate)}
                     </p>
                   </>
                 ) : (
@@ -736,7 +715,7 @@ export default function Dashboard() {
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-content-primary">{transaction.name || 'Transaction'}</p>
                       <p className="mt-1 text-xs text-content-secondary">
-                        {formatDate(parseLocalDate(transaction.date))} · {transaction.category || 'Uncategorized'}
+                        {formatShortDate(parseLocalDate(transaction.date))} · {transaction.category || 'Uncategorized'}
                       </p>
                     </div>
                     <p className={`shrink-0 font-mono text-sm font-semibold tabular-nums ${transaction.type === 'income' ? 'text-brand-profit' : 'text-content-primary'}`}>

@@ -1,5 +1,5 @@
 import { MenuItem, MenuContainer } from "./fluid-menu"
-import { Menu as MenuIcon, X, Home, Mail, User, Settings, Calculator, Activity } from "lucide-react"
+import { Menu as MenuIcon, X, Home, Settings, Calculator, Activity } from "lucide-react"
 
 // A fluid circular menu that elegantly expands to reveal navigation items with smooth icon transitions
 export function MenuDemo() {

@@ -94,22 +94,20 @@ CREATE TABLE IF NOT EXISTS platform_settings (
 );
 
 -- Seed the single settings row.
--- Remote projects may have `platform_settings.id` as INTEGER (older schema) or UUID (newer schema).
+-- NOTE: This table was recreated with a different schema in 20260503030451_cleanup_and_setup.sql
+-- Only seed if the old schema exists (has maintenance_mode column)
 DO $$
 DECLARE
-  id_type TEXT;
+  has_old_schema BOOLEAN;
 BEGIN
-  SELECT data_type
-    INTO id_type
-  FROM information_schema.columns
-  WHERE table_schema = 'public'
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
     AND table_name = 'platform_settings'
-    AND column_name = 'id';
+    AND column_name = 'maintenance_mode'
+  ) INTO has_old_schema;
 
-  IF id_type = 'integer' THEN
-    INSERT INTO platform_settings (id) VALUES (1)
-    ON CONFLICT DO NOTHING;
-  ELSE
+  IF has_old_schema THEN
     INSERT INTO platform_settings (id) VALUES ('00000000-0000-0000-0000-000000000001'::uuid)
     ON CONFLICT DO NOTHING;
   END IF;

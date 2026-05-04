@@ -253,29 +253,12 @@ export default function Ingestion() {
 
   const [recentlyAddedId, setRecentlyAddedId] = React.useState<string | null>(null);
 
-  // ── Realtime Ingestion Sync ───────────────────────────────────
-  React.useEffect(() => {
-    const channel = supabase
-      .channel('ingestion-updates')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'pending_ingestions'
-        },
-        (payload) => {
-          const row = payload.new as { id?: string };
-          if (!row?.id) return;
-          useStore.getState().fetchData(undefined, { background: true });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  // NOTE: Realtime subscription for pending_ingestions removed
+  // The table was deleted when OCR/receipt scanning feature was removed.
+  // If OCR is restored in the future, re-add this subscription with startTransition:
+  // React.startTransition(() => {
+  //   useStore.getState().fetchData(undefined, { background: true });
+  // });
 
   return (
     <div className="w-full space-y-6">

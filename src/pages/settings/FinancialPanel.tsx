@@ -3,7 +3,7 @@ import { MapPin } from 'lucide-react';
 import { CollapsibleModule } from '@/components/common';
 import { toast } from 'sonner';
 import { useStore } from '@/store';
-import { STATE_TAX_MAP } from '@/Taxes';
+import { STATE_TAX_MAP } from '@/pages/Taxes';
 import { getCustomIcon } from '@/lib/utils/customIcons';
 
 // When the stored taxRate is 0 (never been explicitly saved), fall back to the map
@@ -50,9 +50,9 @@ function FinancialPanelInner() {
               }}
               className="focus-app-field block w-full rounded-md border border-surface-border bg-surface-raised px-3 py-2 text-sm text-content-primary transition-colors"
             >
-              {Object.entries(STATE_TAX_MAP).map(([code, { name }]) => (
+              {Object.entries(STATE_TAX_MAP).map(([code, entry]) => (
                 <option key={code} value={code}>
-                  {name} ({code})
+                  {entry.name} ({code})
                 </option>
               ))}
             </select>

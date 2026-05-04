@@ -25,6 +25,7 @@ export function formatCurrency(amount: number): string {
 export * from './analytics';
 export * from './browserSupport';
 export * from './cropAvatar';
+export * from './dates';
 export * from './customIcons';
 export * from './dynamicImportErrors';
 export * from './emailObfuscation';

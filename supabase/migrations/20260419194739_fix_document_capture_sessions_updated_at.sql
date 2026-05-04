@@ -1,25 +1,35 @@
 -- Ensure document_capture_sessions has a stable updated_at column + trigger.
 -- Some environments were missing this column, causing admin query/update mismatches.
+-- NOTE: This table was dropped in 20260428180411_remove_mobile_capture_flow.sql
+-- Skip entire migration if the table doesn't exist
 
-ALTER TABLE public.document_capture_sessions
-  ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now();
-
-UPDATE public.document_capture_sessions
-SET updated_at = COALESCE(updated_at, created_at, now())
-WHERE updated_at IS NULL;
-
-CREATE OR REPLACE FUNCTION public.update_updated_at_column()
-RETURNS trigger
-LANGUAGE plpgsql
-AS $$
+DO $$
 BEGIN
-  NEW.updated_at = now();
-  RETURN NEW;
-END;
-$$;
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'document_capture_sessions'
+  ) THEN
+    ALTER TABLE public.document_capture_sessions
+      ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT now();
 
-DROP TRIGGER IF EXISTS update_document_capture_sessions_updated_at ON public.document_capture_sessions;
-CREATE TRIGGER update_document_capture_sessions_updated_at
-  BEFORE UPDATE ON public.document_capture_sessions
-  FOR EACH ROW
-  EXECUTE FUNCTION public.update_updated_at_column();
+    UPDATE public.document_capture_sessions
+    SET updated_at = COALESCE(updated_at, created_at, now())
+    WHERE updated_at IS NULL;
+
+    CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+    RETURNS trigger
+    LANGUAGE plpgsql
+    AS $_$
+    BEGIN
+      NEW.updated_at = now();
+      RETURN NEW;
+    END;
+    $_$;
+
+    DROP TRIGGER IF EXISTS update_document_capture_sessions_updated_at ON public.document_capture_sessions;
+    CREATE TRIGGER update_document_capture_sessions_updated_at
+      BEFORE UPDATE ON public.document_capture_sessions
+      FOR EACH ROW
+      EXECUTE FUNCTION public.update_updated_at_column();
+  END IF;
+END $$;

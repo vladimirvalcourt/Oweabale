@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, FileText, CreditCard, Calendar, Landmark, Upload } from 'lucide-react';
+import { FileText, CreditCard, Calendar, Landmark, Upload } from 'lucide-react';
 import { TransitionLink } from './TransitionLink';
 
 export type EmptyStateProps = {
@@ -16,14 +16,6 @@ export type EmptyStateProps = {
         href: string;
     };
     hint?: string;
-};
-
-const defaultIcons: Record<string, React.ElementType> = {
-    transactions: Landmark,
-    bills: CreditCard,
-    calendar: Calendar,
-    documents: FileText,
-    upload: Upload,
 };
 
 export function GuidedEmptyState({

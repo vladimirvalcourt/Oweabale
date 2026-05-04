@@ -13,7 +13,7 @@ export default function OweableDashboardPreview() {
     // Create a timeline for the "ghost clicking" sequence
     const tl = gsap.timeline({ repeat: -1, repeatDelay: 3 });
 
-    cardRefs.current.forEach((card, index) => {
+    cardRefs.current.forEach((card, _index) => {
       if (!card) return;
 
       // Animate the card being pressed (click down)

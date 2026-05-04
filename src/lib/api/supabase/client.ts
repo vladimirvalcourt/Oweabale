@@ -63,7 +63,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     fetch: (...args) => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
-      
+
       return fetch(args[0], {
         ...args[1],
         signal: controller.signal,
@@ -93,7 +93,7 @@ export const clearLocalState = async () => {
     // Clear sessionStorage
     sessionStorage.clear();
 
-    console.log('[clearLocalState] All local state cleared successfully');
+    console.warn('[clearLocalState] All local state cleared successfully');
 
     // Force page reload to reset application state
     window.location.href = '/';

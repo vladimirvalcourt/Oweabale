@@ -19,6 +19,15 @@ BEGIN
     WHERE conname = 'profiles_plan_check'
       AND conrelid = 'public.profiles'::regclass
   ) THEN
+    -- Update any existing rows with invalid plan values
+    UPDATE public.profiles
+    SET plan = CASE
+      WHEN plan = 'free' THEN 'tracker'
+      WHEN plan NOT IN ('tracker', 'trial', 'full_suite') THEN 'tracker'
+      ELSE plan
+    END
+    WHERE plan IS NULL OR plan NOT IN ('tracker', 'trial', 'full_suite');
+
     ALTER TABLE public.profiles
       ADD CONSTRAINT profiles_plan_check CHECK (plan IN ('tracker', 'trial', 'full_suite'));
   END IF;

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oweable Connection Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #1a1a1a; }
+        h2 { color: #333; font-size: 18px; margin-top: 0; }
+        .status { 
+            padding: 10px; 
+            border-radius: 4px; 
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        .log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Oweable Connection Diagnostic</h1>
+    
+    <div class="card">
+        <h2>Step 1: Check Supabase Configuration</h2>
+        <button onclick="checkConfig()">Check Config</button>
+        <div id="config-status"></div>
+    </div>
+
+    <div class="card">
+        <h2>Step 2: Test Authentication</h2>
+        <button onclick="checkAuth()">Check Auth Session</button>
+        <div id="auth-status"></div>
+    </div>
+
+    <div class="card">
+        <h2>Step 3: Test Database Query</h2>
+        <button onclick="testQuery()" id="query-btn" disabled>Test Profile Query</button>
+        <div id="query-status"></div>
+    </div>
+
+    <div class="card">
+        <h2>Step 4: Test All Tables</h2>
+        <button onclick="testAllTables()" id="tables-btn" disabled>Test All Tables</button>
+        <div id="tables-status"></div>
+    </div>
+
+    <div class="card">
+        <h2>Console Log</h2>
+        <pre class="log" id="console-log"></pre>
+        <button onclick="clearLog()">Clear Log</button>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        // Your Supabase config (from .env.local)
+        const SUPABASE_URL = 'https://horlyscpspctvceddcup.supabase.co';
+        const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE'; // Replace with actual key from .env.local
+
+        window.supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.log = [];
+
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            window.log.push({ message, type });
+            
+            const logDiv = document.getElementById('console-log');
+            const entry = document.createElement('div');
+            entry.style.color = type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#333';
+            entry.textContent = logEntry;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            
+            console.log(message);
+        }
+
+        window.checkConfig = function() {
+            const statusDiv = document.getElementById('config-status');
+            
+            if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'YOUR_ANON_KEY_HERE') {
+                statusDiv.innerHTML = '<div class="status error">❌ Missing Supabase configuration. Edit this file and add your anon key from .env.local</div>';
+                addLog('Configuration missing', 'error');
+                return;
+            }
+
+            statusDiv.innerHTML = '<div class="status success">✅ Configuration loaded</div>';
+            addLog('Supabase URL: ' + SUPABASE_URL, 'success');
+            addLog('Anon key present: Yes', 'success');
+        };
+
+        window.checkAuth = async function() {
+            const statusDiv = document.getElementById('auth-status');
+            const queryBtn = document.getElementById('query-btn');
+            
+            statusDiv.innerHTML = '<div class="status info">⏳ Checking authentication...</div>';
+            addLog('Checking auth session...');
+
+            try {
+                const { data: { session }, error } = await window.supabase.auth.getSession();
+                
+                if (error) {
+                    statusDiv.innerHTML = `<div class="status error">❌ Auth error: ${error.message}</div>`;
+                    addLog(`Auth error: ${error.message}`, 'error');
+                    return;
+                }
+
+                if (!session) {
+                    statusDiv.innerHTML = '<div class="status warning">⚠️ No active session. Please sign in at http://localhost:3000 first</div>';
+                    addLog('No active session found', 'warning');
+                    return;
+                }
+
+                statusDiv.innerHTML = `
+                    <div class="status success">✅ Authenticated</div>
+                    <div>User ID: ${session.user.id}</div>
+                    <div>Email: ${session.user.email}</div>
+                `;
+                addLog(`Authenticated as: ${session.user.email}`, 'success');
+                
+                // Enable next buttons
+                queryBtn.disabled = false;
+                document.getElementById('tables-btn').disabled = false;
+                
+                // Store user ID for later tests
+                window.userId = session.user.id;
+                
+            } catch (err) {
+                statusDiv.innerHTML = `<div class="status error">❌ Unexpected error: ${err.message}</div>`;
+                addLog(`Auth check failed: ${err.message}`, 'error');
+            }
+        };
+
+        window.testQuery = async function() {
+            const statusDiv = document.getElementById('query-status');
+            const userId = window.userId;
+            
+            if (!userId) {
+                statusDiv.innerHTML = '<div class="status error">❌ No user ID. Check auth first.</div>';
+                return;
+            }
+
+            statusDiv.innerHTML = '<div class="status info">⏳ Testing profile query...</div>';
+            addLog('Testing profile query...');
+
+            try {
+                const startTime = Date.now();
+                const { data, error } = await window.supabase
+                    .from('profiles')
+                    .select('id, plan, trial_started_at, trial_ends_at, trial_expired')
+                    .eq('id', userId)
+                    .maybeSingle();
+
+                const duration = Date.now() - startTime;
+
+                if (error) {
+                    statusDiv.innerHTML = `
+                        <div class="status error">❌ Query failed (${duration}ms)</div>
+                        <div>Error code: ${error.code}</div>
+                        <div>Error message: ${error.message}</div>
+                        <details>
+                            <summary>Full error details</summary>
+                            <pre>${JSON.stringify(error, null, 2)}</pre>
+                        </details>
+                    `;
+                    addLog(`Profile query failed: ${error.message}`, 'error');
+                    return;
+                }
+
+                if (!data) {
+                    statusDiv.innerHTML = `
+                        <div class="status warning">⚠️ Profile not found for user ${userId}</div>
+                        <div>This means the auth trigger didn't create a profile row</div>
+                    `;
+                    addLog('Profile not found', 'warning');
+                    return;
+                }
+
+                statusDiv.innerHTML = `
+                    <div class="status success">✅ Query successful (${duration}ms)</div>
+                    <div>Plan: ${data.plan || 'null'}</div>
+                    <div>Trial Started: ${data.trial_started_at || 'null'}</div>
+                    <div>Trial Ends: ${data.trial_ends_at || 'null'}</div>
+                    <div>Trial Expired: ${data.trial_expired}</div>
+                `;
+                addLog('Profile query successful!', 'success');
+                
+            } catch (err) {
+                statusDiv.innerHTML = `<div class="status error">❌ Unexpected error: ${err.message}</div>`;
+                addLog(`Query failed: ${err.message}`, 'error');
+            }
+        };
+
+        window.testAllTables = async function() {
+            const statusDiv = document.getElementById('tables-status');
+            const userId = window.userId;
+            
+            if (!userId) {
+                statusDiv.innerHTML = '<div class="status error">❌ No user ID. Check auth first.</div>';
+                return;
+            }
+
+            statusDiv.innerHTML = '<div class="status info">⏳ Testing all tables...</div>';
+            addLog('Testing all tables...');
+
+            const tables = [
+                { name: 'profiles', select: 'id,plan' },
+                { name: 'bills', select: 'id,biller,amount' },
+                { name: 'debts', select: 'id,name,type' },
+                { name: 'transactions', select: 'id,name,amount' },
+                { name: 'assets', select: 'id,name,value' },
+                { name: 'incomes', select: 'id,name,amount' },
+                { name: 'subscriptions', select: 'id,name,amount' },
+            ];
+
+            let results = [];
+            let allSuccess = true;
+
+            for (const table of tables) {
+                try {
+                    const startTime = Date.now();
+                    const { data, error, count } = await window.supabase
+                        .from(table.name)
+                        .select(table.select, { count: 'exact', head: true })
+                        .eq('user_id', userId);
+
+                    const duration = Date.now() - startTime;
+
+                    if (error) {
+                        results.push({
+                            table: table.name,
+                            status: 'error',
+                            message: error.message,
+                            duration
+                        });
+                        allSuccess = false;
+                        addLog(`${table.name}: ERROR - ${error.message}`, 'error');
+                    } else {
+                        results.push({
+                            table: table.name,
+                            status: 'success',
+                            count: count || 0,
+                            duration
+                        });
+                        addLog(`${table.name}: OK (${count || 0} rows, ${duration}ms)`, 'success');
+                    }
+                } catch (err) {
+                    results.push({
+                        table: table.name,
+                        status: 'error',
+                        message: err.message
+                    });
+                    allSuccess = false;
+                    addLog(`${table.name}: EXCEPTION - ${err.message}`, 'error');
+                }
+            }
+
+            const summaryHtml = results.map(r => {
+                const icon = r.status === 'success' ? '✅' : '❌';
+                const details = r.status === 'success' 
+                    ? `${r.count} rows, ${r.duration}ms`
+                    : r.message;
+                return `<div>${icon} ${r.table}: ${details}</div>`;
+            }).join('');
+
+            statusDiv.innerHTML = `
+                <div class="status ${allSuccess ? 'success' : 'error'}">
+                    ${allSuccess ? '✅ All tables accessible' : '❌ Some tables failed'}
+                </div>
+                ${summaryHtml}
+            `;
+            
+            addLog(allSuccess ? 'All tables test passed!' : 'Some tables failed', allSuccess ? 'success' : 'error');
+        };
+
+        window.clearLog = function() {
+            window.log = [];
+            document.getElementById('console-log').innerHTML = '';
+        };
+
+        // Auto-check config on load
+        window.addEventListener('load', () => {
+            addLog('Page loaded. Click "Check Config" to start.');
+        });
+    </script>
+</body>
+</html>

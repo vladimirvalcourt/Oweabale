@@ -2,9 +2,9 @@ import React, { useState, useRef, useEffect, useCallback, useMemo, startTransiti
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { TransitionLink } from '@/components/common/TransitionLink';
 import {
-  Bell, Search, Settings, Plus, X,
-  Command, Home, Activity, AlertTriangle, MoreHorizontal,
-  LayoutDashboard, CalendarDays, Inbox
+  Bell, Search, Plus, X,
+  Command, Activity, AlertTriangle, MoreHorizontal,
+  LayoutDashboard, CalendarDays, Inbox, Settings
 } from 'lucide-react';
 import { Menu as HeadlessMenu, Transition, Dialog } from '@headlessui/react';
 import { toast } from 'sonner';
@@ -19,7 +19,7 @@ import { formatCategoryLabel } from '@/lib/api/services/categoryDisplay';
 import { BrandWordmark } from '@/components/common/BrandWordmark';
 import { KeyboardShortcutsDialog } from '@/components/common/KeyboardShortcutsDialog';
 import { isApplePointerPlatform } from '@/lib/utils';
-import type { HouseholdMember } from '@/types';
+// REMOVED: HouseholdMember import (feature deleted)
 import TrialBanner from '@/components/common/TrialBanner';
 import { ThemeToggle } from '@/components/common/ThemeToggle';
 import { useTheme } from '@/hooks';
@@ -133,7 +133,7 @@ export default function Layout() {
     openQuickAdd,
     closeQuickAdd,
     resetData,
-    pendingIngestions,
+    // REMOVED: pendingIngestions (table deleted)
     notifications,
     markNotificationsRead,
     clearNotifications,
@@ -152,7 +152,7 @@ export default function Layout() {
       openQuickAdd: s.openQuickAdd,
       closeQuickAdd: s.closeQuickAdd,
       resetData: s.resetData,
-      pendingIngestions: s.pendingIngestions,
+      // REMOVED: pendingIngestions (table deleted)
       notifications: s.notifications,
       markNotificationsRead: s.markNotificationsRead,
       clearNotifications: s.clearNotifications,
@@ -406,8 +406,8 @@ export default function Layout() {
   }, [navigate]);
 
   const navGroups = useMemo(
-    () => buildNavGroups({ dueSoonCount, pendingIngestionsCount: pendingIngestions.length }),
-    [dueSoonCount, pendingIngestions.length],
+    () => buildNavGroups({ dueSoonCount, pendingIngestionsCount: 0 }),
+    [dueSoonCount],
   );
 
   const lockedToBilling = !checkingFullSuite && !hasFullSuite;

@@ -6,7 +6,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle, CheckCircle2, Flame,
-  Calculator, ChevronDown, ChevronUp, Plus, Minus, Pencil, CalendarDays, AlertCircle
+  Calculator, ChevronDown, ChevronUp, Plus, Minus, Pencil, CalendarDays, AlertCircle, CreditCard
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 import { toast } from 'sonner';
@@ -14,13 +14,14 @@ import { useStore } from '@/store';
 import { useShallow } from 'zustand/react/shallow';
 import { CollapsibleModule } from '@/components/common';
 import { BrandLogo } from '@/components/common';
-import { Dialog } from '@headlessui/react';
 import {
   buildBillNegotiationSuggestions,
   generateAmortizationSchedule,
   groupOutflowsByHorizon,
 } from '@/lib/api/services/finance';
 import { TransitionLink } from '@/components/common';
+import { calcPayoff, monthsToDate } from '@/lib/utils/debtPayoff';
+import { EditBillDialog, EditDebtDialog } from '@/components/obligations';
 import { GuidedEmptyState } from '@/components/common';
 import { rechartsTooltipStableProps } from '@/lib/utils';
 import { SafeResponsiveContainer } from '@/components/charts/SafeResponsiveContainer';
@@ -59,67 +60,6 @@ interface Obligation {
 
 
 type FilterTab = 'all' | 'recurring' | 'debt' | 'ambush';
-
-// Avalanche / Snowball payoff calculator
-function calcPayoff(debts: { remaining: number; apr: number; minPayment: number; name: string }[], extraMonthly: number, strategy: Strategy) {
-  if (!debts.length) return { months: 0, totalInterest: 0, minOnlyInterest: 0, order: [] as string[] };
-
-  let remaining = debts.map(d => ({ ...d }));
-  // Sort strategy
-  if (strategy === 'avalanche') remaining.sort((a, b) => b.apr - a.apr);
-  else remaining.sort((a, b) => a.remaining - b.remaining);
-
-  const order = remaining.map(d => d.name);
-  let months = 0;
-  let totalInterest = 0;
-
-  while (remaining.some(d => d.remaining > 0) && months < 600) {
-    months++;
-    let extra = extraMonthly;
-
-    // Pay minimums on all, calculate interest
-    remaining.forEach(d => {
-      if (d.remaining <= 0) return;
-      const monthlyRate = d.apr / 100 / 12;
-      const interest = d.remaining * monthlyRate;
-      totalInterest += interest;
-      d.remaining = Math.max(0, d.remaining + interest - d.minPayment);
-    });
-
-    // Apply extra to first non-zero in priority order
-    for (const d of remaining) {
-      if (d.remaining > 0 && extra > 0) {
-        const payment = Math.min(extra, d.remaining);
-        d.remaining -= payment;
-        extra -= payment;
-        break;
-      }
-    }
-  }
-
-  // Min-only interest (no extra)
-  let minOnlyInterest = 0;
-  let minRemaining = debts.map(d => ({ ...d }));
-  let minMonths = 0;
-  while (minRemaining.some(d => d.remaining > 0) && minMonths < 600) {
-    minMonths++;
-    minRemaining.forEach(d => {
-      if (d.remaining <= 0) return;
-      const monthlyRate = d.apr / 100 / 12;
-      const interest = d.remaining * monthlyRate;
-      minOnlyInterest += interest;
-      d.remaining = Math.max(0, d.remaining + interest - d.minPayment);
-    });
-  }
-
-  return { months, totalInterest, minOnlyInterest, order };
-}
-
-function monthsToDate(months: number): string {
-  const d = new Date();
-  d.setMonth(d.getMonth() + months);
-  return d.toLocaleString('default', { month: 'short', year: 'numeric' });
-}
 
 export default function Obligations() {
   const location = useLocation();
@@ -1045,239 +985,5 @@ export default function Obligations() {
       <EditBillDialog bill={editBillRow} onClose={() => setEditBillRow(null)} editBill={editBill} />
       <EditDebtDialog debt={editDebtRow} onClose={() => setEditDebtRow(null)} editDebt={editDebt} />
     </div>
-  );
-}
-
-function EditBillDialog({
-  bill,
-  onClose,
-  editBill,
-}: {
-  bill: Bill | null;
-  onClose: () => void;
-  editBill: (id: string, u: Partial<Bill>) => void | Promise<void>;
-}) {
-  const [biller, setBiller] = React.useState('');
-  const [amount, setAmount] = React.useState('');
-  const [category, setCategory] = React.useState('');
-  const [dueDate, setDueDate] = React.useState('');
-  const [frequency, setFrequency] = React.useState<Bill['frequency']>('Monthly');
-
-  React.useEffect(() => {
-    if (!bill) return;
-    setBiller(bill.biller);
-    setAmount(String(bill.amount));
-    setCategory(bill.category);
-    setDueDate(bill.dueDate);
-    setFrequency(bill.frequency);
-  }, [bill]);
-
-  if (!bill) return null;
-
-  const save = async () => {
-    const n = parseFloat(amount);
-    if (!biller.trim() || isNaN(n) || n <= 0) {
-      toast.error('Enter a payee and a valid amount.');
-      return;
-    }
-    await editBill(bill.id, {
-      biller: biller.trim(),
-      amount: n,
-      category: category || bill.category,
-      dueDate,
-      frequency,
-    });
-    toast.success('Bill updated');
-    onClose();
-  };
-
-  return (
-    <Dialog open className="relative z-[100]" onClose={onClose}>
-      <div className="fixed inset-0 bg-black/70" aria-hidden />
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-md rounded-xl border border-surface-border bg-surface-elevated p-6 shadow-2xl">
-          <Dialog.Title className="text-lg font-semibold text-content-primary mb-4">Edit bill</Dialog.Title>
-          <div className="space-y-3">
-            <label className="block text-xs text-content-tertiary">Payee</label>
-            <input
-              value={biller}
-              onChange={(e) => setBiller(e.target.value)}
-              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
-            />
-            <label className="block text-xs text-content-tertiary">Amount ($)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
-            />
-            <label className="block text-xs text-content-tertiary">Category</label>
-            <input
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
-            />
-            <label className="block text-xs text-content-tertiary">Due date</label>
-            <input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="input-date-dark w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm"
-            />
-            <label className="block text-xs text-content-tertiary">Frequency</label>
-            <select
-              value={frequency}
-              onChange={(e) => setFrequency(e.target.value as Bill['frequency'])}
-              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary"
-            >
-              <option value="Weekly">Weekly</option>
-              <option value="Bi-weekly">Bi-weekly</option>
-              <option value="Monthly">Monthly</option>
-              <option value="Yearly">Yearly</option>
-            </select>
-          </div>
-          <div className="mt-6 flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-content-tertiary hover:text-content-primary rounded-md">
-              Cancel
-            </button>
-            <button type="button" onClick={() => void save()} className="rounded-md bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover">
-              Save
-            </button>
-          </div>
-        </Dialog.Panel>
-      </div>
-    </Dialog>
-  );
-}
-
-function EditDebtDialog({
-  debt,
-  onClose,
-  editDebt,
-}: {
-  debt: Debt | null;
-  onClose: () => void;
-  editDebt: (id: string, u: Partial<Debt>) => void | Promise<void>;
-}) {
-  const [name, setName] = React.useState('');
-  const [type, setType] = React.useState('');
-  const [remaining, setRemaining] = React.useState('');
-  const [apr, setApr] = React.useState('');
-  const [minPayment, setMinPayment] = React.useState('');
-  const [paymentDue, setPaymentDue] = React.useState('');
-  const [noPaymentDue, setNoPaymentDue] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!debt) return;
-    setName(debt.name);
-    setType(debt.type);
-    setRemaining(String(debt.remaining));
-    setApr(String(debt.apr));
-    setMinPayment(String(debt.minPayment));
-    const pdd = debt.paymentDueDate?.trim();
-    setNoPaymentDue(!pdd);
-    setPaymentDue(pdd || '');
-  }, [debt]);
-
-  if (!debt) return null;
-
-  const save = async () => {
-    const rem = parseFloat(remaining);
-    const ap = parseFloat(apr);
-    const min = parseFloat(minPayment);
-    if (!name.trim() || isNaN(rem) || rem < 0) {
-      toast.error('Enter account name and a valid balance.');
-      return;
-    }
-    await editDebt(debt.id, {
-      name: name.trim(),
-      type: type.trim() || debt.type,
-      remaining: rem,
-      apr: isNaN(ap) ? 0 : ap,
-      minPayment: isNaN(min) ? 0 : Math.max(0, min),
-      paymentDueDate: noPaymentDue ? null : paymentDue || null,
-    });
-    toast.success('Debt updated');
-    onClose();
-  };
-
-  return (
-    <Dialog open className="relative z-[100]" onClose={onClose}>
-      <div className="fixed inset-0 bg-black/70" aria-hidden />
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="w-full max-w-md rounded-xl border border-surface-border bg-surface-elevated p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-          <Dialog.Title className="text-lg font-semibold text-content-primary mb-1">Edit debt</Dialog.Title>
-          <p className="text-xs text-content-tertiary mb-4">Update balance, APR, minimum payment, or payment due date.</p>
-          <div className="space-y-3">
-            <label className="block text-xs text-content-tertiary">Account / loan name</label>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
-            />
-            <label className="block text-xs text-content-tertiary">Type</label>
-            <input
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              placeholder="Credit Card, Loan, …"
-              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
-            />
-            <label className="block text-xs text-content-tertiary">Balance owed ($)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={remaining}
-              onChange={(e) => setRemaining(e.target.value)}
-              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
-            />
-            <label className="block text-xs text-content-tertiary">APR (%)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={apr}
-              onChange={(e) => setApr(e.target.value)}
-              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
-            />
-            <label className="block text-xs text-content-tertiary">Minimum payment ($/mo)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={minPayment}
-              onChange={(e) => setMinPayment(e.target.value)}
-              className="w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-content-primary focus-app-field"
-            />
-            <label className="flex items-center gap-2 text-sm text-content-secondary cursor-pointer">
-              <input
-                type="checkbox"
-                checked={noPaymentDue}
-                onChange={(e) => setNoPaymentDue(e.target.checked)}
-                className="rounded border-surface-border focus-app"
-              />
-              No payment due date (e.g. closed card with balance)
-            </label>
-            {!noPaymentDue && (
-              <>
-                <label className="block text-xs text-content-tertiary">Next payment due</label>
-                <input
-                  type="date"
-                  value={paymentDue}
-                  onChange={(e) => setPaymentDue(e.target.value)}
-                  className="input-date-dark w-full rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm"
-                />
-              </>
-            )}
-          </div>
-          <div className="mt-6 flex justify-end gap-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-content-tertiary hover:text-content-primary rounded-md">
-              Cancel
-            </button>
-            <button type="button" onClick={() => void save()} className="rounded-md bg-brand-cta px-4 py-2 text-sm font-semibold text-surface-base hover:bg-brand-cta-hover">
-              Save
-            </button>
-          </div>
-        </Dialog.Panel>
-      </div>
-    </Dialog>
   );
 }

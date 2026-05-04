@@ -1,5 +1,5 @@
 import { BorderRotate } from "./animated-gradient-border";
-import { Star, Zap, Shield, Heart, Download, Play, Settings, User, Mail, Phone } from "lucide-react";
+import { Zap, Shield, Heart, Download, Play, Settings, User, Mail, Phone } from "lucide-react";
 
 function Default() {
   return (

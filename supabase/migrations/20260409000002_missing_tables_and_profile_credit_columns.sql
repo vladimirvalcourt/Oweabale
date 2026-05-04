@@ -99,14 +99,39 @@ END $$;
 
 
 -- ── 5. platform_settings: add missing columns + seed row ────
--- Note: table already exists with id INTEGER
-ALTER TABLE platform_settings
-  ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+-- NOTE: This table was recreated with a different schema in 20260503030451_cleanup_and_setup.sql
+-- Only seed if the old schema exists (has updated_at column)
+DO $$
+DECLARE
+  has_old_schema BOOLEAN;
+  id_type TEXT;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+    AND table_name = 'platform_settings'
+    AND column_name = 'updated_at'
+  ) INTO has_old_schema;
 
-INSERT INTO platform_settings (id)
-VALUES (1)
-ON CONFLICT (id) DO NOTHING;
+  IF has_old_schema THEN
+    ALTER TABLE platform_settings
+      ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();
+
+    SELECT data_type
+      INTO id_type
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+      AND table_name = 'platform_settings'
+      AND column_name = 'id';
+
+    IF id_type = 'integer' THEN
+      INSERT INTO platform_settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
+    ELSE
+      INSERT INTO platform_settings (id) VALUES ('00000000-0000-0000-0000-000000000001'::uuid) ON CONFLICT (id) DO NOTHING;
+    END IF;
+  END IF;
+END $$;
 
 ALTER TABLE platform_settings ENABLE ROW LEVEL SECURITY;
 

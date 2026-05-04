@@ -1,7 +1,7 @@
 import { toast } from 'sonner';
 import { supabase } from '@/lib/api/supabase';
 import type { AppState } from '@/types';
-import { isFullSuiteRlsDenied, type StoreSlice } from './sliceUtils';
+import { type StoreSlice } from './sliceUtils';
 
 export const createPlanningSlice: StoreSlice<
   Pick<

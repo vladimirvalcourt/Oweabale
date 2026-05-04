@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks';
 import { AppLoader } from '@/components/common';
@@ -13,6 +14,17 @@ export default function AuthGuard() {
   const location = useLocation();
   const user = useStore((s) => s.user);
   const isLoading = useStore((s) => s.isLoading);
+
+  // Emergency override: if isLoading gets stuck (e.g. fetchData guard deadlock),
+  // force it false after 12s so the user is never permanently locked out.
+  useEffect(() => {
+    if (!isLoading) return;
+    const timeout = setTimeout(() => {
+      console.warn('[AuthGuard] Emergency override: isLoading stuck, forcing false');
+      useStore.setState({ isLoading: false, phase2Hydrated: true });
+    }, 12000);
+    return () => clearTimeout(timeout);
+  }, [isLoading]);
 
   if (authLoading) return <AppLoader />;
   if (!authUser) {

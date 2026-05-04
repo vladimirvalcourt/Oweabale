@@ -2,7 +2,6 @@ import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useStore, type MileageLogEntry } from '@/store';
 import {
-  Calculator,
   Clock,
   Plus,
   Trash2,
@@ -11,7 +10,6 @@ import {
   Zap,
   ExternalLink,
   Download,
-  ListChecks,
   BookOpen,
   Landmark,
   Info,

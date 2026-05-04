@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oweable - Data Check</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 { color: #3b82f6; }
+        .section { 
+            background: #1a1a1a; 
+            padding: 15px; 
+            margin: 10px 0;
+            border-radius: 4px;
+            border-left: 3px solid #3b82f6;
+        }
+        .success { color: #00ff00; }
+        .error { color: #ff4444; }
+        .warning { color: #ffaa00; }
+        pre { 
+            background: #0a0a0a; 
+            padding: 10px; 
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Oweable Data Diagnostic</h1>
+    
+    <div class="section">
+        <h2>Quick Actions</h2>
+        <button onclick="checkAuth()">Check Auth Status</button>
+        <button onclick="testQuery('profiles')">Test Profiles Query</button>
+        <button onclick="testQuery('bills')">Test Bills Query</button>
+        <button onclick="testQuery('transactions')">Test Transactions Query</button>
+        <button onclick="loadAllData()">Load All Data</button>
+        <button onclick="clearConsole()">Clear Console</button>
+    </div>
+
+    <div id="output"></div>
+
+    <script type="module">
+        import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+        const SUPABASE_URL = 'https://horlyscpspctvceddcup.supabase.co';
+        const ANON_KEY = 'sb_publishable_4Cp3W_d7ZOJVyYSiLSDocA_Qth11m7H';
+        
+        const supabase = createClient(SUPABASE_URL, ANON_KEY);
+        
+        window.supabase = supabase;
+        window.output = document.getElementById('output');
+
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `section ${type}`;
+            div.innerHTML = `<pre>${message}</pre>`;
+            output.appendChild(div);
+            console.log(message);
+        }
+
+        window.checkAuth = async function() {
+            log('Checking authentication...', 'info');
+            const { data: { session }, error } = await supabase.auth.getSession();
+            
+            if (error) {
+                log(`❌ Auth Error: ${error.message}`, 'error');
+                return;
+            }
+            
+            if (!session) {
+                log('⚠️ No active session - you need to sign in first', 'warning');
+                log('Go to http://localhost:3000 and sign in, then come back here', 'warning');
+                return;
+            }
+            
+            log(`✅ Authenticated as: ${session.user.email}`, 'success');
+            log(`User ID: ${session.user.id}`, 'success');
+            log(`Session expires: ${new Date(session.expires_at * 1000).toLocaleString()}`, 'success');
+        };
+
+        window.testQuery = async function(table) {
+            log(`\nTesting query on '${table}' table...`, 'info');
+            
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                log('❌ Not authenticated. Sign in first.', 'error');
+                return;
+            }
+            
+            const startTime = performance.now();
+            const { data, error } = await supabase
+                .from(table)
+                .select('*')
+                .eq('user_id', session.user.id)
+                .limit(5);
+            const endTime = performance.now();
+            
+            if (error) {
+                log(`❌ Error querying ${table}:`, 'error');
+                log(JSON.stringify(error, null, 2), 'error');
+                return;
+            }
+            
+            log(`✅ Query successful (${Math.round(endTime - startTime)}ms)`, 'success');
+            log(`Found ${data.length} records`, 'success');
+            if (data.length > 0) {
+                log('Sample record:', 'info');
+                log(JSON.stringify(data[0], null, 2), 'info');
+            }
+        };
+
+        window.loadAllData = async function() {
+            log('\n=== LOADING ALL DATA ===', 'info');
+            
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                log('❌ Not authenticated', 'error');
+                return;
+            }
+            
+            const tables = [
+                'profiles', 'bills', 'debts', 'transactions', 'assets',
+                'incomes', 'subscriptions', 'goals', 'budgets', 'categories',
+                'plaid_accounts', 'citations', 'deductions', 'freelance_entries',
+                'mileage_log', 'client_invoices', 'credit_fixes'
+            ];
+            
+            let totalRecords = 0;
+            
+            for (const table of tables) {
+                const { data, error } = await supabase
+                    .from(table)
+                    .select('id')
+                    .eq('user_id', session.user.id);
+                
+                if (error) {
+                    log(`❌ ${table}: ${error.message}`, 'error');
+                } else {
+                    const count = data.length;
+                    totalRecords += count;
+                    const status = count > 0 ? '✅' : '⚪';
+                    log(`${status} ${table}: ${count} records`);
+                }
+            }
+            
+            log(`\n📊 Total records across all tables: ${totalRecords}`, 'success');
+            log('\nIf you see records above, the database is working correctly!', 'success');
+            log('Refresh http://localhost:3000 to see your data in the dashboard', 'success');
+        };
+
+        window.clearConsole = function() {
+            output.innerHTML = '';
+        };
+
+        // Auto-check on load
+        setTimeout(() => {
+            log('🚀 Page loaded. Click buttons above to test.', 'info');
+            checkAuth();
+        }, 500);
+    </script>
+</body>
+</html>

@@ -182,7 +182,7 @@ export default defineConfig(({ mode }) => {
             // Charts — recharts ships its own d3 subset; keep all in one chunk
             if (id.includes('recharts') || id.includes('/d3-') || id.includes('victory-vendor')) return 'charts';
             // Motion — motion/react is large and only needed by Dashboard
-            if (id.includes('motion/react') || id.includes('motion/dist') || id.includes('framer-motion')) return 'motion';
+            if (id.includes('motion/react') || id.includes('motion/dist')) return 'motion';
             // Headless UI — dialogs, menus, used across settings/billing pages
             if (id.includes('@headlessui')) return 'ui';
             // React core — stable, cache-busts only on React version bumps

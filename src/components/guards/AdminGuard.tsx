@@ -54,7 +54,7 @@ export default function AdminGuard() {
               hasAdminRole = false;
             }
           }
-        } catch (mfaCheckError) {
+        } catch (_mfaCheckError) {
           // If MFA check fails, deny access (fail closed)
           hasAdminRole = false;
         }

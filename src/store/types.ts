@@ -290,6 +290,7 @@ export interface AppState {
   clientInvoices: ClientInvoice[];
   notifications: Notification[];
   pendingIngestions: PendingIngestion[];
+  categorizationRules: CategorizationRule[];
   categorizationExclusions: CategorizationExclusion[];
   adminBroadcasts: AdminBroadcast[];
   platformSettings: PlatformSettings | null;
@@ -415,7 +416,7 @@ export interface AppState {
   updatePendingIngestion: (id: string, updates: Partial<PendingIngestion>) => void;
   removePendingIngestion: (id: string) => void;
   commitIngestion: (id: string) => Promise<boolean>;
-  fetchData: (userId?: string, options?: { background?: boolean; loadMore?: boolean }) => Promise<void>;
+  fetchData: (userId?: string, options?: { background?: boolean; loadMore?: boolean; fullLoad?: boolean }) => Promise<void>;
   loadMoreTransactions: () => Promise<void>;
   /** Egress optimization: Load Phase 2 data on demand */
   loadPhase2Data: () => Promise<void>;

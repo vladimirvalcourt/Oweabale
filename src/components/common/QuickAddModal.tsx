@@ -31,9 +31,11 @@ interface QuickAddModalProps {
 /** Quick Add → Bill/Debt: bill cadence or debt instrument (card vs loan). */
 type ObligationKind = 'bill-weekly' | 'bill-biweekly' | 'bill-monthly' | 'debt-card' | 'debt-loan';
 
+// Move icon definitions outside component to avoid creating components during render
+const NlpIcon = getCustomIcon('nlp');
+const UploadIcon = getCustomIcon('upload');
+
 export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
-  const NlpIcon = getCustomIcon('nlp');
-  const UploadIcon = getCustomIcon('upload');
   const { hasFullSuite } = useFullSuiteAccess();
   const trackerOnly = !hasFullSuite;
   const {
@@ -114,7 +116,7 @@ export default function QuickAddModal({ isOpen, onClose }: QuickAddModalProps) {
     if (scanCameraInputRef.current) scanCameraInputRef.current.value = '';
     setAllowBudgetOverride(false);
     clearLastBudgetGuardrail();
-  }, [formState, clearLastBudgetGuardrail]);
+  }, [formState, setNlpText, clearErrors, clearScan, setAllowBudgetOverride, clearLastBudgetGuardrail]);
 
   // Initialize submission hook
   const submission = useQuickAddSubmission({

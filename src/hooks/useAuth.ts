@@ -18,7 +18,7 @@ const IDLE_TIMEOUT_MS = 15 * 60 * 1000;
 const WARNING_THRESHOLD_MS = 2 * 60 * 1000;
 
 function authDevLog(...args: unknown[]) {
-  if (import.meta.env.DEV) console.log(...args);
+  if (import.meta.env.DEV) console.warn(...args);
 }
 
 /**

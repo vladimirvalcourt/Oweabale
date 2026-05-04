@@ -224,9 +224,12 @@ export default function App() {
   return (
     <BrowserRouter>
       <AppShell />
-      <Suspense fallback={null}>
-        <SpeedInsights />
-      </Suspense>
+      {/* Only load SpeedInsights in production to avoid CSP issues in dev */}
+      {import.meta.env.PROD && (
+        <Suspense fallback={null}>
+          <SpeedInsights />
+        </Suspense>
+      )}
     </BrowserRouter>
   );
 }

@@ -89,8 +89,10 @@ export function detectUnresponsivePage(timeout = 5000) {
         if (timeSinceLastHeartbeat > timeout) {
             console.warn('[Performance] Page appears unresponsive');
 
-            // Attempt recovery
-            attemptRecovery();
+            // Defer recovery to next tick to avoid blocking main thread
+            setTimeout(() => {
+                attemptRecovery();
+            }, 0);
         }
     }, 1000);
 

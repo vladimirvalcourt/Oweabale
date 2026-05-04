@@ -5,7 +5,7 @@ import { useStore } from '@/store';
 const VISIBILITY_REFETCH_MS = 45_000;
 
 function dataSyncDevLog(...args: unknown[]) {
-  if (import.meta.env.DEV) console.log(...args);
+  if (import.meta.env.DEV) console.warn(...args);
 }
 
 /**
@@ -15,7 +15,7 @@ function dataSyncDevLog(...args: unknown[]) {
  *
  * **1. Initial Load:** When user signs in, fetches all data immediately
  * - Triggers when `authLoading` becomes false and `authUserId` is available
- * - Shows loading spinner via `useStore.setState({ isLoading: true })`
+ * - Loading spinner is managed by `fetchData` internally (isLoading: true)
  * - Prevents duplicate fetches using `lastFetchedUserIdRef`
  *
  * **2. Sign Out Cleanup:** When user signs out, clears local store
@@ -79,14 +79,18 @@ export function useDataSync({
         const { data: { session } } = await supabase.auth.getSession();
         if (mounted) {
           authInitializedRef.current = true;
-          console.log('[useDataSync] Auth initialized, session:', session ? 'present' : 'none');
+          console.warn('[useDataSync] Auth initialized, session:', session ? 'present' : 'none');
 
           // If there's already a session on mount, handle it immediately
           if (session?.user?.id && !handledUserIdsRef.current.has(session.user.id)) {
             handledUserIdsRef.current.add(session.user.id);
-            console.log('[useDataSync] Initial session found, fetching data for:', session.user.id);
-            useStore.setState({ isLoading: true });
+            console.warn('[useDataSync] Initial session found, fetching data for:', session.user.id);
+            console.warn('[useDataSync] Calling fetchData for initial session');
             void fetchDataRef.current(session.user.id);
+            console.warn('[useDataSync] fetchData called, waiting for response...');
+          } else {
+            console.warn('[useDataSync] No session or user already handled');
+            console.warn('[useDataSync] Session:', !!session, 'User ID:', session?.user?.id, 'Already handled:', handledUserIdsRef.current.has(session?.user?.id || ''));
           }
         }
       } catch (error) {
@@ -109,29 +113,28 @@ export function useDataSync({
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('[useDataSync] Auth state changed:', event, 'Session:', session ? 'present' : 'null');
+      console.warn('[useDataSync] Auth state changed:', event, 'Session:', session ? 'present' : 'null');
 
-      // Only handle SIGNED_IN events, skip INITIAL_SESSION if already handled
+      // Skip INITIAL_SESSION - already handled in mount effect
       if (event === 'INITIAL_SESSION') {
-        console.log('[useDataSync] Skipping INITIAL_SESSION - already handled in mount');
+        console.warn('[useDataSync] Skipping INITIAL_SESSION - already handled in mount');
         return;
       }
 
       if (event === 'SIGNED_IN' && session?.user?.id) {
         // Deduplicate: only fetch once per user ID
         if (handledUserIdsRef.current.has(session.user.id)) {
-          console.log('[useDataSync] User already handled, skipping duplicate:', session.user.id);
+          console.warn('[useDataSync] User already handled, skipping duplicate:', session.user.id);
           return;
         }
 
+        console.warn('[useDataSync] User signed in, fetching data for:', session.user.id);
         handledUserIdsRef.current.add(session.user.id);
-        console.log('[useDataSync] User signed in, fetching data for:', session.user.id);
-        useStore.setState({ isLoading: true });
         void fetchDataRef.current(session.user.id);
       }
 
       if (event === 'SIGNED_OUT') {
-        console.log('[useDataSync] User signed out, clearing data');
+        console.warn('[useDataSync] User signed out, clearing data');
         hadSessionRef.current = false;
         lastFetchedUserIdRef.current = null;
         handledUserIdsRef.current.clear(); // Clear handled users on sign out

@@ -28,8 +28,14 @@ VALUES (
 )
 ON CONFLICT (id) DO NOTHING;
 
-COMMENT ON TABLE storage.buckets IS 
-  'Storage buckets configuration. The "scans" bucket stores mobile-captured documents.';
+DO $$
+BEGIN
+  COMMENT ON TABLE storage.buckets IS 
+    'Storage buckets configuration. The "scans" bucket stores mobile-captured documents.';
+EXCEPTION WHEN insufficient_privilege THEN
+  -- Skip comment if we don't have permission on system table
+  NULL;
+END $$;
 
 -- ─────────────────────────────────────────────────────────────
 -- 2. Create 'ingestion-files' bucket for desktop uploads
@@ -127,8 +133,14 @@ WITH CHECK (
 
 -- Allow service role to access all ingestion files (for background processing)
 -- Note: Service role bypasses RLS anyway, but this documents intent
-COMMENT ON POLICY "Users manage own ingestion files" ON storage.objects IS
-  'Users can upload/download/delete their own ingestion files. Path must start with user_id.';
+DO $$
+BEGIN
+  COMMENT ON POLICY "Users manage own ingestion files" ON storage.objects IS
+    'Users can upload/download/delete their own ingestion files. Path must start with user_id.';
+EXCEPTION WHEN insufficient_privilege THEN
+  -- Skip comment if we don't have permission on system table
+  NULL;
+END $$;
 
 -- ─────────────────────────────────────────────────────────────
 -- 5. Enable RLS on storage.objects (if not already enabled)

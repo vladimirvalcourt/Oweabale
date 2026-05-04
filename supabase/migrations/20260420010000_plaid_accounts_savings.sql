@@ -18,7 +18,15 @@ CREATE TABLE IF NOT EXISTS public.plaid_accounts (
 );
 
 CREATE INDEX IF NOT EXISTS plaid_accounts_user_id_idx ON public.plaid_accounts (user_id);
-CREATE INDEX IF NOT EXISTS plaid_accounts_plaid_item_id_idx ON public.plaid_accounts (plaid_item_id);
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'plaid_accounts' AND column_name = 'plaid_item_id'
+  ) THEN
+    CREATE INDEX IF NOT EXISTS plaid_accounts_plaid_item_id_idx ON public.plaid_accounts (plaid_item_id);
+  END IF;
+END $$;
 
 COMMENT ON TABLE public.plaid_accounts IS 'Plaid account metadata synced via /accounts/get; RLS allows user SELECT/UPDATE for include_in_savings.';
 COMMENT ON COLUMN public.plaid_accounts.subtype_suggested_savings IS 'Heuristic from Plaid subtype each sync (savings, money market, cd, etc.).';

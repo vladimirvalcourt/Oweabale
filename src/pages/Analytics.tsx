@@ -3,7 +3,8 @@
  * Real net worth timeline from DB snapshots + spending trends from transactions.
  */
 import React, { useState, useEffect, useMemo } from 'react';
-import { TrendingUp, TrendingDown, Activity, PieChart, Target } from 'lucide-react';
+import { toast } from 'sonner';
+import { TrendingUp, TrendingDown, Activity, Target } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine,

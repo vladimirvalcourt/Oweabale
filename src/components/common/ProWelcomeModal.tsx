@@ -7,7 +7,7 @@
  * Keyed on localStorage so it survives page refreshes but only fires once.
  * Dismissed by clicking "Let's go →" or clicking outside.
  */
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { Zap, BarChart2, DollarSign, Target, Shield, X } from 'lucide-react';
@@ -27,7 +27,7 @@ const HIGHLIGHTS = [
 export function ProWelcomeModal() {
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     try {
       if (!localStorage.getItem(STORAGE_KEY)) {
         setIsOpen(true);

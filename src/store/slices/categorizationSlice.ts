@@ -43,7 +43,7 @@ export const createCategorizationSlice: StoreSlice<
     if (userId) {
       await supabase.from('categorization_rules').delete().eq('id', id).eq('user_id', userId);
     }
-    set((state) => ({ categorizationRules: state.categorizationRules.filter((rule) => rule.id !== id) }));
+    set((state) => ({ categorizationRules: state.categorizationRules.filter((rule: CategorizationRule) => rule.id !== id) }));
   },
 
   addCategorizationExclusion: async (exclusion) => {

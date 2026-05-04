@@ -31,8 +31,10 @@ import {
 } from '@/lib/api/stripe';
 import { yieldForPaint } from "@/lib/api/services";
 
+// Move icon definition outside component to avoid creating components during render
+const BillingIcon = getCustomIcon('billing');
+
 function BillingPanelInner() {
-  const BillingIcon = getCustomIcon('billing');
   const TRIAL_REMINDER_SENT_KEY = 'oweable_trial_charge_reminder_last_sent_v1';
   const configuredMonthly = Number(import.meta.env.VITE_PRICING_MONTHLY_DISPLAY);
   const monthlyPrice = Number.isFinite(configuredMonthly) && configuredMonthly > 0 ? configuredMonthly : 10.99;

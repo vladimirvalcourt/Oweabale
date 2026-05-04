@@ -15,7 +15,6 @@ import {
   PieChart,
   Repeat,
   ShieldCheck,
-  Settings,
   Target,
   TrendingUp,
   Wallet,
@@ -145,10 +144,10 @@ export function buildDueSoonPreview({
 
 export function buildNavGroups({
   dueSoonCount,
-  pendingIngestionsCount,
+  pendingIngestionsCount = 0, // Default to 0 since table deleted
 }: {
   dueSoonCount: number;
-  pendingIngestionsCount: number;
+  pendingIngestionsCount?: number;
 }): NavGroup[] {
   const coreNavItems: NavItem[] = [
     { name: 'Pay List', path: '/pro/dashboard', icon: LayoutDashboard, count: dueSoonCount, lazyImport: () => import('../../pages/Dashboard') },

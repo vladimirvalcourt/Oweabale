@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useStore, type Subscription } from '@/store';
 import { normalizeToMonthly, detectUnusedSubscriptions } from '@/lib/api/services/finance';
 import { detectSubscriptionCandidates, type SubscriptionCandidate } from '@/lib/api/services/subscriptionCandidates';
-import { Repeat, Plus, Edit2, Trash2, TrendingUp, X, AlertTriangle } from 'lucide-react';
+import { Plus, Edit2, Trash2, TrendingUp, X, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import { CollapsibleModule } from '@/components/common';
 import { BrandLogo } from '@/components/common';
@@ -142,8 +142,8 @@ export default function Subscriptions() {
     toast.success('Subscription deleted');
   };
 
-  const safeSubscriptions = Array.isArray(subscriptions) ? subscriptions : [];
-  const safeTransactions = Array.isArray(transactions) ? transactions : [];
+  const safeSubscriptions = useMemo(() => Array.isArray(subscriptions) ? subscriptions : [], [subscriptions]);
+  const safeTransactions = useMemo(() => Array.isArray(transactions) ? transactions : [], [transactions]);
 
   const activeSubscriptions = safeSubscriptions.filter(s => s.status === 'active');
   const monthlyCost = activeSubscriptions.reduce(

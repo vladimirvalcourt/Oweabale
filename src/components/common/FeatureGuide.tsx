@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import { X, HelpCircle, ChevronRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -48,7 +48,7 @@ export function FeatureGuide({
     const [isVisible, setIsVisible] = useState(false);
     const [currentStep, setCurrentStep] = useState(0);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         const dismissed = getDismissedGuides();
         if (autoShow && !dismissed.has(featureId)) {
             setIsVisible(true);

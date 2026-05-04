@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Clock, MessageSquare, RefreshCw, Search } from 'lucide-react';
 import { toast } from 'sonner';
-import { AdminEmptyState, AdminMetric, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminInputClass } from '@/features/admin/shared/AdminUI';
+import { AdminEmptyState, AdminPageHeader, AdminPanel, AdminStatusBadge, adminButtonClass, adminInputClass } from '@/features/admin/shared/AdminUI';
 import { invokeAdminAction } from '@/features/admin/shared/adminActionClient';
 import { cn } from '@/lib/utils';
 
@@ -62,7 +62,18 @@ export default function AdminSupportPage() {
   });
 
   const tickets = queueQuery.data?.tickets ?? [];
-  const overdue = tickets.filter((ticket) => ticket.sla_due_at && new Date(ticket.sla_due_at).getTime() < Date.now() && ticket.status !== 'Resolved').length;
+  const [now, setNow] = useState(0);
+
+  useEffect(() => {
+    setNow(Date.now());
+    const interval = setInterval(() => setNow(Date.now()), 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  const overdue = useMemo(() => 
+    tickets.filter((ticket) => ticket.sla_due_at && new Date(ticket.sla_due_at).getTime() < now && ticket.status !== 'Resolved').length,
+    [tickets, now]
+  );
 
   return (
     <section className="mx-auto max-w-[92rem] space-y-5 px-4 py-5 sm:px-6 lg:px-8">

@@ -38,6 +38,10 @@ const DEVELOPMENT_ORIGINS = [
 function isProductionEnvironment(): boolean {
   const env = Deno.env.get('DENO_ENV')?.toLowerCase();
   const supabaseEnv = Deno.env.get('SUPABASE_ENV')?.toLowerCase();
+  // Only treat as production if explicitly set AND not running locally
+  const isLocalSupabase = Deno.env.get('SUPABASE_URL')?.includes('127.0.0.1') ||
+    Deno.env.get('SUPABASE_URL')?.includes('localhost');
+  if (isLocalSupabase) return false;
   return env === 'production' || supabaseEnv === 'production';
 }
 

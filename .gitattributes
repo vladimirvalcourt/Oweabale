@@ -1,0 +1,2 @@
+# Mark auto-generated Supabase types as linguist-generated to hide from diffs
+src/lib/api/supabase.ts linguist-generated

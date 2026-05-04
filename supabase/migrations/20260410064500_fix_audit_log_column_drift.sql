@@ -29,23 +29,43 @@ DROP TRIGGER IF EXISTS trg_audit_transactions ON public.transactions;
 DROP TRIGGER IF EXISTS trg_audit_assets ON public.assets;
 
 DROP TRIGGER IF EXISTS audit_bills ON public.bills;
-CREATE TRIGGER audit_bills
-AFTER INSERT OR UPDATE OR DELETE ON public.bills
-FOR EACH ROW EXECUTE FUNCTION public.fn_audit_trigger();
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'fn_audit_trigger') THEN
+    CREATE TRIGGER audit_bills
+    AFTER INSERT OR UPDATE OR DELETE ON public.bills
+    FOR EACH ROW EXECUTE FUNCTION public.fn_audit_trigger();
+  END IF;
+END $$;
 
 DROP TRIGGER IF EXISTS audit_debts ON public.debts;
-CREATE TRIGGER audit_debts
-AFTER INSERT OR UPDATE OR DELETE ON public.debts
-FOR EACH ROW EXECUTE FUNCTION public.fn_audit_trigger();
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'fn_audit_trigger') THEN
+    CREATE TRIGGER audit_debts
+    AFTER INSERT OR UPDATE OR DELETE ON public.debts
+    FOR EACH ROW EXECUTE FUNCTION public.fn_audit_trigger();
+  END IF;
+END $$;
 
 DROP TRIGGER IF EXISTS audit_transactions ON public.transactions;
-CREATE TRIGGER audit_transactions
-AFTER INSERT OR UPDATE OR DELETE ON public.transactions
-FOR EACH ROW EXECUTE FUNCTION public.fn_audit_trigger();
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'fn_audit_trigger') THEN
+    CREATE TRIGGER audit_transactions
+    AFTER INSERT OR UPDATE OR DELETE ON public.transactions
+    FOR EACH ROW EXECUTE FUNCTION public.fn_audit_trigger();
+  END IF;
+END $$;
 
 DROP TRIGGER IF EXISTS audit_assets ON public.assets;
-CREATE TRIGGER audit_assets
-AFTER INSERT OR UPDATE OR DELETE ON public.assets
-FOR EACH ROW EXECUTE FUNCTION public.fn_audit_trigger();
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_proc WHERE proname = 'fn_audit_trigger') THEN
+    CREATE TRIGGER audit_assets
+    AFTER INSERT OR UPDATE OR DELETE ON public.assets
+    FOR EACH ROW EXECUTE FUNCTION public.fn_audit_trigger();
+  END IF;
+END $$;
 
 COMMIT;

@@ -104,7 +104,8 @@ export const createWealthSlice: StoreSlice<
     const userId = (await supabase.auth.getUser()).data.user?.id;
     let newId = crypto.randomUUID();
     if (userId) {
-      const { data, error } = await supabase.from('credit_fixes').insert({ ...fix, user_id: userId }).select('id').single();
+      const { item: item_type, ...rest } = fix;
+      const { data, error } = await supabase.from('credit_fixes').insert({ ...rest, item_type, user_id: userId }).select('id').single();
       if (error) {
         toast.error('Failed to save credit fix');
         return;
@@ -117,7 +118,9 @@ export const createWealthSlice: StoreSlice<
   updateCreditFix: async (id, updates) => {
     const userId = (await supabase.auth.getUser()).data.user?.id;
     if (userId) {
-      await supabase.from('credit_fixes').update(updates).eq('id', id).eq('user_id', userId);
+      const { item: item_type, ...dbUpdates } = updates as Record<string, unknown>;
+      const payload = item_type !== undefined ? { ...dbUpdates, item_type } : dbUpdates;
+      await supabase.from('credit_fixes').update(payload).eq('id', id).eq('user_id', userId);
     }
     set((state) => ({
       credit: {

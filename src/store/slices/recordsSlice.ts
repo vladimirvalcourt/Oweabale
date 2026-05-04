@@ -3,7 +3,7 @@ import { applyCategorizationRules, merchantKey } from '@/lib/api/services/catego
 import { formatCategoryLabel } from '@/lib/api/services/categoryDisplay';
 import { supabase } from '@/lib/api/supabase';
 import { suggestPlatformFromMerchant } from '@/lib/utils';
-import type { AppState, Transaction } from '@/types';
+import { AppState } from '@/types';
 import { isFullSuiteRlsDenied, type StoreSlice } from './sliceUtils';
 
 export const createRecordsSlice: StoreSlice<

@@ -19,7 +19,7 @@ interface FormRadioGroupProps {
     hint?: string;
 }
 
-export function FormRadioGroup({ id, name, label, value, onChange, options, required, disabled, hint }: FormRadioGroupProps) {
+export function FormRadioGroup({ id, name: _name, label, value, onChange, options, required, disabled, hint }: FormRadioGroupProps) {
     const groupId = `${id}-group`;
     const hintId = hint ? `${id}-hint` : undefined;
 
