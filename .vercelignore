@@ -1,0 +1,5 @@
+# Keep local secrets and machine-specific Vercel state out of CLI uploads.
+.env
+.env.*
+!.env.example
+.vercel
