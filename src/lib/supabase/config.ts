@@ -1,0 +1,4 @@
+const supabaseProjectRef = 'horlyscpspctvceddcup'
+
+export const supabasePublicUrl = `https://${supabaseProjectRef}.supabase.co`
+export const supabasePublicKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhvcmx5c2Nwc3BjdHZjZWRkY3VwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3NTYwMzcsImV4cCI6MjA5MzMzMjAzN30.F5vdJHPxwah-GyHfYsI61dPY_lonAviOSFmtA1XANHQ'
