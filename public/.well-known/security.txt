@@ -1,4 +1,0 @@
-Contact: mailto:security@oweable.com
-Preferred-Languages: en
-Canonical: https://www.oweable.com/.well-known/security.txt
-Policy: https://www.oweable.com/security

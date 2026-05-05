@@ -179,14 +179,14 @@ async function runLiveChecks() {
   const vercelEnv = run('vercel', ['env', 'ls', 'production']);
   if (vercelEnv.ok) {
     requireNames('Vercel production env', parseFirstColumnTableNames(vercelEnv.stdout), [
-      'VITE_SUPABASE_URL',
-      'VITE_SUPABASE_ANON_KEY',
-      'VITE_PRICING_MONTHLY_DISPLAY',
-      'VITE_PRICING_YEARLY_DISPLAY',
+      'NEXT_PUBLIC_SUPABASE_URL',
+      'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+      'NEXT_PUBLIC_PRICING_MONTHLY_DISPLAY',
+      'NEXT_PUBLIC_PRICING_YEARLY_DISPLAY',
       'EXPIRE_TRIALS_CRON_SECRET',
       'WARN_TRIALS_CRON_SECRET',
-      'VITE_POSTHOG_KEY',
-      'VITE_CRISP_ID',
+      'NEXT_PUBLIC_POSTHOG_KEY',
+      'NEXT_PUBLIC_CRISP_ID',
     ]);
   } else {
     add('Vercel production env', false, (vercelEnv.stderr || vercelEnv.stdout).slice(0, 500));

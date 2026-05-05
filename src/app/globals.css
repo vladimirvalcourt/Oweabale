@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-inter);
+
+  /* Surface */
+  --color-surface: #000000;
+  --color-surface-raised: #0f1011;
+  --color-surface-elevated: #191a1b;
+  --color-surface-border: rgba(255, 255, 255, 0.08);
+
+  /* Content */
+  --color-content: #f7f8f8;
+  --color-content-secondary: #d0d6e0;
+  --color-content-tertiary: #8a8f98;
+
+  /* Accent (Cobalt Violet) */
+  --color-accent: #494fdf;
+  --color-accent-hover: #5a62f0;
+  --color-accent-muted: rgba(73, 79, 223, 0.15);
+
+  /* CTA */
+  --color-cta: #f7f8f8;
+  --color-cta-hover: #d0d6e0;
+  --color-cta-text: #000000;
+
+  /* Status */
+  --color-danger: #ef4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.1);
+  --color-danger-border: rgba(239, 68, 68, 0.4);
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(245, 158, 11, 0.1);
+  --color-warning-border: rgba(245, 158, 11, 0.4);
+  --color-success: #22c55e;
+  --color-success-bg: rgba(34, 197, 94, 0.1);
+  --color-success-border: rgba(34, 197, 94, 0.4);
+  --color-info: #3b82f6;
+  --color-info-bg: rgba(59, 130, 246, 0.1);
+  --color-info-border: rgba(59, 130, 246, 0.4);
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-panel: 22px;
+  --radius-full: 9999px;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-content);
+  }
+}
