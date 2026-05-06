@@ -1,6 +1,6 @@
 # Oweable — Frontend Developer Guide
 
-> Last updated: 2026-05-04  
+> Last updated: 2026-05-05  
 > For: Next.js App Router frontend development  
 > Stack: Next.js 16, React 19, Tailwind CSS v4, Supabase, shadcn/ui  
 > Design System: Revolut-inspired dark-first UI (see `docs/` for audit history)
@@ -253,7 +253,6 @@
 
 **Open items / next steps:**
 
-- Implement real Plaid Link flow (backend token exchange)
 - Add 2FA / MFA setup to security settings
 - Add session management to security settings
 
@@ -328,6 +327,85 @@
 **Files changed/created:**
 
 - `src/app/(app)/settings/accounts/page.tsx` — wired up `react-plaid-link` + Supabase edge functions
+
+---
+
+### 2026-05-05 — Phase 15: Stripe + Plaid Integration Audit & Wiring
+
+**What was done:**
+
+- **Full backend audit** of all third-party integrations:
+  - Verified Plaid secrets (`PLAID_CLIENT_ID`, `PLAID_SECRET`) and database tables (`plaid_items`, `plaid_accounts`) exist
+  - Verified Stripe secrets (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`) and billing tables (`billing_subscriptions`, `billing_payments`, `entitlements`, `stripe_events`) exist
+  - Verified GitHub workflows (CI, security scanning with gitleaks/CodeQL, DAST with ZAP, Dependabot) are configured
+  - Verified Vercel project is linked (`projectId` in `.vercel/project.json`)
+
+- **Fixed disconnected billing page** (`src/app/(app)/settings/billing/page.tsx`):
+  - "Upgrade" button now calls `stripe-checkout-session` edge function with `pro_monthly` / `pro_yearly` plan keys
+  - "Manage" button calls `stripe-customer-portal` for active subscribers
+  - "Cancel" button calls `stripe-cancel-subscription` (period-end or immediate, with confirmation dialog)
+  - Fetches live subscription status from `billing_subscriptions` table (period end date, cancel-at-period-end flag)
+  - Shows renewal/cancellation badges based on real Stripe data
+  - **Trial carryover**: if user upgrades during their 14-day trial, remaining days are passed to Stripe as `trial_period_days` so billing only starts after the trial ends
+  - **Fixed price display bug**: Pro was showing `$9/mo` instead of actual Stripe price `$10.99/mo`; Premium marked "Coming soon" (no Stripe checkout yet)
+
+- **Created Vercel cron API route** (`src/app/api/cron/expire-trials/route.ts`):
+  - Forwards Vercel cron requests to `expire-trials` edge function
+  - Supports `x-vercel-signature` header (from Vercel cron) or `Bearer` auth token
+  - Forwards `EXPIRE_TRIALS_CRON_SECRET` in Authorization header to edge function
+
+- **Set missing Supabase secrets:**
+  - `STRIPE_PRICE_PRO_MONTHLY=price_1TMhs0ED22C2sALQbLVdl7Wf`
+  - `STRIPE_PRICE_PRO_YEARLY=price_1TOuyuED22C2sALQUFifKiSE` (corrected typo: had double Q)
+  - `EXPIRE_TRIALS_CRON_SECRET=<random hex>`
+  - `PLAID_ENV=production` (upgraded from default sandbox)
+
+- **Fixed critical Vercel environment variable bug**:
+  - `SUPABASE_SERVICE_ROLE_KEY` pointed to wrong project (`annrxfoblmwhrishochg`); corrected to `horlyscpspctvceddcup`
+  - Removed dead/duplicate keys: `SENTRY_*`, `VITE_*` (this is Next.js, not Vite), `POSTGRES_*` (direct DB creds = security risk), `SUPABASE_ANON_KEY` duplicate, `SUPABASE_SECRET_KEY` (not real), `NX_DAEMON`, `TURBO_*` build configs
+  - Cleaned `.vercel/.env.production.local` from 67 lines → 26 lines
+
+- **Stripe live verification & cleanup**:
+  - Verified both price IDs exist in live Stripe: monthly `$10.99`, yearly `$92.32`
+  - Registered new webhook endpoint `we_1TTtuMED22C2sALQhbvYhC3t` → `horlyscpspctvceddcup`
+  - Deleted stale webhook pointing to wrong Supabase project (`hjgrslcapdmmgxeppguu`)
+  - Saved webhook signing secret to Supabase secrets as `STRIPE_WEBHOOK_SECRET`
+
+- **Database performance fix**:
+  - Migration `20260505190000_add_missing_indexes.sql` — added indexes on `profiles(email, plan, trial_ends_at)`, `billing_subscriptions(created_at DESC)`, `entitlements(ends_at)`
+
+- **Added Next.js error boundaries**:
+  - `src/app/error.tsx` — catches runtime errors in any page, shows "Try again" with error ID
+  - `src/app/not-found.tsx` — 404 page with "Go home" link
+
+- **Deployed all edge functions** to Supabase:
+  - Plaid: `plaid-link-token`, `plaid-exchange`, `plaid-sync`, `plaid-webhook`, `plaid-disconnect`
+  - Stripe: `stripe-webhook`, `stripe-checkout-session`, `stripe-customer-portal`, `stripe-cancel-subscription`, `stripe-sync-billing`
+  - New: `stripe-setup` — admin-only edge function that registers Stripe webhooks, verifies price IDs, lists subscriptions/customers
+
+- **Created local Stripe setup script** (`scripts/stripe-setup.mjs`):
+  - Alternative to the edge function — run locally with `STRIPE_SECRET_KEY` env var
+  - Registers webhook endpoint, verifies price IDs, lists webhooks/subscriptions/customers
+
+**Files changed/created:**
+
+- `src/app/(app)/settings/billing/page.tsx` — fully wired to Stripe checkout, portal, cancel
+- `src/app/api/cron/expire-trials/route.ts` — new Next.js API route for Vercel cron
+- `supabase/functions/stripe-setup/index.ts` — admin-only edge function for Stripe config verification
+- `scripts/stripe-setup.mjs` — local Node.js script for Stripe setup
+- `supabase/migrations/20260505190000_add_missing_indexes.sql` — performance indexes
+- `src/app/error.tsx` — global error boundary
+- `src/app/not-found.tsx` — 404 page
+
+**Open items / next steps:**
+
+- ~~Run `stripe-setup` edge function (requires admin auth) to register webhook endpoint in Stripe dashboard~~ ✅ Done — webhook `we_1TTtuMED22C2sALQhbvYhC3t` registered with signing secret saved to Supabase secrets
+- ~~Add `EXPIRE_TRIALS_CRON_SECRET` to Vercel environment variables~~ ✅ Done — synced with Supabase secret
+- ~~Set `NEXT_PUBLIC_APP_BASE_URL` to production domain~~ ✅ Done — set to `https://www.oweable.com`
+- ~~Fix billing page price display~~ ✅ Done — Pro corrected to `$10.99/mo`, Premium marked "Coming soon"
+- ~~Add missing database indexes~~ ✅ Done — `profiles(email, plan, trial_ends_at)`, `billing_subscriptions(created_at)`, `entitlements(ends_at)`
+- ~~Add Next.js error boundaries~~ ✅ Done — `src/app/error.tsx` and `src/app/not-found.tsx`
+- Add `RESEND_API_KEY` for welcome/trial expiry emails (optional — sign up at resend.com)
 
 ---
 
