@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
+export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
+
 const productionOrigin = 'https://www.oweable.com'
 const localHosts = new Set(['localhost', '127.0.0.1', '[::1]', '::1'])
 
