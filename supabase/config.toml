@@ -150,7 +150,7 @@ enabled = true
 site_url = "https://www.oweable.com"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 # Replace YOUR_PROJECT_REF with your Supabase project ref (Dashboard → Project settings → General).
-additional_redirect_urls = ["https://www.oweable.com", "https://www.oweable.com/dashboard", "https://www.oweable.com/*", "https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback"]
+additional_redirect_urls = ["https://www.oweable.com", "https://www.oweable.com/dashboard", "https://www.oweable.com/auth/callback", "https://www.oweable.com/*", "https://horlyscpspctvceddcup.supabase.co/auth/v1/callback"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # JWT issuer URL. If not set, defaults to the local API URL (http://127.0.0.1:<port>/auth/v1).
