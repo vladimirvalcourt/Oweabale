@@ -14,10 +14,11 @@ export default function AuthPage() {
     if (loading) return
     setLoading(true)
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          skipBrowserRedirect: true,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -25,6 +26,22 @@ export default function AuthPage() {
         },
       })
       if (error) throw error
+
+      if (!data?.url) {
+        throw new Error('Failed to start Google sign in')
+      }
+
+      // Always continue OAuth in the top-level browsing context.
+      // This avoids iframe + browser-error-page origin mismatches.
+      try {
+        if (window.top && window.top !== window.self) {
+          window.top.location.href = data.url
+          return
+        }
+      } catch {
+        // Cross-origin access to `window.top` can throw; fall back below.
+      }
+      window.location.href = data.url
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Failed to sign in with Google'
       toast.error(msg)
