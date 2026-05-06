@@ -42,6 +42,7 @@ export const config = {
   matcher: [
     '/',
     '/auth',
+    '/admin/:path*',
     '/assets/:path*',
     '/bills/:path*',
     '/budgets/:path*',
