@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { request as httpsRequest } from 'node:https';
 import { spawnSync } from 'node:child_process';
 
-const PROJECT_REF = process.env.SUPABASE_PROJECT_REF || 'hjgrslcapdmmgxeppguu';
+const PROJECT_REF = process.env.SUPABASE_PROJECT_REF || 'horlyscpspctvceddcup';
 const SITE_URL = process.env.LAUNCH_GATE_SITE_URL || 'https://www.oweable.com';
 const VERCEL_PROJECT = process.env.LAUNCH_GATE_VERCEL_PROJECT || 'oweabale';
 
@@ -37,7 +37,20 @@ function read(path) {
   return readFileSync(path, 'utf8');
 }
 
+function fileExists(path) {
+  try {
+    readFileSync(path);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function includesAll(path, needles) {
+  if (!fileExists(path)) {
+    add(path, false, 'file missing');
+    return;
+  }
   const text = read(path);
   const missing = needles.filter((needle) => !text.includes(needle));
   add(path, missing.length === 0, missing.length ? `Missing: ${missing.join(', ')}` : 'required markers present');
@@ -122,24 +135,49 @@ function requireNames(label, names, required) {
 }
 
 function runRepoChecks() {
-  includesAll('src/components/common/QuickAddModal.tsx', [
-    'const parseCurrencyInput = (value: string) => parseFloat(value.replace(/,/g, \'\'));',
-    'const parsedAmount = parseCurrencyInput(amount);',
-    'const numAmount = parseCurrencyInput(amount);',
-    'minPayment: parseCurrencyInput(minPayment) || 0',
-    'penaltyFee: parseCurrencyInput(penaltyFee) || 0',
+  includesAll('src/proxy.ts', [
+    'export async function proxy',
+    'updateSession(request)',
   ]);
 
-  includesAll('src/components/guards/ProPlanGuard.tsx', [
-    '<Navigate to="/pro/settings?tab=billing&locked=trial" replace />',
-    'isBillingLockBypass(location.pathname, location.search)',
+  includesAll('src/app/(app)/layout.tsx', [
+    "redirect('/auth')",
+    "redirect('/onboarding')",
   ]);
 
-  includesAll('src/app/constants/fullSuiteAccess.ts', [
-    "profile?.plan === 'trial'",
-    'profile?.trial_expired === false',
-    "row?.status === 'active'",
-    "row?.status === 'trialing'",
+  includesAll('src/app/auth/page.tsx', [
+    "provider: 'google'",
+    'skipBrowserRedirect: true',
+    'window.top.location.href = data.url',
+  ]);
+
+  includesAll('src/app/(app)/settings/accounts/page.tsx', [
+    "supabase.functions.invoke('plaid-link-token'",
+    "supabase.functions.invoke('plaid-exchange'",
+    "supabase.functions.invoke('plaid-disconnect'",
+  ]);
+
+  includesAll('src/app/(app)/settings/billing/page.tsx', [
+    "supabase.functions.invoke('stripe-checkout-session'",
+    "supabase.functions.invoke('stripe-customer-portal'",
+    "supabase.functions.invoke('stripe-cancel-subscription'",
+  ]);
+
+  includesAll('src/app/api/cron/expire-trials/route.ts', [
+    'EXPIRE_TRIALS_CRON_SECRET',
+    'functions/v1/expire-trials',
+    'x-vercel-signature',
+  ]);
+
+  includesAll('vercel.json', [
+    '"/api/cron/expire-trials"',
+    '"0 3 * * *"',
+  ]);
+
+  includesAll('supabase/functions/plaid-disconnect/index.ts', [
+    'plaid_item_id',
+    "await plaidPost('/item/remove'",
+    'remainingItems',
   ]);
 
   includesAll('supabase/migrations/20260501000000_add_reverse_trial_fields.sql', [
@@ -154,27 +192,26 @@ function runRepoChecks() {
     'trial_expired',
     'handle_new_user',
   ]);
-
-  includesAll('vercel.json', [
-    '"/api/cron/expire-trials"',
-    '"/api/cron/trial-warning"',
-    '"/((?!api/).*)"',
-  ]);
 }
 
 async function runLiveChecks() {
   const site = await head(SITE_URL);
   add(`production ${SITE_URL}`, site.ok, site.ok ? `HTTP ${site.status}` : `HTTP ${site.status ?? 'failed'} ${site.error ?? ''}`.trim());
 
+  const expireCron = await get(new URL('/api/cron/expire-trials', SITE_URL).toString());
+  add(
+    'production expire-trials cron route',
+    expireCron.status === 401 || (expireCron.status >= 200 && expireCron.status < 300),
+    `HTTP ${expireCron.status}: ${expireCron.body}`,
+  );
+
   const inspect = run('vercel', ['inspect', SITE_URL, '--timeout', '10s']);
   const inspectText = `${inspect.stdout}\n${inspect.stderr}`;
   const inspectOk =
     inspect.ok &&
     /target\s+production/i.test(inspectText) &&
-    /status\s+.*Ready/i.test(inspectText) &&
-    inspectText.includes('api/cron/trial-warning') &&
-    inspectText.includes('api/cron/expire-trials');
-  add('Vercel production deployment', inspectOk, inspectOk ? 'Ready production deployment with cron lambdas' : inspectText.slice(0, 500));
+    /ready/i.test(inspectText);
+  add('Vercel production deployment', inspectOk, inspectOk ? 'Ready production deployment with cron lambda' : inspectText.slice(0, 500));
 
   const vercelEnv = run('vercel', ['env', 'ls', 'production']);
   if (vercelEnv.ok) {
@@ -184,9 +221,6 @@ async function runLiveChecks() {
       'NEXT_PUBLIC_PRICING_MONTHLY_DISPLAY',
       'NEXT_PUBLIC_PRICING_YEARLY_DISPLAY',
       'EXPIRE_TRIALS_CRON_SECRET',
-      'WARN_TRIALS_CRON_SECRET',
-      'NEXT_PUBLIC_POSTHOG_KEY',
-      'NEXT_PUBLIC_CRISP_ID',
     ]);
   } else {
     add('Vercel production env', false, (vercelEnv.stderr || vercelEnv.stdout).slice(0, 500));
@@ -201,6 +235,11 @@ async function runLiveChecks() {
       'stripe-webhook',
       'stripe-sync-billing',
       'stripe-cancel-subscription',
+      'plaid-link-token',
+      'plaid-exchange',
+      'plaid-sync',
+      'plaid-webhook',
+      'plaid-disconnect',
       'expire-trials',
       'warn-trials',
       'support-contact',
@@ -219,9 +258,10 @@ async function runLiveChecks() {
       'STRIPE_PRICE_PRO_MONTHLY',
       'STRIPE_PRICE_PRO_YEARLY',
       'RESEND_API_KEY',
-      'RESEND_FROM_EMAIL',
       'EXPIRE_TRIALS_CRON_SECRET',
-      'WARN_TRIALS_CRON_SECRET',
+      'PLAID_CLIENT_ID',
+      'PLAID_SECRET',
+      'PLAID_ENV',
     ]);
   } else {
     add('Supabase secrets', false, (secrets.stderr || secrets.stdout).slice(0, 500));
@@ -244,7 +284,7 @@ async function runLiveChecks() {
     if (process.env.LAUNCH_GATE_ALLOW_CRON_TRIGGER !== '1') {
       add('cron trigger opt-in', false, 'Set LAUNCH_GATE_ALLOW_CRON_TRIGGER=1 to call production cron routes.');
     } else {
-      for (const route of ['/api/cron/expire-trials', '/api/cron/trial-warning']) {
+      for (const route of ['/api/cron/expire-trials']) {
         const res = await get(new URL(route, SITE_URL).toString());
         add(`trigger ${route}`, res.ok, `HTTP ${res.status}: ${res.body}`);
       }

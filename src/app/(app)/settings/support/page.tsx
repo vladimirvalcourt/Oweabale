@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import { Loader2, HelpCircle, MessageSquare, Mail } from 'lucide-react'
+import { Loader2, MessageSquare, Mail } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

@@ -20,7 +20,6 @@ import {
   TrendingUp,
   Settings,
   Menu,
-  X,
   Bell,
   Search,
   ChevronDown,

@@ -21,7 +21,7 @@ export default function DisplayPage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const { data, error } = await supabase.from('profiles').select('theme,metadata').eq('id', user.id).single()
+      const { data } = await supabase.from('profiles').select('theme,metadata').eq('id', user.id).single()
       if (data) {
         setTheme((data.theme as Theme) || 'dark')
         setCompactMode(data.metadata?.compactMode ?? false)

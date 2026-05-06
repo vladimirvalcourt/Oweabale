@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import Link from 'next/link'
-import { ArrowLeft, TrendingDown, Zap, Calendar, DollarSign, Trophy, Info, CreditCard } from 'lucide-react'
+import { ArrowLeft, TrendingDown, Zap, Trophy, Info, CreditCard } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'

@@ -97,7 +97,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: profile } = await supabaseAdmin
       .from('profiles')
-      .select('email, stripe_customer_id')
+      .select('email, stripe_customer_id, trial_ends_at')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -134,7 +134,19 @@ Deno.serve(async (req: Request) => {
       defaultOrigin,
     );
 
-    const checkoutSessionParams = {
+    // Calculate remaining trial days for users upgrading during their trial
+    const trialEndsAt = profile?.trial_ends_at
+      ? new Date(profile.trial_ends_at as string)
+      : null;
+    const now = new Date();
+    const trialDays =
+      trialEndsAt && trialEndsAt > now
+        ? Math.ceil(
+            (trialEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+          )
+        : undefined;
+
+    const checkoutSessionParams: Record<string, unknown> = {
       mode: plan.mode,
       customer: customerId,
       success_url: successUrl,
@@ -151,6 +163,7 @@ Deno.serve(async (req: Request) => {
           plan_key: plan.planKey,
           feature_key: plan.featureKey,
         },
+        ...(trialDays && trialDays > 0 ? { trial_period_days: trialDays } : {}),
       },
     };
 

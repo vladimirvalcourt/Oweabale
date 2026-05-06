@@ -32,7 +32,7 @@ export default function NotificationsPage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('profiles')
         .select('metadata')
         .eq('id', user.id)

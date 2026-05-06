@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Receipt } from 'lucide-react'
 import { formatMoney, annualize } from '@/lib/formatters'
 import { BillsList } from './BillsList'
 import { AddBillSheet } from './AddBillSheet'
@@ -36,4 +35,3 @@ export default async function BillsPage() {
     </div>
   )
 }
-

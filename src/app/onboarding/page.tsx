@@ -8,7 +8,6 @@ import {
   Receipt, Wallet, CheckCircle2, ArrowRight, Loader2, Sparkles, ChevronRight, SkipForward,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { formatMoney } from '@/lib/formatters'
 
 const steps = [
   { id: 'welcome', label: 'Welcome', icon: Sparkles },

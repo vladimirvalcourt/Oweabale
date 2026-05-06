@@ -36,7 +36,7 @@ export default function AccountsPage() {
   const [tokenLoading, setTokenLoading] = React.useState(false)
   const [now] = React.useState(() => Date.now())
 
-  async function loadData() {
+  const loadData = React.useCallback(async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setLoading(false); return }
     const [{ data: itemsData }, { data: accountsData }] = await Promise.all([
@@ -46,7 +46,7 @@ export default function AccountsPage() {
     setItems(itemsData ?? [])
     setAccounts(accountsData ?? [])
     setLoading(false)
-  }
+  }, [supabase])
 
   React.useEffect(() => {
     let mounted = true
@@ -82,7 +82,7 @@ export default function AccountsPage() {
       const msg = err instanceof Error ? err.message : 'Failed to exchange token'
       toast.error(msg)
     }
-  }, [supabase])
+  }, [loadData, supabase])
 
   const { open, ready } = usePlaidLink({
     token: linkToken ?? '',

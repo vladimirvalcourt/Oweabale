@@ -5,7 +5,6 @@ import {
   BookOpen,
   CreditCard,
   ShieldCheck,
-  RefreshCw,
 } from "lucide-react";
 
 export const metadata = {
