@@ -6,6 +6,29 @@ import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { Loader2, LockKeyhole } from 'lucide-react'
 
+const productionOrigin = 'https://www.oweable.com'
+const localHosts = new Set(['localhost', '127.0.0.1', '[::1]', '::1'])
+
+function getOAuthRedirectOrigin() {
+  const configuredOrigin = process.env.NEXT_PUBLIC_APP_BASE_URL?.trim().replace(/\/$/, '')
+
+  if (configuredOrigin) {
+    try {
+      return new URL(configuredOrigin).origin
+    } catch {
+      // Fall through to the runtime origin below.
+    }
+  }
+
+  if (typeof window === 'undefined') return productionOrigin
+
+  if (process.env.NODE_ENV === 'production' && localHosts.has(window.location.hostname)) {
+    return productionOrigin
+  }
+
+  return window.location.origin
+}
+
 export default function AuthPage() {
   const [loading, setLoading] = useState(false)
   const supabase = createClient()
@@ -17,7 +40,7 @@ export default function AuthPage() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${getOAuthRedirectOrigin()}/auth/callback`,
           skipBrowserRedirect: true,
           queryParams: {
             access_type: 'offline',
