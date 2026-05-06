@@ -9,6 +9,24 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
+function useOnboardingGuard(supabase: ReturnType<typeof createClient>, router: ReturnType<typeof useRouter>) {
+  React.useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        router.replace('/auth')
+        return
+      }
+      const { data: profile } = await supabase.from('profiles').select('has_completed_onboarding').eq('id', user.id).maybeSingle()
+      if (!cancelled && profile?.has_completed_onboarding) {
+        router.replace('/dashboard')
+      }
+    })()
+    return () => { cancelled = true }
+  }, [supabase, router])
+}
+
 const steps = [
   { id: 'welcome', label: 'Welcome', icon: Sparkles },
   { id: 'bill', label: 'First Bill', icon: Receipt },
@@ -19,6 +37,7 @@ const steps = [
 export default function OnboardingPage() {
   const router = useRouter()
   const supabase = createClient()
+  useOnboardingGuard(supabase, router)
   const [step, setStep] = React.useState(0)
   const [loading, setLoading] = React.useState(false)
   const [skipping, setSkipping] = React.useState(false)
@@ -97,7 +116,7 @@ export default function OnboardingPage() {
         .update({ has_completed_onboarding: true })
         .eq('id', user.id)
       if (error) throw error
-      router.push('/dashboard')
+      window.location.href = '/dashboard'
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Failed to finish')
       setLoading(false)
