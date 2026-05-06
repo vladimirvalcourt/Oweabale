@@ -39,6 +39,8 @@ Deno.serve(async (req: Request) => {
       error: authError,
     } = await supabaseAdmin.auth.getUser(jwt);
     if (authError || !user) throw new Error('Unauthorized');
+    const body = (await req.json().catch(() => ({}))) as { plaid_item_id?: string };
+    const plaidItemId = typeof body.plaid_item_id === 'string' ? body.plaid_item_id.trim() : '';
 
     const { data: platform } = await supabaseAdmin.from('platform_settings').select('plaid_enabled').maybeSingle();
     if (platform && platform.plaid_enabled === false) {
@@ -48,10 +50,14 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const { data: items, error: listErr } = await supabaseAdmin
+    let itemQuery = supabaseAdmin
       .from('plaid_items')
       .select('id, access_token')
       .eq('user_id', user.id);
+    if (plaidItemId) {
+      itemQuery = itemQuery.eq('id', plaidItemId);
+    }
+    const { data: items, error: listErr } = await itemQuery;
 
     if (listErr) throw listErr;
 
@@ -63,19 +69,33 @@ Deno.serve(async (req: Request) => {
       }
     }
 
-    const { error: delErr } = await supabaseAdmin.from('plaid_items').delete().eq('user_id', user.id);
+    let deleteQuery = supabaseAdmin.from('plaid_items').delete().eq('user_id', user.id);
+    if (plaidItemId) {
+      deleteQuery = deleteQuery.eq('id', plaidItemId);
+    }
+    const { error: delErr } = await deleteQuery;
     if (delErr) throw delErr;
 
     const now = new Date().toISOString();
+    const { count: remainingItems, error: remainingErr } = await supabaseAdmin
+      .from('plaid_items')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id);
+    if (remainingErr) throw remainingErr;
+
+    const profilePatch: Record<string, string | boolean | null> = {
+      plaid_needs_relink: false,
+      updated_at: now,
+    };
+    if ((remainingItems ?? 0) === 0) {
+      profilePatch.plaid_institution_name = null;
+      profilePatch.plaid_linked_at = null;
+      profilePatch.plaid_last_sync_at = null;
+    }
+
     const { error: profErr } = await supabaseAdmin
       .from('profiles')
-      .update({
-        plaid_institution_name: null,
-        plaid_linked_at: null,
-        plaid_last_sync_at: null,
-        plaid_needs_relink: false,
-        updated_at: now,
-      })
+      .update(profilePatch)
       .eq('id', user.id);
     if (profErr) throw profErr;
 

@@ -119,8 +119,11 @@ export default function AccountsPage() {
   const handleDisconnect = async (id: string) => {
     if (!confirm('Disconnect this bank? All associated accounts will be removed.')) return
     try {
-      const { error } = await supabase.from('plaid_items').delete().eq('id', id)
+      const { data, error } = await supabase.functions.invoke('plaid-disconnect', {
+        body: { plaid_item_id: id },
+      })
       if (error) throw error
+      if (data?.error) throw new Error(data.error)
       toast.success('Bank disconnected')
       setItems(items.filter(i => i.id !== id))
       setAccounts(accounts.filter(a => a.plaid_item_id !== id))
