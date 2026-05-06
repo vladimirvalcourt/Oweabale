@@ -90,12 +90,14 @@ export function LandingPage() {
           <span className="text-sm font-bold tracking-[0.2em] text-(--color-content)">OWEABLE</span>
           <nav className="flex items-center gap-2">
             <Link
+              prefetch={false}
               href="/auth"
               className="rounded-md px-3 py-1.5 text-sm font-medium text-(--color-content-secondary) transition-colors hover:text-(--color-content)"
             >
               Sign in
             </Link>
             <Link
+              prefetch={false}
               href="/auth"
               className="rounded-md bg-(--color-accent) px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-(--color-accent-hover)"
             >
@@ -126,6 +128,7 @@ export function LandingPage() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             {/* Primary CTA — accent (cobalt violet) per Linear pattern */}
             <Link
+              prefetch={false}
               href="/auth"
               className="inline-flex items-center gap-2 rounded-md bg-(--color-accent) px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-(--color-accent-hover)"
             >
@@ -134,6 +137,7 @@ export function LandingPage() {
             </Link>
             {/* Secondary CTA — surface-1 with hairline border */}
             <Link
+              prefetch={false}
               href="/auth"
               className="inline-flex items-center gap-2 rounded-md border border-(--color-surface-border) bg-(--color-surface-raised) px-5 py-2.5 text-sm font-medium text-(--color-content-secondary) transition-colors hover:bg-(--color-surface-elevated) hover:text-(--color-content)"
             >
@@ -248,6 +252,7 @@ export function LandingPage() {
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Link
+                prefetch={false}
                 href="/auth"
                 className="inline-flex items-center gap-2 rounded-md bg-(--color-accent) px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-(--color-accent-hover)"
               >
@@ -255,6 +260,7 @@ export function LandingPage() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
+                prefetch={false}
                 href="/auth"
                 className="inline-flex items-center gap-2 rounded-md border border-(--color-surface-border) bg-(--color-surface-elevated) px-6 py-2.5 text-sm font-medium text-(--color-content-secondary) transition-colors hover:text-(--color-content)"
               >
@@ -285,12 +291,12 @@ export function LandingPage() {
               </p>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/auth" className="text-sm text-(--color-content-secondary) transition-colors hover:text-(--color-content)">
+                  <Link prefetch={false} href="/auth" className="text-sm text-(--color-content-secondary) transition-colors hover:text-(--color-content)">
                     Get started
                   </Link>
                 </li>
                 <li>
-                  <Link href="/auth" className="text-sm text-(--color-content-secondary) transition-colors hover:text-(--color-content)">
+                  <Link prefetch={false} href="/auth" className="text-sm text-(--color-content-secondary) transition-colors hover:text-(--color-content)">
                     Sign in
                   </Link>
                 </li>

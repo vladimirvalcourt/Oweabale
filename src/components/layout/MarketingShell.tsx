@@ -12,12 +12,14 @@ export function MarketingShell({ children }: { children: ReactNode }) {
           </Link>
           <nav className="flex items-center gap-2">
             <Link
+              prefetch={false}
               href="/auth"
               className="rounded-md px-3 py-1.5 text-sm font-medium text-(--color-content-secondary) transition-colors hover:text-(--color-content)"
             >
               Sign in
             </Link>
             <Link
+              prefetch={false}
               href="/auth"
               className="rounded-md bg-(--color-accent) px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-(--color-accent-hover)"
             >
@@ -47,8 +49,8 @@ export function MarketingShell({ children }: { children: ReactNode }) {
                 Product
               </p>
               <ul className="space-y-3">
-                <li><Link href="/auth" className="text-sm text-(--color-content-secondary) transition-colors hover:text-(--color-content)">Get started</Link></li>
-                <li><Link href="/auth" className="text-sm text-(--color-content-secondary) transition-colors hover:text-(--color-content)">Sign in</Link></li>
+                <li><Link prefetch={false} href="/auth" className="text-sm text-(--color-content-secondary) transition-colors hover:text-(--color-content)">Get started</Link></li>
+                <li><Link prefetch={false} href="/auth" className="text-sm text-(--color-content-secondary) transition-colors hover:text-(--color-content)">Sign in</Link></li>
               </ul>
             </div>
             <div>
