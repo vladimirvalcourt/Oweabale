@@ -25,13 +25,13 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Redirect logged-in users away from landing/auth to dashboard
-  if (user && (pathname === '/' || pathname === '/auth')) {
+  // Redirect logged-in users hitting /auth to dashboard
+  if (user && pathname === '/auth') {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   // Redirect unauthenticated users away from app routes
-  if (!user && pathname !== '/' && pathname !== '/auth' && !pathname.startsWith('/auth/')) {
+  if (!user && pathname !== '/auth' && !pathname.startsWith('/auth/')) {
     return NextResponse.redirect(new URL('/auth', request.url))
   }
 
@@ -40,7 +40,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/',
     '/auth',
     '/admin/:path*',
     '/assets/:path*',
