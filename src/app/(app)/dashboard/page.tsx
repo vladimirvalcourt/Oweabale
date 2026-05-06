@@ -25,7 +25,7 @@ export default async function DashboardPage() {
 
   // Parallelize profile + all data queries — eliminates sequential waterfall
   const [profileRes, billsRes, debtsRes, subsRes, goalsRes, incomesRes, transactionsRes, assetsRes] = await Promise.all([
-    supabase.from('profiles').select('first_name,full_name').eq('id', user.id).single(),
+    supabase.from('profiles').select('first_name,full_name,has_completed_onboarding').eq('id', user.id).single(),
     supabase.from('bills').select('id,biller,amount,due_date,status,frequency').eq('user_id', user.id).order('due_date', { ascending: true }),
     supabase.from('debts').select('id,name,remaining,min_payment,payment_due_date,status,frequency').eq('user_id', user.id).order('payment_due_date', { ascending: true }),
     supabase.from('subscriptions').select('id,name,amount,next_billing_date,status,frequency').eq('user_id', user.id).order('next_billing_date', { ascending: true }),
@@ -34,6 +34,10 @@ export default async function DashboardPage() {
     supabase.from('transactions').select('id,name,amount,category,date,type').eq('user_id', user.id).gte('date', thirtyDaysAgo).order('date', { ascending: false }),
     supabase.from('assets').select('value,type').eq('user_id', user.id),
   ])
+
+  if (profileRes.data && !profileRes.data.has_completed_onboarding) {
+    redirect('/onboarding')
+  }
 
   const profile = profileRes.data
   const displayName = profile?.full_name || profile?.first_name || user.email?.split('@')[0] || 'User'

@@ -74,10 +74,9 @@ export default function OnboardingPage() {
       if (!user) throw new Error('Not authenticated')
       const { error } = await supabase.from('incomes').insert({
         user_id: user.id,
-        source: incomeSource,
+        name: incomeSource,
         amount: Number(incomeAmount),
         frequency: incomeFrequency,
-        status: 'active',
       })
       if (error) throw error
       toast.success('Income added')
